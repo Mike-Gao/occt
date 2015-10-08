@@ -224,7 +224,8 @@ is
 
 --private
 
-    TestDeflection(me : in out)
+    TestDeflection(me : in out;
+                   ChoixIso : ConstIsoparametric from IntImp)
 
     	returns StatusDeflection from IntWalk
 	is static;
