@@ -18,9 +18,15 @@
 #define ChFiKPart_ComputeData_PlnPln_HeaderFile
 
 Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
+                                      TopTools_IndexedMapOfShape& theNewFaces,
+                                      TopTools_IndexedMapOfShape& theNewEdges,
+                                      NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+                                      TColStd_MapOfInteger& theIndsChFiFaces,
 				      const Handle(ChFiDS_SurfData)& Data, 
-				      const gp_Pln& Pl1, 
-				      const gp_Pln& Pl2, 
+				      //const gp_Pln& Pl1, 
+				      //const gp_Pln& Pl2, 
+                                      const Handle(BRepAdaptor_HSurface)& S1, 
+                                      const Handle(BRepAdaptor_HSurface)& S2, 
 				      const TopAbs_Orientation Or1,
 				      const TopAbs_Orientation Or2,
 				      const Standard_Real Radius, 

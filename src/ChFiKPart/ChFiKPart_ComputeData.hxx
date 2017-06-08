@@ -25,9 +25,16 @@
 #include <TopAbs_Orientation.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Real.hxx>
+
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <NCollection_IndexedDataMap.hxx>
+#include <TColStd_ListOfInteger.hxx>
+#include <TColStd_MapOfInteger.hxx>
+
 class TopOpeBRepDS_DataStructure;
 class ChFiDS_SurfData;
 class Adaptor3d_HSurface;
+class BRepAdaptor_HSurface;
 class ChFiDS_Spine;
 class gp_Pnt2d;
 
@@ -49,16 +56,68 @@ public:
   
   //! Computes a simple fillet in several particular
   //! cases.
-  Standard_EXPORT static Standard_Boolean Compute (TopOpeBRepDS_DataStructure& DStr, Handle(ChFiDS_SurfData)& Data, const Handle(Adaptor3d_HSurface)& S1, const Handle(Adaptor3d_HSurface)& S2, const TopAbs_Orientation Or1, const TopAbs_Orientation Or2, const Handle(ChFiDS_Spine)& Sp, const Standard_Integer Iedge);
+  Standard_EXPORT static Standard_Boolean Compute (TopOpeBRepDS_DataStructure& DStr,
+                                                   TopTools_IndexedMapOfShape&    theNewFaces,
+                                                   TopTools_IndexedMapOfShape&    theNewEdges,
+                                                   NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+                                                   TColStd_MapOfInteger&          theIndsChFiFaces,
+                                                   Handle(ChFiDS_SurfData)& Data,
+                                                   //const Handle(Adaptor3d_HSurface)& S1,
+                                                   //const Handle(Adaptor3d_HSurface)& S2,
+                                                   const Handle(BRepAdaptor_HSurface)& S1, 
+                                                   const Handle(BRepAdaptor_HSurface)& S2, 
+                                                   const TopAbs_Orientation Or1,
+                                                   const TopAbs_Orientation Or2,
+                                                   const Handle(ChFiDS_Spine)& Sp,
+                                                   const Standard_Integer Iedge);
   
   //! Computes a toric or spheric corner fillet.
-  Standard_EXPORT static Standard_Boolean ComputeCorner (TopOpeBRepDS_DataStructure& DStr, const Handle(ChFiDS_SurfData)& Data, const Handle(Adaptor3d_HSurface)& S1, const Handle(Adaptor3d_HSurface)& S2, const TopAbs_Orientation OrFace1, const TopAbs_Orientation OrFace2, const TopAbs_Orientation Or1, const TopAbs_Orientation Or2, const Standard_Real minRad, const Standard_Real majRad, const gp_Pnt2d& P1S1, const gp_Pnt2d& P2S1, const gp_Pnt2d& P1S2, const gp_Pnt2d& P2S2);
+  Standard_EXPORT static Standard_Boolean ComputeCorner (TopOpeBRepDS_DataStructure& DStr,
+                                                         TopTools_IndexedMapOfShape&    theNewFaces,
+                                                         TopTools_IndexedMapOfShape&    theNewEdges,
+                                                         NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+                                                         TColStd_MapOfInteger&          theIndsChFiFaces,
+                                                         const Handle(ChFiDS_SurfData)& Data,
+                                                         //const Handle(Adaptor3d_HSurface)& S1,
+                                                         //const Handle(Adaptor3d_HSurface)& S2,
+                                                         const Handle(BRepAdaptor_HSurface)& S1, 
+                                                         const Handle(BRepAdaptor_HSurface)& S2, 
+                                                         const TopAbs_Orientation OrFace1,
+                                                         const TopAbs_Orientation OrFace2,
+                                                         const TopAbs_Orientation Or1,
+                                                         const TopAbs_Orientation Or2,
+                                                         const Standard_Real minRad,
+                                                         const Standard_Real majRad,
+                                                         const gp_Pnt2d& P1S1,
+                                                         const gp_Pnt2d& P2S1,
+                                                         const gp_Pnt2d& P1S2,
+                                                         const gp_Pnt2d& P2S2);
   
   //! Computes spheric corner fillet with non iso pcurve on S2.
-  Standard_EXPORT static Standard_Boolean ComputeCorner (TopOpeBRepDS_DataStructure& DStr, const Handle(ChFiDS_SurfData)& Data, const Handle(Adaptor3d_HSurface)& S1, const Handle(Adaptor3d_HSurface)& S2, const TopAbs_Orientation OrFace1, const TopAbs_Orientation OrFace2, const TopAbs_Orientation Or1, const TopAbs_Orientation Or2, const Standard_Real Rad, const gp_Pnt2d& PS1, const gp_Pnt2d& P1S2, const gp_Pnt2d& P2S2);
+  Standard_EXPORT static Standard_Boolean ComputeCorner (TopOpeBRepDS_DataStructure& DStr,
+                                                         const Handle(ChFiDS_SurfData)& Data,
+                                                         const Handle(Adaptor3d_HSurface)& S1,
+                                                         const Handle(Adaptor3d_HSurface)& S2,
+                                                         const TopAbs_Orientation OrFace1,
+                                                         const TopAbs_Orientation OrFace2,
+                                                         const TopAbs_Orientation Or1,
+                                                         const TopAbs_Orientation Or2,
+                                                         const Standard_Real Rad,
+                                                         const gp_Pnt2d& PS1,
+                                                         const gp_Pnt2d& P1S2,
+                                                         const gp_Pnt2d& P2S2);
   
   //! Computes a toric corner rotule.
-  Standard_EXPORT static Standard_Boolean ComputeCorner (TopOpeBRepDS_DataStructure& DStr, const Handle(ChFiDS_SurfData)& Data, const Handle(Adaptor3d_HSurface)& S, const Handle(Adaptor3d_HSurface)& S1, const Handle(Adaptor3d_HSurface)& S2, const TopAbs_Orientation OfS, const TopAbs_Orientation OS, const TopAbs_Orientation OS1, const TopAbs_Orientation OS2, const Standard_Real Radius);
+  Standard_EXPORT static Standard_Boolean ComputeCorner (TopOpeBRepDS_DataStructure& DStr,
+                                                         const Handle(ChFiDS_SurfData)& Data,
+                                                         const Handle(Adaptor3d_HSurface)& S,
+                                                         const Handle(Adaptor3d_HSurface)& S1,
+                                                         const Handle(Adaptor3d_HSurface)& S2,
+                                                         const TopAbs_Orientation OfS,
+                                                         const TopAbs_Orientation OS,
+                                                         const TopAbs_Orientation OS1,
+                                                         const TopAbs_Orientation OS2,
+                                                         const Standard_Real Radius);
 
 
 

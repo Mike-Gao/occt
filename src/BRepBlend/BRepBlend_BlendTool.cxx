@@ -18,7 +18,9 @@
 #include <Adaptor2d_HCurve2d.hxx>
 #include <Adaptor3d_HSurface.hxx>
 #include <Adaptor3d_HVertex.hxx>
+#include <BRepAdaptor_HCurve2d.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepTools.hxx>
 #include <BRepBlend_BlendTool.hxx>
 #include <BRepBlend_HCurve2dTool.hxx>
 #include <BRepClass_FaceClassifier.hxx>
@@ -133,4 +135,20 @@ void BRepBlend_BlendTool::Bounds(const Handle(Adaptor2d_HCurve2d)& A,
 {
   Ufirst = BRepBlend_HCurve2dTool::FirstParameter(A);
   Ulast  = BRepBlend_HCurve2dTool::LastParameter(A);
+}
+
+//=======================================================================
+//function : IsSeam
+//purpose  : 
+//=======================================================================
+Standard_Boolean BRepBlend_BlendTool::IsSeam(const Handle(Adaptor2d_HCurve2d)& C)
+{
+  Handle(BRepAdaptor_HCurve2d) brhc = 
+    Handle(BRepAdaptor_HCurve2d)::DownCast(C);
+
+  if (brhc.IsNull())
+    return Standard_False;
+
+  return BRepTools::IsReallyClosed(((BRepAdaptor_Curve2d *)&(brhc->Curve2d()))->Edge(),
+                                   ((BRepAdaptor_Curve2d *)&(brhc->Curve2d()))->Face());
 }

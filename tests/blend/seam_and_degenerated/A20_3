@@ -1,0 +1,14 @@
+puts "=========================================================================================================================="
+puts "OCC26907: ChFi3d_Builder algorithm uses old Boolean operations: wrong processing of shapes with seam and degenerated edges"
+puts "=========================================================================================================================="
+puts ""
+
+set maxtol 4.e-6
+set volume 3.66724e+06
+
+restore [locate_data_file HollowedBall.brep] a
+explode a e
+
+blend result a 6 a_7 5 a_8 6 a_9
+
+checknbshapes result -solid 1 -shell 1 -face 8 -wire 8 -edge 21 -vertex 13

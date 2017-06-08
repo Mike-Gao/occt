@@ -88,6 +88,8 @@
 #include <TopOpeBRepDS_DataStructure.hxx>
 #include <TopOpeBRepDS_HDataStructure.hxx>
 #include <TopOpeBRepDS_Surface.hxx>
+#include <BRep_Builder.hxx>
+#include <TopExp.hxx>
 
 #ifdef DRAW
 #include <DrawTrSurf.hxx>
@@ -392,6 +394,14 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
   Handle(ChFiDS_SurfData)& 
     fdpiv = CD[pivot]->ChangeSetOfSurfData()->ChangeValue(i[pivot][deb]);
   
+  //jgv
+  Standard_Integer IndexOfNewFaceDeb = fddeb->IndexOfFace();
+  Standard_Integer IndexOfNewFaceFin = fdfin->IndexOfFace();
+  Standard_Integer IndexOfNewFacePiv = fdpiv->IndexOfFace();
+  const TopoDS_Face& FaceDeb = TopoDS::Face(myNewFaces(IndexOfNewFaceDeb));
+  const TopoDS_Face& FaceFin = TopoDS::Face(myNewFaces(IndexOfNewFaceFin));
+  const TopoDS_Face& FacePiv = TopoDS::Face(myNewFaces(IndexOfNewFacePiv));
+  /////
   
   // HSurfaces and other suitable tools are constructed.
   // ----------------------------------------------------------
@@ -405,16 +415,23 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
   const ChFiDS_FaceInterference& bid2 = CD[pivot]->SetOfSurfData()->
     Value(i[pivot][deb])->InterferenceOnS2();
   ppp2 = bid2.PCurveOnSurf()->Value(bid2.LastParameter());
-  Standard_Real uu1 = ppp1.X(), uu2 = ppp2.X(), vv1 =  ppp1.Y(), vv2 =  ppp2.Y(); 
+  Standard_Real uu1 = ppp1.X(), uu2 = ppp2.X(), vv1 =  ppp1.Y(), vv2 =  ppp2.Y();
+
   GeomAdaptor_Surface 
     gasurf((DStr.Surface(CD[pivot]->SetOfSurfData()->
 			 Value(i[pivot][deb])->Surf())).Surface(),
 	   uu1, uu2, vv1, vv2);
+
+  //jgv
+  Standard_Integer IndOfSurf = CD[pivot]->SetOfSurfData()->Value(i[pivot][deb])->IndexOfFace();
+  /////
+  
   GeomAbs_SurfaceType styp = gasurf.GetType();
   if(styp == GeomAbs_Cylinder){
     Standard_Real h = vv2 - vv1;
     vv1 -= 0.5*h;
     vv2 += 0.5*h;
+
     gasurf.Load((DStr.Surface(CD[pivot]->SetOfSurfData()->
 			      Value(i[pivot][deb])->Surf())).Surface(),
 		uu1, uu2, vv1, vv2);
@@ -423,6 +440,7 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
     Standard_Real h = uu2 - uu1;
     uu1 -= 0.1*h;
     uu2 += 0.1*h;
+
     gasurf.Load((DStr.Surface(CD[pivot]->SetOfSurfData()->
 			      Value(i[pivot][deb])->Surf())).Surface(),
 		uu1, uu2, vv1, vv2);
@@ -435,11 +453,18 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
   Handle(GeomAdaptor_HSurface) Surf = new GeomAdaptor_HSurface(gasurf);
   //  Handle(BRepTopAdaptor_TopolTool) IFac = new BRepTopAdaptor_TopolTool(Fac);
   // Try to not classify on the face for cases of reentering fillets which naturally depass 
-  // the border.  
+  // the border.
+
+  //jgv
+  /*
   Handle(GeomAdaptor_HSurface) 
     bidsurf = new GeomAdaptor_HSurface(Fac->ChangeSurface().Surface());
   Handle(Adaptor3d_TopolTool) 
     IFac = new Adaptor3d_TopolTool(bidsurf);
+  */
+  Handle(Adaptor3d_TopolTool) IFac = new Adaptor3d_TopolTool(Fac);
+  /////
+  
   // end of the attempt.
   Handle(Adaptor3d_TopolTool) ISurf = new Adaptor3d_TopolTool(Surf);
   Handle(ChFiDS_Stripe) corner = new ChFiDS_Stripe();
@@ -493,12 +518,17 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
     
 #ifdef OCCT_DEBUG
     ChFi3d_InitChron(ch); // init perf case torus 
-#endif 
+#endif
+
+    BRepAdaptor_Surface BASpiv(FacePiv);
+    Handle(BRepAdaptor_HSurface) BAHSpiv = new BRepAdaptor_HSurface(BASpiv);
     
     // Direct Construction.
     // ---------------------
     done = ChFiKPart_ComputeData::ComputeCorner
-      (DStr,coin,Fac,Surf,oo1,oo2,o1,o2,Rdeb,Rdp,pfac1,pfac2,psurf1,psurf2);
+      //(DStr,coin,Fac,Surf,oo1,oo2,o1,o2,Rdeb,Rdp,pfac1,pfac2,psurf1,psurf2);
+      (DStr,myNewFaces,myNewEdges,myFaceNewEdges,myIndsChFiFaces,
+       coin,Fac,BAHSpiv,oo1,oo2,o1,o2,Rdeb,Rdp,pfac1,pfac2,psurf1,psurf2);
     
 #ifdef OCCT_DEBUG
     ChFi3d_ResultChron(ch , t_torique); // result perf case torus 
@@ -591,7 +621,7 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
 	if(ChFi3d_GetcontextFORCEFILLING()) done = 0;
 #endif
 	if(done && Gf2){
-	  done = CompleteData(coin,func,lin,Fac,Surf,OFac,Gd1,0,Gf1,0);
+	  done = CompleteData(coin,func,lin,Fac,Surf,OFac,IndOfSurf,Gd1,0,Gf1,0);
 	  filling = !done;
 	}
 	else filling = 1;
@@ -613,7 +643,7 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
 	if(ChFi3d_GetcontextFORCEFILLING()) done = 0;
 #endif
 	if(done && Gf2){
-	  done = CompleteData(coin,func,lin,Fac,Surf,OFac,Gd1,0,Gf1,0);
+	  done = CompleteData(coin,func,lin,Fac,Surf,OFac,IndOfSurf,Gd1,0,Gf1,0);
 	  filling = !done;
 	}
 	else filling = 1;
@@ -744,6 +774,46 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
 			DStr.Surface(coin->Surf()).Surface(),C3d,
 			corner->ChangeFirstPCurve(),P1deb,P2deb,
 			tolesp,tol2d,tolreached,0);
+    //jgv
+    Standard_Integer IndexOfCorner = coin->IndexOfFace();
+    
+    Standard_Integer IndexOfE1 = coin->IndexOfEdge(1);
+    Standard_Integer IndexOfE2 = coin->IndexOfEdge(2);
+    TopoDS_Edge Bound1ofNewFace = TopoDS::Edge(myNewEdges(IndexOfE1));
+    TopoDS_Edge Bound2ofNewFace = TopoDS::Edge(myNewEdges(IndexOfE2));
+    TopoDS_Vertex VfirstOfBound1, VlastOfBound1, VfirstOfBound2, VlastOfBound2;
+    TopExp::Vertices(Bound1ofNewFace, VfirstOfBound1, VlastOfBound1);
+    TopExp::Vertices(Bound2ofNewFace, VfirstOfBound2, VlastOfBound2);
+    
+    Standard_Integer IndOfCorner = coin->IndexOfFace();
+    const TopoDS_Face& CornerFace = TopoDS::Face(myNewFaces(IndOfCorner));
+    BRep_Builder BB;
+    
+    TopoDS_Edge EdgeOnFaceDeb;
+    BB.MakeEdge(EdgeOnFaceDeb, C3d, tolreached);
+    BB.UpdateEdge(EdgeOnFaceDeb, corner->FirstPCurve(), CornerFace, 0.);
+    BB.Range(EdgeOnFaceDeb, P1deb,P2deb);
+    VfirstOfBound1.Orientation(TopAbs_FORWARD);
+    VfirstOfBound2.Orientation(TopAbs_REVERSED);
+    BB.Add(EdgeOnFaceDeb, VfirstOfBound1);
+    BB.Add(EdgeOnFaceDeb, VfirstOfBound2);
+
+    gp_Pnt2d aPnt;
+    gp_Vec2d aTangent;
+    corner->FirstPCurve()->D1(P1deb, aPnt, aTangent);
+    aTangent.Normalize();
+    Standard_Boolean IsVerticalPCurveOnEdeb = (aTangent * gp::DY2d() > 0.9);
+
+    Standard_Integer IndEdeb = myNewEdges.Add(EdgeOnFaceDeb);
+    if (IsVerticalPCurveOnEdeb)
+      IndEdeb *= -1;
+    myFaceNewEdges.ChangeFromKey(IndexOfCorner).Append(IndEdeb);
+    IndEdeb *= -1;
+    if (fddeb->Orientation() != coin->Orientation())
+      IndEdeb *= -1;
+    myFaceNewEdges.ChangeFromKey(IndexOfNewFaceDeb).Append(IndEdeb);
+    /////
+    
     TopOpeBRepDS_Curve Tcurv1(C3d,tolreached);
     Icf = DStr.AddCurve(Tcurv1);
     regdeb.SetCurve(Icf);
@@ -764,6 +834,26 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
 			DStr.Surface(coin->Surf()).Surface(),C3d,
 			corner->ChangeLastPCurve(),P1fin,P2fin,
 			tolesp,tol2d,tolreached,0);
+    //jgv
+    TopoDS_Edge EdgeOnFaceFin;
+    BB.MakeEdge(EdgeOnFaceFin, C3d, tolreached);
+    BB.UpdateEdge(EdgeOnFaceFin, corner->LastPCurve(), CornerFace, 0.);
+    BB.Range(EdgeOnFaceFin, P1fin,P2fin);
+    VlastOfBound1.Orientation(TopAbs_FORWARD);
+    VlastOfBound2.Orientation(TopAbs_REVERSED);
+    BB.Add(EdgeOnFaceFin, VlastOfBound1);
+    BB.Add(EdgeOnFaceFin, VlastOfBound2);
+
+    Standard_Integer IndEfin = myNewEdges.Add(EdgeOnFaceFin);
+    if (!IsVerticalPCurveOnEdeb)
+      IndEfin *= -1;
+    myFaceNewEdges.ChangeFromKey(IndexOfCorner).Append(IndEfin);
+    IndEfin *= -1;
+    if (fdfin->Orientation() != coin->Orientation())
+      IndEfin *= -1;
+    myFaceNewEdges.ChangeFromKey(IndexOfNewFaceFin).Append(IndEfin);
+    /////
+    
     TopOpeBRepDS_Curve Tcurv2(C3d,tolreached);
     Icl = DStr.AddCurve(Tcurv2);
     regfin.SetCurve(Icl);
@@ -796,6 +886,37 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
     fddeb->ChangeVertex(isfirst,isurf2) = Pf2;
     fddeb->ChangeInterferenceOnS1().SetParameter(parpp1,isfirst);
     fddeb->ChangeInterferenceOnS2().SetParameter(parpp2,isfirst);
+    
+    //jgv
+    Standard_Integer IndEarc1 = fddeb->IndexOfEdge(isurf1);
+    Standard_Integer IndEarc2 = fddeb->IndexOfEdge(isurf2);
+    TopoDS_Edge EdgeArc1 = TopoDS::Edge(myNewEdges(IndEarc1));
+    EdgeArc1.Orientation(TopAbs_FORWARD);
+    TopoDS_Edge EdgeArc2 = TopoDS::Edge(myNewEdges(IndEarc2));
+    EdgeArc2.Orientation(TopAbs_FORWARD);
+    Standard_Real fpar1, lpar1, fpar2, lpar2;
+    BRep_Tool::Range(EdgeArc1, fpar1, lpar1);
+    BRep_Tool::Range(EdgeArc2, fpar2, lpar2);
+    if (isfirst)
+    {
+      fpar1 = parpp1;
+      fpar2 = parpp2;
+      VfirstOfBound1.Orientation(TopAbs_FORWARD);
+      VfirstOfBound2.Orientation(TopAbs_FORWARD);
+    }
+    else
+    {
+      lpar1 = parpp1;
+      lpar2 = parpp2;
+      VfirstOfBound1.Orientation(TopAbs_REVERSED);
+      VfirstOfBound2.Orientation(TopAbs_REVERSED);
+    }
+    BB.Range(EdgeArc1, fpar1, lpar1);
+    BB.Range(EdgeArc2, fpar2, lpar2);
+    BB.Add(EdgeArc1, VfirstOfBound1);
+    BB.Add(EdgeArc2, VfirstOfBound2);
+    /////
+    
     TopOpeBRepDS_Curve& tcdeb = DStr.ChangeCurve(Icf);
     Handle(Geom_Curve) crefdeb = tcdeb.Curve();
     Standard_Real tolrdeb;
@@ -803,6 +924,9 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
 			DStr.Surface(fddeb->Surf()).Surface(),
 			P1deb,P2deb,tolesp,tolrdeb,rev);
     tcdeb.Tolerance(Max(tolrdeb,tcdeb.Tolerance()));
+    //jgv
+    BB.UpdateEdge(EdgeOnFaceDeb, CD[deb]->PCurve(isfirst), FaceDeb, Max(tolrdeb,tcdeb.Tolerance()));
+    /////
     if(rev) ChFi3d_EnlargeBox(DStr,CD[deb],fddeb,*pbf2,*pbf1,isfirst);
     else ChFi3d_EnlargeBox(DStr,CD[deb],fddeb,*pbf1,*pbf2,isfirst);
     
@@ -826,6 +950,36 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
     fdfin->ChangeVertex(isfirst,isurf2) = Pl2;
     fdfin->ChangeInterferenceOnS1().SetParameter(parpp1,isfirst);
     fdfin->ChangeInterferenceOnS2().SetParameter(parpp2,isfirst);
+    
+    //jgv
+    IndEarc1 = fdfin->IndexOfEdge(isurf1);
+    IndEarc2 = fdfin->IndexOfEdge(isurf2);
+    EdgeArc1 = TopoDS::Edge(myNewEdges(IndEarc1));
+    EdgeArc1.Orientation(TopAbs_FORWARD);
+    EdgeArc2 = TopoDS::Edge(myNewEdges(IndEarc2));
+    EdgeArc2.Orientation(TopAbs_FORWARD);
+    BRep_Tool::Range(EdgeArc1, fpar1, lpar1);
+    BRep_Tool::Range(EdgeArc2, fpar2, lpar2);
+    if (isfirst)
+    {
+      fpar1 = parpp1;
+      fpar2 = parpp2;
+      VlastOfBound1.Orientation(TopAbs_FORWARD);
+      VlastOfBound2.Orientation(TopAbs_FORWARD);
+    }
+    else
+    {
+      lpar1 = parpp1;
+      lpar2 = parpp2;
+      VlastOfBound1.Orientation(TopAbs_REVERSED);
+      VlastOfBound2.Orientation(TopAbs_REVERSED);
+    }
+    BB.Range(EdgeArc1, fpar1, lpar1);
+    BB.Range(EdgeArc2, fpar2, lpar2);
+    BB.Add(EdgeArc1, VlastOfBound1);
+    BB.Add(EdgeArc2, VlastOfBound2);
+    /////
+    
     TopOpeBRepDS_Curve& tcfin = DStr.ChangeCurve(Icl);
     Handle(Geom_Curve) creffin = tcfin.Curve();
     Standard_Real tolrfin;
@@ -833,6 +987,9 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
 			DStr.Surface(fdfin->Surf()).Surface(),
 			P1fin,P2fin,tolesp,tolrfin,rev);
     tcfin.Tolerance(Max(tolrfin,tcfin.Tolerance()));
+    //jgv
+    BB.UpdateEdge(EdgeOnFaceFin, CD[fin]->PCurve(isfirst), FaceFin, Max(tolrfin,tcfin.Tolerance()));
+    /////
     if(rev) ChFi3d_EnlargeBox(DStr,CD[fin],fdfin,*pbl2,*pbl1,isfirst);
     else ChFi3d_EnlargeBox(DStr,CD[fin],fdfin,*pbl1,*pbl2,isfirst);
     
@@ -864,6 +1021,36 @@ void ChFi3d_FilBuilder::PerformThreeCorner(const Standard_Integer Jndex)
     fdpiv->ChangeVertex(isfirst,isurf2) = Pl2;
     fdpiv->ChangeInterference(isurf1).SetParameter(p[pivot][deb],isfirst);
     fdpiv->ChangeInterference(isurf2).SetParameter(p[pivot][fin],isfirst);
+    
+    //jgv
+    IndEarc1 = fdpiv->IndexOfEdge(isurf1);
+    IndEarc2 = fdpiv->IndexOfEdge(isurf2);
+    EdgeArc1 = TopoDS::Edge(myNewEdges(IndEarc1));
+    EdgeArc1.Orientation(TopAbs_FORWARD);
+    EdgeArc2 = TopoDS::Edge(myNewEdges(IndEarc2));
+    EdgeArc2.Orientation(TopAbs_FORWARD);
+    BRep_Tool::Range(EdgeArc1, fpar1, lpar1);
+    BRep_Tool::Range(EdgeArc2, fpar2, lpar2);
+    if (isfirst)
+    {
+      fpar1 = p[pivot][deb]; //parpp1;
+      fpar2 = p[pivot][fin]; //parpp2;
+      VfirstOfBound2.Orientation(TopAbs_FORWARD);
+      VlastOfBound2.Orientation(TopAbs_FORWARD);
+    }
+    else
+    {
+      lpar1 = p[pivot][deb]; //parpp1;
+      lpar2 = p[pivot][fin]; //parpp2;
+      VfirstOfBound2.Orientation(TopAbs_REVERSED);
+      VlastOfBound2.Orientation(TopAbs_REVERSED);
+    }
+    BB.Range(EdgeArc1, fpar1, lpar1);
+    BB.Range(EdgeArc2, fpar2, lpar2);
+    BB.Add(EdgeArc1, VfirstOfBound2);
+    BB.Add(EdgeArc2, VlastOfBound2);
+    /////
+    
     CD[pivot]->InDS(isfirst); // filDS already does it from the corner.
     if(rev) ChFi3d_EnlargeBox(DStr,CD[pivot],fdpiv,*pbl2,*pbf2,isfirst);
     else ChFi3d_EnlargeBox(DStr,CD[pivot],fdpiv,*pbf2,*pbl2,isfirst);

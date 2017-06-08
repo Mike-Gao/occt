@@ -369,7 +369,7 @@ Standard_Boolean
     ChFi3d_FilCommonPoint(lin->EndPointOnSecond(),lin->TransitionOnS2(),
 			  Standard_False, Data->ChangeVertexLastOnS2(), tolesp);
   }
-  done = CompleteData(Data,Func,lin,S1,S2,Or,0,0,0,0);
+  done = CompleteData(Data,Func,lin,S1,S2,Or,0,0,0,0,0); //jgv 0???
   if(!done)  throw Standard_Failure("PerformSurf : Failed approximation!");
 //  maybesingular = (Func.GetMinimalDistance()<=100*tolapp3d);
   Standard_Boolean ok = Standard_False;

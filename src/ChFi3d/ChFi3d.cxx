@@ -144,7 +144,8 @@ Standard_Boolean ChFi3d::IsTangentFaces(const TopoDS_Edge& theEdge,
                                         const TopoDS_Face& theFace2,
                                         const GeomAbs_Shape Order)
 {
-  if (Order == GeomAbs_G1 && BRep_Tool::Continuity(theEdge, theFace1, theFace2) != GeomAbs_C0)
+  if (Order > GeomAbs_C0 &&
+      BRep_Tool::Continuity( theEdge, theFace1, theFace2 ) >= Order)
     return Standard_True;
 
   Standard_Real TolC0 = Max(0.001, 1.5*BRep_Tool::Tolerance(theEdge));

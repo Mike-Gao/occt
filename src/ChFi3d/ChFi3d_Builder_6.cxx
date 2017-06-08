@@ -98,6 +98,7 @@
 #include <TopOpeBRepDS_Surface.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <TopTools_ListOfShape.hxx>
+#include <BRepLib_MakeEdge.hxx>
 
 #include <stdio.h>
 
@@ -533,6 +534,7 @@ Standard_Boolean ChFi3d_Builder::CompleteData
  const Handle(Adaptor3d_HSurface)& S1,
  const Handle(Adaptor3d_HSurface)& S2,
  const TopAbs_Orientation Or1,
+ const Standard_Integer theIndOfFace2,
  const Standard_Boolean Gd1,
  const Standard_Boolean Gd2,
  const Standard_Boolean Gf1,
@@ -558,7 +560,7 @@ Standard_Boolean ChFi3d_Builder::CompleteData
 #ifdef OCCT_DEBUG
   approx.Dump(std::cout);
 #endif
-  return StoreData( Data, approx, lin, S1, S2, Or1, Gd1, Gd2, Gf1, Gf2, Reversed);
+  return StoreData( Data, approx, lin, S1, S2, Or1, theIndOfFace2, Gd1, Gd2, Gf1, Gf2, Reversed);
 } 
 
 
@@ -595,7 +597,7 @@ Standard_Boolean ChFi3d_Builder::CompleteData
   approx.Dump(std::cout);
 #endif
 
-  return StoreData(Data,approx,lin,S1,S2,Or,0,0,0,0,Reversed);
+  return StoreData(Data,approx,lin,S1,S2,Or,0,0,0,0,0,Reversed); //jgv 0???
 } 
 
 
@@ -632,7 +634,7 @@ Standard_Boolean ChFi3d_Builder::CompleteData
   approx.Dump(std::cout);
 #endif
 
-  return StoreData(Data,approx,lin,S1,S2,Or,0,0,0,0);
+  return StoreData(Data,approx,lin,S1,S2,Or,0,0,0,0,0); //jgv 0???
 } 
 
 
@@ -649,6 +651,7 @@ Standard_Boolean ChFi3d_Builder::StoreData(Handle(ChFiDS_SurfData)& Data,
 					   const Handle(Adaptor3d_HSurface)& S1,
 					   const Handle(Adaptor3d_HSurface)& S2,
 					   const TopAbs_Orientation Or1,
+                                           const Standard_Integer theIndOfFace2,
 					   const Standard_Boolean Gd1,
 					   const Standard_Boolean Gd2,
 					   const Standard_Boolean Gf1,
@@ -755,6 +758,7 @@ Standard_Boolean ChFi3d_Builder::StoreData(Handle(ChFiDS_SurfData)& Data,
     BS1 = Handle(BRepAdaptor_HSurface)::DownCast(S1);
   Handle(BRepAdaptor_HSurface) 
     BS2 = Handle(BRepAdaptor_HSurface)::DownCast(S2);
+  TopoDS_Face FaceOfS2;
   Geom2dAPI_ProjectPointOnCurve projector;
 
   Standard_Real Uon1 = UFirst, Uon2 = ULast;
@@ -817,6 +821,28 @@ Standard_Boolean ChFi3d_Builder::StoreData(Handle(ChFiDS_SurfData)& Data,
   if(Reversed) TraOn1 = ChFi3d_TrsfTrans(lin->TransitionOnS2());
   else TraOn1 = ChFi3d_TrsfTrans(lin->TransitionOnS1());
   Fint1.SetInterference(Index1OfCurve,TraOn1,PCurveOnFace,PCurveOnSurf);
+
+  //jgv
+  TopoDS_Edge Boundary1, Boundary2;
+  Boundary1 = BRepLib_MakeEdge(Crv3d1, pppdeb, pppfin);
+  BRep_Builder BB;
+  BB.UpdateEdge(Boundary1, tolcheck);
+  TopLoc_Location aLoc;
+  BB.UpdateEdge(Boundary1, PCurveOnSurf, Surf, aLoc, 0.);
+  BB.UpdateEdge(Boundary1, PCurveOnFace, BS1->ChangeSurface().Face(), 0.);
+  myNewEdges.Add(Boundary1);
+
+  Standard_Integer IndF1, IndF2;
+  if (!myNewFaces.Contains(BS1->ChangeSurface().Face()))
+    myNewFaces.Add(BS1->ChangeSurface().Face());
+  IndF1 = myNewFaces.FindIndex(BS1->ChangeSurface().Face());
+  if (!myFaceNewEdges.Contains(IndF1))
+  {
+    //ChFi3d_ListOfQualifiedEdge aList;
+    TColStd_ListOfInteger aList;
+    myFaceNewEdges.Add(IndF1, aList);
+  }
+  /////
   
   // SurfData is filled in what concerns S2,
   Handle(Geom_Curve) Crv3d2 = Surf->UIso(Uon2);
@@ -870,6 +896,29 @@ Standard_Boolean ChFi3d_Builder::StoreData(Handle(ChFiDS_SurfData)& Data,
     if(Reversed) TraOn2 = ChFi3d_TrsfTrans(lin->TransitionOnS1());
     else TraOn2 = ChFi3d_TrsfTrans(lin->TransitionOnS2());
     Fint2.SetInterference(Index2OfCurve,TraOn2,PCurveOnFace,PCurveOnSurf);
+
+    //jgv
+    Boundary2 = BRepLib_MakeEdge(Crv3d2, pppdeb, pppfin);
+    BB.UpdateEdge(Boundary2, tolcheck);
+    BB.UpdateEdge(Boundary2, PCurveOnSurf, Surf, aLoc, 0.);
+    if (BS2.IsNull())
+      FaceOfS2 = TopoDS::Face(myNewFaces(theIndOfFace2));
+    else
+      FaceOfS2 = BS2->ChangeSurface().Face();
+    //BB.UpdateEdge(Boundary2, PCurveOnFace, BS2->ChangeSurface().Face(), 0.);
+    BB.UpdateEdge(Boundary2, PCurveOnFace, FaceOfS2, 0.);
+    myNewEdges.Add(Boundary2);
+
+    if (!myNewFaces.Contains(FaceOfS2))
+      myNewFaces.Add(FaceOfS2);
+    IndF2 = myNewFaces.FindIndex(FaceOfS2);
+    if (!myFaceNewEdges.Contains(IndF2))
+    {
+      //ChFi3d_ListOfQualifiedEdge aList;
+      TColStd_ListOfInteger aList;
+      myFaceNewEdges.Add(IndF2, aList);
+    }
+    /////
   }
   else {
     Handle(Geom2d_Curve) bidpc;
@@ -932,6 +981,36 @@ Standard_Boolean ChFi3d_Builder::StoreData(Handle(ChFiDS_SurfData)& Data,
     break;
   }
 //  Modified by skv - Wed Jun  9 17:16:26 2004 OCC5898 End
+
+  //Add new face and its new edges in the maps
+  TopoDS_Face aNewFace;
+  BB.MakeFace(aNewFace);
+  BB.UpdateFace(aNewFace, Surf, aLoc, Precision::Confusion());
+  aNewFace.Orientation(Data->Orientation());
+  Standard_Integer IndNewFace = myNewFaces.Add(aNewFace);
+  myIndsChFiFaces.Add(IndNewFace);
+  //ChFi3d_ListOfQualifiedEdge aList;
+  TColStd_ListOfInteger aList;
+  myFaceNewEdges.Add(IndNewFace, aList);
+  Data->ChangeIndexOfFace(IndNewFace);
+
+  Standard_Integer IndE1 = myNewEdges.FindIndex(Boundary1);
+  Data->ChangeIndexOfE1(IndE1);
+  IndE1 *= -1;
+  myFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE1);
+  IndE1 *= -1;
+  if (Data->Orientation() != BS1->ChangeSurface().Face().Orientation())
+    IndE1 *= -1;
+  myFaceNewEdges.ChangeFromKey(IndF1).Append(IndE1);
+
+  Standard_Integer IndE2 = myNewEdges.FindIndex(Boundary2);
+  Data->ChangeIndexOfE2(IndE2);
+  myFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE2);
+  IndE2 *= -1;
+  if (Data->Orientation() != FaceOfS2.Orientation())
+    IndE2 *= -1;
+  myFaceNewEdges.ChangeFromKey(IndF2).Append(IndE2);
+  ////////////////////////
   
   if(!Gd1 && !S1.IsNull())
     ChFi3d_FilCommonPoint(lin->StartPointOnFirst(),lin->TransitionOnS1(),

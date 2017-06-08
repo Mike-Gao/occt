@@ -94,6 +94,8 @@
 #include <TopOpeBRepDS_Surface.hxx>
 #include <TopOpeBRepDS_SurfaceCurveInterference.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
+#include <BRepLib_MakeEdge.hxx>
+#include <BRepLib_MakeVertex.hxx>
 
 static void Reduce(const Standard_Real& p1,
 		   const Standard_Real& p2,
@@ -146,6 +148,8 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
   done = 0;
   const TopoDS_Vertex& Vtx = myVDataMap.FindKey(Index);
   TopOpeBRepDS_DataStructure& DStr = myDS->ChangeDS();
+  BRep_Builder BB;
+  TopoDS_Vertex Vertices [3];
 
   //Information on fillets is extracted 
   //------------------------------------------------------
@@ -161,6 +165,9 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
   ChFiDS_SequenceOfSurfData& SeqFil1 =    
     Corner1->ChangeSetOfSurfData()->ChangeSequence();
   Handle(ChFiDS_SurfData)& Fd1 = SeqFil1.ChangeValue(IFd1);
+  //jgv
+  Standard_Integer IndexOfNewFace1 = Fd1->IndexOfFace();
+  /////
 
   //the second
   //----------
@@ -176,6 +183,9 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
   ChFiDS_SequenceOfSurfData& SeqFil2 =    
     Corner2->ChangeSetOfSurfData()->ChangeSequence();
   Handle(ChFiDS_SurfData)& Fd2 = SeqFil2.ChangeValue(IFd2);
+  //jgv
+  Standard_Integer IndexOfNewFace2 = Fd2->IndexOfFace();
+  /////
 
   // The concavities are analysed in case of differents concavities, 
   // preview an evolutionary connection of type ThreeCorner of R to 0.
@@ -265,7 +275,7 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
   }
   gp_Pnt psp1 = Hpivot->Value(parCP1);
   gp_Pnt psp2 = Hpivot->Value(parCP2);
-  Standard_Real sameparam = (psp1.Distance(psp2) < 10 * tolesp);
+  Standard_Boolean sameparam = (psp1.Distance(psp2) < 10 * tolesp);
    
   TopoDS_Face FF1 = TopoDS::Face(DStr.Shape(Fd1->Index(IFaArc1)));
   TopoDS_Face FF2 = TopoDS::Face(DStr.Shape(Fd2->Index(IFaArc2)));
@@ -346,6 +356,54 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
     // CornerData are updated with results of the intersection. 
     Standard_Real WFirst = Gc->FirstParameter();
     Standard_Real WLast = Gc->LastParameter();
+    
+    //jgv
+    ChFiDS_FaceInterference& InterfArc1 = Fd1->ChangeInterference(IFaArc1);
+    Standard_Integer IndEarc1 = Fd1->IndexOfEdge(IFaArc1);
+    TopoDS_Edge EdgeArc1 = TopoDS::Edge(myNewEdges(IndEarc1));
+    EdgeArc1.Orientation(TopAbs_FORWARD);
+    Standard_Real fpar, lpar;
+    Handle(Geom_Curve) CurveEdgeArc1 = BRep_Tool::Curve(EdgeArc1, fpar, lpar);
+    if (isfirst1)
+      fpar = InterfArc1.FirstParameter();
+    else
+      lpar = InterfArc1.LastParameter();
+    BB.Range(EdgeArc1, fpar, lpar);
+    Vertices[1] = (isfirst1)? TopExp::FirstVertex(EdgeArc1)
+      : TopExp::LastVertex(EdgeArc1);
+    gp_Pnt aPnt = CurveEdgeArc1->Value((isfirst1)? fpar : lpar);
+    if (Vertices[1].IsNull())
+    {
+      Vertices[1] = BRepLib_MakeVertex(aPnt);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirst1)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeArc1, Vertices[1].Oriented(OrOfVer));
+    }
+    else
+      BB.UpdateVertex(Vertices[1], aPnt, 0.);
+    
+    ChFiDS_FaceInterference& InterfArc2 = Fd2->ChangeInterference(IFaArc2);
+    Standard_Integer IndEarc2 = Fd2->IndexOfEdge(IFaArc2);
+    TopoDS_Edge EdgeArc2 = TopoDS::Edge(myNewEdges(IndEarc2));
+    EdgeArc2.Orientation(TopAbs_FORWARD);
+    Handle(Geom_Curve) CurveEdgeArc2 = BRep_Tool::Curve(EdgeArc2, fpar, lpar);
+    if (isfirst2)
+      fpar = InterfArc2.FirstParameter();
+    else
+      lpar = InterfArc2.LastParameter();
+    BB.Range(EdgeArc2, fpar, lpar);
+    TopoDS_Vertex aVertexArc2 = (isfirst2)? TopExp::FirstVertex(EdgeArc2)
+      : TopExp::LastVertex(EdgeArc2);
+    if (!aVertexArc2.IsSame(Vertices[1]))
+    {
+      BB.Remove(EdgeArc2, aVertexArc2);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirst2)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeArc2, Vertices[1].Oriented(OrOfVer));
+    }
+    /////
     Standard_Integer Ipoin1;
     Standard_Integer Ipoin2;
     ChFiDS_CommonPoint& cpco1 = Fd1->ChangeVertex(isfirst1,IFaCo1);
@@ -363,6 +421,32 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
     cpco1.SetPoint(PFaCo);
     cpco1.SetTolerance(Max(tolreached,tolpco));
     Fd1->ChangeInterference(IFaCo1).SetParameter(UIntPC1,isfirst1);
+    //jgv
+    ChFiDS_FaceInterference& Interf1 = Fd1->ChangeInterference(IFaCo1);
+    Standard_Integer IndEsurf1 = Fd1->IndexOfEdge(IFaCo1);
+    TopoDS_Edge EdgeSurf1 = TopoDS::Edge(myNewEdges(IndEsurf1));
+    EdgeSurf1.Orientation(TopAbs_FORWARD);
+    Handle(Geom_Curve) CurveEdgeSurf1 = BRep_Tool::Curve(EdgeSurf1, fpar, lpar);
+    //BRep_Tool::Range(EdgeSurf, fpar, lpar);
+    if (isfirst1)
+      fpar = Interf1.FirstParameter();
+    else
+      lpar = Interf1.LastParameter();
+    BB.Range(EdgeSurf1, fpar, lpar);
+    Vertices[2] = (isfirst1)? TopExp::FirstVertex(EdgeSurf1)
+      : TopExp::LastVertex(EdgeSurf1);
+    aPnt = CurveEdgeSurf1->Value((isfirst1)? fpar : lpar);
+    if (Vertices[2].IsNull())
+    {
+      Vertices[2] = BRepLib_MakeVertex(aPnt);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirst1)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeSurf1, Vertices[2].Oriented(OrOfVer));
+    }
+    else
+      BB.UpdateVertex(Vertices[2], aPnt, 0.);
+    /////
     tolparc = Max(tolparc,tolreached);
     cparc1.SetTolerance(Max(tolparc,tolreached));
     Ipoin1 = ChFi3d_IndexPointInDS(Fd1->Vertex(isfirst1,1),DStr);
@@ -374,6 +458,69 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
     Corner2->SetCurve(ICurv,isfirst2);
     Corner2->ChangePCurve(isfirst2) = PGc2;
     Fd2->ChangeInterference(IFaCo2).SetParameter(UIntPC2,isfirst2);
+    //jgv
+    ChFiDS_FaceInterference& Interf2 = Fd2->ChangeInterference(IFaCo2);
+    Standard_Integer IndEsurf2 = Fd2->IndexOfEdge(IFaCo2);
+    TopoDS_Edge EdgeSurf2 = TopoDS::Edge(myNewEdges(IndEsurf2));
+    EdgeSurf2.Orientation(TopAbs_FORWARD);
+    Handle(Geom_Curve) CurveEdgeSurf2 = BRep_Tool::Curve(EdgeSurf2, fpar, lpar);
+    //BRep_Tool::Range(EdgeSurf, fpar, lpar);
+    if (isfirst2)
+      fpar = Interf2.FirstParameter();
+    else
+      lpar = Interf2.LastParameter();
+    BB.Range(EdgeSurf2, fpar, lpar);
+    TopoDS_Vertex aVertex2 = (isfirst2)? TopExp::FirstVertex(EdgeSurf2)
+      : TopExp::LastVertex(EdgeSurf2);
+    if (!aVertex2.IsSame(Vertices[2]))
+    {
+      BB.Remove(EdgeSurf2, aVertex2);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirst2)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeSurf2, Vertices[2].Oriented(OrOfVer));
+    }
+
+    //Create new edge
+    gp_Pnt aPntVer = BRep_Tool::Pnt(Vertices[IFaArc1]);
+    gp_Pnt aPntFromCurve = Gc->Value(WFirst);
+    Standard_Real aDist = aPntVer.Distance(aPntFromCurve);
+    BB.UpdateVertex(Vertices[IFaArc1], 1.01*aDist);
+    TopoDS_Edge aNewEdge = BRepLib_MakeEdge(Gc,
+                                            Vertices[IFaArc1], Vertices[IFaCo1],
+                                            WFirst, WLast);
+    BB.UpdateEdge(aNewEdge, tolreached);
+    TopLoc_Location aLoc;
+    BB.UpdateEdge(aNewEdge, PGc1, DStr.Surface(Fd1->Surf()).Surface(), aLoc, 0.);
+    BB.UpdateEdge(aNewEdge, PGc2, DStr.Surface(Fd2->Surf()).Surface(), aLoc, 0.);
+    myNewEdges.Add(aNewEdge);
+    //Temporary
+    //TopAbs_Orientation Or1 = Fd1->Orientation();
+    //TopAbs_Orientation Or2 = Fd2->Orientation();
+    ///////////
+    Standard_Integer IndE = myNewEdges.FindIndex(aNewEdge);
+    Standard_Boolean IsFirstArcForward = Standard_True;
+    const TColStd_ListOfInteger& Elist = myFaceNewEdges.FindFromKey(IndexOfNewFace1);
+    TColStd_ListIteratorOfListOfInteger itl(Elist);
+    for (; itl.More(); itl.Next())
+    {
+      Standard_Integer anIndexOfEdge = itl.Value();
+      if (Abs(anIndexOfEdge) == IndEarc1)
+      {
+        IsFirstArcForward = (anIndexOfEdge > 0);
+        break;
+      }
+    }
+    if ((isfirst1  && IFaArc1 == 1 && IsFirstArcForward) ||
+        (!isfirst1 && IFaArc1 == 2 && IsFirstArcForward))
+      IndE *= -1;
+    //QualifiedEdge aQE(IndE, Et);
+    myFaceNewEdges.ChangeFromKey(IndexOfNewFace1).Append(IndE);
+    Standard_Integer IndE_forNewFace2 = IndE;
+    if (Fd1->Orientation() == Fd2->Orientation())
+      IndE_forNewFace2 *= -1;
+    myFaceNewEdges.ChangeFromKey(IndexOfNewFace2).Append(IndE_forNewFace2);
+    /////
     Fd2->ChangeVertex(isfirst2,IFaCo2) = Fd1->Vertex(isfirst1,IFaCo1);
     Fd2->ChangeVertex(isfirst2,IFaArc2) = Fd1->Vertex(isfirst1,IFaArc1);
     if (IFaCo1!=IFaCo2) Corner2->SetOrientation(TopAbs_REVERSED,isfirst2);
@@ -414,6 +561,7 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
     Standard_Integer IFaCoBig, IFaCoSma, IFaArcBig, IFaArcSma;
     Standard_Boolean isfirstBig, isfirstSma;
     Standard_Real UIntPCBig, UIntPCSma;
+    Standard_Integer IndexOfSmaNewFace, IndexOfBigNewFace;
     
     if((parcrois && parCP2 > parCP1) || (!parcrois && parCP2 < parCP1)){
       UIntPCBig = UIntPC2; UIntPCSma = UIntPC1; 
@@ -423,6 +571,7 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
       IFaCoBig = IFaCo2; IFaCoSma = IFaCo1;
       IFaArcBig = IFaArc2; IFaArcSma = IFaArc1;
       isfirstBig = isfirst2; isfirstSma = isfirst1;
+      IndexOfSmaNewFace = IndexOfNewFace1; IndexOfBigNewFace = IndexOfNewFace2;
     }
     else{
       UIntPCBig = UIntPC1, UIntPCSma = UIntPC2; 
@@ -432,6 +581,7 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
       IFaCoBig = IFaCo1; IFaCoSma = IFaCo2;
       IFaArcBig = IFaArc1; IFaArcSma = IFaArc2;
       isfirstBig = isfirst1; isfirstSma = isfirst2;
+      IndexOfSmaNewFace = IndexOfNewFace2; IndexOfBigNewFace = IndexOfNewFace1;
     }
     
     //Intersection of the big with the small :
@@ -511,10 +661,62 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
     psmaco.SetPoint(PFaCo);
     psmaco.SetTolerance(Max(tolpco,tolreached));
     SmaFD->ChangeInterference(IFaCoSma).SetParameter(UIntPCSma,isfirstSma);
+    //jgv
+    ChFiDS_FaceInterference& SmaInterf = SmaFD->ChangeInterference(IFaCoSma);
+    Standard_Integer IndEsmall = SmaFD->IndexOfEdge(IFaCoSma);
+    TopoDS_Edge EdgeSmall = TopoDS::Edge(myNewEdges(IndEsmall));
+    EdgeSmall.Orientation(TopAbs_FORWARD);
+    Standard_Real fpar, lpar;
+    Handle(Geom_Curve) CurveEdgeSma = BRep_Tool::Curve(EdgeSmall, fpar, lpar);
+    //BRep_Tool::Range(EdgeSmall, fpar, lpar);
+    if (isfirstSma)
+      fpar = SmaInterf.FirstParameter();
+    else
+      lpar = SmaInterf.LastParameter();
+    BB.Range(EdgeSmall, fpar, lpar);
+    Vertices[2] = (isfirstSma)? TopExp::FirstVertex(EdgeSmall)
+      : TopExp::LastVertex(EdgeSmall);
+    gp_Pnt aPnt = CurveEdgeSma->Value((isfirstSma)? fpar : lpar);
+    if (Vertices[2].IsNull())
+    {
+      Vertices[2] = BRepLib_MakeVertex(aPnt);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirstSma)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeSmall, Vertices[2].Oriented(OrOfVer));
+    }
+    else
+      BB.UpdateVertex(Vertices[2], aPnt, 0.);
+    /////
     psmamil.Reset();
     psmamil.SetPoint(PMil);
     psmamil.SetTolerance(Max(tolpmil,tolreached));
     SmaFD->ChangeInterference(IFaArcSma).SetParameter(wi,isfirstSma);
+    //jgv
+    ChFiDS_FaceInterference& SmaArcInterf = SmaFD->ChangeInterference(IFaArcSma);
+    Standard_Integer IndEarcsmall = SmaFD->IndexOfEdge(IFaArcSma);
+    TopoDS_Edge EdgeArcSmall = TopoDS::Edge(myNewEdges(IndEarcsmall));
+    EdgeArcSmall.Orientation(TopAbs_FORWARD);
+    Handle(Geom_Curve) CurveEdgeArcSma = BRep_Tool::Curve(EdgeArcSmall, fpar, lpar);
+    if (isfirstSma)
+      fpar = SmaArcInterf.FirstParameter();
+    else
+      lpar = SmaArcInterf.LastParameter();
+    BB.Range(EdgeArcSmall, fpar, lpar);
+    Vertices[1] = (isfirstSma)? TopExp::FirstVertex(EdgeArcSmall)
+      : TopExp::LastVertex(EdgeArcSmall);
+    aPnt = CurveEdgeArcSma->Value((isfirstSma)? fpar : lpar);
+    if (Vertices[1].IsNull())
+    {
+      Vertices[1] = BRepLib_MakeVertex(aPnt);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirstSma)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeArcSmall, Vertices[1].Oriented(OrOfVer));
+    }
+    else
+      BB.UpdateVertex(Vertices[1], aPnt, 0.);
+    /////
     IpointCo = ChFi3d_IndexPointInDS(psmaco,DStr);
     SmaCD->SetIndexPoint(IpointCo,isfirstSma,IFaCoSma);
     IpointMil = ChFi3d_IndexPointInDS(psmamil,DStr);
@@ -525,6 +727,87 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
     BigCD->SetIndexPoint(IpointCo,isfirstBig,IFaCoBig);
     BigFD->ChangeVertex(isfirstBig,IFaCoBig) = psmaco;
     BigFD->ChangeInterference(IFaCoBig).SetParameter(UIntPCBig,isfirstBig);
+    //jgv
+    ChFiDS_FaceInterference& BigInterf = BigFD->ChangeInterference(IFaCoBig);
+    Standard_Integer IndEbig = BigFD->IndexOfEdge(IFaCoBig);
+    TopoDS_Edge EdgeBig = TopoDS::Edge(myNewEdges(IndEbig));
+    EdgeBig.Orientation(TopAbs_FORWARD);
+
+    //???
+    TopoDS_Vertex BigVer [3];
+    Handle(Geom_Curve) CurveEdgeBig = BRep_Tool::Curve(EdgeBig, fpar, lpar);
+    //BRep_Tool::Range(EdgeBig, fpar, lpar);
+    if (isfirstBig)
+      fpar = BigInterf.FirstParameter();
+    else
+      lpar = BigInterf.LastParameter();
+    BB.Range(EdgeBig, fpar, lpar);
+    BigVer[2] = (isfirstBig)? TopExp::FirstVertex(EdgeBig)
+      : TopExp::LastVertex(EdgeBig);
+    aPnt = CurveEdgeBig->Value((isfirstBig)? fpar : lpar);
+    //if (BigVer[2].IsNull())
+    if (!BigVer[2].IsSame(Vertices[2]))
+    {
+      //BigVer[2] = BRepLib_MakeVertex(aPnt);
+      BB.Remove(EdgeBig, BigVer[2]);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirstBig)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeBig, Vertices[2].Oriented(OrOfVer));
+    }
+    /////
+    
+    ChFiDS_FaceInterference& BigArcInterf = BigFD->ChangeInterference(IFaArcBig);
+    Standard_Integer IndEarcbig = BigFD->IndexOfEdge(IFaArcBig);
+    TopoDS_Edge EdgeArcBig = TopoDS::Edge(myNewEdges(IndEarcbig));
+    EdgeArcBig.Orientation(TopAbs_FORWARD);
+
+    //???
+    Handle(Geom_Curve) CurveEdgeArcBig = BRep_Tool::Curve(EdgeArcBig, fpar, lpar);
+    if (isfirstBig)
+      fpar = BigArcInterf.FirstParameter();
+    else
+      lpar = BigArcInterf.LastParameter();
+    BB.Range(EdgeArcBig, fpar, lpar);
+    BigVer[1] = (isfirstBig)? TopExp::FirstVertex(EdgeArcBig)
+      : TopExp::LastVertex(EdgeArcBig);
+    aPnt = CurveEdgeArcBig->Value((isfirstBig)? fpar : lpar);
+    if (BigVer[1].IsNull())
+    {
+      BigVer[1] = BRepLib_MakeVertex(aPnt);
+      TopAbs_Orientation OrOfVer = TopAbs_FORWARD;
+      if (!isfirstBig)
+        OrOfVer = TopAbs_REVERSED;
+      BB.Add(EdgeArcBig, BigVer[1].Oriented(OrOfVer));
+    }
+    else
+      BB.UpdateVertex(BigVer[1], aPnt, 0.);
+    /////
+    
+    //Create new edge
+    gp_Pnt aPntVer = BRep_Tool::Pnt(Vertices[2]);
+    gp_Pnt aPntFromCurve = Gc->Value(WFirst);
+    Standard_Real aDist = aPntVer.Distance(aPntFromCurve);
+    BB.UpdateVertex(Vertices[2], 1.01*aDist);
+    TopoDS_Edge aNewEdge = BRepLib_MakeEdge(Gc,
+                                            Vertices[2], Vertices[1],
+                                            WFirst, WLast);
+    BB.UpdateEdge(aNewEdge, tolreached);
+    TopLoc_Location aLoc;
+    BB.UpdateEdge(aNewEdge, PGc1, DStr.Surface(SmaFD->Surf()).Surface(), aLoc, 0.);
+    BB.UpdateEdge(aNewEdge, PGc2, DStr.Surface(BigFD->Surf()).Surface(), aLoc, 0.);
+    myNewEdges.Add(aNewEdge);
+    Standard_Integer IndE = myNewEdges.FindIndex(aNewEdge);
+    if (isfirstSma  && IFaArcSma == 1 ||
+        !isfirstSma && IFaArcSma == 2)
+      IndE *= -1;
+    //QualifiedEdge aQE(IndE, Et);
+    myFaceNewEdges.ChangeFromKey(IndexOfSmaNewFace).Append(IndE);
+    Standard_Integer IndE_forBigNewFace = IndE;
+    if (SmaFD->Orientation() == BigFD->Orientation())
+      IndE_forBigNewFace *= -1;
+    myFaceNewEdges.ChangeFromKey(IndexOfBigNewFace).Append(IndE_forBigNewFace);
+    /////
     
     TopOpeBRepDS_ListOfInterference& Li = DStr.ChangeCurveInterferences(ICurv);
     Handle(TopOpeBRepDS_CurvePointInterference) Interfp;
@@ -619,6 +902,37 @@ Standard_Boolean ChFi3d_Builder::PerformTwoCornerbyInter(const Standard_Integer 
       // End of update of the BigCD and the DS.
     WFirst = Gc->FirstParameter();
     WLast = Gc->LastParameter();
+
+    //Create additional new edge
+    TopoDS_Edge anAdditionalNewEdge = BRepLib_MakeEdge(Gc,
+                                                       Vertices[1], BigVer[1],
+                                                       WFirst, WLast);
+    BB.UpdateEdge(anAdditionalNewEdge, tolreached);
+    BB.UpdateEdge(anAdditionalNewEdge, PGc1, F, 0.);
+    BB.UpdateEdge(anAdditionalNewEdge, PGc2, DStr.Surface(BigFD->Surf()).Surface(), aLoc, 0.);
+    myNewEdges.Add(anAdditionalNewEdge);
+    IndE = myNewEdges.FindIndex(anAdditionalNewEdge);
+    if (IndE_forBigNewFace < 0)
+      IndE *= -1;
+    //QualifiedEdge aQE(IndE, Et);
+    myFaceNewEdges.ChangeFromKey(IndexOfBigNewFace).Append(IndE);
+    Standard_Integer IndE_forOldFace = IndE;
+    if (BigFD->Orientation() == F.Orientation())
+      IndE_forOldFace *= -1;
+    
+    Standard_Integer IndF;
+    if (!myNewFaces.Contains(F))
+      myNewFaces.Add(F);
+    IndF = myNewFaces.FindIndex(F);
+    if (!myFaceNewEdges.Contains(IndF))
+    {
+      //ChFi3d_ListOfQualifiedEdge aList;
+      TColStd_ListOfInteger aList;
+      myFaceNewEdges.Add(IndF, aList);
+    }
+    myFaceNewEdges.ChangeFromKey(IndF).Append(IndE_forOldFace);
+    /////
+    
     ICurv = DStr.AddCurve(TopOpeBRepDS_Curve(Gc,tolreached));
     cpend.SetTolerance(Max(cpend.Tolerance(),tolreached));
     IpointArc = ChFi3d_IndexPointInDS(cpend,DStr);

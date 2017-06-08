@@ -1279,7 +1279,7 @@ ChFi3d_FilBuilder::PerformSurf(ChFiDS_SequenceOfSurfData&          SeqData,
           ChFi3d_InitChron(ch);// init  perf  CompleteData
 #endif
 
-    done = CompleteData(Data,Func,lin,S1,S2,Or,gd1,gd2,gf1,gf2);
+          done = CompleteData(Data,Func,lin,S1,S2,Or,0,gd1,gd2,gf1,gf2); //jgv 0???
 
 #ifdef OCCT_DEBUG
          ChFi3d_ResultChron(ch , t_completedata);// result perf CompleteData
@@ -1313,7 +1313,7 @@ ChFi3d_FilBuilder::PerformSurf(ChFiDS_SequenceOfSurfData&          SeqData,
           ChFi3d_InitChron(ch);// init perf CompleteData
 #endif
 
-    done = CompleteData(Data,Func,lin,S1,S2,Or,gd1,gd2,gf1,gf2);
+          done = CompleteData(Data,Func,lin,S1,S2,Or,0,gd1,gd2,gf1,gf2); //jgv 0???
 
 #ifdef OCCT_DEBUG
          ChFi3d_ResultChron(ch , t_completedata);// result perf CompleteData

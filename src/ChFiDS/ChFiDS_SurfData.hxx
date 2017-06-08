@@ -81,6 +81,12 @@ public:
   
     void ChangeIndexOfS2 (const Standard_Integer Index);
   
+    void ChangeIndexOfFace (const Standard_Integer Index);
+  
+    void ChangeIndexOfE1 (const Standard_Integer Index);
+  
+    void ChangeIndexOfE2 (const Standard_Integer Index);
+  
     void ChangeSurf (const Standard_Integer Index);
   
     void SetIndexOfC1 (const Standard_Integer Index);
@@ -105,7 +111,11 @@ public:
   
   Standard_EXPORT ChFiDS_FaceInterference& ChangeInterference (const Standard_Integer OnS);
   
+  Standard_EXPORT Standard_Integer IndexOfFace () const;
+  
   Standard_EXPORT Standard_Integer Index (const Standard_Integer OfS) const;
+  
+  Standard_EXPORT Standard_Integer IndexOfEdge(const Standard_Integer OfS) const;
   
   //! returns one of the four vertices  wether First is true
   //! or wrong and OnS equals 1 or 2.
@@ -187,7 +197,11 @@ private:
   Standard_Integer indexOfC1;
   Standard_Integer indexOfS2;
   Standard_Integer indexOfC2;
+  Standard_Integer indexOfE1;
+  Standard_Integer indexOfE2;
+  Standard_Integer indexOfFace;
   Standard_Integer indexOfConge;
+  
   Standard_Boolean isoncurv1;
   Standard_Boolean isoncurv2;
   Standard_Boolean twistons1;

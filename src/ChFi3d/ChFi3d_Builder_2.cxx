@@ -2419,7 +2419,8 @@ void ChFi3d_Builder::PerformSetOfKPart(Handle(ChFiDS_Stripe)& Stripe,
       Handle(ChFiDS_SurfData)   SD = new ChFiDS_SurfData();
       ChFiDS_SequenceOfSurfData LSD;
       
-      if(!ChFiKPart_ComputeData::Compute(DStr,SD,HS1,HS2,Or1,Or2,Spine,iedge)){
+      if(!ChFiKPart_ComputeData::Compute(DStr,myNewFaces,myNewEdges,myFaceNewEdges,myIndsChFiFaces,
+                                         SD,HS1,HS2,Or1,Or2,Spine,iedge)){
 #ifdef OCCT_DEBUG
 	std::cout<<"failed calculation KPart"<<std::endl;
 #endif
@@ -2728,9 +2729,10 @@ void ChFi3d_Builder::PerformSetOfKGen(Handle(ChFiDS_Stripe)& Stripe,
 //  Modified by Sergey KHROMOV - Wed Feb  5 12:03:17 2003 Begin
 // 	  if(ChFi3d_IntTraces(prevsd,prevpar1,nprevpar1,1,1,
 // 			      nextsd,nextpar1,nnextpar1,1,-1,p2d)){
+          TopoDS_Face FaceOfPCurves = TopoDS::Face(DStr.Shape(prevsd->Index(1)));
 	  if(ChFi3d_IntTraces(prevsd,prevpar1,nprevpar1,1,1,
-			      nextsd,nextpar1,nnextpar1,1,-1,p2d,
-			      Standard_False, Standard_True)){
+			      nextsd,nextpar1,nnextpar1,1,-1,
+                              FaceOfPCurves,p2d,Standard_False, Standard_True)){
 //  Modified by Sergey KHROMOV - Wed Feb  5 12:03:17 2003 End
 	    previntf1.SetLastParameter(nprevpar1);
 	    nextintf1.SetFirstParameter(nnextpar1);
@@ -2786,9 +2788,10 @@ void ChFi3d_Builder::PerformSetOfKGen(Handle(ChFiDS_Stripe)& Stripe,
 //  Modified by Sergey KHROMOV - Wed Feb  5 12:03:17 2003 Begin
 // 	  if(ChFi3d_IntTraces(prevsd,prevpar2,nprevpar2,2,1,
 // 			      nextsd,nextpar2,nnextpar2,2,-1,p2d)){
+          TopoDS_Face FaceOfPCurves = TopoDS::Face(DStr.Shape(prevsd->Index(2)));
 	  if(ChFi3d_IntTraces(prevsd,prevpar2,nprevpar2,2,1,
-			      nextsd,nextpar2,nnextpar2,2,-1,p2d,
-			      Standard_False, Standard_True)){
+			      nextsd,nextpar2,nnextpar2,2,-1,
+                              FaceOfPCurves,p2d,Standard_False, Standard_True)){
 //  Modified by Sergey KHROMOV - Wed Feb  5 12:03:17 2003 End
 	    previntf2.SetLastParameter(nprevpar2);
 	    nextintf2.SetFirstParameter(nnextpar2);
@@ -2985,7 +2988,8 @@ void ChFi3d_Builder::PerformSetOfKGen(Handle(ChFiDS_Stripe)& Stripe,
 	    TColStd_ListOfInteger li;
 	    myEVIMap.Bind(Ej,li);
 	  }
-	  myEVIMap.ChangeFind(Ej).Append(cursd->Surf());
+	  //myEVIMap.ChangeFind(Ej).Append(cursd->Surf());
+	  myEVIMap.ChangeFind(Ej).Append(cursd->IndexOfFace());
 	}
       }
       else if(IF < IL){

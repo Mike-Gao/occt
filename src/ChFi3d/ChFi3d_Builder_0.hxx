@@ -81,6 +81,14 @@ Standard_Real ChFi3d_InPeriod(const Standard_Real U,
 			      const Standard_Real ULast,
 			      const Standard_Real Eps);
 
+void ChFi3d_AdjustSecondPointToFirstPoint(const gp_Pnt2d& theFirstPoint,
+                                          gp_Pnt2d& theSecondPoint,
+                                          const BRepAdaptor_Surface& theSurf);
+
+void ChFi3d_SplitAndAdjust(const TopTools_ListOfShape& theElist,
+                           TopTools_ListOfShape& theNewElist,
+                           const BRepAdaptor_Surface& theBAsurf);
+
 void ChFi3d_Boite(const gp_Pnt2d& p1,const gp_Pnt2d& p2,
 		  Standard_Real& mu,Standard_Real& Mu,
 		  Standard_Real& mv,Standard_Real& Mv);
@@ -327,6 +335,7 @@ Standard_Boolean ChFi3d_IntTraces(const Handle(ChFiDS_SurfData)& fd1,
 				  Standard_Real&                 p2,
 				  const Standard_Integer         jf2,
 				  const Standard_Integer         sens2,
+                                  const TopoDS_Face&             theFace,
 				  const gp_Pnt2d&                RefP2d,
 				  const Standard_Boolean         Check2dDistance = Standard_False,
 				  const Standard_Boolean         enlarge = Standard_False);
@@ -560,6 +569,9 @@ Standard_Integer ChFi3d_NumberOfEdges(const TopoDS_Vertex& Vtx,
 Standard_Integer ChFi3d_NumberOfSharpEdges(const TopoDS_Vertex& Vtx,
                                            const ChFiDS_Map& VEMap,
                                            const ChFiDS_Map& EFmap);
+
+Standard_Boolean ChFi3d_IsInSingularity(const TopoDS_Vertex& Vtx,
+                                        const ChFiDS_Map& VEMap);
 
 void ChFi3d_cherche_vertex (const TopoDS_Edge & E1,
 			    const TopoDS_Edge & E2,

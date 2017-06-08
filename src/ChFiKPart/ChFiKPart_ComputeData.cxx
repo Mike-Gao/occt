@@ -82,6 +82,10 @@
 #include <TopOpeBRepDS_Curve.hxx>
 #include <TopOpeBRepDS_DataStructure.hxx>
 #include <TopOpeBRepDS_Surface.hxx>
+#include <TColStd_ListOfInteger.hxx>
+#include <TColStd_MapOfInteger.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepLib_MakeVertex.hxx>
 
 //#include <BRepAdaptor_Curve2d.hxx>
 //#include <BRepAdaptor_HCurve2d.hxx>
@@ -91,9 +95,15 @@
 //=======================================================================
  Standard_Boolean ChFiKPart_ComputeData::Compute
  (TopOpeBRepDS_DataStructure&    DStr, 
+  TopTools_IndexedMapOfShape&    theNewFaces,
+  TopTools_IndexedMapOfShape&    theNewEdges,
+  NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+  TColStd_MapOfInteger&          theIndsChFiFaces,
   Handle(ChFiDS_SurfData)&       Data, 
-  const Handle(Adaptor3d_HSurface)& S1, 
-  const Handle(Adaptor3d_HSurface)& S2, 
+  //const Handle(Adaptor3d_HSurface)& S1, 
+  //const Handle(Adaptor3d_HSurface)& S2, 
+  const Handle(BRepAdaptor_HSurface)& S1, 
+  const Handle(BRepAdaptor_HSurface)& S2, 
   const TopAbs_Orientation       Or1, 
   const TopAbs_Orientation       Or2, 
   const Handle(ChFiDS_Spine)&    Sp, 
@@ -115,15 +125,16 @@
 
   // Return orientations.
   TopAbs_Orientation OrFace1 = TopAbs_FORWARD, OrFace2 = TopAbs_FORWARD;
-  Handle(BRepAdaptor_HSurface) HS = Handle(BRepAdaptor_HSurface)::DownCast(S1);
-  if (!HS.IsNull()) OrFace1 = HS->ChangeSurface().Face().Orientation();
-  HS = Handle(BRepAdaptor_HSurface)::DownCast(S2);
-  if (!HS.IsNull()) OrFace2 = HS->ChangeSurface().Face().Orientation();
+  //Handle(BRepAdaptor_HSurface) HS = Handle(BRepAdaptor_HSurface)::DownCast(S1);
+  OrFace1 = S1->ChangeSurface().Face().Orientation();
+  //HS = Handle(BRepAdaptor_HSurface)::DownCast(S2);
+  OrFace2 = S2->ChangeSurface().Face().Orientation();
   
   if(!Spine.IsNull()){
     Standard_Real Radius = Spine->Radius(Iedge);
     if ( typ1 == GeomAbs_Plane && typ2 == GeomAbs_Plane ){
-      surfok = ChFiKPart_MakeFillet(DStr,Data,S1->Plane(),S2->Plane(), 
+      surfok = ChFiKPart_MakeFillet(DStr,theNewFaces,theNewEdges,theFaceNewEdges,theIndsChFiFaces,
+                                    Data,S1,S2, 
 				    Or1,Or2,Radius,Spine->Line(),
 				    Wref,OrFace1);
     }
@@ -134,7 +145,8 @@
 				      Or1,Or2,Radius,Spine->Line(),
 				      Wref,OrFace1,Standard_True);
 	else
-	  surfok = ChFiKPart_MakeFillet(DStr,Data,S1->Plane(),S2->Cylinder(),
+	  surfok = ChFiKPart_MakeFillet(DStr,theNewFaces,theNewEdges,theFaceNewEdges,theIndsChFiFaces,
+                                        Data,S1,S2,
 					S2->FirstUParameter(),S2->LastUParameter(),
 					Or1,Or2,Radius,Spine->Circle(),
 					Wref,OrFace1,Standard_True);
@@ -146,7 +158,8 @@
 				      Or2,Or1,Radius,Spine->Line(),
 				      Wref,OrFace2,Standard_False);
       else 
-	surfok = ChFiKPart_MakeFillet(DStr,Data,S2->Plane(),S1->Cylinder(), 
+	surfok = ChFiKPart_MakeFillet(DStr,theNewFaces,theNewEdges,theFaceNewEdges,theIndsChFiFaces,
+                                      Data,S2,S1, 
 				      S1->FirstUParameter(),S1->LastUParameter(),
 				      Or2,Or1,Radius,Spine->Circle(),
 				      Wref,OrFace2,Standard_False);
@@ -342,9 +355,15 @@
 
 Standard_Boolean ChFiKPart_ComputeData::ComputeCorner
   (TopOpeBRepDS_DataStructure& DStr,
+  TopTools_IndexedMapOfShape&    theNewFaces,
+  TopTools_IndexedMapOfShape&    theNewEdges,
+  NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+  TColStd_MapOfInteger&          theIndsChFiFaces,
    const Handle(ChFiDS_SurfData)& Data, 
-   const Handle(Adaptor3d_HSurface)& S1, 
-   const Handle(Adaptor3d_HSurface)& S2,
+   //const Handle(Adaptor3d_HSurface)& S1, 
+   //const Handle(Adaptor3d_HSurface)& S2,
+   const Handle(BRepAdaptor_HSurface)& S1, 
+   const Handle(BRepAdaptor_HSurface)& S2, 
    const TopAbs_Orientation OrFace1,
    const TopAbs_Orientation,
    const TopAbs_Orientation Or1,
@@ -378,9 +397,10 @@ Standard_Boolean ChFiKPart_ComputeData::ComputeCorner
     fu = First;
     lu = Last;
   }
-  surfok = ChFiKPart_MakeFillet(DStr,Data,S1->Plane(),cyl, 
-			       fu,lu,Or1,Or2,minRad,circ,
-			       First,OrFace1,Standard_True);
+  surfok = ChFiKPart_MakeFillet(DStr,theNewFaces,theNewEdges,theFaceNewEdges,theIndsChFiFaces,
+                                Data,S1,S2,/*S1->Plane(),cyl,*/
+                                fu,lu,Or1,Or2,minRad,circ,
+                                First,OrFace1,Standard_True);
   if(surfok){
     if ( typ2 != GeomAbs_Cylinder ){
       Data->ChangeInterferenceOnS2().ChangePCurveOnFace() = 
@@ -394,6 +414,36 @@ Standard_Boolean ChFiKPart_ComputeData::ComputeCorner
     Data->ChangeInterferenceOnS1().SetLastParameter(Last);
     Data->ChangeInterferenceOnS2().SetFirstParameter(First);
     Data->ChangeInterferenceOnS2().SetLastParameter(Last);
+
+    //jgv
+    Standard_Integer IndexOfE1 = Data->IndexOfEdge(1);
+    Standard_Integer IndexOfE2 = Data->IndexOfEdge(2);
+    TopoDS_Edge Bound1 = TopoDS::Edge(theNewEdges(IndexOfE1));
+    TopoDS_Edge Bound2 = TopoDS::Edge(theNewEdges(IndexOfE2));
+    BRep_Builder BB;
+    BB.Range(Bound1, First, Last);
+    BB.Range(Bound2, First, Last);
+    if (!BRep_Tool::Degenerated(Bound1))
+    {
+      BRepAdaptor_Curve BAcurve(Bound1);
+      gp_Pnt aPnt = BAcurve.Value(First);
+      TopoDS_Vertex V1 = BRepLib_MakeVertex(aPnt);
+      BB.Add(Bound1, V1);
+      aPnt = BAcurve.Value(Last);
+      TopoDS_Vertex V2 = BRepLib_MakeVertex(aPnt);
+      V2.Reverse();
+      BB.Add(Bound1, V2);
+    }
+    BRepAdaptor_Curve BAcurve(Bound2);
+    gp_Pnt aPnt = BAcurve.Value(First);
+    TopoDS_Vertex V1 = BRepLib_MakeVertex(aPnt);
+    BB.Add(Bound2, V1);
+    aPnt = BAcurve.Value(Last);
+    TopoDS_Vertex V2 = BRepLib_MakeVertex(aPnt);
+    V2.Reverse();
+    BB.Add(Bound2, V2);
+    /////
+    
     return Standard_True;
   }
   return Standard_False;

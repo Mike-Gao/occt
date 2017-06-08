@@ -1520,7 +1520,7 @@ ChFi3d_ChBuilder::PerformSurf(ChFiDS_SequenceOfSurfData&          SeqData,
 		       Inside,Appro,Forward,Soldep,intf,intl,
 		       gd1,gd2,gf1,gf2,RecOnS1,RecOnS2);
     if(!done) return Standard_False; // ratrappage possible PMN 14/05/1998
-    done = CompleteData(Data,*pFunc,lin,S1,S2,Or,gd1,gd2,gf1,gf2);
+    done = CompleteData(Data,*pFunc,lin,S1,S2,Or,0,gd1,gd2,gf1,gf2); //jgv 0???
     if(!done) throw Standard_Failure("PerformSurf : Fail of approximation!");
   }
   else if (chsp->IsChamfer() == ChFiDS_TwoDist) {
@@ -1571,7 +1571,7 @@ ChFi3d_ChBuilder::PerformSurf(ChFiDS_SequenceOfSurfData&          SeqData,
 		       Inside,Appro,Forward,Soldep,intf,intl,
 		       gd1,gd2,gf1,gf2,RecOnS1,RecOnS2);
     if(!done) return Standard_False; // ratrappage possible PMN 14/05/1998
-    done = CompleteData(Data,*pFunc,lin,S1,S2,Or,gd1,gd2,gf1,gf2);
+    done = CompleteData(Data,*pFunc,lin,S1,S2,Or,0,gd1,gd2,gf1,gf2); //jgv 0???
     if(!done) throw Standard_Failure("PerformSurf : Fail of approximation!");
   }
   else { //distance and angle
@@ -1591,7 +1591,7 @@ ChFi3d_ChBuilder::PerformSurf(ChFiDS_SequenceOfSurfData&          SeqData,
                        gd1,gd2,gf1,gf2,RecOnS1,RecOnS2);
     
     if(!done) return Standard_False; // ratrappage possible PMN 14/05/1998
-    done = CompleteData(Data,Func,lin,S1,S2,Or,gd1,gd2,gf1,gf2);
+    done = CompleteData(Data,Func,lin,S1,S2,Or,0,gd1,gd2,gf1,gf2); //jgv 0???
     if(!done) throw Standard_Failure("PerformSurf : Fail of approximation!");
   }
   

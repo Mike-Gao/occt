@@ -55,8 +55,10 @@
 #include <BRepAdaptor_HSurface.hxx>
 #include <BRepAlgo_NormalProjection.hxx>
 #include <BRepBlend_Line.hxx>
+#include <BRepLib_MakeVertex.hxx>
 #include <BRepLib_MakeEdge.hxx>
 #include <BRepLib_MakeFace.hxx>
+#include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_TopolTool.hxx>
 #include <ChFi3d_Builder.hxx>
@@ -154,6 +156,23 @@ extern void ChFi3d_InitChron(OSD_Chronometer& ch);
 extern void ChFi3d_ResultChron(OSD_Chronometer & ch,Standard_Real& time);
 #endif
 
+//=======================================================================
+//function : UpdateEdgeTolerance
+//purpose  : 
+//=======================================================================
+
+static void UpdateEdgeTolerance(const TopoDS_Edge& theEdge,
+                                const TopoDS_Face& theFace)
+{
+  BRep_Builder BB;
+  BRepLib_CheckCurveOnSurface aCS(theEdge, theFace);
+  aCS.Perform();
+  if (aCS.IsDone())
+  {
+    Standard_Real aMaxDist = aCS.MaxDistance();
+    BB.UpdateEdge(theEdge, aMaxDist);
+  }
+}
 
 //=======================================================================
 //function : Indices
@@ -1115,6 +1134,11 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
     CD.SetValue(0,cnext);
     Index.SetValue(0,ChFi3d_IndexOfSurfData(V1,cnext,sense));
     sens.SetValue(0,sense);
+    //jgv
+    //const Handle(ChFiDS_SurfData)& SDfa = CD(0)->SetOfSurfData()->Value(Index.Value(0));
+    //Standard_Integer indfa = SDfa->IndexOfFace();
+    //const TopoDS_Face& aFace = TopoDS::Face(myNewFaces(indfa)); 
+    /////
     numfa.SetValue(0 ,1,SurfIndex(CD, 0, Index.Value(0), FACE2));
     numfa.SetValue(1 ,0, numfa.Value(0 ,1));
     Fcur=TopoDS::Face(DStr.Shape(numfa.Value(0,1)));
@@ -2053,7 +2077,13 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
 // declaration for plate 
   GeomPlate_BuildPlateSurface PSurf(3,10,3,tol2d,tolesp,angular);
 
-// calculation of curves on surface for each stripe 
+// calculation of curves on surface for each stripe
+
+  //jgv
+  BRep_Builder BB;
+  ChFiDS_SequenceOfSurfData SeqSD;
+  TopTools_Array1OfShape aVertices(0, nedge), aNewEdges(0, nedge);
+  /////
   for (ic=0;ic<nedge;ic++) {
     gp_Pnt2d p2d1, p2d2;
     if (!sharp.Value(ic)) {
@@ -2063,7 +2093,13 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
       Calcul_P2dOnSurf(CD.Value(ic),jfp,i.Value(ic,icmoins),p.Value(ic,icmoins),p2d1);
       Calcul_P2dOnSurf(CD.Value(ic),jf.Value(ic),i.Value(ic,icplus),p.Value(ic,icplus),p2d2);
 //      if (i[ic][icplus]!=  i[ic][icmoins]) std::cout<<"probleme surface"<<std::endl;
-      indice= SurfIndex(CD, ic, i.Value(ic,icplus), ChFiSURFACE);
+      //jgv
+      const Handle(ChFiDS_SurfData)& aSD = CD(ic)->SetOfSurfData()->Value(i.Value(ic,icplus));
+      SeqSD.Append(aSD);
+      Standard_Integer ind_surf = aSD->IndexOfFace();
+      const TopoDS_Face& FaceSurf = TopoDS::Face(myNewFaces(ind_surf)); 
+      /////
+      indice = SurfIndex(CD, ic, i.Value(ic,icplus), ChFiSURFACE);
       Handle (GeomAdaptor_HSurface) Asurf =
 	new GeomAdaptor_HSurface(DStr.Surface(indice).Surface());
       // calculation of curve 2d  
@@ -2086,6 +2122,122 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
       isfirst=(sens.Value(ic)==1);
       GeomLib::BuildCurve3d(tolapp,CurvOnS,CurvOnS.FirstParameter(),
 			    CurvOnS.LastParameter(),Curv3d,maxapp,avedev);
+      //jgv
+      Standard_Integer IndE1 = aSD->IndexOfEdge(jfp);
+      Standard_Integer IndE2 = aSD->IndexOfEdge(jf.Value(ic));
+      const TopoDS_Edge& EdgeOnS1 = TopoDS::Edge(myNewEdges(IndE1));
+      const TopoDS_Edge& EdgeOnS2 = TopoDS::Edge(myNewEdges(IndE2));
+
+      TopoDS_Vertex VertexOnE1, VertexOnE2;
+      
+      TopoDS_Vertex FirstVonE1, LastVonE1, FirstVonE2, LastVonE2;
+      TopExp::Vertices(EdgeOnS1, FirstVonE1, LastVonE1);
+      if (isfirst && !FirstVonE1.IsNull())
+      {
+        VertexOnE1 = FirstVonE1;
+        //aVertices(ic) = FirstVonE1;
+      }
+      else if (!isfirst && !LastVonE1.IsNull())
+      {
+        VertexOnE1 = LastVonE1;
+        //aVertices(ic) = LastVonE1;
+      }
+      TopExp::Vertices(EdgeOnS2, FirstVonE2, LastVonE2);
+      if (isfirst && !FirstVonE2.IsNull())
+      {
+        VertexOnE2 = FirstVonE2;
+        //aVertices(ic+1) = FirstVonE2;
+      }
+      else if (!isfirst && !LastVonE2.IsNull())
+      {
+        VertexOnE2 = LastVonE2;
+        //aVertices(ic+1) = LastVonE2;
+      }
+      
+      TopoDS_Edge aNewEdge;
+      BB.MakeEdge(aNewEdge, Curv3d, maxapp);
+      BB.UpdateEdge(aNewEdge, pcurve, FaceSurf, Precision::Confusion());
+      BB.Range(aNewEdge, CurvOnS.FirstParameter(), CurvOnS.LastParameter());
+      
+      gp_Pnt FirstPnt = Curv3d->Value(CurvOnS.FirstParameter());
+      gp_Pnt LastPnt  = Curv3d->Value(CurvOnS.LastParameter());
+      //TopoDS_Vertex aV1, aV2;
+      //gp_Pnt PntForV1, PntForV2;
+      Standard_Real fpar, lpar, fpar2, lpar2;
+      BRep_Tool::Range(EdgeOnS1, fpar, lpar);
+      BRep_Tool::Range(EdgeOnS2, fpar2, lpar2);
+      
+      if (!VertexOnE1.IsNull())
+        BB.UpdateVertex(VertexOnE1, FirstPnt, Precision::Confusion());
+      if (!VertexOnE2.IsNull())
+        BB.UpdateVertex(VertexOnE2, LastPnt, Precision::Confusion());
+      
+      if (aVertices(ic).IsNull())
+      {
+        if (VertexOnE1.IsNull())
+          aVertices(ic) = BRepLib_MakeVertex(FirstPnt);
+        else
+          aVertices(ic) = VertexOnE1;
+      }
+      else
+      {
+        const TopoDS_Vertex& aV1 = TopoDS::Vertex(aVertices(ic));
+        gp_Pnt aPnt = BRep_Tool::Pnt(aV1);
+        gp_Pnt MidPnt((aPnt.XYZ() + FirstPnt.XYZ())/2);
+        BB.UpdateVertex(aV1, MidPnt, 1.001*aPnt.Distance(MidPnt));
+      }
+      if (aVertices(ic+1).IsNull())
+      {
+        if (VertexOnE2.IsNull())
+          aVertices(ic+1) = BRepLib_MakeVertex(LastPnt);
+        else
+          aVertices(ic+1) = VertexOnE2;
+      }
+      else
+      {
+        const TopoDS_Vertex& aV2 = TopoDS::Vertex(aVertices(ic+1));
+        gp_Pnt aPnt = BRep_Tool::Pnt(aV2);
+        gp_Pnt MidPnt((aPnt.XYZ() + LastPnt.XYZ())/2);
+        BB.UpdateVertex(aV2, MidPnt, 1.001*aPnt.Distance(MidPnt));
+      }
+
+      TopoDS_Edge F_EdgeOnS1 = EdgeOnS1;
+      F_EdgeOnS1.Orientation(TopAbs_FORWARD);
+      TopoDS_Edge F_EdgeOnS2 = EdgeOnS2;
+      F_EdgeOnS2.Orientation(TopAbs_FORWARD);
+      if (isfirst)
+      {
+        BB.Range(F_EdgeOnS1, p.Value(ic,icmoins), lpar);
+        if (VertexOnE1.IsNull())
+          BB.Add(F_EdgeOnS1, aVertices(ic).Oriented(TopAbs_FORWARD));
+        //else
+        //BB.UpdateVertex(VertexOnE1, );
+        BB.Range(F_EdgeOnS2, p.Value(ic,icplus), lpar2);
+        if (VertexOnE2.IsNull())
+          BB.Add(F_EdgeOnS2, aVertices(ic+1).Oriented(TopAbs_FORWARD));
+        //else
+      }
+      else
+      {
+        BB.Range(F_EdgeOnS1, fpar, p.Value(ic,icmoins));
+        if (VertexOnE1.IsNull())
+          BB.Add(F_EdgeOnS1, aVertices(ic).Oriented(TopAbs_REVERSED));
+        //else
+        BB.Range(F_EdgeOnS2, fpar2, p.Value(ic,icplus));
+        if (VertexOnE2.IsNull())
+          BB.Add(F_EdgeOnS2, aVertices(ic+1).Oriented(TopAbs_REVERSED));
+        //else
+      }
+
+      BB.Add(aNewEdge, aVertices(ic).Oriented(TopAbs_FORWARD));
+      BB.Add(aNewEdge, aVertices(ic+1).Oriented(TopAbs_REVERSED));
+      if (ic == 0)
+        aVertices(nedge) = aVertices(0);
+      myNewEdges.Add(aNewEdge);
+      aNewEdges(ic) = aNewEdge;
+      //Standard_Integer IndNewEdge = myNewEdges.FindIndex(aNewEdge);
+      //myFaceNewEdges.ChangeFromKey(ind_surf).Append(IndNewEdge);
+      /////
       TopOpeBRepDS_Curve tcurv3d( Curv3d,maxapp);
       indcurve3d.SetValue(n3d,DStr.AddCurve(tcurv3d));
       gp_Pnt point1,point2; 
@@ -2240,7 +2392,12 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
 	}
 	p2d2 = curv2d2 ->Value(p.Value(icplus,ic));
 
-	Asurf = new GeomAdaptor_HSurface(BRep_Tool::Surface(TopoDS::Face(Fvive.Value(ic,icplus))));
+        //jgv
+        const TopoDS_Face& Aface = TopoDS::Face(Fvive.Value(ic,icplus));
+        //Standard_Integer IndAface = myNewFaces.FindIndex(Aface);
+        /////
+	//Asurf = new GeomAdaptor_HSurface(BRep_Tool::Surface(TopoDS::Face(Fvive.Value(ic,icplus))));
+	Asurf = new GeomAdaptor_HSurface(BRep_Tool::Surface(Aface));
 	Standard_Real tolu,tolv,ratio; 
 	tolu=Asurf->Surface().UResolution(1.e-3);
 	tolv=Asurf->Surface().VResolution(1.e-3);
@@ -2382,6 +2539,43 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
            parfin= CurvOnS.LastParameter();
            curveint= new Geom_TrimmedCurve(Curv3d,pardeb,parfin);
          }
+         //jgv
+         else
+         {
+           pardeb = curveint->FirstParameter();
+           parfin = curveint->LastParameter();
+         }
+         /////
+
+         //jgv
+         TopoDS_Edge aNewEdge;
+         BB.MakeEdge(aNewEdge, curveint, maxapp1);
+         BB.UpdateEdge(aNewEdge, pcurve, Aface, Precision::Confusion());
+         BB.Range(aNewEdge, pardeb, parfin);
+         gp_Pnt Pnts [2];
+         Pnts[0] = curveint->Value(pardeb);
+         Pnts[1] = curveint->Value(parfin);
+         TopoDS_Vertex aVV [2];
+         for (Standard_Integer indv = 0; indv < 2; indv++)
+         {
+           if (aVertices(ic + indv).IsNull())
+             aVV[indv] = BRepLib_MakeVertex(Pnts[indv]);
+           else
+           {
+             aVV[indv] = TopoDS::Vertex(aVertices(ic + indv));
+             gp_Pnt aPnt = BRep_Tool::Pnt(aVV[indv]);
+             gp_Pnt MidPnt((aPnt.XYZ() + Pnts[indv].XYZ())/2);
+             BB.UpdateVertex(aVV[indv], MidPnt, 1.001*aPnt.Distance(MidPnt));
+           }
+           aVertices(ic + indv) = aVV[indv];
+         }
+         BB.Add(aNewEdge, aVV[0].Oriented(TopAbs_FORWARD));
+         BB.Add(aNewEdge, aVV[1].Oriented(TopAbs_REVERSED));
+         myNewEdges.Add(aNewEdge);
+         aNewEdges(ic) = aNewEdge;
+         //Standard_Integer IndNewEdge = myNewEdges.FindIndex(aNewEdge);
+         //myFaceNewEdges.ChangeFromKey(IndAface).Append(IndNewEdge);
+         /////
 
          //storage in the DS  
          TopOpeBRepDS_Curve tcurv3d( curveint,maxapp1);
@@ -2734,6 +2928,18 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
 //     if (scal>0) orplate=orsurfdata;
 //     else  orplate=TopAbs::Reverse(orsurfdata);  
     orplate = PlateOrientation(Surf,PSurf.Curves2d(),SumFaceNormalAtV1);
+
+    //jgv
+    TopoDS_Face aNewFace;
+    BB.MakeFace(aNewFace);
+    TopLoc_Location aLoc;
+    BB.UpdateFace(aNewFace, Surf, aLoc, Precision::Confusion());
+    aNewFace.Orientation(orplate);
+    Standard_Integer IndNewFace = myNewFaces.Add(aNewFace);
+    myIndsChFiFaces.Add(IndNewFace);
+    TColStd_ListOfInteger aList;
+    myFaceNewEdges.Add(IndNewFace, aList);
+    /////
     
     //  creation of solidinterderence for Plate 
     Handle(TopOpeBRepDS_SolidSurfaceInterference) SSI = 
@@ -2830,8 +3036,14 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
 	Indices(nedge,ic,icplus,icmoins);
 	
 	isfirst=(sens.Value(ic)==1);
-      //   calculate curves interference relative to stripes
       
+        //jgv
+        const Handle(ChFiDS_SurfData)& aSD = CD(ic)->SetOfSurfData()->Value(i.Value(ic,icplus));
+        Standard_Integer ind_surf = aSD->IndexOfFace();
+        //const TopoDS_Face& FaceSurf = TopoDS::Face(myNewFaces(ind_surf)); 
+        /////
+        
+        //   calculate curves interference relative to stripes
 	apperror=Mapp.CriterionError()*coef;
 	pardeb=CD.Value(ic)->PCurve(isfirst)->FirstParameter();
 	parfin=CD.Value(ic)->PCurve(isfirst)->LastParameter();
@@ -2848,7 +3060,23 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
 	TopOpeBRepDS_Point& tpt1= DStr.ChangePoint(indpoint(ic,0));
 	TopOpeBRepDS_Point& tpt2= DStr.ChangePoint(indpoint(ic,1));
 	tpt1.Tolerance (tpt1.Tolerance()+apperror);
-	tpt2.Tolerance (tpt2.Tolerance()+apperror ); 
+	tpt2.Tolerance (tpt2.Tolerance()+apperror );
+
+        //jgv
+        Handle(Geom2d_Curve) aPCurve = PSurf.Curves2d()->Value(n3d);
+        BB.UpdateEdge(TopoDS::Edge(aNewEdges(ic)), aPCurve, aNewFace, Precision::Confusion());
+        UpdateEdgeTolerance(TopoDS::Edge(aNewEdges(ic)), aNewFace);
+
+        Standard_Integer IndE = myNewEdges.FindIndex(aNewEdges(ic));
+        //Temporary
+        IndE *= -1;
+        ///////////
+        myFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE);
+        IndE *= -1;
+        if (orplate != aSD->Orientation())
+          IndE *= -1;
+        myFaceNewEdges.ChangeFromKey(ind_surf).Append(IndE);
+        /////
 	
       // calculate surfaceinterference
 	Interfc=ChFi3d_FilCurveInDS(indcurve3d.Value(n3d),Isurf,
@@ -2889,6 +3117,26 @@ void  ChFi3d_Builder::PerformMoreThreeCorner(const Standard_Integer Jndex,
 	  // actual connection
 	  if (!moresurf.Value(ic)){
 	    n3d++;
+
+            //jgv
+            const TopoDS_Face& Aface = TopoDS::Face(Fvive.Value(ic,icplus));
+            Standard_Integer IndAface = myNewFaces.FindIndex(Aface);
+            
+            Handle(Geom2d_Curve) aPCurve = PSurf.Curves2d()->Value(n3d);
+            BB.UpdateEdge(TopoDS::Edge(aNewEdges(ic)), aPCurve, aNewFace, Precision::Confusion());
+            UpdateEdgeTolerance(TopoDS::Edge(aNewEdges(ic)), aNewFace);
+            
+            Standard_Integer IndE = myNewEdges.FindIndex(aNewEdges(ic));
+            //Temporary
+            IndE *= -1;
+            ///////////
+            myFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE);
+            IndE *= -1;
+            if (orplate != Aface.Orientation())
+              IndE *= -1;
+            myFaceNewEdges.ChangeFromKey(IndAface).Append(IndE);
+            /////
+            
 	    TopOpeBRepDS_Curve& tcourb1 = DStr.ChangeCurve(indcurve3d.Value(n3d));
 	    tcourb1.Tolerance(tcourb1.Tolerance()+apperror);
 	    if (!deuxconges) {

@@ -15,7 +15,8 @@
 // commercial license or contractual agreement.
 
 
-#include <Adaptor3d_HSurface.hxx>
+//#include <Adaptor3d_HSurface.hxx>
+#include <BRepAdaptor_HSurface.hxx>
 #include <ChFiDS_Spine.hxx>
 #include <ChFiDS_SurfData.hxx>
 #include <ChFiKPart_ComputeData.hxx>
@@ -40,15 +41,25 @@
 #include <IntAna_QuadQuadGeo.hxx>
 #include <Precision.hxx>
 #include <TopOpeBRepDS_DataStructure.hxx>
+#include <TColStd_ListOfInteger.hxx>
+#include <TColStd_MapOfInteger.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepLib_MakeEdge.hxx>
 
 //=======================================================================
 //function : MakeFillet
 //Purpose  : cas plan/plan.
 //=======================================================================
 Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
+                                      TopTools_IndexedMapOfShape& theNewFaces,
+                                      TopTools_IndexedMapOfShape& theNewEdges,
+                                      NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+                                      TColStd_MapOfInteger& theIndsChFiFaces,
 				      const Handle(ChFiDS_SurfData)& Data, 
-				      const gp_Pln& Pl1, 
-				      const gp_Pln& Pl2, 
+				      //const gp_Pln& Pl1, 
+				      //const gp_Pln& Pl2, 
+                                      const Handle(BRepAdaptor_HSurface)& S1, 
+                                      const Handle(BRepAdaptor_HSurface)& S2, 
 				      const TopAbs_Orientation Or1,
 				      const TopAbs_Orientation Or2,
 				      const Standard_Real Radius, 
@@ -56,6 +67,31 @@ Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
 				      const Standard_Real First, 
 				      const TopAbs_Orientation Of1)
 {
+  Standard_Integer IndF1, IndF2;
+  const TopoDS_Face& F1 = S1->ChangeSurface().Face();
+  const TopoDS_Face& F2 = S2->ChangeSurface().Face();
+  
+  if (!theNewFaces.Contains(F1))
+    theNewFaces.Add(F1);
+  IndF1 = theNewFaces.FindIndex(F1);
+  if (!theFaceNewEdges.Contains(IndF1))
+  {
+    //ChFi3d_ListOfQualifiedEdge aList;
+    TColStd_ListOfInteger aList;
+    theFaceNewEdges.Add(IndF1, aList);
+  }
+  if (!theNewFaces.Contains(F2))
+    theNewFaces.Add(F2);
+  IndF2 = theNewFaces.FindIndex(F2);
+  if (!theFaceNewEdges.Contains(IndF2))
+  {
+    //ChFi3d_ListOfQualifiedEdge aList;
+    TColStd_ListOfInteger aList;
+    theFaceNewEdges.Add(IndF2, aList);
+  }
+
+  gp_Pln Pl1 = S1->Plane();
+  gp_Pln Pl2 = S2->Plane();
 
 //calcul du cylindre
   gp_Ax3 Pos1 = Pl1.Position();
@@ -146,6 +182,77 @@ Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
   Data->ChangeInterferenceOnS2().
     SetInterference(ChFiKPart_IndexCurveInDS(GLinPln2,DStr),
 		    trans,GLin2dPln2,GLin2dCyl2);
+
+  //Add new face and its new edges in the maps
+  BRep_Builder BB;
+  TopLoc_Location aLoc;
+  TopoDS_Face aNewFace;
+  BB.MakeFace(aNewFace);
+  BB.UpdateFace(aNewFace, gcyl, aLoc, Precision::Confusion());
+  aNewFace.Orientation(Data->Orientation());
+  Standard_Integer IndNewFace = theNewFaces.Add(aNewFace);
+  theIndsChFiFaces.Add(IndNewFace);
+  //ChFi3d_ListOfQualifiedEdge aList;
+  TColStd_ListOfInteger aList;
+  theFaceNewEdges.Add(IndNewFace, aList);
+  Data->ChangeIndexOfFace(IndNewFace);
+
+  TopoDS_Edge Boundary1, Boundary2;
+  Boundary1 = BRepLib_MakeEdge(GLinPln1);
+  BB.UpdateEdge(Boundary1, GLin2dPln1, F1, 0.);
+  BB.UpdateEdge(Boundary1, GLin2dCyl1, aNewFace, 0.);
+  theNewEdges.Add(Boundary1);
+
+  /*
+  Standard_Integer IndE1 = theNewEdges.FindIndex(Boundary1);
+  Data->ChangeIndexOfE1(IndE1);
+  //QualifiedEdge aQE1(IndE1, Et);
+  if (Data->Orientation() == TopAbs_REVERSED)
+    IndE1 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndF1).Append(IndE1);
+  Standard_Integer IndE1_forNewFace = IndE1;
+  if (Data->Orientation() == TopAbs_FORWARD)
+    IndE1_forNewFace *= -1;
+  //theFaceNewEdges.ChangeFromKey(IndNewFace).Append(-IndE1);
+  theFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE1_forNewFace);
+  */
+
+  Standard_Integer IndE1 = theNewEdges.FindIndex(Boundary1);
+  Data->ChangeIndexOfE1(IndE1);
+  IndE1 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE1);
+  IndE1 *= -1;
+  if (Data->Orientation() != F1.Orientation())
+    IndE1 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndF1).Append(IndE1);
+
+  Boundary2 = BRepLib_MakeEdge(GLinPln2);
+  BB.UpdateEdge(Boundary2, GLin2dPln2, F2, 0.);
+  BB.UpdateEdge(Boundary2, GLin2dCyl2, aNewFace, 0.);
+  theNewEdges.Add(Boundary2);
+
+  /*
+  Standard_Integer IndE2 = theNewEdges.FindIndex(Boundary2);
+  Data->ChangeIndexOfE2(IndE2);
+  IndE2 *= -1;
+  if (Data->Orientation() == TopAbs_REVERSED)
+    IndE2 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndF2).Append(IndE2);
+  Standard_Integer IndE2_forNewFace = IndE2;
+  if (Data->Orientation() == TopAbs_FORWARD)
+    IndE2_forNewFace *= -1;
+  //theFaceNewEdges.ChangeFromKey(IndNewFace).Append(-IndE2);
+  theFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE2_forNewFace);
+  */
+
+  Standard_Integer IndE2 = theNewEdges.FindIndex(Boundary2);
+  Data->ChangeIndexOfE2(IndE2);
+  theFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE2);
+  IndE2 *= -1;
+  if (Data->Orientation() != F2.Orientation())
+    IndE2 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndF2).Append(IndE2);
+  
   return Standard_True;
 }
 

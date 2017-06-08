@@ -45,6 +45,9 @@
 #include <IntAna_QuadQuadGeo.hxx>
 #include <Precision.hxx>
 #include <TopOpeBRepDS_DataStructure.hxx>
+#include <BRepAdaptor_HSurface.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepLib_MakeVertex.hxx>
 
 //=======================================================================
 //function : MakeFillet
@@ -224,19 +227,50 @@ Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
 //=======================================================================
 
 Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
+                                      TopTools_IndexedMapOfShape& theNewFaces,
+                                      TopTools_IndexedMapOfShape& theNewEdges,
+                                      NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+                                      TColStd_MapOfInteger& theIndsChFiFaces,
 				      const Handle(ChFiDS_SurfData)& Data, 
-				      const gp_Pln& Pln, 
-				      const gp_Cylinder& Cyl, 
+				      //const gp_Pln& Pln, 
+				      //const gp_Cylinder& Cyl, 
+                                      const Handle(BRepAdaptor_HSurface)& Spln, 
+                                      const Handle(BRepAdaptor_HSurface)& Scyl, 
 				      const Standard_Real fu,
 				      const Standard_Real lu,
 				      const TopAbs_Orientation Or1,
 				      const TopAbs_Orientation Or2,
 				      const Standard_Real Radius, 
 				      const gp_Circ& Spine, 
-				      const Standard_Real First, 
+				      const Standard_Real First,
 				      const TopAbs_Orientation Ofpl,
 				      const Standard_Boolean plandab)
 {
+  Standard_Integer IndFpln, IndFcyl;
+  const TopoDS_Face& FacePln = Spln->ChangeSurface().Face();
+  const TopoDS_Face& FaceCyl = Scyl->ChangeSurface().Face();
+  
+  if (!theNewFaces.Contains(FacePln))
+    theNewFaces.Add(FacePln);
+  IndFpln = theNewFaces.FindIndex(FacePln);
+  if (!theFaceNewEdges.Contains(IndFpln))
+  {
+    //ChFi3d_ListOfQualifiedEdge aList;
+    TColStd_ListOfInteger aList;
+    theFaceNewEdges.Add(IndFpln, aList);
+  }
+  if (!theNewFaces.Contains(FaceCyl))
+    theNewFaces.Add(FaceCyl);
+  IndFcyl = theNewFaces.FindIndex(FaceCyl);
+  if (!theFaceNewEdges.Contains(IndFcyl))
+  {
+    //ChFi3d_ListOfQualifiedEdge aList;
+    TColStd_ListOfInteger aList;
+    theFaceNewEdges.Add(IndFcyl, aList);
+  }
+
+  gp_Pln      Pln = Spln->Plane();
+  gp_Cylinder Cyl = Scyl->Cylinder();
 
 //calculation of the fillet (torus or sphere).
   Standard_Boolean c1sphere = Standard_False;
@@ -306,16 +340,15 @@ Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
   gp_Ax3 FilAx3(Or,Dz,Dx);
   if (FilAx3.YDirection().Dot(Dy) <= 0.){ FilAx3.YReverse(); }
 
-  if(c1sphere) {
-    Handle(Geom_SphericalSurface) 
-      gsph = new Geom_SphericalSurface(FilAx3,Radius);
-    Data->ChangeSurf(ChFiKPart_IndexSurfaceInDS(gsph,DStr));
-  }
-  else{
-    Handle(Geom_ToroidalSurface) 
-      gtor = new Geom_ToroidalSurface(FilAx3,Rad,Radius);
-    Data->ChangeSurf(ChFiKPart_IndexSurfaceInDS(gtor,DStr));
-  }
+  Handle(Geom_Surface) NewSurf;
+  
+  if(c1sphere)
+    NewSurf = new Geom_SphericalSurface(FilAx3,Radius);
+  else
+    NewSurf = new Geom_ToroidalSurface(FilAx3,Rad,Radius);
+
+  Data->ChangeSurf(ChFiKPart_IndexSurfaceInDS(NewSurf, DStr));
+  
   
   // It is checked if the orientation of the fillet is the same as of faces.
   gp_Pnt P,PP;
@@ -451,6 +484,66 @@ Standard_Boolean ChFiKPart_MakeFillet(TopOpeBRepDS_DataStructure& DStr,
       SetInterference(ChFiKPart_IndexCurveInDS(GCircCyl,DStr),
 		      trans,GLin2dCyl,GLin2dFil2);
   }
+
+  //Add new face and its new edges in the maps
+  BRep_Builder BB;
+  TopLoc_Location aLoc;
+  TopoDS_Face aNewFace;
+  BB.MakeFace(aNewFace);
+  BB.UpdateFace(aNewFace, NewSurf, aLoc, Precision::Confusion());
+  aNewFace.Orientation(Data->Orientation());
+  Standard_Integer IndNewFace = theNewFaces.Add(aNewFace);
+  theIndsChFiFaces.Add(IndNewFace);
+  TColStd_ListOfInteger aList;
+  theFaceNewEdges.Add(IndNewFace, aList);
+  Data->ChangeIndexOfFace(IndNewFace);
+
+  TopoDS_Edge Boundary1, Boundary2;
+  BB.MakeEdge(Boundary1);
+  BB.UpdateEdge(Boundary1, GLin2dFil1, aNewFace, 0.);
+  if (GCircPln.IsNull())
+  {
+    BB.Degenerated(Boundary1, Standard_True);
+    gp_Pnt2d aPnt2d = GLin2dFil1->Value(First);
+    gp_Pnt aPnt = NewSurf->Value(aPnt2d.X(), aPnt2d.Y());
+    TopoDS_Vertex aVertex = BRepLib_MakeVertex(aPnt);
+    BB.Add(Boundary1, aVertex);
+    aVertex.Reverse();
+    BB.Add(Boundary1, aVertex);
+  }
+  else
+  {
+    BB.UpdateEdge(Boundary1, GCircPln, 0.);
+    BB.UpdateEdge(Boundary1, GCirc2dPln, FacePln, 0.);
+  }
+  theNewEdges.Add(Boundary1);
+
+  Standard_Integer IndE1 = theNewEdges.FindIndex(Boundary1);
+  Data->ChangeIndexOfE1(IndE1);
+  theFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE1);
+  if (!GCircPln.IsNull()) //<Boundary1> is not degenerated
+  {
+    IndE1 *= -1;
+    if (Data->Orientation() != FacePln.Orientation())
+      IndE1 *= -1;
+    theFaceNewEdges.ChangeFromKey(IndFpln).Append(IndE1);
+  }
+
+  BB.MakeEdge(Boundary2);
+  BB.UpdateEdge(Boundary2, GCircCyl, 0.);
+  BB.UpdateEdge(Boundary2, GLin2dCyl, FaceCyl, 0.);
+  BB.UpdateEdge(Boundary2, GLin2dFil2, aNewFace, 0.);
+  theNewEdges.Add(Boundary2);
+
+  Standard_Integer IndE2 = theNewEdges.FindIndex(Boundary2);
+  Data->ChangeIndexOfE2(IndE2);
+  IndE2 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndNewFace).Append(IndE2);
+  IndE2 *= -1;
+  if (Data->Orientation() != FaceCyl.Orientation())
+    IndE2 *= -1;
+  theFaceNewEdges.ChangeFromKey(IndFcyl).Append(IndE2);
+  
   return Standard_True;
 }
 

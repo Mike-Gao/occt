@@ -31,11 +31,14 @@
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_DataMapOfShapeListOfInteger.hxx>
 #include <TopTools_DataMapOfShapeShape.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <TColStd_MapOfInteger.hxx>
 #include <Standard_Boolean.hxx>
 #include <Standard_Integer.hxx>
 #include <ChFiDS_ErrorStatus.hxx>
 #include <math_Vector.hxx>
 #include <TopAbs_Orientation.hxx>
+//#include <BRepOffset_Type.hxx>
 #include <ChFiDS_SequenceOfSurfData.hxx>
 #include <TopAbs_State.hxx>
 
@@ -74,6 +77,22 @@ class TopoDS_Face;
 class AppBlend_Approx;
 class Geom2d_Curve;
 
+struct QualifiedEdge
+{
+  Standard_Integer Index;
+  TopAbs_Orientation Orientation;
+  //BRepOffset_Type Convexity;
+  
+  QualifiedEdge(Standard_Integer theIndex,
+                TopAbs_Orientation theOrientation)
+    : Index(theIndex),
+      Orientation(theOrientation)
+  {
+  }
+};
+
+typedef NCollection_List<QualifiedEdge> ChFi3d_ListOfQualifiedEdge;
+typedef ChFi3d_ListOfQualifiedEdge::Iterator ChFi3d_ListIteratorOfListOfQualifiedEdge;
 
 //! Root  class  for calculation of  surfaces (fillets,
 //! chamfers)  destined  to smooth edges  of
@@ -719,6 +738,7 @@ protected:
                                                  const Handle(Adaptor3d_HSurface)& S1,
                                                  const Handle(Adaptor3d_HSurface)& S2,
                                                  const TopAbs_Orientation Or1,
+                                                 const Standard_Integer theIndOfFace2,
                                                  const Standard_Boolean Gd1,
                                                  const Standard_Boolean Gd2,
                                                  const Standard_Boolean Gf1,
@@ -746,6 +766,7 @@ protected:
                                               const Handle(Adaptor3d_HSurface)& S1,
                                               const Handle(Adaptor3d_HSurface)& S2,
                                               const TopAbs_Orientation Or1,
+                                              const Standard_Integer theIndOfFace2,
                                               const Standard_Boolean Gd1,
                                               const Standard_Boolean Gd2,
                                               const Standard_Boolean Gf1,
@@ -779,6 +800,12 @@ protected:
   ChFiDS_Map myVFMap;
   ChFiDS_Map myVEMap;
   Handle(TopOpeBRepDS_HDataStructure) myDS;
+  //TopTools_IndexedDataMapOfShapeListOfShape myFaceNewEdges;
+  NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger> myFaceNewEdges;
+  //NCollection_IndexedDataMap<Standard_Integer, ChFi3d_ListOfQualifiedEdge> myFaceNewEdges;
+  TopTools_IndexedMapOfShape myNewFaces;
+  TopTools_IndexedMapOfShape myNewEdges;
+  TColStd_MapOfInteger myIndsChFiFaces;
   Handle(TopOpeBRepBuild_HBuilder) myCoup;
   ChFiDS_ListOfStripe myListStripe;
   ChFiDS_StripeMap myVDataMap;

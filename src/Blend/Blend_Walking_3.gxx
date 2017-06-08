@@ -41,7 +41,15 @@ Standard_Integer Blend_Walking::ArcToRecadre(const Standard_Boolean OnFirst,
   lastpt2d.SetCoord(uprev,vprev);
   Iter->Init();
   while (Iter->More()) {
+    
     nbarc++; ok = 0;
+
+    if (TheBlendTool::IsSeam(Iter->Value()))
+    {
+      Iter->Next();
+      continue;
+    }
+    
     if (OnFirst) {
       if(byinter) { 
 	ok = okinter = TheBlendTool::Inters(pt2d,lastpt2d,
