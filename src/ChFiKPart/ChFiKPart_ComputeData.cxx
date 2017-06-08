@@ -82,6 +82,8 @@
 #include <TopOpeBRepDS_Curve.hxx>
 #include <TopOpeBRepDS_DataStructure.hxx>
 #include <TopOpeBRepDS_Surface.hxx>
+#include <TColStd_ListOfInteger.hxx>
+#include <TColStd_MapOfInteger.hxx>
 
 //#include <BRepAdaptor_Curve2d.hxx>
 //#include <BRepAdaptor_HCurve2d.hxx>
@@ -91,9 +93,15 @@
 //=======================================================================
  Standard_Boolean ChFiKPart_ComputeData::Compute
  (TopOpeBRepDS_DataStructure&    DStr, 
+  TopTools_IndexedMapOfShape&    theNewFaces,
+  TopTools_IndexedMapOfShape&    theNewEdges,
+  NCollection_IndexedDataMap<Standard_Integer, TColStd_ListOfInteger>& theFaceNewEdges,
+  TColStd_MapOfInteger&          theIndsChFiFaces,
   Handle(ChFiDS_SurfData)&       Data, 
-  const Handle(Adaptor3d_HSurface)& S1, 
-  const Handle(Adaptor3d_HSurface)& S2, 
+  //const Handle(Adaptor3d_HSurface)& S1, 
+  //const Handle(Adaptor3d_HSurface)& S2, 
+  const Handle(BRepAdaptor_HSurface)& S1, 
+  const Handle(BRepAdaptor_HSurface)& S2, 
   const TopAbs_Orientation       Or1, 
   const TopAbs_Orientation       Or2, 
   const Handle(ChFiDS_Spine)&    Sp, 
@@ -115,15 +123,16 @@
 
   // Return orientations.
   TopAbs_Orientation OrFace1 = TopAbs_FORWARD, OrFace2 = TopAbs_FORWARD;
-  Handle(BRepAdaptor_HSurface) HS = Handle(BRepAdaptor_HSurface)::DownCast(S1);
-  if (!HS.IsNull()) OrFace1 = HS->ChangeSurface().Face().Orientation();
-  HS = Handle(BRepAdaptor_HSurface)::DownCast(S2);
-  if (!HS.IsNull()) OrFace2 = HS->ChangeSurface().Face().Orientation();
+  //Handle(BRepAdaptor_HSurface) HS = Handle(BRepAdaptor_HSurface)::DownCast(S1);
+  OrFace1 = S1->ChangeSurface().Face().Orientation();
+  //HS = Handle(BRepAdaptor_HSurface)::DownCast(S2);
+  OrFace2 = S2->ChangeSurface().Face().Orientation();
   
   if(!Spine.IsNull()){
     Standard_Real Radius = Spine->Radius(Iedge);
     if ( typ1 == GeomAbs_Plane && typ2 == GeomAbs_Plane ){
-      surfok = ChFiKPart_MakeFillet(DStr,Data,S1->Plane(),S2->Plane(), 
+      surfok = ChFiKPart_MakeFillet(DStr,theNewFaces,theNewEdges,theFaceNewEdges,theIndsChFiFaces,
+                                    Data,S1,S2, 
 				    Or1,Or2,Radius,Spine->Line(),
 				    Wref,OrFace1);
     }

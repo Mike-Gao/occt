@@ -2419,7 +2419,8 @@ void ChFi3d_Builder::PerformSetOfKPart(Handle(ChFiDS_Stripe)& Stripe,
       Handle(ChFiDS_SurfData)   SD = new ChFiDS_SurfData();
       ChFiDS_SequenceOfSurfData LSD;
       
-      if(!ChFiKPart_ComputeData::Compute(DStr,SD,HS1,HS2,Or1,Or2,Spine,iedge)){
+      if(!ChFiKPart_ComputeData::Compute(DStr,myNewFaces,myNewEdges,myFaceNewEdges,myIndsChFiFaces,
+                                         SD,HS1,HS2,Or1,Or2,Spine,iedge)){
 #ifdef OCCT_DEBUG
 	cout<<"failed calculation KPart"<<endl;
 #endif
@@ -2985,7 +2986,8 @@ void ChFi3d_Builder::PerformSetOfKGen(Handle(ChFiDS_Stripe)& Stripe,
 	    TColStd_ListOfInteger li;
 	    myEVIMap.Bind(Ej,li);
 	  }
-	  myEVIMap.ChangeFind(Ej).Append(cursd->Surf());
+	  //myEVIMap.ChangeFind(Ej).Append(cursd->Surf());
+	  myEVIMap.ChangeFind(Ej).Append(cursd->IndexOfFace());
 	}
       }
       else if(IF < IL){

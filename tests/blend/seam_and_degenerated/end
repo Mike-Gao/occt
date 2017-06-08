@@ -1,0 +1,10 @@
+set tolres [checkmaxtol result]
+
+if { ${tolres} > ${maxtol}} {
+   puts "Error: bad tolerance of result"
+}
+
+checkprops result -v ${volume} -deps ${depsilon}
+
+# to end a test script
+puts "TEST COMPLETED"

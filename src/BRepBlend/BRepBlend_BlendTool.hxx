@@ -76,6 +76,10 @@ public:
   //! or a bounding box for an infinite arc.
   Standard_EXPORT static void Bounds (const Handle(Adaptor2d_HCurve2d)& C, Standard_Real& Ufirst, Standard_Real& Ulast);
   
+  //! Returns the status of edge:
+  //! is it a seam edge or not
+  Standard_EXPORT static Standard_Boolean IsSeam (const Handle(Adaptor2d_HCurve2d)& C);
+  
     static Handle(Adaptor2d_HCurve2d) CurveOnSurf (const Handle(Adaptor2d_HCurve2d)& C, const Handle(Adaptor3d_HSurface)& S);
 
 
