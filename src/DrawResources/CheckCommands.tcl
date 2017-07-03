@@ -172,7 +172,7 @@ proc _check_arg {check_name check_result {get_value 0}} {
   if { $arg == ${check_name} } {
     if {${get_value}} {
       incr narg
-      if { $narg < [llength $args] && ! [regexp {^-} [lindex $args $narg]] } {
+      if { $narg < [llength $args] && ! [regexp {^-[^0-9]} [lindex $args $narg]] } {
         set ${check_result} "[lindex $args $narg]"
       } else {
         error "Option ${check_result} requires argument"
@@ -351,26 +351,33 @@ proc checkfreebounds {shape ref_value args} {
 }
 
 help checkmaxtol {
-  Compare max tolerance of shape with ref_value.
-  Argument "source_shapes" is a list of used for sewing shapes.
-  It can be empty to skip comparison of tolerance with source shapes.
+  Compare max tolerance of shape with reference value.
+  Command returns max tolerance of the shape.
 
-  Use: checkmaxtol shape ref_value [source_shapes={}] [options...]
+  Use: checkmaxtol shape [options...]
   Allowed options are:
-    -min_tol: minimum tolerance for comparison
-    -multi_tol: tolerance multiplier
+    -ref: reference value of maximum tolerance.
+    -source: list of shapes to compare with, e.g.: -source {shape1 shape2 shape3}
+    -min_tol: minimum tolerance for comparison.
+    -multi_tol: tolerance multiplier.
 }
-proc checkmaxtol {shape ref_value {source_shapes {}} args} {
-  puts "checkmaxtol ${shape} ${ref_value} ${source_shapes} ${args}"
+
+proc checkmaxtol {shape args} {
+  puts "checkmaxtol ${shape} ${args}"
   upvar ${shape} ${shape}
 
+  set ref_value ""
+  set source_shapes {}
   set min_tol 0
   set tol_multiplier 0
 
+  # check arguments
   for {set narg 0} {$narg < [llength $args]} {incr narg} {
     set arg [lindex $args $narg]
     if {[_check_arg "-min_tol" min_tol 1] ||
-        [_check_arg "-multi_tol" tol_multiplier 1]
+        [_check_arg "-multi_tol" tol_multiplier 1] ||
+        [_check_arg "-source" source_shapes 1] ||
+        [_check_arg "-ref" ref_value 1]
        } {
       continue
     }
@@ -382,26 +389,33 @@ proc checkmaxtol {shape ref_value {source_shapes {}} args} {
   }
 
   # get max tol of shape
-  regexp {max tol = ([-0-9.+eE]+)} [tolmax ${shape}] full max_tol
+  set max_tol 0
+  if {[regexp "Tolerance MAX=(\[-0-9.+eE\]+)" [tolerance ${shape}] full maxtol_temp]} {
+    set max_tol ${maxtol_temp}
+  } else {
+    error "Error: cannot get tolerances of shape \"${shape}\""
+  }
 
-  checkreal "Max tolerance" $max_tol $ref_value 0.0001 0.01
-  if {[llength $source_shapes]} {
-    # find max tol of source shapes
-    foreach source_shape $source_shapes {
-      upvar ${source_shape} ${source_shape}
-      regexp {max tol = ([-0-9.+eE]+)} [tolmax $source_shape] full _src_max_tol
-      if { ${_src_max_tol} > ${min_tol} } {
-        set min_tol ${_src_max_tol}
-      }
-    }
-    if {${tol_multiplier}} {
-      set min_tol [expr ${tol_multiplier} * ${_src_max_tol}]
-    }
-    # compare max tol of source shapes with max tol of sewing_result
-    if { ${max_tol} > ${min_tol} } {
-      puts "Error: tolerance of \"${shape}\" (${max_tol}) is greater than max tolerance of source shapes (${min_tol})"
+  # find max tol of source shapes
+  foreach source_shape ${source_shapes} {
+    upvar ${source_shape} ${source_shape}
+    set _src_max_tol [checkmaxtol ${source_shape}]
+    if { [expr ${_src_max_tol} > ${min_tol} ] } {
+      set min_tol ${_src_max_tol}
     }
   }
+  # apply -multi_tol option
+  if {${tol_multiplier}} {
+    set min_tol [expr ${tol_multiplier} * ${_src_max_tol}]
+  }
+  # compare max tol of source shapes with checking tolerance
+  if { ${min_tol} && [expr ${max_tol} > ${min_tol}] } {
+    puts "Error: tolerance of \"${shape}\" (${max_tol}) is greater than checking tolerance (${min_tol})"
+  }
+  if { ${ref_value} != "" } {
+    checkreal "Max tolerance" ${max_tol} ${ref_value} 0.0001 0.01
+  }
+  return ${max_tol}
 }
 
 help checkfaults {
@@ -434,4 +448,290 @@ proc checkfaults {shape source_shape {ref_value 0}} {
   if { $nb_r > $nb_a } {
     puts "Error : Number of faults is $nb_r"
   }
+}
+
+# auxiliary: check all arguments
+proc _check_args { args {options {}} {command_name ""}} {
+  # check arguments
+  for {set narg 0} {${narg} < [llength ${args}]} {incr narg} {
+    set arg [lindex ${args} ${narg}]
+    set toContinue 0
+    foreach option ${options} {
+      set option_name            [lindex ${option} 0]
+      set variable_to_save_value [lindex ${option} 1]
+      set get_value              [lindex ${option} 2]
+      set local_value ""
+      if { [_check_arg ${option_name} local_value ${get_value}] } {
+        upvar ${variable_to_save_value} ${variable_to_save_value}
+        set ${variable_to_save_value} ${local_value}
+        set toContinue 1
+      }
+    }
+    if {${toContinue}} { continue }
+    # unsupported option
+    if { [regexp {^-} ${arg}] } {
+      error "Error: unsupported option \"${arg}\""
+    }
+    error "Error: cannot interpret argument ${narg} (${arg})"
+  }
+  foreach option ${options} {
+    set option_name            [lindex ${option} 0]
+    set variable_to_save_value [lindex ${option} 1]
+    set should_exist           [lindex ${option} 3]
+    if {![info exists ${variable_to_save_value}] && ${should_exist} == 1} {
+      error "Error: wrong using of command '${command_name}', '${option_name}' option is required"
+    }
+  }
+}
+
+help checkprops {
+  Procedure includes commands to compute length, area and volume of input shape.
+
+  Use: checkprops shapename [options...]
+  Allowed options are:
+    -l LENGTH: command lprops, computes the mass properties of all edges in the shape with a linear density of 1
+    -s AREA: command sprops, computes the mass properties of all faces with a surface density of 1 
+    -v VOLUME: command vprops, computes the mass properties of all solids with a density of 1
+    -eps EPSILON: the epsilon defines relative precision of computation
+    -equal SHAPE: compare area\volume\length of input shapes. Puts error if its are not equal
+    -notequal SHAPE: compare area\volume\length of input shapes. Puts error if its are equal
+  Options -l, -s and -v are independent and can be used in any order. Tolerance epsilon is the same for all options.
+}
+
+proc checkprops {shape args} {
+    puts "checkprops ${shape} ${args}"
+    upvar ${shape} ${shape}
+
+    if {![isdraw ${shape}] || [regexp "${shape} is a \n" [whatis ${shape}]]} {
+        puts "Error: The command cannot be built"
+        return
+    }
+
+    set length -1
+    set area -1
+    set volume -1
+    set epsilon 1.0e-4
+    set compared_equal_shape -1
+    set compared_notequal_shape -1
+    set equal_check 0
+
+    set options {{"-eps" epsilon 1}
+                 {"-equal" compared_equal_shape 1}
+                 {"-notequal" compared_notequal_shape 1}}
+
+    if { [regexp {\-[not]*equal} $args] } {
+        lappend options {"-s" area 0}
+        lappend options {"-l" length 0}
+        lappend options {"-v" volume 0}
+        set equal_check 1
+    } else {
+        lappend options {"-s" area 1}
+        lappend options {"-l" length 1}
+        lappend options {"-v" volume 1}
+    }
+    _check_args ${args} ${options} "checkprops"
+
+    if { ${length} != -1 || ${equal_check} == 1 } {
+        set CommandName lprops
+        set mass $length
+        set prop "length"
+        set equal_check 0
+    }
+    if { ${area} != -1 || ${equal_check} == 1 } {
+        set CommandName sprops
+        set mass $area
+        set prop "area"
+        set equal_check 0
+    }
+    if { ${volume} != -1 || ${equal_check} == 1 } {
+        set CommandName vprops
+        set mass $volume
+        set prop "volume"
+        set equal_check 0
+    }
+    
+    regexp {Mass +: +([-0-9.+eE]+)} [${CommandName} ${shape} ${epsilon}] full m
+
+    if { ${compared_equal_shape} != -1 } {
+        upvar ${compared_equal_shape} ${compared_equal_shape}
+        regexp {Mass +: +([-0-9.+eE]+)} [${CommandName} ${compared_equal_shape} ${epsilon}] full compared_m
+        if { $compared_m != $m } {
+            puts "Error: Shape ${compared_equal_shape} is not equal to shape ${shape}"
+        }
+    }
+
+    if { ${compared_notequal_shape} != -1 } {
+        upvar ${compared_notequal_shape} ${compared_notequal_shape}
+        regexp {Mass +: +([-0-9.+eE]+)} [${CommandName} ${compared_notequal_shape} ${epsilon}] full compared_m
+        if { $compared_m == $m } {
+            puts "Error: Shape ${compared_notequal_shape} is equal shape to ${shape}"
+        }
+    }
+
+    if { ${compared_equal_shape} == -1 && ${compared_notequal_shape} == -1 } {
+        if { [string compare "$mass" "empty"] != 0 } {
+            if { $m == 0 } {
+                puts "Error : The command is not valid. The $prop is 0."
+            }
+            if { $mass > 0 } {
+                puts "The expected $prop is $mass"
+            }
+            #check of change of area is < 1%
+            if { ($mass != 0 && [expr 1.*abs($mass - $m)/$mass] > 0.01) || ($mass == 0 && $m != 0) } {
+                puts "Error : The $prop of result shape is $m"
+            }
+        } else {
+            if { $m != 0 } {
+                puts "Error : The command is not valid. The $prop is $m"
+            }
+        }
+    }
+}
+
+help checkdump {
+  Procedure includes command to parse output dump and compare it with reference values.
+
+  Use: checkdump shapename [options...]
+  Allowed options are:
+    -name NAME: list of parsing parameters (e.g. Center, Axis, etc)
+    -ref VALUE: list of reference values for each parameter in NAME 
+    -eps EPSILON: the epsilon defines relative precision of computation
+}
+
+proc checkdump {shape args} {
+    puts "checkdump ${shape} ${args}"
+    upvar ${shape} ${shape}
+
+    set ddump -1
+    set epsilon -1
+    set options {{"-name" params 1}
+                 {"-ref" ref 1}
+                 {"-eps" epsilon 1}
+                 {"-dump" ddump 1}}
+
+    if { ${ddump} == -1 } {
+        set ddump [dump ${shape}]
+    }
+    _check_args ${args} ${options} "checkdump"
+
+    set index 0
+    foreach param ${params} {
+        set pattern "${param}\\s*:\\s*" 
+        set number_pattern "(\[-0-9.+eE\]+)\\s*" 
+        set ref_values ""
+        set local_ref ${ref}
+        if { [llength ${params}] > 1 } {
+            set local_ref [lindex ${ref} ${index}]
+        }
+        foreach item ${local_ref} {
+            if { ![regexp "$pattern$number_pattern" $ddump full res] } {
+                puts "Error: cheked parameter ${param} is not listed in dump"
+                break
+            }
+            lappend ref_values $res 
+            set pattern "${pattern}${res},\\s*" 
+            ## without precision
+            if { ${epsilon} == -1 } {
+                if { ${item} != ${res} } {
+                    puts "Error: parameter ${param} - current value (${res}) is not equal to reference value (${item})"
+                } else {
+                    puts "OK: parameter ${param} - current value (${res}) is equal to reference value (${item})"
+                }
+            ## with precision
+            } else {
+                set precision 0.0000001
+                if { ( abs($res) > $precision ) || ( abs($item) > $precision ) } {
+                    if { ($item != 0 && [expr 1.*abs($item - $res)/$item] > $epsilon) || ($item == 0 && $res != 0) } {
+                        puts "Error: The $param of the resulting shape is $res and the expected $param is $item"
+                    } else {
+                        puts "OK: parameter ${param} - current value (${res}) is equal to reference value (${item})"
+                    }
+                }
+            }
+        }
+        incr index
+    }
+}
+
+help checklength {
+  Procedure includes commands to compute length of input shape.
+
+  Use: checklength shapename [options...]
+  Allowed options are:
+    -l LENGTH: command length, computes the length of input curve with precision of computation
+    -eps EPSILON: the epsilon defines relative precision of computation
+    -equal SHAPE: compare length of input shapes. Puts error if its are not equal
+    -notequal SHAPE: compare length of input shapes. Puts error if its are equal
+}
+
+proc checklength {shape args} {
+    puts "checklength ${shape} ${args}"
+    upvar ${shape} ${shape}
+
+    if {![isdraw ${shape}] || [regexp "${shape} is a \n" [whatis ${shape}]]} {
+        puts "Error: The command cannot be built"
+        return
+    }
+
+    set length -1
+    set epsilon 1.0e-4
+    set compared_equal_shape -1
+    set compared_notequal_shape -1
+    set equal_check 0
+
+    set options {{"-eps" epsilon 1}
+                 {"-equal" compared_equal_shape 1}
+                 {"-notequal" compared_notequal_shape 1}}
+
+    if { [regexp {\-[not]*equal} $args] } {
+        lappend options {"-l" length 0}
+        set equal_check 1
+    } else {
+        lappend options {"-l" length 1}
+    }
+    _check_args ${args} ${options} "checkprops"
+
+    if { ${length} != -1 || ${equal_check} == 1 } {
+        set CommandName length
+        set mass $length
+        set prop "length"
+        set equal_check 0
+    }
+
+    regexp "The +length+ ${shape} +is +(\[-0-9.+eE\]+)" [${CommandName} ${shape} ${epsilon}] full m
+
+    if { ${compared_equal_shape} != -1 } {
+        upvar ${compared_equal_shape} ${compared_equal_shape}
+        regexp "The +length+ ${compared_equal_shape} +is +(\[-0-9.+eE\]+)" [${CommandName} ${compared_equal_shape} ${epsilon}] full compared_m
+        if { $compared_m != $m } {
+            puts "Error: length of shape ${compared_equal_shape} is not equal to shape ${shape}"
+        }
+    }
+
+    if { ${compared_notequal_shape} != -1 } {
+        upvar ${compared_notequal_shape} ${compared_notequal_shape}
+        regexp "The +length+ ${compared_notequal_shape} +is +(\[-0-9.+eE\]+)" [${CommandName} ${compared_notequal_shape} ${epsilon}] full compared_m
+        if { $compared_m == $m } {
+            puts "Error: length of shape ${compared_notequal_shape} is equal shape to ${shape}"
+        }
+    }
+
+    if { ${compared_equal_shape} == -1 && ${compared_notequal_shape} == -1 } {
+        if { [string compare "$mass" "empty"] != 0 } {
+            if { $m == 0 } {
+                puts "Error : The command is not valid. The $prop is 0."
+            }
+            if { $mass > 0 } {
+                puts "The expected $prop is $mass"
+            }
+            #check of change of area is < 1%
+            if { ($mass != 0 && [expr 1.*abs($mass - $m)/$mass] > 0.01) || ($mass == 0 && $m != 0) } {
+                puts "Error : The $prop of result shape is $m"
+            }
+        } else {
+            if { $m != 0 } {
+                puts "Error : The command is not valid. The $prop is $m"
+            }
+        }
+    }
 }
