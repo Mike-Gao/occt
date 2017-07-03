@@ -359,8 +359,8 @@ proc checkfreebounds {shape ref_value args} {
 }
 
 help checkmaxtol {
-  Returns max tolerance of the shape and prints error message if specified
-  criteria are not satisfied.
+  Compare max tolerance of shape with reference value.
+  Command returns max tolerance of the shape.
 
   Use: checkmaxtol shape [options...]
 
