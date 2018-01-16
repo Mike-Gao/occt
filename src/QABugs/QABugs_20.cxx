@@ -2579,6 +2579,39 @@ static Standard_Integer OCC30708_2 (Draw_Interpretor& di, Standard_Integer, cons
   return 0;
 }
 
+#include <GC_MakeArcOfCircle.hxx>
+#include <BRepAdaptor_CompCurve.hxx>
+#include <gp_Circ.hxx>
+//=======================================================================
+//function : OCC29430
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC29430(Draw_Interpretor& theDI,
+                                 Standard_Integer /*theNArg*/,
+                                 const char** theArgVal)
+{
+  const Standard_Real r45 = M_PI / 4.0, r225 = 3.0*M_PI / 4.0;
+
+  GC_MakeArcOfCircle arcMaker(gp_Circ(gp_Ax2(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0), gp_Dir(1.0, 0.0, 0.0)), 1.0), r45, r225, Standard_True);
+  BRepBuilderAPI_MakeEdge edgeMaker(arcMaker.Value());
+  BRepBuilderAPI_MakeWire wireMaker(edgeMaker.Edge());
+  const TopoDS_Wire circle = wireMaker.Wire();
+
+  DBRep::Set(theArgVal[1], circle);
+
+  BRepAdaptor_CompCurve curve(circle);
+  theDI << "Curve.FirstParameter() = " << curve.FirstParameter() << "\n";
+  theDI << "Curve.LastParameter() = " << curve.LastParameter() << "\n";
+  theDI << "Curve.Period() = " << (curve.IsPeriodic()? curve.Period() : 0.0) << "\n";
+  const gp_Pnt aStartPt = curve.Value(curve.FirstParameter());
+  const gp_Pnt anEndPt = curve.Value(curve.LastParameter());
+
+  DrawTrSurf::Set(theArgVal[2], aStartPt);
+  DrawTrSurf::Set(theArgVal[3], anEndPt);
+
+  return 0;
+}
+
 void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   const char *group = "QABugs";
 
@@ -2613,6 +2646,10 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
 
   theCommands.Add ("OCC30708_2", "Tests initialization of the BRepLib_MakeWire with null shape",
                    __FILE__, OCC30708_2, group);
+
+  theCommands.Add("OCC29430", "OCC29430 <result wire> "
+                              "<result first point> <result last point>",
+                              __FILE__, OCC29430, group);
 
   return;
 }

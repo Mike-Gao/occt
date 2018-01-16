@@ -1437,3 +1437,10 @@ The Error/Warning reporting system of the algorithms in Boolean Component (in al
 The methods returning the status of errors and warnings of the algorithms (ErrorStatus() and WarningStatus()) have been removed.
 Instead use methods HasErrors() and HasWarnings() to check for presence of errors and warnings, respectively.
 The full list of errors and warnings, with associated data such as problematic sub-shapes, can be obtained by method GetReport().
+
+@section upgrade_occt730 Upgrade to OCCT 7.3.0
+
+@subsection upgrade_730_BRepAdaptor_CompCurve Changes in BRepAdaptor_CompCurve
+
+The method BRepAdaptor_CompCurve::SetPeriodic has been eliminated.
+Since new version, the method BRepAdaptor_CompCurve::IsPeriodic() will always return FALSE. Earlier, it could return TRUE in case if the wire contained only one edge based on periodic curve. 
