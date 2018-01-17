@@ -301,7 +301,7 @@ Standard_Integer GeomAdaptor_Curve::NbIntervals(const GeomAbs_Shape S) const
                                     myBSplineCurve->IsPeriodic111(),
                                     1,Nb,Index2,newLast);
           // Protection against myFirst = UFirst - eps, which located as ULast - eps
-          if (myBSplineCurve->IsPeriodic() && (newLast - newFirst) < Precision::PConfusion())
+          if (myBSplineCurve->IsPeriodic111() && (newLast - newFirst) < Precision::PConfusion())
           {
             if (Abs(newLast - myBSplineCurve->FirstParameter()) < Precision::PConfusion())
               newLast += myBSplineCurve->Period();
@@ -433,7 +433,7 @@ void GeomAdaptor_Curve::Intervals(TColStd_Array1OfReal& T,
             FirstParam = newFirst;
             LastParam = newLast;
             // Protection against myFirst = UFirst - eps, which located as ULast - eps
-            if (myBSplineCurve->IsPeriodic() && (LastParam - FirstParam) < Precision::PConfusion())
+            if (myBSplineCurve->IsPeriodic111() && (LastParam - FirstParam) < Precision::PConfusion())
             {
               if (Abs(LastParam - myBSplineCurve->FirstParameter()) < Precision::PConfusion())
                 LastParam += myBSplineCurve->Period();
