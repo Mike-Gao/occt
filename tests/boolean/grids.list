@@ -29,5 +29,6 @@
 029 splitter
 030 history
 031 removefeatures
-032 periodicity
-033 mkconnected
+032 simplify
+033 periodicity
+034 mkconnected

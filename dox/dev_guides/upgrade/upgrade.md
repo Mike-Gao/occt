@@ -1576,3 +1576,15 @@ Class *Message_PrinterOStream* can be used instead of *CDM_COutMessageDriver* to
 If custom driver class is used in the application, that class shall be reimplemented inheriting from *Message_Printer* instead of *CDM_MessageDriver*.
 Method *Send()* should be redefined instead of method *Write()* of *CDM_MessageDriver*.
 To use the custom printer in OCAF, it can be either added to default messenger or set into the custom *Message_Messenger* object created in the method *MessageDriver()* of a class inheriting *CDF_Application*.
+
+@section upgrade_occt740 Upgrade to OCCT 7.4.0
+
+@subsection upgrade_740_removed Removed features
+* The following methods of the class *BRepAlgoAPI_BooleanOperation* have been removed as obsolete or replaced:
+  - *BuilderCanWork* can be replaced with *IsDone* or *HasErrors* method.
+  - *FuseEdges* removed as obsolete.
+  - *RefineEdges* replaced with new method *SimplifyResult*.
+* The method *ImagesResult* of the class *BOPAlgo_BuilderShape* has been removed as unused. The functionality of this method can be completely replaced by the history methods *Modified* and *IsDeleted*.
+* The method *TrackHistory* of the classes *BOPAlgo_RemoveFeatures* and *BRepAlgoAPI_Defeaturing* has been renamed to *SetToFillHistory*.
+* The method *GetHistory* of the class *BRepAlgoAPI_Defeaturing* has been renamed to *History*.
+
