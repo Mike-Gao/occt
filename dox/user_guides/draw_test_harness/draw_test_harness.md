@@ -6093,6 +6093,7 @@ This group of commands is used to create topology from shapes and to extract sha
   * To create faces, use the **mkplane**, **mkface** commands.
   * To extract the geometry from edges or faces, use the **mkcurve** and **mkface** commands.
   * To extract the 2d curves from edges or faces, use the **pcurve** command.
+  * To add/set the 2d curves to edges of face, use the **addpcurve** or **setpcurve** command.
 
 
 @subsubsection occt_draw_7_2_1  vertex
@@ -6415,14 +6416,16 @@ vertex v2 10 0 0
 edge e v1 v2 
 ~~~~~
 
-@subsubsection occt_draw_7_2_9  pcurve
+@subsubsection occt_draw_7_2_9  pcurve, addpcurve, setpcurve
 
 Syntax:      
 
 ~~~~~
 pcurve [name edgename] facename 
+addpcurve edge 2dcurve face [tol (default 1.e-7)]
+setpcurve edge 2dcurve face [tol (default 1.e-4)]
 ~~~~~
-
+**pcurve**
 Extracts the 2d curve of an edge on a face. If only the face is specified, the command extracts all the curves and colors them according to their orientation. This is useful in checking to see if the edges in a face are correctly oriented, i.e. they turn counter-clockwise. To make curves visible, use a fitted 2d view. 
 
 **Example:** 
@@ -6435,6 +6438,14 @@ av2d; # a 2d view
 pcurve p 
 2dfit 
 ~~~~~
+
+**addpcurve**, 
+Add given pcurve to edge of face, update edge tolerance.
+
+**setpcurve**
+Add given pcurve to edge, if pcurve cannot be set with tolerance less then tol,
+algorithm builds new pcurve by projecting edge on face and sets it.
+
 
 @subsubsection occt_draw_7_2_10  chfi2d
 

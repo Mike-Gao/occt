@@ -237,7 +237,7 @@ static void ExtendC2d (Handle(Geom2d_BSplineCurve)& aRes,
   }
   gp_Lin2d BoundLin(thePole, theBoundDir); //one of the bounds of rectangle
   Standard_Real ParOnLin = 0.;
-  if (theBoundDir.IsParallel(aDBnd, 100.*Precision::Angular()))
+  if (theBoundDir.IsParallel(aDBnd, Precision::PConfusion()))
   {
     ParOnLin = ElCLib::Parameter(aLin, thePole);
   }

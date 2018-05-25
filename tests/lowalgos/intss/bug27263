@@ -30,6 +30,6 @@ if {${NbCurv} != ${GoodNbCurv}} {
 }
 
 checklength c_1 -l 2.9620641619623407
-checklength c_2 -l 3.1050603628884668
+checklength c_2 -l 3.105060362884668
 
 checkview -screenshot -2d -path ${imagedir}/${test_image}.png

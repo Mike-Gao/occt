@@ -960,7 +960,7 @@ void BRepOffsetAPI_DraftAngle::CorrectVertexTol()
   anExp.Init(myShape, TopAbs_EDGE);
   for(; anExp.More(); anExp.Next())
   {
-    const TopoDS_Shape& anE = anExp.Current();
+    const TopoDS_Edge& anE = TopoDS::Edge(anExp.Current());
     //Skip old (not modified) edges
     if(anInitEdges.Contains(anE))
       continue;
@@ -971,7 +971,7 @@ void BRepOffsetAPI_DraftAngle::CorrectVertexTol()
     //
     aNewEdges.Add(anE);
     //
-    Standard_Real anETol = BRep_Tool::Tolerance(TopoDS::Edge(anE));
+    Standard_Real anETol = BRep_Tool::Tolerance(anE);
     TopoDS_Iterator anIter(anE);
     for(; anIter.More(); anIter.Next())
     {
@@ -997,6 +997,18 @@ void BRepOffsetAPI_DraftAngle::CorrectVertexTol()
       }
       else
       {
+        gp_Pnt aVPnt = BRep_Tool::Pnt(aVtx);
+        Standard_Real f, l;
+        TopLoc_Location anL;
+        const Handle(Geom_Curve)& aECrv = BRep_Tool::Curve(TopoDS::Edge(anE), anL, f, l);
+        Standard_Real aVPar = BRep_Tool::Parameter(aVtx, anE);
+        gp_Pnt aCP = aECrv->Value(aVPar);
+        if (!anL.IsIdentity())
+        {
+          aCP.Transform(anL.Transformation());
+        }
+        Standard_Real aD = aVPnt.Distance(aCP);
+        aBB.UpdateVertex(aVtx, aD);
         aBB.UpdateVertex(aVtx, anETol + Epsilon(anETol));
       }
     }
