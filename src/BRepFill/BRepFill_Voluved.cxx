@@ -62,7 +62,6 @@
 static const Standard_Real aPipeLinearTolerance = 1.0e-4;
 static const Standard_Real aPipeAngularTolerance = 1.0e-2;
 
-static const Standard_Boolean isParallelComputation = Standard_False;
 const char aDirPatch[] = "D:\\nbv-29523\\shapes\\my\\";
 
 static Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
@@ -70,7 +69,7 @@ static Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
                                                TopTools_ListOfShape& theListOfFaces,
                                                TopTools_ListOfShape& theListOfSplits);
 
-#define BREPFILL_VOLUVED_DEBUG
+//#define BREPFILL_VOLUVED_DEBUG
 
 //=======================================================================
 //function : GetSpineAndProfile
@@ -498,7 +497,7 @@ void BRepFill_Voluved::GetLids()
   // Split interfered edges
   BOPAlgo_PaveFiller aPF;
   aPF.SetArguments(aLE);
-  aPF.SetRunParallel(isParallelComputation);
+  aPF.SetRunParallel(myIsParallel);
 
   aPF.Perform();
   if (aPF.HasErrors())
@@ -515,7 +514,7 @@ void BRepFill_Voluved::GetLids()
     aBuilder.AddArgument(aS);
   }
 
-  aBuilder.SetRunParallel(isParallelComputation);
+  aBuilder.SetRunParallel(myIsParallel);
   aBuilder.PerformWithFiller(aPF);
   if (aBuilder.HasErrors())
   {
@@ -788,7 +787,7 @@ void BRepFill_Voluved::BuildSolid()
     // Split interfered faces
     BOPAlgo_PaveFiller aPF;
     aPF.SetArguments(aLF);
-    aPF.SetRunParallel(isParallelComputation);
+    aPF.SetRunParallel(myIsParallel);
     aPF.SetFuzzyValue(myFuzzyValue);
 
     aPF.Perform();
@@ -802,7 +801,7 @@ void BRepFill_Voluved::BuildSolid()
         aBuilder.AddArgument(aS);
       }
 
-      aBuilder.SetRunParallel(isParallelComputation);
+      aBuilder.SetRunParallel(myIsParallel);
       aBuilder.PerformWithFiller(aPF);
       myPipeShell = aBuilder.Shape();
     }
@@ -854,7 +853,7 @@ void BRepFill_Voluved::BuildSolid()
   aMV.SetArguments(aLF);
   aMV.SetFuzzyValue(myFuzzyValue);
   aMV.SetIntersect(Standard_True);
-  aMV.SetRunParallel(isParallelComputation);
+  aMV.SetRunParallel(myIsParallel);
   aMV.SetAvoidInternalShapes(Standard_True);
   aMV.Perform();
 
@@ -906,7 +905,7 @@ void BRepFill_Voluved::ExtractOuterSolid(TopoDS_Shape& theShape,
   BOPAlgo_MakerVolume aMV;
   aMV.SetArguments(theArgsList);
   aMV.SetIntersect(Standard_True);
-  aMV.SetRunParallel(isParallelComputation);
+  aMV.SetRunParallel(myIsParallel);
   aMV.SetAvoidInternalShapes(Standard_True);
   aMV.Perform();
 
@@ -1590,10 +1589,10 @@ static void InsertEDegenerated(const TopoDS_Face& theFace,
 //function : CheckSingularityAndAdd
 //purpose  : Returns TRUE if theF has been split
 //=======================================================================
-Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
-                                        const Standard_Real theFuzzyToler,
-                                        TopTools_ListOfShape& theListOfFaces,
-                                        TopTools_ListOfShape& theListOfSplits)
+Standard_Boolean BRepFill_Voluved::CheckSingularityAndAdd(const TopoDS_Face& theF,
+                                                          const Standard_Real theFuzzyToler,
+                                                          TopTools_ListOfShape& theListOfFaces,
+                                                          TopTools_ListOfShape& theListOfSplits) const
 {
   const BRepAdaptor_Surface anAS(theF, Standard_False);
   GeomAbs_SurfaceType aSType = anAS.GetType();
@@ -1619,7 +1618,7 @@ Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
     // Split interfered edges
     BOPAlgo_PaveFiller aPF;
     aPF.SetArguments(aLE);
-    aPF.SetRunParallel(isParallelComputation);
+    aPF.SetRunParallel(myIsParallel);
 
     aPF.Perform();
     if (aPF.HasErrors())
@@ -1644,7 +1643,7 @@ Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
       aBuilder.AddArgument(aS);
     }
 
-    aBuilder.SetRunParallel(isParallelComputation);
+    aBuilder.SetRunParallel(myIsParallel);
     aBuilder.PerformWithFiller(aPF);
     if (aBuilder.HasErrors())
     {
@@ -1729,7 +1728,7 @@ Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
       aBAB.AddArgument(aSh);
     }
 
-    aBAB.SetRunParallel(isParallelComputation);
+    aBAB.SetRunParallel(myIsParallel);
     aBAB.SetNonDestructive(Standard_True);
     aBAB.PerformWithFiller(aPF);
     if (aBAB.HasErrors())

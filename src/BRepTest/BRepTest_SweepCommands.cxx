@@ -243,6 +243,7 @@ Standard_Integer evolved(Draw_Interpretor& di, Standard_Integer n, const char** 
   Standard_Real aTolerance = 0.0;
   TopoDS_Shape Base;
   TopoDS_Wire Prof;
+  Standard_Boolean isParallel = Standard_True;
 
   for (Standard_Integer i = 2; i < n; i++)
   {
@@ -252,9 +253,15 @@ Standard_Integer evolved(Draw_Interpretor& di, Standard_Integer n, const char** 
       return 1;
     }
 
-    if (!Solid && !strcmp(a[i], "-solid"))
+    if (!strcmp(a[i], "-solid"))
     {
       Solid = Standard_True;
+      continue;
+    }
+
+    if (!strcmp(a[i], "-stm"))
+    {
+      isParallel = Standard_False;
       continue;
     }
 
@@ -309,10 +316,12 @@ Standard_Integer evolved(Draw_Interpretor& di, Standard_Integer n, const char** 
 
   TopoDS_Shape Volevo = IsAFace ? BRepOffsetAPI_MakeEvolved(TopoDS::Face(Base),
                                                             Prof, GeomAbs_Arc, !hasToComputeAxes,
-                                                            Solid, Standard_False, isVolume, aTolerance) :
+                                                            Solid, Standard_False, isVolume,
+                                                            aTolerance, isParallel) :
                                   BRepOffsetAPI_MakeEvolved(TopoDS::Wire(Base),
                                                             Prof, GeomAbs_Arc, !hasToComputeAxes,
-                                                            Solid, Standard_False, isVolume, aTolerance);
+                                                            Solid, Standard_False, isVolume,
+                                                            aTolerance, isParallel);
 
   DBRep::Set(a[1],Volevo);
 

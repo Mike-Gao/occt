@@ -2550,7 +2550,7 @@ static Standard_Integer myCall(Draw_Interpretor&, Standard_Integer theNbArgs, co
   }
 
   // ################################ Extrude tool #########################################
-  BRepOffsetAPI_MakeEvolved mkEvolved = BRepOffsetAPI_MakeEvolved(extrudeWire, toolWire, GeomAbs_Arc, Standard_False, Standard_True, Standard_False, Standard_True, 0);
+  BRepOffsetAPI_MakeEvolved mkEvolved = BRepOffsetAPI_MakeEvolved(extrudeWire, toolWire, GeomAbs_Arc, Standard_False, Standard_True, Standard_False, Standard_True, 0, Standard_True);
 
   DBRep::Set(theArgVec[1], mkEvolved.Shape());
 

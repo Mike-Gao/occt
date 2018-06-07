@@ -46,10 +46,12 @@ BRepOffsetAPI_MakeEvolved::BRepOffsetAPI_MakeEvolved(const TopoDS_Wire&     Spin
 					 const Standard_Boolean Solid,
 					 const Standard_Boolean ProfOnSpine,
                                          const Standard_Boolean theIsVolume,
-                                         const Standard_Real    Tol)
+                                         const Standard_Real    Tol,
+                                         const Standard_Boolean theRunInParallel)
 {
   if (theIsVolume)
   {
+    myVolume.SetRunParallel(theRunInParallel);
     myVolume.Perform(Spine, Profil, Tol);
   }
   else
@@ -85,10 +87,12 @@ BRepOffsetAPI_MakeEvolved::BRepOffsetAPI_MakeEvolved(const TopoDS_Face&     Spin
 					 const Standard_Boolean Solid,
 					 const Standard_Boolean ProfOnSpine,
                                          const Standard_Boolean theIsVolume,
-                                         const Standard_Real    Tol)
+                                         const Standard_Real    Tol,
+                                         const Standard_Boolean theRunInParallel)
 {
   if (theIsVolume)
   {
+    myVolume.SetRunParallel(theRunInParallel);
     myVolume.Perform(TopoDS::Wire(TopoDS_Iterator(Spine).Value()), Profil, Tol);
   }
   else

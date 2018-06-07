@@ -25,6 +25,7 @@
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_ListOfShape.hxx>
 class BOPAlgo_MakerVolume;
+class TopoDS_Face;
 
 //! Constructs an evolved volume from a spine (wire or face)
 //! and  a profile ( wire).
@@ -35,7 +36,8 @@ public:
   DEFINE_STANDARD_ALLOC
 
   Standard_EXPORT BRepFill_Voluved() :myErrorStatus(BRepFill_Voluved_Empty),
-                                      myFuzzyValue(0.0)
+                                      myFuzzyValue(0.0),
+                                      myIsParallel(Standard_True)
   {
   }
   
@@ -55,6 +57,12 @@ public:
     return myResult;
   }
   
+  //! Triggers computation mode between Parallel/Single-thread
+  void SetRunParallel(Standard_Boolean theValue)
+  {
+    myIsParallel = theValue;
+  }
+
 protected:
 
   Standard_EXPORT void PerformSweep();
@@ -73,6 +81,12 @@ protected:
 
   Standard_EXPORT void GetSpineAndProfile(const TopoDS_Wire& theSpine,
                                           const TopoDS_Wire& theProfile);
+
+  Standard_EXPORT Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
+                                                          const Standard_Real theFuzzyToler,
+                                                          TopTools_ListOfShape& theListOfFaces,
+                                                          TopTools_ListOfShape& theListOfSplits) const;
+
 
 private:
 
@@ -93,7 +107,7 @@ private:
   TopoDS_Compound myTopBottom; // Lids can be split on several faces
   TopoDS_Shape myResult;
   Standard_Real myFuzzyValue;
-
+  Standard_Boolean myIsParallel;
 
 };
 
