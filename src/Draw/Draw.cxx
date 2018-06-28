@@ -575,3 +575,27 @@ void Draw::Load(Draw_Interpretor& theDI, const TCollection_AsciiString& theKey,
   (*fp) (theDI);
 
 }
+
+//=======================================================================
+//function : ParseOnOff
+//purpose  :
+//=======================================================================
+Standard_Boolean Draw::ParseOnOff (Standard_CString  theArg,
+                                   Standard_Boolean& theIsOn)
+{
+  TCollection_AsciiString aFlag(theArg);
+  aFlag.LowerCase();
+  if (aFlag == "on"
+   || aFlag == "1")
+  {
+    theIsOn = Standard_True;
+    return Standard_True;
+  }
+  else if (aFlag == "off"
+        || aFlag == "0")
+  {
+    theIsOn = Standard_False;
+    return Standard_True;
+  }
+  return Standard_False;
+}

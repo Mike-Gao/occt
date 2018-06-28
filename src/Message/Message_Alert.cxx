@@ -48,3 +48,13 @@ Standard_Boolean Message_Alert::Merge (const Handle(Message_Alert)& /*theTarget*
   // by default, merge trivially
   return Standard_True;
 }
+
+//=======================================================================
+//function : IsEqual
+//purpose  : 
+//=======================================================================
+
+Standard_Boolean Message_Alert::IsSame(const Handle(Message_Alert)& theAlert)
+{
+  return IsEqual (GetMessageKey(), theAlert->GetMessageKey());
+}

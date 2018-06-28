@@ -49,6 +49,7 @@
 #include <IntTools_Tools.hxx>
 #include <IntTools_TopolTool.hxx>
 #include <IntTools_WLineTool.hxx>
+#include <Message_Alerts.hxx>
 #include <ProjLib_Plane.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
@@ -1487,6 +1488,7 @@ void IntTools_FaceFace::MakeCurve(const Standard_Integer Index,
                                                                  mbspc.Knots(),
                                                                  mbspc.Multiplicities(),
                                                                  mbspc.Degree());
+              MESSAGE_INFO_OBJECT(BS, "IntTools_FaceFace::MakeCurve", "", 0, NULL);
               GeomLib_CheckBSplineCurve Check(BS,TOLCHECK,TOLANGCHECK);
               Check.FixTangent(Standard_True,Standard_True);
               //

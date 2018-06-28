@@ -54,6 +54,11 @@ public:
   //! Base implementation always returns true.
   virtual Standard_EXPORT Standard_Boolean Merge (const Handle(Message_Alert)& theTarget);
   
+  //! Return true if the current and parameter alert have the same content
+  //! \param theAlert an alert to compare
+  //! @return True if equal.
+  virtual Standard_EXPORT Standard_Boolean IsSame (const Handle(Message_Alert)& theAlert);
+
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_Alert,Standard_Transient)
 };

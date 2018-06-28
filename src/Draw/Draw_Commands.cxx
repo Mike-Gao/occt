@@ -45,4 +45,5 @@ void Draw::Commands (Draw_Interpretor& theCommands)
   Draw::GraphicCommands(theCommands);
   Draw::PloadCommands(theCommands);
   Draw::UnitCommands(theCommands);
+  Draw::MessageCommands(theCommands);
 }

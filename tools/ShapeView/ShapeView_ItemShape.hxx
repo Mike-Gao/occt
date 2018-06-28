@@ -19,6 +19,7 @@
 #include <inspector/ShapeView_ItemBase.hxx>
 #include <Standard.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -45,6 +46,13 @@ public:
 
   //! Destructor
   virtual ~ShapeView_ItemShape() Standard_OVERRIDE {};
+
+  //! Sets explore type
+  //! \param theType type of item explode. If TopAbs_SHAPE, no expode, only iteration by shape
+  void SetExplodeType (const TopAbs_ShapeEnum theType) { myExplodeType  = theType; }
+
+  //! Returns expode type of the item
+  TopAbs_ShapeEnum GetExplodeType() const { return myExplodeType; }
 
   //! Returns the current shape
   const TopoDS_Shape& GetItemShape() const { initItem(); return myShape; }
@@ -108,10 +116,11 @@ protected:
 private:
 
   //! Constructor
-  ShapeView_ItemShape(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  : ShapeView_ItemBase(theParent, theRow, theColumn) {}
+  ShapeView_ItemShape (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+    : ShapeView_ItemBase (theParent, theRow, theColumn), myExplodeType (TopAbs_SHAPE) {}
 
 private:
+  TopAbs_ShapeEnum myExplodeType; //!< type of explore own shape and get children
 
   TopoDS_Shape myShape; //!< current shape
   QString myFileName; //!< BREP file name

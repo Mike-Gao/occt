@@ -19,6 +19,9 @@
 #include <BRepTools.hxx>
 
 #include <AIS_Shape.hxx>
+
+#include <TopExp.hxx>
+
 // =======================================================================
 // function : ReadShape
 // purpose :
@@ -30,4 +33,25 @@ TopoDS_Shape ShapeView_Tools::ReadShape (const TCollection_AsciiString& theFileN
   BRep_Builder aBuilder;
   BRepTools::Read (aShape, theFileName.ToCString(), aBuilder);
   return aShape;
+}
+
+// =======================================================================
+// function : IsPossibleToExplode
+// purpose :
+// =======================================================================
+Standard_Boolean ShapeView_Tools::IsPossibleToExplode (const TopoDS_Shape& theShape,
+  NCollection_List<TopAbs_ShapeEnum>& theExplodeTypes)
+{
+  TopAbs_ShapeEnum aShapeType = theShape.ShapeType();
+
+  TopTools_IndexedMapOfShape aSubShapes;
+  for (int aType = aShapeType + 1; aType <= TopAbs_SHAPE; aType++)
+  {
+    aSubShapes.Clear();
+    TopExp::MapShapes(theShape, (TopAbs_ShapeEnum)aType, aSubShapes);
+    if (aSubShapes.Extent() > 0)
+      theExplodeTypes.Append((TopAbs_ShapeEnum)aType);
+  }
+
+  return theExplodeTypes.Size() > 0;
 }

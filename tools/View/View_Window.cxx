@@ -27,6 +27,7 @@
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
 
+#include <AIS_Shape.hxx>
 #include <V3d.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -160,15 +161,27 @@ void View_Window::onViewContextMenuRequested (const QPoint& thePosition)
 {
 #if TINSPECTORAPI_VERSION_HEX > 0x070200
   QMenu* aMenu = new QMenu (this);
-  QMenu* anOrientationSubMenu = aMenu->addMenu ("Set View Orientation");
 
-  for (int i = 0; i < (int)V3d_XnegYnegZneg; i++)
+  QMenu* anOrientationSubMenu = aMenu->addMenu ("Set View Orientation");
+  for (int i = 0; i <= (int)V3d_XnegYnegZneg; i++)
   {
     V3d_TypeOfOrientation anOrientationType = (V3d_TypeOfOrientation)i;
     anOrientationSubMenu->addAction (View_Tools::CreateAction (V3d::TypeOfOrientationToString (anOrientationType),
                                                                SLOT (onSetOrientation()), this, this));
   }
   aMenu->addMenu (anOrientationSubMenu);
+
+  anOrientationSubMenu = aMenu->addMenu ("Activate Selection Mode");
+  for (int i = TopAbs_COMPOUND; i <= (int)TopAbs_SHAPE; i++)
+  {
+    anOrientationSubMenu->addAction (View_Tools::CreateAction (TopAbs::ShapeTypeToString((TopAbs_ShapeEnum)i),
+                                                               SLOT (onActivateSelectionMode()), this, this));
+  }
+  aMenu->addMenu (anOrientationSubMenu);
+
+  anOrientationSubMenu->addSeparator();
+  anOrientationSubMenu->addAction (View_Tools::CreateAction ("NONE",
+                                                             SLOT (onActivateSelectionMode()), this, this));
 
   QPoint aPoint = myView->mapToGlobal (thePosition);
   aMenu->exec (aPoint);
@@ -186,10 +199,9 @@ void View_Window::onSetOrientation()
 #if TINSPECTORAPI_VERSION_HEX > 0x070200
   QAction* anAction = (QAction*)(sender());
 
-  TCollection_AsciiString anOrientationStr (anAction->text().toStdString().c_str());
-
+  TCollection_AsciiString anActionText (anAction->text().toStdString().c_str());
   V3d_TypeOfOrientation anOrientationType;
-  if (!V3d::TypeOfOrientationFromString (anOrientationStr.ToCString(), anOrientationType))
+  if (!V3d::TypeOfOrientationFromString (anActionText.ToCString(), anOrientationType))
     return;
 
   Handle(V3d_View) aView = myView->GetViewer()->GetView();
@@ -200,6 +212,31 @@ void View_Window::onSetOrientation()
   aView->FitAll();
   aView->Redraw();
 #endif
+}
+
+// =======================================================================
+// function : onActivateSelectionMode
+// purpose :
+// =======================================================================
+void View_Window::onActivateSelectionMode()
+{
+  Handle(AIS_InteractiveContext) aContext = myView->GetViewer()->GetContext();
+  if (aContext.IsNull())
+    return;
+
+  QAction* anAction = (QAction*)(sender());
+  TCollection_AsciiString anActionText (anAction->text().toStdString().c_str());
+
+  if (anActionText == "NONE")
+  {
+    aContext->Deactivate();
+    return;
+  }
+
+  TopAbs_ShapeEnum aShapeType;
+  if (!TopAbs::ShapeTypeFromString (anActionText.ToCString(), aShapeType))
+    return;
+  aContext->Activate (AIS_Shape::SelectionMode (aShapeType));
 }
 
 // =======================================================================

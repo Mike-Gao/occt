@@ -114,11 +114,17 @@ protected slots:
   //! Exports shape to BREP file and view result file
   void onBREPDirectory();
 
+  //! Set the shape item exploded
+  void onExplode();
+
   //! Removes all shapes in tree view
   void onClearView() { RemoveAllShapes(); }
 
   //! Load BREP file and updates tree model to have shape of the file
   void onLoadFile();
+
+  //! Load BREP files from the selected directory and updates tree model to have shapes of the files
+  void onLoadDirectory();
 
   //! View BREP files of selected items if exist
   void onBREPView();

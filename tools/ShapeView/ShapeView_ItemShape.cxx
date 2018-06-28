@@ -31,6 +31,9 @@
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Vertex.hxx>
 
+#include <TopExp.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
+
 #include <Standard_WarningsDisable.hxx>
 #include <QObject>
 #include <QStringList>
@@ -189,7 +192,15 @@ QString locationInfo (const TopLoc_Location& theLocation)
 // =======================================================================
 TopoDS_Shape ShapeView_ItemShape::GetShape (const int theRowId) const
 {
-  TopoDS_Iterator aSubShapeIt (myShape);
+  if (myExplodeType != TopAbs_SHAPE)
+  {
+    TopTools_IndexedMapOfShape aSubShapes;
+    TopExp::MapShapes(myShape, myExplodeType, aSubShapes);
+
+    return aSubShapes(theRowId + 1);
+  }
+
+  TopoDS_Iterator aSubShapeIt(myShape);
   for (int aCurrentIndex = 0; aSubShapeIt.More(); aSubShapeIt.Next(), aCurrentIndex++)
   {
     if (aCurrentIndex != theRowId)
@@ -266,6 +277,7 @@ QVariant ShapeView_ItemShape::initValue(const int theRole) const
         case 19: return aCurve->IsPeriodic() ? QString::number (aCurve->Period()) : ToString (aCurve->IsPeriodic());
       }
     }
+    case 20: return Row() + 1;
     default: break;
   }
   return QVariant();
@@ -282,8 +294,17 @@ int ShapeView_ItemShape::initRowCount() const
     return 0;
 
   int aRowsCount = 0;
-  for (TopoDS_Iterator aSubShapeIt(aShape); aSubShapeIt.More(); aSubShapeIt.Next())
-    aRowsCount++;
+  if (myExplodeType != TopAbs_SHAPE)
+  {
+    TopTools_IndexedMapOfShape aSubShapes;
+    TopExp::MapShapes(aShape, myExplodeType, aSubShapes);
+    aRowsCount = aSubShapes.Extent();
+  }
+  else
+  {
+    for (TopoDS_Iterator aSubShapeIt(aShape); aSubShapeIt.More(); aSubShapeIt.Next())
+      aRowsCount++;
+  }
   return aRowsCount;
 }
 

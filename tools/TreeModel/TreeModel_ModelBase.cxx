@@ -66,10 +66,6 @@ QModelIndex TreeModel_ModelBase::index (int theRow, int theColumn, const QModelI
   if (!hasIndex (theRow, theColumn, theParent))
     return QModelIndex();
 
-  // to create index on the root item
-  if (!theParent.isValid())
-    return createIndex (theRow, theColumn, getIndexValue (RootItem (theColumn)));
-
   TreeModel_ItemBasePtr aParentItem;
   if (!theParent.isValid())
     aParentItem = RootItem (theColumn);
@@ -164,10 +160,6 @@ QVariant TreeModel_ModelBase::headerData (int theSection, Qt::Orientation theOri
 // =======================================================================
 int TreeModel_ModelBase::rowCount (const QModelIndex& theParent) const
 {
-  // to create index on the root item
-  if (!theParent.isValid())
-    return 1;
-
   TreeModel_ItemBasePtr aParentItem;
   if (!theParent.isValid())
     aParentItem = RootItem (0);
@@ -207,21 +199,32 @@ void TreeModel_ModelBase::EmitDataChanged (const QModelIndex& theTopLeft, const 
 }
 
 // =======================================================================
+// function : GetSelected
+// purpose :
+// =======================================================================
+QModelIndexList TreeModel_ModelBase::GetSelected (const QModelIndexList& theIndices, const int theCellId,
+                                                  const Qt::Orientation theOrientation)
+{
+  QModelIndexList aSelected;
+  for (QModelIndexList::const_iterator anIndicesIt = theIndices.begin(); anIndicesIt != theIndices.end(); anIndicesIt++)
+  {
+    QModelIndex anIndex = *anIndicesIt;
+    if ((theOrientation == Qt::Horizontal && anIndex.column() == theCellId) ||
+        (theOrientation == Qt::Vertical && anIndex.row() == theCellId))
+      aSelected.append (anIndex);
+  }
+  return aSelected;
+}
+
+// =======================================================================
 // function : SingleSelected
 // purpose :
 // =======================================================================
 QModelIndex TreeModel_ModelBase::SingleSelected (const QModelIndexList& theIndices, const int theCellId,
                                                  const Qt::Orientation theOrientation)
 {
-  QModelIndexList aFirstColumnSelectedIndices;
-  for (QModelIndexList::const_iterator anIndicesIt = theIndices.begin(); anIndicesIt != theIndices.end(); anIndicesIt++)
-  {
-    QModelIndex anIndex = *anIndicesIt;
-    if ((theOrientation == Qt::Horizontal && anIndex.column() == theCellId) ||
-        (theOrientation == Qt::Vertical && anIndex.row() == theCellId))
-      aFirstColumnSelectedIndices.append (anIndex);
-  }
-  return aFirstColumnSelectedIndices.size() == 1 ? aFirstColumnSelectedIndices.first() : QModelIndex();
+  QModelIndexList aSelected = GetSelected (theIndices, theCellId, theOrientation);
+  return aSelected.size() == 1 ? aSelected.first() : QModelIndex();
 }
 
 // =======================================================================

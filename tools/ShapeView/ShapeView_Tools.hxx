@@ -32,6 +32,12 @@ public:
   //! \param theFileName a file name
   //! \return shape or NULL
   Standard_EXPORT static TopoDS_Shape ReadShape (const TCollection_AsciiString& theFileName);
+
+  //! Checks whether it is possible to expode the shape
+  //! \param theShape source shape object
+  //! \param theExplodeTypes container of possible shape types to be exploded
+  Standard_EXPORT static Standard_Boolean IsPossibleToExplode(const TopoDS_Shape& theShape,
+    NCollection_List<TopAbs_ShapeEnum>& theExplodeTypes);
 };
 
 #endif

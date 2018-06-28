@@ -129,7 +129,13 @@ public:
   //! Defines Draw unit commands
   Standard_EXPORT static void UnitCommands (Draw_Interpretor& I);
 
+  //! Defines Draw message commands
+  Standard_EXPORT static void MessageCommands (Draw_Interpretor& I);
 
+  //! Parses boolean argument.
+  //! Handles either flag specified by 0|1 or on|off.
+  Standard_EXPORT static Standard_Boolean ParseOnOff (Standard_CString  theArg,
+                                                      Standard_Boolean& theIsOn);
 
 
 protected:

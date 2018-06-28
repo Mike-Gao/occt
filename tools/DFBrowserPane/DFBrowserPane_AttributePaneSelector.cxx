@@ -15,7 +15,9 @@
 
 #include <inspector/DFBrowserPane_AttributePaneSelector.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QItemSelectionModel>
+#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor

@@ -348,14 +348,43 @@ void ShapeView_Window::onTreeViewContextMenuRequested (const QPoint& thePosition
   ShapeView_ItemRootPtr aRootItem = itemDynamicCast<ShapeView_ItemRoot> (anItemBase);
   if (aRootItem) {
     aMenu->addAction (ViewControl_Tools::CreateAction ("Load BREP file", SLOT (onLoadFile()), myMainWindow, this));
+    aMenu->addAction (ViewControl_Tools::CreateAction ("Load BREP file from a directory", SLOT (onLoadDirectory()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("Remove all shape items", SLOT (onClearView()), myMainWindow, this));
   }
-  else {
+  else
+  {
     if (!GetTemporaryDirectory().IsEmpty())
       aMenu->addAction (ViewControl_Tools::CreateAction ("BREP view", SLOT (onBREPView()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("Close All BREP views", SLOT (onCloseAllBREPViews()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("BREP directory", SLOT (onBREPDirectory()), myMainWindow, this));
+
+    ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
+    const TopoDS_Shape& aShape = aShapeItem->GetItemShape();
+    TopAbs_ShapeEnum anExplodeType = aShapeItem->GetExplodeType();
+    NCollection_List<TopAbs_ShapeEnum> anExplodeTypes;
+    if (ShapeView_Tools::IsPossibleToExplode (aShape, anExplodeTypes))
+    {
+      QMenu* anExplodeMenu = aMenu->addMenu ("Explode");
+      for (NCollection_List<TopAbs_ShapeEnum>::Iterator anExpIterator (anExplodeTypes); anExpIterator.More();
+        anExpIterator.Next())
+      {
+        TopAbs_ShapeEnum aType = anExpIterator.Value();
+        QAction* anAction = ViewControl_Tools::CreateAction (TopAbs::ShapeTypeToString (aType), SLOT (onExplode()), myMainWindow, this);
+        anExplodeMenu->addAction (anAction);
+        if (anExplodeType == aType)
+        {
+          anAction->setCheckable (true);
+          anAction->setChecked (true);
+        }
+      }
+      QAction* anAction = ViewControl_Tools::CreateAction ("NONE", SLOT (onExplode()), myMainWindow, this);
+      anExplodeMenu->addSeparator();
+      anExplodeMenu->addAction (anAction);
+    }
   }
+
+  //aMenu->addAction(ViewControl_Tools::CreateAction("BREP directory", SLOT(onBREPDirectory()), myMainWindow, this));
+
 
   QPoint aPoint = myTreeView->mapToGlobal (thePosition);
   aMenu->exec (aPoint);
@@ -390,6 +419,46 @@ void ShapeView_Window::onBREPDirectory()
 }
 
 // =======================================================================
+// function : onExplode
+// purpose :
+// =======================================================================
+void ShapeView_Window::onExplode()
+{
+  QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected(aModel->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex(anIndex);
+  if (!anItemBase)
+    return;
+
+  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
+  if (!aShapeItem)
+    return;
+
+  QAction* anAction = (QAction*)sender();
+  if (!anAction)
+    return;
+
+  QApplication::setOverrideCursor (Qt::WaitCursor);
+  TopAbs_ShapeEnum aShapeType;
+  if (anAction->text() == "NONE")
+    aShapeType = TopAbs_SHAPE;
+  else
+    aShapeType = TopAbs::ShapeTypeFromString(anAction->text().toStdString().c_str());
+
+  myViewWindow->GetDisplayer()->EraseAllPresentations();
+  aShapeItem->SetExplodeType(aShapeType);
+
+  //anItemBase->Parent()->Reset(); - TODO (update only modified sub-tree)
+  ShapeView_TreeModel* aTreeModel = dynamic_cast<ShapeView_TreeModel*> (myTreeView->model());
+  aTreeModel->Reset();
+  aTreeModel->EmitLayoutChanged();
+  QApplication::restoreOverrideCursor();
+}
+
+// =======================================================================
 // function : onLoadFile
 // purpose :
 // =======================================================================
@@ -401,6 +470,25 @@ void ShapeView_Window::onLoadFile()
   aFileName = QDir().toNativeSeparators (aFileName);
   if (!aFileName.isEmpty())
     onOpenFile(aFileName);
+}
+
+// =======================================================================
+// function : onLoadDirectory
+// purpose :
+// =======================================================================
+void ShapeView_Window::onLoadDirectory()
+{
+  QString aDirectory = QFileDialog::getExistingDirectory(0, tr("Select directory"));
+
+  QFileInfo aFileInfo(aDirectory);
+  if (!aFileInfo.exists() || !aFileInfo.isReadable())
+    return;
+
+  QDir aDir(aDirectory);
+  QStringList aFileNames = aDir.entryList(QDir::Files, QDir::Name);
+
+  for (int i = 0; i < aFileNames.size(); i++)
+    onOpenFile(aDir.absoluteFilePath(aFileNames[i]));
 }
 
 // =======================================================================

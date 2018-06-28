@@ -89,6 +89,9 @@ protected slots:
   //! Sets the view scene orientation by the text of selected action
   void onSetOrientation();
 
+  //! Activates selection mode in the viewer
+  void onActivateSelectionMode();
+
   //! Sets selected display mode in the current context
   void onDisplayModeChanged();
 
