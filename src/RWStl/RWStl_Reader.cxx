@@ -126,7 +126,8 @@ namespace
 //==============================================================================
 
 Standard_Boolean RWStl_Reader::Read (const char* theFile,
-                                     const Handle(Message_ProgressIndicator)& theProgress)
+                                     const Handle(Message_ProgressIndicator)& theProgress,
+                                     bool IsMultiSolid)
 {
   std::filebuf aBuf;
   OSD_OpenStream (aBuf, theFile, std::ios::in | std::ios::binary);
@@ -165,6 +166,8 @@ Standard_Boolean RWStl_Reader::Read (const char* theFile,
       }
     }
     aStream >> std::ws; // skip any white spaces
+    if (IsMultiSolid)
+      AddSolid();
   }
   return ! aStream.fail();
 }

@@ -411,6 +411,22 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     {
       aFilePath = theArgVec[anArgIter];
     }
+    else if (theArgc == 4 && strcmp("multi", theArgv[3]) == 0)
+    {
+      NCollection_Sequence<Handle(Poly_Triangulation)> theTriangList;
+      RWStl::ReadFile(theArgv[2], theTriangList);
+      BRep_Builder aB;
+      TopoDS_Compound aCmp;
+      aB.MakeCompound(aCmp);
+      for (int i = 1; i <= theTriangList.Length(); i++)
+      { 
+        TopoDS_Face aFace;
+        aB.MakeFace(aFace);
+        aB.UpdateFace(aFace, theTriangList(i));
+        aB.Add(aCmp, aFace);
+      }
+      DBRep::Set(theArgv[1], aCmp);
+    }
     else
     {
       std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
