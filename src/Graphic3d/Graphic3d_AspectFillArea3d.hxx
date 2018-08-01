@@ -254,20 +254,41 @@ public:
 
 public:
 
+  //! Returns TRUE if elements should be drawn with filled interior.
+  bool IsFilledInterior() const
+  {
+    return myInteriorStyle == Aspect_IS_SOLID
+        || myInteriorStyle == Aspect_IS_SOLID_WIREFRAME
+        || myInteriorStyle == Aspect_IS_HIDDENLINE;
+  }
+
   //! Returns true if edges should be drawn (false by default).
-  bool ToDrawEdges() const { return myToDrawEdges; }
+  //! Alias for InteriorStyle()==Aspect_IS_SOLID_WIREFRAME.
+  bool ToDrawEdges() const
+  {
+    return myInteriorStyle == Aspect_IS_SOLID_WIREFRAME
+        || myInteriorStyle == Aspect_IS_HOLLOW
+        || myInteriorStyle == Aspect_IS_HIDDENLINE;
+  }
 
   //! Set if edges should be drawn or not.
-  void SetDrawEdges (bool theToDraw) { myToDrawEdges = theToDraw; }
+  //! Alias for SetInteriorStyle() with Aspect_IS_SOLID_WIREFRAME or Aspect_IS_SOLID value.
+  void SetDrawEdges (bool theToDraw)
+  {
+    myInteriorStyle = theToDraw ? Aspect_IS_SOLID_WIREFRAME : Aspect_IS_SOLID;
+  }
 
   //! Returns true if edges should be drawn.
-  bool Edge() const { return myToDrawEdges; }
+  //! Alias for InteriorStyle()==Aspect_IS_SOLID_WIREFRAME.
+  bool Edge() const { return ToDrawEdges(); }
 
   //! The edges of FillAreas are drawn.
-  void SetEdgeOn() { myToDrawEdges = true; }
+  //! Alias for SetInteriorStyle(Aspect_IS_SOLID_WIREFRAME).
+  void SetEdgeOn() { SetDrawEdges (true); }
 
   //! The edges of FillAreas are not drawn.
-  void SetEdgeOff() { myToDrawEdges = false; }
+  //! Alias for SetInteriorStyle(Aspect_IS_SOLID).
+  void SetEdgeOff() { SetDrawEdges (false); }
 
   //! Return color of edges.
   const Quantity_Color& EdgeColor() const { return myEdgeColor.GetRGB(); }
@@ -277,6 +298,9 @@ public:
 
   //! Modifies the color of the edge of the face
   void SetEdgeColor (const Quantity_Color& theColor) { myEdgeColor.SetRGB (theColor); }
+
+  //! Modifies the color of the edge of the face
+  void SetEdgeColor (const Quantity_ColorRGBA& theColor) { myEdgeColor = theColor; }
 
   //! Return edges line type.
   Aspect_TypeOfLine EdgeLineType() const { return myEdgeType; }
@@ -297,6 +321,18 @@ public:
     }
     myEdgeWidth = (float )theWidth;
   }
+
+  //! Returns TRUE if Interior Styles drawing element edges should discard first edge in triangle; FALSE by default.
+  //! Graphics hardware works mostly with triangles, so that wireframe presentation will draw triangle edges by default.
+  //! This flag allows rendering wireframe presentation of quad-only array split into triangles.
+  //! For this, quads should be split in specific order, so that the quad diagonal (to be NOT rendered) goes first:
+  //!     1------2
+  //!    /      /   Triangle #1: 2-0-1; Triangle #2: 0-2-3
+  //!   0------3
+  bool ToSkipFirstEdge() const { return myToSkipFirstEdge; }
+
+  //! Set skip first triangle edge flag for drawing wireframe presentation of quads array split into triangles.
+  void SetSkipFirstEdge (bool theToSkipFirstEdge) { myToSkipFirstEdge = theToSkipFirstEdge; }
 
 public:
 
@@ -370,8 +406,8 @@ protected:
   Handle(Graphic3d_HatchStyle) myHatchStyle;
 
   Graphic3d_PolygonOffset myPolygonOffset;
+  bool                    myToSkipFirstEdge;
   bool                    myToDistinguishMaterials;
-  bool                    myToDrawEdges;
   bool                    myToSuppressBackFaces;
   bool                    myToMapTexture;
 

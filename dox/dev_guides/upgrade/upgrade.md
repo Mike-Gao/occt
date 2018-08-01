@@ -1678,3 +1678,11 @@ Standard_Boolean meshing_new()
 Some public methods of the class BRepFilletAPI_MakeChamfer are released from excess arguments:
 - method Add for symmetric chamfer now takes only 2 arguments: distance and edge;
 - method GetDistAngle now takes only 3 arguments: index of contour, distance and angle.
+
+@subsection upgrade_740_interiorstyles Interior styles
+
+Previously defined as separate Boolean flag *Graphic3d_AspectFillArea3d::ToDrawEdges()* property has been merged into *Graphic3d_AspectFillArea3d::InteriorStyle()*.
+So that applications using *ToDrawEdges()* might require modification.
+
+*Aspect_InteriorStyle* enumeration has been extended with new value *Aspect_IS_SOLID_WIREFRAME* drawing interior with triangle edges (wireframe),
+which previosly could be achieved by Aspect_IS_SOLID+SetEdgeOn combination.

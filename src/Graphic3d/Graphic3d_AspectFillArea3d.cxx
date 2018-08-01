@@ -32,8 +32,8 @@ Graphic3d_AspectFillArea3d::Graphic3d_AspectFillArea3d()
   myEdgeType            (Aspect_TOL_SOLID),
   myEdgeWidth           (1.0f),
   myHatchStyle          (Handle(Graphic3d_HatchStyle)()),
+  myToSkipFirstEdge     (false),
   myToDistinguishMaterials (false),
-  myToDrawEdges         (false),
   myToSuppressBackFaces (true),
   myToMapTexture        (false)
 {
@@ -63,8 +63,8 @@ Graphic3d_AspectFillArea3d::Graphic3d_AspectFillArea3d (const Aspect_InteriorSty
   myEdgeType            (theEdgeLineType),
   myEdgeWidth           ((float )theEdgeLineWidth),
   myHatchStyle          (Handle(Graphic3d_HatchStyle)()),
+  myToSkipFirstEdge     (false),
   myToDistinguishMaterials (false),
-  myToDrawEdges         (false),
   myToSuppressBackFaces (true),
   myToMapTexture        (false)
 {
