@@ -979,6 +979,39 @@ Standard_Boolean BRepTools::IsReallyClosed(const TopoDS_Edge& E,
 }
 
 //=======================================================================
+//function : DetectClosedness
+//purpose  : 
+//=======================================================================
+
+void BRepTools::DetectClosedness(const TopoDS_Face& theFace,
+                                 Standard_Boolean&  theUclosed,
+                                 Standard_Boolean&  theVclosed)
+{
+  theUclosed = theVclosed = Standard_False;
+  
+  TopExp_Explorer Explo(theFace, TopAbs_EDGE);
+  for (; Explo.More(); Explo.Next())
+  {
+    const TopoDS_Edge& anEdge = TopoDS::Edge(Explo.Current());
+    if (BRep_Tool::IsClosed(anEdge, theFace) &&
+        BRepTools::IsReallyClosed(anEdge, theFace))
+    {
+      Standard_Real fpar, lpar;
+      Handle(Geom2d_Curve) PCurve1 = BRep_Tool::CurveOnSurface(anEdge, theFace, fpar, lpar);
+      Handle(Geom2d_Curve) PCurve2 = BRep_Tool::CurveOnSurface(TopoDS::Edge(anEdge.Reversed()),
+                                                               theFace, fpar, lpar);
+      gp_Pnt2d Point1 = PCurve1->Value(fpar);
+      gp_Pnt2d Point2 = PCurve2->Value(fpar);
+      Standard_Boolean IsUiso = (Abs(Point1.X() - Point2.X()) > Abs(Point1.Y() - Point2.Y()));
+      if (IsUiso)
+        theUclosed = Standard_True;
+      else
+        theVclosed = Standard_True;
+    }
+  }
+}
+
+//=======================================================================
 //function : EvalAndUpdateTol
 //purpose  : 
 //=======================================================================

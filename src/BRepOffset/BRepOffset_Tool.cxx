@@ -183,24 +183,6 @@ TopAbs_Orientation BRepOffset_Tool::OriEdgeInFace (const TopoDS_Edge& E,
 }
 
 //=======================================================================
-//function : IsPCurveUiso
-//purpose  : 
-//=======================================================================
-
-static Standard_Boolean IsPCurveUiso(const Handle(Geom2d_Curve)& thePCurve,
-                                     Standard_Real theFirstPar,
-                                     Standard_Real theLastPar)
-{
-  gp_Pnt2d FirstP2d = thePCurve->Value(theFirstPar);
-  gp_Pnt2d LastP2d  = thePCurve->Value(theLastPar);
-
-  Standard_Real DeltaU = Abs(FirstP2d.X() - LastP2d.X());
-  Standard_Real DeltaV = Abs(FirstP2d.Y() - LastP2d.Y());
-
-  return (DeltaU < DeltaV);
-}
-
-//=======================================================================
 //function : FindPeriod
 //purpose  : 
 //=======================================================================
@@ -3230,40 +3212,6 @@ void BRepOffset_Tool::CheckBounds(const TopoDS_Face& F,
 }
 
 //=======================================================================
-//function : DetectClosedness
-//purpose  : 
-//=======================================================================
-
-void BRepOffset_Tool::DetectClosedness(const TopoDS_Face& theFace,
-                                       Standard_Boolean&  theUclosed,
-                                       Standard_Boolean&  theVclosed)
-{
-  theUclosed = theVclosed = Standard_False;
-  
-  BRepAdaptor_Surface BAsurf(theFace, Standard_False);
-  Standard_Boolean IsSurfUclosed = BAsurf.IsUClosed();
-  Standard_Boolean IsSurfVclosed = BAsurf.IsVClosed();
-  if (!IsSurfUclosed && !IsSurfVclosed)
-    return;
-  
-  TopExp_Explorer Explo(theFace, TopAbs_EDGE);
-  for (; Explo.More(); Explo.Next())
-  {
-    const TopoDS_Edge& anEdge = TopoDS::Edge(Explo.Current());
-    if (BRepTools::IsReallyClosed(anEdge, theFace))
-    {
-      Standard_Real fpar, lpar;
-      Handle(Geom2d_Curve) aPCurve = BRep_Tool::CurveOnSurface(anEdge, theFace, fpar, lpar);
-      Standard_Boolean IsUiso = IsPCurveUiso(aPCurve, fpar, lpar);
-      if (IsSurfUclosed && IsUiso)
-        theUclosed = Standard_True;
-      if (IsSurfVclosed && !IsUiso)
-        theVclosed = Standard_True;
-    }
-  }
-}
-
-//=======================================================================
 //function : EnLargeFace
 //purpose  : 
 //=======================================================================
@@ -3282,16 +3230,13 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
  const Standard_Real      theLenBeforeVfirst,
  const Standard_Real      theLenAfterVlast)
 {
-  //Detect closedness in U and V
-  Standard_Boolean uclosed = Standard_False, vclosed = Standard_False;
-  DetectClosedness(F, uclosed, vclosed);
-  
   //---------------------------
   // extension de la geometrie.
   //---------------------------
   TopLoc_Location       L;
   Handle (Geom_Surface) S = BRep_Tool::Surface(F,L);
   Standard_Real         UU1,VV1,UU2,VV2;
+  Standard_Boolean      uperiodic = Standard_False, vperiodic = Standard_False;
   Standard_Boolean      isVV1degen = Standard_False, isVV2degen = Standard_False;
   Standard_Real         US1,VS1,US2,VS2;
   Standard_Real         UF1,VF1,UF2,VF2;
@@ -3345,6 +3290,7 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
   }
 
   if (S->IsUPeriodic()) {
+    uperiodic = Standard_True;
     Standard_Real    Period = S->UPeriod(); 
     Standard_Real    Delta  = Period - (UF2 - UF1);
     Standard_Real    alpha  = 0.1;
@@ -3354,6 +3300,7 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
     }
   }
   if (S->IsVPeriodic()) {
+    vperiodic = Standard_True;
     Standard_Real    Period = S->VPeriod(); 
     Standard_Real    Delta  = Period - (VF2 - VF1);
     Standard_Real    alpha  = 0.1;
@@ -3395,6 +3342,16 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
   if (!theEnlargeVlast)
     VV2 = VF2;
 
+  //Detect closedness in U and V directions
+  Standard_Boolean uclosed = Standard_False, vclosed = Standard_False;
+  BRepTools::DetectClosedness(F, uclosed, vclosed);
+  if (uclosed && !uperiodic &&
+      (theLenBeforeUfirst != 0. || theLenAfterUlast != 0.))
+    uclosed = Standard_False;
+  if (vclosed && !vperiodic &&
+      (theLenBeforeVfirst != 0. && theLenAfterVlast != 0.))
+    vclosed = Standard_False;
+  
   MakeFace(S,UU1,UU2,VV1,VV2,uclosed,vclosed,isVV1degen,isVV2degen,BF);
   BF.Location(L);
 /*
