@@ -51,3 +51,8 @@ XmlMXCAFDoc_VisMaterialToolDriver.cxx
 XmlMXCAFDoc_VisMaterialToolDriver.hxx
 XmlMXCAFDoc_VolumeDriver.cxx
 XmlMXCAFDoc_VolumeDriver.hxx
+XmlMXCAFDoc_AnimationDriver.cxx
+XmlMXCAFDoc_AnimationDriver.hxx
+XmlMXCAFDoc_AnimationToolDriver.cxx
+XmlMXCAFDoc_AnimationToolDriver.hxx
+
