@@ -212,6 +212,18 @@ void AIS_Manipulator::SetPart (const Standard_Integer theAxisIndex, const AIS_Ma
 }
 
 //=======================================================================
+//function : SetPart
+//purpose  : 
+//=======================================================================
+void AIS_Manipulator::SetPart (const AIS_ManipulatorMode theMode, const Standard_Boolean theIsEnabled)
+{
+  for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
+  {
+    SetPart (anIt, theMode, theIsEnabled);
+  }
+}
+
+//=======================================================================
 //function : EnableMode
 //purpose  : 
 //=======================================================================
@@ -949,10 +961,14 @@ void AIS_Manipulator::ComputeSelection (const Handle(SelectMgr_Selection)& theSe
   {
     for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
     {
+      if (!myAxes[anIt].HasTranslation())
+      {
+        continue;
+      }
       const Axis& anAxis = myAxes[anIt];
       if (aMode != AIS_MM_None)
       {
-        anOwner = new AIS_ManipulatorOwner(this, anIt, AIS_MM_Translation, 9);
+        anOwner = new AIS_ManipulatorOwner (this, anIt, AIS_MM_Translation, 9);
       }
       // define sensitivity by line
       Handle(Select3D_SensitiveSegment) aLine = new Select3D_SensitiveSegment (anOwner, gp::Origin(), anAxis.TranslatorTipPosition());
@@ -970,6 +986,10 @@ void AIS_Manipulator::ComputeSelection (const Handle(SelectMgr_Selection)& theSe
   {
     for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
     {
+      if (!myAxes[anIt].HasRotation())
+      {
+        continue;
+      }
       const Axis& anAxis = myAxes[anIt];
       if (aMode != AIS_MM_None)
       {
@@ -990,6 +1010,10 @@ void AIS_Manipulator::ComputeSelection (const Handle(SelectMgr_Selection)& theSe
   {
     for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
     {
+      if (!myAxes[anIt].HasScaling())
+      {
+        continue;
+      }
       if (aMode != AIS_MM_None)
       {
         anOwner = new AIS_ManipulatorOwner (this, anIt, AIS_MM_Scaling, 9);
