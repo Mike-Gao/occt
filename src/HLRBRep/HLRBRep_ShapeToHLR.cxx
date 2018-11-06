@@ -14,11 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef No_Exception
-// #define No_Exception
-#endif
-
-
 #include <BRep_Tool.hxx>
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_MapOfShapeTool.hxx>

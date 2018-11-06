@@ -14,11 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef No_Exception
-#define No_Exception
-#endif
-
-
 #include <Bnd_Box.hxx>
 #include <ElCLib.hxx>
 #include <gp.hxx>

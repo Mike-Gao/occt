@@ -14,11 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef No_Exception
-// #define No_Exception
-#endif
-
-
 #include <gp_Ax2.hxx>
 #include <gp_Ax3.hxx>
 #include <gp_Lin.hxx>
