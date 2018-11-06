@@ -14,15 +14,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//  Modified by skv - Tue Sep  9 15:10:35 2003 OCC620
-
-
-#ifndef No_Exception
-#define No_Exception
-#endif
-
-
 #include <ElSLib.hxx>
+
 #include <gp.hxx>
 #include <gp_Ax3.hxx>
 #include <gp_Circ.hxx>
