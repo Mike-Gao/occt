@@ -1490,7 +1490,7 @@ Standard_Boolean OpenGl_ShaderManager::prepareStdProgramUnlit (Handle(OpenGl_Sha
                                                                const Standard_Integer        theBits)
 {
   Handle(Graphic3d_ShaderProgram) aProgramSrc = new Graphic3d_ShaderProgram();
-  TCollection_AsciiString aSrcVert, aSrcVertExtraMain, aSrcVertExtraFunc, aSrcGetAlpha;
+  TCollection_AsciiString aSrcVert, aSrcVertExtraMain, aSrcVertExtraFunc, aSrcGetAlpha, aSrcVertExtraOut, aSrcFragExtraOut;
   TCollection_AsciiString aSrcFrag, aSrcFragExtraMain, aSrcFragWriteOit;
   TCollection_AsciiString aSrcFragGetColor     = EOL"vec4 getColor(void) { return occColor; }";
   TCollection_AsciiString aSrcFragMainGetColor = EOL"  occSetFragColor (getColor());";
@@ -1701,6 +1701,7 @@ Standard_Boolean OpenGl_ShaderManager::prepareStdProgramUnlit (Handle(OpenGl_Sha
 
   aSrcVert =
       aSrcVertExtraFunc
+    + aSrcVertExtraOut
     + EOL"void main()"
       EOL"{"
       EOL"  vec4 vertex = occVertex;"
@@ -1712,6 +1713,7 @@ Standard_Boolean OpenGl_ShaderManager::prepareStdProgramUnlit (Handle(OpenGl_Sha
   aSrcFrag =
       aSrcFragGetColor
     + aSrcGetAlpha
+    + aSrcFragExtraOut
     + EOL"void main()"
       EOL"{"
     + aSrcFragExtraMain

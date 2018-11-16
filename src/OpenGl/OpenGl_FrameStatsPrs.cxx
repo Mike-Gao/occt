@@ -395,7 +395,7 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
 
     aCtx->ShaderManager()->BindFaceProgram (Handle(OpenGl_TextureSet)(), Graphic3d_TOSM_UNLIT,
                                             Graphic3d_AlphaMode_Blend, true, false,
-                                            Handle(OpenGl_ShaderProgram)());
+                                            Handle(OpenGl_ShaderProgram)(), Aspect_IS_SOLID);
     aCtx->SetColor4fv (OpenGl_Vec4 (1.0f, 1.0f, 1.0f, 1.0f));
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
