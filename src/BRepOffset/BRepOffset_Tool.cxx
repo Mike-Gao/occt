@@ -2961,37 +2961,48 @@ static Standard_Boolean EnlargeGeometry(Handle(Geom_Surface)&  S,
     
     Standard_Real du_first = 0., du_last = 0.,
       dv_first = 0., dv_last = 0.;
-    Handle( Geom_Curve ) uiso, viso, uiso1, uiso2, viso1, viso2;
+    Handle( Geom_Curve ) uiso1, uiso2, viso1, viso2;
+    Standard_Real gabarit_uiso1, gabarit_uiso2, gabarit_viso1, gabarit_viso2;
+
+    uiso1 = S->UIso( u1 );
+    uiso2 = S->UIso( u2 );
+    viso1 = S->VIso( v1 );
+    viso2 = S->VIso( v2 );
+    gabarit_uiso1 = BRepOffset_Tool::Gabarit( uiso1 );
+    gabarit_uiso2 = BRepOffset_Tool::Gabarit( uiso2 );
+    gabarit_viso1 = BRepOffset_Tool::Gabarit( viso1 );
+    gabarit_viso2 = BRepOffset_Tool::Gabarit( viso2 );
+    if (gabarit_viso1 <= TolApex ||
+        gabarit_viso2 <= TolApex)
+      enlargeU = Standard_False;
+    if (gabarit_uiso1 <= TolApex ||
+        gabarit_uiso2 <= TolApex)
+      enlargeV = Standard_False;
+    
     GeomAdaptor_Curve gac;
     if (enlargeU)
     {
-      viso = S->VIso( v1 );
-      gac.Load( viso );
+      gac.Load( viso1 );
       Standard_Real du_default = GCPnts_AbscissaPoint::Length( gac ) * coeff;
       du_first = (theLenBeforeUfirst == -1)? du_default : theLenBeforeUfirst;
       du_last  = (theLenAfterUlast == -1)? du_default : theLenAfterUlast;
-      uiso1 = S->UIso( u1 );
-      uiso2 = S->UIso( u2 );
-      if (BRepOffset_Tool::Gabarit( uiso1 ) <= TolApex)
+      if (gabarit_uiso1 <= TolApex)
         enlargeUfirst = Standard_False;
-      if (BRepOffset_Tool::Gabarit( uiso2 ) <= TolApex)
+      if (gabarit_uiso2 <= TolApex)
         enlargeUlast = Standard_False;
     }
     if (enlargeV)
     {
-      uiso = S->UIso( u1 );
-      gac.Load( uiso );
+      gac.Load( uiso1 );
       Standard_Real dv_default = GCPnts_AbscissaPoint::Length( gac ) * coeff;
       dv_first = (theLenBeforeVfirst == -1)? dv_default : theLenBeforeVfirst;
       dv_last  = (theLenAfterVlast == -1)? dv_default : theLenAfterVlast;
-      viso1 = S->VIso( v1 );
-      viso2 = S->VIso( v2 );
-      if (BRepOffset_Tool::Gabarit( viso1 ) <= TolApex)
+      if (gabarit_viso1 <= TolApex)
       {
         enlargeVfirst = Standard_False;
         IsV1degen = Standard_True;
       }
-      if (BRepOffset_Tool::Gabarit( viso2 ) <= TolApex)
+      if (gabarit_viso2 <= TolApex)
       {
         enlargeVlast = Standard_False;
         IsV2degen = Standard_True;
