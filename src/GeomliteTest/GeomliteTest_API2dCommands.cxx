@@ -557,7 +557,9 @@ static Standard_Integer deviation(Draw_Interpretor& theDI, Standard_Integer theN
 {
   if (theNArg < 3)
   {
-    theDI << "Use: deviation2d result curve [U0]\n";
+    theDI << "Use: deviation2d result curve [-i U0] [-d N]\n"
+             "\"-i\" sets an initial parameter for computation by iterative method;\n"
+             "\"-d\" sets number of sub-intervals for searching. Default value is 2.";
     return 1;
   }
 
@@ -683,8 +685,6 @@ void GeomliteTest::API2dCommands(Draw_Interpretor& theCommands)
     intconcon, g);
 
   theCommands.Add("2ddeviation", "deviation2d result curve [-i U0] [-d N]\n"
-                  "\"-i\" sets an initial parameter for computation by iterative method;\n"
-                  "\"-d\" sets number of sub-intervals for searching. Default val is 2.",
                   __FILE__, deviation, g);
 
 }
