@@ -115,7 +115,7 @@ public:
                                                        const Standard_Boolean theEnlargeU = Standard_True,
                                                        const Standard_Boolean theEnlargeVfirst = Standard_True,
                                                        const Standard_Boolean theEnlargeVlast = Standard_True,
-                                                       const Standard_Boolean theUseInfini = Standard_True,
+                                                       const Standard_Integer theExtensionMode = 1,
                                                        const Standard_Real    theLenBeforeUfirst = -1.,
                                                        const Standard_Real    theLenAfterUlast   = -1.,
                                                        const Standard_Real    theLenBeforeVfirst = -1.,

@@ -2825,6 +2825,7 @@ static Standard_Boolean EnlargeGeometry(Handle(Geom_Surface)&  S,
 					const Standard_Real    uf2,
 					const Standard_Real    vf1,
 					const Standard_Real    vf2,
+                                        const Standard_Real    coeff,
 					const Standard_Boolean theGlobalEnlargeU,
 					const Standard_Boolean theGlobalEnlargeVfirst,
 					const Standard_Boolean theGlobalEnlargeVlast,
@@ -2833,14 +2834,13 @@ static Standard_Boolean EnlargeGeometry(Handle(Geom_Surface)&  S,
                                         const Standard_Real    theLenBeforeVfirst,
                                         const Standard_Real    theLenAfterVlast)
 {
-  const Standard_Real coeff = 1.;
   const Standard_Real TolApex = 1.e-5;
 
   Standard_Boolean SurfaceChange = Standard_False;
   if ( S->DynamicType() == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
     Handle(Geom_Surface) BS = Handle(Geom_RectangularTrimmedSurface)::DownCast (S)->BasisSurface();
     EnlargeGeometry(BS,U1,U2,V1,V2,IsV1degen,IsV2degen,
-		    uf1,uf2,vf1,vf2,
+		    uf1,uf2,vf1,vf2,coeff,
                     theGlobalEnlargeU, theGlobalEnlargeVfirst, theGlobalEnlargeVlast,
                     theLenBeforeUfirst, theLenAfterUlast, theLenBeforeVfirst, theLenAfterVlast);
     if (!theGlobalEnlargeVfirst)
@@ -2857,7 +2857,7 @@ static Standard_Boolean EnlargeGeometry(Handle(Geom_Surface)&  S,
   else if (S->DynamicType() == STANDARD_TYPE(Geom_OffsetSurface)) {
     Handle(Geom_Surface) Surf = Handle(Geom_OffsetSurface)::DownCast (S)->BasisSurface();
     SurfaceChange = EnlargeGeometry(Surf,U1,U2,V1,V2,IsV1degen,IsV2degen,
-				    uf1,uf2,vf1,vf2,
+				    uf1,uf2,vf1,vf2,coeff,
                                     theGlobalEnlargeU, theGlobalEnlargeVfirst, theGlobalEnlargeVlast,
                                     theLenBeforeUfirst, theLenAfterUlast, theLenBeforeVfirst, theLenAfterVlast);
     Handle(Geom_OffsetSurface)::DownCast(S)->SetBasisSurface(Surf);
@@ -3276,7 +3276,7 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
  const Standard_Boolean   theEnlargeU,
  const Standard_Boolean   theEnlargeVfirst,
  const Standard_Boolean   theEnlargeVlast,
- const Standard_Boolean   theUseInfini,
+ const Standard_Integer   theExtensionMode,
  const Standard_Real      theLenBeforeUfirst,
  const Standard_Real      theLenAfterUlast,
  const Standard_Real      theLenBeforeVfirst,
@@ -3316,10 +3316,12 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
   }
 
   S->Bounds            (US1,US2,VS1,VS2);
-  if (theUseInfini)
+  Standard_Real coeff;
+  if (theExtensionMode == 1)
   {
     UU1 = VV1 = - infini;
     UU2 = VV2 =   infini;
+    coeff = 0.25;
   }
   else
   {
@@ -3329,10 +3331,11 @@ Standard_Boolean BRepOffset_Tool::EnLargeFace
     UU2 = UF2 + 10*FaceDU;
     VV1 = VF1 - 10*FaceDV;
     VV2 = VF2 + 10*FaceDV;
+    coeff = 1.;
   }
   
   if (CanExtentSurface) {
-    SurfaceChange = EnlargeGeometry(S, UU1, UU2, VV1, VV2, isVV1degen, isVV2degen, UF1, UF2, VF1, VF2,
+    SurfaceChange = EnlargeGeometry(S, UU1, UU2, VV1, VV2, isVV1degen, isVV2degen, UF1, UF2, VF1, VF2, coeff,
                                     theEnlargeU, theEnlargeVfirst, theEnlargeVlast,
                                     theLenBeforeUfirst, theLenAfterUlast, theLenBeforeVfirst, theLenAfterVlast);
   }
