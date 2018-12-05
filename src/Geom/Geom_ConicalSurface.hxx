@@ -179,7 +179,10 @@ public:
   //! side of the axis of revolution of this cone if the
   //! half-angle at the apex is positive, and on the positive
   //! side of the "main Axis" if the half-angle is negative.
+  //! If theVParametr != 0 (points on the real variable) then it will store
+  //! the V-parameter of the apex.
   Standard_EXPORT gp_Pnt Apex() const;
+  Standard_EXPORT gp_Pnt Apex(Standard_Real* const theVParametr) const;
   
 
   //! The conical surface is infinite in the V direction so

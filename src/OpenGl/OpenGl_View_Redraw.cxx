@@ -39,6 +39,10 @@
 #include <OpenGl_Structure.hxx>
 #include <OpenGl_ArbFBO.hxx>
 
+#if defined(_WIN32) && defined(HAVE_VIDEOCAPTURE)
+#include <OpenGl_AVIWriter.hxx>
+#endif
+
 namespace
 {
   //! Format Frame Buffer format for logging messages.
@@ -522,6 +526,24 @@ void OpenGl_View::Redraw()
       blitBuffers (anImmFbo, aFrameBuffer, myToFlipOutput);
     }
   }
+
+#if defined(_WIN32) && defined(HAVE_VIDEOCAPTURE)
+  if (OpenGl_AVIWriter_AllowWriting(myWindow->PlatformWindow()->NativeHandle()))
+  {
+    GLint params[4];
+    glGetIntegerv(GL_VIEWPORT, params);
+    int nWidth = params[2] & ~0x7;
+    int nHeight = params[3] & ~0x7;
+
+    const int nBitsPerPixel = 24;
+    GLubyte* aDumpData = new GLubyte[nWidth * nHeight * nBitsPerPixel / 8];
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, nWidth, nHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, aDumpData);
+    OpenGl_AVIWriter_AVIWriter(aDumpData, nWidth, nHeight, nBitsPerPixel);
+    delete[] aDumpData;
+  }
+#endif
 
   if (myRenderParams.Method == Graphic3d_RM_RAYTRACING
    && myRenderParams.IsGlobalIlluminationEnabled)

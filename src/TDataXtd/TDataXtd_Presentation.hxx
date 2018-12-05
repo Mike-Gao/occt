@@ -114,7 +114,12 @@ public:
 
   Standard_EXPORT void SetMode(const Standard_Integer theMode);
 
-  Standard_EXPORT void SetSelectionMode(const Standard_Integer theSelectionMode);
+  //! Sets selection mode.
+  //! If "theTransaction" flag is OFF, modification of the attribute doesn't influence the transaction mechanism
+  //! (the attribute doesn't participate in undo/redo because of this modification).
+  //! Certainly, if any other data of the attribute is modified (display mode, color, ...),
+  //! the attribute will be included into undo/redo.
+  Standard_EXPORT void SetSelectionMode(const Standard_Integer theSelectionMode, const Standard_Boolean theTransaction = Standard_True);
 
   Standard_EXPORT Standard_Integer MaterialIndex() const;
 

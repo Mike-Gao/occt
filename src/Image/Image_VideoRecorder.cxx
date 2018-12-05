@@ -41,10 +41,12 @@ extern "C"
   #pragma warning(disable : 4244)
 #endif
 
+#ifdef HAVE_FFMPEG
   #include <libavcodec/avcodec.h>
   #include <libavformat/avformat.h>
   #include <libswscale/swscale.h>
   #include <libavutil/imgutils.h>
+#endif
 
 #ifdef _MSC_VER
   #pragma warning(default : 4244)
