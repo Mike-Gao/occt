@@ -25,6 +25,7 @@
 
 #include <inspector/ShapeView_ItemRoot.hxx>
 #include <inspector/ShapeView_ItemShape.hxx>
+#include <inspector/ViewControl_Tools.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -163,27 +164,6 @@ void ToOtherInfo (const TopoDS_Shape& theShape, QVariant& theValue, QVariant& th
 }
 
 // =======================================================================
-// function : locationInfo
-// purpose :
-// =======================================================================
-QString locationInfo (const TopLoc_Location& theLocation)
-{
-  QString anInfo;
-
-  gp_Trsf aTrsf = theLocation.Transformation();
-  QStringList aValues, aRowValues;
-  for (int aRowId = 1; aRowId <= 3; aRowId++)
-  {
-    aRowValues.clear();
-    for (int aColumnId = 1; aColumnId <= 4; aColumnId++)
-      aRowValues.append (QString::number (aTrsf.Value(aRowId, aColumnId)));
-    aValues.append (aRowValues.join (","));
-  }
-  anInfo.append (aValues.join ("  "));
-  return anInfo;
-}
-
-// =======================================================================
 // function : GetShape
 // purpose :
 // =======================================================================
@@ -218,7 +198,7 @@ QVariant ShapeView_ItemShape::initValue(const int theRole) const
     case 2: return rowCount() > 0 ? QVariant (rowCount()) : QVariant();
     case 3: return TShapePointer().ToCString();
     case 4: return ToName(aShape.Orientation());
-    case 5: return locationInfo(aShape.Location());
+    case 5: return ViewControl_Tools::ToString (aShape.Location()).ToCString();
     case 6: return ToString (aShape.Checked());
     case 7: return ToString (aShape.Closed());
     case 8: return ToString (aShape.Infinite());

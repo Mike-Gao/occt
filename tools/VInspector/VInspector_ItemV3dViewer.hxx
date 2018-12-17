@@ -40,14 +40,24 @@ public:
   //! Destructor
   virtual ~VInspector_ItemV3dViewer() Standard_OVERRIDE {};
 
+  //! Returns view by index using active views iterator
+  //! \param theRow row index of the view
+  //! \return view
+  Standard_EXPORT Handle(V3d_View) GetView (const int theRow) const;
+
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
 
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myViewer; }
+
   //! Returns current drawer, initialize the drawer if it was not initialized yet
-  Standard_EXPORT Handle(V3d_Viewer) GetViewer() const;
+  Standard_EXPORT Handle(V3d_Viewer) GetViewer() const
+  { return Handle(V3d_Viewer)::DownCast (GetObject()); }
 
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.

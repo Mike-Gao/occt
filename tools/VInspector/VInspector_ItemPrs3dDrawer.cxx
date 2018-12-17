@@ -166,17 +166,6 @@ void VInspector_ItemPrs3dDrawer::initItem() const
 }
 
 // =======================================================================
-// function : GetDrawer
-// purpose :
-// =======================================================================
-
-Handle(Prs3d_Drawer) VInspector_ItemPrs3dDrawer::GetDrawer() const
-{
-  initItem();
-  return myDrawer;
-}
-
-// =======================================================================
 // function : GetPrs3dAspect
 // purpose :
 // =======================================================================

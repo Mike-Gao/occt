@@ -46,7 +46,14 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
-  Standard_EXPORT Handle(Prs3d_BasicAspect) GetAspect() const;
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myAspect; }
+
+  //! Returns the current aspect, init item if it was not initialized yet
+  //! \return interactive object
+  Standard_EXPORT Handle(Prs3d_BasicAspect) GetAspect() const
+  { return Handle(Prs3d_BasicAspect)::DownCast (GetObject()); }
 
   //! Returns sub aspect of the row if possible, e.g. Datum/Dimension aspect
   //! \param theRow child row index

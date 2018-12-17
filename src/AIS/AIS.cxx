@@ -88,6 +88,11 @@ namespace
   {
     "DISPLAYED", "ERASED", "NONE"
   };
+
+  static Standard_CString AIS_Table_PrintKindOfInteractive[6] =
+  {
+    "NONE", "DATUM", "SHAPE", "OBJECT", "RELATION", "DIMENSION"
+  };
 }
 
 //=======================================================================
@@ -1571,6 +1576,36 @@ Standard_Boolean AIS::DisplayStatusFromString (Standard_CString theTypeString,
     if (aName == aTypeName)
     {
       theType = AIS_DisplayStatus (aTypeIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : KindOfInteractiveToString
+//purpose  :
+//=======================================================================
+Standard_CString AIS::KindOfInteractiveToString (AIS_KindOfInteractive theType)
+{
+  return AIS_Table_PrintKindOfInteractive[theType];
+}
+
+//=======================================================================
+//function : KindOfInteractiveFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean AIS::KindOfInteractiveFromString (Standard_CString theTypeString,
+                                                   AIS_KindOfInteractive& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = 0; aTypeIter <= AIS_KOI_Dimension; ++aTypeIter)
+  {
+    Standard_CString aTypeName = AIS_Table_PrintKindOfInteractive[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = AIS_KindOfInteractive (aTypeIter);
       return Standard_True;
     }
   }

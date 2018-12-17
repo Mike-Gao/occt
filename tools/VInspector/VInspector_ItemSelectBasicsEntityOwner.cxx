@@ -17,6 +17,7 @@
 #include <inspector/VInspector_ItemSelectMgrSensitiveEntity.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
 #include <inspector/VInspector_Tools.hxx>
+#include <inspector/ViewControl_Table.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
 #include <SelectMgr_SensitiveEntity.hxx>
@@ -49,47 +50,47 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::initValue(int theItemRole) cons
       {
         case 0: return anOwner->DynamicType()->Name();
         case 2: return VInspector_Tools::GetPointerInfo (anOwner, true).ToCString();
-        case 3:
-        {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
+        //case 3:
+        //{
+        //  Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
+        //  if (BROwnr.IsNull())
+        //    return QVariant();
 
-          const TopoDS_Shape& aShape = BROwnr->Shape();
-          if (aShape.IsNull())
-            return QVariant();
+        //  const TopoDS_Shape& aShape = BROwnr->Shape();
+        //  if (aShape.IsNull())
+        //    return QVariant();
 
-          return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
-        }
-        case 17:
-        case 18:
-        case 19:
-          {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
+        //  return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
+        //}
+        //case 17:
+        //case 18:
+        //case 19:
+        //  {
+        //  Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
+        //  if (BROwnr.IsNull())
+        //    return QVariant();
 
-          const TopoDS_Shape& aShape = BROwnr->Shape();
-          if (aShape.IsNull())
-            return QVariant();
+        //  const TopoDS_Shape& aShape = BROwnr->Shape();
+        //  if (aShape.IsNull())
+        //    return QVariant();
 
-          return Column() == 17 ? VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString()
-               : Column() == 18 ? VInspector_Tools::OrientationToName (aShape.Orientation()).ToCString()
-               :           /*19*/ ViewControl_Tools::ToString (aShape.Location()).ToCString();
-        }
-        case 21:
-          {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
+        //  return Column() == 17 ? VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString()
+        //       : Column() == 18 ? VInspector_Tools::OrientationToName (aShape.Orientation()).ToCString()
+        //       :           /*19*/ ViewControl_Tools::ToString (aShape.Location()).ToCString();
+        //}
+        //case 21:
+        //  {
+        //  Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
+        //  if (BROwnr.IsNull())
+        //    return QVariant();
 
-          //const TopoDS_Shape& aShape = BROwnr->Shape();
-          //if (aShape.IsNull())
-          //  return QVariant();
+        //  //const TopoDS_Shape& aShape = BROwnr->Shape();
+        //  //if (aShape.IsNull())
+        //  //  return QVariant();
 
-          return ViewControl_Tools::ToString (BROwnr->Location()).ToCString();
-        }
-        default: break;
+        //  return ViewControl_Tools::ToString (BROwnr->Location()).ToCString();
+        //}
+        //default: break;
       }
       break;
     }
@@ -126,7 +127,8 @@ void VInspector_ItemSelectBasicsEntityOwner::Init()
   if (aParentItem)
   {
     Handle(SelectMgr_SensitiveEntity) anEntity = aParentItem->GetSensitiveEntity();
-    anOwner = anEntity->BaseSensitive()->OwnerId();
+    if (!anEntity.IsNull() && !anEntity->BaseSensitive().IsNull())
+      anOwner = anEntity->BaseSensitive()->OwnerId();
   }
   else
   {
@@ -164,6 +166,7 @@ void VInspector_ItemSelectBasicsEntityOwner::Init()
     }
   }
   myOwner = anOwner;
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init();
 }
 
@@ -189,16 +192,6 @@ void VInspector_ItemSelectBasicsEntityOwner::initItem() const
 }
 
 // =======================================================================
-// function : getEntityOwner
-// purpose :
-// =======================================================================
-Handle(SelectBasics_EntityOwner) VInspector_ItemSelectBasicsEntityOwner::getEntityOwner() const
-{
-  initItem();
-  return myOwner;
-}
-
-// =======================================================================
 // function : GetTableRowCount
 // purpose :
 // =======================================================================
@@ -213,16 +206,11 @@ int VInspector_ItemSelectBasicsEntityOwner::GetTableRowCount() const
 // =======================================================================
 ViewControl_EditType VInspector_ItemSelectBasicsEntityOwner::GetTableEditType(const int theRow, const int) const
 {
-  /*switch (theRow)
+  switch (theRow)
   {
-  case 4: return ViewControl_EditType_Line;
-  case 5: return ViewControl_EditType_Combo;
-  case 6: return ViewControl_EditType_Bool;
-  case 12: return ViewControl_EditType_Bool;
-  case 17: return ViewControl_EditType_Combo;
-  case 18: return ViewControl_EditType_Bool;
-  default: return ViewControl_EditType_None;
-  }*/
+    case 0: return ViewControl_EditType_Spin;
+    default: return ViewControl_EditType_None;
+  }
   return ViewControl_EditType_None;
 }
 
@@ -263,38 +251,34 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::GetTableData(const int theRow, 
 
   bool isFirstColumn = theColumn == 0;
 
-  /*Handle(AIS_InteractiveObject) aPrs = GetInteractiveObject();
+  Handle(SelectBasics_EntityOwner) anOwner = getEntityOwner();
   switch (theRow)
   {
-  case 0: return ViewControl_Table::SeparatorData();
-  case 1: return isFirstColumn ? QVariant (STANDARD_TYPE (AIS_InteractiveObject)->Name())
-  : ViewControl_Tools::GetPointerInfo (aPrs).ToCString();
-  case 2: return ViewControl_Table::SeparatorData();
-  case 3: return isFirstColumn ? QVariant ("HasWidth") : QVariant (aPrs->HasWidth());
-  case 4: return isFirstColumn ? QVariant ("Width") : QVariant (aPrs->Width());
-  case 5: return isFirstColumn ? QVariant ("CurrentFacingModel")
-  : QVariant (Aspect::TypeOfFacingModelToString (aPrs->CurrentFacingModel()));
-  case 6: return isFirstColumn ? QVariant ("IsInfinite") : QVariant (aPrs->IsInfinite());
-  case 7: return isFirstColumn ? QVariant ("HasColor") : QVariant (aPrs->HasColor());
-  case 8: return isFirstColumn ? QVariant ("HasMaterial") : QVariant (aPrs->HasMaterial());
+    case 0: return isFirstColumn ? QVariant ("Priority") : QVariant (anOwner->Priority());
+    case 1: return isFirstColumn ? QVariant ("HasLocation") : QVariant (anOwner->HasLocation());
+    case 2: return isFirstColumn ? QVariant ("Location") :
+      (anOwner->HasLocation() ? QVariant (ViewControl_Tools::ToString (anOwner->Location()).ToCString()) : QVariant());
+    default: break;
+  }
 
-  case 9: return ViewControl_Table::SeparatorData();
-  case 10: return isFirstColumn ? QVariant (STANDARD_TYPE (SelectMgr_SelectableObject)->Name())
-  : ViewControl_Tools::GetPointerInfo (aPrs).ToCString();
-  case 11: return ViewControl_Table::SeparatorData();
-  case 12: return isFirstColumn ? QVariant ("IsAutoHilight") : QVariant (aPrs->IsAutoHilight());
-  case 13: return isFirstColumn ? QVariant ("GlobalSelectionMode") : QVariant (aPrs->GlobalSelectionMode());
+  Handle(StdSelect_BRepOwner) aBROwner = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
+  if (aBROwner.IsNull())
+    return QVariant();
 
-  case 14: return ViewControl_Table::SeparatorData();
-  case 15: return isFirstColumn ? QVariant (STANDARD_TYPE (PrsMgr_PresentableObject)->Name())
-  : ViewControl_Tools::GetPointerInfo (aPrs).ToCString();
-  case 16: return ViewControl_Table::SeparatorData();
-  case 17: return isFirstColumn ? QVariant ("TypeOfPresentation3d")
-  : QVariant (PrsMgr::TypeOfPresentation3dToString (aPrs->TypeOfPresentation3d()));
-  case 18: return isFirstColumn ? QVariant ("IsMutable") : QVariant (aPrs->IsMutable());
-  case 19: return isFirstColumn ? QVariant ("HasOwnPresentations") : QVariant (aPrs->HasOwnPresentations());
-  default: return QVariant();
-  }*/
+  int aBRepOwnerRow = theRow - 3;
+  switch (aBRepOwnerRow)
+  {
+    case 0: return ViewControl_Table::SeparatorData();
+    case 1: return isFirstColumn ? QVariant (STANDARD_TYPE (StdSelect_BRepOwner)->Name())
+                                 : ViewControl_Tools::GetPointerInfo (aBROwner).ToCString();
+    case 2: return ViewControl_Table::SeparatorData();
+    case 3: return isFirstColumn ? QVariant ("HilightMode") : QVariant (aBROwner->HilightMode());
+    case 4: return isFirstColumn ? QVariant ("Shape") :
+      (!aBROwner->Shape().IsNull() ? ViewControl_Tools::GetPointerInfo (aBROwner->Shape().TShape()).ToCString() : QVariant());
+    case 5: return isFirstColumn ? QVariant ("ShapeType") :
+      (!aBROwner->Shape().IsNull() ? VInspector_Tools::GetShapeTypeInfo (aBROwner->Shape().ShapeType()).ToCString() : QVariant());
+    default: return QVariant();
+  }
   return QVariant();
 }
 
@@ -304,22 +288,24 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::GetTableData(const int theRow, 
 // =======================================================================
 bool VInspector_ItemSelectBasicsEntityOwner::SetTableData(const int theRow, const int, const QVariant& theValue)
 {
-  /*Handle(AIS_InteractiveObject) aPrs = GetInteractiveObject();
+  Handle(SelectBasics_EntityOwner) anOwner = getEntityOwner();
   switch (theRow)
   {
-  case 4:
-  {
-  double aValue = theValue.toDouble();
-  if (aValue > 0) aPrs->SetWidth (aValue);
-  else aPrs->UnsetWidth();
+    case 0: anOwner->SetPriority (theValue.toInt());
+    default: return false;
   }
-  break;
-  case 5: aPrs->SetCurrentFacingModel (Aspect::TypeOfFacingModelFromString (theValue.toString().toStdString().c_str()));
-  case 6: aPrs->SetInfiniteState (theValue.toBool());
-  case 12: aPrs->SetAutoHilight(theValue.toBool());
-  case 17: aPrs->SetTypeOfPresentation (PrsMgr::TypeOfPresentation3dFromString (theValue.toString().toStdString().c_str()));
-  case 18: aPrs->SetMutable (theValue.toBool());
-  default: return false;
-  }*/
   return true;
+}
+
+// =======================================================================
+// function : buildPresentationShape
+// purpose :
+// =======================================================================
+TopoDS_Shape VInspector_ItemSelectBasicsEntityOwner::buildPresentationShape()
+{
+  Handle(StdSelect_BRepOwner) aBROwner = Handle(StdSelect_BRepOwner)::DownCast (myOwner);
+  if (aBROwner.IsNull())
+    return TopoDS_Shape();
+
+  return aBROwner->Shape();
 }

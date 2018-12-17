@@ -28,16 +28,6 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetGroup
-// purpose :
-// =======================================================================
-Handle(Graphic3d_Group) VInspector_ItemGraphic3dGroup::GetGroup() const
-{
-  initItem();
-  return myGroup;
-}
-
-// =======================================================================
 // function : Init
 // purpose :
 // =======================================================================

@@ -20,6 +20,7 @@
 #include <Standard.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <inspector/TreeModel_ColumnType.hxx>
 #include <inspector/TreeModel_ItemBase.hxx>
 #include <inspector/ViewControl_EditType.hxx>
 
@@ -46,6 +47,10 @@ public:
   //! \return a context
   Standard_EXPORT Handle(AIS_InteractiveContext) GetContext() const;
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { return NULL; }
+
   //! Returns presentation of the attribute to be visualized in the view
   //! \thePresentations [out] container of presentation handles to be visualized
   virtual void GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations)
@@ -53,7 +58,11 @@ public:
 
   //! Returns shape of the item parameters
   //! \return generated shape of the item parameters
-  virtual TopoDS_Shape GetPresentationShape() const { initItem(); return myPresentationShape; }
+  Standard_EXPORT virtual TopoDS_Shape GetPresentationShape() const;
+
+  //! Rebuild presentation shape if the item use it
+  //! \return generated shape of the item parameters
+  void UpdatePresentationShape() { myPresentationShape = buildPresentationShape(); }
 
   //! Returns number of table rows
   //! \return an integer value
@@ -90,6 +99,10 @@ protected:
 
   //! Initialize the current item. It creates a backup of the specific item information
   virtual void initItem() const {}
+
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() { return TopoDS_Shape(); }
 
 protected:
 

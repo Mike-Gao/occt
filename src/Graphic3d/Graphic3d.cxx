@@ -61,6 +61,29 @@ namespace
   {
     "NONE", "ZOOM_PERS", "ROTATE_PERS", "TRIEDRON_PERS", "2d", "ZOOM_ROTATE_PERS"
   };
+
+  static Standard_CString Graphic3d_Table_PrintCameraProjection[5] =
+  {
+    "ORTHOGRAPHIC", "PERSPECTIVE", "STEREO", "MONOLEFTEYE", "MONORIGHTEYE"
+  };
+
+  static Standard_CString Graphic3d_Table_PrintFocusType[2] =
+  {
+    "ABSOLUTE", "RELATIVE"
+  };
+
+  static Standard_CString Graphic3d_Table_PrintIODType[2] =
+  {
+    "ABSOLUTE", "RELATIVE"
+  };
+
+  static Standard_CString Graphic3d_Table_PrintNameOfMaterial[26] =
+  {
+    "BRASS", "BRONZE", "COPPER", "GOLD", "PEWTER", "PLASTER", "PLASTIC", "SILVER", // 8
+    "STEEL", "STONE", "SHINY_PLASTIC", "SATIN", "METALIZED", "NEON_GNC", "CHROME", // 7
+    "ALUMINIUM", "OBSIDIAN", "NEON_PHC", "JADE", "CHARCOAL", "WATER", "GLASS", // 7
+    "DIAMOND", "TRANSPARENT", "DEFAULT", "UserDefined" // 4
+  };
 }
 
 //=======================================================================
@@ -290,8 +313,6 @@ Standard_Boolean Graphic3d::TypeOfAttributeFromString (Standard_CString theTypeS
   return Standard_False;
 }
 
-
-
 //=======================================================================
 //function : TypeOfDataToString
 //purpose  :
@@ -363,6 +384,129 @@ Standard_Boolean Graphic3d::TransModeFlagsFromString (Standard_CString theTypeSt
         case 4: theType = Graphic3d_TMF_2d; break;
         case 5: theType = Graphic3d_TMF_ZoomRotatePers; break;
       }
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : CameraProjectionToString
+//purpose  :
+//=======================================================================
+Standard_CString Graphic3d::CameraProjectionToString (Graphic3d_Camera::Projection theType)
+{
+  return Graphic3d_Table_PrintCameraProjection[theType];
+}
+
+//=======================================================================
+//function : CameraProjectionFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean Graphic3d::CameraProjectionFromString (Standard_CString theTypeString,
+                                                        Graphic3d_Camera::Projection& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = Graphic3d_Camera::Projection_Orthographic;
+    aTypeIter <= Graphic3d_Camera::Projection_MonoRightEye; ++aTypeIter)
+  {
+    Standard_CString aTypeName = Graphic3d_Table_PrintCameraProjection[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = Graphic3d_Camera::Projection (aTypeIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : CameraFocusTypeToString
+//purpose  :
+//=======================================================================
+Standard_CString Graphic3d::CameraFocusTypeToString (Graphic3d_Camera::FocusType theType)
+{
+  return Graphic3d_Table_PrintFocusType[theType];
+}
+
+//=======================================================================
+//function : FocusTypeFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean Graphic3d::CameraFocusTypeFromString (Standard_CString theTypeString,
+                                                       Graphic3d_Camera::FocusType& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = Graphic3d_Camera::FocusType_Absolute;
+    aTypeIter <= Graphic3d_Camera::FocusType_Relative; ++aTypeIter)
+  {
+    Standard_CString aTypeName = Graphic3d_Table_PrintFocusType[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = Graphic3d_Camera::FocusType (aTypeIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : CameraIODTypeToString
+//purpose  :
+//=======================================================================
+Standard_CString Graphic3d::CameraIODTypeToString (Graphic3d_Camera::IODType theType)
+{
+  return Graphic3d_Table_PrintIODType[theType];
+}
+
+//=======================================================================
+//function : IODTypeFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean Graphic3d::CameraIODTypeFromString (Standard_CString theTypeString,
+                                                     Graphic3d_Camera::IODType& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = Graphic3d_Camera::IODType_Absolute;
+    aTypeIter <= Graphic3d_Camera::IODType_Relative; ++aTypeIter)
+  {
+    Standard_CString aTypeName = Graphic3d_Table_PrintIODType[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = Graphic3d_Camera::IODType (aTypeIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : NameOfMaterialToString
+//purpose  :
+//=======================================================================
+Standard_CString Graphic3d::NameOfMaterialToString (Graphic3d_NameOfMaterial theType)
+{
+  return Graphic3d_Table_PrintNameOfMaterial[theType];
+}
+
+//=======================================================================
+//function : NameOfMaterialFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean Graphic3d::NameOfMaterialFromString (Standard_CString theTypeString,
+                                                      Graphic3d_NameOfMaterial& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = Graphic3d_TOD_USHORT; aTypeIter <= Graphic3d_TOD_FLOAT; ++aTypeIter)
+  {
+    Standard_CString aTypeName = Graphic3d_Table_PrintNameOfMaterial[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = Graphic3d_NameOfMaterial (aTypeIter);
       return Standard_True;
     }
   }

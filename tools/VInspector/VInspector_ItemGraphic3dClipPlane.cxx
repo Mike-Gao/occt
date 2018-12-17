@@ -71,14 +71,14 @@ QVariant VInspector_ItemGraphic3dClipPlane::initValue (const int theItemRole) co
 
 void VInspector_ItemGraphic3dClipPlane::Init()
 {
-  VInspector_ItemV3dViewPtr aParentViewItem = itemDynamicCast<VInspector_ItemV3dView>(Parent());
-  Handle(Graphic3d_ClipPlane) aClipPlane;
-  if (!aParentViewItem) // ClipPlanes
-  {
-    aParentViewItem = itemDynamicCast<VInspector_ItemV3dView>(Parent()->Parent());
-    aClipPlane = aParentViewItem->GetClipPlane(Row());
-  }
-  setClipPlane (aClipPlane);
+  //VInspector_ItemV3dViewPtr aParentViewItem = itemDynamicCast<VInspector_ItemV3dView>(Parent());
+  //Handle(Graphic3d_ClipPlane) aClipPlane;
+  //if (!aParentViewItem) // ClipPlanes
+  //{
+  //  aParentViewItem = itemDynamicCast<VInspector_ItemV3dView>(Parent()->Parent());
+  //  aClipPlane = aParentViewItem->GetClipPlane(Row());
+  //}
+  //setClipPlane (aClipPlane);
   TreeModel_ItemBase::Init();
 }
 
@@ -104,17 +104,6 @@ void VInspector_ItemGraphic3dClipPlane::initItem() const
   if (IsInitialized())
     return;
   const_cast<VInspector_ItemGraphic3dClipPlane*>(this)->Init();
-}
-
-// =======================================================================
-// function : GetView
-// purpose :
-// =======================================================================
-
-Handle(Graphic3d_ClipPlane) VInspector_ItemGraphic3dClipPlane::GetClipPlane() const
-{
-  initItem();
-  return myClipPlane;
 }
 
 // =======================================================================

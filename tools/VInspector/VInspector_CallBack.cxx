@@ -38,7 +38,15 @@ IMPLEMENT_STANDARD_RTTIEXT(VInspector_CallBack, VInspectorAPI_CallBack)
 // =======================================================================
 void VInspector_CallBack::Activate (Handle(AIS_InteractiveObject) thePrs, const Standard_Integer theMode)
 {
-  QList<QVariant> anInfo = VInspector_Tools::GetInfo (thePrs);
+  QList<QVariant> anInfo;
+  if (!thePrs.IsNull())
+    anInfo = VInspector_Tools::GetInfo (thePrs);
+  else
+  {
+    anInfo.append ("Activate");
+    anInfo.append ("");
+    anInfo.append ("");
+  }
   anInfo[0] = QString ("%1: %2").arg (anInfo[0].toString()).arg (theMode);
   myHistoryModel->AddElement (VInspector_CallBackMode_Activate, anInfo);
 }

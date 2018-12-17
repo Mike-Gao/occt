@@ -41,9 +41,14 @@ public:
   //! Destructor
   virtual ~VInspector_ItemPresentableObject() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myIO; }
+
   //! Returns the current interactive object, init item if it was not initialized yet
   //! \return interactive object
-  Standard_EXPORT Handle(AIS_InteractiveObject) GetInteractiveObject() const;
+  Standard_EXPORT Handle(AIS_InteractiveObject) GetInteractiveObject() const
+  { return Handle(AIS_InteractiveObject)::DownCast (GetObject()); }
 
   //! Returns pointer information for the current interactive object, init item if it was not initialized yet
   //! \return string value
@@ -106,7 +111,10 @@ protected:
   //! \return the created item
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE;
 
-private:
+protected:
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() Standard_OVERRIDE;
 
   //! Set interactive object into the current field
   //! \param theIO a presentation

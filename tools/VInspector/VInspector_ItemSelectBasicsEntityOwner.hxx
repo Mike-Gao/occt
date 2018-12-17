@@ -45,6 +45,10 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myOwner; }
+
   //! Returns the current entity owner
   Handle(SelectBasics_EntityOwner) EntityOwner() const { return myOwner; }
 
@@ -88,6 +92,9 @@ protected:
   virtual void initItem() const Standard_OVERRIDE;
 
 protected:
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape();
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position
@@ -106,7 +113,8 @@ private:
 private:
 
   //! Returns the current entity owner. Initializes the item if it was not initialized yet
-  Handle(SelectBasics_EntityOwner) getEntityOwner() const;
+  Handle(SelectBasics_EntityOwner) getEntityOwner() const
+  { return Handle(SelectBasics_EntityOwner)::DownCast (GetObject()); }
 
 private:
 

@@ -483,6 +483,21 @@ QString ViewControl_ColorSelector::ColorToString (const Quantity_ColorRGBA& theC
 // purpose :
 // =======================================================================
 
+QColor ViewControl_ColorSelector::ColorToQColor (const Quantity_Color& theColor)
+{
+  int aDelta = 255;
+
+  Standard_Real aRed, aGreen, aBlue;
+  theColor.Values (aRed, aGreen, aBlue, Quantity_TOC_RGB);
+
+  return QColor((int)(aRed * aDelta), (int)(aGreen * aDelta), (int)(aBlue * aDelta));
+}
+
+// =======================================================================
+// function : ColorToQColor
+// purpose :
+// =======================================================================
+
 QColor ViewControl_ColorSelector::ColorToQColor (const Quantity_ColorRGBA& theColor)
 {
   int aDelta = 255;

@@ -521,6 +521,17 @@ void V3d_View::SetAxis (const Standard_Real theX,  const Standard_Real theY,  co
 }
 
 //=============================================================================
+//function : Axis
+//purpose  :
+//=============================================================================
+void V3d_View::Axis (Standard_Real& theX, Standard_Real& theY, Standard_Real& theZ,
+                     Standard_Real& theVx, Standard_Real& theVy, Standard_Real& theVz)
+{
+  myDefaultViewPoint.Coord (theX, theY, theZ);
+  myDefaultViewAxis.Coord (theVx, theVy, theVz);
+}
+
+//=============================================================================
 //function : SetShadingModel
 //purpose  :
 //=============================================================================

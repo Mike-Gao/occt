@@ -41,8 +41,13 @@ public:
   //! Destructor
   virtual ~VInspector_ItemSelectMgrSensitiveEntity() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myEntity; }
+
   //! \return the current sensitive entity
-  Standard_EXPORT Handle(SelectMgr_SensitiveEntity) GetSensitiveEntity() const;
+  Standard_EXPORT Handle(SelectMgr_SensitiveEntity) GetSensitiveEntity() const
+  { return Handle(SelectMgr_SensitiveEntity)::DownCast (GetObject()); }
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;

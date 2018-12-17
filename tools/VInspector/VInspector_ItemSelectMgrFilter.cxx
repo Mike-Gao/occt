@@ -127,12 +127,3 @@ void VInspector_ItemSelectMgrFilter::initItem() const
   const_cast<VInspector_ItemSelectMgrFilter*>(this)->Init();
 }
 
-// =======================================================================
-// function : GetInteractiveObject
-// purpose :
-// =======================================================================
-Handle(SelectMgr_Filter) VInspector_ItemSelectMgrFilter::GetFilter() const
-{
-  initItem();
-  return myFilter;
-}

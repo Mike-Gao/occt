@@ -32,22 +32,12 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : getSelection
-// purpose :
-// =======================================================================
-Handle(SelectMgr_Selection) VInspector_ItemSelectMgrSelection::getSelection() const
-{
-  initItem();
-  return mySelection;
-}
-
-// =======================================================================
 // function : initRowCount
 // purpose :
 // =======================================================================
 int VInspector_ItemSelectMgrSelection::initRowCount() const
 {
-  Handle(SelectMgr_Selection) aSelection = getSelection();
+  Handle(SelectMgr_Selection) aSelection = GetSelection();
 #if OCC_VERSION_HEX < 0x070201
   int aRows = 0;
   for (aSelection->Init(); aSelection->More(); aSelection->Next())
@@ -72,7 +62,7 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
     {
       switch (Column())
       {
-        case 0: return getSelection()->DynamicType()->Name();
+        case 0: return GetSelection()->DynamicType()->Name();
         case 1: return rowCount();
         case 3:
         {
@@ -81,7 +71,7 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
           else
           {
             VInspector_ItemPresentableObjectPtr aParentItem = itemDynamicCast<VInspector_ItemPresentableObject>(Parent());
-            return VInspector_Tools::SelectionModeToName(getSelection()->Mode(), aParentItem->GetInteractiveObject()).ToCString();
+            return VInspector_Tools::SelectionModeToName(GetSelection()->Mode(), aParentItem->GetInteractiveObject()).ToCString();
           }
         }
         case 4:
@@ -90,7 +80,7 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
             return "SelectMgr_StateOfSelection";
           else {
             int aNbSelected = 0;
-            SelectMgr_StateOfSelection aState = getSelection()->GetSelectionState();
+            SelectMgr_StateOfSelection aState = GetSelection()->GetSelectionState();
             if (aState == SelectMgr_SOS_Activated || aState == SelectMgr_SOS_Any)
             {
               Handle(AIS_InteractiveContext) aContext = GetContext();
@@ -112,16 +102,16 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
         }
         case 9:
         {
-          SelectMgr_StateOfSelection aState = getSelection()->GetSelectionState();
+          SelectMgr_StateOfSelection aState = GetSelection()->GetSelectionState();
           return VInspector_Tools::ToName (VInspector_SelectionType_StateOfSelection, aState).ToCString();
         }
-        case 10: return QString::number (getSelection()->Sensitivity());
+        case 10: return QString::number (GetSelection()->Sensitivity());
         case 11:
           return VInspector_Tools::ToName (VInspector_SelectionType_TypeOfUpdate,
-                                           getSelection()->UpdateStatus()).ToCString();
+                                           GetSelection()->UpdateStatus()).ToCString();
         case 12:
           return VInspector_Tools::ToName (VInspector_SelectionType_TypeOfBVHUpdate,
-                                           getSelection()->BVHUpdateStatus()).ToCString();
+                                           GetSelection()->BVHUpdateStatus()).ToCString();
         default:
           break;
       }
@@ -129,7 +119,7 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
     }
     case Qt::ForegroundRole:
     {
-      SelectMgr_StateOfSelection aState = getSelection()->GetSelectionState();
+      SelectMgr_StateOfSelection aState = GetSelection()->GetSelectionState();
       return QVariant (aState == SelectMgr_SOS_Activated ? QColor (Qt::black) : QColor (Qt::darkGray));
     }
   }

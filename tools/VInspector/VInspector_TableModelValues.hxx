@@ -21,6 +21,10 @@
 #include <inspector/VInspector_ItemBase.hxx>
 #include <inspector/TreeModel_ItemBase.hxx>
 
+class ViewControl_PaneCreator;
+
+#include <NCollection_List.hxx>
+
 //! \class VInspector_TableModelValues
 //! \brief This is an implementation for ViewControl_TableModel to present tree item values
 class VInspector_TableModelValues : public ViewControl_TableModelValues
@@ -28,7 +32,8 @@ class VInspector_TableModelValues : public ViewControl_TableModelValues
 public:
 
   //! Constructor
-  Standard_EXPORT VInspector_TableModelValues (const TreeModel_ItemBasePtr& theItem);
+  Standard_EXPORT VInspector_TableModelValues (const TreeModel_ItemBasePtr& theItem,
+    const NCollection_List<Handle(ViewControl_PaneCreator)>& theCreators);
 
   //! Destructor
   virtual ~VInspector_TableModelValues() Standard_OVERRIDE {}
@@ -84,6 +89,7 @@ private:
   VInspector_ItemBasePtr GetItem() const;
 
 private:
+  NCollection_List<Handle(ViewControl_PaneCreator)> myCreators; //!< pane creators
   TreeModel_ItemBasePtr myItem; //!< source item base
 };
 

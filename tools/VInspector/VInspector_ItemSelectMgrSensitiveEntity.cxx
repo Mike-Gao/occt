@@ -38,16 +38,6 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetSensitiveEntity
-// purpose :
-// =======================================================================
-Handle(SelectMgr_SensitiveEntity) VInspector_ItemSelectMgrSensitiveEntity::GetSensitiveEntity() const
-{
-  initItem();
-  return myEntity;
-}
-
-// =======================================================================
 // function : initValue
 // purpose :
 // =======================================================================
@@ -66,8 +56,6 @@ int VInspector_ItemSelectMgrSensitiveEntity::initRowCount() const
 QVariant VInspector_ItemSelectMgrSensitiveEntity::initValue (int theItemRole) const
 {
   Handle(SelectMgr_SensitiveEntity) anEntity = GetSensitiveEntity();
-  Handle(SelectBasics_EntityOwner) anOwner = anEntity->BaseSensitive()->OwnerId();
-
   switch (theItemRole)
   {
     case Qt::DisplayRole:
@@ -77,34 +65,6 @@ QVariant VInspector_ItemSelectMgrSensitiveEntity::initValue (int theItemRole) co
       switch (Column())
       {
         case 0: return anEntity->DynamicType()->Name();
-        /*case 2: return VInspector_Tools::GetPointerInfo (GetSensitiveEntity()->BaseSensitive()->OwnerId(), true).ToCString();
-        case 3:
-        {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
-
-          const TopoDS_Shape& aShape = BROwnr->Shape();
-          if (aShape.IsNull())
-            return QVariant();
-
-          return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
-        }
-        case 13: return
-#if OCC_VERSION_HEX <= 0x060901
-                       ("none");
-#else
-                       myEntity->IsActiveForSelection() ? QString ("true") : QString ("false");
-#endif
-        case 14: return QString::number (GetSensitiveEntity()->BaseSensitive()->SensitivityFactor());
-        case 15: return QString::number (GetSensitiveEntity()->BaseSensitive()->NbSubElements());
-        case 16:
-        {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
-          return anOwner->Priority();
-        }*/
         default:
           break;
       }
@@ -155,7 +115,7 @@ void VInspector_ItemSelectMgrSensitiveEntity::Init()
 {
   VInspector_ItemSelectMgrSelectionPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrSelection>(Parent());
 
-  Handle(SelectMgr_Selection) aSelection = aParentItem->getSelection();
+  Handle(SelectMgr_Selection) aSelection = aParentItem->GetSelection();
 
   int aRowId = Row();
   int aCurrentId = 0;

@@ -192,8 +192,33 @@ TCollection_AsciiString ViewControl_Tools::ToString (const gp_Pnt& thePoint)
 // function : ToString
 // purpose :
 // =======================================================================
+TCollection_AsciiString ViewControl_Tools::ToString (const gp_Dir& theDir)
+{
+  return TCollection_AsciiString (theDir.X()) + ","
+       + TCollection_AsciiString (theDir.Y()) + ","
+       + TCollection_AsciiString (theDir.Z());
+}
+
+// =======================================================================
+// function : ToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString ViewControl_Tools::ToString (const gp_XYZ& theValue)
+{
+  return TCollection_AsciiString (theValue.X()) + ","
+       + TCollection_AsciiString (theValue.Y()) + ","
+       + TCollection_AsciiString (theValue.Z());
+}
+
+// =======================================================================
+// function : ToString
+// purpose :
+// =======================================================================
 TCollection_AsciiString ViewControl_Tools::ToString (const Bnd_Box& theValue)
 {
+  if (theValue.IsVoid())
+    return "Bnd_Box is void";
+
   return QString ("(%1, %2, %3), (%4, %5, %6)")
     .arg (theValue.CornerMin().X()).arg (theValue.CornerMin().Y()).arg (theValue.CornerMin().Z())
     .arg (theValue.CornerMax().X()).arg (theValue.CornerMax().Y()).arg (theValue.CornerMax().Z()).toStdString().c_str();
@@ -211,4 +236,13 @@ TCollection_AsciiString ViewControl_Tools::ToString (const Handle(TColgp_HArray1
     aPointList.append(ViewControl_Tools::ToString (thePoints->Value (aPntIter)).ToCString());
 
   return aPointList.join(" ,").toStdString().c_str();
+}
+
+// =======================================================================
+// function : ToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString ViewControl_Tools::ToString (const TopLoc_Location& theLocation)
+{
+  return ToString (theLocation.Transformation());
 }

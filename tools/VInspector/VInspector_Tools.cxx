@@ -30,6 +30,8 @@
 #include <AIS_Trihedron.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepTools.hxx>
 #include <Graphic3d.hxx>
 #include <Graphic3d_IndexBuffer.hxx>
@@ -45,6 +47,8 @@
 #include <Standard_WarningsDisable.hxx>
 #include <QStringList>
 #include <Standard_WarningsRestore.hxx>
+
+#include <TopoDS_Compound.hxx>
 
 #include <sstream>
 
@@ -511,6 +515,7 @@ TopoDS_Shape VInspector_Tools::ReadShape (const TCollection_AsciiString& theFile
 // purpose :
 // =======================================================================
 void VInspector_Tools::GetPropertyTableValues (const TreeModel_ItemBasePtr& theItem,
+                                               const NCollection_List<Handle(ViewControl_PaneCreator)>& theCreators,
                                                QList<ViewControl_TableModelValues*>& theTableValues)
 {
   TreeModel_ItemBasePtr anItem = theItem;
@@ -523,7 +528,7 @@ void VInspector_Tools::GetPropertyTableValues (const TreeModel_ItemBasePtr& theI
       anItem = theItem->Parent();
   }
 
-  theTableValues.append (new VInspector_TableModelValues (anItem));
+  theTableValues.append (new VInspector_TableModelValues (anItem, theCreators));
 }
 
 namespace
@@ -589,6 +594,65 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Bnd_Box& theBoundingBox)
   BRepPrimAPI_MakeBox aBoxBuilder(theBoundingBox.CornerMin(), theBoundingBox.CornerMax());
   return aBoxBuilder.Shape();
 }
+
+//=======================================================================
+//function : CreateShape
+//purpose  :
+//=======================================================================
+TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBoundingBox)
+{
+  if (!theBoundingBox.IsValid())
+    return TopoDS_Shape();
+
+  gp_Pnt aPntMin = gp_Pnt (theBoundingBox.CornerMin().x(), theBoundingBox.CornerMin().y(), theBoundingBox.CornerMin().z());
+  gp_Pnt aPntMax = gp_Pnt (theBoundingBox.CornerMax().x(), theBoundingBox.CornerMax().y(), theBoundingBox.CornerMax().z());
+
+  Standard_Boolean aThinOnX = fabs (aPntMin.X() - aPntMax.X()) < Precision::Confusion();
+  Standard_Boolean aThinOnY = fabs (aPntMin.Y() - aPntMax.Y()) < Precision::Confusion();
+  Standard_Boolean aThinOnZ = fabs (aPntMin.Z() - aPntMax.Z()) < Precision::Confusion();
+  if (aThinOnX || aThinOnY || aThinOnZ)
+  {
+    gp_Pnt aPnt1, aPnt2, aPnt3, aPnt4 ;
+    if (aThinOnX)
+    {
+      aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
+      aPnt2 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMin.Z());
+      aPnt3 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMax.Z());
+      aPnt4 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMax.Z());
+    }
+    if (aThinOnY)
+    {
+      aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
+      aPnt2 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMin.Z());
+      aPnt3 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMax.Z());
+      aPnt4 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMax.Z());
+    }
+    if (aThinOnZ)
+    {
+      aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
+      aPnt2 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMin.Z());
+      aPnt3 = gp_Pnt(aPntMax.X(), aPntMax.Y(), aPntMin.Z());
+      aPnt4 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMin.Z());
+    }
+    BRep_Builder aBuilder;
+    TopoDS_Compound aCompound;
+    aBuilder.MakeCompound (aCompound);
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt1, aPnt2));
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt2, aPnt3));
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt3, aPnt4));
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt4, aPnt1));
+
+    return aCompound;
+  }
+  else
+  {
+    BRepPrimAPI_MakeBox aBoxBuilder (
+      gp_Pnt (theBoundingBox.CornerMin().x(), theBoundingBox.CornerMin().y(), theBoundingBox.CornerMin().z()),
+      gp_Pnt (theBoundingBox.CornerMax().x(), theBoundingBox.CornerMax().y(), theBoundingBox.CornerMax().z()));
+    return aBoxBuilder.Shape();
+  }
+}
+
 
 //=======================================================================
 //function : ToVariant

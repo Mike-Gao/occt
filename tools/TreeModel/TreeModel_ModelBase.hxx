@@ -163,6 +163,12 @@ public:
   Standard_EXPORT static QModelIndex SingleSelected (const QModelIndexList& theIndices, const int theCellId,
                                                      const Qt::Orientation theOrientation = Qt::Horizontal);
 
+
+  //! Returns selected tree model items for indices.
+  //! \param theIndices a container of selected indices
+  //! \return model items from the list
+  Standard_EXPORT static QList<TreeModel_ItemBasePtr> GetSelectedItems (const QModelIndexList& theIndices);
+
 protected:
   //! Creates root item
   //! \param theColumnId index of a column

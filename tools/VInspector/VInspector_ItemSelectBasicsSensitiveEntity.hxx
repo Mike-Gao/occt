@@ -43,8 +43,13 @@ public:
   //! Destructor
   virtual ~VInspector_ItemSelectBasicsSensitiveEntity() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myEntity; }
+
   //! \return the current sensitive entity
-  Standard_EXPORT Handle(SelectBasics_SensitiveEntity) GetSensitiveEntity() const;
+  Standard_EXPORT Handle(SelectBasics_SensitiveEntity) GetSensitiveEntity() const
+  { return Handle(SelectBasics_SensitiveEntity)::DownCast (GetObject()); }
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
@@ -111,12 +116,15 @@ protected:
                          const int theRole,
                          const TCollection_AsciiString& theEntityKind) const;
 
-  //! Creates shape depending on the entity kind and parameters
+protected:
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() Standard_OVERRIDE { return buildPresentationShape (myEntity); }
+
+    //! Creates shape depending on the entity kind and parameters
   //! \param theEntity current sensitive entity
   //! \return shape or NULL
   static TopoDS_Shape buildPresentationShape (const Handle(SelectBasics_SensitiveEntity)& theEntity);
-
-private:
 
   //! Constructor
   //! param theParent a parent item

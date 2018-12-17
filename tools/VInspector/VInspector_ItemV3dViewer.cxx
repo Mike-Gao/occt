@@ -27,6 +27,29 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
+// function : GetView
+// purpose :
+// =======================================================================
+Handle(V3d_View) VInspector_ItemV3dViewer::GetView (const int theRow) const
+{
+  Handle(V3d_Viewer) aViewer = GetViewer();
+
+  int aViewId = 0;
+  for (V3d_ListOfViewIterator anActiveViewIter (GetViewer()->ActiveViewIterator()); anActiveViewIter.More(); anActiveViewIter.Next())
+  {
+    Handle(V3d_View) aView = anActiveViewIter.Value();
+    if (aView->View().IsNull())
+      continue;
+
+    if (theRow == aViewId)
+      return aView;
+    aViewId++;
+  }
+
+  return NULL;
+}
+
+// =======================================================================
 // function : initRowCount
 // purpose :
 // =======================================================================
@@ -35,7 +58,13 @@ int VInspector_ItemV3dViewer::initRowCount() const
   if (Column() != 0)
     return 0;
 
-  return 1;
+  int aNbOfViews = 0;
+  for (V3d_ListOfViewIterator anActiveViewIter (GetViewer()->ActiveViewIterator()); anActiveViewIter.More(); anActiveViewIter.Next())
+  {
+    if (!anActiveViewIter.Value().IsNull())
+      aNbOfViews++;
+  }
+  return aNbOfViews;
 }
 
 // =======================================================================
@@ -104,17 +133,6 @@ void VInspector_ItemV3dViewer::initItem() const
   if (IsInitialized())
     return;
   const_cast<VInspector_ItemV3dViewer*>(this)->Init();
-}
-
-// =======================================================================
-// function : GetViewer
-// purpose :
-// =======================================================================
-
-Handle(V3d_Viewer) VInspector_ItemV3dViewer::GetViewer() const
-{
-  initItem();
-  return myViewer;
 }
 
 // =======================================================================

@@ -48,8 +48,13 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myDrawer; }
+
   //! Returns current drawer, initialize the drawer if it was not initialized yet
-  Standard_EXPORT Handle(Prs3d_Drawer) GetDrawer() const;
+  Standard_EXPORT Handle(Prs3d_Drawer) GetDrawer() const
+  { return Handle(Prs3d_Drawer)::DownCast (GetObject()); }
 
   //! Returns drawer of the row if possible
   //! \param theRow child row index

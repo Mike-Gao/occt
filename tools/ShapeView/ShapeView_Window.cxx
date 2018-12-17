@@ -105,7 +105,7 @@ ShapeView_Window::ShapeView_Window (QWidget* theParent)
   myMainWindow->setCentralWidget (myTreeView);
 
   // view
-  myViewWindow = new View_Window (myMainWindow, false);
+  myViewWindow = new View_Window (myMainWindow, NULL, false);
   connect (myViewWindow, SIGNAL(eraseAllPerformed()), this, SLOT(onEraseAllPerformed()));
   aVisibilityState->SetDisplayer (myViewWindow->GetDisplayer());
   aVisibilityState->SetPresentationType (View_PresentationType_Main);

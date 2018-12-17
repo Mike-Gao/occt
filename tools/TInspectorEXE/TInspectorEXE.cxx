@@ -122,7 +122,7 @@ int main (int argc, char** argv)
     aPlugins.insert("TKShapeView");
     aPlugins.insert("TKVInspector");
 
-    anActivatedPluginName = "TKDFBrowser";
+    anActivatedPluginName = "TKVInspector";
   }
   else
     anActivatedPluginName = *aPlugins.rbegin();

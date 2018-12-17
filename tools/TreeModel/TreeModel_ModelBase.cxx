@@ -236,6 +236,24 @@ QModelIndex TreeModel_ModelBase::SingleSelected (const QModelIndexList& theIndic
 }
 
 // =======================================================================
+// function :  GetSelectedItems
+// purpose :
+// =======================================================================
+QList<TreeModel_ItemBasePtr> TreeModel_ModelBase::GetSelectedItems (const QModelIndexList& theIndices)
+{
+  QList<TreeModel_ItemBasePtr> anItems;
+
+  for (QModelIndexList::const_iterator anIndicesIt = theIndices.begin(); anIndicesIt != theIndices.end(); anIndicesIt++)
+  {
+    TreeModel_ItemBasePtr anItem = TreeModel_ModelBase::GetItemByIndex (*anIndicesIt);
+    if (!anItem || anItems.contains (anItem))
+      continue;
+    anItems.append (anItem);
+  }
+  return anItems;
+}
+
+// =======================================================================
 // function :  getIndexValue
 // purpose :
 // =======================================================================

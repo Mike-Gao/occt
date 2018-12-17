@@ -15,9 +15,12 @@
 
 #include <inspector/VInspector_TableModelValues.hxx>
 
+#include <inspector/ViewControl_Pane.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
 #include <inspector/ViewControl_TableModelFilter.hxx>
 #include <inspector/VInspector_Tools.hxx>
+
+#include <inspector/ViewControl_PaneCreator.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QFont>
@@ -28,8 +31,9 @@
 // purpose :
 // =======================================================================
 
-VInspector_TableModelValues::VInspector_TableModelValues (const TreeModel_ItemBasePtr& theItem)
- : ViewControl_TableModelValues(), myItem (theItem)
+VInspector_TableModelValues::VInspector_TableModelValues (const TreeModel_ItemBasePtr& theItem,
+  const NCollection_List<Handle(ViewControl_PaneCreator)>& theCreators)
+ : ViewControl_TableModelValues(), myItem (theItem), myCreators (theCreators)
 {
   QList<TreeModel_HeaderSection> aHeaderValues;
   aHeaderValues.append(TreeModel_HeaderSection ("Function", 190));
@@ -70,7 +74,26 @@ QVariant VInspector_TableModelValues::Data (const int theRow, const int theColum
         return ViewControl_TableModelValues::EditCellColor();
     }
     default:
-      return GetItem()->GetTableData (theRow, theColumn, theRole);
+    {
+      VInspector_ItemBasePtr anItem = GetItem();
+      Handle(Standard_Transient) anObject = anItem->GetObject();
+      if (anObject.IsNull())
+        return anItem->GetTableData (theRow, theColumn, theRole);
+
+      int aCurrentRow = theRow;
+      for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+      {
+        Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+        ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+        if (!aPane)
+          continue;
+        if (aCurrentRow >= aPane->GetTableRowCount (anObject))
+          aCurrentRow -= aPane->GetTableRowCount (anObject);
+        else
+          return aPane->GetTableData (anObject, aCurrentRow, theColumn, theRole);
+      }
+      return anItem->GetTableData (aCurrentRow, theColumn, theRole);
+    }
   }
 }
 
@@ -84,7 +107,24 @@ bool VInspector_TableModelValues::SetData (const int theRow, const int theColumn
   if (theRole != Qt::EditRole)
     return false;
 
-  return GetItem()->SetTableData (theRow, theColumn, theValue);
+  VInspector_ItemBasePtr anItem = GetItem();
+  Handle(Standard_Transient) anObject = anItem->GetObject();
+  if (anObject.IsNull())
+    return anItem->SetTableData (theRow, theColumn, theValue);
+
+  int aCurrentRow = theRow;
+  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+  {
+    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+    if (!aPane)
+      continue;
+    if (aCurrentRow >= aPane->GetTableRowCount (anObject))
+      aCurrentRow -= aPane->GetTableRowCount (anObject);
+    else
+      return aPane->SetTableData (anObject, aCurrentRow, theColumn, theValue);
+  }
+  return anItem->SetTableData (aCurrentRow, theColumn, theValue);
 }
 
 // =======================================================================
@@ -109,7 +149,22 @@ Qt::ItemFlags VInspector_TableModelValues::Flags (const QModelIndex& theIndex) c
 
 int VInspector_TableModelValues::GetValuesCount () const
 {
-  return GetItem()->GetTableRowCount() * 2;
+  VInspector_ItemBasePtr anItem = GetItem();
+
+  int aRowCount = anItem->GetTableRowCount();
+  Handle(Standard_Transient) anObject = anItem->GetObject();
+  if (anObject.IsNull())
+    return aRowCount * 2;
+
+  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+  {
+    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+    if (!aPane)
+      continue;
+    aRowCount += aPane->GetTableRowCount (anObject);
+  }
+  return aRowCount * 2;
 }
 
 // =======================================================================
@@ -122,7 +177,24 @@ ViewControl_EditType VInspector_TableModelValues::GetEditType (const int theRow,
   if (theColumn == 0)
     return ViewControl_EditType_None;
 
-  return GetItem()->GetTableEditType (theRow, theColumn);
+  VInspector_ItemBasePtr anItem = GetItem();
+  Handle(Standard_Transient) anObject = anItem->GetObject();
+  if (anObject.IsNull())
+    return anItem->GetTableEditType (theRow, theColumn);
+
+  int aCurrentRow = theRow;
+  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+  {
+    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+    if (!aPane)
+      continue;
+    if (aCurrentRow >= aPane->GetTableRowCount (anObject))
+      aCurrentRow -= aPane->GetTableRowCount (anObject);
+    else
+      return aPane->GetTableEditType (anObject, aCurrentRow, theColumn);
+  }
+  return anItem->GetTableEditType (aCurrentRow, theColumn);
 }
 
 // =======================================================================
@@ -135,7 +207,24 @@ QList<QVariant> VInspector_TableModelValues::GetEnumValues (const int theRow, co
   if (theColumn != 1)
     return QList<QVariant>();
 
-  return GetItem()->GetTableEnumValues (theRow, theColumn);
+  VInspector_ItemBasePtr anItem = GetItem();
+  Handle(Standard_Transient) anObject = anItem->GetObject();
+  if (anObject.IsNull())
+    return anItem->GetTableEnumValues (theRow, theColumn);
+
+  int aCurrentRow = theRow;
+  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+  {
+    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+    if (!aPane)
+      continue;
+    if (aCurrentRow >= aPane->GetTableRowCount (anObject))
+      aCurrentRow -= aPane->GetTableRowCount (anObject);
+    else
+      return aPane->GetTableEnumValues (anObject, aCurrentRow, theColumn);
+  }
+  return anItem->GetTableEnumValues (aCurrentRow, theColumn);
 }
 
 // =======================================================================

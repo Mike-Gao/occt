@@ -41,26 +41,38 @@ void View_Viewer::SetWindow(const Handle(Aspect_Window)& theWindow)
 }
 
 // =======================================================================
-// function : InitStandardViewer
+// function : InitViewer
 // purpose :
 // =======================================================================
-void View_Viewer::InitStandardViewer()
+void View_Viewer::InitViewer (const Handle(AIS_InteractiveContext)& theContext)
+{
+  myContext = theContext;
+  myViewer = myContext->CurrentViewer();
+}
+
+// =======================================================================
+// function : CreateStandardViewer
+// purpose :
+// =======================================================================
+Handle(AIS_InteractiveContext) View_Viewer::CreateStandardViewer()
 {
   Handle(Aspect_DisplayConnection) aDisplayConnection = new Aspect_DisplayConnection();
   static Handle(OpenGl_GraphicDriver) aGraphicDriver = new OpenGl_GraphicDriver (aDisplayConnection);
 
 #if OCC_VERSION_HEX > 0x060901
-  myViewer = new V3d_Viewer (aGraphicDriver);
+  Handle(V3d_Viewer) aViewer = new V3d_Viewer (aGraphicDriver);
 #else
   TCollection_AsciiString a3DName ("Visu3D");
-  myViewer = new V3d_Viewer (aGraphicDriver, a3DName.ToExtString(), "", 1000.0, V3d_XposYnegZpos, Quantity_NOC_GRAY30,
-                             V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT, Standard_True, Standard_False);
+  Handle(V3d_Viewer) aViewer = new V3d_Viewer (aGraphicDriver, a3DName.ToExtString(), "", 1000.0, V3d_XposYnegZpos,
+    Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT, Standard_True, Standard_False);
 #endif
 
-  myViewer->SetDefaultLights();
-  myViewer->SetLightOn();
-  myViewer->SetDefaultBackgroundColor (Quantity_NOC_GRAY30);
+  aViewer->SetDefaultLights();
+  aViewer->SetLightOn();
+  aViewer->SetDefaultBackgroundColor (Quantity_NOC_GRAY30);
 
-  myContext = new AIS_InteractiveContext (myViewer);
-  myContext->UpdateCurrentViewer();
+  Handle(AIS_InteractiveContext) aContext = new AIS_InteractiveContext (aViewer);
+  aContext->UpdateCurrentViewer();
+
+  return aContext;
 }

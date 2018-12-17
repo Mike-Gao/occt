@@ -46,8 +46,13 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myClipPlane; }
+
   //! Returns current clip plane, initialize if it was not initialized yet
-  Standard_EXPORT Handle(Graphic3d_ClipPlane) GetClipPlane() const;
+  Standard_EXPORT Handle(Graphic3d_ClipPlane) GetClipPlane() const
+    { return Handle(Graphic3d_ClipPlane)::DownCast (GetObject()); }
 
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.

@@ -40,9 +40,14 @@ public:
   //! Destructor
   virtual ~VInspector_ItemGraphic3dCStructure() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myCStructure; }
+
   //! Returns the current C structure, init item if it was not initialized yet
   //! \return graphic C structure object
-  Standard_EXPORT Handle(Graphic3d_CStructure) GetCStructure() const;
+  Standard_EXPORT Handle(Graphic3d_CStructure) GetCStructure() const
+    {  return Handle(Graphic3d_CStructure)::DownCast (GetObject()); }
 
   //! Returns group of the C structure
   //! \param theRowId a group index
@@ -59,10 +64,22 @@ public:
   //! \return an integer value
   virtual int GetTableRowCount() const Standard_OVERRIDE;
 
+  //! Returns container of string values for enumeration in the model row
+  //! \param theRow table model row index
+  //! \param theColumn a model index column
+  //! \return string values for the enumeration presented in the row or an empty container
+  virtual QList<QVariant> GetTableEnumValues (const int theRow, const int theColumn) const Standard_OVERRIDE;
+
   //! Returns table value for the row in form: <function name> <function value>
   //! \param theRow a model index row
   //! \param theColumn a model index column
   virtual QVariant GetTableData (const int theRow, const int theColumn, const int theRole) const Standard_OVERRIDE;
+
+  //! Sets the value into the table cell. Only 1st column value might be modified.
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \param theValue a new cell value
+  virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
 
 protected:
 

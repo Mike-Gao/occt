@@ -19,6 +19,7 @@
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 
+#include <TopoDS_Shape.hxx>
 #include <V3d_View.hxx>
 
 class VInspector_ItemV3dView;
@@ -46,12 +47,13 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
-  //! Returns current drawer, initialize the drawer if it was not initialized yet
-  Standard_EXPORT Handle(V3d_View) GetView() const;
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myView; }
 
-  //! Returns clip plane of the row if possible
-  //! \param theRow child row index
-  Standard_EXPORT Handle(Graphic3d_ClipPlane) GetClipPlane(const int theRow);
+  //! Returns current drawer, initialize the drawer if it was not initialized yet
+  Standard_EXPORT Handle(V3d_View) GetView() const
+  { return Handle(V3d_View)::DownCast (GetObject()); }
 
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
@@ -92,6 +94,17 @@ protected:
   //! \param theColumn a model index column
   //! \param theValue a new cell value
   virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
+
+protected:
+
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() Standard_OVERRIDE { return buildPresentationShape (myView); }
+
+    //! Creates shape for the 3d view parameters
+  //! \param theView current view
+  //! \return shape or NULL
+  static TopoDS_Shape buildPresentationShape (const Handle(V3d_View)& theView);
 
 protected:
 

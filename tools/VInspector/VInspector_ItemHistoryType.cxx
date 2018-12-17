@@ -61,16 +61,17 @@ QVariant VInspector_ItemHistoryType::initValue(const int theRole) const
 
   VInspector_ItemHistoryRootPtr aParentItem = itemDynamicCast<VInspector_ItemHistoryRoot>(Parent());
   const VInspector_ItemHistoryTypeInfo& aTypeInfo = aParentItem->GetTypeInfo(Row());
+  int aRowCount = rowCount();
   QList<QVariant> anElements = rowCount() > 0 ? aTypeInfo.myElements[rowCount() - 1] : QList<QVariant>(); // the last item
   int anInfoSize = anElements.size();
   switch (Column())
   {
     case 0: return VInspector_CallBack::GetInfo(aTypeInfo.myMode);
-    case 1: return rowCount();
-    case 2: return anInfoSize > 1 ? anElements[1].toString() : QVariant(); // pointer info
-    case 3: return anInfoSize > 2 ? anElements[2].toString() : QVariant(); // shape type
-    case 4: return anInfoSize > 0 ? anElements[0].toString() : QVariant(); // AIS name
-    case 5: return anInfoSize > 3 ? anElements[3].toString() : QVariant(); // owner info
+    case 3: return rowCount();
+    case 4: return anInfoSize > 1 ? anElements[1].toString() : QVariant(); // pointer info
+    case 5: return anInfoSize > 2 ? anElements[2].toString() : QVariant(); // shape type
+    case 6: return anInfoSize > 0 ? anElements[0].toString() : QVariant(); // AIS name
+    case 7: return anInfoSize > 3 ? anElements[3].toString() : QVariant(); // owner info
     default: break;
   }
   return QVariant();

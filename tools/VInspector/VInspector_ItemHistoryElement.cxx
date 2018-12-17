@@ -32,9 +32,9 @@ QVariant VInspector_ItemHistoryElement::initValue(const int theRole) const
   switch (Column())
   {
     case 0: return getName();
-    case 1: return QVariant();
-    case 2: return GetPointerInfo();
-    case 3: return GetShapeTypeInfo();
+    case 2: return QVariant();
+    case 3: return GetPointerInfo();
+    case 4: return GetShapeTypeInfo();
     default: break;
   }
   return QVariant();

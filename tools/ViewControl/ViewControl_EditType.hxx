@@ -25,7 +25,8 @@ enum ViewControl_EditType
   ViewControl_EditType_Combo, //!< combo box widget
   ViewControl_EditType_Double, //!< line edit widget used double validator
   ViewControl_EditType_Line, //!< line edit widget
-  ViewControl_EditType_Spin //!< spin box widget
+  ViewControl_EditType_Spin, //!< spin box widget
+  ViewControl_EditType_DoubleVec3 //!< control to enter three double values
 };
 
 #endif

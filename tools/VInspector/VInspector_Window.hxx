@@ -25,6 +25,8 @@
 #include <inspector/VInspector_CallBack.hxx>
 #include <inspector/VInspector_DisplayActionType.hxx>
 
+#include <inspector/ViewControl_PaneCreator.hxx>
+
 #include <Standard_WarningsDisable.hxx>
 #include <QObject>
 #include <QItemSelection>
@@ -46,6 +48,13 @@ class QAction;
 class QDockWidget;
 class QTreeView;
 class QWidget;
+
+//#define DEBUG_TWO_VIEWS
+
+#ifdef DEBUG_TWO_VIEWS
+class View_CameraPositionPrs;
+#endif
+
 
 //! \class VInspector_Window
 //! Window that unites all VInspector controls.
@@ -96,12 +105,15 @@ public:
   //! Returns selected shapes
   //! \param theModel selection model
   //! \return container of shapes
-  NCollection_List<TopoDS_Shape> GetSelectedShapes (QItemSelectionModel* theModel);
+  NCollection_List<TopoDS_Shape> GetSelectedShapes (const QModelIndexList& theIndices);
 
   //! Returns selected elements
   //! \param theModel selection model
   //! \return container of OpenGl elements
   NCollection_List<OpenGl_Element*> GetSelectedElements (QItemSelectionModel* theModel);
+
+  //! Returns the first not zero transform persistent of selected elements
+  Handle(Graphic3d_TransformPers) GetSelectedTransformPers();
 
 private:
 
@@ -151,6 +163,26 @@ private slots:
   //! Apply activated display action
   void onDisplayActionTypeClicked();
 
+#ifdef DEBUG_TWO_VIEWS
+  //! Processing mouse down in the view
+  //! \param theX X mouse position in pixels
+  //! \param theY Y mouse position in pixels
+  void onViewLeftButtonDown (const int theX, const int theY);
+
+  //! Processing mouse up in the view
+  //! \param theX X mouse position in pixels
+  //! \param theY Y mouse position in pixels
+  void onViewLeftButtonUp (const int theX, const int theY);
+
+  //! Processing move in the view
+  //! \param theX X mouse position in pixels
+  //! \param theY Y mouse position in pixels
+  void onViewMoveTo (const int theX, const int theY);
+
+  //! Processing left button up
+  void onViewLeftButtonUp();
+#endif
+
 private:
 
   //! Inits the window content by the given context
@@ -174,7 +206,9 @@ private:
 
   //!< Updates presentation of preview for parameter shapes. Creates a compound of the shapes
   //!< \param theShape container of shapes
-  void updatePreviewPresentation (const NCollection_List<TopoDS_Shape>& theShapes);
+  //!< \param thePersistent transform persistent to be used in preview presentation
+  void updatePreviewPresentation (const NCollection_List<TopoDS_Shape>& theShapes,
+                                  const Handle(Graphic3d_TransformPers)& thePersistent);
 
   //!< Updates presentation of preview for OpenGl elements.
   //!< \param theElements container of elements
@@ -194,12 +228,18 @@ private:
   QTreeView* myHistoryView; //!< history of AIS context calls
   Handle(VInspector_CallBack) myCallBack; //!< AIS context call back, if set
 
+  NCollection_List<Handle(ViewControl_PaneCreator)> myPaneCreators; //!< panes for AIS presentations
+
   ViewControl_MessageDialog* myExportToShapeViewDialog; //!< dialog about exporting TopoDS_Shape to ShapeView plugin
   View_Window* myViewWindow; //!< temporary view window, it is created if Open is called but context is still NULL
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
   Handle(VInspector_PrsOpenGlElement) myOpenGlPreviewPresentation; //!< presentation of preview for OpenGl elements
+
+#ifdef DEBUG_TWO_VIEWS
+  Handle(View_CameraPositionPrs) myCameraPrs;
+#endif
 };
 
 #endif

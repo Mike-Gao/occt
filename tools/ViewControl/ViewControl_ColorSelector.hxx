@@ -67,6 +67,11 @@ public:
   //! \return text value
   static QString ColorToString (const Quantity_ColorRGBA& theColor);
 
+  //! Converts color to QColor value in form: r;g;b
+  //! \param theColor color value
+  //! \return qt color value
+  static QColor ColorToQColor (const Quantity_Color& theColor);
+
   //! Converts color to QColor value in form: r;g;b;a
   //! \param theColor color value
   //! \return qt color value

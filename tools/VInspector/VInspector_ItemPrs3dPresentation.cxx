@@ -90,9 +90,7 @@ void VInspector_ItemPrs3dPresentation::Init()
   TCollection_AsciiString aName;
   Handle(Prs3d_Presentation) aPresentation = aParentItem->GetPresentation (Row(), aName);
   setPresentation (aPresentation, aName);
-
-  myPresentationShape = VInspector_Tools::CreateShape (aPresentation->MinMaxValues());
-
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }
 
@@ -119,16 +117,6 @@ void VInspector_ItemPrs3dPresentation::initItem() const
 }
 
 // =======================================================================
-// function : GetInteractiveObject
-// purpose :
-// =======================================================================
-Handle(Prs3d_Presentation) VInspector_ItemPrs3dPresentation::GetPresentation() const
-{
-  initItem();
-  return myPresentation;
-}
-
-// =======================================================================
 // function : setPresentation
 // purpose :
 // =======================================================================
@@ -147,6 +135,31 @@ int VInspector_ItemPrs3dPresentation::GetTableRowCount() const
 {
   return 14;
 }
+
+// =======================================================================
+// function : GetTableEnumValues
+// purpose :
+// =======================================================================
+QList<QVariant> VInspector_ItemPrs3dPresentation::GetTableEnumValues (const int theRow, const int) const
+{
+  QList<QVariant> aValues;
+  switch (theRow)
+  {
+    case 4:
+    {
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_UNKNOWN));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_Default));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_Top));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_Topmost));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_TopOSD));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_BotOSD));
+    }
+    break;
+    default: break;
+  }
+  return aValues;
+}
+
 
 // =======================================================================
 // function : GetTableData
@@ -182,4 +195,31 @@ QVariant VInspector_ItemPrs3dPresentation::GetTableData (const int theRow, const
     default: return QVariant();
   }
   return QVariant();
+}
+
+// =======================================================================
+// function : SetTableData
+// purpose :
+// =======================================================================
+bool VInspector_ItemPrs3dPresentation::SetTableData (const int theRow, const int, const QVariant& theValue)
+{
+  Handle(Prs3d_Presentation) aPrs = GetPresentation();
+  switch (theRow)
+  {
+    case 8: aPrs->SetZLayer (Graphic3d::ZLayerIdFromString (theValue.toString().toStdString().c_str()));
+    default: return false;
+  }
+  return true;
+}
+
+// =======================================================================
+// function : buildPresentationShape
+// purpose :
+// =======================================================================
+TopoDS_Shape VInspector_ItemPrs3dPresentation::buildPresentationShape()
+{
+  if (!myPresentation.IsNull())
+    myPresentationShape = VInspector_Tools::CreateShape (myPresentation->MinMaxValues());
+
+  return TopoDS_Shape();
 }

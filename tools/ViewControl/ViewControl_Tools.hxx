@@ -16,13 +16,16 @@
 #ifndef ViewControl_Tools_H
 #define ViewControl_Tools_H
 
+#include <gp_Dir.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Trsf.hxx>
+#include <gp_XYZ.hxx>
 #include <Bnd_Box.hxx>
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <TColgp_HArray1OfPnt.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <TopLoc_Location.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QString>
@@ -100,7 +103,17 @@ public:
   //! Returns text of point
   //! \param theValue a 3D point
   //! \return text value
-  Standard_EXPORT static TCollection_AsciiString ToString (const gp_Pnt& theValue);
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_Pnt& thePoint);
+
+  //! Returns text of direction
+  //! \param theValue a direction
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_Dir& theDir);
+
+  //! Returns text of cartesian entity in 3D space
+  //! \param theValue an entity
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_XYZ& theValue);
 
   //! Returns text of bounding box in form: (xmin, ymin, zmin), (xmax, ymax, zmax)
   //! \param theValue a bounding box
@@ -111,6 +124,11 @@ public:
   //! \param thePoints points
   //! \return text value
   Standard_EXPORT static TCollection_AsciiString ToString (const Handle(TColgp_HArray1OfPnt)& thePoints);
+
+  //! Returns text of location
+  //! \param theLocation object location
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const TopLoc_Location& theLocation);
 
 };
 

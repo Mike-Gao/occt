@@ -38,8 +38,13 @@ public:
   //! Destructor
   virtual ~VInspector_ItemSelectMgrSelection() {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return mySelection; }
+
   //! \return current selection value
-  Standard_EXPORT Handle(SelectMgr_Selection) getSelection() const;
+  Standard_EXPORT Handle(SelectMgr_Selection) GetSelection() const
+  { return Handle(SelectMgr_Selection)::DownCast (GetObject()); }
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;

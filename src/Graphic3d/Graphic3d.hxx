@@ -16,11 +16,13 @@
 
 #include <Graphic3d_AlphaMode.hxx>
 #include <Graphic3d_Buffer.hxx>
+#include <Graphic3d_Camera.hxx>
 #include <Graphic3d_HorizontalTextAlignment.hxx>
 #include <Graphic3d_VerticalTextAlignment.hxx>
 #include <Graphic3d_TextPath.hxx>
 #include <Graphic3d_TransModeFlags.hxx>
 #include <Graphic3d_TypeOfShadingModel.hxx>
+#include <Graphic3d_NameOfMaterial.hxx>
 
 #include <Graphic3d_ZLayerId.hxx>
 #include <Standard_DefineAlloc.hxx>
@@ -232,6 +234,94 @@ public:
   //! @return TRUE if string identifier is known
   Standard_EXPORT static Standard_Boolean TransModeFlagsFromString (const Standard_CString theTypeString,
                                                                     Graphic3d_TransModeFlags& theType);
+
+  //! Returns the string name for a given type.
+  //! @param theType an enumeration type
+  //! @return string identifier from the enumeration list
+  Standard_EXPORT static Standard_CString CameraProjectionToString (Graphic3d_Camera::Projection theType);
+
+  //! Returns the orientation type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return enumeration type or Projection_Orthographic if string identifier is invalid
+  static Graphic3d_Camera::Projection CameraProjectionFromString (Standard_CString theTypeString)
+  {
+    Graphic3d_Camera::Projection aType = Graphic3d_Camera::Projection_Orthographic;
+    CameraProjectionFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected type
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean CameraProjectionFromString (const Standard_CString theTypeString,
+                                                                      Graphic3d_Camera::Projection& theType);
+
+  //! Returns the string name for a given type.
+  //! @param theType an enumeration type
+  //! @return string identifier from the enumeration list
+  Standard_EXPORT static Standard_CString CameraFocusTypeToString (Graphic3d_Camera::FocusType theType);
+
+  //! Returns the orientation type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return enumeration type or FocusType_Absolute if string identifier is invalid
+  static Graphic3d_Camera::FocusType CameraFocusTypeFromString (Standard_CString theTypeString)
+  {
+    Graphic3d_Camera::FocusType aType = Graphic3d_Camera::FocusType_Absolute;
+    CameraFocusTypeFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected type
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean CameraFocusTypeFromString (const Standard_CString theTypeString,
+                                                                     Graphic3d_Camera::FocusType& theType);
+
+  //! Returns the string name for a given type.
+  //! @param theType an enumeration type
+  //! @return string identifier from the enumeration list
+  Standard_EXPORT static Standard_CString CameraIODTypeToString (Graphic3d_Camera::IODType theType);
+
+  //! Returns the orientation type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return enumeration type or IODType_Absolute if string identifier is invalid
+  static Graphic3d_Camera::IODType CameraIODTypeFromString (Standard_CString theTypeString)
+  {
+    Graphic3d_Camera::IODType aType = Graphic3d_Camera::IODType_Absolute;
+    CameraIODTypeFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected type
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean CameraIODTypeFromString (const Standard_CString theTypeString,
+                                                                   Graphic3d_Camera::IODType& theType);
+
+  //! Returns the string name for a given type.
+  //! @param theType an enumeration type
+  //! @return string identifier from the enumeration list
+  Standard_EXPORT static Standard_CString NameOfMaterialToString (Graphic3d_NameOfMaterial theType);
+
+  //! Returns the orientation type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return enumeration type or IODType_Absolute if string identifier is invalid
+  static Graphic3d_NameOfMaterial NameOfMaterialFromString (Standard_CString theTypeString)
+  {
+    Graphic3d_NameOfMaterial aType = Graphic3d_NOM_BRASS;
+    NameOfMaterialFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected type
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean NameOfMaterialFromString (const Standard_CString theTypeString,
+                                                                    Graphic3d_NameOfMaterial& theType);
 };
 
 #endif // _Graphic3d_HeaderFile

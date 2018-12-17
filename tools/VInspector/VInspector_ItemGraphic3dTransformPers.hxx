@@ -40,9 +40,14 @@ public:
   //! Destructor
   virtual ~VInspector_ItemGraphic3dTransformPers() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myTransformPers; }
+
   //! Returns the current C structure, init item if it was not initialized yet
   //! \return graphic C structure object
-  Standard_EXPORT Handle(Graphic3d_TransformPers) GetTransformPers() const;
+  Standard_EXPORT Handle(Graphic3d_TransformPers) GetTransformPers() const
+  { return Handle(Graphic3d_TransformPers)::DownCast (GetObject()); }
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;

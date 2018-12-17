@@ -49,10 +49,10 @@ int VInspector_ItemPresentations::initRowCount() const
   Handle(AIS_InteractiveObject) aPresentation = aParentPrsItem->GetInteractiveObject();
 
   int aNbProperties = 0;
-  if (!aPresentation->GetSelectPresentation (NULL).IsNull())
+  if (!aPresentation->GetSelectPresentation (GetContext()->MainPrsMgr()).IsNull())
     aNbProperties++;
 
-  if (!aPresentation->GetHilightPresentation (NULL).IsNull())
+  if (!aPresentation->GetHilightPresentation (GetContext()->MainPrsMgr()).IsNull())
     aNbProperties++;
 
   for (PrsMgr_Presentations::Iterator aPrsIter (aPresentation->Presentations()); aPrsIter.More(); aPrsIter.Next())

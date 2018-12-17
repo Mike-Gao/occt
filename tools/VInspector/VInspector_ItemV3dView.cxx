@@ -17,8 +17,17 @@
 
 #include <AIS.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <TopoDS_Compound.hxx>
+#include <V3d_ListOfLight.hxx>
+
+#include <inspector/ViewControl_Tools.hxx>
+#include <inspector/VInspector_ItemAspectWindow.hxx>
 #include <inspector/VInspector_ItemContext.hxx>
-#include <inspector/VInspector_ItemGraphic3dClipPlane.hxx>
+#include <inspector/VInspector_ItemGraphic3dCamera.hxx>
+#include <inspector/VInspector_ItemGraphic3dCView.hxx>
 #include <inspector/VInspector_ItemV3dViewer.hxx>
 #include <inspector/VInspector_Tools.hxx>
 
@@ -30,31 +39,14 @@
 // function : initRowCount
 // purpose :
 // =======================================================================
-Handle(Graphic3d_ClipPlane) VInspector_ItemV3dView::GetClipPlane(const int theRow)
-{
-  Handle(V3d_View) aView = GetView();
-
-  const Handle(Graphic3d_SequenceOfHClipPlane)& aClipPlanes = aView->ClipPlanes();
-
-  Standard_Integer aPlaneId = 0;
-  for (Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt (*aClipPlanes); aPlaneIt.More(); aPlaneIt.Next(), ++aPlaneId)
-  {
-    if (aPlaneId == theRow)
-      return aPlaneIt.Value();
-  }
-  return 0;
-}
-
-// =======================================================================
-// function : initRowCount
-// purpose :
-// =======================================================================
 int VInspector_ItemV3dView::initRowCount() const
 {
   if (Column() != 0)
     return 0;
 
-  return 1; // ClipPlanes
+  return 3; // 0 - Default Camera, 1 - Aspect_Window, 2 - CView
+  // TODO: V3d_ListOfLight, V3d_Trihedron,
+  //Aspect_Grid-MyPlane-MyTrsf-MyGridEchoStructure-MyGridEchoGroup
 }
 
 // =======================================================================
@@ -90,11 +82,11 @@ void VInspector_ItemV3dView::Init()
   Handle(V3d_View) aView;
   if (aParentItem)
   {
-    Handle(V3d_Viewer) aViewer = aParentItem->GetViewer();
-    aViewer->InitActiveViews();
-    aView = aViewer->ActiveView();
+    aView = aParentItem->GetView (Row());
   }
   setView (aView);
+
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }
 
@@ -123,30 +115,19 @@ void VInspector_ItemV3dView::initItem() const
 }
 
 // =======================================================================
-// function : GetView
-// purpose :
-// =======================================================================
-
-Handle(V3d_View) VInspector_ItemV3dView::GetView() const
-{
-  initItem();
-  return myView;
-}
-
-// =======================================================================
 // function : GetTableRowCount
 // purpose :
 // =======================================================================
 int VInspector_ItemV3dView::GetTableRowCount() const
 {
-  return 0;
+  return 60;
 }
 
 // =======================================================================
 // function : GetTableEditType
 // purpose :
 // =======================================================================
-ViewControl_EditType VInspector_ItemV3dView::GetTableEditType (const int theRow, const int) const
+ViewControl_EditType VInspector_ItemV3dView::GetTableEditType (const int, const int) const
 {
   return ViewControl_EditType_None;
 }
@@ -155,7 +136,7 @@ ViewControl_EditType VInspector_ItemV3dView::GetTableEditType (const int theRow,
 // function : GetTableEnumValues
 // purpose :
 // =======================================================================
-QList<QVariant> VInspector_ItemV3dView::GetTableEnumValues (const int theRow, const int) const
+QList<QVariant> VInspector_ItemV3dView::GetTableEnumValues (const int, const int) const
 {
   QList<QVariant> aValues;
   return aValues;
@@ -169,15 +150,93 @@ QVariant VInspector_ItemV3dView::GetTableData (const int theRow, const int theCo
 {
   if (theRole != Qt::DisplayRole)
     return QVariant();
+
+  Handle(V3d_View) aView = GetView();
+  if (aView.IsNull())
+    return QVariant();
+
+  bool isFirstColumn = theColumn == 0;
+  switch (theRow)
+  {
+    case 0:
+    {
+      if (isFirstColumn)
+        return QVariant ("ImmediateUpdate");
+
+      Standard_Boolean aCurState = aView->SetImmediateUpdate (Standard_False);
+      aView->SetImmediateUpdate (aCurState);
+
+      return aCurState;
+    }
+    break;
+    case 1:
+    {
+      if (isFirstColumn)
+        return QVariant ("ActiveLights");
+
+      V3d_ListOfLightIterator aLightsIt = aView->ActiveLightIterator();
+      Standard_Integer aNbOfLights = 0;
+      while (aLightsIt.More())
+      {
+        aNbOfLights++;
+        aLightsIt.Next();
+      }
+      return aNbOfLights;
+    }
+    case 2:
+    {
+      if (isFirstColumn)
+        return QVariant ("Axis: origin");
+
+      Standard_Real aX, anY, aZ, aVx, aVy, aVz;
+      aView->Axis (aX, anY, aZ, aVx, aVy, aVz);
+
+      return ViewControl_Tools::ToString (gp_Pnt (aX, anY, aZ)).ToCString();
+    }
+    case 3:
+    {
+      if (isFirstColumn)
+        return QVariant ("Axis: direction");
+
+      Standard_Real aX, anY, aZ, aVx, aVy, aVz;
+      aView->Axis (aX, anY, aZ, aVx, aVy, aVz);
+
+      return ViewControl_Tools::ToString (gp_Dir (aVx, aVy, aVz)).ToCString();
+    }
+    case 4: return isFirstColumn ? QVariant ("ComputedMode") : QVariant (aView->ComputedMode());
+    case 5: return isFirstColumn ? QVariant ("AutoZFitMode") : QVariant (aView->AutoZFitMode());
+    case 6: return isFirstColumn ? QVariant ("AutoZFitScaleFactor") : QVariant (aView->AutoZFitScaleFactor());
+  }
+  return QVariant();
 }
 
 // =======================================================================
 // function : SetTableData
 // purpose :
 // =======================================================================
-bool VInspector_ItemV3dView::SetTableData (const int theRow, const int, const QVariant& theValue)
+bool VInspector_ItemV3dView::SetTableData (const int, const int, const QVariant&)
 {
   return true;
+}
+
+// =======================================================================
+// function : buildPresentationShape
+// purpose :
+// =======================================================================
+TopoDS_Shape VInspector_ItemV3dView::buildPresentationShape (const Handle(V3d_View)& theView)
+{
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+
+  Standard_Real aX, anY, aZ, aVx, aVy, aVz;
+  theView->Axis (aX, anY, aZ, aVx, aVy, aVz);
+  gp_Pnt anOrigin (aX, anY, aZ);
+
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (anOrigin));
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Lin (anOrigin, gp_Dir (aVx, aVy, aVz))));
+
+  return aCompound;
 }
 
 // =======================================================================
@@ -187,7 +246,11 @@ bool VInspector_ItemV3dView::SetTableData (const int theRow, const int, const QV
 TreeModel_ItemBasePtr VInspector_ItemV3dView::createChild (int theRow, int theColumn)
 {
   if (theRow == 0)
-    return VInspector_ItemGraphic3dClipPlane::CreateItem (currentItem(), theRow, theColumn);
+    return VInspector_ItemGraphic3dCamera::CreateItem (currentItem(), theRow, theColumn);
+  else if (theRow == 1)
+    return VInspector_ItemAspectWindow::CreateItem (currentItem(), theRow, theColumn);
+  else if (theRow == 2)
+    return VInspector_ItemGraphic3dCView::CreateItem (currentItem(), theRow, theColumn);
 
   return TreeModel_ItemBasePtr();
 }

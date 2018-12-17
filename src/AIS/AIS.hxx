@@ -24,6 +24,7 @@
 #include <Standard_Boolean.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Real.hxx>
+#include <AIS_KindOfInteractive.hxx>
 #include <AIS_KindOfSurface.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Quantity_NameOfColor.hxx>
@@ -272,6 +273,28 @@ public:
   //! @return TRUE if string identifier is known
   Standard_EXPORT static Standard_Boolean DisplayStatusFromString (const Standard_CString theTypeString,
                                                                    AIS_DisplayStatus& theType);
+
+  //! Returns the string name for a given enum type.
+  //! @param theType display status
+  //! @return string identifier
+  Standard_EXPORT static Standard_CString KindOfInteractiveToString (AIS_KindOfInteractive theType);
+
+  //! Returns the display status from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return status type or AIS_KOI_None if string identifier is invalid
+  static AIS_KindOfInteractive KindOfInteractiveFromString (Standard_CString theTypeString)
+  {
+    AIS_KindOfInteractive aType = AIS_KOI_None;
+    KindOfInteractiveFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the shape type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected display status
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean KindOfInteractiveFromString (const Standard_CString theTypeString,
+                                                                       AIS_KindOfInteractive& theType);
 
 };
 

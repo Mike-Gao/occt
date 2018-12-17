@@ -41,9 +41,14 @@ public:
   //! Destructor
   virtual ~VInspector_ItemGraphic3dGroup() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myGroup; }
+
   //! Returns the current graphic3d group, init item if it was not initialized yet
   //! \return graphic group
-  Standard_EXPORT Handle(Graphic3d_Group) GetGroup() const;
+  Standard_EXPORT Handle(Graphic3d_Group) GetGroup() const
+    { return Handle(Graphic3d_Group)::DownCast (GetObject()); }
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;

@@ -31,16 +31,6 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetTransformPers
-// purpose :
-// =======================================================================
-Handle(Graphic3d_TransformPers) VInspector_ItemGraphic3dTransformPers::GetTransformPers() const
-{
-  initItem();
-  return myTransformPers;
-}
-
-// =======================================================================
 // function : Init
 // purpose :
 // =======================================================================

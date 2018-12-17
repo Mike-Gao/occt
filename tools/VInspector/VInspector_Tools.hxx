@@ -31,6 +31,9 @@
 #include <inspector/VInspector_CallBackMode.hxx>
 #include <inspector/VInspector_DisplayActionType.hxx>
 #include <inspector/VInspector_SelectionType.hxx>
+
+#include <inspector/ViewControl_PaneCreator.hxx>
+
 #include <inspector/TreeModel_ItemBase.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -148,6 +151,7 @@ public:
   //! \param theAlert a message alert
   //! \param theTableValue container of values
   Standard_EXPORT static void GetPropertyTableValues (const TreeModel_ItemBasePtr& theItem,
+                                                      const NCollection_List<Handle(ViewControl_PaneCreator)>& theCreators,
                                                       QList<ViewControl_TableModelValues*>& theTableValues);
 
   //! Returns the string name for a given type.
@@ -177,11 +181,15 @@ public:
   //! \return string presentation
   Standard_EXPORT static QVariant ToVariant (const Select3D_BndBox3d& theBoundingBox);
 
-
   //! Creates box shape
   //! \param theBoundingBox box shape parameters
   //! \return created shape
   Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_Box& theBoundingBox);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Select3D_BndBox3d& theBoundingBox);
 
   //! Build string presentation of Graphic3D index buffer
   //! \param theIndexBuffer index buffer

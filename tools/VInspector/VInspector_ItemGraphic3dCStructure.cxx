@@ -29,16 +29,6 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetCStructure
-// purpose :
-// =======================================================================
-Handle(Graphic3d_CStructure) VInspector_ItemGraphic3dCStructure::GetCStructure() const
-{
-  initItem();
-  return myCStructure;
-}
-
-// =======================================================================
 // function : GetGroup
 // purpose :
 // =======================================================================
@@ -142,6 +132,30 @@ int VInspector_ItemGraphic3dCStructure::GetTableRowCount() const
 }
 
 // =======================================================================
+// function : GetTableEnumValues
+// purpose :
+// =======================================================================
+QList<QVariant> VInspector_ItemGraphic3dCStructure::GetTableEnumValues (const int theRow, const int) const
+{
+  QList<QVariant> aValues;
+  switch (theRow)
+  {
+    case 8:
+    {
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_UNKNOWN));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_Default));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_Top));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_Topmost));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_TopOSD));
+      aValues.append (Graphic3d::ZLayerIdToString (Graphic3d_ZLayerId_BotOSD));
+    }
+    break;
+    default: break;
+  }
+  return aValues;
+}
+
+// =======================================================================
 // function : GetTableData
 // purpose :
 // =======================================================================
@@ -191,6 +205,21 @@ QVariant VInspector_ItemGraphic3dCStructure::GetTableData (const int theRow, con
 
     default: return QVariant();
   }
+}
+
+// =======================================================================
+// function : SetTableData
+// purpose :
+// =======================================================================
+bool VInspector_ItemGraphic3dCStructure::SetTableData (const int theRow, const int, const QVariant& theValue)
+{
+  Handle(Graphic3d_CStructure) aCStructure = GetCStructure();
+  switch (theRow)
+  {
+    case 8: aCStructure->SetZLayer (Graphic3d::ZLayerIdFromString (theValue.toString().toStdString().c_str()));
+    default: return false;
+  }
+  return true;
 }
 
 // =======================================================================

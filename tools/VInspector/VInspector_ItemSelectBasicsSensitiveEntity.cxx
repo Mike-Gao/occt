@@ -15,6 +15,7 @@
 
 
 #include <inspector/VInspector_ItemSelectBasicsSensitiveEntity.hxx>
+#include <inspector/VInspector_ItemSelect3DSensitiveSetItem.hxx>
 
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_Shape.hxx>
@@ -60,21 +61,15 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetSensitiveEntity
-// purpose :
-// =======================================================================
-Handle(SelectBasics_SensitiveEntity) VInspector_ItemSelectBasicsSensitiveEntity::GetSensitiveEntity() const
-{
-  initItem();
-  return myEntity;
-}
-
-// =======================================================================
 // function : initValue
 // purpose :
 // =======================================================================
 int VInspector_ItemSelectBasicsSensitiveEntity::initRowCount() const
 {
+  Handle(Select3D_SensitiveSet) aSensitiveSet = Handle(Select3D_SensitiveSet)::DownCast (GetSensitiveEntity());
+  if (!aSensitiveSet.IsNull())
+    return aSensitiveSet->Size();
+
   return 0;
 }
 
@@ -85,6 +80,9 @@ int VInspector_ItemSelectBasicsSensitiveEntity::initRowCount() const
 QVariant VInspector_ItemSelectBasicsSensitiveEntity::initValue (int theItemRole) const
 {
   Handle(SelectBasics_SensitiveEntity) anEntity = GetSensitiveEntity();
+  if (anEntity.IsNull())
+    return QVariant();
+
   Handle(SelectBasics_EntityOwner) anOwner = anEntity->OwnerId();
 
   switch (theItemRole)
@@ -130,7 +128,7 @@ QVariant VInspector_ItemSelectBasicsSensitiveEntity::initValue (int theItemRole)
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemSelectBasicsSensitiveEntity::createChild (int theRow, int theColumn)
 {
-  return VInspector_ItemSelectBasicsEntityOwner::CreateItem (currentItem(), theRow, theColumn);
+  return VInspector_ItemSelect3DSensitiveSetItem::CreateItem (currentItem(), theRow, theColumn);
 }
 
 // =======================================================================
@@ -144,8 +142,8 @@ void VInspector_ItemSelectBasicsSensitiveEntity::Init()
   Handle(SelectMgr_SensitiveEntity) anEntity = aParentItem->GetSensitiveEntity();
 
   myEntity = anEntity->BaseSensitive();
-  myPresentationShape = buildPresentationShape (myEntity);
 
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init();
 }
 
@@ -207,7 +205,11 @@ void VInspector_ItemSelectBasicsSensitiveEntity::GetPresentations(NCollection_Li
   if (aBaseEntity.IsNull())
     return;
 
-  myPresentation = new AIS_Shape (myPresentationShape);
+  TopoDS_Shape aShape = GetPresentationShape();
+  if (aShape.IsNull())
+    return;
+
+  myPresentation = new AIS_Shape (aShape);
   myPresentation->SetColor (Quantity_Color (Quantity_NOC_BLUE1));
   thePresentations.Append (myPresentation);
 }
@@ -246,6 +248,9 @@ QVariant VInspector_ItemSelectBasicsSensitiveEntity::GetTableData (const int the
   bool isFirstColumn = theColumn == 0;
 
   Handle(SelectBasics_SensitiveEntity) anEntity = GetSensitiveEntity();
+  if (anEntity.IsNull())
+    return QVariant();
+
   switch (theRow)
   {
     case 0: return ViewControl_Table::SeparatorData();
@@ -398,7 +403,10 @@ QVariant VInspector_ItemSelectBasicsSensitiveEntity::getTableData (const int the
       }
     }
   }
-  //Select3D_SensitivePrimitiveArray
+  else if (theEntityKind == STANDARD_TYPE (Select3D_SensitivePrimitiveArray)->Name())
+  {
+    // TODO
+  }
   else if (theEntityKind == STANDARD_TYPE (Select3D_SensitiveTriangulation)->Name())
   {
     Handle(Select3D_SensitiveTriangulation) anEntity = Handle(Select3D_SensitiveTriangulation)::DownCast (aBaseEntity);
@@ -424,7 +432,11 @@ TopoDS_Shape VInspector_ItemSelectBasicsSensitiveEntity::buildPresentationShape
   TopoDS_Compound aCompound;
   aBuilder.MakeCompound (aCompound);
 
-  aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex(aBaseEntity->CenterOfGeometry()));
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (aBaseEntity->CenterOfGeometry()));
+  
+  Select3D_BndBox3d aBoundingBox = aBaseEntity->BoundingBox();
+  if (aBoundingBox.IsValid())
+    aBuilder.Add (aCompound, VInspector_Tools::CreateShape (aBoundingBox));
 
   Standard_CString aTypeName = aBaseEntity->DynamicType()->Name();
   if (aTypeName == STANDARD_TYPE (Select3D_SensitiveBox)->Name())
@@ -470,6 +482,9 @@ TopoDS_Shape VInspector_ItemSelectBasicsSensitiveEntity::buildPresentationShape
     anEntity->Points3D (aPoints);
     for (Standard_Integer aPntIter = aPoints->Lower(); aPntIter <= aPoints->Upper(); ++aPntIter)
       aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex(aPoints->Value (aPntIter)));
+  }
+  else if (aTypeName == STANDARD_TYPE (Select3D_SensitivePrimitiveArray)->Name())
+  {
   }
   else if (aTypeName == STANDARD_TYPE (Select3D_SensitiveTriangulation)->Name())
   {

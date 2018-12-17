@@ -56,7 +56,7 @@ private:
   //! aSelection, available in Shape mode, specified by
   //! aMode
   Standard_EXPORT virtual void ComputeSelection (const Handle(SelectMgr_Selection)& theSelection,
-                                                 const Standard_Integer theMode) {}
+                                                 const Standard_Integer theMode) {(void)theSelection; (void)theMode; }
 
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(VInspector_PrsOpenGlElement, AIS_InteractiveObject)

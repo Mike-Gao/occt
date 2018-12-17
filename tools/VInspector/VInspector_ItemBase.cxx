@@ -59,3 +59,16 @@ Handle(AIS_InteractiveContext) VInspector_ItemBase::GetContext() const
 
   return myContext;
 }
+
+// =======================================================================
+// function : GetContext
+// purpose :
+// =======================================================================
+TopoDS_Shape VInspector_ItemBase::GetPresentationShape() const
+{
+  if (Column() != TreeModel_ColumnType_Name)
+    return TopoDS_Shape();
+  
+  initItem();
+  return myPresentationShape;
+}

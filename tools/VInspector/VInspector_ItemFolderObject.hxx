@@ -45,6 +45,10 @@ public:
   //! Destructor
   virtual ~VInspector_ItemFolderObject() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { return NULL; }
+
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
 
