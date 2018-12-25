@@ -1167,6 +1167,13 @@ public: //! @name sub-intensity management (deprecated)
   Standard_EXPORT void SubIntensityOff (const Handle(AIS_InteractiveObject)& theIObj,
                                         const Standard_Boolean               theToUpdateViewer);
 
+  //! Sets selection instance to manipulate a container of selected owners
+  //! \param theSelection an instance of the selection
+  void SetSelection (const Handle(AIS_Selection)& theSelection) { mySelection = theSelection; }
+
+  //! Returns selection instance
+  const Handle(AIS_Selection)& Selection() const { return mySelection; }
+
 protected: //! @name internal methods
 
   Standard_EXPORT void GetDefModes (const Handle(AIS_InteractiveObject)& anIobj, Standard_Integer& Dmode, Standard_Integer& HiMod, Standard_Integer& SelMode) const;
