@@ -89,33 +89,41 @@ Add(const Handle(Geom_BoundedCurve)& NewCurve,
 
   Standard_Boolean avant, apres;
   myTol = Tolerance;
+  Standard_Real aSqTol = Tolerance * Tolerance;
 
-  Standard_Integer LBs = Bs->NbPoles(), LCb = myCurve->NbPoles();
+  Standard_Real aSqDistFF = myCurve->Value(myCurve->FirstParameter()).SquareDistance(Bs->Value(Bs->FirstParameter()));
+  Standard_Real aSqDistFL = myCurve->Value(myCurve->FirstParameter()).SquareDistance(Bs->Value(Bs->LastParameter()));
+  Standard_Real aSqDistLF = myCurve->Value(myCurve->LastParameter()).SquareDistance(Bs->Value(Bs->FirstParameter()));
+  Standard_Real aSqDistLL = myCurve->Value(myCurve->LastParameter()).SquareDistance(Bs->Value(Bs->LastParameter()));
 
-  avant = (( myCurve->Pole(1).Distance(Bs->Pole(1))  < myTol)||
-	   ( myCurve->Pole(1).Distance(Bs->Pole(LBs))< myTol));
-  apres = (( myCurve->Pole(LCb).Distance(Bs->Pole(1))  < myTol) ||
-	   ( myCurve->Pole(LCb).Distance(Bs->Pole(LBs))< myTol));
+  avant = (aSqDistFF < aSqTol) || (aSqDistFL < aSqTol);
+  apres = (aSqDistLF < aSqTol) || (aSqDistLL < aSqTol);
 
-  // myCurve est (sera) elle fermee ?
-  if (avant && apres) { // On leve l'ambiguite
+  // myCurve is closed?
+  if (avant && apres) { // Eliminating ambiguity
     if (After) avant = Standard_False;
     else       apres = Standard_False;
   }
 
-  // Ajout Apres ?
-  if ( apres) {
-    if (myCurve->Pole(LCb).Distance(Bs->Pole(LBs)) < myTol) {Bs->Reverse();}
+  // Add after?
+  if (apres) {
+    if (aSqDistLL < aSqTol && aSqDistLL < aSqDistLF)
+    {
+      Bs->Reverse();
+    }
     Add(myCurve, Bs, Standard_True, WithRatio, MinM);
     return Standard_True;
   }
-  // Ajout avant ?  
+  // Add before?
   else if (avant) {
-    if (myCurve->Pole(1).Distance(Bs->Pole(1)) < myTol) {Bs->Reverse();}
+    if (aSqDistFF < aSqTol && aSqDistFF < aSqDistFL)
+    {
+      Bs->Reverse();
+    }
     Add(Bs, myCurve, Standard_False, WithRatio, MinM);
     return Standard_True;
   }
-  
+
   return Standard_False;
 }
 
