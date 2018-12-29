@@ -846,14 +846,14 @@ void BRepFill_CompatibleWires::Perform (const Standard_Boolean WithRotation)
   
   if (allClosed) {
     // All sections are closed 
-    if (report) {
+    //if (report) {
       // same number of elements  
       SameNumberByPolarMethod(WithRotation);
-    }
-    else {
-      // origin
-      ComputeOrigin(Standard_False);
-    }
+    //}
+    //else {
+    //  // origin
+    //  ComputeOrigin(Standard_False);
+    //}
     myIsDone = Standard_True;
   }
   else if (allOpen) {
