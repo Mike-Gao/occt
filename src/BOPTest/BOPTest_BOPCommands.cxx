@@ -648,7 +648,7 @@ Standard_Integer bopcurves (Draw_Interpretor& di,
                      anAppTol);
   aFF.SetList(aListOfPnts);
   //
-  aFF.Perform (aF1, aF2);
+  aFF.Perform (aF1, aF2, BOPTest_Objects::RunParallel());
   //
   anIsDone=aFF.IsDone();
   if (!anIsDone) {

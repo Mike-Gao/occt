@@ -148,7 +148,7 @@ class BOPAlgo_FaceFace :
     {
       OCC_CATCH_SIGNALS
 
-      IntTools_FaceFace::Perform(myF1, myF2);
+      IntTools_FaceFace::Perform(myF1, myF2, myRunParallel);
     }
     catch (Standard_Failure)
     {
@@ -251,6 +251,7 @@ void BOPAlgo_PaveFiller::PerformFF()
       //
       BOPAlgo_FaceFace& aFaceFace=aVFaceFace.Appended();
       //
+      aFaceFace.SetRunParallel (myRunParallel);
       aFaceFace.SetIndices(nF1, nF2);
       aFaceFace.SetFaces(aF1, aF2);
       // compute minimal tolerance for the curves
