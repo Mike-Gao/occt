@@ -60,6 +60,8 @@ void VInspector_ItemGraphic3dCStructure::Init()
 
   Handle(Prs3d_Presentation) aPresentation = aParentItem->GetPresentation();
   myCStructure = aPresentation->CStructure();
+  if (!myCStructure.IsNull())
+    myTransformPersistence = myCStructure->TransformPersistence();
 
   TreeModel_ItemBase::Init();
 }
@@ -72,6 +74,7 @@ void VInspector_ItemGraphic3dCStructure::Reset()
 {
   VInspector_ItemBase::Reset();
   myCStructure = NULL;
+  myTransformPersistence = NULL;
 }
 
 // =======================================================================

@@ -589,7 +589,7 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Bnd_Box& theBoundingBox)
       theBoundingBox.IsXThin (Precision::Confusion()) ||
       theBoundingBox.IsYThin (Precision::Confusion()) ||
       theBoundingBox.IsZThin (Precision::Confusion()))
-    return TopoDS_Shape();
+    return TopoDS_Shape(); // TODO: display shape for thin box, like in the same method for Select3D_BndBox3d
 
   BRepPrimAPI_MakeBox aBoxBuilder(theBoundingBox.CornerMin(), theBoundingBox.CornerMax());
   return aBoxBuilder.Shape();
@@ -610,6 +610,16 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBounding
   Standard_Boolean aThinOnX = fabs (aPntMin.X() - aPntMax.X()) < Precision::Confusion();
   Standard_Boolean aThinOnY = fabs (aPntMin.Y() - aPntMax.Y()) < Precision::Confusion();
   Standard_Boolean aThinOnZ = fabs (aPntMin.Z() - aPntMax.Z()) < Precision::Confusion();
+
+  if (((int)aThinOnX + (int)aThinOnY + (int)aThinOnZ) > 1) // thin box in several directions is a point
+  {
+    BRep_Builder aBuilder;
+    TopoDS_Compound aCompound;
+    aBuilder.MakeCompound (aCompound);
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (aPntMin));
+    return aCompound;
+  }
+
   if (aThinOnX || aThinOnY || aThinOnZ)
   {
     gp_Pnt aPnt1, aPnt2, aPnt3, aPnt4 ;
@@ -620,14 +630,14 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBounding
       aPnt3 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMax.Z());
       aPnt4 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMax.Z());
     }
-    if (aThinOnY)
+    else if (aThinOnY)
     {
       aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
       aPnt2 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMin.Z());
       aPnt3 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMax.Z());
       aPnt4 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMax.Z());
     }
-    if (aThinOnZ)
+    else if (aThinOnZ)
     {
       aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
       aPnt2 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMin.Z());
@@ -696,6 +706,50 @@ QVariant VInspector_Tools::ToVariant (const Handle(Graphic3d_BoundBuffer)& theBo
   //Handle(Graphic3d_Buffer) aBuffer = Handle(Graphic3d_Buffer)::DownCast (theBoundBuffer);
   //return VInspector_Tools::ToVariant (aBuffer);
   return QVariant();
+}
+
+//=======================================================================
+//function : ToVariant
+//purpose  :
+//=======================================================================
+QVariant VInspector_Tools::ToVariant (const Graphic3d_Mat4d& theMatrix)
+{
+  TCollection_AsciiString aValues;
+  for (int aRowId = 1; aRowId <= theMatrix.Rows(); aRowId++)
+  {
+    for (int aColId = 1; aColId <= theMatrix.Cols(); aColId++)
+    {
+      aValues += TCollection_AsciiString (theMatrix.GetValue (aRowId, aColId));
+      if (aColId != theMatrix.Rows())
+        aValues += ",";
+    }
+    if (aRowId != theMatrix.Rows())
+      aValues += "  ";
+  }
+
+  return aValues.ToCString();
+}
+
+//=======================================================================
+//function : ToVariant
+//purpose  :
+//=======================================================================
+QVariant VInspector_Tools::ToVariant (const Graphic3d_Mat4& theMatrix)
+{
+  TCollection_AsciiString aValues;
+  for (int aRowId = 1; aRowId <= theMatrix.Rows(); aRowId++)
+  {
+    for (int aColId = 1; aColId <= theMatrix.Cols(); aColId++)
+    {
+      aValues += TCollection_AsciiString (theMatrix.GetValue (aRowId, aColId));
+      if (aColId != theMatrix.Rows())
+        aValues += ",";
+    }
+    if (aRowId != theMatrix.Rows())
+      aValues += "  ";
+  }
+
+  return aValues.ToCString();
 }
 
 //=======================================================================

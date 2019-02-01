@@ -19,6 +19,8 @@
 #include <AIS_InteractiveContext.hxx>
 #include <Bnd_Box.hxx>
 #include <Graphic3d_Buffer.hxx>
+#include <Graphic3d_Mat4.hxx>
+#include <Graphic3d_Mat4d.hxx>
 #include <Select3D_BndBox3d.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <Standard.hxx>
@@ -205,6 +207,16 @@ public:
   //! \param theBoundBuffer index buffer
   //! \return string presentation
   Standard_EXPORT static QVariant ToVariant (const Handle(Graphic3d_BoundBuffer)& theBoundBuffer);
+
+  //! Convert matrix values into a text presentation
+  //! \param theMatrix a matrix of elements
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Graphic3d_Mat4d& theMatrix);
+
+  //! Convert matrix values into a text presentation
+  //! \param theMatrix a matrix of elements
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Graphic3d_Mat4& theMatrix);
 
   Standard_EXPORT static QString ToString (const Graphic3d_Attribute& theAttribute);
 

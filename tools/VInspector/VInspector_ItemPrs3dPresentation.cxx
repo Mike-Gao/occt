@@ -176,7 +176,7 @@ QVariant VInspector_ItemPrs3dPresentation::GetTableData (const int theRow, const
   switch (theRow)
   {
     case 0: return ViewControl_Table::SeparatorData();
-    case 1: return isFirstColumn ? QVariant (STANDARD_TYPE (Graphic3d_Structure)->Name())
+    case 1: return isFirstColumn ? QVariant (STANDARD_TYPE (Prs3d_Presentation)->Name())
                                  : ViewControl_Tools::GetPointerInfo (aPrs).ToCString();
     case 2: return ViewControl_Table::SeparatorData();
     case 3: return isFirstColumn ? QVariant ("DisplayPriority") : QVariant (aPrs->DisplayPriority());

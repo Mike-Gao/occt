@@ -434,18 +434,14 @@ Handle(Graphic3d_TransformPers) VInspector_Window::GetSelectedTransformPers()
     if (!aVItem)
       continue;
 
-    Handle(AIS_InteractiveObject) anIO;
-    while (aVItem && anIO.IsNull())
+    while (aVItem)
     {
-      VInspector_ItemPresentableObjectPtr aPrsObjectItem = itemDynamicCast<VInspector_ItemPresentableObject>(aVItem);
-      if (aPrsObjectItem)
-      {
-        anIO = aPrsObjectItem->GetInteractiveObject();
-      }
+      Handle(Graphic3d_TransformPers) aPers = aVItem->TransformPersistence();
+      if (!aPers.IsNull())
+        return aPers;
+
       aVItem = itemDynamicCast<VInspector_ItemBase>(aVItem->Parent());
     }
-    if (!anIO.IsNull() && !anIO->TransformPersistence().IsNull())
-      return anIO->TransformPersistence();
   }
   return Handle(Graphic3d_TransformPers)();
 }

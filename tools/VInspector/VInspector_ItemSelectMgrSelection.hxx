@@ -52,6 +52,15 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
+    //! Returns number of table rows
+  //! \return an integer value
+  virtual int GetTableRowCount() const Standard_OVERRIDE;
+
+  //! Returns table value for the row in form: <function name> <function value>
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  virtual QVariant GetTableData (const int theRow, const int theColumn, const int theRole) const Standard_OVERRIDE;
+
 protected:
 
   //! Initializes the current item. It is empty because Reset() is also empty.

@@ -189,3 +189,40 @@ void VInspector_ItemSelectMgrSelection::initItem() const
   const_cast<VInspector_ItemSelectMgrSelection*>(this)->Init();
   // an empty method to don't initialize the main label, as it was not cleared in Reset()
 }
+
+// =======================================================================
+// function : GetTableRowCount
+// purpose :
+// =======================================================================
+int VInspector_ItemSelectMgrSelection::GetTableRowCount() const
+{
+  return 10;
+}
+
+// =======================================================================
+// function : GetTableData
+// purpose :
+// =======================================================================
+QVariant VInspector_ItemSelectMgrSelection::GetTableData (const int theRow, const int theColumn, const int theRole) const
+{
+  if (theRole != Qt::DisplayRole)
+    return QVariant();
+
+  bool isFirstColumn = theColumn == 0;
+
+  Handle(SelectMgr_Selection) aSelection = GetSelection();
+  switch (theRow)
+  {
+    case 0: return isFirstColumn ? QVariant ("Mode") : QVariant (aSelection->Mode());
+    case 1: return isFirstColumn ? QVariant ("Sensitivity") : QVariant (aSelection->Sensitivity());
+    case 2: return isFirstColumn ? QVariant ("UpdateStatus")
+                                 : QVariant ((int)aSelection->UpdateStatus()); // TODO! SelectMgr_TypeOfUpdate
+    case 3: return isFirstColumn ? QVariant ("BVHUpdateStatus")
+                                 : QVariant ((int)aSelection->BVHUpdateStatus()); // TODO! SelectMgr_TypeOfBVHUpdate
+    case 4: return isFirstColumn ? QVariant ("GetSelectionState")
+                                 : QVariant ((int)aSelection->GetSelectionState()); // TODO! SelectMgr_StateOfSelection
+
+    default: return QVariant();
+  }
+  return QVariant();
+}

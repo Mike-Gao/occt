@@ -204,6 +204,7 @@ void VInspector_ItemPresentableObject::Init()
   }
 
   setInteractiveObject (anIO);
+  myTransformPersistence = anIO->TransformPersistence();
   UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }
@@ -218,6 +219,7 @@ void VInspector_ItemPresentableObject::Reset()
 
   SetContext (NULL);
   setInteractiveObject (NULL);
+  myTransformPersistence = NULL;
 }
 
 // =======================================================================

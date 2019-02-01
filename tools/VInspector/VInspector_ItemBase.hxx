@@ -24,6 +24,8 @@
 #include <inspector/TreeModel_ItemBase.hxx>
 #include <inspector/ViewControl_EditType.hxx>
 
+class Graphic3d_TransformPers;
+
 class VInspector_ItemBase;
 typedef QExplicitlySharedDataPointer<VInspector_ItemBase> VInspector_ItemBasePtr;
 
@@ -55,6 +57,9 @@ public:
   //! \thePresentations [out] container of presentation handles to be visualized
   virtual void GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations)
   { (void)thePresentations; }
+
+  //! Returns transform persistent of the item or NULL
+  Handle(Graphic3d_TransformPers) TransformPersistence() const { return myTransformPersistence; }
 
   //! Returns shape of the item parameters
   //! \return generated shape of the item parameters
@@ -117,6 +122,7 @@ protected:
 
   Handle(AIS_InteractiveContext) myContext; //!< the current context
   TopoDS_Shape myPresentationShape; //!< item presentation shape
+  Handle(Graphic3d_TransformPers) myTransformPersistence; //!< item cached persistent
 };
 
 #endif

@@ -241,6 +241,24 @@ QVariant VInspector_ItemGraphic3dCamera::GetTableData (const int theRow, const i
                                   : QVariant (ViewControl_Tools::ToString (aCamera->Direction()).ToCString());
     case 19: return isFirstColumn ? (!isToolTip ? QVariant ("ViewDimensions") : QVariant ("View plane size at center (target) point and distance between ZFar and ZNear planes"))
                                   : ViewControl_Tools::ToString (aCamera->ViewDimensions()).ToCString();
+
+    case 20: return ViewControl_Table::SeparatorData();
+    case 21: return isFirstColumn ? QVariant ("TransformMatrices (D):") : QVariant();
+    case 22: return ViewControl_Table::SeparatorData();
+
+    case 23: return isFirstColumn ? QVariant ("OrientationMatrix") : VInspector_Tools::ToVariant (aCamera->OrientationMatrix());
+    case 24: return isFirstColumn ? QVariant ("ProjectionMatrix")  : VInspector_Tools::ToVariant (aCamera->ProjectionMatrix());
+    case 25: return isFirstColumn ? QVariant ("ProjectionStereoLeft") : VInspector_Tools::ToVariant (aCamera->ProjectionStereoLeft());
+    case 26: return isFirstColumn ? QVariant ("ProjectionStereoRight") : VInspector_Tools::ToVariant (aCamera->ProjectionStereoRight());
+
+    case 27: return ViewControl_Table::SeparatorData();
+    case 28: return isFirstColumn ? QVariant ("TransformMatrices (F):") : QVariant();
+    case 29: return ViewControl_Table::SeparatorData();
+
+    case 30: return isFirstColumn ? QVariant ("OrientationMatrixF") : VInspector_Tools::ToVariant (aCamera->OrientationMatrixF());
+    case 31: return isFirstColumn ? QVariant ("ProjectionMatrixF")  : VInspector_Tools::ToVariant (aCamera->ProjectionMatrixF());
+    case 32: return isFirstColumn ? QVariant ("ProjectionStereoLeftF") : VInspector_Tools::ToVariant (aCamera->ProjectionStereoLeftF());
+    case 33: return isFirstColumn ? QVariant ("ProjectionStereoRightF") : VInspector_Tools::ToVariant (aCamera->ProjectionStereoRightF());
   }
   return QVariant();
 }
