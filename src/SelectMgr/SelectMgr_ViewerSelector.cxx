@@ -276,6 +276,9 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
   aCriterion.Priority  = anOwner->Priority();
   aCriterion.Depth     = aPickResult.Depth();
   aCriterion.MinDist   = aPickResult.DistToGeomCenter();
+  if (!aSelectable.IsNull() && !aSelectable->TransformPersistence().IsNull() &&
+     aSelectable->TransformPersistence()->Mode() == Graphic3d_TMF_2d)
+    aCriterion.MinDist = 0; // having 2D persistent, 3D geometry point is not required
   aCriterion.ToPreferClosest = preferclosest;
 
   if (SelectMgr_SortCriterion* aPrevCriterion = mystored.ChangeSeek (anOwner))
