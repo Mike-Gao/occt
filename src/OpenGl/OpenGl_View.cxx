@@ -143,15 +143,15 @@ void OpenGl_View::ReleaseGlResources (const Handle(OpenGl_Context)& theCtx)
     myTextureEnv.Nullify();
   }
 
-  if (myTextureParams != NULL)
+  if (!myTextureParams.IsNull())
   {
     myTextureParams->Release (theCtx.operator->());
   }
-  if (myBgGradientArray != NULL)
+  if (!myBgGradientArray.IsNull())
   {
     myBgGradientArray->Release (theCtx.operator->());
   }
-  if (myBgTextureArray != NULL)
+  if (!myBgTextureArray.IsNull())
   {
     myBgTextureArray->Release (theCtx.operator->());
   }

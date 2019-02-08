@@ -696,17 +696,17 @@ public: //! @name methods to alter or retrieve current state
   Standard_EXPORT Standard_Boolean BindProgram (const Handle(OpenGl_ShaderProgram)& theProgram);
 
   //! Setup current shading material.
-  Standard_EXPORT void SetShadingMaterial (const OpenGl_AspectFace* theAspect,
+  Standard_EXPORT void SetShadingMaterial (Handle(OpenGl_AspectFace)& theAspect,
                                            const Handle(Graphic3d_PresentationAttributes)& theHighlight);
 
   //! Checks if transparency is required for the given aspect and highlight style.
-  Standard_EXPORT static Standard_Boolean CheckIsTransparent (const OpenGl_AspectFace* theAspect,
+  Standard_EXPORT static Standard_Boolean CheckIsTransparent (Handle(OpenGl_AspectFace)& theAspect,
                                                               const Handle(Graphic3d_PresentationAttributes)& theHighlight,
                                                               Standard_ShortReal& theAlphaFront,
                                                               Standard_ShortReal& theAlphaBack);
 
   //! Checks if transparency is required for the given aspect and highlight style.
-  static Standard_Boolean CheckIsTransparent (const OpenGl_AspectFace* theAspect,
+  static Standard_Boolean CheckIsTransparent (Handle(OpenGl_AspectFace)& theAspect,
                                               const Handle(Graphic3d_PresentationAttributes)& theHighlight)
   {
     Standard_ShortReal anAlphaFront = 1.0f, anAlphaBack = 1.0f;

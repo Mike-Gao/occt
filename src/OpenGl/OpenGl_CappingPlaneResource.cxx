@@ -124,7 +124,7 @@ void OpenGl_CappingPlaneResource::Release (OpenGl_Context* theContext)
 // =======================================================================
 void OpenGl_CappingPlaneResource::updateAspect (const Handle(Graphic3d_AspectFillArea3d)& theObjAspect)
 {
-  if (myAspect == NULL)
+  if (myAspect.IsNull())
   {
     myAspect = new OpenGl_AspectFace();
     myAspectMod = myPlaneRoot->MCountAspect() - 1; // mark out of sync

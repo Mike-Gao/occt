@@ -125,7 +125,7 @@ void OpenGl_View::drawBackground (const Handle(OpenGl_Workspace)& theWorkspace)
   {
     aCtx->core11fwd->glDisable (GL_BLEND);
 
-    const OpenGl_AspectFace* anOldAspectFace = theWorkspace->SetAspectFace (myTextureParams);
+    const Handle(OpenGl_AspectFace) anOldAspectFace = theWorkspace->SetAspectFace (myTextureParams);
     myBgTextureArray->Render (theWorkspace);
     theWorkspace->SetAspectFace (anOldAspectFace);
   }

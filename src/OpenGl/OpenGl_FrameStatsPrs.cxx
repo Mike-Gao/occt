@@ -19,6 +19,8 @@
 
 #include <Graphic3d_ArrayOfTriangles.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_FrameStatsPrs, OpenGl_Element)
+
 namespace
 {
   //! Auxiliary structure defining vertex with two attributes.
@@ -361,7 +363,7 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
     glDepthMask (GL_FALSE);
   }
 
-  const OpenGl_AspectText* aTextAspectBack = theWorkspace->SetAspectText (&myTextAspect);
+  const Handle(OpenGl_AspectText)& aTextAspectBack = theWorkspace->SetAspectText (&myTextAspect);
 
   aCtx->ModelWorldState.Push();
   aCtx->ModelWorldState.ChangeCurrent().InitIdentity();

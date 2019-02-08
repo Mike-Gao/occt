@@ -29,12 +29,7 @@
 class OpenGl_Group;
 class OpenGl_Structure;
 
-struct OpenGl_ElementNode
-{
-  OpenGl_Element*     elem;
-  OpenGl_ElementNode* next;
-  DEFINE_STANDARD_ALLOC
-};
+typedef NCollection_List<Handle(OpenGl_Element)> OpenGl_ElementNodes;
 
 //! Implementation of low-level graphic group.
 class OpenGl_Group : public Graphic3d_Group
@@ -50,9 +45,9 @@ public:
   //! Return line aspect.
   virtual Handle(Graphic3d_AspectLine3d) LineAspect() const Standard_OVERRIDE
   {
-    return myAspectLine != NULL
-         ? myAspectLine->Aspect()
-         : Handle(Graphic3d_AspectLine3d)();
+    return !myAspectLine.IsNull()
+           ? myAspectLine->Aspect()
+           : Handle(Graphic3d_AspectLine3d)();
   }
 
   //! Update line aspect.
@@ -64,9 +59,9 @@ public:
   //! Return marker aspect.
   virtual Handle(Graphic3d_AspectMarker3d) MarkerAspect() const Standard_OVERRIDE
   {
-    return myAspectMarker != NULL
-         ? myAspectMarker->Aspect()
-         : Handle(Graphic3d_AspectMarker3d)();
+    return !myAspectMarker.IsNull()
+          ? myAspectMarker->Aspect()
+          : Handle(Graphic3d_AspectMarker3d)();
   }
 
   //! Update marker aspect.
@@ -78,7 +73,7 @@ public:
   //! Return fill area aspect.
   virtual Handle(Graphic3d_AspectFillArea3d) FillAreaAspect() const Standard_OVERRIDE
   {
-    return myAspectFace != NULL
+    return !myAspectFace.IsNull()
          ? myAspectFace->Aspect()
          : Handle(Graphic3d_AspectFillArea3d)();
   }
@@ -92,7 +87,7 @@ public:
   //! Return marker aspect.
   virtual Handle(Graphic3d_AspectText3d) TextAspect() const Standard_OVERRIDE
   {
-    return myAspectText != NULL
+    return !myAspectText.IsNull()
          ? myAspectText->Aspect()
          : Handle(Graphic3d_AspectText3d)();
   }
@@ -145,16 +140,16 @@ public:
 
   OpenGl_Structure* GlStruct() const { return (OpenGl_Structure* )(myStructure->CStructure().operator->()); }
 
-  Standard_EXPORT void AddElement (OpenGl_Element* theElem);
+  Standard_EXPORT void AddElement (Handle(OpenGl_Element) theElem);
 
   Standard_EXPORT virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const;
   Standard_EXPORT virtual void Release (const Handle(OpenGl_Context)&   theGlCtx);
 
-  //! Returns first OpenGL element node of the group.
-  const OpenGl_ElementNode* FirstNode() const { return myFirst; }
+  //! Returns OpenGl elements of the group
+  const OpenGl_ElementNodes& GetElements() const { return myElements; }
 
   //! Returns OpenGL face aspect.
-  const OpenGl_AspectFace* AspectFace() const { return myAspectFace; }
+  const Handle(OpenGl_AspectFace)& AspectFace() const { return myAspectFace; }
 
   //! Is the group ray-tracable (contains ray-tracable elements)?
   Standard_Boolean IsRaytracable() const { return myIsRaytracable; }
@@ -165,13 +160,12 @@ protected:
 
 protected:
 
-  OpenGl_AspectLine*     myAspectLine;
-  OpenGl_AspectFace*     myAspectFace;
-  OpenGl_AspectMarker*   myAspectMarker;
-  OpenGl_AspectText*     myAspectText;
+  Handle(OpenGl_AspectLine) myAspectLine;
+  Handle(OpenGl_AspectFace) myAspectFace;
+  Handle(OpenGl_AspectMarker) myAspectMarker;
+  Handle(OpenGl_AspectText) myAspectText;
 
-  OpenGl_ElementNode*    myFirst;
-  OpenGl_ElementNode*    myLast;
+  OpenGl_ElementNodes    myElements;
 
   Standard_Boolean       myIsRaytracable;
 

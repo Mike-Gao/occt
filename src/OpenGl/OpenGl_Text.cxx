@@ -29,6 +29,8 @@
 #include <Graphic3d_TransformUtils.hxx>
 #include <TCollection_HAsciiString.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Text, OpenGl_Element)
+
 namespace
 {
   static const GLdouble THE_IDENTITY_MATRIX[16] =
@@ -353,10 +355,10 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
 // =======================================================================
 void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
-  theWorkspace->SetAspectFace (&theWorkspace->FontFaceAspect());
+  theWorkspace->SetAspectFace (theWorkspace->FontFaceAspect());
   theWorkspace->ApplyAspectFace();
-  const OpenGl_AspectText*      aTextAspect  = theWorkspace->ApplyAspectText();
-  const Handle(OpenGl_Context)& aCtx         = theWorkspace->GetGlContext();
+  const Handle(OpenGl_AspectText) aTextAspect  = theWorkspace->ApplyAspectText();
+  const Handle(OpenGl_Context)& aCtx           = theWorkspace->GetGlContext();
   const Handle(OpenGl_TextureSet) aPrevTexture = aCtx->BindTextures (Handle(OpenGl_TextureSet)());
 
   // Bind custom shader program or generate default version

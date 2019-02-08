@@ -34,6 +34,7 @@ class OpenGl_View;
 //! @sa Graphic3d_GraduatedTrihedron
 class OpenGl_GraduatedTrihedron : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_GraduatedTrihedron, OpenGl_Element)
 public:
 
   DEFINE_STANDARD_ALLOC

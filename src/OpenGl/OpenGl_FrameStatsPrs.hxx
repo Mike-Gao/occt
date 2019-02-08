@@ -25,6 +25,7 @@ class OpenGl_VertexBuffer;
 //! Element rendering frame statistics.
 class OpenGl_FrameStatsPrs : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_FrameStatsPrs, OpenGl_Element)
 public:
 
   //! Default constructor.

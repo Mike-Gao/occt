@@ -520,9 +520,9 @@ protected: //! @name Rendering properties
 
 protected: //! @name Background parameters
 
-  OpenGl_AspectFace*      myTextureParams;   //!< Stores texture and its parameters for textured background
-  OpenGl_BackgroundArray* myBgGradientArray; //!< Primitive array for gradient background
-  OpenGl_BackgroundArray* myBgTextureArray;  //!< Primitive array for texture  background
+  Handle(OpenGl_AspectFace)      myTextureParams;   //!< Stores texture and its parameters for textured background
+  Handle(OpenGl_BackgroundArray) myBgGradientArray; //!< Primitive array for gradient background
+  Handle(OpenGl_BackgroundArray) myBgTextureArray;  //!< Primitive array for texture  background
 
 protected: //! @name data types related to ray-tracing
 
@@ -776,11 +776,11 @@ protected: //! @name methods related to ray-tracing
                                       const Handle(OpenGl_Context)&  theGlContext);
 
   //! Creates ray-tracing material properties.
-  OpenGl_RaytraceMaterial convertMaterial (const OpenGl_AspectFace*      theAspect,
+  OpenGl_RaytraceMaterial convertMaterial (const Handle(OpenGl_AspectFace)& theAspect,
                                            const Handle(OpenGl_Context)& theGlContext);
 
   //! Adds OpenGL primitive array to ray-traced scene geometry.
-  Handle(OpenGl_TriangleSet) addRaytracePrimitiveArray (const OpenGl_PrimitiveArray* theArray,
+  Handle(OpenGl_TriangleSet) addRaytracePrimitiveArray (const Handle(OpenGl_PrimitiveArray) theArray,
                                                         const Standard_Integer       theMatID,
                                                         const OpenGl_Mat4*           theTrans);
 

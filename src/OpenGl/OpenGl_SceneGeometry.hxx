@@ -36,10 +36,7 @@ namespace OpenGl_Raytrace
   Standard_Boolean IsRaytracedGroup (const OpenGl_Group* theGroup);
 
   //! Checks to see if the element contains ray-trace geometry.
-  Standard_Boolean IsRaytracedElement (const OpenGl_ElementNode* theNode);
-
-  //! Checks to see if the element contains ray-trace geometry.
-  Standard_Boolean IsRaytracedElement (const OpenGl_Element* theElement);
+  Standard_Boolean IsRaytracedElement (const Handle(OpenGl_Element) theElement);
 }
 
 //! Stores properties of surface material.

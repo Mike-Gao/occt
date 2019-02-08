@@ -23,8 +23,9 @@ class OpenGl_Workspace;
 class OpenGl_Context;
 
 //! Base interface for drawable elements.
-class OpenGl_Element
+class OpenGl_Element : public Standard_Transient
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_Element, Standard_Transient)
 public:
 
   Standard_EXPORT OpenGl_Element();
@@ -40,18 +41,14 @@ public:
   //! Pointer to the context is used because this method might be called
   //! when the context is already being destroyed and usage of a handle
   //! would be unsafe
-  template <typename theResource_t>
   static void Destroy (OpenGl_Context* theContext,
-                       theResource_t*& theElement)
+                       Handle(OpenGl_Element)& theElement)
   {
-    if (theElement == NULL)
+    if (theElement.IsNull())
     {
       return;
     }
-
     theElement->Release (theContext);
-    OpenGl_Element* anElement = theElement;
-    delete anElement;
     theElement = NULL;
   }
 

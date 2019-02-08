@@ -33,7 +33,7 @@
 //! Text rendering
 class OpenGl_Text : public OpenGl_Element
 {
-
+  DEFINE_STANDARD_RTTIEXT(OpenGl_Text, OpenGl_Element)
 public:
 
   //! Main constructor

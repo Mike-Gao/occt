@@ -123,16 +123,25 @@ OpenGl_Workspace::OpenGl_Workspace (OpenGl_View* theView, const Handle(OpenGl_Wi
   myNbSkippedTranspElems (0),
   myRenderFilter (OpenGl_RenderFilter_Empty),
   //
-  myAspectLineSet (&myDefaultAspectLine),
-  myAspectFaceSet (&myDefaultAspectFace),
-  myAspectMarkerSet (&myDefaultAspectMarker),
-  myAspectTextSet (&myDefaultAspectText),
-  //
   ViewMatrix_applied (&myDefaultMatrix),
   StructureMatrix_applied (&myDefaultMatrix),
   myToAllowFaceCulling (false),
   myModelViewMatrix (myDefaultMatrix)
 {
+  myDefaultAspectLine = new OpenGl_AspectLine();
+  myDefaultAspectFace = new OpenGl_AspectFace();
+  myDefaultAspectMarker = new OpenGl_AspectMarker();
+  myDefaultAspectText = new OpenGl_AspectText();
+
+  myNoneCulling = new OpenGl_AspectFace();
+  myFrontCulling = new OpenGl_AspectFace();
+  myFontFaceAspect = new OpenGl_AspectFace();
+
+  myAspectLineSet = myDefaultAspectLine;
+  myAspectFaceSet = myDefaultAspectFace;
+  myAspectMarkerSet = myDefaultAspectMarker;
+  myAspectTextSet = myDefaultAspectText;
+
   if (!myGlContext.IsNull() && myGlContext->MakeCurrent())
   {
     myGlContext->core11fwd->glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
@@ -155,16 +164,16 @@ OpenGl_Workspace::OpenGl_Workspace (OpenGl_View* theView, const Handle(OpenGl_Wi
   #endif
   }
 
-  myFontFaceAspect.Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Mask, 0.285f);
-  myFontFaceAspect.Aspect()->SetShadingModel (Graphic3d_TOSM_UNLIT);
+  myFontFaceAspect->Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Mask, 0.285f);
+  myFontFaceAspect->Aspect()->SetShadingModel (Graphic3d_TOSM_UNLIT);
 
-  myNoneCulling .Aspect()->SetSuppressBackFaces (false);
-  myNoneCulling .Aspect()->SetDrawEdges (false);
-  myNoneCulling .Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Opaque);
+  myNoneCulling->Aspect()->SetSuppressBackFaces (false);
+  myNoneCulling->Aspect()->SetDrawEdges (false);
+  myNoneCulling->Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Opaque);
 
-  myFrontCulling.Aspect()->SetSuppressBackFaces (true);
-  myFrontCulling.Aspect()->SetDrawEdges (false);
-  myFrontCulling.Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Opaque);
+  myFrontCulling->Aspect()->SetSuppressBackFaces (true);
+  myFrontCulling->Aspect()->SetDrawEdges (false);
+  myFrontCulling->Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Opaque);
 }
 
 // =======================================================================
@@ -206,12 +215,12 @@ void OpenGl_Workspace::ResetAppliedAspect()
 
   myHighlightStyle.Nullify();
   myToAllowFaceCulling  = false;
-  myAspectLineSet       = &myDefaultAspectLine;
-  myAspectFaceSet       = &myDefaultAspectFace;
+  myAspectLineSet       = myDefaultAspectLine;
+  myAspectFaceSet       = myDefaultAspectFace;
   myAspectFaceApplied.Nullify();
-  myAspectMarkerSet     = &myDefaultAspectMarker;
+  myAspectMarkerSet     = myDefaultAspectMarker;
   myAspectMarkerApplied.Nullify();
-  myAspectTextSet       = &myDefaultAspectText;
+  myAspectTextSet       = myDefaultAspectText;
   myGlContext->SetPolygonOffset (Graphic3d_PolygonOffset());
 
   ApplyAspectLine();
@@ -219,8 +228,8 @@ void OpenGl_Workspace::ResetAppliedAspect()
   ApplyAspectMarker();
   ApplyAspectText();
 
-  myGlContext->SetTypeOfLine (myDefaultAspectLine.Aspect()->Type());
-  myGlContext->SetLineWidth  (myDefaultAspectLine.Aspect()->Width());
+  myGlContext->SetTypeOfLine (myDefaultAspectLine->Aspect()->Type());
+  myGlContext->SetLineWidth  (myDefaultAspectLine->Aspect()->Width());
 }
 
 // =======================================================================
@@ -229,9 +238,9 @@ void OpenGl_Workspace::ResetAppliedAspect()
 // =======================================================================
 Graphic3d_PolygonOffset OpenGl_Workspace::SetDefaultPolygonOffset (const Graphic3d_PolygonOffset& theOffset)
 {
-  Graphic3d_PolygonOffset aPrev = myDefaultAspectFace.Aspect()->PolygonOffset();
-  myDefaultAspectFace.Aspect()->SetPolygonOffset (theOffset);
-  if (myAspectFaceApplied == myDefaultAspectFace.Aspect()
+  Graphic3d_PolygonOffset aPrev = myDefaultAspectFace->Aspect()->PolygonOffset();
+  myDefaultAspectFace->Aspect()->SetPolygonOffset (theOffset);
+  if (myAspectFaceApplied == myDefaultAspectFace->Aspect()
    || myAspectFaceApplied.IsNull()
    || (myAspectFaceApplied->PolygonOffset().Mode & Aspect_POM_None) == Aspect_POM_None)
   {
@@ -244,9 +253,9 @@ Graphic3d_PolygonOffset OpenGl_Workspace::SetDefaultPolygonOffset (const Graphic
 // function : SetAspectLine
 // purpose  :
 // =======================================================================
-const OpenGl_AspectLine* OpenGl_Workspace::SetAspectLine (const OpenGl_AspectLine* theAspect)
+const Handle(OpenGl_AspectLine) OpenGl_Workspace::SetAspectLine (const Handle(OpenGl_AspectLine)& theAspect)
 {
-  const OpenGl_AspectLine* aPrevAspectLine = myAspectLineSet;
+  Handle(OpenGl_AspectLine) aPrevAspectLine = myAspectLineSet;
   myAspectLineSet = theAspect;
   return aPrevAspectLine;
 }
@@ -255,9 +264,9 @@ const OpenGl_AspectLine* OpenGl_Workspace::SetAspectLine (const OpenGl_AspectLin
 // function : SetAspectFace
 // purpose  :
 // =======================================================================
-const OpenGl_AspectFace * OpenGl_Workspace::SetAspectFace (const OpenGl_AspectFace* theAspect)
+const Handle(OpenGl_AspectFace) OpenGl_Workspace::SetAspectFace (const Handle(OpenGl_AspectFace)& theAspect)
 {
-  const OpenGl_AspectFace* aPrevAspectFace = myAspectFaceSet;
+  Handle(OpenGl_AspectFace) aPrevAspectFace = myAspectFaceSet;
   myAspectFaceSet = theAspect;
   return aPrevAspectFace;
 }
@@ -266,9 +275,9 @@ const OpenGl_AspectFace * OpenGl_Workspace::SetAspectFace (const OpenGl_AspectFa
 // function : SetAspectMarker
 // purpose  :
 // =======================================================================
-const OpenGl_AspectMarker* OpenGl_Workspace::SetAspectMarker (const OpenGl_AspectMarker* theAspect)
+const Handle(OpenGl_AspectMarker) OpenGl_Workspace::SetAspectMarker (const Handle(OpenGl_AspectMarker)& theAspect)
 {
-  const OpenGl_AspectMarker* aPrevAspectMarker = myAspectMarkerSet;
+  Handle(OpenGl_AspectMarker) aPrevAspectMarker = myAspectMarkerSet;
   myAspectMarkerSet = theAspect;
   return aPrevAspectMarker;
 }
@@ -277,9 +286,9 @@ const OpenGl_AspectMarker* OpenGl_Workspace::SetAspectMarker (const OpenGl_Aspec
 // function : SetAspectText
 // purpose  :
 // =======================================================================
-const OpenGl_AspectText * OpenGl_Workspace::SetAspectText (const OpenGl_AspectText* theAspect)
+const Handle(OpenGl_AspectText) OpenGl_Workspace::SetAspectText (const Handle(OpenGl_AspectText)& theAspect)
 {
-  const OpenGl_AspectText* aPrevAspectText = myAspectTextSet;
+  Handle(OpenGl_AspectText) aPrevAspectText = myAspectTextSet;
   myAspectTextSet = theAspect;
   return aPrevAspectText;
 }
@@ -288,7 +297,7 @@ const OpenGl_AspectText * OpenGl_Workspace::SetAspectText (const OpenGl_AspectTe
 // function : ApplyAspectFace
 // purpose  :
 // =======================================================================
-const OpenGl_AspectFace* OpenGl_Workspace::ApplyAspectFace()
+const Handle(OpenGl_AspectFace)& OpenGl_Workspace::ApplyAspectFace()
 {
   if (myView->BackfacingModel() == Graphic3d_TOBM_AUTOMATIC)
   {
@@ -395,7 +404,7 @@ const OpenGl_AspectFace* OpenGl_Workspace::ApplyAspectFace()
 // function : ApplyAspectMarker
 // purpose  :
 // =======================================================================
-const OpenGl_AspectMarker* OpenGl_Workspace::ApplyAspectMarker()
+const Handle(OpenGl_AspectMarker)& OpenGl_Workspace::ApplyAspectMarker()
 {
   if (myAspectMarkerSet->Aspect() != myAspectMarkerApplied)
   {
@@ -486,7 +495,7 @@ Standard_Boolean OpenGl_Workspace::BufferDump (const Handle(OpenGl_FrameBuffer)&
 // function : ShouldRender
 // purpose  :
 // =======================================================================
-bool OpenGl_Workspace::ShouldRender (const OpenGl_Element* theElement)
+bool OpenGl_Workspace::ShouldRender (const Handle(OpenGl_Element)& theElement)
 {
   // render only non-raytracable elements when RayTracing is enabled
   if ((myRenderFilter & OpenGl_RenderFilter_NonRaytraceableOnly) != 0)
@@ -522,7 +531,7 @@ bool OpenGl_Workspace::ShouldRender (const OpenGl_Element* theElement)
   {
     if (!theElement->IsFillDrawMode())
     {
-      if (dynamic_cast<const OpenGl_AspectFace*> (theElement) == NULL)
+      if (Handle(OpenGl_AspectFace)::DownCast(theElement).IsNull())
       {
         return false;
       }
