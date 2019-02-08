@@ -39,6 +39,7 @@ uses
     IndexedDataMapOfShapeListOfShape from BOPCol, 
     DataMapOfIntegerReal from BOPCol, 
     DataMapOfIntegerInteger from BOPCol,
+    IndexedMapOfShape from BOPCol,
     --  
     Context from IntTools,
     -- 
@@ -282,6 +283,7 @@ is
         theMVI:out DataMapOfShapeInteger from BOPCol;  
         theDMExEdges:out DataMapOfPaveBlockListOfPaveBlock from BOPDS; 
         theDMI:out DataMapOfIntegerInteger from BOPCol;
+        theMicroEdges: IndexedMapOfShape from BOPCol;
         theAllocator:out BaseAllocator from BOPCol) 
       returns Integer from Standard 
       is protected;  

@@ -386,7 +386,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
   BOPCol_ListOfInteger aLSE(aAllocator), aLBV(aAllocator);
   BOPCol_MapOfInteger aMVOnIn(100, aAllocator), aMF(100, aAllocator),
                       aMVStick(100,aAllocator), aMVEF(100, aAllocator),
-                      aMI(100, aAllocator);
+                      aMI(100, aAllocator), aMVBounds(100, aAllocator);
   BOPDS_IndexedMapOfPaveBlock aMPBOnIn(100, aAllocator);
   BOPDS_MapOfPaveBlock aMPBAdd(100, aAllocator);
   BOPDS_ListOfPaveBlock aLPB(aAllocator);
@@ -398,6 +398,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
   BOPCol_DataMapOfIntegerListOfInteger aDMVLV;
   BOPCol_DataMapOfIntegerListOfInteger aDMBV(100, aAllocator);
   BOPCol_DataMapIteratorOfDataMapOfIntegerReal aItMV;
+  BOPCol_IndexedMapOfShape aMicroEdges(100, aAllocator);
   //
   for (i=0; i<aNbFF; ++i) {
     //
@@ -484,6 +485,10 @@ void BOPAlgo_PaveFiller::MakeBlocks()
         //
         if (!aLBV.IsEmpty()) {
           aDMBV.Bind(j, aLBV);
+          BOPCol_ListIteratorOfListOfInteger aItI(aLBV);
+          for (; aItI.More(); aItI.Next()) {
+            aMVBounds.Add(aItI.Value());
+          }
         }
       }
     }//for (j=0; j<aNbC; ++j) {
@@ -526,6 +531,27 @@ void BOPAlgo_PaveFiller::MakeBlocks()
           continue;
         }
         //
+        const TopoDS_Vertex& aV1=(*(TopoDS_Vertex *)(&myDS->Shape(nV1)));
+        const TopoDS_Vertex& aV2=(*(TopoDS_Vertex *)(&myDS->Shape(nV2)));
+        //
+        // Make Edge
+        BOPTools_AlgoTools::MakeEdge (aIC, aV1, aT1, aV2, aT2, aTolR3D, aES);
+        //
+        // check for micro edge
+        if (BOPTools_AlgoTools::IsMicroEdge(aES, myContext)) {
+          // If the section edge is a micro edge, i.e. the whole edge is
+          // covered by the tolerance spheres of its vertices, it will be
+          // passed into post treatment process to fuse its vertices.
+          // The edge itself will not be kept.
+          if (!aMVBounds.Contains(nV1) && !aMVBounds.Contains(nV2)) {
+            aMicroEdges.Add(aES);
+            // keep vertices for post treatment
+            aMVI.Bind(aV1, nV1);
+            aMVI.Bind(aV2, nV2);
+          }
+          continue;
+        }
+        //
         bExist=IsExistingPaveBlock(aPB, aNC, aTolR3D, aMPBOnIn, aPBOut);
         if (bExist) {
           if (aMPBAdd.Add(aPBOut)) {
@@ -554,21 +580,10 @@ void BOPAlgo_PaveFiller::MakeBlocks()
           }
           continue;
         }
-        //
-        // Make Edge
-        const TopoDS_Vertex& aV1=(*(TopoDS_Vertex *)(&myDS->Shape(nV1)));
-        const TopoDS_Vertex& aV2=(*(TopoDS_Vertex *)(&myDS->Shape(nV2)));
-        //
-        BOPTools_AlgoTools::MakeEdge (aIC, aV1, aT1, 
-                                      aV2, aT2, aTolR3D, aES);
-        BOPTools_AlgoTools::MakePCurve(aES, aF1, aF2, aIC, 
+        // Make p-curves
+        BOPTools_AlgoTools::MakePCurve(aES, aF1, aF2, aIC,
                                        mySectionAttribute.PCurveOnS1(),
                                        mySectionAttribute.PCurveOnS2());
-        //
-        if (BOPTools_AlgoTools::IsMicroEdge(aES, myContext)) {
-          continue;
-        }
-        //
         // Append the Pave Block to the Curve j
         aLPBC.Append(aPB);
         //
@@ -617,7 +632,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
 
   // post treatment
   MakeSDVerticesFF(aDMVLV, aDMNewSD);
-  myErrorStatus=PostTreatFF(aMSCPB, aMVI, aDMExEdges, aDMNewSD, aAllocator);
+  myErrorStatus=PostTreatFF(aMSCPB, aMVI, aDMExEdges, aDMNewSD, aMicroEdges, aAllocator);
   if (myErrorStatus) {
     return;
   }
@@ -669,6 +684,7 @@ Standard_Integer BOPAlgo_PaveFiller::PostTreatFF
      BOPCol_DataMapOfShapeInteger& aMVI,
      BOPDS_DataMapOfPaveBlockListOfPaveBlock& aDMExEdges,
      BOPCol_DataMapOfIntegerInteger& aDMNewSD,
+     const BOPCol_IndexedMapOfShape& theMicroEdges,
      Handle(NCollection_BaseAllocator)& theAllocator)
 {
   Standard_Integer iRet, aNbS;
@@ -699,8 +715,9 @@ Standard_Integer BOPAlgo_PaveFiller::PostTreatFF
   //
   BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
   //
+  Standard_Integer aNbME = theMicroEdges.Extent();
   // 0
-  if (aNbS==1) {
+  if (aNbS==1 && (aNbME == 0)) {
     const TopoDS_Shape& aS=theMSCPB.FindKey(1);
     const BOPDS_CoupleOfPaveBlocks &aCPB=theMSCPB.FindFromIndex(1);
     
@@ -757,6 +774,49 @@ Standard_Integer BOPAlgo_PaveFiller::PostTreatFF
           }
         }
       }
+    }
+  }
+  //
+  // The section edges considered as a micro should be
+  // specially treated - their vertices should be united and
+  // the edge itself should be removed. Thus, we add only
+  // its vertices into operation.
+  //
+  BRep_Builder aBB;
+  for (k = 1; k <= aNbME; ++k) {
+    const TopoDS_Edge& aEM = *(TopoDS_Edge*)&theMicroEdges(k);
+    //
+    TopoDS_Vertex aVerts[2];
+    TopExp::Vertices(aEM, aVerts[0], aVerts[1]);
+    for (Standard_Integer i = 0; i < 2; ++i) {
+      nV = myDS->Index(aVerts[i]);
+      const Standard_Integer* pSD = aDMNewSD.Seek(nV);
+      if (pSD) {
+        aVerts[i] = *(TopoDS_Vertex*)&myDS->Shape(*pSD);
+      }
+      //
+      if (anAddedSD.Add(aVerts[i])) {
+        aLS.Append(aVerts[i]);
+      }
+    }
+    //
+    if (aVerts[0].IsSame(aVerts[1])) {
+      continue;
+    }
+    //
+    // make sure these vertices will be united
+    const gp_Pnt& aP1 = BRep_Tool::Pnt(aVerts[0]);
+    const gp_Pnt& aP2 = BRep_Tool::Pnt(aVerts[1]);
+    //
+    Standard_Real aDist = aP1.Distance(aP2);
+    Standard_Real aTolV1 = BRep_Tool::Tolerance(aVerts[0]);
+    Standard_Real aTolV2 = BRep_Tool::Tolerance(aVerts[1]);
+    //
+    aDist -= (aTolV1 + aTolV2);
+    if (aDist > 0.) {
+      aDist /= 2.;
+      aBB.UpdateVertex(aVerts[0], aTolV1 + aDist);
+      aBB.UpdateVertex(aVerts[1], aTolV2 + aDist);
     }
   }
   //
