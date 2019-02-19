@@ -69,7 +69,7 @@ void IMeshTools_ShapeExplorer::Accept (
   // Explore faces
   TopTools_ListOfShape aFaceList;
   BRepLib::ReverseSortFaces (GetShape (), aFaceList);
-  TopTools_MapOfShape aFaceMap;
+  //TopTools_MapOfShape aFaceMap;
 
   // make array of faces suitable for processing (excluding faces without surface)
   TopLoc_Location aDummyLoc;
@@ -77,12 +77,12 @@ void IMeshTools_ShapeExplorer::Accept (
   TopTools_ListIteratorOfListOfShape aFaceIter (aFaceList);
   for (; aFaceIter.More (); aFaceIter.Next ())
   {
-    TopoDS_Shape aFaceNoLoc = aFaceIter.Value ();
-    aFaceNoLoc.Location (aEmptyLoc);
-    if (!aFaceMap.Add(aFaceNoLoc))
-    {
-      continue; // already processed
-    }
+    //TopoDS_Shape aFaceNoLoc = aFaceIter.Value ();
+    //aFaceNoLoc.Location (aEmptyLoc);
+    //if (!aFaceMap.Add(aFaceNoLoc))
+    //{
+    //  continue; // already processed
+    //}
 
     TopoDS_Face aFace = TopoDS::Face (aFaceIter.Value ());
     const Handle (Geom_Surface)& aSurf = BRep_Tool::Surface (aFace, aDummyLoc);
