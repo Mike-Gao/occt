@@ -11,4 +11,4 @@ explode a e
 
 blend result a 5 a_1 5 a_3
 
-checknbshapes result -solid 1 -shell 1 -face 6 -wire 6 -edge 15 -vertex 10
+checknbshapes result -solid 1 -shell 1 -face 6 -wire 6 -edge 17 -vertex 11

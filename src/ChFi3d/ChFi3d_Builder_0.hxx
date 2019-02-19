@@ -335,6 +335,7 @@ Standard_Boolean ChFi3d_IntTraces(const Handle(ChFiDS_SurfData)& fd1,
 				  Standard_Real&                 p2,
 				  const Standard_Integer         jf2,
 				  const Standard_Integer         sens2,
+                                  const TopoDS_Face&             theFace,
 				  const gp_Pnt2d&                RefP2d,
 				  const Standard_Boolean         Check2dDistance = Standard_False,
 				  const Standard_Boolean         enlarge = Standard_False);

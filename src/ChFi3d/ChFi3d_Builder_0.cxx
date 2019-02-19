@@ -177,6 +177,64 @@ extern void ChFi3d_SettraceDRAWSPINE(const Standard_Boolean b);
 #include <BRepAdaptor_HSurface.hxx>
 #include <TopOpeBRepDS_SurfaceCurveInterference.hxx>
 
+
+//=======================================================================
+//function : ChFi3d_IsFirstInside
+//purpose  : 
+//=======================================================================
+Standard_Boolean ChFi3d_IsFirstInside(const Standard_Real theVal1,
+                                      const Standard_Real theVal2,
+                                      const Standard_Real theMin,
+                                      const Standard_Real theMax)
+{
+  Standard_Real IsFirstInside  = (theMin < theVal1 && theVal1 < theMax);
+  Standard_Real IsSecondInside = (theMin < theVal2 && theVal2 < theMax);
+  if (IsFirstInside && !IsSecondInside)
+    return Standard_True;
+  if (!IsFirstInside && IsSecondInside)
+    return Standard_False;
+
+  if (IsFirstInside && IsSecondInside)
+  {
+    Standard_Real MinDistForFirst  = Min(theVal1 - theMin, theMax - theVal1);
+    Standard_Real MinDistForSecond = Min(theVal2 - theMin, theMax - theVal2);
+    return (MinDistForFirst > MinDistForSecond);
+  }
+  else
+  {
+    cout<<endl<<"Both points outside!"<<endl;
+    return Standard_True;
+  }
+}
+
+//=======================================================================
+//function : ChFi3d_AdjustPCurve
+//purpose  : 
+//=======================================================================
+void ChFi3d_AdjustPCurve(Geom2dAdaptor_Curve&   thePCurve,
+                         const Standard_Real    theCoordOnPCurve,
+                         const Standard_Real    theRefCoord,
+                         const Standard_Real    thePeriod,
+                         const Standard_Boolean theInUdirection)
+{
+  Standard_Real aCoord = theCoordOnPCurve;
+  Standard_Real Sign = (aCoord < theRefCoord)? 1 : -1;
+  
+  while (Abs(aCoord - theRefCoord) > thePeriod/2)
+    aCoord += Sign * thePeriod;
+
+  Standard_Real Offset = aCoord - theCoordOnPCurve;
+  gp_Vec2d OffsetVector;
+  if (theInUdirection)
+    OffsetVector.SetCoord(Offset, 0.);
+  else
+    OffsetVector.SetCoord(0., Offset);
+
+  Handle(Geom2d_Curve) aPCurve = thePCurve.Curve();
+  aPCurve->Translate(OffsetVector);
+  thePCurve.Load(aPCurve);
+}
+
 //=======================================================================
 //function : ChFi3d_InPeriod
 //purpose  : 
@@ -1038,7 +1096,9 @@ Standard_Boolean ChFi3d_IsInFront(TopOpeBRepDS_DataStructure& DStr,
     gp_Pnt2d P2d;
     if (Check2dDistance)
       P2d = BRep_Tool::Parameters( Vtx, face );
-    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,fd2,pref2,p2,jf2,sens2,P2d,Check2dDistance,enlarge)) {
+    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,
+                        fd2,pref2,p2,jf2,sens2,
+                        face,P2d,Check2dDistance,enlarge)) {
       u1 = p1; u2 = p2; ss = sameside; j1 = jf1; j2 = jf2; ff = face;
       ok = 1;
     }
@@ -1059,7 +1119,9 @@ Standard_Boolean ChFi3d_IsInFront(TopOpeBRepDS_DataStructure& DStr,
     gp_Pnt2d P2d;
     if (Check2dDistance)
       P2d = BRep_Tool::Parameters( Vtx, face );
-    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,fd2,pref2,p2,jf2,sens2,P2d,Check2dDistance,enlarge)) {
+    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,
+                        fd2,pref2,p2,jf2,sens2,
+                        face,P2d,Check2dDistance,enlarge)) {
       Standard_Boolean restore = 
         ok && ((j1 == jf1 && sens1*(p1 - u1) > 0.) || 
         (j2 == jf2 && sens2*(p2 - u2) > 0.));
@@ -1092,7 +1154,9 @@ Standard_Boolean ChFi3d_IsInFront(TopOpeBRepDS_DataStructure& DStr,
     gp_Pnt2d P2d;
     if (Check2dDistance)
       P2d = BRep_Tool::Parameters( Vtx, face );
-    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,fd2,pref2,p2,jf2,sens2,P2d,Check2dDistance,enlarge)) {
+    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,
+                        fd2,pref2,p2,jf2,sens2,
+                        face,P2d,Check2dDistance,enlarge)) {
       Standard_Boolean restore = 
         ok && ((j1 == jf1 && sens1*(p1 - u1) > 0.) || 
         (j2 == jf2 && sens2*(p2 - u2) > 0.));
@@ -1125,7 +1189,9 @@ Standard_Boolean ChFi3d_IsInFront(TopOpeBRepDS_DataStructure& DStr,
     gp_Pnt2d P2d;
     if (Check2dDistance)
       P2d = BRep_Tool::Parameters( Vtx, face );
-    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,fd2,pref2,p2,jf2,sens2,P2d,Check2dDistance,enlarge)) {
+    if(ChFi3d_IntTraces(fd1,pref1,p1,jf1,sens1,
+                        fd2,pref2,p2,jf2,sens2,
+                        face,P2d,Check2dDistance,enlarge)) {
       Standard_Boolean restore = 
         ok && ((j1 == jf1 && sens1*(p1 - u1) > 0.) || 
         (j2 == jf2 && sens2*(p2 - u2) > 0.));
@@ -1162,18 +1228,19 @@ static Standard_Real recadre(const Standard_Real p,
 //purpose  : 
 //=======================================================================
 Standard_Boolean ChFi3d_IntTraces(const Handle(ChFiDS_SurfData)& fd1,
-  const Standard_Real            pref1,
-  Standard_Real&                 p1,
-  const Standard_Integer         jf1,
-  const Standard_Integer         sens1,
-  const Handle(ChFiDS_SurfData)& fd2,
-  const Standard_Real            pref2,
-  Standard_Real&                 p2,
-  const Standard_Integer         jf2,
-  const Standard_Integer         sens2,
-  const gp_Pnt2d&                RefP2d,
-  const Standard_Boolean         Check2dDistance,
-  const Standard_Boolean         enlarge)
+                                  const Standard_Real            pref1,
+                                  Standard_Real&                 p1,
+                                  const Standard_Integer         jf1,
+                                  const Standard_Integer         sens1,
+                                  const Handle(ChFiDS_SurfData)& fd2,
+                                  const Standard_Real            pref2,
+                                  Standard_Real&                 p2,
+                                  const Standard_Integer         jf2,
+                                  const Standard_Integer         sens2,
+                                  const TopoDS_Face&             theFace,
+                                  const gp_Pnt2d&                RefP2d,
+                                  const Standard_Boolean         Check2dDistance,
+                                  const Standard_Boolean         enlarge)
 {
   Geom2dAdaptor_Curve C1;
   Geom2dAdaptor_Curve C2;
@@ -1227,6 +1294,26 @@ Standard_Boolean ChFi3d_IntTraces(const Handle(ChFiDS_SurfData)& fd1,
     Intersection.Perform(C1,C2,
       Precision::PIntersection(),
       Precision::PIntersection());
+    
+    if (!Intersection.IsDone() || Intersection.IsEmpty())
+    {
+      BRepAdaptor_Surface BAsurf(theFace, Standard_False);
+      if (BAsurf.IsUPeriodic())
+      {
+        //put the pcurves in the same parametric context
+        Standard_Real Uperiod = BAsurf.UPeriod();
+        Standard_Real Umin = BAsurf.FirstUParameter();
+        Standard_Real Umax = BAsurf.LastUParameter();
+        gp_Pnt2d Origin1 = C1.Value(0.);
+        gp_Pnt2d Origin2 = C2.Value(0.);
+        Standard_Boolean IsFirstPointInside =
+          ChFi3d_IsFirstInside(Origin1.X(), Origin2.X(), Umin, Umax);
+        if (IsFirstPointInside)
+          ChFi3d_AdjustPCurve(C2, Origin2.X(), Origin1.X(), Uperiod, Standard_True);
+        else
+          ChFi3d_AdjustPCurve(C1, Origin1.X(), Origin2.X(), Uperiod, Standard_True);
+      }
+    }
   }
   if (Intersection.IsDone()) {
     if (!Intersection.IsEmpty()) {
