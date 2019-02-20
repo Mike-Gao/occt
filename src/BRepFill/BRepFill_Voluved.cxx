@@ -62,7 +62,8 @@
 static const Standard_Real aPipeLinearTolerance = 1.0e-4;
 static const Standard_Real aPipeAngularTolerance = 1.0e-2;
 
-const char aDirPatch[] = "D:\\nbv-29523\\shapes\\my\\";
+static const Standard_Boolean isParallelComputation = Standard_False;
+const char aDirPatch[] = "T:\\pp\\";
 
 static Standard_Boolean CheckSingularityAndAdd(const TopoDS_Face& theF,
                                                const Standard_Real theFuzzyToler,

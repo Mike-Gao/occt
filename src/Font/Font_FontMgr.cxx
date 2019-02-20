@@ -49,7 +49,8 @@ static const Font_FontMgr_FontAliasMapNode Font_FontMgr_MapOfFontsAliases[] =
   { "Symbol"                   , "Symbol"         , Font_FA_Regular  },
   { "ZapfDingbats"             , "WingDings"      , Font_FA_Regular  },
   { "Rock"                     , "Arial"          , Font_FA_Regular  },
-  { "Iris"                     , "Lucida Console" , Font_FA_Regular  }
+  { "Iris"                     , "Lucida Console" , Font_FA_Regular  },
+  { "NSimSun"                  , "SimSun"         , Font_FA_Regular  }
 
 #elif defined(__ANDROID__)
 
@@ -218,6 +219,8 @@ static Handle(Font_SystemFont) checkFont (const Handle(Font_FTLibrary)& theFTLib
     Handle(TCollection_HAsciiString) aFontName = new TCollection_HAsciiString (aFontFace->family_name);
     Handle(TCollection_HAsciiString) aFontPath = new TCollection_HAsciiString (theFontPath);
     aResult = new Font_SystemFont (aFontName, anAspect, aFontPath);
+    // automatically identify some known single-line fonts
+    aResult->SetSingleStrokeFont (aFontName->String().StartsWith ("OLF "));
   }
 
   FT_Done_Face (aFontFace);

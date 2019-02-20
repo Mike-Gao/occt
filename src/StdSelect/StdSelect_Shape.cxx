@@ -54,7 +54,7 @@ void StdSelect_Shape::Compute(const Handle(PrsMgr_PresentationManager3d)& /*PM*/
     else
       StdPrs_WFShape::Add (P, mysh, myDrawer);
   }
-  else if (aMode==0)
+  else
     StdPrs_WFShape::Add (P, mysh, myDrawer);
 }
 

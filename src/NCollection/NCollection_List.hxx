@@ -142,8 +142,7 @@ public:
     PAppend(pNew, theIter);
   }
 
-  //! Append another list at the end.
-  //! After this operation, theOther list will be cleared.
+  //! Append another list at the end
   void Append (NCollection_List& theOther)
   { 
     if (this == &theOther || theOther.Extent()<1)

@@ -157,8 +157,13 @@ public:
   Standard_EXPORT void UnsetMode();
   
   Standard_EXPORT Standard_Integer SelectionMode() const;
-  
-  Standard_EXPORT void SetSelectionMode (const Standard_Integer theSelectionMode);
+
+  //! Sets selection mode.
+  //! If "theTransaction" flag is OFF, modification of the attribute doesn't influence the transaction mechanism
+  //! (the attribute doesn't participate in undo/redo because of this modification).
+  //! Certainly, if any other data of the attribute is modified (display mode, color, ...),
+  //! the attribute will be included into undo/redo.
+  Standard_EXPORT void SetSelectionMode (const Standard_Integer theSelectionMode, const Standard_Boolean theTransaction = Standard_True);
   
   Standard_EXPORT Standard_Boolean HasOwnSelectionMode() const;
   
@@ -197,6 +202,10 @@ protected:
 private:
 
   Handle(AIS_InteractiveContext) getAISContext() const;
+
+  //! Activates selection mode of the interactive object.
+  //! It is called internally on change of selection mode and AISUpdate().
+  void ActivateSelectionMode();
   
   //! Updates AIS_InteractiveObject stored in the attribute
   //! and applies the visualization settings
@@ -209,7 +218,6 @@ private:
   //! the viewer; If <remove> = True then AISObject is removed
   //! from AIS_InteractiveContext instead of simple erasing in the viewer
   Standard_EXPORT void AISErase (const Standard_Boolean remove = Standard_False);
-
 private:
   Handle(AIS_InteractiveObject) myAIS;
 };

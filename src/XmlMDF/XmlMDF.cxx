@@ -256,7 +256,10 @@ Standard_Integer XmlMDF::ReadSubTree (const XmlObjMgt_Element&    theElement,
           if (isBound)
             tAtt = Handle(TDF_Attribute)::DownCast(theRelocTable.Find(anID));
           else
+          {
             tAtt = driver -> NewEmpty();
+            tAtt->SetID();
+          }
 	  if (tAtt->Label().IsNull())
 	    theLabel.AddAttribute (tAtt);
 	  else

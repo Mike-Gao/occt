@@ -73,6 +73,13 @@ public:
                              const unsigned int        thePointSize,
                              const unsigned int        theResolution);
 
+  //! Return TRUE if this is single-stroke (one-line) font, FALSE by default.
+  //! Such fonts define single-line glyphs instead of closed contours, so that they are rendered incorrectly by normal software.
+  bool IsSingleStrokeFont() const { return myIsSingleLine; }
+
+  //! Set if this font should be rendered as single-stroke (one-line).
+  void SetSingleStrokeFont (bool theIsSingleLine) { myIsSingleLine = theIsSingleLine; }
+
   //! Release currently loaded font.
   Standard_EXPORT virtual void Release();
 
@@ -98,6 +105,13 @@ public:
   unsigned int PointSize() const
   {
     return myPointSize;
+  }
+
+  //! Setup glyph scaling along X-axis.
+  //! By default glyphs are not scaled (scaling factor = 1.0)
+  void SetWidthScaling (const float theScaleFactor)
+  {
+    myWidthScaling = theScaleFactor;
   }
 
   //! Compute advance to the next character with kerning applied when applicable.
@@ -154,15 +168,17 @@ protected:
 
 protected:
 
-  Handle(Font_FTLibrary) myFTLib;       //!< handle to the FT library object
-  FT_Face                myFTFace;      //!< FT face object
-  NCollection_String     myFontPath;    //!< font path
-  unsigned int           myPointSize;   //!< point size set by FT_Set_Char_Size
-  int32_t                myLoadFlags;   //!< default load flags
+  Handle(Font_FTLibrary) myFTLib;        //!< handle to the FT library object
+  FT_Face                myFTFace;       //!< FT face object
+  NCollection_String     myFontPath;     //!< font path
+  unsigned int           myPointSize;    //!< point size set by FT_Set_Char_Size
+  float                  myWidthScaling; //!< scale glyphs along X-axis
+  int32_t                myLoadFlags;    //!< default load flags
+  bool                   myIsSingleLine; //!< single stroke font flag, FALSE by default
 
-  Image_PixMap           myGlyphImg;    //!< cached glyph plane
-  FT_Vector*             myKernAdvance; //!< buffer variable
-  Standard_Utf32Char     myUChar;       //!< currently loaded unicode character
+  Image_PixMap           myGlyphImg;     //!< cached glyph plane
+  FT_Vector*             myKernAdvance;  //!< buffer variable
+  Standard_Utf32Char     myUChar;        //!< currently loaded unicode character
 
 public:
 

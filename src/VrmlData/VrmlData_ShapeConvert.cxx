@@ -134,6 +134,7 @@ void VrmlData_ShapeConvert::Convert (const Standard_Boolean theExtractFaces,
         TopoDS_Shape aTestedShape;
         aTestedShape.TShape (aShape.TShape());
         aTestedShape.Orientation (isReverse ? TopAbs_REVERSED : TopAbs_FORWARD);
+        Standard_Boolean isTessellate (Standard_False);
         switch (ShapeType[i]) {
         case TopAbs_FACE:
           {
@@ -147,6 +148,16 @@ void VrmlData_ShapeConvert::Convert (const Standard_Boolean theExtractFaces,
                 break;
               }
 
+              if (aTri.IsNull())
+                isTessellate = Standard_True;
+              // Check the existing deflection
+              else if (aTri->Deflection() > aDeflection+ Precision::Confusion())
+                isTessellate = Standard_True;
+              if (isTessellate) {
+                // Triangulate the face by the standard OCC mesher
+                BRepMesh_IncrementalMesh IM (aFace, aDeflection, Standard_False, theDeflAngle);
+                aTri = BRep_Tool::Triangulation (aFace, aLoc);
+              }
               if (aTri.IsNull() == Standard_False) {
                 TopoDS_Shape aTestedShapeRev = aTestedShape;
                 aTestedShapeRev.Orientation (isReverse ?
@@ -179,6 +190,8 @@ void VrmlData_ShapeConvert::Convert (const Standard_Boolean theExtractFaces,
          {
            const TopoDS_Edge& aEdge = TopoDS::Edge (aShape);
             if (aEdge.IsNull() == Standard_False) {
+              Handle(Poly_Polygon3D) aPol = BRep_Tool::Polygon3D (aEdge, aLoc);
+              
               if (aRelMap.IsBound (aTestedShape)) {
                 aTShapeNode = aRelMap(aTestedShape);
                 break;
@@ -191,34 +204,53 @@ void VrmlData_ShapeConvert::Convert (const Standard_Boolean theExtractFaces,
                 aTShapeNode = aRelMap(aTestedShape);
                 break;
               }
+              
+              if (aPol.IsNull())
+                isTessellate = Standard_True;
+              // Check the existing deflection
+              else if (aPol->Deflection() > aDeflection+ Precision::Confusion()
+                       && BRep_Tool::IsGeometric(aEdge))
+                isTessellate = Standard_True;
+              
+              if (isTessellate && BRep_Tool::IsGeometric(aEdge)) {
+                //try to find PolygonOnTriangulation
+                Handle(Poly_PolygonOnTriangulation) aPT;
+                Handle(Poly_Triangulation) aT;
+                TopLoc_Location aL;
 
-              //try to find PolygonOnTriangulation
-              Handle(Poly_PolygonOnTriangulation) aPT;
-              Handle(Poly_Triangulation) aT;
-              TopLoc_Location aL;
-              BRep_Tool::PolygonOnTriangulation(aEdge, aPT, aT, aL);
+                Standard_Boolean found = Standard_False;
+                Standard_Integer j = 1;
+                for (;;) {
+                  BRep_Tool::PolygonOnTriangulation(aEdge, aPT, aT, aL, j);
 
-              // If PolygonOnTriangulation was found -> get the Polygon3D
-              Handle(Poly_Polygon3D) aPol;
-              if(!aPT.IsNull() && !aT.IsNull() && aPT->HasParameters()) {
-                BRepAdaptor_Curve aCurve(aEdge);
-                Handle(TColStd_HArray1OfReal) aPrs = aPT->Parameters();
-                Standard_Integer nbNodes = aPT->NbNodes();
-                TColgp_Array1OfPnt arrNodes(1, nbNodes);
-                TColStd_Array1OfReal arrUVNodes(1, nbNodes);
+                  if (aPT.IsNull() || aT.IsNull()) break;
 
-                for(Standard_Integer j = 1; j <= nbNodes; j++) {
-                  arrUVNodes(j) = aPrs->Value(aPrs->Lower() + j - 1);
-                  arrNodes(j) = aCurve.Value(arrUVNodes(j));
+                  if (aPT->Deflection() <= aDeflection + Precision::Confusion()
+                      && aPT->HasParameters())
+                  {
+                    found = Standard_True;
+                    break;
+                  }
+                  j++;
                 }
-                aPol = new Poly_Polygon3D(arrNodes, arrUVNodes);
-                aPol->Deflection (aPT->Deflection());
-              }
-              else {
-                aPol = BRep_Tool::Polygon3D(aEdge, aL);
+                
+                if(found) {
 
-                // If polygon was not found -> generate it
-                if (aPol.IsNull()) {
+                  BRepAdaptor_Curve aCurve(aEdge);
+                  Handle(TColStd_HArray1OfReal) aPrs = aPT->Parameters();
+                  Standard_Integer nbNodes = aPT->NbNodes();
+                  TColgp_Array1OfPnt arrNodes(1, nbNodes);
+                  TColStd_Array1OfReal arrUVNodes(1, nbNodes);
+
+                  for(Standard_Integer j = 1; j <= nbNodes; j++) {
+                    arrUVNodes(j) = aPrs->Value(aPrs->Lower() + j - 1);
+                    arrNodes(j) = aCurve.Value(arrUVNodes(j));
+                  }
+                  aPol = new Poly_Polygon3D(arrNodes, arrUVNodes);
+                  aPol->Deflection (aPT->Deflection());
+                }
+                else{
+                  
                   BRepAdaptor_Curve aCurve(aEdge);
                   const Standard_Real aFirst = aCurve.FirstParameter();
                   const Standard_Real aLast  = aCurve.LastParameter();
@@ -236,11 +268,10 @@ void VrmlData_ShapeConvert::Convert (const Standard_Boolean theExtractFaces,
                   aPol = new Poly_Polygon3D(arrNodes, arrUVNodes);
                   aPol->Deflection (aDeflection);
                 }
+                
+                BRep_Builder aBld;
+                aBld.UpdateEdge (aEdge, aPol);
               }
-
-              if (aPol.IsNull())
-                continue;
-
               aTShapeNode = polToIndexedLineSet (aPol);
               myScene.AddNode (aTShapeNode, Standard_False);
               // Bind the converted face

@@ -29,12 +29,14 @@ IMPLEMENT_STANDARD_RTTIEXT(Font_FTFont,Standard_Transient)
 // purpose  :
 // =======================================================================
 Font_FTFont::Font_FTFont (const Handle(Font_FTLibrary)& theFTLib)
-: myFTLib      (theFTLib),
-  myFTFace     (NULL),
-  myPointSize  (0U),
-  myLoadFlags  (FT_LOAD_NO_HINTING | FT_LOAD_TARGET_NORMAL),
-  myKernAdvance(new FT_Vector()),
-  myUChar      (0U)
+: myFTLib       (theFTLib),
+  myFTFace      (NULL),
+  myPointSize   (0U),
+  myWidthScaling(1.0),
+  myLoadFlags   (FT_LOAD_NO_HINTING | FT_LOAD_TARGET_NORMAL),
+  myIsSingleLine(false),
+  myKernAdvance (new FT_Vector()),
+  myUChar       (0U)
 {
   if (myFTLib.IsNull())
   {
@@ -118,9 +120,12 @@ bool Font_FTFont::Init (const NCollection_String& theFontName,
 {
   Handle(Font_FontMgr) aFontMgr = Font_FontMgr::GetInstance();
   const Handle(TCollection_HAsciiString) aFontName = new TCollection_HAsciiString (theFontName.ToCString());
-  Handle(Font_SystemFont) aRequestedFont = aFontMgr->FindFont (aFontName, theFontAspect, thePointSize);
-  return !aRequestedFont.IsNull()
-      && Font_FTFont::Init (aRequestedFont->FontPath()->ToCString(), thePointSize, theResolution);
+  if (Handle(Font_SystemFont) aRequestedFont = aFontMgr->FindFont (aFontName, theFontAspect, thePointSize))
+  {
+    myIsSingleLine = aRequestedFont->IsSingleStrokeFont();
+    return Font_FTFont::Init (aRequestedFont->FontPath()->ToCString(), thePointSize, theResolution);
+  }
+  return false;
 }
 
 // =======================================================================
@@ -263,12 +268,19 @@ float Font_FTFont::AdvanceX (const Standard_Utf32Char theUCharNext)
     return 0.0f;
   }
 
-  if (FT_HAS_KERNING (myFTFace) == 0 || theUCharNext == 0
-   || FT_Get_Kerning (myFTFace, myUChar, theUCharNext, FT_KERNING_UNFITTED, myKernAdvance) != 0)
+  FT_Pos aKerningX = 0;
+  if (theUCharNext != 0
+   && FT_HAS_KERNING (myFTFace) != 0)
   {
-    return fromFTPoints<float> (myFTFace->glyph->advance.x);
+    const FT_UInt aCharCurr = FT_Get_Char_Index (myFTFace, myUChar);
+    const FT_UInt aCharNext = FT_Get_Char_Index (myFTFace, theUCharNext);
+    if (aCharCurr != 0 && aCharNext != 0
+     && FT_Get_Kerning (myFTFace, aCharCurr, aCharNext, FT_KERNING_UNFITTED, myKernAdvance) == 0)
+    {
+      aKerningX = myKernAdvance->x;
+    }
   }
-  return fromFTPoints<float> (myKernAdvance->x + myFTFace->glyph->advance.x);
+  return myWidthScaling * fromFTPoints<float> (myFTFace->glyph->advance.x + aKerningX);
 }
 
 // =======================================================================
@@ -282,12 +294,19 @@ float Font_FTFont::AdvanceY (const Standard_Utf32Char theUCharNext)
     return 0.0f;
   }
 
-  if (FT_HAS_KERNING (myFTFace) == 0 || theUCharNext == 0
-   || FT_Get_Kerning (myFTFace, myUChar, theUCharNext, FT_KERNING_UNFITTED, myKernAdvance) != 0)
+  FT_Pos aKerningY = 0;
+  if (theUCharNext != 0
+   && FT_HAS_KERNING (myFTFace) != 0)
   {
-    return fromFTPoints<float> (myFTFace->glyph->advance.y);
+    const FT_UInt aCharCurr = FT_Get_Char_Index (myFTFace, myUChar);
+    const FT_UInt aCharNext = FT_Get_Char_Index (myFTFace, theUCharNext);
+    if (aCharCurr != 0 && aCharNext != 0
+        && FT_Get_Kerning (myFTFace, aCharCurr, aCharNext, FT_KERNING_UNFITTED, myKernAdvance) == 0)
+    {
+      aKerningY = myKernAdvance->y;
+    }
   }
-  return fromFTPoints<float> (myKernAdvance->y + myFTFace->glyph->advance.y);
+  return fromFTPoints<float> (myFTFace->glyph->advance.y + aKerningY);
 }
 
 // =======================================================================
