@@ -71,11 +71,11 @@ private:
 
     OpenGl_Vec3         Direction;
     Quantity_Color      NameColor;
-    OpenGl_AspectLine   LineAspect;
-    mutable OpenGl_Text Label;
-    mutable OpenGl_PrimitiveArray Tickmark;
-    mutable OpenGl_PrimitiveArray Line;
-    mutable OpenGl_PrimitiveArray Arrow;
+    Handle(OpenGl_AspectLine) LineAspect;
+    mutable Handle(OpenGl_Text) Label;
+    mutable Handle(OpenGl_PrimitiveArray) Tickmark;
+    mutable Handle(OpenGl_PrimitiveArray) Line;
+    mutable Handle(OpenGl_PrimitiveArray) Arrow;
 
   public:
 
@@ -166,7 +166,7 @@ private:
   //! @param thaTx the X for vector of translation
   //! @param thaTy the Y for vector of translation
   //! @param thaTz the Z for vector of translation
-  void renderLine (const OpenGl_PrimitiveArray&    theLine,
+  void renderLine (const Handle(OpenGl_PrimitiveArray)& theLine,
                    const Handle(OpenGl_Workspace)& theWorkspace,
                    const OpenGl_Mat4&              theMat,
                    const Standard_ShortReal        theXt,
@@ -216,13 +216,13 @@ protected:
 
   mutable Axis myAxes[3]; //!< Axes for trihedron
   mutable Graphic3d_GraduatedTrihedron myData;
-  mutable OpenGl_AspectLine myGridLineAspect; //!< Color grid properties
+  mutable Handle(OpenGl_AspectLine) myGridLineAspect; //!< Color grid properties
 
 protected: //! @name Labels properties
 
-  mutable OpenGl_Text       myLabelValues;
-  mutable OpenGl_AspectText myAspectLabels;
-  mutable OpenGl_AspectText myAspectValues;
+  mutable Handle(OpenGl_Text)       myLabelValues;
+  mutable Handle(OpenGl_AspectText) myAspectLabels;
+  mutable Handle(OpenGl_AspectText) myAspectValues;
 
 private:
 

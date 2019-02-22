@@ -253,44 +253,36 @@ Graphic3d_PolygonOffset OpenGl_Workspace::SetDefaultPolygonOffset (const Graphic
 // function : SetAspectLine
 // purpose  :
 // =======================================================================
-const Handle(OpenGl_AspectLine) OpenGl_Workspace::SetAspectLine (const Handle(OpenGl_AspectLine)& theAspect)
+void OpenGl_Workspace::SetAspectLine (const Handle(OpenGl_AspectLine)& theAspect)
 {
-  Handle(OpenGl_AspectLine) aPrevAspectLine = myAspectLineSet;
   myAspectLineSet = theAspect;
-  return aPrevAspectLine;
 }
 
 // =======================================================================
 // function : SetAspectFace
 // purpose  :
 // =======================================================================
-const Handle(OpenGl_AspectFace) OpenGl_Workspace::SetAspectFace (const Handle(OpenGl_AspectFace)& theAspect)
+void OpenGl_Workspace::SetAspectFace (const Handle(OpenGl_AspectFace)& theAspect)
 {
-  Handle(OpenGl_AspectFace) aPrevAspectFace = myAspectFaceSet;
   myAspectFaceSet = theAspect;
-  return aPrevAspectFace;
 }
 
 // =======================================================================
 // function : SetAspectMarker
 // purpose  :
 // =======================================================================
-const Handle(OpenGl_AspectMarker) OpenGl_Workspace::SetAspectMarker (const Handle(OpenGl_AspectMarker)& theAspect)
+void OpenGl_Workspace::SetAspectMarker (const Handle(OpenGl_AspectMarker)& theAspect)
 {
-  Handle(OpenGl_AspectMarker) aPrevAspectMarker = myAspectMarkerSet;
   myAspectMarkerSet = theAspect;
-  return aPrevAspectMarker;
 }
 
 // =======================================================================
 // function : SetAspectText
 // purpose  :
 // =======================================================================
-const Handle(OpenGl_AspectText) OpenGl_Workspace::SetAspectText (const Handle(OpenGl_AspectText)& theAspect)
+void OpenGl_Workspace::SetAspectText (const Handle(OpenGl_AspectText)& theAspect)
 {
-  Handle(OpenGl_AspectText) aPrevAspectText = myAspectTextSet;
   myAspectTextSet = theAspect;
-  return aPrevAspectText;
 }
 
 // =======================================================================

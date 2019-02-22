@@ -125,7 +125,9 @@ void OpenGl_View::drawBackground (const Handle(OpenGl_Workspace)& theWorkspace)
   {
     aCtx->core11fwd->glDisable (GL_BLEND);
 
-    const Handle(OpenGl_AspectFace) anOldAspectFace = theWorkspace->SetAspectFace (myTextureParams);
+    const Handle(OpenGl_AspectFace) anOldAspectFace = theWorkspace->AspectFace();
+    theWorkspace->SetAspectFace (myTextureParams);
+
     myBgTextureArray->Render (theWorkspace);
     theWorkspace->SetAspectFace (anOldAspectFace);
   }
@@ -1161,7 +1163,7 @@ void OpenGl_View::renderTrihedron (const Handle(OpenGl_Workspace) &theWorkspace)
 {
   if (myToShowGradTrihedron)
   {
-    myGraduatedTrihedron.Render (theWorkspace);
+    myGraduatedTrihedron->Render (theWorkspace);
   }
 }
 
@@ -1174,8 +1176,8 @@ void OpenGl_View::renderFrameStats()
   if (myRenderParams.ToShowStats
    && myRenderParams.CollectedStats != Graphic3d_RenderingParams::PerfCounters_NONE)
   {
-    myFrameStatsPrs.Update (myWorkspace);
-    myFrameStatsPrs.Render (myWorkspace);
+    myFrameStatsPrs->Update (myWorkspace);
+    myFrameStatsPrs->Render (myWorkspace);
   }
 }
 

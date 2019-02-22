@@ -505,7 +505,9 @@ void OpenGl_PrimitiveArray::drawEdges (const OpenGl_Vec4&              theEdgeCo
     return;
   }
 
-  const Handle(OpenGl_AspectLine) anAspectLineOld = theWorkspace->SetAspectLine (theWorkspace->AspectFace()->AspectEdge());
+  const Handle(OpenGl_AspectLine) anAspectLineOld = theWorkspace->AspectLine();
+  theWorkspace->SetAspectLine (theWorkspace->AspectFace()->AspectEdge());
+
   const Handle(OpenGl_AspectLine) anAspect = theWorkspace->ApplyAspectLine();
 
 #if !defined(GL_ES_VERSION_2_0)

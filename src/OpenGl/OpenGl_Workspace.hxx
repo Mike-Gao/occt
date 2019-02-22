@@ -175,16 +175,16 @@ public:
   const Handle(OpenGl_AspectText)&   AspectText()   const { return myAspectTextSet; }
 
   //! Assign new line aspect (will be applied within ApplyAspectLine()).
-  Standard_EXPORT const Handle(OpenGl_AspectLine) SetAspectLine   (const Handle(OpenGl_AspectLine)& theAspect);
+  Standard_EXPORT void SetAspectLine   (const Handle(OpenGl_AspectLine)& theAspect);
 
   //! Assign new face aspect (will be applied within ApplyAspectFace()).
-  Standard_EXPORT const Handle(OpenGl_AspectFace) SetAspectFace (const Handle(OpenGl_AspectFace)& theAspect);
+  Standard_EXPORT void SetAspectFace (const Handle(OpenGl_AspectFace)& theAspect);
 
   //! Assign new marker aspect (will be applied within ApplyAspectMarker()).
-  Standard_EXPORT const Handle(OpenGl_AspectMarker) SetAspectMarker (const Handle(OpenGl_AspectMarker)& theAspect);
+  Standard_EXPORT void SetAspectMarker (const Handle(OpenGl_AspectMarker)& theAspect);
 
   //! Assign new text aspect (will be applied within ApplyAspectText()).
-  Standard_EXPORT const Handle(OpenGl_AspectText) SetAspectText   (const Handle(OpenGl_AspectText)&   theAspect);
+  Standard_EXPORT void SetAspectText   (const Handle(OpenGl_AspectText)&   theAspect);
 
   //! Apply line aspect.
   //! @return aspect set by SetAspectLine()

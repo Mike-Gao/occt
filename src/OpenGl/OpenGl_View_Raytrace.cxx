@@ -584,7 +584,7 @@ Standard_Boolean OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        
 // function : addRaytracePrimitiveArray
 // purpose  : Adds OpenGL primitive array to ray-traced scene geometry
 // =======================================================================
-Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const Handle(OpenGl_PrimitiveArray) theArray,
+Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const Handle(OpenGl_PrimitiveArray)& theArray,
                                                                    const Standard_Integer       theMaterial,
                                                                    const OpenGl_Mat4*           theTransform)
 {
@@ -704,7 +704,7 @@ Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const Handle(
       {
         const Standard_Integer aVertNum = aBounds->Bounds[aBound];
 
-        if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, aBoundStart, *theArray))
+        if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, aBoundStart, theArray))
         {
           aSet.Nullify();
           return Handle(OpenGl_TriangleSet)();
@@ -717,7 +717,7 @@ Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const Handle(
     {
       const Standard_Integer aVertNum = !anIndices.IsNull() ? anIndices->NbElements : anAttribs->NbElements;
 
-      if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, 0, *theArray))
+      if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, 0, theArray))
       {
         aSet.Nullify();
         return Handle(OpenGl_TriangleSet)();
@@ -741,17 +741,17 @@ Standard_Boolean OpenGl_View::addRaytraceVertexIndices (OpenGl_TriangleSet&     
                                                         const Standard_Integer               theMatID,
                                                         const Standard_Integer               theCount,
                                                         const Standard_Integer               theOffset,
-                                                        const OpenGl_PrimitiveArray&         theArray)
+                                                        const Handle(OpenGl_PrimitiveArray)& theArray)
 {
-  switch (theArray.DrawMode())
+  switch (theArray->DrawMode())
   {
-    case GL_TRIANGLES:      return addRaytraceTriangleArray        (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_TRIANGLE_FAN:   return addRaytraceTriangleFanArray     (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_TRIANGLE_STRIP: return addRaytraceTriangleStripArray   (theSet, theMatID, theCount, theOffset, theArray.Indices());
+    case GL_TRIANGLES:      return addRaytraceTriangleArray        (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_TRIANGLE_FAN:   return addRaytraceTriangleFanArray     (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_TRIANGLE_STRIP: return addRaytraceTriangleStripArray   (theSet, theMatID, theCount, theOffset, theArray->Indices());
   #if !defined(GL_ES_VERSION_2_0)
-    case GL_QUAD_STRIP:     return addRaytraceQuadrangleStripArray (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_QUADS:          return addRaytraceQuadrangleArray      (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_POLYGON:        return addRaytracePolygonArray         (theSet, theMatID, theCount, theOffset, theArray.Indices());
+    case GL_QUAD_STRIP:     return addRaytraceQuadrangleStripArray (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_QUADS:          return addRaytraceQuadrangleArray      (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_POLYGON:        return addRaytracePolygonArray         (theSet, theMatID, theCount, theOffset, theArray->Indices());
   #endif
   }
 

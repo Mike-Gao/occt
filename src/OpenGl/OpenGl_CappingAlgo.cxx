@@ -72,7 +72,7 @@ namespace
     aContext->ModelWorldState.SetCurrent (OpenGl_Mat4::Map (*thePlane->Orientation()->mat));
     aContext->ApplyModelViewMatrix();
 
-    thePlane->Primitives().Render (theWorkspace);
+    thePlane->Primitives()->Render (theWorkspace);
 
     aContext->ModelWorldState.Pop();
     aContext->ApplyModelViewMatrix();
@@ -108,7 +108,7 @@ namespace
       thePlane->Update (aContext, !anObjAspectFace.IsNull() ? anObjAspectFace->Aspect() : Handle(Graphic3d_AspectFillArea3d)());
       theWorkspace->SetAspectFace (thePlane->AspectFace());
       theWorkspace->SetRenderFilter (aPrevFilter);
-      if (!theWorkspace->ShouldRender (&thePlane->Primitives()))
+      if (!theWorkspace->ShouldRender (thePlane->Primitives()))
       {
         continue;
       }
