@@ -26,6 +26,7 @@ class OpenGl_ShaderProgram;
 //! The element holding Graphic3d_AspectLine3d.
 class OpenGl_AspectLine : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_AspectLine, OpenGl_Element)
 public:
 
   //! Empty constructor.

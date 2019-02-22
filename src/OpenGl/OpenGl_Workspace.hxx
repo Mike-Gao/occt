@@ -163,44 +163,44 @@ public:
   }
 
   //! Currently set line aspect (can differ from applied).
-  const OpenGl_AspectLine*   AspectLine()   const { return myAspectLineSet; }
+  const Handle(OpenGl_AspectLine)& AspectLine() const { return myAspectLineSet; }
 
   //! Currently set face aspect (can differ from applied).
-  const OpenGl_AspectFace*   AspectFace()   const { return myAspectFaceSet; }
+  const Handle(OpenGl_AspectFace)& AspectFace() const { return myAspectFaceSet; }
 
   //! Currently set marker aspect (can differ from applied).
-  const OpenGl_AspectMarker* AspectMarker() const { return myAspectMarkerSet; }
+  const Handle(OpenGl_AspectMarker)& AspectMarker() const { return myAspectMarkerSet; }
 
   //! Currently set text aspect (can differ from applied).
-  const OpenGl_AspectText*   AspectText()   const { return myAspectTextSet; }
+  const Handle(OpenGl_AspectText)& AspectText() const { return myAspectTextSet; }
 
   //! Assign new line aspect (will be applied within ApplyAspectLine()).
-  Standard_EXPORT const OpenGl_AspectLine*   SetAspectLine   (const OpenGl_AspectLine*   theAspect);
+  Standard_EXPORT void SetAspectLine (const Handle(OpenGl_AspectLine)& theAspect);
 
   //! Assign new face aspect (will be applied within ApplyAspectFace()).
-  Standard_EXPORT const OpenGl_AspectFace*   SetAspectFace   (const OpenGl_AspectFace*   theAspect);
+  Standard_EXPORT void SetAspectFace (const Handle(OpenGl_AspectFace)& theAspect);
 
   //! Assign new marker aspect (will be applied within ApplyAspectMarker()).
-  Standard_EXPORT const OpenGl_AspectMarker* SetAspectMarker (const OpenGl_AspectMarker* theAspect);
+  Standard_EXPORT void SetAspectMarker (const Handle(OpenGl_AspectMarker)& theAspect);
 
   //! Assign new text aspect (will be applied within ApplyAspectText()).
-  Standard_EXPORT const OpenGl_AspectText*   SetAspectText   (const OpenGl_AspectText*   theAspect);
+  Standard_EXPORT void SetAspectText (const Handle(OpenGl_AspectText)& theAspect);
 
   //! Apply line aspect.
   //! @return aspect set by SetAspectLine()
-  const OpenGl_AspectLine* ApplyAspectLine() { return myAspectLineSet; }
+  const Handle(OpenGl_AspectLine)& ApplyAspectLine() { return myAspectLineSet; }
 
   //! Apply face aspect.
   //! @return aspect set by SetAspectFace()
-  Standard_EXPORT const OpenGl_AspectFace*   ApplyAspectFace();
+  Standard_EXPORT const Handle(OpenGl_AspectFace)& ApplyAspectFace();
 
   //! Apply marker aspect.
   //! @return aspect set by SetAspectMarker()
-  Standard_EXPORT const OpenGl_AspectMarker* ApplyAspectMarker();
+  Standard_EXPORT const Handle(OpenGl_AspectMarker)& ApplyAspectMarker();
 
   //! Apply text aspect.
   //! @return aspect set by SetAspectText()
-  const OpenGl_AspectText* ApplyAspectText() { return myAspectTextSet; }
+  const Handle(OpenGl_AspectText)& ApplyAspectText() { return myAspectTextSet; }
 
   //! Clear the applied aspect state to default values.
   void ResetAppliedAspect();
@@ -216,7 +216,7 @@ public:
   //! Checks whether the element can be rendered or not.
   //! @param theElement [in] the element to check
   //! @return True if element can be rendered
-  bool ShouldRender (const OpenGl_Element* theElement);
+  bool ShouldRender (const Handle(OpenGl_Element)& theElement);
 
   //! Return the number of skipped transparent elements within active OpenGl_RenderFilter_OpaqueOnly filter.
   //! @sa OpenGl_LayerList::Render()
@@ -233,13 +233,13 @@ public:
   inline const OpenGl_Matrix* ModelMatrix() const { return StructureMatrix_applied; }
 
   //! Returns face aspect for textured font rendering.
-  const OpenGl_AspectFace& FontFaceAspect() const { return myFontFaceAspect; }
+  const Handle(OpenGl_AspectFace)& FontFaceAspect() const { return myFontFaceAspect; }
 
   //! Returns face aspect for none culling mode.
-  const OpenGl_AspectFace& NoneCulling() const { return myNoneCulling; }
+  const Handle(OpenGl_AspectFace)& NoneCulling() const { return myNoneCulling; }
 
   //! Returns face aspect for front face culling mode.
-  const OpenGl_AspectFace& FrontCulling() const { return myFrontCulling; }
+  const Handle(OpenGl_AspectFace)& FrontCulling() const { return myFrontCulling; }
 
   //! Sets a new environment texture.
   void SetEnvironmentTexture (const Handle(OpenGl_TextureSet)& theTexture) { myEnvironmentTexture = theTexture; }
@@ -254,26 +254,26 @@ protected: //! @name protected fields
   Handle(OpenGl_Context)           myGlContext;
   Standard_Boolean                 myUseZBuffer;
   Standard_Boolean                 myUseDepthWrite;
-  OpenGl_AspectFace                myNoneCulling;
-  OpenGl_AspectFace                myFrontCulling;
-  OpenGl_AspectFace                myFontFaceAspect;
+  Handle(OpenGl_AspectFace)        myNoneCulling;
+  Handle(OpenGl_AspectFace)        myFrontCulling;
+  Handle(OpenGl_AspectFace)        myFontFaceAspect;
 
 protected: //! @name fields related to status
 
   Standard_Integer myNbSkippedTranspElems; //!< counter of skipped transparent elements for OpenGl_LayerList two rendering passes method
   Standard_Integer myRenderFilter;         //!< active filter for skipping rendering of elements by some criteria (multiple render passes)
 
-  OpenGl_AspectLine   myDefaultAspectLine;
-  OpenGl_AspectFace   myDefaultAspectFace;
-  OpenGl_AspectMarker myDefaultAspectMarker;
-  OpenGl_AspectText   myDefaultAspectText;
+  Handle(OpenGl_AspectLine)   myDefaultAspectLine;
+  Handle(OpenGl_AspectFace)   myDefaultAspectFace;
+  Handle(OpenGl_AspectMarker) myDefaultAspectMarker;
+  Handle(OpenGl_AspectText)   myDefaultAspectText;
 
-  const OpenGl_AspectLine*   myAspectLineSet;
-  const OpenGl_AspectFace*   myAspectFaceSet;
+  Handle(OpenGl_AspectLine)   myAspectLineSet;
+  Handle(OpenGl_AspectFace)   myAspectFaceSet;
   Handle(Graphic3d_AspectFillArea3d) myAspectFaceApplied;
-  const OpenGl_AspectMarker* myAspectMarkerSet;
+  Handle(OpenGl_AspectMarker) myAspectMarkerSet;
   Handle(Graphic3d_AspectMarker3d) myAspectMarkerApplied;
-  const OpenGl_AspectText*   myAspectTextSet;
+  Handle(OpenGl_AspectText)   myAspectTextSet;
   Handle(Graphic3d_PresentationAttributes) myAspectFaceAppliedWithHL;
 
   const OpenGl_Matrix* ViewMatrix_applied;

@@ -3165,7 +3165,7 @@ Handle(OpenGl_FrameBuffer) OpenGl_Context::SetDefaultFrameBuffer (const Handle(O
 // function : SetShadingMaterial
 // purpose  :
 // =======================================================================
-void OpenGl_Context::SetShadingMaterial (const OpenGl_AspectFace* theAspect,
+void OpenGl_Context::SetShadingMaterial (const Handle(OpenGl_AspectFace)& theAspect,
                                          const Handle(Graphic3d_PresentationAttributes)& theHighlight)
 {
   const Handle(Graphic3d_AspectFillArea3d)& anAspect = (!theHighlight.IsNull() && !theHighlight->BasicFillAreaAspect().IsNull())
@@ -3237,7 +3237,7 @@ void OpenGl_Context::SetShadingMaterial (const OpenGl_AspectFace* theAspect,
 // function : CheckIsTransparent
 // purpose  :
 // =======================================================================
-Standard_Boolean OpenGl_Context::CheckIsTransparent (const OpenGl_AspectFace* theAspect,
+Standard_Boolean OpenGl_Context::CheckIsTransparent (const Handle(OpenGl_AspectFace)& theAspect,
                                                      const Handle(Graphic3d_PresentationAttributes)& theHighlight,
                                                      Standard_ShortReal& theAlphaFront,
                                                      Standard_ShortReal& theAlphaBack)

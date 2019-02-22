@@ -21,6 +21,8 @@
 #include <OpenGl_ShaderManager.hxx>
 #include <OpenGl_ShaderProgram.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_AspectText, OpenGl_Element)
+
 namespace
 {
   static const TCollection_AsciiString THE_EMPTY_KEY;
