@@ -21,6 +21,8 @@
 #include <OpenGl_View.hxx>
 #include <Graphic3d_TextureParams.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_BackgroundArray, OpenGl_PrimitiveArray)
+
 // =======================================================================
 // method  : Constructor
 // purpose :
@@ -337,7 +339,7 @@ Standard_Boolean OpenGl_BackgroundArray::createTextureArray (const Handle(OpenGl
 
   // Get texture parameters
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
-  const OpenGl_AspectFace* anAspectFace = theWorkspace->AspectFace();
+  const Handle(OpenGl_AspectFace)& anAspectFace = theWorkspace->AspectFace();
   GLfloat aTextureWidth  = (GLfloat )anAspectFace->TextureSet (aCtx)->First()->SizeX();
   GLfloat aTextureHeight = (GLfloat )anAspectFace->TextureSet (aCtx)->First()->SizeY();
 

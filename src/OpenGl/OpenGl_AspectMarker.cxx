@@ -27,6 +27,8 @@
 #include <NCollection_Vec4.hxx>
 #include <TColStd_HArray1OfByte.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_AspectMarker, OpenGl_Element)
+
 namespace
 {
   static const TCollection_AsciiString THE_EMPTY_KEY;

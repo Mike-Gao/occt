@@ -205,9 +205,10 @@ void OpenGl_FrameStats::updateStructures (Standard_Integer theViewId,
           for (OpenGl_Structure::GroupIterator aGroupIter (aStruct->Groups()); aGroupIter.More(); aGroupIter.Next())
           {
             const OpenGl_Group* aGroup = aGroupIter.Value();
-            for (const OpenGl_ElementNode* aNodeIter = aGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
+            for (OpenGl_ElementNodes::Iterator anElemIterator (aGroup->GetElements()); anElemIterator.More(); anElemIterator.Next())
             {
-              if (const OpenGl_PrimitiveArray* aPrim = dynamic_cast<const OpenGl_PrimitiveArray*> (aNodeIter->elem))
+              Handle(OpenGl_PrimitiveArray) aPrim = Handle(OpenGl_PrimitiveArray)::DownCast (anElemIterator.Value());
+              if (!aPrim.IsNull())
               {
                 myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += estimatedDataSize (aPrim->AttributesVbo());
                 myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += estimatedDataSize (aPrim->IndexVbo());
@@ -227,9 +228,10 @@ void OpenGl_FrameStats::updateStructures (Standard_Integer theViewId,
       for (OpenGl_Structure::GroupIterator aGroupIter (aStruct->Groups()); aGroupIter.More(); aGroupIter.Next())
       {
         const OpenGl_Group* aGroup = aGroupIter.Value();
-        for (const OpenGl_ElementNode* aNodeIter = aGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
+        for (OpenGl_ElementNodes::Iterator anElemIterator (aGroup->GetElements()); anElemIterator.More(); anElemIterator.Next())
         {
-          if (const OpenGl_PrimitiveArray* aPrim = dynamic_cast<const OpenGl_PrimitiveArray*> (aNodeIter->elem))
+          Handle(OpenGl_PrimitiveArray) aPrim = Handle(OpenGl_PrimitiveArray)::DownCast (anElemIterator.Value());
+          if (!aPrim.IsNull())
           {
             ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsNotCulled];
             if (theToCountMem)
@@ -313,9 +315,8 @@ void OpenGl_FrameStats::updateStructures (Standard_Integer theViewId,
               ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsLineNotCulled];
             }
           }
-          else if (const OpenGl_Text* aText = dynamic_cast<const OpenGl_Text*> (aNodeIter->elem))
+          else if (!Handle(OpenGl_Text)::DownCast(anElemIterator.Value()).IsNull())
           {
-            (void )aText;
             ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsNotCulled];
             ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsTextNotCulled];
           }

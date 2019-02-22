@@ -33,7 +33,7 @@
 //! Text rendering
 class OpenGl_Text : public OpenGl_Element
 {
-
+  DEFINE_STANDARD_RTTIEXT(OpenGl_Text, OpenGl_Element)
 public:
 
   //! Main constructor
@@ -83,13 +83,13 @@ public: //! @name methods for compatibility with layers
   Standard_EXPORT OpenGl_Text();
 
   //! Create key for shared resource
-  Standard_EXPORT static TCollection_AsciiString FontKey (const OpenGl_AspectText& theAspect,
+  Standard_EXPORT static TCollection_AsciiString FontKey (const Handle(OpenGl_AspectText)& theAspect,
                                                           const Standard_Integer   theHeight,
                                                           const unsigned int       theResolution);
 
   //! Find shared resource for specified font or initialize new one
   Standard_EXPORT static Handle(OpenGl_Font) FindFont (const Handle(OpenGl_Context)& theCtx,
-                                                       const OpenGl_AspectText&      theAspect,
+                                                       const Handle(OpenGl_AspectText)& theAspect,
                                                        const Standard_Integer        theHeight,
                                                        const unsigned int            theResolution,
                                                        const TCollection_AsciiString theKey);
@@ -97,7 +97,7 @@ public: //! @name methods for compatibility with layers
   //! Compute text width
   Standard_EXPORT static void StringSize (const Handle(OpenGl_Context)& theCtx,
                                           const NCollection_String&     theText,
-                                          const OpenGl_AspectText&      theTextAspect,
+                                          const Handle(OpenGl_AspectText)& theTextAspect,
                                           const OpenGl_TextParam&       theParams,
                                           const unsigned int            theResolution,
                                           Standard_ShortReal&           theWidth,
@@ -112,8 +112,8 @@ public: //! @name methods for compatibility with layers
 
   //! Perform rendering
   Standard_EXPORT void Render (const Handle(OpenGl_Context)& theCtx,
-                               const OpenGl_AspectText&      theTextAspect,
-                               const unsigned int            theResolution = Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION) const;
+                               const Handle(OpenGl_AspectText)& theTextAspect,
+                               const unsigned int theResolution = Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION) const;
 
 protected:
 
@@ -127,21 +127,21 @@ private:
 
   //! Setup matrix.
   void setupMatrix (const Handle(OpenGl_Context)& theCtx,
-                    const OpenGl_AspectText&      theTextAspect,
+                    const Handle(OpenGl_AspectText)& theTextAspect,
                     const OpenGl_Vec3             theDVec) const;
 
   //! Draw arrays of vertices.
   void drawText (const Handle(OpenGl_Context)& theCtx,
-                 const OpenGl_AspectText&      theTextAspect) const;
+                 const Handle(OpenGl_AspectText)& theTextAspect) const;
 
   //! Draw rectangle from bounding text box.
   void drawRect (const Handle(OpenGl_Context)& theCtx,
-                 const OpenGl_AspectText&      theTextAspect,
+                 const Handle(OpenGl_AspectText)& theTextAspect,
                  const OpenGl_Vec4&            theColorSubs) const;
 
   //! Main rendering code
   void render (const Handle(OpenGl_Context)& theCtx,
-               const OpenGl_AspectText&      theTextAspect,
+               const Handle(OpenGl_AspectText)& theTextAspect,
                const OpenGl_Vec4&            theColorText,
                const OpenGl_Vec4&            theColorSubs,
                const unsigned int            theResolution) const;

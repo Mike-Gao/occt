@@ -31,6 +31,7 @@ class OpenGl_GraphicDriver;
 //! Class for rendering of arbitrary primitive array.
 class OpenGl_PrimitiveArray : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_PrimitiveArray, OpenGl_Element)
 public:
   //! OpenGL does not provide a constant for "none" draw mode.
   //! So we define our own one that does not conflict with GL constants and utilizes common GL invalid value.

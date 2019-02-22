@@ -29,6 +29,7 @@ class OpenGl_ShaderProgram;
 //! The element holding Graphic3d_AspectMarker3d.
 class OpenGl_AspectMarker : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_AspectMarker, OpenGl_Element)
 public:
 
   //! Empty constructor.

@@ -13,12 +13,13 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <OpenGl_PrimitiveArray.hxx>
+
 #include <OpenGl_AspectFace.hxx>
 #include <OpenGl_Context.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <OpenGl_IndexBuffer.hxx>
 #include <OpenGl_PointSprite.hxx>
-#include <OpenGl_PrimitiveArray.hxx>
 #include <OpenGl_Sampler.hxx>
 #include <OpenGl_ShaderManager.hxx>
 #include <OpenGl_ShaderProgram.hxx>
@@ -27,6 +28,8 @@
 #include <OpenGl_Workspace.hxx>
 #include <Graphic3d_TextureParams.hxx>
 #include <NCollection_AlignedAllocator.hxx>
+
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_PrimitiveArray, OpenGl_Element)
 
 namespace
 {
@@ -502,8 +505,10 @@ void OpenGl_PrimitiveArray::drawEdges (const OpenGl_Vec4&              theEdgeCo
     return;
   }
 
-  const OpenGl_AspectLine* anAspectLineOld = theWorkspace->SetAspectLine (theWorkspace->AspectFace()->AspectEdge());
-  const OpenGl_AspectLine* anAspect = theWorkspace->ApplyAspectLine();
+  const Handle(OpenGl_AspectLine) anAspectLineOld = theWorkspace->AspectLine();
+  theWorkspace->SetAspectLine (theWorkspace->AspectFace()->AspectEdge());
+
+  const Handle(OpenGl_AspectLine)& anAspect = theWorkspace->ApplyAspectLine();
 
 #if !defined(GL_ES_VERSION_2_0)
   glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
@@ -588,8 +593,8 @@ void OpenGl_PrimitiveArray::drawEdges (const OpenGl_Vec4&              theEdgeCo
 // =======================================================================
 void OpenGl_PrimitiveArray::drawMarkers (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
-  const OpenGl_AspectMarker* anAspectMarker = theWorkspace->ApplyAspectMarker();
-  const Handle(OpenGl_Context)&     aCtx    = theWorkspace->GetGlContext();
+  const Handle(OpenGl_AspectMarker)& anAspectMarker = theWorkspace->ApplyAspectMarker();
+  const Handle(OpenGl_Context)& aCtx    = theWorkspace->GetGlContext();
   const GLenum aDrawMode = !aCtx->ActiveProgram().IsNull()
                          && aCtx->ActiveProgram()->HasTessellationStage()
                          ? GL_PATCHES
@@ -765,9 +770,9 @@ void OpenGl_PrimitiveArray::Render (const Handle(OpenGl_Workspace)& theWorkspace
     return;
   }
 
-  const OpenGl_AspectFace*   anAspectFace   = theWorkspace->ApplyAspectFace();
-  const OpenGl_AspectLine*   anAspectLine   = theWorkspace->ApplyAspectLine();
-  const OpenGl_AspectMarker* anAspectMarker = myDrawMode == GL_POINTS
+  const Handle(OpenGl_AspectFace)& anAspectFace = theWorkspace->ApplyAspectFace();
+  const Handle(OpenGl_AspectLine)& anAspectLine = theWorkspace->ApplyAspectLine();
+  const Handle(OpenGl_AspectMarker)& anAspectMarker = myDrawMode == GL_POINTS
                                             ? theWorkspace->ApplyAspectMarker()
                                             : theWorkspace->AspectMarker();
 
@@ -1041,7 +1046,7 @@ Standard_Boolean OpenGl_PrimitiveArray::processIndices (const Handle(OpenGl_Cont
     return Standard_True;
   }
 
-  if (myAttribs->NbElements > std::numeric_limits<GLushort>::max())
+  if (myAttribs->NbElements > IntegerLast()/*std::numeric_limits<GLushort>::max()*/)
   {
     Handle(Graphic3d_Buffer) anAttribs = new Graphic3d_Buffer (new NCollection_AlignedAllocator (16));
     if (!anAttribs->Init (myIndices->NbElements, myAttribs->AttributesArray(), myAttribs->NbAttributes))

@@ -72,7 +72,7 @@ namespace
     aContext->ModelWorldState.SetCurrent (OpenGl_Mat4::Map (*thePlane->Orientation()->mat));
     aContext->ApplyModelViewMatrix();
 
-    thePlane->Primitives().Render (theWorkspace);
+    thePlane->Primitives()->Render (theWorkspace);
 
     aContext->ModelWorldState.Pop();
     aContext->ApplyModelViewMatrix();
@@ -104,11 +104,11 @@ namespace
       theStencilSentry.Init();
 
       // check if capping plane should be rendered within current pass (only opaque / only transparent)
-      const OpenGl_AspectFace* anObjAspectFace = aRenderPlane->ToUseObjectProperties() ? aGroupIter.Value()->AspectFace() : NULL;
-      thePlane->Update (aContext, anObjAspectFace != NULL ? anObjAspectFace->Aspect() : Handle(Graphic3d_AspectFillArea3d)());
+      const Handle(OpenGl_AspectFace) anObjAspectFace = aRenderPlane->ToUseObjectProperties() ? aGroupIter.Value()->AspectFace() : NULL;
+      thePlane->Update (aContext, !anObjAspectFace.IsNull() ? anObjAspectFace->Aspect() : Handle(Graphic3d_AspectFillArea3d)());
       theWorkspace->SetAspectFace (thePlane->AspectFace());
       theWorkspace->SetRenderFilter (aPrevFilter);
-      if (!theWorkspace->ShouldRender (&thePlane->Primitives()))
+      if (!theWorkspace->ShouldRender (thePlane->Primitives()))
       {
         continue;
       }
@@ -124,7 +124,7 @@ namespace
       const bool aColorMaskBack = aContext->SetColorMask (false);
 
       // override aspects, disable culling
-      theWorkspace->SetAspectFace (&theWorkspace->NoneCulling());
+      theWorkspace->SetAspectFace (theWorkspace->NoneCulling());
       theWorkspace->ApplyAspectFace();
 
       // evaluate number of pair faces
@@ -156,7 +156,7 @@ namespace
       }
 
       // override material, cull back faces
-      theWorkspace->SetAspectFace (&theWorkspace->FrontCulling());
+      theWorkspace->SetAspectFace (theWorkspace->FrontCulling());
       theWorkspace->ApplyAspectFace();
 
       // enable all clip plane except the rendered one
@@ -207,7 +207,7 @@ void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorks
   }
 
   // remember current aspect face defined in workspace
-  const OpenGl_AspectFace* aFaceAsp = theWorkspace->AspectFace();
+  const Handle(OpenGl_AspectFace)& aFaceAsp = theWorkspace->AspectFace();
 
   // only filled primitives should be rendered
   const Standard_Integer aPrevFilter = theWorkspace->RenderFilter();

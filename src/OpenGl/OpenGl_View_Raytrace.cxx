@@ -144,11 +144,10 @@ Standard_Boolean OpenGl_View::updateRaytraceGeometry (const RaytraceUpdateMode  
           for (OpenGl_Structure::GroupIterator aGroupIter (aStructure->Groups()); aGroupIter.More(); aGroupIter.Next())
           {
             // Extract OpenGL elements from the group (primitives arrays)
-            for (const OpenGl_ElementNode* aNode = aGroupIter.Value()->FirstNode(); aNode != NULL; aNode = aNode->next)
+            for (OpenGl_ElementNodes::Iterator anElemIterator (aGroupIter.Value()->GetElements()); anElemIterator.More(); anElemIterator.Next())
             {
-              OpenGl_PrimitiveArray* aPrimArray = dynamic_cast<OpenGl_PrimitiveArray*> (aNode->elem);
-
-              if (aPrimArray != NULL)
+              Handle(OpenGl_PrimitiveArray) aPrimArray = Handle(OpenGl_PrimitiveArray)::DownCast (anElemIterator.Value());
+              if (!aPrimArray.IsNull())
               {
                 anArrayIDs.insert (aPrimArray->GetUID());
               }
@@ -344,7 +343,7 @@ void buildTextureTransform (const Handle(Graphic3d_TextureParams)& theParams, BV
 // function : convertMaterial
 // purpose  : Creates ray-tracing material properties
 // =======================================================================
-OpenGl_RaytraceMaterial OpenGl_View::convertMaterial (const OpenGl_AspectFace*      theAspect,
+OpenGl_RaytraceMaterial OpenGl_View::convertMaterial (const Handle(OpenGl_AspectFace)& theAspect,
                                                       const Handle(OpenGl_Context)& theGlContext)
 {
   OpenGl_RaytraceMaterial theMaterial;
@@ -509,7 +508,7 @@ Standard_Boolean OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        
   {
     // Get group material
     OpenGl_RaytraceMaterial aGroupMaterial;
-    if (aGroupIter.Value()->AspectFace() != NULL)
+    if (!aGroupIter.Value()->AspectFace().IsNull())
     {
       aGroupMaterial = convertMaterial (
         aGroupIter.Value()->AspectFace(), theGlContext);
@@ -519,14 +518,14 @@ Standard_Boolean OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        
 
     // Use group material if available, otherwise use structure material
     myRaytraceGeometry.Materials.push_back (
-      aGroupIter.Value()->AspectFace() != NULL ? aGroupMaterial : theStructMat);
+      !aGroupIter.Value()->AspectFace().IsNull() ? aGroupMaterial : theStructMat);
 
     // Add OpenGL elements from group (extract primitives arrays and aspects)
-    for (const OpenGl_ElementNode* aNode = aGroupIter.Value()->FirstNode(); aNode != NULL; aNode = aNode->next)
+    for (OpenGl_ElementNodes::Iterator anElemIterator (aGroupIter.Value()->GetElements()); anElemIterator.More(); anElemIterator.Next())
     {
-      OpenGl_AspectFace* anAspect = dynamic_cast<OpenGl_AspectFace*> (aNode->elem);
+      Handle(OpenGl_AspectFace) anAspect = Handle(OpenGl_AspectFace)::DownCast (anElemIterator.Value());
 
-      if (anAspect != NULL)
+      if (!anAspect.IsNull())
       {
         aMatID = static_cast<Standard_Integer> (myRaytraceGeometry.Materials.size());
 
@@ -536,9 +535,9 @@ Standard_Boolean OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        
       }
       else
       {
-        OpenGl_PrimitiveArray* aPrimArray = dynamic_cast<OpenGl_PrimitiveArray*> (aNode->elem);
+        Handle(OpenGl_PrimitiveArray) aPrimArray = Handle(OpenGl_PrimitiveArray)::DownCast (anElemIterator.Value());
 
-        if (aPrimArray != NULL)
+        if (!aPrimArray.IsNull())
         {
           std::map<Standard_Size, OpenGl_TriangleSet*>::iterator aSetIter = myArrayToTrianglesMap.find (aPrimArray->GetUID());
 
@@ -585,7 +584,7 @@ Standard_Boolean OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        
 // function : addRaytracePrimitiveArray
 // purpose  : Adds OpenGL primitive array to ray-traced scene geometry
 // =======================================================================
-Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const OpenGl_PrimitiveArray* theArray,
+Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const Handle(OpenGl_PrimitiveArray)& theArray,
                                                                    const Standard_Integer       theMaterial,
                                                                    const OpenGl_Mat4*           theTransform)
 {
@@ -705,7 +704,7 @@ Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const OpenGl_
       {
         const Standard_Integer aVertNum = aBounds->Bounds[aBound];
 
-        if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, aBoundStart, *theArray))
+        if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, aBoundStart, theArray))
         {
           aSet.Nullify();
           return Handle(OpenGl_TriangleSet)();
@@ -718,7 +717,7 @@ Handle(OpenGl_TriangleSet) OpenGl_View::addRaytracePrimitiveArray (const OpenGl_
     {
       const Standard_Integer aVertNum = !anIndices.IsNull() ? anIndices->NbElements : anAttribs->NbElements;
 
-      if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, 0, *theArray))
+      if (!addRaytraceVertexIndices (*aSet, theMaterial, aVertNum, 0, theArray))
       {
         aSet.Nullify();
         return Handle(OpenGl_TriangleSet)();
@@ -742,17 +741,17 @@ Standard_Boolean OpenGl_View::addRaytraceVertexIndices (OpenGl_TriangleSet&     
                                                         const Standard_Integer               theMatID,
                                                         const Standard_Integer               theCount,
                                                         const Standard_Integer               theOffset,
-                                                        const OpenGl_PrimitiveArray&         theArray)
+                                                        const Handle(OpenGl_PrimitiveArray)& theArray)
 {
-  switch (theArray.DrawMode())
+  switch (theArray->DrawMode())
   {
-    case GL_TRIANGLES:      return addRaytraceTriangleArray        (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_TRIANGLE_FAN:   return addRaytraceTriangleFanArray     (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_TRIANGLE_STRIP: return addRaytraceTriangleStripArray   (theSet, theMatID, theCount, theOffset, theArray.Indices());
+    case GL_TRIANGLES:      return addRaytraceTriangleArray        (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_TRIANGLE_FAN:   return addRaytraceTriangleFanArray     (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_TRIANGLE_STRIP: return addRaytraceTriangleStripArray   (theSet, theMatID, theCount, theOffset, theArray->Indices());
   #if !defined(GL_ES_VERSION_2_0)
-    case GL_QUAD_STRIP:     return addRaytraceQuadrangleStripArray (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_QUADS:          return addRaytraceQuadrangleArray      (theSet, theMatID, theCount, theOffset, theArray.Indices());
-    case GL_POLYGON:        return addRaytracePolygonArray         (theSet, theMatID, theCount, theOffset, theArray.Indices());
+    case GL_QUAD_STRIP:     return addRaytraceQuadrangleStripArray (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_QUADS:          return addRaytraceQuadrangleArray      (theSet, theMatID, theCount, theOffset, theArray->Indices());
+    case GL_POLYGON:        return addRaytracePolygonArray         (theSet, theMatID, theCount, theOffset, theArray->Indices());
   #endif
   }
 
@@ -2640,7 +2639,7 @@ Standard_Boolean OpenGl_View::setUniformState (const Standard_Integer        the
   }
 
   // Set background colors (only gradient background supported)
-  if (myBgGradientArray != NULL && myBgGradientArray->IsDefined())
+  if (!myBgGradientArray.IsNull() && myBgGradientArray->IsDefined())
   {
     theProgram->SetUniform (theGlContext,
       myUniformLocations[theProgramId][OpenGl_RT_uBackColorTop], myBgGradientArray->GradientColor (0));

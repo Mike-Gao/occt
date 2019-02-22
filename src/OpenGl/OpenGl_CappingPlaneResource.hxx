@@ -61,13 +61,13 @@ public:
   const Handle(Graphic3d_ClipPlane)& Plane() const { return myPlaneRoot; }
 
   //! @return aspect face for rendering capping surface.
-  inline const OpenGl_AspectFace* AspectFace() const { return myAspect; }
+  inline const Handle(OpenGl_AspectFace)& AspectFace() const { return myAspect; }
 
   //! @return evaluated orientation matrix to transform infinite plane.
   inline const OpenGl_Matrix* Orientation() const { return &myOrientation; }
 
   //! @return primitive array of vertices to render infinite plane.
-  inline const OpenGl_PrimitiveArray& Primitives() const { return myPrimitives; }
+  inline const Handle(OpenGl_PrimitiveArray)& Primitives() const { return myPrimitives; }
 
 private:
 
@@ -79,9 +79,9 @@ private:
 
 private:
 
-  OpenGl_PrimitiveArray       myPrimitives;    //!< vertices and texture coordinates for rendering
+  Handle(OpenGl_PrimitiveArray) myPrimitives;  //!< vertices and texture coordinates for rendering
   OpenGl_Matrix               myOrientation;   //!< plane transformation matrix.
-  OpenGl_AspectFace*          myAspect;        //!< capping face aspect.
+  Handle(OpenGl_AspectFace)   myAspect;        //!< capping face aspect.
   Handle(Graphic3d_ClipPlane) myPlaneRoot;     //!< parent clipping plane structure.
   Handle(Graphic3d_AspectFillArea3d) myFillAreaAspect; //!< own capping aspect
   unsigned int                myEquationMod;   //!< modification counter for plane equation.

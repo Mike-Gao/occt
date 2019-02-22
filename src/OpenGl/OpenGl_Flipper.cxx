@@ -22,6 +22,8 @@
 
 #include <gp_Ax2.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Flipper, OpenGl_Element)
+
 // =======================================================================
 // function : Constructor
 // purpose  :

@@ -28,6 +28,7 @@
 //! gradient or texture background rendering.
 class OpenGl_BackgroundArray : public OpenGl_PrimitiveArray
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_BackgroundArray, OpenGl_PrimitiveArray)
 public:
 
   //! Main constructor.
