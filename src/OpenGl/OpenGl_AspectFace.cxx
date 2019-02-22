@@ -32,6 +32,8 @@
 
 #include <Image_PixMap.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_AspectFace, OpenGl_Element)
+
 namespace
 {
   //! Initialize default material in this way for backward compatibility.
@@ -66,6 +68,7 @@ OpenGl_AspectFace::OpenGl_AspectFace()
                                             THE_DEFAULT_MATERIAL, THE_DEFAULT_MATERIAL)),
   myShadingModel (Graphic3d_TOSM_UNLIT)
 {
+  myAspectEdge = new OpenGl_AspectLine();
   myAspect->SetShadingModel (myShadingModel);
   myAspect->SetHatchStyle (Handle(Graphic3d_HatchStyle)());
 }
@@ -77,6 +80,8 @@ OpenGl_AspectFace::OpenGl_AspectFace()
 OpenGl_AspectFace::OpenGl_AspectFace (const Handle(Graphic3d_AspectFillArea3d)& theAspect)
 : myShadingModel (Graphic3d_TOSM_DEFAULT)
 {
+  myAspectEdge = new OpenGl_AspectLine();
+
   SetAspect (theAspect);
 }
 
@@ -97,9 +102,9 @@ void OpenGl_AspectFace::SetAspect (const Handle(Graphic3d_AspectFillArea3d)& the
                  ? theAspect->ShadingModel()
                  : Graphic3d_TOSM_UNLIT;
 
-  myAspectEdge.Aspect()->SetColor (theAspect->EdgeColor());
-  myAspectEdge.Aspect()->SetType  (theAspect->EdgeLineType());
-  myAspectEdge.Aspect()->SetWidth (theAspect->EdgeWidth());
+  myAspectEdge->Aspect()->SetColor (theAspect->EdgeColor());
+  myAspectEdge->Aspect()->SetType  (theAspect->EdgeLineType());
+  myAspectEdge->Aspect()->SetWidth (theAspect->EdgeWidth());
 
   // update texture binding
   myResources.UpdateTexturesRediness (myAspect->TextureSet());

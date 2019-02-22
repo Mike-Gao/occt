@@ -460,10 +460,10 @@ void OpenGl_Structure::Render (const Handle(OpenGl_Workspace) &theWorkspace) con
   aCtx->ApplyModelViewMatrix();
 
   // remember aspects
-  const OpenGl_AspectLine*   aPrevAspectLine   = theWorkspace->AspectLine();
-  const OpenGl_AspectFace*   aPrevAspectFace   = theWorkspace->AspectFace();
-  const OpenGl_AspectMarker* aPrevAspectMarker = theWorkspace->AspectMarker();
-  const OpenGl_AspectText*   aPrevAspectText   = theWorkspace->AspectText();
+  const Handle(OpenGl_AspectLine)& aPrevAspectLine   = theWorkspace->AspectLine();
+  const Handle(OpenGl_AspectFace)& aPrevAspectFace   = theWorkspace->AspectFace();
+  const Handle(OpenGl_AspectMarker)& aPrevAspectMarker = theWorkspace->AspectMarker();
+  const Handle(OpenGl_AspectText)& aPrevAspectText   = theWorkspace->AspectText();
 
   // Apply correction for mirror transform
   if (myIsMirrored)

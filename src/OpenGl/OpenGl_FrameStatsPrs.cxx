@@ -19,6 +19,8 @@
 
 #include <Graphic3d_ArrayOfTriangles.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_FrameStatsPrs, OpenGl_Element)
+
 namespace
 {
   //! Auxiliary structure defining vertex with two attributes.
@@ -50,7 +52,11 @@ OpenGl_FrameStatsPrs::OpenGl_FrameStatsPrs()
   myChartIndices (new OpenGl_IndexBuffer()),
   myChartLines (new OpenGl_VertexBuffer())
 {
-  //
+  myCountersText = new OpenGl_Text();
+  myTextAspect = new OpenGl_AspectText();
+  myChartLabels[0] = new OpenGl_Text();
+  myChartLabels[1] = new OpenGl_Text();
+  myChartLabels[2] = new OpenGl_Text();
 }
 
 // =======================================================================
@@ -68,10 +74,10 @@ OpenGl_FrameStatsPrs::~OpenGl_FrameStatsPrs()
 // =======================================================================
 void OpenGl_FrameStatsPrs::Release (OpenGl_Context* theCtx)
 {
-  myCountersText.Release (theCtx);
-  myChartLabels[0].Release (theCtx);
-  myChartLabels[1].Release (theCtx);
-  myChartLabels[2].Release (theCtx);
+  myCountersText->Release (theCtx);
+  myChartLabels[0]->Release (theCtx);
+  myChartLabels[1]->Release (theCtx);
+  myChartLabels[2]->Release (theCtx);
   myChartVertices->Release (theCtx);
   myChartIndices->Release (theCtx);
   myChartLines->Release (theCtx);
@@ -88,7 +94,7 @@ void OpenGl_FrameStatsPrs::Update (const Handle(OpenGl_Workspace)& theWorkspace)
   const Graphic3d_RenderingParams& aRendParams = theWorkspace->View()->RenderingParams();
   myCountersTrsfPers = theWorkspace->View()->RenderingParams().StatsPosition;
   myChartTrsfPers    = theWorkspace->View()->RenderingParams().ChartPosition;
-  myTextAspect.SetAspect (aRendParams.StatsTextAspect);
+  myTextAspect->SetAspect (aRendParams.StatsTextAspect);
 
   // adjust text alignment depending on corner
   OpenGl_TextParam aParams;
@@ -111,21 +117,21 @@ void OpenGl_FrameStatsPrs::Update (const Handle(OpenGl_Workspace)& theWorkspace)
   {
     aParams.VAlign = Graphic3d_VTA_BOTTOM;
   }
-  if (aParams.Height != myCountersText.FormatParams().Height
-   || aParams.HAlign != myCountersText.FormatParams().HAlign
-   || aParams.VAlign != myCountersText.FormatParams().VAlign)
+  if (aParams.Height != myCountersText->FormatParams().Height
+   || aParams.HAlign != myCountersText->FormatParams().HAlign
+   || aParams.VAlign != myCountersText->FormatParams().VAlign)
   {
-    myCountersText.Release (aCtx.operator->());
+    myCountersText->Release (aCtx.operator->());
   }
 
   if (!aStats->IsFrameUpdated (myStatsPrev)
-   && !myCountersText.Text().IsEmpty())
+   && !myCountersText->Text().IsEmpty())
   {
     return;
   }
 
   TCollection_AsciiString aText = aStats->FormatStats (aRendParams.CollectedStats);
-  myCountersText.Init (aCtx, aText.ToCString(), OpenGl_Vec3 (0.0f, 0.0f, 0.0f), aParams);
+  myCountersText->Init (aCtx, aText.ToCString(), OpenGl_Vec3 (0.0f, 0.0f, 0.0f), aParams);
 
   updateChart (theWorkspace);
 }
@@ -341,9 +347,9 @@ void OpenGl_FrameStatsPrs::updateChart (const Handle(OpenGl_Workspace)& theWorks
     const float aLabX = aParams.HAlign == Graphic3d_HTA_RIGHT
                       ? float(anOffset.x())
                       : float(anOffset.x() + aCharSize.x());
-    myChartLabels[0].Init (aCtx, aLabels[isTopDown ? 0 : 2].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y()),                    0.0f), aParams);
-    myChartLabels[1].Init (aCtx, aLabels[isTopDown ? 1 : 1].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y() / 2), 0.0f), aParams);
-    myChartLabels[2].Init (aCtx, aLabels[isTopDown ? 2 : 0].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y()),     0.0f), aParams);
+    myChartLabels[0]->Init (aCtx, aLabels[isTopDown ? 0 : 2].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y()),                    0.0f), aParams);
+    myChartLabels[1]->Init (aCtx, aLabels[isTopDown ? 1 : 1].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y() / 2), 0.0f), aParams);
+    myChartLabels[2]->Init (aCtx, aLabels[isTopDown ? 2 : 0].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y()),     0.0f), aParams);
   }
 }
 
@@ -361,7 +367,8 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
     glDepthMask (GL_FALSE);
   }
 
-  const OpenGl_AspectText* aTextAspectBack = theWorkspace->SetAspectText (&myTextAspect);
+  const Handle(OpenGl_AspectText)& aTextAspectBack = theWorkspace->AspectText();
+  theWorkspace->SetAspectText (myTextAspect);
 
   aCtx->ModelWorldState.Push();
   aCtx->ModelWorldState.ChangeCurrent().InitIdentity();
@@ -376,7 +383,7 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
                                  aCtx->VirtualViewport()[2], aCtx->VirtualViewport()[3]);
     }
     aCtx->ApplyModelViewMatrix();
-    myCountersText.Render (theWorkspace);
+    myCountersText->Render (theWorkspace);
     aCtx->WorldViewState.Pop();
   }
 
@@ -419,9 +426,9 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
     myChartLines->unbindAttribute (aCtx, Graphic3d_TOA_COLOR);
     myChartLines->unbindAttribute (aCtx, Graphic3d_TOA_POS);
 
-    myChartLabels[0].Render (theWorkspace);
-    myChartLabels[1].Render (theWorkspace);
-    myChartLabels[2].Render (theWorkspace);
+    myChartLabels[0]->Render (theWorkspace);
+    myChartLabels[1]->Render (theWorkspace);
+    myChartLabels[2]->Render (theWorkspace);
 
     aCtx->WorldViewState.Pop();
   }

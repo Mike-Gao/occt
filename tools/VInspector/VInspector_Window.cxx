@@ -385,9 +385,9 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
 // function : GetSelectedElements
 // purpose :
 // =======================================================================
-NCollection_List<OpenGl_Element*> VInspector_Window::GetSelectedElements (QItemSelectionModel* theModel)
+NCollection_List<Handle(OpenGl_Element)> VInspector_Window::GetSelectedElements (QItemSelectionModel* theModel)
 {
-  NCollection_List<OpenGl_Element*> anElements;
+  NCollection_List<Handle(OpenGl_Element)> anElements;
   QList<TreeModel_ItemBasePtr> anItems;
   QModelIndexList anIndices = theModel->selectedIndexes();
   for (QModelIndexList::const_iterator anIndicesIt = anIndices.begin(); anIndicesIt != anIndices.end(); anIndicesIt++)
@@ -410,7 +410,7 @@ NCollection_List<OpenGl_Element*> VInspector_Window::GetSelectedElements (QItemS
     if (!aVItem)
       continue;
 
-    OpenGl_Element* anElement = aVItem->GetElement();
+    Handle(OpenGl_Element) anElement = aVItem->GetElement();
     if (!anElement)
       continue;
 
@@ -681,11 +681,12 @@ void VInspector_Window::onTreeViewSelectionChanged (const QItemSelection&,
   if (myPropertyPanelWidget->toggleViewAction()->isChecked())
     updatePropertyPanelBySelection();
 
+  Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
   NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (myTreeView->selectionModel()->selectedIndexes());
-  updatePreviewPresentation(aSelectedShapes, GetSelectedTransformPers());
+  updatePreviewPresentation(aSelectedShapes, aSelectedPersistent);
 
-  NCollection_List<OpenGl_Element*> aSelectedElements = GetSelectedElements (myTreeView->selectionModel());
-  updatePreviewPresentation(aSelectedElements);
+  NCollection_List<Handle(OpenGl_Element)> aSelectedElements = GetSelectedElements (myTreeView->selectionModel());
+  updatePreviewPresentation(aSelectedElements, aSelectedPersistent);
 
   QApplication::restoreOverrideCursor();
 }
@@ -1022,7 +1023,8 @@ void VInspector_Window::updatePreviewPresentation (const NCollection_List<TopoDS
 // function : updatePreviewPresentation
 // purpose :
 // =======================================================================
-void VInspector_Window::updatePreviewPresentation (const NCollection_List<OpenGl_Element*>& theElements)
+void VInspector_Window::updatePreviewPresentation (const NCollection_List<Handle(OpenGl_Element)>& theElements,
+                                                   const Handle(Graphic3d_TransformPers)& thePersistent)
 {
   Handle(AIS_InteractiveContext) aContext;
   VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
@@ -1044,12 +1046,14 @@ void VInspector_Window::updatePreviewPresentation (const NCollection_List<OpenGl
 
     myOpenGlPreviewPresentation->SetColor (Quantity_Color (Quantity_NOC_BLUE1));
     myOpenGlPreviewPresentation->SetZLayer (Graphic3d_ZLayerId_Topmost);
+    myOpenGlPreviewPresentation->SetTransformPersistence(thePersistent);
     if (!aContext.IsNull())
       aContext->Display (myOpenGlPreviewPresentation, Standard_True);
   }
   else
   {
     myOpenGlPreviewPresentation->Set (theElements);
+    myOpenGlPreviewPresentation->SetTransformPersistence(thePersistent);
     if (!aContext.IsNull())
       aContext->Redisplay (myOpenGlPreviewPresentation, Standard_True);
   }

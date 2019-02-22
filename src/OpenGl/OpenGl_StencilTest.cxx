@@ -16,6 +16,8 @@
 #include <OpenGl_GlCore11.hxx>
 #include <OpenGl_StencilTest.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_StencilTest, OpenGl_Element)
+
 OpenGl_StencilTest::OpenGl_StencilTest()
 {
   //

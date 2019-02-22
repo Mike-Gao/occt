@@ -20,6 +20,7 @@
 
 class OpenGl_StencilTest : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_StencilTest, OpenGl_Element)
 public:
 
   //! Default constructor

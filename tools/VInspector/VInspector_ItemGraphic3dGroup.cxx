@@ -75,7 +75,7 @@ int VInspector_ItemGraphic3dGroup::initRowCount() const
     return 0;
 
   int aNbElements = 0;
-  for (const OpenGl_ElementNode* aNodeIter = anOpenGlGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
+  for (OpenGl_ElementNodes::Iterator anElemIter (anOpenGlGroup->GetElements()); anElemIter.More(); anElemIter.Next())
   {
     aNbElements++;
   }
@@ -99,10 +99,6 @@ QVariant VInspector_ItemGraphic3dGroup::initValue (const int theItemRole) const
   {
     case 0: return theItemRole == Qt::DisplayRole ? aGroup->DynamicType()->Name()
                                                   : STANDARD_TYPE (Graphic3d_Group)->Name();
-    case 1:
-      return rowCount();
-    case 2:
-      return ViewControl_Tools::GetPointerInfo (aGroup, true).ToCString();
     default:
       break;
   }
@@ -113,21 +109,21 @@ QVariant VInspector_ItemGraphic3dGroup::initValue (const int theItemRole) const
 // function : GetElementNode
 // purpose :
 // =======================================================================
-OpenGl_Element* VInspector_ItemGraphic3dGroup::GetElementNode (const int theRowId) const
+Handle(OpenGl_Element) VInspector_ItemGraphic3dGroup::GetElementNode (const int theRowId) const
 {
   int aCurrentIndex = 0;
 
   Handle(Graphic3d_Group) aGroup = GetGroup();
   Handle(OpenGl_Group) anOpenGlGroup = Handle(OpenGl_Group)::DownCast(aGroup);
   if (anOpenGlGroup.IsNull())
-    return 0;
-  for (const OpenGl_ElementNode* aNodeIter = anOpenGlGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
+    return NULL;
+  for (OpenGl_ElementNodes::Iterator anElemIter (anOpenGlGroup->GetElements()); anElemIter.More(); anElemIter.Next())
   {
     if (theRowId == aCurrentIndex)
-      return aNodeIter->elem;
+      return anElemIter.Value();
     aCurrentIndex++;
   }
-  return 0;
+  return NULL;
 }
 
 // =======================================================================

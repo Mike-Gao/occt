@@ -40,9 +40,10 @@ void VInspector_PrsOpenGlElement::Compute (const Handle(PrsMgr_PresentationManag
 
   Handle(OpenGl_Group) aGroup = Handle(OpenGl_Group)::DownCast (thePrs->NewGroup());
   aGroup->SetDestroyElements (Standard_False);
-  for (NCollection_List<OpenGl_Element*>::Iterator anElementsIt (myElements); anElementsIt.More(); anElementsIt.Next())
+
+  for (NCollection_List<Handle(OpenGl_Element)>::Iterator anElementsIt (myElements); anElementsIt.More(); anElementsIt.Next())
   {
-    OpenGl_Element* anElement = anElementsIt.Value();
+    Handle(OpenGl_Element) anElement = anElementsIt.Value();
     aGroup->AddElement (anElement);
   }
   // invalidate bounding box of the scene
