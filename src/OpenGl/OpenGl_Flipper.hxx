@@ -27,6 +27,7 @@ class gp_Ax2;
 //! Originally, this element serves for need of flipping the 3D text of dimension presentations.
 class OpenGl_Flipper : public OpenGl_Element
 {
+  DEFINE_STANDARD_RTTIEXT(OpenGl_Flipper, OpenGl_Element)
 public:
 
   //! Construct rendering element to flip model-view matrix

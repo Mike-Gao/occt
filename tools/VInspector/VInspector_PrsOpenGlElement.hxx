@@ -41,7 +41,7 @@ public:
 
   //! Fills internal container of elements
   //! \param theElements elements to be displayed
-  void Set (const NCollection_List<OpenGl_Element*>& theElements) { myElements = theElements; }
+  void Set (const NCollection_List<Handle(OpenGl_Element)>& theElements) { myElements = theElements; }
 
 private:
   //! Calculates the 3D view aPresentation and its updates.
@@ -62,7 +62,7 @@ private:
   DEFINE_STANDARD_RTTIEXT(VInspector_PrsOpenGlElement, AIS_InteractiveObject)
 
 private:
-  NCollection_List<OpenGl_Element*> myElements;
+  NCollection_List<Handle(OpenGl_Element)> myElements;
 };
 
 #endif

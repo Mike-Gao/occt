@@ -59,7 +59,7 @@ public:
   //! Returns element node or NULL
   //! \param theRowId row index
   //! \return element node
-  OpenGl_Element* GetElementNode(const int theRowId) const;
+  Standard_EXPORT Handle(OpenGl_Element) GetElementNode(const int theRowId) const;
 
   //! Returns number of table rows
   //! \return an integer value

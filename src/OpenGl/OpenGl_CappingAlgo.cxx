@@ -66,18 +66,18 @@ namespace
   class OpenGl_SharedElement : public OpenGl_Resource
   {
     public:
-      OpenGl_SharedElement (OpenGl_Element* theGlElement) : myGlElement (theGlElement) {}
+      OpenGl_SharedElement (Handle(OpenGl_Element) theGlElement) : myGlElement (theGlElement) {}
       virtual void Release (OpenGl_Context* theGlCtx) Standard_OVERRIDE
       {
         OpenGl_Element::Destroy (theGlCtx, myGlElement);
       }
-      OpenGl_Element* GlElement() const { return myGlElement; }
+      Handle(OpenGl_Element) GlElement() const { return myGlElement; }
 
       //! Returns estimated GPU memory usage for holding data without considering overheads and allocation alignment rules.
       Standard_Size EstimatedDataSize() const Standard_OVERRIDE { return 0; }
 
     private:
-      OpenGl_Element* myGlElement;
+      Handle(OpenGl_Element) myGlElement;
 
     public:
 
@@ -85,7 +85,7 @@ namespace
   };
 
   //! Iitializes and returns vertex buffer for plane section
-  OpenGl_PrimitiveArray* initQuad (const Handle(OpenGl_Context)& theContext)
+  Handle(OpenGl_PrimitiveArray) initQuad (const Handle(OpenGl_Context)& theContext)
   {
     Handle(OpenGl_SharedElement) aSharedResource;
 
@@ -95,14 +95,14 @@ namespace
       theContext->ShareResource (THE_QUAD_PARRAY, aSharedResource);
     }
 
-    return dynamic_cast<OpenGl_PrimitiveArray*> (aSharedResource->GlElement());
+    return Handle(OpenGl_PrimitiveArray)::DownCast (aSharedResource->GlElement());
   }
 
   //! Render section plane using the given aspects.
   void renderSection (const Handle(OpenGl_Workspace)& theWorkspace,
-                      const OpenGl_PrimitiveArray*    theQuad,
-                      const OpenGl_AspectFace*        theCappingAspect,
-                      const OpenGl_AspectFace*        theHatchAspect,
+                      const Handle(OpenGl_PrimitiveArray)& theQuad,
+                      const Handle(OpenGl_AspectFace)& theCappingAspect,
+                      const Handle(OpenGl_AspectFace)& theHatchAspect,
                       const OpenGl_Mat4&              theCappingMatrix,
                       const Standard_ShortReal        theHatchScale,
                       const Standard_ShortReal        theHatchRotate)
@@ -111,7 +111,7 @@ namespace
     const bool wasCullAllowed = theWorkspace->SetAllowFaceCulling (true);
 
     const Standard_Boolean isTextureHatch =
-        theHatchAspect != NULL
+        !theHatchAspect.IsNull()
     &&  theHatchAspect->Aspect()->TextureMapState();
 
     aContext->ModelWorldState.Push();
@@ -123,7 +123,7 @@ namespace
 
     theQuad->Render (theWorkspace);
 
-    if (theHatchAspect != NULL)
+    if (!theHatchAspect.IsNull())
     {
       Graphic3d_Vec2     aPrevScale;
       Standard_ShortReal aPrevRotate = 0.0;
@@ -184,7 +184,7 @@ namespace
                                          const Handle(Graphic3d_ClipPlane)& theClipChain,
                                          const Standard_Integer          theSubPlaneIndex,
                                          const Handle(OpenGl_CappingPlaneResource)& thePlane,
-                                         const OpenGl_PrimitiveArray*    theQuad)
+                                         const Handle(OpenGl_PrimitiveArray) theQuad)
   {
     const Standard_Integer aPrevFilter = theWorkspace->RenderFilter();
     const Standard_Integer anAnyFilter = aPrevFilter & ~(Standard_Integer )(OpenGl_RenderFilter_OpaqueOnly | OpenGl_RenderFilter_TransparentOnly);
@@ -221,7 +221,7 @@ namespace
       glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
       // override aspects, disable culling
-      theWorkspace->SetAspectFace (&theWorkspace->NoneCulling());
+      theWorkspace->SetAspectFace (theWorkspace->NoneCulling());
       theWorkspace->ApplyAspectFace();
 
       // evaluate number of pair faces
@@ -240,7 +240,7 @@ namespace
       aGroupIter.Value()->Render (theWorkspace);
 
       // override material, cull back faces
-      theWorkspace->SetAspectFace (&theWorkspace->FrontCulling());
+      theWorkspace->SetAspectFace (theWorkspace->FrontCulling());
       theWorkspace->ApplyAspectFace();
 
       // enable all clip plane except the rendered one
@@ -260,7 +260,7 @@ namespace
         glEnable (GL_DEPTH_TEST);
       }
 
-      const OpenGl_AspectFace*        aGroupAspectFace    = aGroupIter.Value()->AspectFace();
+      const Handle(OpenGl_AspectFace)& aGroupAspectFace = aGroupIter.Value()->AspectFace();
       const OpenGl_CappingPlaneResource* aGroupAspectCapping = aGroupIter.Value()->AspectFillCapping();
       const OpenGl_CappingPlaneResource* anAspectCapping =
           thePlane && (!aGroupAspectCapping || aGroupAspectCapping->Aspect().IsNull() || aPlane->ToOverrideCappingAspect())
@@ -272,9 +272,9 @@ namespace
         anAspectCapping = &THE_DEFAULT_ASPECT;
       }
 
-      const OpenGl_AspectFace* anAspectFace     = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
+      Handle(OpenGl_AspectFace) anAspectFace    = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
       const Standard_Boolean   hasHatch         = anAspectCapping->Aspect()->ToDrawHatch();
-      const OpenGl_AspectFace* anAspectHatching = hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL;
+      const Handle(OpenGl_AspectFace)& anAspectHatching = hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL;
       const Standard_Boolean   hasTextureHatch  = hasHatch && !anAspectCapping->Aspect()->TextureHatch().IsNull();
       const Standard_Boolean   isRotatePers     = hasTextureHatch && !aCamera.IsNull() && anAspectCapping->Aspect()->IsHatchRotationPersistent();
       const Standard_Boolean   isZoomPers       = hasTextureHatch && !aCamera.IsNull() && anAspectCapping->Aspect()->IsHatchZoomPersistent();
@@ -348,14 +348,14 @@ void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorks
     return;
   }
 
-  const OpenGl_PrimitiveArray* aCappingQuad = initQuad (aContext);
-  if (!aCappingQuad)
+  Handle(OpenGl_PrimitiveArray) aCappingQuad = initQuad (aContext);
+  if (aCappingQuad.IsNull())
   {
     return;
   }
 
   // remember current aspect face defined in workspace
-  const OpenGl_AspectFace* aFaceAsp = theWorkspace->AspectFace();
+  const Handle(OpenGl_AspectFace)& aFaceAsp = theWorkspace->AspectFace();
 
   // only filled primitives should be rendered
   const Standard_Integer aPrevFilter = theWorkspace->RenderFilter();

@@ -33,16 +33,6 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetGroup
-// purpose :
-// =======================================================================
-OpenGl_Element* VInspector_ItemOpenGlElement::GetElement() const
-{
-  initItem();
-  return myElement;
-}
-
-// =======================================================================
 // function : Init
 // purpose :
 // =======================================================================
@@ -61,7 +51,7 @@ void VInspector_ItemOpenGlElement::Init()
 void VInspector_ItemOpenGlElement::Reset()
 {
   VInspector_ItemBase::Reset();
-  myElement = 0;
+  myElement = NULL;
 }
 
 // =======================================================================
@@ -96,26 +86,17 @@ QVariant VInspector_ItemOpenGlElement::initValue (const int theItemRole) const
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
-  OpenGl_Element* anElement = GetElement();
-  if (anElement == 0)
+  Handle(OpenGl_Element) anElement = GetElement();
+  if (anElement.IsNull())
     return Column() == 0 ? "Empty element" : "";
 
   switch (Column())
   {
     case 0:
     {
-      if (theItemRole != Qt::ToolTipRole)
-        return "OpenGl_Element";
-
-      VInspector_ElementKind aKind = GetElementKind();
-      if (aKind == VInspector_ElementKind_PrimitiveArray) return "OpenGl_PrimitiveArray";
-      else if (aKind == VInspector_ElementKind_Text) return "OpenGl_Text";
-      else return "OpenGl_Element";
+      return theItemRole == Qt::ToolTipRole ? QVariant ("")
+                                            : QVariant (anElement->DynamicType()->Name());
     }
-    case 1:
-      return rowCount();
-    case 2:
-      return ViewControl_Tools::GetPointerInfo (anElement, true).ToCString();
     default:
       break;
   }
@@ -140,16 +121,15 @@ QVariant VInspector_ItemOpenGlElement::GetTableData (const int theRow, const int
   if (theRole != Qt::DisplayRole)
     return QVariant();
 
-  OpenGl_Element* anElement = GetElement();
-  if (anElement == 0)
+  Handle(OpenGl_Element) anElement = GetElement();
+  if (anElement.IsNull())
     return QVariant();
 
   bool isFirstColumn = theColumn == 0;
 
-  VInspector_ElementKind aKind = GetElementKind();
-  if (aKind == VInspector_ElementKind_PrimitiveArray)
+  if (!Handle(OpenGl_PrimitiveArray)::DownCast (anElement).IsNull())
   {
-    OpenGl_PrimitiveArray* aCElement = dynamic_cast<OpenGl_PrimitiveArray*>(anElement);
+    Handle(OpenGl_PrimitiveArray) aCElement = Handle(OpenGl_PrimitiveArray)::DownCast (anElement);
     switch (theRow)
     {
       case 0: return isFirstColumn ? QVariant ("IsInitialized") : QVariant (aCElement->IsInitialized());
@@ -163,18 +143,14 @@ QVariant VInspector_ItemOpenGlElement::GetTableData (const int theRow, const int
         : !aCElement->AttributesVbo().IsNull() ? QVariant (ViewControl_Tools::GetPointerInfo (aCElement->AttributesVbo()).ToCString()) : QVariant();
 
       case 6: return isFirstColumn ? QVariant ("Indices") : VInspector_Tools::ToVariant (aCElement->Indices());
-      case 7:
-      {
-        const Handle(Graphic3d_Buffer)& anAttributes = aCElement->Attributes();
-        return isFirstColumn ? QVariant ("Attributes") : VInspector_Tools::ToVariant (aCElement->Attributes());
-      }
+      case 7: return isFirstColumn ? QVariant ("Attributes") : VInspector_Tools::ToVariant (aCElement->Attributes());
       case 8: return isFirstColumn ? QVariant ("Bounds") : VInspector_Tools::ToVariant (aCElement->Bounds());
       default: return QVariant();
     }
   }
-  else if (aKind == VInspector_ElementKind_Text)
+  else if (!Handle(OpenGl_Text)::DownCast (anElement).IsNull())
   {
-    OpenGl_Text* aCmElement = dynamic_cast<OpenGl_Text*>(anElement);
+    Handle(OpenGl_Text) aCmElement = Handle(OpenGl_Text)::DownCast (anElement);
     switch (theRow)
     {
       case 0:
@@ -196,28 +172,12 @@ QVariant VInspector_ItemOpenGlElement::GetTableData (const int theRow, const int
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemOpenGlElement::createChild (int theRow, int theColumn)
 {
+  (void)theRow;
+  (void)theColumn;
   //if (theRow == 0)
   //  return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
   //else
   //  return VInspector_ItemPresentableObject::CreateItem (currentItem(), theRow, theColumn);
 
   return TreeModel_ItemBasePtr();
-}
-
-// =======================================================================
-// function : GetElementKind
-// purpose :
-// =======================================================================
-VInspector_ItemOpenGlElement::VInspector_ElementKind VInspector_ItemOpenGlElement::GetElementKind() const
-{
-  OpenGl_Element* anElement = GetElement();
-  if (anElement == 0)
-    return VInspector_ElementKind_Undefined;
-
-  if (dynamic_cast<OpenGl_PrimitiveArray*>(anElement))
-    return VInspector_ElementKind_PrimitiveArray;
-  else if (dynamic_cast<OpenGl_Text*>(anElement))
-    return VInspector_ElementKind_Text;
-
-  return VInspector_ElementKind_Undefined;
 }

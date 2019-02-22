@@ -111,6 +111,9 @@ OpenGl_View::OpenGl_View (const Handle(Graphic3d_StructureManager)& theMgr,
   myRaytraceFBO1[1]          = new OpenGl_FrameBuffer();
   myRaytraceFBO2[0]          = new OpenGl_FrameBuffer();
   myRaytraceFBO2[1]          = new OpenGl_FrameBuffer();
+
+  myGraduatedTrihedron       = new OpenGl_GraduatedTrihedron();
+  myFrameStatsPrs            = new OpenGl_FrameStatsPrs();
 }
 
 // =======================================================================
@@ -131,8 +134,8 @@ OpenGl_View::~OpenGl_View()
 // =======================================================================
 void OpenGl_View::ReleaseGlResources (const Handle(OpenGl_Context)& theCtx)
 {
-  myGraduatedTrihedron.Release (theCtx.operator->());
-  myFrameStatsPrs.Release (theCtx.operator->());
+  myGraduatedTrihedron->Release (theCtx.operator->());
+  myFrameStatsPrs->Release (theCtx.operator->());
 
   if (!myTextureEnv.IsNull())
   {
@@ -144,15 +147,15 @@ void OpenGl_View::ReleaseGlResources (const Handle(OpenGl_Context)& theCtx)
     myTextureEnv.Nullify();
   }
 
-  if (myTextureParams != NULL)
+  if (!myTextureParams.IsNull())
   {
     myTextureParams->Release (theCtx.operator->());
   }
-  if (myBgGradientArray != NULL)
+  if (!myBgGradientArray.IsNull())
   {
     myBgGradientArray->Release (theCtx.operator->());
   }
-  if (myBgTextureArray != NULL)
+  if (!myBgTextureArray.IsNull())
   {
     myBgTextureArray->Release (theCtx.operator->());
   }
@@ -334,7 +337,7 @@ void OpenGl_View::GraduatedTrihedronDisplay (const Graphic3d_GraduatedTrihedron&
   myGTrihedronData = theTrihedronData;
   myGTrihedronData.PtrView = this;
   myGTrihedronData.CubicAxesCallback = SetMinMaxValuesCallback;
-  myGraduatedTrihedron.SetValues (myGTrihedronData);
+  myGraduatedTrihedron->SetValues (myGTrihedronData);
   myToShowGradTrihedron = true;
 }
 
@@ -345,7 +348,7 @@ void OpenGl_View::GraduatedTrihedronDisplay (const Graphic3d_GraduatedTrihedron&
 void OpenGl_View::GraduatedTrihedronErase()
 {
   myGTrihedronData.PtrView = NULL;
-  myGraduatedTrihedron.Release (myWorkspace->GetGlContext().operator->());
+  myGraduatedTrihedron->Release (myWorkspace->GetGlContext().operator->());
   myToShowGradTrihedron = false;
 }
 
@@ -355,7 +358,7 @@ void OpenGl_View::GraduatedTrihedronErase()
 // =======================================================================
 void OpenGl_View::GraduatedTrihedronMinMaxValues (const Graphic3d_Vec3 theMin, const Graphic3d_Vec3 theMax)
 {
-  myGraduatedTrihedron.SetMinMax (theMin, theMax);
+  myGraduatedTrihedron->SetMinMax (theMin, theMax);
 }
 
 // =======================================================================

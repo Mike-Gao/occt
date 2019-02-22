@@ -56,7 +56,7 @@ public:
   virtual Standard_Size EstimatedDataSize() const Standard_OVERRIDE { return 0; }
 
   //! @return primitive array of vertices to render infinite plane.
-  static OpenGl_PrimitiveArray* BuildInfinitPlaneVertices();
+  static Handle(OpenGl_PrimitiveArray) BuildInfinitPlaneVertices();
 
   //! Returns true if capping should draw hatch layer.
   Standard_Boolean ToDrawHatch() const 
@@ -68,10 +68,10 @@ public:
 
   //! Returns the shading aspect for drawing face of a clipping section itself.
   //! @param theObjectAspect [in] the aspect of an object if it requires combining.
-  Standard_EXPORT  const OpenGl_AspectFace* CappingFaceAspect (const OpenGl_AspectFace* theObjectAspect) const;
+  Standard_EXPORT  Handle(OpenGl_AspectFace) CappingFaceAspect (const Handle(OpenGl_AspectFace)& theObjectAspect) const;
 
   //! Returns the shading aspect for drawing hatch layer of a section.
-  Standard_EXPORT const OpenGl_AspectFace* HatchingFaceAspect() const;
+  Standard_EXPORT Handle(OpenGl_AspectFace) HatchingFaceAspect() const;
 
 private:
 
@@ -84,8 +84,8 @@ private:
 private:
 
   Handle(Graphic3d_AspectFillCapping) myAspect;         //!< Section style settings from application's level.
-  mutable OpenGl_AspectFace           myCappingAspect;  //!< GL aspect for shading base layer of a capping section.
-  mutable OpenGl_AspectFace           myHatchingAspect; //!< GL aspect for shading hatching layer (additional to base) of a capping section.
+  mutable Handle(OpenGl_AspectFace)   myCappingAspect;  //!< GL aspect for shading base layer of a capping section.
+  mutable Handle(OpenGl_AspectFace)   myHatchingAspect; //!< GL aspect for shading hatching layer (additional to base) of a capping section.
   mutable Standard_Size               myHatchingState;
 
 public:

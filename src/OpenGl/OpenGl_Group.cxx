@@ -40,7 +40,7 @@ namespace
   //! should be rendered or not.
   //! @return True if element passes the check and renders,
   static bool renderFiltered (const Handle(OpenGl_Workspace)& theWorkspace,
-                              OpenGl_Element* theElement)
+                              const Handle(OpenGl_Element)& theElement)
   {
     if (!theWorkspace->ShouldRender (theElement))
     {
@@ -58,12 +58,6 @@ namespace
 // =======================================================================
 OpenGl_Group::OpenGl_Group (const Handle(Graphic3d_Structure)& theStruct)
 : Graphic3d_Group (theStruct),
-  myAspectLine(NULL),
-  myAspectFace(NULL),
-  myAspectMarker(NULL),
-  myAspectText(NULL),
-  myFirst(NULL),
-  myLast(NULL),
   myIsRaytracable (Standard_False),
   myIsDestroyElements (Standard_True)
 {
@@ -94,7 +88,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectLine3d
     return;
   }
 
-  if (myAspectLine == NULL)
+  if (myAspectLine.IsNull())
   {
     myAspectLine = new OpenGl_AspectLine (theAspect);
   }
@@ -111,7 +105,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectLine3d
 // =======================================================================
 void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectLine3d)& theAspect)
 {
-  if (myAspectLine == NULL)
+  if (myAspectLine.IsNull())
   {
     SetGroupPrimitivesAspect (theAspect);
     return;
@@ -121,7 +115,7 @@ void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectLine3d)& th
     return;
   }
 
-  OpenGl_AspectLine* anAspectLine = new OpenGl_AspectLine (theAspect);
+  Handle(OpenGl_AspectLine) anAspectLine = new OpenGl_AspectLine (theAspect);
   AddElement (anAspectLine);
   Update();
 }
@@ -137,7 +131,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectFillAr
     return;
   }
 
-  if (myAspectFace == NULL)
+  if (myAspectFace.IsNull())
   {
     myAspectFace = new OpenGl_AspectFace (theAspect);
   }
@@ -164,7 +158,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectFillAr
 // =======================================================================
 void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectFillArea3d)& theAspect)
 {
-  if (myAspectFace == NULL)
+  if (myAspectFace.IsNull())
   {
     SetGroupPrimitivesAspect (theAspect);
     return;
@@ -174,7 +168,7 @@ void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectFillArea3d)
     return;
   }
 
-  OpenGl_AspectFace* anAspectFace = new OpenGl_AspectFace (theAspect);
+  Handle(OpenGl_AspectFace) anAspectFace = new OpenGl_AspectFace (theAspect);
   AddElement (anAspectFace);
   Update();
 }
@@ -190,7 +184,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectMarker
     return;
   }
 
-  if (myAspectMarker == NULL)
+  if (myAspectMarker.IsNull())
   {
     myAspectMarker = new OpenGl_AspectMarker (theAspMarker);
   }
@@ -207,7 +201,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectMarker
 // =======================================================================
 void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectMarker3d)& theAspMarker)
 {
-  if (myAspectMarker == NULL)
+  if (myAspectMarker.IsNull())
   {
     SetGroupPrimitivesAspect (theAspMarker);
     return;
@@ -217,7 +211,7 @@ void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectMarker3d)& 
     return;
   }
 
-  OpenGl_AspectMarker* anAspectMarker = new OpenGl_AspectMarker (theAspMarker);
+  Handle(OpenGl_AspectMarker) anAspectMarker = new OpenGl_AspectMarker (theAspMarker);
   AddElement (anAspectMarker);
   Update();
 }
@@ -233,7 +227,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectText3d
     return;
   }
 
-  if (myAspectText == NULL)
+  if (myAspectText.IsNull())
   {
     myAspectText = new OpenGl_AspectText (theAspText);
   }
@@ -250,7 +244,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_AspectText3d
 // =======================================================================
 void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectText3d)& theAspText)
 {
-  if (myAspectText == NULL)
+  if (myAspectText.IsNull())
   {
     SetGroupPrimitivesAspect (theAspText);
     return;
@@ -260,7 +254,7 @@ void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectText3d)& th
     return;
   }
 
-  OpenGl_AspectText* anAspectText = new OpenGl_AspectText (theAspText);
+  Handle(OpenGl_AspectText) anAspectText = new OpenGl_AspectText (theAspText);
   AddElement (anAspectText);
   Update();
 }
@@ -271,25 +265,25 @@ void OpenGl_Group::SetPrimitivesAspect (const Handle(Graphic3d_AspectText3d)& th
 // =======================================================================
 void OpenGl_Group::SynchronizeAspects()
 {
-  if (myAspectFace != NULL)
+  if (!myAspectFace.IsNull())
   {
     myAspectFace->SynchronizeAspects();
   }
-  if (myAspectLine != NULL)
+  if (!myAspectLine.IsNull())
   {
     myAspectLine->SynchronizeAspects();
   }
-  if (myAspectMarker != NULL)
+  if (!myAspectMarker.IsNull())
   {
     myAspectMarker->SynchronizeAspects();
   }
-  if (myAspectText != NULL)
+  if (!myAspectText.IsNull())
   {
     myAspectText->SynchronizeAspects();
   }
-  for (OpenGl_ElementNode* aNode = myFirst; aNode != NULL; aNode = aNode->next)
+  for (OpenGl_ElementNodes::Iterator anElemIterator(myElements); anElemIterator.More(); anElemIterator.Next())
   {
-    aNode->elem->SynchronizeAspects();
+    anElemIterator.ChangeValue()->SynchronizeAspects();
   }
 }
 
@@ -335,7 +329,7 @@ void OpenGl_Group::AddPrimitiveArray (const Graphic3d_TypeOfPrimitiveArray theTy
   OpenGl_Structure* aStruct = GlStruct();
   const OpenGl_GraphicDriver* aDriver = aStruct->GlDriver();
 
-  OpenGl_PrimitiveArray* anArray = new OpenGl_PrimitiveArray (aDriver, theType, theIndices, theAttribs, theBounds);
+  Handle(OpenGl_PrimitiveArray) anArray = new OpenGl_PrimitiveArray (aDriver, theType, theIndices, theAttribs, theBounds);
   AddElement (anArray);
 
   Graphic3d_Group::AddPrimitiveArray (theType, theIndices, theAttribs, theBounds, theToEvalMinMax);
@@ -365,7 +359,7 @@ void OpenGl_Group::Text (const Standard_CString                  theTextUtf,
   aParams.HAlign = theHta;
   aParams.VAlign = theVta;
   const OpenGl_Vec3 aPoint (thePoint.X(), thePoint.Y(), thePoint.Z());
-  OpenGl_Text* aText = new OpenGl_Text (theTextUtf, aPoint, aParams);
+  Handle(OpenGl_Text) aText = new OpenGl_Text (theTextUtf, aPoint, aParams);
   AddElement (aText);
   Graphic3d_Group::Text (theTextUtf, thePoint, theHeight, theAngle,
                          theTp, theHta, theVta, theToEvalMinMax);
@@ -397,7 +391,7 @@ void OpenGl_Group::Text (const Standard_CString                  theTextUtf,
   aParams.HAlign      = theHTA;
   aParams.VAlign      = theVTA;
 
-  OpenGl_Text* aText = new OpenGl_Text (theTextUtf, theOrientation, aParams, theHasOwnAnchor != Standard_False);
+  Handle(OpenGl_Text) aText = new OpenGl_Text (theTextUtf, theOrientation, aParams, theHasOwnAnchor != Standard_False);
 
   AddElement (aText);
 
@@ -420,7 +414,7 @@ void OpenGl_Group::Text (const Standard_CString                  theTextUtf,
 void OpenGl_Group::SetFlippingOptions (const Standard_Boolean theIsEnabled,
                                        const gp_Ax2&          theRefPlane)
 {
-  OpenGl_Flipper* aFlipper = new OpenGl_Flipper (theRefPlane);
+  Handle(OpenGl_Flipper) aFlipper = new OpenGl_Flipper (theRefPlane);
   aFlipper->SetOptions (theIsEnabled);
   AddElement (aFlipper);
 }
@@ -431,7 +425,7 @@ void OpenGl_Group::SetFlippingOptions (const Standard_Boolean theIsEnabled,
 // =======================================================================
 void OpenGl_Group::SetStencilTestOptions (const Standard_Boolean theIsEnabled)
 {
-  OpenGl_StencilTest* aStencilTest = new OpenGl_StencilTest();
+  Handle(OpenGl_StencilTest) aStencilTest = new OpenGl_StencilTest();
   aStencilTest->SetOptions (theIsEnabled);
   AddElement (aStencilTest);
 }
@@ -440,16 +434,11 @@ void OpenGl_Group::SetStencilTestOptions (const Standard_Boolean theIsEnabled)
 // function : AddElement
 // purpose  :
 // =======================================================================
-void OpenGl_Group::AddElement (OpenGl_Element* theElem)
+void OpenGl_Group::AddElement (Handle(OpenGl_Element) theElem)
 {
-  OpenGl_ElementNode *aNode = new OpenGl_ElementNode();
+  myElements.Append (theElem);
 
-  aNode->elem = theElem;
-  aNode->next = NULL;
-  (myLast? myLast->next : myFirst) = aNode;
-  myLast = aNode;
-
-  if (OpenGl_Raytrace::IsRaytracedElement (aNode))
+  if (OpenGl_Raytrace::IsRaytracedElement (theElem))
   {
     myIsRaytracable = Standard_True;
 
@@ -470,19 +459,19 @@ void OpenGl_Group::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   // Setup aspects
   theWorkspace->SetAllowFaceCulling (myIsClosed
                                  && !theWorkspace->GetGlContext()->Clipping().IsClippingOrCappingOn());
-  const OpenGl_AspectLine*   aBackAspectLine   = theWorkspace->AspectLine();
-  const OpenGl_AspectFace*   aBackAspectFace   = theWorkspace->AspectFace();
-  const OpenGl_AspectMarker* aBackAspectMarker = theWorkspace->AspectMarker();
-  const OpenGl_AspectText*   aBackAspectText   = theWorkspace->AspectText();
-  const bool isLineSet   = myAspectLine   && renderFiltered (theWorkspace, myAspectLine);
-  const bool isFaceSet   = myAspectFace   && renderFiltered (theWorkspace, myAspectFace);
-  const bool isMarkerSet = myAspectMarker && renderFiltered (theWorkspace, myAspectMarker);
-  const bool isTextSet   = myAspectText   && renderFiltered (theWorkspace, myAspectText);
+  const Handle(OpenGl_AspectLine)& aBackAspectLine   = theWorkspace->AspectLine();
+  const Handle(OpenGl_AspectFace)& aBackAspectFace   = theWorkspace->AspectFace();
+  const Handle(OpenGl_AspectMarker)& aBackAspectMarker = theWorkspace->AspectMarker();
+  const Handle(OpenGl_AspectText)& aBackAspectText   = theWorkspace->AspectText();
+  const bool isLineSet   = !myAspectLine.IsNull()   && renderFiltered (theWorkspace, myAspectLine);
+  const bool isFaceSet   = !myAspectFace.IsNull()   && renderFiltered (theWorkspace, myAspectFace);
+  const bool isMarkerSet = !myAspectMarker.IsNull() && renderFiltered (theWorkspace, myAspectMarker);
+  const bool isTextSet   = !myAspectText.IsNull()   && renderFiltered (theWorkspace, myAspectText);
 
   // Render group elements
-  for (OpenGl_ElementNode* aNodeIter = myFirst; aNodeIter != NULL; aNodeIter = aNodeIter->next)
+  for (OpenGl_ElementNodes::Iterator anElemIterator(myElements); anElemIterator.More(); anElemIterator.Next())
   {
-    renderFiltered (theWorkspace, aNodeIter->elem);
+    renderFiltered (theWorkspace, anElemIterator.Value());
   }
 
   // Restore aspects
@@ -525,15 +514,12 @@ void OpenGl_Group::Release (const Handle(OpenGl_Context)& theGlCtx)
   // Delete elements
   if (myIsDestroyElements)
   {
-    while (myFirst != NULL)
+    for (OpenGl_ElementNodes::Iterator anElemIterator(myElements); anElemIterator.More(); anElemIterator.Next())
     {
-      OpenGl_ElementNode* aNext = myFirst->next;
-      OpenGl_Element::Destroy (theGlCtx.operator->(), myFirst->elem);
-      delete myFirst;
-      myFirst = aNext;
+      OpenGl_Element::Destroy (theGlCtx.operator->(), anElemIterator.ChangeValue());
     }
   }
-  myLast = NULL;
+  myElements.Clear();
 
   OpenGl_Element::Destroy (theGlCtx.operator->(), myAspectLine);
   OpenGl_Element::Destroy (theGlCtx.operator->(), myAspectFace);

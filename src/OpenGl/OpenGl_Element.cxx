@@ -15,6 +15,8 @@
 
 #include <OpenGl_Element.hxx>
 
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Element, Standard_Transient)
+
 // =======================================================================
 // function : OpenGl_Element
 // purpose  :

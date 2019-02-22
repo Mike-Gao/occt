@@ -19,8 +19,9 @@
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 
+#include <OpenGl_Element.hxx>
+
 class Graphic3d_Group;
-class OpenGl_Element;
 
 class VInspector_ItemOpenGlElement;
 typedef QExplicitlySharedDataPointer<VInspector_ItemOpenGlElement> VInspector_ItemOpenGlElementPtr;
@@ -41,9 +42,13 @@ public:
   //! Destructor
   virtual ~VInspector_ItemOpenGlElement() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myElement; }
+
   //! Returns the current graphic3d group, init item if it was not initialized yet
   //! \return graphic group
-  Standard_EXPORT OpenGl_Element* GetElement() const;
+  Handle(OpenGl_Element) GetElement() const { return Handle(OpenGl_Element)::DownCast (GetObject());}
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
@@ -84,26 +89,16 @@ protected:
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE;
 
 private:
-  enum VInspector_ElementKind
-  {
-    VInspector_ElementKind_PrimitiveArray, //!< OpenGl_PrimitiveArray
-    VInspector_ElementKind_Text, //!< OpenGl_Text
-    VInspector_ElementKind_Undefined //!< another OpenGl_Element kind
-  };
-
-  //! Returns kind of the current element
-  //! \return kind
-  VInspector_ElementKind GetElementKind() const;
 
   //! Constructor
   //! param theParent a parent item
   //! \param theRow the item row positition in the parent item
   //! \param theColumn the item column positition in the parent item
   VInspector_ItemOpenGlElement(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-    : VInspector_ItemBase(theParent, theRow, theColumn), myElement (0) {}
+    : VInspector_ItemBase(theParent, theRow, theColumn) {}
 
 private:
-  OpenGl_Element* myElement; //! current element
+  Handle(OpenGl_Element) myElement; //! current element
 };
 
 #endif

@@ -110,7 +110,7 @@ public:
   //! Returns selected elements
   //! \param theModel selection model
   //! \return container of OpenGl elements
-  NCollection_List<OpenGl_Element*> GetSelectedElements (QItemSelectionModel* theModel);
+  NCollection_List<Handle(OpenGl_Element)> GetSelectedElements (QItemSelectionModel* theModel);
 
   //! Returns the first not zero transform persistent of selected elements
   Handle(Graphic3d_TransformPers) GetSelectedTransformPers();
@@ -212,7 +212,8 @@ private:
 
   //!< Updates presentation of preview for OpenGl elements.
   //!< \param theElements container of elements
-  void updatePreviewPresentation (const NCollection_List<OpenGl_Element*>& theElements);
+  void updatePreviewPresentation (const NCollection_List<Handle(OpenGl_Element)>& theElements,
+                                  const Handle(Graphic3d_TransformPers)& thePersistent);
 
 private:
 

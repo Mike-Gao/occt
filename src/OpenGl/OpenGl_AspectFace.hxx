@@ -28,7 +28,7 @@ class OpenGl_Texture;
 //! The element holding Graphic3d_AspectFillArea3d.
 class OpenGl_AspectFace : public OpenGl_Element
 {
-
+  DEFINE_STANDARD_RTTIEXT(OpenGl_AspectFace, OpenGl_Element)
 public:
 
   //! Empty constructor.
@@ -44,10 +44,10 @@ public:
   Standard_EXPORT void SetAspect (const Handle(Graphic3d_AspectFillArea3d)& theAspect);
 
   //! Set edge aspect.
-  void SetAspectEdge (const OpenGl_AspectLine* theAspectEdge) { myAspectEdge = *theAspectEdge; }
+  void SetAspectEdge (const Handle(OpenGl_AspectLine)& theAspectEdge) { myAspectEdge = theAspectEdge; }
 
   //! @return edge aspect.
-  const OpenGl_AspectLine* AspectEdge() const  { return &myAspectEdge; }
+  const Handle(OpenGl_AspectLine)& AspectEdge() const  { return myAspectEdge; }
 
   //! Returns Shading Model.
   Graphic3d_TypeOfShadingModel ShadingModel() const { return myShadingModel; }
@@ -140,7 +140,7 @@ protected:
   } myResources;
 
   Handle(Graphic3d_AspectFillArea3d) myAspect;
-  OpenGl_AspectLine                  myAspectEdge;
+  Handle(OpenGl_AspectLine)          myAspectEdge;
   Graphic3d_TypeOfShadingModel       myShadingModel;
 
 public:

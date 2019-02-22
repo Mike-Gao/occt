@@ -593,21 +593,10 @@ namespace OpenGl_Raytrace
   // function : IsRaytracedElement
   // purpose  : Checks to see if the element contains ray-trace geometry
   // =======================================================================
-  Standard_Boolean IsRaytracedElement (const OpenGl_ElementNode* theNode)
+  Standard_Boolean IsRaytracedElement (const Handle(OpenGl_Element) theElement)
   {
-    OpenGl_PrimitiveArray* anArray = dynamic_cast<OpenGl_PrimitiveArray*> (theNode->elem);
-    return anArray != NULL
-        && anArray->DrawMode() >= GL_TRIANGLES;
-  }
-
-  // =======================================================================
-  // function : IsRaytracedElement
-  // purpose  : Checks to see if the element contains ray-trace geometry
-  // =======================================================================
-  Standard_Boolean IsRaytracedElement (const OpenGl_Element* theElement)
-  {
-    const OpenGl_PrimitiveArray* anArray = dynamic_cast<const OpenGl_PrimitiveArray*> (theElement);
-    return anArray != NULL
+    Handle(OpenGl_PrimitiveArray) anArray = Handle(OpenGl_PrimitiveArray)::DownCast (theElement);
+    return !anArray.IsNull()
         && anArray->DrawMode() >= GL_TRIANGLES;
   }
 
@@ -617,9 +606,9 @@ namespace OpenGl_Raytrace
   // =======================================================================
   Standard_Boolean IsRaytracedGroup (const OpenGl_Group* theGroup)
   {
-    for (const OpenGl_ElementNode* aNode = theGroup->FirstNode(); aNode != NULL; aNode = aNode->next)
+    for (OpenGl_ElementNodes::Iterator anElemIterator (theGroup->GetElements()); anElemIterator.More(); anElemIterator.Next())
     {
-      if (IsRaytracedElement (aNode))
+      if (IsRaytracedElement (anElemIterator.Value()))
       {
         return Standard_True;
       }
