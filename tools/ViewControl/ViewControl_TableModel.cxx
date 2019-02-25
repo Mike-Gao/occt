@@ -25,7 +25,6 @@ void ViewControl_TableModel::SetModelValues (ViewControl_TableModelValues* theMo
     delete myModelValues;
 
   myModelValues = theModelValues;
-  SetFilter(0);
 }
 
 // =======================================================================
@@ -37,8 +36,7 @@ int ViewControl_TableModel::columnCount(const QModelIndex& theParent) const
   if (!myModelValues)
     return 0;
 
-  int aColumnCount = myModelValues->ColumnCount (theParent);
-  return isFilterActive() ? myFilter->ColumnCount (aColumnCount) : aColumnCount;
+  return myModelValues->ColumnCount (theParent);
 }
 
 // =======================================================================
@@ -50,8 +48,7 @@ int ViewControl_TableModel::rowCount(const QModelIndex& theParent ) const
   if (!myModelValues)
     return 0;
 
-  return isFilterActive() ? myFilter->RowCount (myModelValues->ColumnCount (theParent))
-                          : myModelValues->RowCount (theParent);
+  return myModelValues->RowCount (theParent);
 }
 
 // =======================================================================
@@ -64,9 +61,6 @@ QVariant ViewControl_TableModel::data (const QModelIndex& theIndex, int theRole)
     return QVariant();
 
   int aRow = theIndex.row(), aColumn = theIndex.column();
-  if (isFilterActive())
-    myFilter->GetSourcePosition (theIndex, aRow, aColumn);
-
   return myModelValues->Data (aRow, aColumn, theRole);
 }
 
@@ -80,20 +74,5 @@ bool ViewControl_TableModel::setData (const QModelIndex& theIndex, const QVarian
     return false;
 
   int aRow = theIndex.row(), aColumn = theIndex.column();
-  if (isFilterActive())
-    myFilter->GetSourcePosition (theIndex, aRow, aColumn);
-
   return myModelValues->SetData (aRow, aColumn, theValue, theRole);
-}
-
-// =======================================================================
-// function : GetSourcePosition
-// purpose :
-// =======================================================================
-void ViewControl_TableModel::GetSourcePosition (const QModelIndex& theIndex, int& theRow, int& theColumn)
-{
-  if (isFilterActive())
-    myFilter->GetSourcePosition (theIndex, theRow, theColumn);
-  else
-    myModelValues->GetSourcePosition (theIndex.row(), theIndex.column(), theRow, theColumn);
 }

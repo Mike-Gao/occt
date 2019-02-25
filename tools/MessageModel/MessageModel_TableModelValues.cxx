@@ -13,53 +13,63 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/ViewControl_TableModelFilter.hxx>
+#include <inspector/MessageModel_TableModelValues.hxx>
+
+#include <inspector/ViewControl_TableModel.hxx>
+
+#include <Message_AttributeVectorOfValues.hxx>
+
+const int REAL_SIGNS = 16;
+
+// =======================================================================
+// function : Constructor
+// purpose :
+// =======================================================================
+
+MessageModel_TableModelValues::MessageModel_TableModelValues (const Handle(Message_Attribute)& theAttribute,
+  const int theSectionWidth)
+ : myAttribute (Handle(Message_AttributeVectorOfValues)::DownCast (theAttribute))
+{
+  SetDefaultSectionSize (Qt::Horizontal, theSectionWidth);
+}
 
 // =======================================================================
 // function : ColumnCount
 // purpose :
 // =======================================================================
 
-int ViewControl_TableModelFilter::ColumnCount (const int theSourceColumnCount) const
+int MessageModel_TableModelValues::ColumnCount (const QModelIndex&) const
 {
-  return myColumnCount <= 0 ? theSourceColumnCount : myColumnCount;
+  return myAttribute->GetColumnCount();
 }
 
 // =======================================================================
 // function : RowCount
 // purpose :
 // =======================================================================
-
-int ViewControl_TableModelFilter::RowCount (const int theSourceColumnCount) const
+int MessageModel_TableModelValues::RowCount (const QModelIndex& theParent) const
 {
-  if (myColumnCount <= 0)
-    return 1;
+  int aColumnCount = ColumnCount (theParent);
+  if (!aColumnCount)
+    return 0;
 
-  int aRows = (int) (theSourceColumnCount / myColumnCount);
-  if (myColumnCount > 0 && aRows * myColumnCount < theSourceColumnCount)
-    aRows++; /// row with left values, not fully filled
-
-  return aRows;
+  return myAttribute->GetValues().Length() / aColumnCount;
 }
 
 // =======================================================================
-// function : GetSourcePosition
+// function : Data
 // purpose :
 // =======================================================================
 
-void ViewControl_TableModelFilter::GetSourcePosition (const QModelIndex& theIndex, int& theRow, int& theColumn) const
+QVariant MessageModel_TableModelValues::Data (const int theRow, const int theColumn, int theRole) const
 {
-  GetSourcePosition (theIndex.row(), theIndex.column(), theRow, theColumn);
-}
+  int aColumnCount = ColumnCount (QModelIndex());
+  int anIndex = theRow * aColumnCount + theColumn;
 
-// =======================================================================
-// function : GetSourcePosition
-// purpose :
-// =======================================================================
+  if (theRole == Qt::DisplayRole && anIndex < myAttribute->GetValues().Length())
+  {
+    return myAttribute->GetValues().Value(anIndex).ToCString();
+  }
 
-void ViewControl_TableModelFilter::GetSourcePosition (const int theSourceRow, const int theSourceColumn, int& theRow,
-                                                      int& theColumn) const
-{
-  theRow = 0;
-  theColumn = myColumnCount * theSourceRow + theSourceColumn;
+  return QVariant();
 }

@@ -1,0 +1,12 @@
+pload ALL INSPECTOR
+vinit
+
+activateReport -mode on -gravity info
+
+box s 200 100 120
+vdisplay s -dispmode 1
+vfit
+vselmode 2 1
+
+tinspector -plugins shapeview
+tinspector -plugins messageview

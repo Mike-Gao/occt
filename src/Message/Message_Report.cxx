@@ -26,6 +26,8 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 
+static Handle(Message_Report) MyReport;
+
 //=======================================================================
 //function : Message_Report
 //purpose  :
@@ -35,6 +37,18 @@ Message_Report::Message_Report ()
 : myIsUsePerfMeter (Standard_False), myLimit (-1)
 {
   SetActive (Standard_True);
+}
+
+//=======================================================================
+//function : CurrentReport
+//purpose  :
+//=======================================================================
+Handle(Message_Report) Message_Report::CurrentReport(const Standard_Boolean theToCreate)
+{
+  if (MyReport.IsNull() && theToCreate)
+    MyReport = new Message_Report();
+
+  return MyReport;
 }
 
 //=======================================================================

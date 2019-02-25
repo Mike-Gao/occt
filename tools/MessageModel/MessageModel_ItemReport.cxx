@@ -20,7 +20,9 @@
 
 #include <OSD_Path.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QColor>
+#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : initValue

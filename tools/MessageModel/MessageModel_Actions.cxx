@@ -24,15 +24,19 @@
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
-#include <TCollection_AsciiString.hxx>
-#include <TopoDS_AlertWithShape.hxx>
+#include <Message_AlertExtended.hxx>
 
+#include <TCollection_AsciiString.hxx>
+#include <TopoDS_AlertAttribute.hxx>
+
+#include <Standard_WarningsDisable.hxx>
 #include <QAction>
 #include <QFileDialog>
 #include <QItemSelectionModel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QWidget>
+#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -146,7 +150,7 @@ void MessageModel_Actions::OnDeactivateReport()
     return;
 
   aReport->SetActive (Standard_False);
-  ((MessageModel_TreeModel*)mySelectionModel)->EmitDataChanged (aReportIndex, aReportIndex);
+  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
 }
 
 // =======================================================================
@@ -161,7 +165,7 @@ void MessageModel_Actions::OnActivateReport()
     return;
 
   aReport->SetActive (Standard_True);
-  ((MessageModel_TreeModel*)mySelectionModel)->EmitDataChanged (aReportIndex, aReportIndex);
+  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
 }
 
 // =======================================================================
@@ -199,11 +203,18 @@ void MessageModel_Actions::OnExportToShapeView()
     if (anAlert.IsNull())
       continue;
 
-    Handle(TopoDS_AlertWithShape) aShapeAlert = Handle(TopoDS_AlertWithShape)::DownCast (anAlert);
-    if (aShapeAlert.IsNull() || aShapeAlert->GetShape().IsNull())
+    Handle(Message_AlertExtended) anExtAlert = Handle(Message_AlertExtended)::DownCast (anAlert);
+    if (anExtAlert.IsNull())
       continue;
 
-    const TopoDS_Shape aShape = aShapeAlert->GetShape();
+    Handle(Message_Attribute) anAttribute = anExtAlert->Attribute();
+    if (anAttribute.IsNull())
+      continue;
+
+    if (!anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+      continue;
+
+    const TopoDS_Shape aShape = Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape();
     if (aShape.IsNull())
       continue;
     aPluginParameters.Append (aShape.TShape());

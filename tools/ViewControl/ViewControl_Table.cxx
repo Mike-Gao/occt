@@ -16,7 +16,7 @@
 #include <inspector/ViewControl_Table.hxx>
 #include <inspector/ViewControl_TableItemDelegate.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
-#include <inspector/ViewControl_TableProperty.hxx>
+#include <inspector/ViewControl_Tools.hxx>
 
 #include <inspector/TreeModel_Tools.hxx>
 
@@ -44,9 +44,6 @@ ViewControl_Table::ViewControl_Table (QWidget* theParent)
   QGridLayout* aLayout = new QGridLayout (myMainWidget);
   aLayout->setContentsMargins (0, 0, 0, 0);
 
-  myProperty = new ViewControl_TableProperty(myMainWidget, this);
-  aLayout->addWidget (myProperty->GetControl());
-
   myTableView = new QTableView (myMainWidget);
   myTableView->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
 
@@ -57,7 +54,6 @@ ViewControl_Table::ViewControl_Table (QWidget* theParent)
   aVHeader->setDefaultSectionSize (aDefCellSize);
 
   aLayout->addWidget (myTableView);
-  aLayout->addWidget (myProperty->GetInformationControl());
 }
 
 // =======================================================================
@@ -72,8 +68,6 @@ void ViewControl_Table::SetModel (QAbstractTableModel* theModel)
   myTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   QItemSelectionModel* aSelectionModel = new QItemSelectionModel(theModel);
   myTableView->setSelectionModel (aSelectionModel);
-  connect(aSelectionModel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-          this, SLOT(onTableSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
 // =======================================================================
@@ -87,9 +81,6 @@ void ViewControl_Table::Init (ViewControl_TableModelValues* theModelValues)
 
   ViewControl_TableModel* aModel = dynamic_cast<ViewControl_TableModel*> (myTableView->model());
   aModel->SetModelValues (theModelValues);
-
-  myProperty->SetActive (theModelValues->UseTableProperties());
-  myProperty->Init();
 
   ViewControl_TableItemDelegate* aDelegate = dynamic_cast<ViewControl_TableItemDelegate*>(myTableView->itemDelegate());
   aDelegate->SetModelValues (theModelValues);
@@ -123,8 +114,6 @@ void ViewControl_Table::GetSelectedIndices (QMap<int, QList<int>>& theSelectedIn
   int aRow, aColumn;
   for (QModelIndexList::const_iterator anIt = aSelected.begin(); anIt != aSelected.end(); anIt++)
   {
-    aModel->GetSourcePosition (*anIt, aRow, aColumn);
-
     if (!theSelectedIndices.contains (aRow))
       theSelectedIndices.insert (aRow, QList<int>());
     theSelectedIndices[aRow].append (aColumn);
@@ -132,13 +121,11 @@ void ViewControl_Table::GetSelectedIndices (QMap<int, QList<int>>& theSelectedIn
 }
 
 // =======================================================================
-// function : onTableSelectionChanged
+// function : SeparatorData
 // purpose :
 // =======================================================================
 
-void ViewControl_Table::onTableSelectionChanged(const QItemSelection&, const QItemSelection&)
+QString ViewControl_Table::SeparatorData()
 {
-  QModelIndexList aSelected = myTableView->selectionModel()->selectedIndexes();
-
-  myProperty->UpdateOnTableSelectionChanged();
+  return ViewControl_Tools::TableSeparator();
 }

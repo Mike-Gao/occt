@@ -23,8 +23,10 @@
 #include <Standard.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QMap>
 #include <QVariant>
+#include <Standard_WarningsRestore.hxx>
 
 #include <NCollection_Vector.hxx>
 

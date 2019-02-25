@@ -19,8 +19,6 @@
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 
-#include <inspector/ViewControl_TableProperty.hxx>
-
 #include <Standard_WarningsDisable.hxx>
 #include <QItemSelection>
 #include <QObject>
@@ -68,24 +66,13 @@ public:
   //! \return the table view
   QTableView* GetTableView() const { return myTableView; }
 
-  //! Returns instance of table property control
-  //! \return property
-  ViewControl_TableProperty* GetProperty() const { return myProperty; }
-
   //! Retuns model indices of the selected cells in table view
   //! \param theSelectedIndices [out] a container of indices: row to list of columns
   Standard_EXPORT void GetSelectedIndices (QMap<int, QList<int>>& aSelectedIndices);
 
   //! Returns text of separation row in table
   //! \return string value
-  static QString SeparatorData() { return "---------------------------"; }
-
-protected slots:
-
-  //! Updates controls by selection change in table view
-  //! \param theSelected container of selected table cells
-  //! \param theDeselected container of selected table cells
-  void onTableSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
+  Standard_EXPORT static QString SeparatorData();
 
 private:
   bool myIsActive; //!< true if the table is used in property view and visible
@@ -93,7 +80,5 @@ private:
   QWidget* myMainWidget; //!< parent of all controls
   bool myIsUseProperty; //!< boolean value whether the property control should be shown/hidden
   QTableView* myTableView; //!< table view
-
-  ViewControl_TableProperty* myProperty; //!< modifier of the table visual properties
 };
 #endif

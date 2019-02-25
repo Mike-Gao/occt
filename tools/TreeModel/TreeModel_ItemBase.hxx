@@ -19,6 +19,7 @@
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <inspector/TreeModel_ItemRole.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QExplicitlySharedDataPointer>
@@ -127,6 +128,12 @@ public:
   //! \return the row count
   int rowCount() const { return cachedValue(TreeModel_ItemRole_RowCountRole).toInt(); }
 
+  //! Sets item table properties builder
+  void SetProperties (const Handle(TreeModel_ItemProperties)& theProperties) { myProperties = theProperties; }
+
+  //! Returns item table properties builder
+  Handle(TreeModel_ItemProperties) GetProperties() const { return myProperties; }
+
 protected:
 
   //! \param theParent the parent item
@@ -168,6 +175,8 @@ private:
   int m_iRow;          //!< the item row position in the parent item
   int m_iColumn;       //!< the item column position in the parent item
   bool m_bInitialized; //!< the state whether the item content is already initialized
+
+  Handle(TreeModel_ItemProperties) myProperties; //!< item properties
 };
 
 //! Returns an explicitly shared pointer to the pointer held by other, using a

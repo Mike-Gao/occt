@@ -68,31 +68,6 @@ public:
   //! Clears selection in active tables
   Standard_EXPORT void ClearActiveTablesSelection();
 
-  //! Sets X steps values for table properties
-  //! \param container of values
-  void SetXSteps (const QList<double>& theValues) { myXStepValues = theValues; }
-
-  //! Sets divide values for table properties
-  //! \param container of values
-  void SetDivideValues (const QList<int>& theValues) { myDivideValues = theValues; }
-
-  //! Save state of three view in a container in form: key, value. It saves:
-  //! - XStep of property table
-  //! - divide values of property table
-  //! \param theTreeView a view instance
-  //! \param theItems [out] properties
-  //! \param thePrefix peference item prefix
-  Standard_EXPORT static void SaveState (ViewControl_PropertyView* theView, QMap<QString, QString>& theItems,
-                                         const QString& thePrefix = QString());
-  //! Restore state of three view by a container
-  //! \param theTreeView a view instance
-  //! \param theKey property key
-  //! \param theValue property value
-  //! \param thePrefix peference item prefix
-  //! \return boolean value whether the property is applyed to the tree view
-  Standard_EXPORT static bool RestoreState (ViewControl_PropertyView* theView, const QString& theKey, const QString& theValue,
-                                            const QString& thePrefix = QString());
-
 signals:
   void propertyViewSelectionChanged();
 
@@ -120,8 +95,5 @@ private:
   QVBoxLayout* myTableWidgetLayout; //! main view layout where tables or custom widgets are presented
   QList<ViewControl_Table*> myTables; //!< table view, shown only first tables filled in Init method
   QWidget* myCustomWidget; //!< custom view widget
-
-  QList<double> myXStepValues; //! predefined values for XStep in ViewControl_TableProperty
-  QList<int> myDivideValues; //! predefined values for divide value in ViewControl_TableProperty
 };
 #endif

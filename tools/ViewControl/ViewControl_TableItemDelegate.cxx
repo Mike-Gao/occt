@@ -24,6 +24,7 @@
 #include <QComboBox>
 #include <QDoubleValidator>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QSpinBox>
 #include <Standard_WarningsRestore.hxx>
 
@@ -49,8 +50,8 @@ QWidget* ViewControl_TableItemDelegate::createEditor (QWidget* theParent,
   if (!myModelValues)
     return 0;
 
-  int aRow, aColumn;
-  myModelValues->GetSourcePosition (theIndex.row(), theIndex.column(), aRow, aColumn);
+  int aRow = theIndex.row();
+  int aColumn = theIndex.column();
   ViewControl_EditType anEditType = myModelValues->GetEditType (aRow, aColumn);
 
   QWidget* anEditor = createEditorControl (theParent, anEditType);
@@ -68,8 +69,8 @@ void ViewControl_TableItemDelegate::setEditorData (QWidget* theEditor, const QMo
   if (!myModelValues)
     return;
 
-  int aRow, aColumn;
-  myModelValues->GetSourcePosition (theIndex.row(), theIndex.column(), aRow, aColumn);
+  int aRow = theIndex.row();
+  int aColumn = theIndex.column();
   ViewControl_EditType anEditType = myModelValues->GetEditType (aRow, aColumn);
 
   setEditorValue (theEditor, anEditType, theIndex.model()->data(theIndex));
@@ -86,8 +87,8 @@ void ViewControl_TableItemDelegate::setModelData (QWidget* theEditor, QAbstractI
   if (!myModelValues)
     return;
 
-  int aRow, aColumn;
-  myModelValues->GetSourcePosition (theIndex.row(), theIndex.column(), aRow, aColumn);
+  int aRow = theIndex.row();
+  int aColumn = theIndex.column();
   ViewControl_EditType anEditType = myModelValues->GetEditType (aRow, aColumn);
 
   theModel->setData (theIndex, getEditorValue (theEditor, anEditType));
@@ -113,7 +114,13 @@ QWidget* ViewControl_TableItemDelegate::createEditorControl (QWidget* theParent,
       return aLineEdit;
     }
     case ViewControl_EditType_Line: return new QLineEdit (theParent);
-    case ViewControl_EditType_Spin: return new QSpinBox (theParent);
+    case ViewControl_EditType_Spin:
+    {
+      QSpinBox* aSpinBox = new QSpinBox (theParent);
+      aSpinBox->setRange (IntegerFirst(), IntegerLast());
+      return aSpinBox;
+    }
+    case ViewControl_EditType_DoAction: return new QPushButton (theParent);
 
     default: return 0;
   }
@@ -177,6 +184,7 @@ void ViewControl_TableItemDelegate::setEditorValue (QWidget* theEditor, const Vi
     case ViewControl_EditType_Double:
     case ViewControl_EditType_Line: (qobject_cast<QLineEdit*>(theEditor))->setText (theValue.toString()); break;
     case ViewControl_EditType_Spin: (qobject_cast<QSpinBox*>(theEditor))->setValue (theValue.toInt()); break;
+    case ViewControl_EditType_DoAction: (qobject_cast<QPushButton*>(theEditor))->setText ("UnSelect"); break;
 
     default: break;
   }
@@ -198,6 +206,7 @@ QVariant ViewControl_TableItemDelegate::getEditorValue (QWidget* theEditor, cons
     case ViewControl_EditType_Double:
     case ViewControl_EditType_Line: return (qobject_cast<QLineEdit*>(theEditor))->text();
     case ViewControl_EditType_Spin: return (qobject_cast<QSpinBox*>(theEditor))->value();
+    case ViewControl_EditType_DoAction: return QVariant ("Clicked");
 
     default: return QVariant();
   }

@@ -89,3 +89,39 @@ Standard_Boolean Message::GravityFromString (const Standard_CString theGravitySt
   }
   return Standard_False;
 }
+
+// =======================================================================
+// function : GetPointerInfo
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::TransientToString (const Handle(Standard_Transient)& thePointer, const bool isShortInfo)
+{
+  if (thePointer.IsNull())
+    return TCollection_AsciiString();
+
+  return PointerToString(thePointer.operator->(), isShortInfo);
+}
+
+// =======================================================================
+// function : GetPointerInfo
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::PointerToString (const void* thePointer, const bool isShortInfo)
+{
+  std::ostringstream aPtrStr;
+  aPtrStr << thePointer;
+  if (!isShortInfo)
+    return aPtrStr.str().c_str();
+
+  TCollection_AsciiString anInfoPtr (aPtrStr.str().c_str());
+  for (int aSymbolId = 1; aSymbolId < anInfoPtr.Length(); aSymbolId++)
+  {
+    if (anInfoPtr.Value(aSymbolId) != '0')
+    {
+      anInfoPtr = anInfoPtr.SubString(aSymbolId, anInfoPtr.Length());
+      anInfoPtr.Prepend("0x");
+      return anInfoPtr;
+    }
+  }
+  return aPtrStr.str().c_str();
+}

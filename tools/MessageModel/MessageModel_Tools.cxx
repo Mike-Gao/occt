@@ -14,11 +14,11 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/MessageModel_Tools.hxx>
-#include <inspector/MessageModel_TableModelRealValues.hxx>
-#include <inspector/MessageModel_TableModelRealVec3Values.hxx>
+#include <inspector/MessageModel_TableModelValues.hxx>
 
 #include <inspector/ViewControl_Table.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
+#include <inspector/ViewControl_TableModelValuesDefault.hxx>
 
 #include <BRep_Builder.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
@@ -26,10 +26,10 @@
 #include <BRepTools.hxx>
 #include <Message_AlertExtended.hxx>
 #include <Message_AttributeObject.hxx>
-#include <Message_AttributeVectorOfReal.hxx>
-#include <Message_AttributeVectorOfRealVec3.hxx>
+#include <Message_AttributeVectorOfValues.hxx>
+
 #include <Precision.hxx>
-#include <TopoDS_AlertWithShape.hxx>
+#include <TopoDS_AlertAttribute.hxx>
 #include <TopoDS_Edge.hxx>
 
 // =======================================================================
@@ -65,10 +65,18 @@ TCollection_AsciiString MessageModel_Tools::GetPointerInfo (const Handle(Standar
 // =======================================================================
 TCollection_AsciiString MessageModel_Tools::GetPointerAlertInfo (const Handle(Message_Alert)& theAlert)
 {
-  if (theAlert->IsKind (STANDARD_TYPE (TopoDS_AlertWithShape)))
-    return GetPointerInfo (Handle(TopoDS_AlertWithShape)::DownCast (theAlert)->GetShape().TShape());
-  else if (theAlert->IsKind (STANDARD_TYPE (Message_AttributeObject)))
-    return GetPointerInfo (Handle(Message_AttributeObject)::DownCast (theAlert)->GetObject());
+  Handle(Message_AlertExtended) anExtAlert = Handle(Message_AlertExtended)::DownCast (theAlert);
+  if (anExtAlert.IsNull())
+    return TCollection_AsciiString();
+
+  Handle(Message_Attribute) anAttribute = anExtAlert->Attribute();
+  if (anAttribute.IsNull())
+    return TCollection_AsciiString();
+
+  if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+    return GetPointerInfo (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape().TShape());
+  else if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
+    return GetPointerInfo (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
   return TCollection_AsciiString();
 }
 
@@ -78,10 +86,17 @@ TCollection_AsciiString MessageModel_Tools::GetPointerAlertInfo (const Handle(Me
 // =======================================================================
 TCollection_AsciiString MessageModel_Tools::GetShapeTypeAlertInfo (const Handle(Message_Alert)& theAlert)
 {
-  TopoDS_Shape aShape;
+  Handle(Message_AlertExtended) anExtAlert = Handle(Message_AlertExtended)::DownCast (theAlert);
+  if (anExtAlert.IsNull())
+    return TCollection_AsciiString();
 
-  if (theAlert->IsKind (STANDARD_TYPE (TopoDS_AlertWithShape)))
-    aShape = Handle(TopoDS_AlertWithShape)::DownCast (theAlert)->GetShape();
+  Handle(Message_Attribute) anAttribute = anExtAlert->Attribute();
+  if (anAttribute.IsNull())
+    return TCollection_AsciiString();
+
+  TopoDS_Shape aShape;
+  if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+    aShape = Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape();
 
   if (aShape.IsNull())
     return TCollection_AsciiString();
@@ -98,11 +113,19 @@ TCollection_AsciiString MessageModel_Tools::GetShapeTypeAlertInfo (const Handle(
 // =======================================================================
 TCollection_AsciiString MessageModel_Tools::GetStandardTypeAlertInfo (const Handle(Message_Alert)& theAlert)
 {
+  Handle(Message_AlertExtended) anExtAlert = Handle(Message_AlertExtended)::DownCast (theAlert);
+  if (anExtAlert.IsNull())
+    return TCollection_AsciiString();
+
+  Handle(Message_Attribute) anAttribute = anExtAlert->Attribute();
+  if (anAttribute.IsNull())
+    return TCollection_AsciiString();
+
   Handle(Standard_Transient) aPointer;
-  if (theAlert->IsKind (STANDARD_TYPE (TopoDS_AlertWithShape)))
-    aPointer = Handle(TopoDS_AlertWithShape)::DownCast (theAlert)->GetShape().TShape();
-  else if (theAlert->IsKind (STANDARD_TYPE (Message_AttributeObject)))
-    aPointer = Handle(Message_AttributeObject)::DownCast (theAlert)->GetObject();
+  if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+    aPointer = Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape().TShape();
+  else if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
+    aPointer = Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject();
 
   if (aPointer.IsNull())
     return TCollection_AsciiString();
@@ -117,8 +140,6 @@ TCollection_AsciiString MessageModel_Tools::GetStandardTypeAlertInfo (const Hand
 void MessageModel_Tools::GetPropertyTableValues (const Handle(Message_Alert)& theAlert,
                                                  QList<ViewControl_TableModelValues*>& theTableValues)
 {
-  ViewControl_TableModelValues* aTableValues = 0;
-
   Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(theAlert);
   if (anExtendedAlert.IsNull())
     return;
@@ -127,23 +148,17 @@ void MessageModel_Tools::GetPropertyTableValues (const Handle(Message_Alert)& th
   if (anAttribute.IsNull())
     return;
 
-  if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfReal)))
+  if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
   {
-    int aSectionSize = 60;
-    aTableValues = new MessageModel_TableModelRealValues (anAttribute, aSectionSize);
-    theTableValues.append (aTableValues);
-  }
-  else if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfRealVec3)))
-  {
-    int aSectionSize = 160;
-    aTableValues = new MessageModel_TableModelRealVec3Values (anAttribute, aSectionSize);
+    int aSectionSize = 200;
+    ViewControl_TableModelValues* aTableValues = new MessageModel_TableModelValues (anAttribute, aSectionSize);
     theTableValues.append (aTableValues);
   }
   else
   {
     if (!anAttribute->GetDescription().IsEmpty())
     {
-      aTableValues = new ViewControl_TableModelValues();
+      ViewControl_TableModelValuesDefault* aTableValues = new ViewControl_TableModelValuesDefault();
       QList<TreeModel_HeaderSection> aHeaderValues;
       QVector<QVariant> aValues;
       aHeaderValues << TreeModel_HeaderSection ("Description", -2);
@@ -163,77 +178,4 @@ void MessageModel_Tools::GetPropertyTableValues (const Handle(Message_Alert)& th
       theTableValues.append (aTableValues);
     }
   }
-}
-
-// =======================================================================
-// function : BuildShape
-// purpose :
-// =======================================================================
-TopoDS_Shape MessageModel_Tools::BuildShape (const Handle(Message_Alert)& theAlert, QList<int> theSelectedIndices, ViewControl_Table* theTable)
-{
-  if (theAlert.IsNull())
-    return TopoDS_Shape();
-
-  BRep_Builder aBuilder;
-  TopoDS_Compound aCompound;
-  aBuilder.MakeCompound(aCompound);
-
-  if (theAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfReal)))
-  {
-    Handle(Message_AttributeVectorOfReal) aValuesAlert = Handle(Message_AttributeVectorOfReal)::DownCast (theAlert);
-    NCollection_Vector<double> aValues = aValuesAlert->GetValues();
-    int aValuesSize = aValues.Size();
-
-    gp_Pnt aPreviousPoint(0, 0, 0), aCurrentPoint(0, 0, 0);
-    double aXStep = theTable->GetProperty()->GetXStep();
-    if (aXStep < 0)
-      aXStep = 1;
-    double aCurrentXValue = 0;
-    for (QList<int>::const_iterator anIt = theSelectedIndices.begin(); anIt != theSelectedIndices.end(); anIt++)
-    {
-      if (*anIt >= aValuesSize)
-        continue;
-
-      if (aCurrentXValue == 0)
-      { //just define the previous point
-        aPreviousPoint.SetX (aCurrentXValue);
-        aPreviousPoint.SetY (aValues.Value (*anIt));
-        aCurrentXValue = aCurrentXValue + aXStep;
-        continue;
-      }
-      aCurrentPoint.SetX (aCurrentXValue);
-      aCurrentPoint.SetY (aValues.Value (*anIt));
-      if (aPreviousPoint.Distance (aCurrentPoint) < Precision::Confusion())
-        continue;
-
-      TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge (aPreviousPoint, aCurrentPoint);
-      aBuilder.Add (aCompound, anEdge);
-      aPreviousPoint = aCurrentPoint;
-      aCurrentXValue = aCurrentXValue + aXStep;
-    }
-  }
-  else if (theAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfRealVec3)))
-  {
-    Handle(Message_AttributeVectorOfRealVec3) aValuesAlert = Handle(Message_AttributeVectorOfRealVec3)::DownCast (theAlert);
-    NCollection_Vector<NCollection_Vec3<double>> aValues = aValuesAlert->GetValues();
-    int aValuesSize = aValues.Size();
-
-    gp_Pnt aCurrentPoint(0, 0, 0);
-    NCollection_Vec3<double> aValue;
-    for (QList<int>::const_iterator anIt = theSelectedIndices.begin(); anIt != theSelectedIndices.end(); anIt++)
-    {
-      if (*anIt >= aValuesSize)
-        continue;
-
-      aValue = aValues.Value (*anIt);
-      aCurrentPoint.SetX (aValue.x());
-      aCurrentPoint.SetY (aValue.y());
-      aCurrentPoint.SetZ (aValue.z());
-
-      TopoDS_Vertex aVertex = BRepBuilderAPI_MakeVertex (aCurrentPoint);
-      aBuilder.Add (aCompound, aVertex);
-    }
-  }
-
-  return aCompound;
 }

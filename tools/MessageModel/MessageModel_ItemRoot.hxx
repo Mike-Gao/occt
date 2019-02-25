@@ -66,6 +66,11 @@ public:
   Standard_EXPORT void SetReport (const int theRowId, const Handle(Message_Report)& theReport,
     const TCollection_AsciiString& theReportDescription = "");
 
+  //! Returns true if report exists is in the list of the current reports
+  //! \param theReport a report instance
+  //! \return boolen value
+  Standard_EXPORT Standard_Boolean HasReport (const Handle(Message_Report)& theReport);
+
   //! Clears internal container of added reports
   void RemoveAllReports() { myReports.Clear(); }
 

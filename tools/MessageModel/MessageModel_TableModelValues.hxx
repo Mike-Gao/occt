@@ -13,28 +13,25 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef MessageModel_TableModelRealValues_H
-#define MessageModel_TableModelRealValues_H
-
-#ifdef _MSC_VER
-  #pragma warning(disable : 4127 4718) // conditional expression is constant, recursive call has no side effects
-#endif
+#ifndef MessageModel_TableModelValues_H
+#define MessageModel_TableModelValues_H
 
 #include <inspector/ViewControl_TableModelValues.hxx>
 
-#include <Message_AttributeVectorOfReal.hxx>
+#include <Message_Attribute.hxx>
+class Message_AttributeVectorOfValues;
 
-//! \class MessageModel_TableModelRealValues
-//! \brief This is an implementation for ViewControl_TableModel to present Message_AttributeVectorOfReal object
-class MessageModel_TableModelRealValues : public ViewControl_TableModelValues
+//! \class MessageModel_TableModelValues
+//! \brief This is an implementation for ViewControl_TableModel to present Message_AttributeVectorOfValues object
+class MessageModel_TableModelValues : public ViewControl_TableModelValues
 {
 public:
 
   //! Constructor
-  Standard_EXPORT MessageModel_TableModelRealValues (const Handle(Message_Attribute)& theAttribute, const int theSectionWidth);
+  Standard_EXPORT MessageModel_TableModelValues (const Handle(Message_Attribute)& theAttribute, const int theSectionWidth);
 
   //! Destructor
-  virtual ~MessageModel_TableModelRealValues() Standard_OVERRIDE {}
+  virtual ~MessageModel_TableModelValues() Standard_OVERRIDE {}
 
   //! Returns number of columns, size of header values
   //! \param theParent an index of the parent item
@@ -44,7 +41,7 @@ public:
   //! Returns number of rows, depending on orientation: myColumnCount or size of values container
   //! \param theParent an index of the parent item
   //! \return an integer value
-  virtual int RowCount (const QModelIndex& theParent = QModelIndex()) const { (void)theParent; return 1; }
+  Standard_EXPORT virtual int RowCount (const QModelIndex& theParent) const;
 
   //! Returns content of the model index for the given role, it is obtained from internal container of values
   //! It returns value only for DisplayRole.
@@ -53,14 +50,8 @@ public:
   //! \return value intepreted depending on the given role
   Standard_EXPORT virtual QVariant Data (const int theRow, const int theColumn, int theRole = Qt::DisplayRole) const;
 
-  //! Returns minimum and maximum values of selected items or the table content (if selected list is empty)
-  //! \param theMinValue minimum
-  //! \param theMaxValue maximum
-  //! \param theSelected selected cells
-  virtual void GetRangeValues (QString& theMinValue, QString& theMaxValue, const QModelIndexList& theSelected) const;
-
 private:
-  Handle(Message_AttributeVectorOfReal) myAttribute; //!< alert attribute, container of table values
+  Handle(Message_AttributeVectorOfValues) myAttribute; //!< alert attribute, container of table values
 };
 
 #endif

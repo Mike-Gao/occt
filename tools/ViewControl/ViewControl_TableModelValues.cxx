@@ -27,11 +27,24 @@
 
 int ViewControl_TableModelValues::ColumnCount (const QModelIndex&) const
 {
-  Qt::Orientation anAdditionalOrientation = myOrientation == Qt::Vertical ? Qt::Horizontal : Qt::Vertical;
-  if (myHeaderValues[anAdditionalOrientation].size() > 0)
-    return myHeaderValues[anAdditionalOrientation].size();
+  if (!GetProperties().IsNull())
+    return GetProperties()->GetTableColumnCount();
 
-  return myValues.size();
+  return 0;
+}
+
+
+// =======================================================================
+// function : RowCount
+// purpose :
+// =======================================================================
+
+int ViewControl_TableModelValues::RowCount (const QModelIndex&) const
+{
+  if (!GetProperties().IsNull())
+    return GetProperties()->GetTableRowCount();
+
+  return 0;
 }
 
 // =======================================================================
@@ -41,8 +54,12 @@ int ViewControl_TableModelValues::ColumnCount (const QModelIndex&) const
 
 QVariant ViewControl_TableModelValues::Data (const int theRow, const int theColumn, int theRole) const
 {
-  if (theRole == Qt::DisplayRole)
-    return myValues.at ((int)getPosition (theRow, theColumn));
+  if (!GetProperties().IsNull())
+  {
+    QVariant aValue = GetProperties()->GetTableData (theRow, theColumn, theRole);
+    if (aValue.isValid())
+      return aValue;
+  }
 
   if (theRole == Qt::TextAlignmentRole) // for multi-lines text, align it to the top
     return Qt::AlignTop;
@@ -59,6 +76,19 @@ QVariant ViewControl_TableModelValues::Data (const int theRow, const int theColu
       QColor (Qt::darkGray).darker (150);
   }
   return QVariant();
+}
+
+// =======================================================================
+// function : SetData
+// purpose :
+// =======================================================================
+
+bool ViewControl_TableModelValues::SetData (const int theRow, const int theColumn, const QVariant& theValue, int)
+{
+  if (!GetProperties().IsNull())
+    return GetProperties()->SetTableData (theRow, theColumn, theValue);
+
+  return false;
 }
 
 // =======================================================================

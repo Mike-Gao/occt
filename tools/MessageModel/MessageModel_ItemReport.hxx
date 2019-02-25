@@ -21,8 +21,10 @@
 #include <TCollection_AsciiString.hxx>
 #include <Message_Report.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QMap>
 #include <QVariant>
+#include <Standard_WarningsRestore.hxx>
 
 class MessageModel_ItemReport;
 typedef QExplicitlySharedDataPointer<MessageModel_ItemReport> MessageModel_ItemReportPtr;

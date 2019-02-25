@@ -17,7 +17,6 @@
 
 #include <inspector/ViewControl_Pane.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
-#include <inspector/ViewControl_TableModelFilter.hxx>
 #include <inspector/VInspector_Tools.hxx>
 
 #include <inspector/ViewControl_PaneCreator.hxx>
@@ -42,10 +41,6 @@ VInspector_TableModelValues::VInspector_TableModelValues (const TreeModel_ItemBa
 
   SetHeaderVisible(Qt::Horizontal, Standard_False);
   SetHeaderVisible(Qt::Vertical, Standard_False);
-
-  SetUseTableSeparateSize (false);
-  SetUseTableProperties (false);
-  SetUseTablePropertiesXStep (false, -1);
 }
 
 // =======================================================================
@@ -140,31 +135,6 @@ Qt::ItemFlags VInspector_TableModelValues::Flags (const QModelIndex& theIndex) c
     aFlags = aFlags | Qt::ItemIsEditable;
 
   return aFlags;
-}
-
-// =======================================================================
-// function : GetRangeValues
-// purpose :
-// =======================================================================
-
-int VInspector_TableModelValues::GetValuesCount () const
-{
-  VInspector_ItemBasePtr anItem = GetItem();
-
-  int aRowCount = anItem->GetTableRowCount();
-  Handle(Standard_Transient) anObject = anItem->GetObject();
-  if (anObject.IsNull())
-    return aRowCount * 2;
-
-  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
-  {
-    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
-    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
-    if (!aPane)
-      continue;
-    aRowCount += aPane->GetTableRowCount (anObject);
-  }
-  return aRowCount * 2;
 }
 
 // =======================================================================

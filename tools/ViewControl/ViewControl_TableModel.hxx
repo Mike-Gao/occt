@@ -18,7 +18,6 @@
 
 #include <Standard.hxx>
 
-#include <inspector/ViewControl_TableModelFilter.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -40,7 +39,7 @@ class ViewControl_TableModel : public QAbstractTableModel
 public:
 
   //! Constructor
-  ViewControl_TableModel (QObject* theParent = 0) : myModelValues (0), myFilter (0) { (void)theParent; }
+  ViewControl_TableModel (QObject* theParent = 0) : myModelValues (0) { (void)theParent; }
 
   //! Destructor
   virtual ~ViewControl_TableModel() {}
@@ -52,10 +51,6 @@ public:
   //! Returns instance of interface for access totable values
   //! \return interface or NULL
   ViewControl_TableModelValues* GetModelValues() const { return myModelValues; }
-
-  //! Sets table values filter to rearrange values presentation
-  //! \param filter instance
-  void SetFilter (ViewControl_TableModelFilter* theFilter) { myFilter = theFilter; }
 
   //! Emits the layoutChanged signal from outside of this class
   void EmitLayoutChanged() { emit layoutChanged(); }
@@ -98,20 +93,8 @@ public:
   Qt::ItemFlags flags (const QModelIndex& theIndex) const
   { return myModelValues ? myModelValues->Flags (theIndex) : Qt::NoItemFlags; }
 
-  //! Returns source row and column values peforming conversion back from filter
-  //! \param theIndex a model index
-  //! \param theRow a model row
-  //! \param theColumn a model column
-  Standard_EXPORT void GetSourcePosition (const QModelIndex& theIndex, int& theRow, int& theColumn);
-
-protected:
-  //! Returns true if the filter is not NULL and active
-  //! \return true if active
-  Standard_Boolean isFilterActive() const { return myFilter && myFilter->IsActive(); }
-
 private:
   ViewControl_TableModelValues* myModelValues; //! interface to table values
-  ViewControl_TableModelFilter* myFilter; //! filter of values
 };
 
 #endif
