@@ -23,8 +23,10 @@
 #include <Prs3d_PointAspect.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
+
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
+#include <inspector/View_Tools.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -277,18 +279,7 @@ void View_Displayer::DisplayedPresentations (NCollection_Shared<AIS_ListOfIntera
 // =======================================================================
 Handle(V3d_View) View_Displayer::GetView() const
 {
-  Handle(V3d_View) aView;
-  if (GetContext().IsNull())
-    return aView;
-
-  const Handle(V3d_Viewer)& aViewer = GetContext()->CurrentViewer();
-  if (!aViewer.IsNull())
-  {
-    aViewer->InitActiveViews();
-    if (aViewer->MoreActiveViews())
-      aView = aViewer->ActiveView();
-  }
-  return aView;
+  return View_Tools::FindActiveView (GetContext());
 }
 
 // =======================================================================

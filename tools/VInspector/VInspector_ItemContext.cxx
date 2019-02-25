@@ -88,6 +88,10 @@ int VInspector_ItemContext::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemContext::initValue (const int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
@@ -97,7 +101,6 @@ QVariant VInspector_ItemContext::initValue (const int theItemRole) const
   switch (Column())
   {
     case 0: return GetContext()->DynamicType()->Name();
-    case 1: return rowCount();
     case 4:
     {
       Handle(AIS_InteractiveObject) anEmptyIO;

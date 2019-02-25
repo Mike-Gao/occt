@@ -88,6 +88,10 @@ int VInspector_ItemGraphic3dGroup::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemGraphic3dGroup::initValue (const int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 

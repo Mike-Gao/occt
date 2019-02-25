@@ -29,6 +29,10 @@
 // =======================================================================
 QVariant VInspector_ItemPrs3dPresentation::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (Column() != 0 || (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole))
     return QVariant();
 

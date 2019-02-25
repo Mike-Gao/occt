@@ -34,6 +34,12 @@
 
 #include <algorithm>
 
+//#define REPORT_SELECTION_BUILD
+#ifdef REPORT_SELECTION_BUILD
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
+
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_ViewerSelector, Standard_Transient)
 
 namespace {
@@ -199,6 +205,12 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
                                              const gp_GTrsf& theInversedTrsf,
                                              SelectMgr_SelectingVolumeManager& theMgr)
 {
+  #ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO_OBJECT (theEntity, "checkOverlap", "", &aPerfMeter, NULL);
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+  #endif
+
   Handle(SelectMgr_EntityOwner) anOwner (Handle(SelectMgr_EntityOwner)::DownCast (theEntity->OwnerId()));
   Handle(SelectMgr_SelectableObject) aSelectable;
   Standard_Boolean toRestoresViewClipEnabled = Standard_False;
@@ -248,7 +260,13 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
   }
 
   SelectBasics_PickResult aPickResult;
+  #ifdef REPORT_SELECTION_BUILD
+  MESSAGE_INFO (TCollection_AsciiString ("Matches - start"), "", &aPerfMeter, aParentAlert);
+  #endif
   const Standard_Boolean isMatched = theEntity->Matches(theMgr, aPickResult);
+  #ifdef REPORT_SELECTION_BUILD
+  MESSAGE_INFO (TCollection_AsciiString ("Matches - end"), "", &aPerfMeter, aParentAlert);
+  #endif
   if (toRestoresViewClipEnabled)
   {
     theMgr.SetViewClippingEnabled (Standard_True);
@@ -356,6 +374,12 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
     return;
   }
 
+  #ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO_OBJECT (theObject, "traverseObject", "", &aPerfMeter, NULL);
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+  #endif
+
   const opencascade::handle<BVH_Tree<Standard_Real, 3> >& aSensitivesTree = anEntitySet->BVH();
   gp_GTrsf aInversedTrsf;
   if (theObject->HasTransformation() || !theObject->TransformPersistence().IsNull())
@@ -403,6 +427,10 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   Standard_Integer aHead = -1;
   for (;;)
   {
+    #ifdef REPORT_SELECTION_BUILD
+    MESSAGE_INFO (TCollection_AsciiString ("aNode") + aNode, "", &aPerfMeter, aParentAlert);
+    #endif
+
     if (!aSensitivesTree->IsOuter (aNode))
     {
       const Standard_Integer aLeftChildIdx  = aSensitivesTree->Child<0> (aNode);
@@ -496,6 +524,12 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 //=======================================================================
 void SelectMgr_ViewerSelector::TraverseSensitives()
 {
+#ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("TraverseSensitives", "", &aPerfMeter, NULL);
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+#endif
+
   mystored.Clear();
 
   Standard_Integer aWidth;
@@ -520,6 +554,11 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
 
   for (Standard_Integer aBVHSetIt = 0; aBVHSetIt < SelectMgr_SelectableObjectSet::BVHSubsetNb; ++aBVHSetIt)
   {
+    #ifdef REPORT_SELECTION_BUILD
+    MESSAGE_INFO (TCollection_AsciiString ("aBVHSetIt") + aBVHSetIt, "", &aPerfMeter, aParentAlert);
+    Handle(Message_Alert) aParentAlertLevel1 = OCCT_Message_Alert;
+    #endif
+
     SelectMgr_SelectableObjectSet::BVHSubset aBVHSubset =
       static_cast<SelectMgr_SelectableObjectSet::BVHSubset> (aBVHSetIt);
 
@@ -578,6 +617,9 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
     Standard_Integer aHead = -1;
     for (;;)
     {
+      #ifdef REPORT_SELECTION_BUILD
+      MESSAGE_INFO (TCollection_AsciiString ("aNode - ") + aNode, "", &aPerfMeter, aParentAlertLevel1);
+      #endif
       if (!aBVHTree->IsOuter (aNode))
       {
         const Standard_Integer aLeftChildIdx  = aBVHTree->Child<0> (aNode);
@@ -815,6 +857,12 @@ TCollection_AsciiString SelectMgr_ViewerSelector::Status (const Handle(SelectMgr
 //=======================================================================
 void SelectMgr_ViewerSelector::SortResult()
 {
+#ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("SortResult", "", &aPerfMeter, NULL);
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+#endif
+
   if(mystored.IsEmpty()) return;
 
   const Standard_Integer anExtent = mystored.Extent();

@@ -109,11 +109,13 @@ void ViewControl_Table::Init (ViewControl_TableModelValues* theModelValues)
 void ViewControl_Table::GetSelectedIndices (QMap<int, QList<int>>& theSelectedIndices)
 {
   QModelIndexList aSelected = myTableView->selectionModel()->selectedIndexes();
-  ViewControl_TableModel* aModel = dynamic_cast<ViewControl_TableModel*> (myTableView->model());
 
   int aRow, aColumn;
   for (QModelIndexList::const_iterator anIt = aSelected.begin(); anIt != aSelected.end(); anIt++)
   {
+    QModelIndex anIndex = *anIt;
+    aRow = anIndex.row();
+    aColumn = anIndex.column();
     if (!theSelectedIndices.contains (aRow))
       theSelectedIndices.insert (aRow, QList<int>());
     theSelectedIndices[aRow].append (aColumn);

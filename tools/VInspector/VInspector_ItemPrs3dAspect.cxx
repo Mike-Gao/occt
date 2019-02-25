@@ -47,6 +47,10 @@
 
 QVariant VInspector_ItemPrs3dAspect::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole)
   {
     Handle(Prs3d_BasicAspect) anAspect = GetAspect();
@@ -58,14 +62,6 @@ QVariant VInspector_ItemPrs3dAspect::initValue (int theItemRole) const
         return theItemRole == Qt::ToolTipRole
           ? (aNullAspect ? QVariant("Prs3d_BasicAspect is empty") : QVariant (anAspect->DynamicType()->Name()))
           : QVariant (myName.ToCString());
-      }
-      case 1:
-        return rowCount();
-      case 2:
-      {
-        if (!aNullAspect)
-          return VInspector_Tools::GetPointerInfo (anAspect, true).ToCString();
-        break;
       }
       default: break;
     }

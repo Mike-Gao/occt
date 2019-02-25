@@ -54,6 +54,10 @@ int VInspector_ItemSelectMgrSelection::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   switch (theItemRole)
   {
     case Qt::DisplayRole:
@@ -63,7 +67,6 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
       switch (Column())
       {
         case 0: return GetSelection()->DynamicType()->Name();
-        case 1: return rowCount();
         case 3:
         {
           if (theItemRole == Qt::ToolTipRole)

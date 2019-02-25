@@ -37,6 +37,26 @@ QAction* View_Tools::CreateAction (const QString& theText, const char* theSlot, 
 }
 
 // =======================================================================
+// function : GetView
+// purpose :
+// =======================================================================
+Handle(V3d_View) View_Tools::FindActiveView (const Handle(AIS_InteractiveContext)& theContext)
+{
+  if (theContext.IsNull())
+    return NULL;
+
+  const Handle(V3d_Viewer)& aViewer = theContext->CurrentViewer();
+  if (aViewer.IsNull())
+    return NULL;
+
+  aViewer->InitActiveViews();
+  if (!aViewer->MoreActiveViews())
+    return NULL;
+
+  return aViewer->ActiveView();
+}
+
+// =======================================================================
 // function : SaveState
 // purpose :
 // =======================================================================

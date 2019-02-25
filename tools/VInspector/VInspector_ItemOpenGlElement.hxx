@@ -48,7 +48,8 @@ public:
 
   //! Returns the current graphic3d group, init item if it was not initialized yet
   //! \return graphic group
-  Handle(OpenGl_Element) GetElement() const { return Handle(OpenGl_Element)::DownCast (GetObject());}
+  Standard_EXPORT Handle(OpenGl_Element) GetElement() const
+    { return Handle(OpenGl_Element)::DownCast (GetObject());}
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;

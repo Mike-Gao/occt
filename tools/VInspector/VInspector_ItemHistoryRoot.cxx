@@ -78,6 +78,10 @@ const VInspector_ItemHistoryTypeInfo& VInspector_ItemHistoryRoot::GetTypeInfo (c
 // =======================================================================
 QVariant VInspector_ItemHistoryRoot::initValue (const int theRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theRole != Qt::DisplayRole && theRole != Qt::EditRole && theRole != Qt::ToolTipRole)
     return QVariant();
  

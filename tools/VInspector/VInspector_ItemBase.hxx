@@ -53,6 +53,11 @@ public:
   //! \return object
   virtual Handle(Standard_Transient) GetObject() const { return NULL; }
 
+  //! Returns item information for the given role. Fills internal container if it was not filled yet
+  //! \param theItemRole a value role
+  //! \return the value
+  Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
+
   //! Returns presentation of the attribute to be visualized in the view
   //! \thePresentations [out] container of presentation handles to be visualized
   virtual void GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations)

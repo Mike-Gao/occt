@@ -36,6 +36,10 @@
 // =======================================================================
 QVariant VInspector_ItemSelectBasicsEntityOwner::initValue(int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   switch (theItemRole)
   { 
     case Qt::DisplayRole:
@@ -49,48 +53,7 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::initValue(int theItemRole) cons
       switch (Column())
       {
         case 0: return anOwner->DynamicType()->Name();
-        case 2: return VInspector_Tools::GetPointerInfo (anOwner, true).ToCString();
-        //case 3:
-        //{
-        //  Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-        //  if (BROwnr.IsNull())
-        //    return QVariant();
-
-        //  const TopoDS_Shape& aShape = BROwnr->Shape();
-        //  if (aShape.IsNull())
-        //    return QVariant();
-
-        //  return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
-        //}
-        //case 17:
-        //case 18:
-        //case 19:
-        //  {
-        //  Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-        //  if (BROwnr.IsNull())
-        //    return QVariant();
-
-        //  const TopoDS_Shape& aShape = BROwnr->Shape();
-        //  if (aShape.IsNull())
-        //    return QVariant();
-
-        //  return Column() == 17 ? VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString()
-        //       : Column() == 18 ? VInspector_Tools::OrientationToName (aShape.Orientation()).ToCString()
-        //       :           /*19*/ ViewControl_Tools::ToString (aShape.Location()).ToCString();
-        //}
-        //case 21:
-        //  {
-        //  Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-        //  if (BROwnr.IsNull())
-        //    return QVariant();
-
-        //  //const TopoDS_Shape& aShape = BROwnr->Shape();
-        //  //if (aShape.IsNull())
-        //  //  return QVariant();
-
-        //  return ViewControl_Tools::ToString (BROwnr->Location()).ToCString();
-        //}
-        //default: break;
+        default: break;
       }
       break;
     }

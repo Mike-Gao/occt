@@ -53,6 +53,10 @@
 // =======================================================================
 QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole)
   {
     Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
@@ -67,14 +71,6 @@ QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
         else
           return theItemRole == Qt::ToolTipRole ? QVariant ("")
                                                 : QVariant (anIO->DynamicType()->Name());
-      }
-      case 1:
-        return rowCount();
-      case 2:
-      {
-        if (!aNullIO)
-          return VInspector_Tools::GetPointerInfo (anIO, true).ToCString();
-        break;
       }
       case 4:
       {

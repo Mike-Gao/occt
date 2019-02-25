@@ -69,6 +69,11 @@
 
 #include <OSD_Timer.hxx>
 
+//#define REPORT_SELECTION_BUILD
+#ifdef REPORT_SELECTION_BUILD
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
 
 IMPLEMENT_STANDARD_RTTIEXT(StdSelect_ViewerSelector3d,SelectMgr_ViewerSelector)
 
@@ -117,6 +122,11 @@ void StdSelect_ViewerSelector3d::Pick (const Standard_Integer theXPix,
                                        const Standard_Integer theYPix,
                                        const Handle(V3d_View)& theView)
 {
+#ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("Pick", TCollection_AsciiString ("theXPix = ") + theXPix + ", theYPix = " + theYPix, &aPerfMeter, NULL);
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+#endif
   updateZLayers (theView);
   if(myToUpdateTolerance)
   {
@@ -131,6 +141,11 @@ void StdSelect_ViewerSelector3d::Pick (const Standard_Integer theXPix,
   mySelectingVolumeMgr.SetWindowSize (aWidth, aHeight);
   gp_Pnt2d aMousePos (static_cast<Standard_Real> (theXPix),
                       static_cast<Standard_Real> (theYPix));
+
+#ifdef REPORT_SELECTION_BUILD
+  MESSAGE_INFO ("Pick", TCollection_AsciiString ("aMousePos - X = ") + aMousePos.X() + ", Y = " + aMousePos.Y(), &aPerfMeter, aParentAlert);
+#endif
+
   mySelectingVolumeMgr.BuildSelectingVolume (aMousePos);
   mySelectingVolumeMgr.SetViewClipping (theView->ClipPlanes());
 

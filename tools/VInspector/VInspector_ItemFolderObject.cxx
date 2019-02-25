@@ -20,6 +20,7 @@
 #include <inspector/VInspector_ItemPresentableObject.hxx>
 #include <inspector/VInspector_ItemPrs3dDrawer.hxx>
 #include <inspector/VInspector_ItemSelectMgrFilter.hxx>
+#include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
 #include <inspector/VInspector_ItemV3dViewer.hxx>
 
 #include <AIS_InteractiveObject.hxx>
@@ -31,6 +32,10 @@
 // =======================================================================
 QVariant VInspector_ItemFolderObject::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (Column() != 0 || (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole))
     return QVariant();
 
@@ -55,7 +60,7 @@ int VInspector_ItemFolderObject::initRowCount() const
   {
     case ParentKind_ContextItem:
     {
-      int aNbChildren = 2; // Filters, Viewer
+      int aNbChildren = 3; // Filters, Viewer, MainSelector
       aNbChildren++; // DefaultDrawer
       for (int aTypeId = 0; aTypeId < Prs3d_TypeOfHighlight_NB; aTypeId++)
       {
@@ -91,6 +96,8 @@ TreeModel_ItemBasePtr VInspector_ItemFolderObject::createChild (int theRow, int 
         return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
       else if (theRow == 1)
         return VInspector_ItemV3dViewer::CreateItem (currentItem(), theRow, theColumn);
+      else if (theRow == 2)
+        return VInspector_ItemSelectMgrViewerSelector::CreateItem (currentItem(), theRow, theColumn);
       else
         return VInspector_ItemPrs3dDrawer::CreateItem (currentItem(), theRow, theColumn);
     }
@@ -137,10 +144,10 @@ Handle(Prs3d_Drawer) VInspector_ItemFolderObject::GetPrs3dDrawer (const int theR
   {
     case ParentKind_ContextItem:
     {
-      if (theRow == 0 || theRow == 1) // "Filters", "Viewer"
+      if (theRow == 0 || theRow == 1 || theRow == 2) // "Filters", "Viewer", "Viewer Selector"
         return 0;
 
-      if (theRow == 2)
+      if (theRow == 3)
       {
         theName = "DefaultDrawer";
         return GetContext()->DefaultDrawer();
@@ -152,7 +159,7 @@ Handle(Prs3d_Drawer) VInspector_ItemFolderObject::GetPrs3dDrawer (const int theR
         const Handle(Prs3d_Drawer)& aDrawer = GetContext()->HighlightStyle (aType);
         if (aDrawer.IsNull())
           continue;
-        if (aCurId == theRow - 3)
+        if (aCurId == theRow - 4)
         {
           theName = TCollection_AsciiString ("HighlightStyle: ") + Prs3d::TypeOfHighlightToString (aType);
           return aDrawer;

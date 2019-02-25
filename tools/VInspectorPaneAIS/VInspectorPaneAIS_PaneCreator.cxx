@@ -15,12 +15,10 @@
 
 #include <inspector/VInspectorPaneAIS_PaneCreator.hxx>
 #include <inspector/VInspectorPaneAIS_Shape.hxx>
-#include <inspector/VInspectorPaneAIS_Trihedron.hxx>
 
 #include <AIS_Shape.hxx>
-#include <AIS_Trihedron.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(VInspectorPaneAIS_PaneCreator, VInspectorAPI_CallBack)
+IMPLEMENT_STANDARD_RTTIEXT(VInspectorPaneAIS_PaneCreator, ViewControl_PaneCreator)
 
 // =======================================================================
 // function : createPane
@@ -30,8 +28,6 @@ ViewControl_Pane* VInspectorPaneAIS_PaneCreator::createPane (const Standard_CStr
 {
   if (theName == STANDARD_TYPE (AIS_Shape)->Name())
     return new VInspectorPaneAIS_Shape();
-  //else if (theName == STANDARD_TYPE (AIS_Trihedron)->Name())
-  //  return new VInspectorPaneAIS_Trihedron();
 
   return NULL;
 }

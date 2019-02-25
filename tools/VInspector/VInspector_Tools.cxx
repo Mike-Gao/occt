@@ -69,6 +69,9 @@ TCollection_AsciiString VInspector_Tools::GetShapeTypeInfo (const TopAbs_ShapeEn
 // =======================================================================
 TCollection_AsciiString VInspector_Tools::GetPointerInfo (const Handle(Standard_Transient)& thePointer, const bool isShortInfo)
 {
+  if (!thePointer.operator->())
+    return "";
+
   std::ostringstream aPtrStr;
   aPtrStr << thePointer.operator->();
   if (!isShortInfo)
@@ -585,14 +588,16 @@ QVariant VInspector_Tools::ToVariant (const Select3D_BndBox3d& theBoundingBox)
 //=======================================================================
 TopoDS_Shape VInspector_Tools::CreateShape (const Bnd_Box& theBoundingBox)
 {
-  if (theBoundingBox.IsVoid() || theBoundingBox.IsWhole() ||
-      theBoundingBox.IsXThin (Precision::Confusion()) ||
-      theBoundingBox.IsYThin (Precision::Confusion()) ||
-      theBoundingBox.IsZThin (Precision::Confusion()))
-    return TopoDS_Shape(); // TODO: display shape for thin box, like in the same method for Select3D_BndBox3d
+  if (theBoundingBox.IsVoid() || theBoundingBox.IsWhole())
+    return TopoDS_Shape();
 
-  BRepPrimAPI_MakeBox aBoxBuilder(theBoundingBox.CornerMin(), theBoundingBox.CornerMax());
-  return aBoxBuilder.Shape();
+  Standard_Real aXmin, anYmin, aZmin, aXmax, anYmax, aZmax;
+  theBoundingBox.Get (aXmin, anYmin, aZmin, aXmax, anYmax, aZmax);
+
+  gp_Pnt aPntMin = gp_Pnt (aXmin, anYmin, aZmin);
+  gp_Pnt aPntMax = gp_Pnt (aXmax, anYmax, aZmax);
+
+  return CreateBoxShape (aPntMin, aPntMax);
 }
 
 //=======================================================================
@@ -607,16 +612,25 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBounding
   gp_Pnt aPntMin = gp_Pnt (theBoundingBox.CornerMin().x(), theBoundingBox.CornerMin().y(), theBoundingBox.CornerMin().z());
   gp_Pnt aPntMax = gp_Pnt (theBoundingBox.CornerMax().x(), theBoundingBox.CornerMax().y(), theBoundingBox.CornerMax().z());
 
-  Standard_Boolean aThinOnX = fabs (aPntMin.X() - aPntMax.X()) < Precision::Confusion();
-  Standard_Boolean aThinOnY = fabs (aPntMin.Y() - aPntMax.Y()) < Precision::Confusion();
-  Standard_Boolean aThinOnZ = fabs (aPntMin.Z() - aPntMax.Z()) < Precision::Confusion();
+  return CreateBoxShape (aPntMin, aPntMax);
+}
+
+//=======================================================================
+//function : CreateBoxShape
+//purpose  :
+//=======================================================================
+TopoDS_Shape VInspector_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax)
+{
+  Standard_Boolean aThinOnX = fabs (thePntMin.X() - thePntMax.X()) < Precision::Confusion();
+  Standard_Boolean aThinOnY = fabs (thePntMin.Y() - thePntMax.Y()) < Precision::Confusion();
+  Standard_Boolean aThinOnZ = fabs (thePntMin.Z() - thePntMax.Z()) < Precision::Confusion();
 
   if (((int)aThinOnX + (int)aThinOnY + (int)aThinOnZ) > 1) // thin box in several directions is a point
   {
     BRep_Builder aBuilder;
     TopoDS_Compound aCompound;
     aBuilder.MakeCompound (aCompound);
-    aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (aPntMin));
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (thePntMin));
     return aCompound;
   }
 
@@ -625,24 +639,24 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBounding
     gp_Pnt aPnt1, aPnt2, aPnt3, aPnt4 ;
     if (aThinOnX)
     {
-      aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
-      aPnt2 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMin.Z());
-      aPnt3 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMax.Z());
-      aPnt4 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMax.Z());
+      aPnt1 = gp_Pnt(thePntMin.X(), thePntMin.Y(), thePntMin.Z());
+      aPnt2 = gp_Pnt(thePntMin.X(), thePntMax.Y(), thePntMin.Z());
+      aPnt3 = gp_Pnt(thePntMin.X(), thePntMax.Y(), thePntMax.Z());
+      aPnt4 = gp_Pnt(thePntMin.X(), thePntMin.Y(), thePntMax.Z());
     }
     else if (aThinOnY)
     {
-      aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
-      aPnt2 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMin.Z());
-      aPnt3 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMax.Z());
-      aPnt4 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMax.Z());
+      aPnt1 = gp_Pnt(thePntMin.X(), thePntMin.Y(), thePntMin.Z());
+      aPnt2 = gp_Pnt(thePntMax.X(), thePntMin.Y(), thePntMin.Z());
+      aPnt3 = gp_Pnt(thePntMax.X(), thePntMin.Y(), thePntMax.Z());
+      aPnt4 = gp_Pnt(thePntMin.X(), thePntMin.Y(), thePntMax.Z());
     }
     else if (aThinOnZ)
     {
-      aPnt1 = gp_Pnt(aPntMin.X(), aPntMin.Y(), aPntMin.Z());
-      aPnt2 = gp_Pnt(aPntMax.X(), aPntMin.Y(), aPntMin.Z());
-      aPnt3 = gp_Pnt(aPntMax.X(), aPntMax.Y(), aPntMin.Z());
-      aPnt4 = gp_Pnt(aPntMin.X(), aPntMax.Y(), aPntMin.Z());
+      aPnt1 = gp_Pnt(thePntMin.X(), thePntMin.Y(), thePntMin.Z());
+      aPnt2 = gp_Pnt(thePntMax.X(), thePntMin.Y(), thePntMin.Z());
+      aPnt3 = gp_Pnt(thePntMax.X(), thePntMax.Y(), thePntMin.Z());
+      aPnt4 = gp_Pnt(thePntMin.X(), thePntMax.Y(), thePntMin.Z());
     }
     BRep_Builder aBuilder;
     TopoDS_Compound aCompound;
@@ -656,9 +670,7 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBounding
   }
   else
   {
-    BRepPrimAPI_MakeBox aBoxBuilder (
-      gp_Pnt (theBoundingBox.CornerMin().x(), theBoundingBox.CornerMin().y(), theBoundingBox.CornerMin().z()),
-      gp_Pnt (theBoundingBox.CornerMax().x(), theBoundingBox.CornerMax().y(), theBoundingBox.CornerMax().z()));
+    BRepPrimAPI_MakeBox aBoxBuilder (thePntMin, thePntMax);
     return aBoxBuilder.Shape();
   }
 }
