@@ -114,7 +114,7 @@ TCollection_AsciiString ViewControl_Tools::GetPointerInfo (const void* thePointe
     if (anInfoPtr.Value(aSymbolId) != '0')
     {
       anInfoPtr = anInfoPtr.SubString(aSymbolId, anInfoPtr.Length());
-      anInfoPtr.Prepend("0x");
+      anInfoPtr.Prepend(GetPointerPrefix());
       return anInfoPtr;
     }
   }

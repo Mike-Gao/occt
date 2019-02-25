@@ -57,6 +57,19 @@ void MessageModel_TreeModel::createRootItem (const int theColumnId)
 }
 
 // =======================================================================
+// function : HasShape
+// purpose :
+// =======================================================================
+Standard_Boolean MessageModel_TreeModel::HasReport (const Handle(Message_Report)& theReport)
+{
+  if (columnCount() == 0)
+    return Standard_False;
+
+  MessageModel_ItemRootPtr aRootItem = itemDynamicCast<MessageModel_ItemRoot> (RootItem (0));
+  return aRootItem && aRootItem->HasReport (theReport);
+}
+
+// =======================================================================
 // function : AddShape
 // purpose :
 // =======================================================================

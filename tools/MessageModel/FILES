@@ -12,10 +12,8 @@ MessageModel_ItemRoot.cxx
 MessageModel_ItemRoot.hxx
 MessageModel_ReportCallBack.cxx
 MessageModel_ReportCallBack.hxx
-MessageModel_TableModelRealValues.cxx
-MessageModel_TableModelRealValues.hxx
-MessageModel_TableModelRealVec3Values.cxx
-MessageModel_TableModelRealVec3Values.hxx
+MessageModel_TableModelValues.cxx
+MessageModel_TableModelValues.hxx
 MessageModel_Tools.cxx
 MessageModel_Tools.hxx
 MessageModel_TreeModel.cxx

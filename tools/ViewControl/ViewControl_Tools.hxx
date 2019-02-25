@@ -42,6 +42,9 @@ class QWidget;
 class ViewControl_Tools
 {
 public:
+  //! Returns text of separation row in table
+  //! \return string value
+  static QString TableSeparator() { return "---------------------------"; }
 
   //! Creates an action with the given text connected to the slot
   //! \param theText an action text value
@@ -60,6 +63,9 @@ public:
   //! \param theTableView table view instance
   //! \param theOrientation header orientation
   Standard_EXPORT static void SetDefaultHeaderSections (QTableView* theTableView, const Qt::Orientation theOrientation);
+
+  //! Returns default prefix added for each pointer info string
+  Standard_EXPORT static TCollection_AsciiString GetPointerPrefix() { return "0x"; }
 
   //! Convert handle pointer to string value
   //! \param thePointer a pointer

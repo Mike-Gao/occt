@@ -31,6 +31,8 @@ TreeModel_ModelBase::TreeModel_ModelBase (QObject* theParent)
 : QAbstractItemModel (theParent), m_pRootItem (0), m_pUseVisibilityColumn (false),
   myVisibilityState (0)
 {
+  myVisibleIcon = QIcon (":/icons/item_visible.png");
+  myInvisibleIcon = QIcon (":/icons/item_invisible.png");
 }
 
 // =======================================================================
@@ -104,14 +106,18 @@ QVariant TreeModel_ModelBase::data (const QModelIndex& theIndex, int theRole) co
     if (!myVisibilityState || !myVisibilityState->CanBeVisible (theIndex))
       return QVariant();
 
-    QVariant aValue = QIcon (myVisibilityState->IsVisible (theIndex) ? ":/icons/item_visible.png"
-                                                                     : ":/icons/item_invisible.png");
+    QVariant aValue = myVisibilityState->IsVisible (theIndex) ? myVisibleIcon : myInvisibleIcon;
     anItem->SetCustomData (aValue, theRole);
     return aValue;
   }
 
   TreeModel_ItemBasePtr anItem = GetItemByIndex (theIndex);
-  return anItem->data (theIndex, theRole);
+  QVariant anItemData = anItem->data (theIndex, theRole);
+
+  if (anItemData.isNull() && theRole == Qt::BackgroundRole && myHighlightedIndices.contains (theIndex))
+    anItemData = TreeModel_Tools::LightHighlightColor();
+
+  return anItemData;
 }
 
 // =======================================================================

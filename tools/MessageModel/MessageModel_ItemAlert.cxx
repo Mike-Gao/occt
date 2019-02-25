@@ -21,15 +21,16 @@
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <Message_AlertExtended.hxx>
-#include <Message_AttributeVectorOfReal.hxx>
-#include <Message_AttributeVectorOfRealVec3.hxx>
+#include <Message_AttributeVectorOfValues.hxx>
 #include <Message_CompositeAlerts.hxx>
 
 #include <TCollection_AsciiString.hxx>
-#include <TopoDS_AlertWithShape.hxx>
+#include <TopoDS_AlertAttribute.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QColor>
 #include <QIcon>
+#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : initValue
@@ -65,12 +66,16 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
   // if the alert is composite, process the real alert
   if (theRole == Qt::DecorationRole && Column() == 0)
   {
-    if (anAlert->IsKind (STANDARD_TYPE (TopoDS_AlertWithShape)))
+    Handle(Message_AlertExtended) anExtAttribute = Handle(Message_AlertExtended)::DownCast (anAlert);
+    if (anExtAttribute.IsNull())
+      return QVariant();
+
+    Handle(Message_Attribute) anAttribute = anExtAttribute->Attribute();
+
+    if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
       return QIcon (":/icons/item_shape.png");
-    else if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfReal)))
-      return QIcon (":/icons/item_vectorOfReal.png");
-    else if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfRealVec3)))
-      return QIcon (":/icons/item_vectorOfRealVec3.png");
+    else if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
+      return QIcon (":/icons/item_vectorOfValues.png");
     else
       return QVariant();
   }

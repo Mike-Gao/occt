@@ -29,7 +29,6 @@
 
 #include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
-#include <inspector/ViewControl_TableProperty.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
 
 #include <inspector/View_Tools.hxx>
@@ -112,6 +111,7 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
   ((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (MESSAGEVIEW_DEFAULT_TREE_VIEW_WIDTH,
                                                                  MESSAGEVIEW_DEFAULT_TREE_VIEW_HEIGHT));
   MessageModel_TreeModel* aModel = new MessageModel_TreeModel (myTreeView);
+  //aModel->SetReversed (Standard_True);
   for (int i = 5; i <= 7; i++) // hide shape parameters columns
   {
     TreeModel_HeaderSection anItem = aModel->GetHeaderItem (i);
@@ -217,7 +217,6 @@ void MessageView_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIt
   QMap<QString, QString> anItems;
   TreeModel_Tools::SaveState (myTreeView, anItems);
   View_Tools::SaveState (myViewWindow, anItems);
-  ViewControl_PropertyView::SaveState (myPropertyView, anItems);
 
   for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
     theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
@@ -242,8 +241,6 @@ void MessageView_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap&
     else if (TreeModel_Tools::RestoreState (myTreeView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
       continue;
     else if (View_Tools::RestoreState (myViewWindow, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
-      continue;
-    else if (ViewControl_PropertyView::RestoreState (myPropertyView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
       continue;
   }
 }
@@ -273,6 +270,13 @@ void MessageView_Window::UpdateContent()
     NCollection_List<TCollection_AsciiString> aNames;
     myParameters->SetFileNames (aName, aNames);
     isUpdated = true;
+  }
+  Handle(Message_Report) aDefaultReport = Message_Report::CurrentReport( Standard_False);
+  MessageModel_TreeModel* aViewModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  if (!aDefaultReport.IsNull() && !aViewModel->HasReport (aDefaultReport))
+  {
+    aDefaultReport->SetCallBack (myCallBack);
+    addReport (aDefaultReport);
   }
   // reload report of selected item
   onReloadReport();
@@ -484,7 +488,7 @@ void MessageView_Window::onPropertyViewSelectionChanged()
     return;
   }
 
-  TopoDS_Shape aShapeOfSelection = MessageModel_Tools::BuildShape (anAlertItem->GetAlert(), aSelectedIndices[0], aFirstTable);
+  /*TopoDS_Shape aShapeOfSelection = MessageModel_Tools::BuildShape (anAlertItem->GetAlert(), aSelectedIndices[0], aFirstTable);
   if (aShapeOfSelection.IsNull())
     return;
 
@@ -504,7 +508,7 @@ void MessageView_Window::onPropertyViewSelectionChanged()
   {
     anAlertItem->SetCustomShape (aShapeOfSelection);
     aVisibilityState->SetVisible (anIndex, true);
-  }
+  }*/
 }
 
 // =======================================================================

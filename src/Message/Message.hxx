@@ -83,7 +83,22 @@ public:
   Standard_EXPORT static Standard_Boolean GravityFromString (const Standard_CString theGravityString,
                                                              Message_Gravity& theGravity);
 
+  //! Returns separator symbol of Dump information
+  static Standard_Character DumpSeparator() { return '\\'; }
 
+  //! Convert handle pointer to string value
+  //! \param thePointer a pointer
+  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString TransientToString (const Handle(Standard_Transient)& thePointer,
+                                                                    const bool isShortInfo = true);
+
+  //! Convert pointer to string value
+  //! \param thePointer a pointer
+  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString PointerToString (const void* thePointer,
+                                                                  const bool isShortInfo = true);
 
 protected:
 

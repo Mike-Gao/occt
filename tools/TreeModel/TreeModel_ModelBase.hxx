@@ -84,6 +84,13 @@ public:
   //!< \return the checker interface
   TreeModel_VisibilityState* GetVisibilityState () const { return myVisibilityState; }
 
+  //! Returns true if the tree view model contains highlighted items. This highlight is set manually.
+  bool HasHighlighted() { return !myHighlightedIndices.isEmpty(); }
+
+  //! Sets items of the indices highlighted in the model.
+  //! \param theIndices a list of tree model indices
+  void SetHighlighted (const QModelIndexList& theIndices = QModelIndexList()) { myHighlightedIndices = theIndices; }
+
   //! Returns the index of the item in the model specified by the given row, column and parent index.
   //! Saves an internal pointer at the createIndex. This pointer is a shared pointer to the class,
   //! that realizes a base item interface. If the parent is invalid, a root item is used, otherwise a new item
@@ -187,6 +194,10 @@ protected:
 
   bool m_pUseVisibilityColumn; //!< the state whether column=0 is reserved for Visibility state
   TreeModel_VisibilityState* myVisibilityState; //!< the interface of item visibility
+  QIcon myVisibleIcon; //!< icon of visible state
+  QIcon myInvisibleIcon; //!< icon of invisible state
+
+  QModelIndexList myHighlightedIndices; //!< tree model indices that should be visualized as highlighted
 };
 
 #endif

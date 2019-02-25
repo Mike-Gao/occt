@@ -22,8 +22,9 @@
 #include <Standard_Transient.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QList>
-//#include <QColor>
+#include <Standard_WarningsRestore.hxx>
 
 class Message_Alert;
 class ViewControl_TableModelValues;
@@ -63,13 +64,6 @@ public:
   //! \param theTableValue container of values
   Standard_EXPORT static void GetPropertyTableValues (const Handle(Message_Alert)& theAlert,
                                                       QList<ViewControl_TableModelValues*>& theTableValues);
-
-  //! Creates TopoDS_Compound with TopoDS_Edge/Vertex on alert data
-  //! \param theAlert a message alert
-  //! \parm theSelectedIndices a container of indices
-  //! \param theTableView source view
-  Standard_EXPORT TopoDS_Shape static BuildShape (const Handle(Message_Alert)& theAlert, QList<int> aSelectedIndices,
-                                                  ViewControl_Table* theTableView);
 };
 
 #endif

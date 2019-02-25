@@ -198,13 +198,6 @@ ViewControl_Table* ViewControl_PropertyView::findTable (const int theTableId, co
   connect (aTable->GetTableView()->selectionModel(),
           SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)),
           this, SLOT(onTableSelectionChanged (const QItemSelection&, const QItemSelection&)));
-  connect (aTable->GetProperty(), SIGNAL (propertyChanged()), this, SIGNAL (propertyViewSelectionChanged()));
-
-  if (myXStepValues.size() > theTableId)
-    aTable->GetProperty()->SetXStep (myXStepValues[theTableId]);
-
-  if (myDivideValues.size() > theTableId)
-    aTable->GetProperty()->SetDivideSize (myDivideValues[theTableId]);
 
   myTableWidgetLayout->addWidget (aTable->GetControl());
 
@@ -223,59 +216,4 @@ void ViewControl_PropertyView::onTableSelectionChanged (const QItemSelection&, c
     return;
 
   emit propertyViewSelectionChanged();
-}
-
-// =======================================================================
-// function : SaveState
-// purpose :
-// =======================================================================
-void ViewControl_PropertyView::SaveState (ViewControl_PropertyView* theView,
-                                          QMap<QString, QString>& theItems,
-                                          const QString& thePrefix)
-{
-  QList<ViewControl_Table*> anActiveTables;
-  theView->GetActiveTables(anActiveTables);
-
-  if (anActiveTables.size() == 0)
-    return;
-
-  anActiveTables[0]->GetProperty()->GetXStep();
-  QStringList aDivideSizes, aXSteps;
-  for (int i = 0; i < anActiveTables.size(); i++)
-  {
-    aXSteps.append (QString::number (anActiveTables[i]->GetProperty()->GetXStep()));
-    aDivideSizes.append (QString::number (anActiveTables[i]->GetProperty()->GetDivideSize()));
-  }
-  theItems[thePrefix + "property_view_xstep_value"] = aXSteps.join (",");
-  theItems[thePrefix + "property_view_divide_value"] = aDivideSizes.join (",");
-}
-
-// =======================================================================
-// function : RestoreState
-// purpose :
-// =======================================================================
-bool ViewControl_PropertyView::RestoreState (ViewControl_PropertyView* theView,
-                                             const QString& theKey,
-                                             const QString& theValue,
-                                             const QString& thePrefix)
-{
-  if (theKey == thePrefix + "property_view_xstep_value")
-  {
-    QList<double> aXStepValues;
-    QStringList aValues = theValue.split (",", QString::SkipEmptyParts);
-    for (int aValueId = 0; aValueId < aValues.size(); aValueId++)
-      aXStepValues.append (aValues.at (aValueId).toDouble());
-    theView->SetXSteps (aXStepValues);
-  }
-  else if (theKey == thePrefix + "property_view_divide_value")
-  {
-    QList<int> aDivideValues;
-    QStringList aValues = theValue.split (",", QString::SkipEmptyParts);
-    for (int aValueId = 0; aValueId < aValues.size(); aValueId++)
-      aDivideValues.append (aValues.at (aValueId).toInt());
-    theView->SetDivideValues (aDivideValues);
-  }
-  else
-    return false;
-  return true;
 }

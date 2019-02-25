@@ -19,6 +19,7 @@
 #include <Standard.hxx>
 
 #include <inspector/TreeModel_HeaderSection.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/ViewControl_EditType.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -40,20 +41,20 @@ public:
 
   //! Constructor
   Standard_EXPORT ViewControl_TableModelValues (const Qt::Orientation& theOrientation = Qt::Vertical)
-    : myUseTableProperties (false), myUseTableSeparateSize (true), myUseTablePropertiesXStep (false),
-      myUseTablePropertiesXStepValue (-1)
   { SetOrientation (theOrientation); }
 
   //! Destructor
   virtual ~ViewControl_TableModelValues() {}
 
+  //! Sets item table properties builder
+  void SetProperties (const Handle(TreeModel_ItemProperties)& theProperties) { myProperties = theProperties; }
+
+  //! Returns item table properties builder
+  Handle(TreeModel_ItemProperties) GetProperties() const { return myProperties; }
+
   //! Sets direction of the values applying, whether it should be placed by rows or by columns
   //! \param theOrientation if horizontal, the values are applyed by rows, otherwise by columns
   void SetOrientation (const Qt::Orientation& theOrientation) { myOrientation = theOrientation; }
-
-  //! Fills the model values.
-  //! \param theValues a container of table model values
-  void SetValues (const QVector<QVariant>& theValues) { myValues = theValues; }
 
   //! Fills the model header values for orientation.
   //! \param theValues a container of header text values
@@ -94,34 +95,6 @@ public:
     return myDefaultSectionSize.contains (theOrientation);
   }
 
-  //! Stores whether the properties control of the table visible or not
-  //! \param theUseProperties boolean state
-  void SetUseTableProperties (const bool theUseProperties) { myUseTableProperties = theUseProperties; }
-
-  //! Returns true if the properties control of the table visible or not
-  //! \return boolean value
-  bool UseTableProperties() const { return myUseTableProperties; }
-
-  //! Stores whether the properties control of the table visible or not
-  //! \param theUseProperties boolean state
-  void SetUseTableSeparateSize (const bool theUseSize)
-  { myUseTableSeparateSize = theUseSize; }
-
-  //! Returns true if the properties control of the table visible or not
-  //! \return boolean value
-  bool UseTableSeparateSize() const
-  { return myUseTableSeparateSize; }
-
-  //! Stores whether the properties control of the table visible or not
-  //! \param theUseProperties boolean state
-  void SetUseTablePropertiesXStep (const bool theUseStep, const double theStep)
-  { myUseTablePropertiesXStep = theUseStep; myUseTablePropertiesXStepValue = theStep; }
-
-  //! Returns true if the properties control of the table visible or not
-  //! \return boolean value
-  double UseTablePropertiesXStep(bool& theUseStep) const
-  { theUseStep = myUseTablePropertiesXStep; return myUseTablePropertiesXStepValue; }
-
   //! Returns number of columns, size of header values
   //! \param theParent an index of the parent item
   //! \return an integer value
@@ -130,8 +103,7 @@ public:
   //! Returns number of rows, depending on orientation: myColumnCount or size of values container
   //! \param theParent an index of the parent item
   //! \return an integer value
-  virtual int RowCount (const QModelIndex& theParent = QModelIndex()) const
-  { return ColumnCount (theParent) > 0 ? GetValuesCount() / ColumnCount (theParent) : 0; }
+  Standard_EXPORT virtual int RowCount (const QModelIndex& theParent = QModelIndex()) const;
 
   //! Returns content of the model index for the given role, it is obtained from internal container of values
   //! It returns value only for DisplayRole.
@@ -147,8 +119,7 @@ public:
   //! \param theRole a view role
   //! \return true if the value is changed
   Standard_EXPORT virtual bool SetData (const int theRow, const int theColumn, const QVariant& theValue,
-                                        int theRole = Qt::DisplayRole)
-  { (void)theRow; (void)theColumn; (void)theValue; (void)theRole; return false; }
+                                        int theRole = Qt::DisplayRole);
 
   //! Returns content of the model index for the given role, it is obtainer from internal container of header values
   //! It returns value only for DisplayRole.
@@ -163,28 +134,6 @@ public:
   //! \return flags
   virtual Qt::ItemFlags Flags (const QModelIndex& theIndex) const
   { return theIndex.isValid() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable : Qt::NoItemFlags; }
-
-  //! Returns minimum and maximum values of the table content
-  //! \param theMinValue minimum
-  //! \param theMaxValue maximum
-  virtual void GetRangeValues (QString& theMinValue, QString& theMaxValue, const QModelIndexList& theSelected) const
-  { (void)theMinValue; (void)theMaxValue; (void)theSelected; }
-
-  //! Returns additional info
-  virtual QString AdditionalInformation() const { return QString(); }
-
-  //! Returns number of rows, depending on orientation: myColumnCount or size of values container
-  //! \param theParent an index of the parent item
-  //! \return an integer value
-  virtual int GetValuesCount () const { return myValues.size(); }
-
-  //! Returns source row/column indices for the filtered model index for the given role
-  //! \param theSourceRow model row index
-  //! \param theSourceColumn model column index
-  //! \param theRow [out] row number value
-  //! \param theColumn [out] column value
-  Standard_EXPORT virtual void GetSourcePosition (const int theSourceRow, const int theSourceColumn, int& theRow, int& theColumn) const
-  { theRow = theSourceRow; theColumn = theSourceColumn; }
 
   //! Returns item delegate to provide cell editors. By default, it is empty
   //! \return delegate
@@ -209,11 +158,6 @@ public:
   static QColor EditCellColor() { return QColor (Qt::darkBlue); }
 
 protected:
-  //! Finds position in internal vector of values using the table column/row count
-  //! \param theRow a row of a table cell
-  //! \param theColumn a column of a table cell
-  size_t getPosition (const int theRow, const int theColumn) const { return ColumnCount() * theRow + theColumn; }
-
   //! Returns true if the header item is italic of the parameter index
   //! \param theRow a model index row
   //! \param theColumn a model index column
@@ -226,11 +170,8 @@ protected:
   QMap<Qt::Orientation, QList<TreeModel_HeaderSection> > myHeaderValues; //!< table header values
   QMap<Qt::Orientation, bool> myVisibleHeader; //! table header visibility
   QMap<Qt::Orientation, int> myDefaultSectionSize; //! table section default size
-  QVector<QVariant> myValues; //! cached container of table values
-  bool myUseTableProperties; //! state whether the table property control is visible
-  bool myUseTableSeparateSize; //! state whether table custom column size is possible
-  bool myUseTablePropertiesXStep; //! true if XStep value is used
-  double myUseTablePropertiesXStepValue; //! value to define OX step for 1D table, Z = 0
+
+  Handle(TreeModel_ItemProperties) myProperties; //!< item properties
 };
 
 #endif

@@ -17,7 +17,6 @@
 #define VInspector_TableModelValues_H
 
 #include <inspector/ViewControl_TableModelValues.hxx>
-#include <inspector/ViewControl_TableModelFilter.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 #include <inspector/TreeModel_ItemBase.hxx>
 
@@ -65,11 +64,6 @@ public:
   //! \param theIndex a model index
   //! \return flags
   virtual Qt::ItemFlags Flags (const QModelIndex& theIndex) const Standard_OVERRIDE;
-
-  //! Returns number of rows, depending on orientation: myColumnCount or size of values container
-  //! \param theParent an index of the parent item
-  //! \return an integer value
-  virtual int GetValuesCount () const Standard_OVERRIDE;
 
   //! Returns type of edit control for the model index. By default, it is an empty control
   //! \param theRow a model index row

@@ -52,6 +52,21 @@ const Handle(Message_Report)& MessageModel_ItemRoot::GetReport (const int theRow
 }
 
 // =======================================================================
+// function : HasReport
+// purpose :
+// =======================================================================
+Standard_Boolean MessageModel_ItemRoot::HasReport (const Handle(Message_Report)& theReport)
+{
+  NCollection_List<MessageModel_ReportInformation>::Iterator aReportsIt (myReports);
+  for (int aRowId = 0; aReportsIt.More(); aReportsIt.Next(), aRowId++)
+  {
+    if (aReportsIt.Value().myReport == theReport)
+      return Standard_True;
+  }
+  return Standard_False;
+}
+
+// =======================================================================
 // function : initValue
 // purpose :
 // =======================================================================
