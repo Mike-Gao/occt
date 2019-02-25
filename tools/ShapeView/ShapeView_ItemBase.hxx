@@ -32,6 +32,11 @@ public:
   //! Resets cached values
   virtual void Reset() Standard_OVERRIDE { TreeModel_ItemBase::Reset(); }
 
+  //! Return data value for the role.
+  //! \param theRole a value role
+  //! \return the value
+  Standard_EXPORT virtual QVariant initValue(const int theRole) const;
+
 protected:
 
   //! Initialize the current item. It creates a backup of the specific item information
