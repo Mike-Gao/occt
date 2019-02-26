@@ -24,6 +24,7 @@
 #include <BRepLib_WireError.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
+#include <TopTools_DataMapOfShapeShape.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <BRepLib_MakeShape.hxx>
 #include <TopTools_ListOfShape.hxx>
@@ -172,14 +173,14 @@ private:
   };
 
   void CollectCoincidentVertices(const TopTools_ListOfShape& theL,
-    NCollection_List<NCollection_List<TopoDS_Vertex>>& theGrVL);
+                                 NCollection_List<NCollection_List<TopoDS_Vertex>>& theGrVL);
 
   void CreateNewVertices(const NCollection_List<NCollection_List<TopoDS_Vertex>>& theGrVL, 
-    NCollection_DataMap<TopoDS_Vertex, TopoDS_Vertex>& theO2NV);
+                         TopTools_DataMapOfShapeShape& theO2NV);
 
   void CreateNewListOfEdges(const TopTools_ListOfShape& theL,
-    const NCollection_DataMap<TopoDS_Vertex, TopoDS_Vertex>& theO2NV,
-    TopTools_ListOfShape& theNewEList);
+                            const TopTools_DataMapOfShapeShape& theO2NV,
+                            TopTools_ListOfShape& theNewEList);
 
   void Add(const TopoDS_Edge& E, Standard_Boolean IsCheckGeometryProximity);
 
