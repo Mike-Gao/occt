@@ -249,6 +249,9 @@ void Extrema_ExtCC::Perform()
     }
     default: break;
     }
+    if (mypoints.Size() == 0) {
+      myDone = Standard_False;
+    }
   } else if (type1 == GeomAbs_Circle && type2 == GeomAbs_Circle) {
     //analytical case - two circles
     Standard_Boolean bIsDone;
@@ -258,10 +261,10 @@ void Extrema_ExtCC::Perform()
       PrepareResults(CCXtrem, Standard_False, U11, U12, U21, U22);
     }
     else {
-      myECC.Perform();
-      PrepareResults(myECC, U11, U12, U21, U22);
+      myDone = Standard_False;
     }
-  } else {
+  } 
+  if(!myDone){
     myECC.Perform();
     PrepareResults(myECC, U11, U12, U21, U22);
   }
