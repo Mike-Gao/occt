@@ -502,7 +502,7 @@ static Standard_Integer OCC30182 (Draw_Interpretor& , Standard_Integer theNbArgs
   TopoDS_Shape aShape = BRepPrimAPI_MakeBox (100.0 * anImage->Ratio(), 100.0, 1.0).Shape();
   Handle(AIS_Shape) aPrs = new AIS_Shape (aShape);
   aPrs->SetDisplayMode (AIS_Shaded);
-  aPrs->Attributes()->SetupOwnShadingAspect();
+  //aPrs->Attributes()->SetupOwnShadingAspect(); // corrected after porting on current master
   const Handle(Graphic3d_AspectFillArea3d)& anAspect = aPrs->Attributes()->ShadingAspect()->Aspect();
   anAspect->SetShadingModel (Graphic3d_TOSM_UNLIT);
   anAspect->SetTextureMapOn (true);
