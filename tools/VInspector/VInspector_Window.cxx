@@ -19,6 +19,7 @@
 #include <AIS_Trihedron.hxx>
 #include <BRep_Builder.hxx>
 #include <Geom_Axis2Placement.hxx>
+#include <Prs3d_PointAspect.hxx>
 #include <TopoDS_Compound.hxx>
 
 #include <inspector/TreeModel_ColumnType.hxx>
@@ -1142,8 +1143,11 @@ void VInspector_Window::updatePreviewPresentation (const NCollection_List<TopoDS
 
   if (myPreviewPresentation.IsNull())
   {
+    Quantity_Color aColor(Quantity_NOC_TOMATO);//Quantity_NOC_GREENYELLOW));//Quantity_NOC_BLUE1));
+
     myPreviewPresentation = new AIS_Shape (aCompound);
-    myPreviewPresentation->SetColor (Quantity_Color (Quantity_NOC_TOMATO));//Quantity_NOC_GREENYELLOW));//Quantity_NOC_BLUE1));
+    myPreviewPresentation->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_O_PLUS, aColor, 3.0));
+    myPreviewPresentation->SetColor (aColor);
     myPreviewPresentation->SetZLayer (Graphic3d_ZLayerId_Topmost);
 
     myPreviewPresentation->SetTransformPersistence(thePersistent);

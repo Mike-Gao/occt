@@ -27,6 +27,8 @@
 #include <OpenGl_CappingPlaneResource.hxx>
 #include <OpenGl_Element.hxx>
 
+class Font_TextFormatter;
+
 class OpenGl_Group;
 class OpenGl_CappingPlaneResource;
 class OpenGl_Structure;
@@ -139,6 +141,15 @@ public:
                                      const Graphic3d_TextPath                theTp,
                                      const Graphic3d_HorizontalTextAlignment theHTA,
                                      const Graphic3d_VerticalTextAlignment   theVTA,
+                                     const Standard_Boolean                  theToEvalMinMax,
+                                     const Standard_Boolean                  theHasOwnAnchor = Standard_True) Standard_OVERRIDE;
+
+  //! Add text element in 3D space.
+  Standard_EXPORT virtual void Text (const Handle(Font_TextFormatter)&       theTextFormatter,
+                                     const gp_Ax2&                           theOrientation,
+                                     const Standard_Real                     theHeight,
+                                     const Standard_Real                     theAngle,
+                                     const Graphic3d_TextPath                theTp,
                                      const Standard_Boolean                  theToEvalMinMax,
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True) Standard_OVERRIDE;
 

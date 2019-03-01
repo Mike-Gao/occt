@@ -339,14 +339,14 @@ Font_Rect Font_FTFont::BoundingBox (const NCollection_String&               theS
                                     const Graphic3d_HorizontalTextAlignment theAlignX,
                                     const Graphic3d_VerticalTextAlignment   theAlignY)
 {
-  Font_TextFormatter aFormatter;
-  aFormatter.SetupAlignment (theAlignX, theAlignY);
-  aFormatter.Reset();
+  Handle(Font_TextFormatter) aFormatter = new Font_TextFormatter();
+  aFormatter->SetupAlignment (theAlignX, theAlignY);
+  aFormatter->Reset();
 
-  aFormatter.Append (theString, *this);
-  aFormatter.Format();
+  aFormatter->Append (theString, *this);
+  aFormatter->Format();
 
   Font_Rect aBndBox;
-  aFormatter.BndBox (aBndBox);
+  aFormatter->BndBox (aBndBox);
   return aBndBox;
 }

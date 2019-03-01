@@ -24,6 +24,8 @@
 #include <OpenGl_Text.hxx>
 #include <OpenGl_Workspace.hxx>
 
+#include <Font_TextFormatter.hxx>
+
 #include <Graphic3d_ArrayOfPrimitives.hxx>
 #include <Graphic3d_GroupDefinitionError.hxx>
 
@@ -405,6 +407,38 @@ void OpenGl_Group::Text (const Standard_CString                  theTextUtf,
                          theToEvalMinMax,
                          theHasOwnAnchor);
 
+}
+
+// =======================================================================
+// function : SetFlippingOptions
+// purpose  :
+// =======================================================================
+void OpenGl_Group::Text (const Handle(Font_TextFormatter)&       theTextFormatter,
+                         const gp_Ax2&                           theOrientation,
+                         const Standard_Real                     theHeight,
+                         const Standard_Real                     theAngle,
+                         const Graphic3d_TextPath                theTp,
+                         const Standard_Boolean                  theToEvalMinMax,
+                         const Standard_Boolean                  theHasOwnAnchor)
+{
+  if (IsDeleted())
+  {
+    return;
+  }
+
+  OpenGl_TextParam  aParams;
+  OpenGl_Structure* aStruct = GlStruct();
+
+  aParams.Height      = int ((theHeight < 2.0) ? aStruct->GlDriver()->DefaultTextHeight() : theHeight);
+
+  Handle(OpenGl_Text) aText = new OpenGl_Text ("", theOrientation, aParams, theHasOwnAnchor != Standard_False);
+  aText->SetTextFormatter (theTextFormatter);
+
+  AddElement (aText);
+
+  Graphic3d_Group::Text ("", theOrientation, theHeight, theAngle,
+                         theTp, theTextFormatter->HorizontalTextAlignment(), theTextFormatter->VerticalTextAlignment(),
+                         theToEvalMinMax, theHasOwnAnchor);
 }
 
 // =======================================================================
