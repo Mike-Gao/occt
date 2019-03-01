@@ -1,5 +1,5 @@
 puts "============"
-puts "OCC30217"
+puts "OCC30217_1"
 puts "============"
 puts ""
 #########################################################################
@@ -16,7 +16,7 @@ set tol_rel 1.0e-2
 set param11 1.8484218380721342
 set param12 1.8484627151687805
 set param21 50.908401295062035
-set param22 1.8484627151687805    
+set param22 50.909328431594709
 
 set info [2dintersect c2 s2 -tol 1e-8]
 regexp {Curve 1 first parameter: +([-0-9.+eE]+) last parameter: +([-0-9.+eE]+)} ${info} full curve1p1 curve1p2

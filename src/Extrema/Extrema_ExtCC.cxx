@@ -249,7 +249,8 @@ void Extrema_ExtCC::Perform()
     }
     default: break;
     }
-    if (mypoints.Size() == 0) {
+    if (mypoints.Size() == 0)
+    {
       myDone = Standard_False;
     }
   } else if (type1 == GeomAbs_Circle && type2 == GeomAbs_Circle) {
@@ -265,8 +266,10 @@ void Extrema_ExtCC::Perform()
     }
   } 
   if(!myDone){
+    Standard_Boolean isParallel = myIsPar;
     myECC.Perform();
     PrepareResults(myECC, U11, U12, U21, U22);
+    myIsPar = myIsPar || isParallel;
   }
 }
 
