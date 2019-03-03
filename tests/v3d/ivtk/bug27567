@@ -31,7 +31,7 @@ for {set i 1} {${i} <= ${i_max}} {incr i} {
   unset t
   
 
-  # Display the j-th shape
+  # Display the i-th shape
   ivtkdisplay b$i
 		
   # Display shaded
@@ -61,6 +61,6 @@ for {set i 1} {${i} <= ${i_max}} {incr i} {
   unset b$i
 
   lappend listmem [meminfo h]
-  checktrend $listmem 0 120000 "Memory leak detected"
+  checktrend $listmem 0 1 "Memory leak detected"
 }
 
