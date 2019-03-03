@@ -181,13 +181,22 @@ namespace
       switch (theOrigin)
       {
         case SEEK_SET:
-          isSeekDone = (bool )aThis->myIStream->seekg ((std::streamoff )aThis->myInitPos + theOffset, std::ios::beg);
+          if (aThis->myIStream->seekg ((std::streamoff )aThis->myInitPos + theOffset, std::ios::beg))
+          {
+            isSeekDone = true;
+          }
           break;
         case SEEK_CUR:
-          isSeekDone = (bool )aThis->myIStream->seekg (theOffset, std::ios::cur);
+          if (aThis->myIStream->seekg (theOffset, std::ios::cur))
+          {
+            isSeekDone = true;
+          }
           break;
         case SEEK_END:
-          isSeekDone = (bool )aThis->myIStream->seekg (theOffset, std::ios::end);
+          if (aThis->myIStream->seekg (theOffset, std::ios::end))
+          {
+            isSeekDone = true;
+          }
           break;
       }
       return isSeekDone ? 0 : -1;
