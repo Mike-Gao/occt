@@ -85,11 +85,8 @@
 #include <IVtkDraw_HighlightAndSelectionPipeline.hxx>
 #include <IVtkDraw_Interactor.hxx>
 
-// prevent disabling some MSVC warning messages by VTK headers 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4244)
-#endif
+// prevent disabling some MSVC warning messages by VTK headers
+#include <Standard_WarningsDisable.hxx>
 #include <vtkAlgorithmOutput.h>
 #include <vtkAppendPolyData.h>
 #include <vtkBMPWriter.h>
@@ -111,6 +108,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
+#include <vtkTimerLog.h>
 #include <vtkWindowToImageFilter.h>
 #ifndef _WIN32
 #include <X11/X.h>
@@ -123,9 +121,7 @@
 #include <X11/Xutil.h>
 #include <tk.h>
 #endif
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <Standard_WarningsRestore.hxx>
 
 // workaround name conflicts with OCCT methods (in class TopoDS_Shape for example)
 #ifdef Convex
@@ -407,6 +403,37 @@ static Standard_Integer VtkInit (Draw_Interpretor& ,
   return 0;
 }
 
+//================================================================
+// Function : VtkTimerLog
+// Purpose  :
+//================================================================
+static Standard_Integer VtkTimerLog (Draw_Interpretor& ,
+                                    Standard_Integer theNbArgs,
+                                    const char** theArgVec)
+{
+  TCollection_AsciiString aVal;
+  if (theNbArgs == 2)
+  {
+    aVal = theArgVec[1];
+    aVal.LowerCase();
+  }
+  if (aVal == "1"
+   || aVal == "on")
+  {
+    vtkTimerLog::LoggingOn();
+  }
+  else if (aVal == "0"
+        || aVal == "off")
+  {
+    vtkTimerLog::LoggingOff();
+  }
+  else
+  {
+    std::cout << "Syntax error: wrong arguments\n";
+    return 1;
+  }
+  return 0;
+}
 
 //================================================================
 // Function : CreateActor
@@ -1173,6 +1200,11 @@ void IVtkDraw::Commands (Draw_Interpretor& theCommands)
     "\n\t\t: Creates the Vtk window",
     __FILE__, VtkInit, group);
 
+  theCommands.Add("ivtktimerlog",
+    "ivtktimerlog {on|off}\n"
+    "\n\t\t: Enables/disables VTK timer profiler",
+    __FILE__, VtkTimerLog, group);
+
   theCommands.Add("ivtkdisplay",
     "ivtkdisplay usage:\n"
     "ivtkdisplay name1 name2 ..."
@@ -1235,7 +1267,6 @@ void IVtkDraw::Commands (Draw_Interpretor& theCommands)
     "Color parameters r,g,b = [0..255].",
     __FILE__, VtkBackgroundColor, group);
 }
-
 
 //================================================================
 // Function : Factory

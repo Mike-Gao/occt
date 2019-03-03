@@ -2765,13 +2765,14 @@ proc _checkpoint {coord_x coord_y rd_ch gr_ch bl_ch} {
 # the check fails and procedure raises error with specified message.
 #
 # Otherwise the procedure returns false meaning that more iterations are needed.
-# Note that false is returned in any case if length of listval is less than 3.
+# Note that analysis is peformed only if listval contains at least 5 values,
+# thus false is returned unconditionally for shorter lists.
 #
 # See example of use to check memory leaks in bugs/caf/bug23489
 #
 proc checktrend {listval delta tolerance message} {
     set nbval [llength $listval]
-    if { $nbval < 3} {
+    if { $nbval < 5} {
         return 0
     }
 

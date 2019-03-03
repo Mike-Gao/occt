@@ -1422,7 +1422,7 @@ proc osutils:vtkCsf {{theOS ""}} {
     }
   }
 
-  set aLibArray [list vtkCommonCore vtkCommonDataModel vtkCommonExecutionModel vtkCommonMath vtkCommonTransforms vtkRenderingCore \
+  set aLibArray [list vtkCommonCore vtkCommonSystem vtkCommonDataModel vtkCommonExecutionModel vtkCommonMath vtkCommonTransforms vtkRenderingCore \
                       vtkRenderingOpenGL  vtkFiltersGeneral vtkIOCore vtkIOImage vtkImagingCore vtkInteractionStyle]
 
   # Additional suffices for the libraries
