@@ -50,11 +50,14 @@ IMeshTools_ShapeExplorer::~IMeshTools_ShapeExplorer ()
 void IMeshTools_ShapeExplorer::Accept (
   const Handle (IMeshTools_ShapeVisitor)& theVisitor)
 {
-  // Explore all free edges in shape.
-  TopExp_Explorer aFreeEdgesIt (GetShape (), TopAbs_EDGE, TopAbs_FACE);
-  for (; aFreeEdgesIt.More(); aFreeEdgesIt.Next())
+  // Explore all edges in shape - either free or related to some face.
+  TopTools_IndexedMapOfShape aEdges;
+  TopExp::MapShapes (GetShape (), TopAbs_EDGE, aEdges);
+
+  TopTools_IndexedMapOfShape::Iterator aEdgeIt (aEdges);
+  for (; aEdgeIt.More (); aEdgeIt.Next ())
   {
-    const TopoDS_Edge& aEdge = TopoDS::Edge (aFreeEdgesIt.Current());
+    const TopoDS_Edge& aEdge = TopoDS::Edge (aEdgeIt.Value ());
     if (!BRep_Tool::IsGeometric(aEdge))
     {
       continue;
@@ -63,48 +66,15 @@ void IMeshTools_ShapeExplorer::Accept (
     theVisitor->Visit (aEdge);
   }
 
-  // Explore all related to some face edges in shape.
+  // Explore faces
   TopTools_ListOfShape aFaceList;
   BRepLib::ReverseSortFaces (GetShape (), aFaceList);
   TopTools_MapOfShape aFaceMap;
 
+  // make array of faces suitable for processing (excluding faces without surface)
   TopLoc_Location aDummyLoc;
   const TopLoc_Location aEmptyLoc;
   TopTools_ListIteratorOfListOfShape aFaceIter (aFaceList);
-  for (; aFaceIter.More (); aFaceIter.Next ())
-  {
-    TopoDS_Shape aFaceNoLoc = aFaceIter.Value ();
-    aFaceNoLoc.Location (aEmptyLoc);
-    if (!aFaceMap.Add(aFaceNoLoc))
-    {
-      continue; // already processed
-    }
-
-    TopoDS_Face aFace = TopoDS::Face (aFaceIter.Value ());
-    const Handle (Geom_Surface)& aSurf = BRep_Tool::Surface (aFace, aDummyLoc);
-    if (aSurf.IsNull())
-    {
-      continue;
-    }
-
-    TopExp_Explorer anEdgesExp (aFace, TopAbs_EDGE);
-    for (; anEdgesExp.More(); anEdgesExp.Next())
-    {
-      const TopoDS_Edge& aEdge =  TopoDS::Edge (anEdgesExp.Current());
-      if (!BRep_Tool::IsGeometric(aEdge))
-      {
-        continue;
-      }
-
-      theVisitor->Visit (aEdge);
-    }
-  }
-
-  // Explore faces
-  aFaceMap.Clear();
-
-  // make array of faces suitable for processing (excluding faces without surface)
-  aFaceIter.Init (aFaceList);
   for (; aFaceIter.More (); aFaceIter.Next ())
   {
     TopoDS_Shape aFaceNoLoc = aFaceIter.Value ();
