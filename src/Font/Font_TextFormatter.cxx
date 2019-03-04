@@ -312,7 +312,7 @@ Standard_Boolean Font_TextFormatter::BndBox (const Standard_Integer theIndex, Fo
     theBndBox.Left = aLeftCorner.x();
     theBndBox.Bottom = aLeftCorner.y();
     theBndBox.Top = theBndBox.Bottom + myLineSpacing;
-    if (Abs (aLeftCorner.y() - aNextLeftCorner.y()) < Precision::Confusion())
+    if (Abs (aLeftCorner.y() - aNextLeftCorner.y()) < Precision::Confusion()) // in the same row
     {
       theBndBox.Right = aNextLeftCorner.x();
     }
@@ -339,26 +339,33 @@ Standard_Boolean Font_TextFormatter::BndBox (const Standard_Integer theIndex, Fo
   return Standard_True;
 }
 
+
 // =======================================================================
-// function : LastLFBndBox
+// function : IsLFSymbol
 // purpose  :
 // =======================================================================
-Standard_Boolean Font_TextFormatter::LastLFBndBox (Font_Rect& theBndBox) const
+Standard_Boolean Font_TextFormatter::IsLFSymbol (const Standard_Integer theIndex) const
 {
-  if (GetCorners().Length() == 0 || myLastSymbolWidth > 0.0f)
+  Font_Rect aBndBox;
+  if (!BndBox (theIndex, aBndBox))
     return Standard_False;
 
-  const NCollection_Vec2<Standard_ShortReal>& aLastCorner = BottomLeft (GetCorners().Length() -1);
+  return Abs (aBndBox.Right - aBndBox.Left) < Precision::Confusion();
+}
 
-  theBndBox.Top = aLastCorner.y();
-  theBndBox.Bottom = theBndBox.Top - myLineSpacing;
+// =======================================================================
+// function : GetFirstPosition
+// purpose  :
+// =======================================================================
+Standard_ShortReal Font_TextFormatter::GetFirstPosition() const
+{
   switch (myAlignX)
   {
-    case Graphic3d_HTA_LEFT:   theBndBox.Left = theBndBox.Right = 0; break;
-    case Graphic3d_HTA_RIGHT:  theBndBox.Left = theBndBox.Right = myBndWidth; break;
-    case Graphic3d_HTA_CENTER: theBndBox.Left = theBndBox.Right = 0.5f * myBndWidth; break;
+    default:
+    case Graphic3d_HTA_LEFT:   return 0; break;
+    case Graphic3d_HTA_RIGHT:  return myBndWidth; break;
+    case Graphic3d_HTA_CENTER: return 0.5f * myBndWidth; break;
   }
-  return Standard_True;
 }
 
 // =======================================================================
@@ -388,7 +395,7 @@ Standard_Integer Font_TextFormatter::LineIndex (const Standard_Integer theIndex)
   if (myLineSpacing < 0.0f)
     return 0;
 
-  return (Standard_Integer)Abs((BottomLeft (theIndex).y() + myLineSpacing) / myLineSpacing);
+  return (Standard_Integer)Abs((BottomLeft (theIndex).y() + myAscender) / myLineSpacing);
 }
 
 // =======================================================================

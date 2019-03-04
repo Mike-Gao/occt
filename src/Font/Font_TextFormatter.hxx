@@ -152,16 +152,22 @@ public:
 
   //! Returns specific glyph rectangle.
   inline const NCollection_Vec2<Standard_ShortReal>& BottomLeft (const Standard_Integer theIndex) const
-  {
-    return myCorners.Value (theIndex);
-  }
+  { return myCorners.Value (theIndex); }
 
   //! Returns symbol bounding box
   //! @param bounding box.
   Standard_EXPORT Standard_Boolean BndBox (const Standard_Integer theIndex, Font_Rect& theBndBox) const;
 
-  //! Returns true if the last symbol is caret. Creates bounding box of the next row symbol position
-  Standard_EXPORT Standard_Boolean LastLFBndBox (Font_Rect& theBndBox) const;
+  //! Returns the line height
+  //! \param theIndex a line index, obtained by LineIndex()
+  Standard_ShortReal LineHeight (const Standard_Integer theIndex) const
+  { return theIndex == 0 ? myAscender : myLineSpacing; }
+
+  //! Returns true if the symbol by the index is '\n'. The width of the symbol is zero.
+  Standard_EXPORT Standard_Boolean IsLFSymbol (const Standard_Integer theIndex) const;
+
+  //! Returns position of the first symbol in a line using alignment
+  Standard_EXPORT Standard_ShortReal GetFirstPosition() const;
 
   //! Returns column index of the corner index in the current line
   Standard_EXPORT Standard_Integer LinePositionIndex (const Standard_Integer theIndex) const;
@@ -274,7 +280,7 @@ protected: //! @name input data
   NCollection_Vector<Standard_ShortReal>
                      myNewLines;      //!< position at LF
   Standard_ShortReal myLineSpacing;   //!< line spacing (computed as maximum of all fonts involved in text formatting)
-  Standard_ShortReal myAscender;      //!<
+  Standard_ShortReal myAscender;      //!< line spacing for the first line
   bool               myIsFormatted;   //!< formatting state
 
 protected: //! @name temporary variables for formatting routines
