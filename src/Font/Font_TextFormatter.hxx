@@ -163,6 +163,9 @@ public:
   Standard_ShortReal LineHeight (const Standard_Integer theIndex) const
   { return theIndex == 0 ? myAscender : myLineSpacing; }
 
+  //!< Returns width of a line
+  Standard_EXPORT Standard_ShortReal LineWidth (const Standard_Integer theIndex) const;
+
   //! Returns true if the symbol by the index is '\n'. The width of the symbol is zero.
   Standard_EXPORT Standard_Boolean IsLFSymbol (const Standard_Integer theIndex) const;
 
@@ -245,10 +248,6 @@ public:
 
   //!< Returns true if the symbol is CR, BEL, FF, NP, BS or VT
   Standard_EXPORT static Standard_Boolean IsCommandSymbol (const Standard_Utf32Char& theSymbol);
-
-protected:
-  //!< Returns width of a line
-  Standard_ShortReal getLineWidth (const Standard_Integer theIndex) const;
 
   DEFINE_STANDARD_RTTIEXT (Font_TextFormatter, Standard_Transient)
 

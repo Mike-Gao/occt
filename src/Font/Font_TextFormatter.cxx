@@ -238,7 +238,7 @@ void Font_TextFormatter::Format()
     else
     {
       for (int aLineIt = 0; aLineIt < myLinesNb; aLineIt++)
-        aMaxLineWidth = Max (aMaxLineWidth, getLineWidth (aLineIt));
+        aMaxLineWidth = Max (aMaxLineWidth, LineWidth (aLineIt));
     }
   }
 
@@ -319,7 +319,7 @@ Standard_Boolean Font_TextFormatter::BndBox (const Standard_Integer theIndex, Fo
     else
     {
       // the next symbol is on the next row either by '\n' or by wrapping
-      Standard_ShortReal aLineWidth = getLineWidth (LineIndex (theIndex));
+      Standard_ShortReal aLineWidth = LineWidth (LineIndex (theIndex));
       theBndBox.Left = aLeftCorner.x();
       switch (myAlignX)
       {
@@ -415,10 +415,10 @@ Standard_Boolean Font_TextFormatter::IsCommandSymbol (const Standard_Utf32Char& 
 }
 
 // =======================================================================
-// function : getLineWidth
+// function : LineWidth
 // purpose  :
 // =======================================================================
-Standard_ShortReal Font_TextFormatter::getLineWidth (const Standard_Integer theIndex) const
+Standard_ShortReal Font_TextFormatter::LineWidth (const Standard_Integer theIndex) const
 {
   if (theIndex < 0)
     return 0;
@@ -427,7 +427,7 @@ Standard_ShortReal Font_TextFormatter::getLineWidth (const Standard_Integer theI
     return theIndex == 0 ? myNewLines[0] : myNewLines[theIndex] - myNewLines[theIndex -1];
 
   if (theIndex == myNewLines.Length()) // the last line
-    return myPen.x() - getLineWidth (theIndex - 1);
+    return myPen.x() - LineWidth (theIndex - 1);
 
   return 0;
 }
