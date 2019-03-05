@@ -193,8 +193,8 @@ void Font_TextFormatter::newLine (const Standard_Integer theLastRect,
   {
     default:
     case Graphic3d_HTA_LEFT:   myMoveVec.x() = -aXMin; break;
-    case Graphic3d_HTA_RIGHT:  myMoveVec.x() = -aXMin +        (theMaxLineWidth - (aXMax - aXMin)); break;
-    case Graphic3d_HTA_CENTER: myMoveVec.x() = -aXMin + 0.5f * (theMaxLineWidth - (aXMax - aXMin)); break;
+    case Graphic3d_HTA_RIGHT:  myMoveVec.x() = -aXMin +        (theMaxLineWidth - (aXMax - aXMin)) - theMaxLineWidth; break;
+    case Graphic3d_HTA_CENTER: myMoveVec.x() = -aXMin + 0.5f * (theMaxLineWidth - (aXMax - aXMin)) - 0.5 * theMaxLineWidth; break;
   }
 
   move (myCorners, myMoveVec, myRectLineStart, theLastRect);
