@@ -237,8 +237,9 @@ void Font_TextFormatter::Format()
       aMaxLineWidth = myPen.x();
     else
     {
-      for (int aLineIt = 0; aLineIt < myLinesNb; aLineIt++)
+      for (int aLineIt = 0; aLineIt < myNewLines.Size(); aLineIt++)
         aMaxLineWidth = Max (aMaxLineWidth, LineWidth (aLineIt));
+      aMaxLineWidth = Max (aMaxLineWidth, LineWidth (myNewLines.Size())); // processing the last line also
     }
   }
 
