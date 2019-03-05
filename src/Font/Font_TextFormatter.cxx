@@ -428,7 +428,7 @@ Standard_ShortReal Font_TextFormatter::LineWidth (const Standard_Integer theInde
     return theIndex == 0 ? myNewLines[0] : myNewLines[theIndex] - myNewLines[theIndex -1];
 
   if (theIndex == myNewLines.Length()) // the last line
-    return myPen.x() - LineWidth (theIndex - 1);
+    return theIndex == 0 ? myPen.x() : myPen.x() - myNewLines[theIndex -1];
 
   return 0;
 }
