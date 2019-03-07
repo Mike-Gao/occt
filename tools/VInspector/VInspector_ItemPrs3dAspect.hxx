@@ -160,6 +160,27 @@ private:
                      const int theStartRow,
                      const QVariant& theValue) const;
 
+  //! Returns true if the table value in the row is a color of a material
+  Standard_Boolean isColorMaterialRow (const int theRow) const;
+
+  //! Returns type of edit control for the material row
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \return edit type
+  Standard_Boolean getTableEditTypeMaterial (const int theRow,
+                                             ViewControl_EditType& theType) const;
+
+  //! Returns value of Graphic3d_MaterialAspect for the row
+  QVariant getMaterialValue (const int theRow,
+                             const int theColumn,
+                             const int theRole,
+                             const Graphic3d_MaterialAspect& theMaterial,
+                             const TCollection_AsciiString& theInfo) const;
+
+  Standard_Boolean setMaterialValue (const int theRow,
+                                     Graphic3d_MaterialAspect& theMaterial,
+                                     const QVariant& theValue) const;
+
   //! Returns color data depending on parameters
   //! \param theInfo information value if column is the first one
   //! \param theColor color value

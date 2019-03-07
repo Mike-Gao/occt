@@ -52,6 +52,7 @@
 #include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
 
+#include <inspector/View_Displayer.hxx>
 #include <inspector/View_Widget.hxx>
 #include <inspector/View_Window.hxx>
 
@@ -587,8 +588,12 @@ bool VInspector_Window::OpenFile(const TCollection_AsciiString& theFileName)
     return isModelUpdated;
 
   Handle(AIS_Shape) aPresentation = new AIS_Shape (aShape);
-  aContext->Display (aPresentation, false);
-  aContext->Load (aPresentation, -1/*selection mode*/);
+
+  View_Displayer* aDisplayer = myViewWindow->GetDisplayer();
+  aDisplayer->DisplayPresentation (aPresentation);
+
+  //aContext->Display (aPresentation, false);
+  //aContext->Load (aPresentation, -1/*selection mode*/);
   aContext->UpdateCurrentViewer();
 
   UpdateTreeModel();
