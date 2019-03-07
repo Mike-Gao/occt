@@ -18,6 +18,8 @@
 
 #include <OpenGl_Element.hxx>
 
+#include <NCollection_String.hxx>
+
 #include <OpenGl_AspectText.hxx>
 #include <OpenGl_TextParam.hxx>
 #include <OpenGl_TextBuilder.hxx>
@@ -29,6 +31,8 @@
 #include <Graphic3d_VerticalTextAlignment.hxx>
 
 #include <gp_Ax2.hxx>
+
+class Font_TextFormatter;
 
 //! Text rendering
 class OpenGl_Text : public OpenGl_Element
@@ -60,6 +64,9 @@ public:
                              const Standard_Utf8Char*      theText,
                              const OpenGl_Vec3&            thePoint,
                              const OpenGl_TextParam&       theParams);
+
+  //! Setup text formatter
+  Standard_EXPORT void SetTextFormatter (const Handle(Font_TextFormatter)& theFormatter) { myFormatter = theFormatter; }
 
   //! Setup new position
   Standard_EXPORT void SetPosition (const OpenGl_Vec3& thePoint);
@@ -176,6 +183,8 @@ protected:
   bool               myHasPlane;    //!< Check if text have orientation in 3D space.
   bool               myHasAnchorPoint; //!< Shows if it has own attach point
 
+  Handle(Font_TextFormatter) myFormatter; //!< Text formatter, an alternative to text params
+ 
 public:
 
   DEFINE_STANDARD_ALLOC
