@@ -2,5 +2,3 @@ VInspectorPaneAIS_PaneCreator.cxx
 VInspectorPaneAIS_PaneCreator.hxx
 VInspectorPaneAIS_Shape.cxx
 VInspectorPaneAIS_Shape.hxx
-VInspectorPaneAIS_Trihedron.cxx
-VInspectorPaneAIS_Trihedron.hxx

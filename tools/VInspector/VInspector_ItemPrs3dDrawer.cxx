@@ -48,6 +48,10 @@
 
 QVariant VInspector_ItemPrs3dDrawer::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   Handle(Prs3d_Drawer) aDrawer = GetDrawer();
   bool aNullDrawer = aDrawer.IsNull();
   if (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole)
@@ -59,14 +63,6 @@ QVariant VInspector_ItemPrs3dDrawer::initValue (int theItemRole) const
         return theItemRole == Qt::ToolTipRole
           ? (aNullDrawer ? QVariant("Prs3d_Drawer is empty") : QVariant (aDrawer->DynamicType()->Name()))
           : QVariant (myName.ToCString());
-      }
-      case 1:
-        return rowCount();
-      case 2:
-      {
-        if (!aNullDrawer)
-          return VInspector_Tools::GetPointerInfo (aDrawer, true).ToCString();
-        break;
       }
       default: break;
     }

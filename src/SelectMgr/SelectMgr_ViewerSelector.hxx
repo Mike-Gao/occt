@@ -109,6 +109,9 @@ public:
   //!   depth which is used to choose among objects of the same priority.
   void SetPickClosest (const Standard_Boolean theToPreferClosest) { preferclosest = theToPreferClosest; }
 
+  //! Return preference of selecting one object for OnePicked() method
+  Standard_Boolean IsPickClosest() const { return preferclosest; }
+
   //! Returns the number of detected owners.
   Standard_Integer NbPicked() const { return mystored.Extent(); }
 

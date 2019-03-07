@@ -79,6 +79,10 @@ int VInspector_ItemSelectBasicsSensitiveEntity::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemSelectBasicsSensitiveEntity::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   Handle(SelectBasics_SensitiveEntity) anEntity = GetSensitiveEntity();
   if (anEntity.IsNull())
     return QVariant();

@@ -40,8 +40,13 @@ public:
   //! Returns number of columns. It has two columns: <funciton name> <function value>
   //! \param theParent an index of the parent item
   //! \return an integer value
-  Standard_EXPORT virtual int ColumnCount (const QModelIndex& theParent = QModelIndex()) const
+  Standard_EXPORT virtual int ColumnCount (const QModelIndex& theParent = QModelIndex()) const Standard_OVERRIDE
   { (void)theParent; return 2; }
+
+  //! Returns number of rows, depending on orientation: myColumnCount or size of values container
+  //! \param theParent an index of the parent item
+  //! \return an integer value
+  Standard_EXPORT virtual int RowCount (const QModelIndex& theParent = QModelIndex()) const Standard_OVERRIDE;
 
   //! Returns content of the model index for the given role, it is obtained from internal container of values
   //! It returns value only for DisplayRole.
@@ -49,7 +54,7 @@ public:
   //! \param theColumn a model index column
   //! \param theRole a view role
   //! \return value intepreted depending on the given role
-  Standard_EXPORT virtual QVariant Data (const int theRow, const int theColumn, int theRole = Qt::DisplayRole) const;
+  Standard_EXPORT virtual QVariant Data (const int theRow, const int theColumn, int theRole = Qt::DisplayRole) const Standard_OVERRIDE;
 
   //! Sets content of the model index for the given role, it is applyed to internal container of values
   //! \param theRow a model index row
@@ -57,7 +62,7 @@ public:
   //! \param theRole a view role
   //! \return true if the value is changed
   Standard_EXPORT virtual bool SetData (const int theRow, const int theColumn, const QVariant& theValue,
-                                        int theRole = Qt::DisplayRole);
+                                        int theRole = Qt::DisplayRole) Standard_OVERRIDE;
 
   //! Returns flags for the item: ItemIsEnabled | Qt::ItemIsSelectable.
   //! Additional flag for the column 1 is Qt::ItemIsEditable.
@@ -76,6 +81,12 @@ public:
   //! \param theColumn a model index column
   //! \return string values for the enumeration presented in the row or an empty container
   virtual QList<QVariant> GetEnumValues (const int theRow, const int theColumn) const Standard_OVERRIDE;
+
+  //! Returns container of pane shapes
+  //! \param theRow table model row index
+  //! \param theColumn a model index column
+  //! \param [out] output container of shapes to add pane new shapes if found
+  Standard_EXPORT void GetPaneShapes (const int theRow, const int theColumn, NCollection_List<TopoDS_Shape>& theShapes);
 
 private:
 

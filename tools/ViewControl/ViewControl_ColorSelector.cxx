@@ -20,7 +20,7 @@
 #include <inspector/ViewControl_Tools.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
-//#include <Quantity.hxx>
+#include <Quantity.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QAbstractTableModel>
@@ -85,7 +85,7 @@ public:
           return QVariant ("Name");
         Quantity_NameOfColor aColorName;
         if (ViewControl_ColorSelector::IsExactColorName(myColor, aColorName))
-          return "";//Quantity::NameOfColorToString (aColorName);
+          return Quantity::NameOfColorToString (aColorName);
       }
       break;
       case 2: return isFirstColumn ? QVariant ("Red") : ViewControl_Tools::ToVariant (myColor.GetRGB().Red());
@@ -93,7 +93,7 @@ public:
       case 4: return isFirstColumn ? QVariant ("Blue") : ViewControl_Tools::ToVariant (myColor.GetRGB().Blue());
       case 5: return isFirstColumn ? QVariant ("Alpha") : ViewControl_Tools::ToVariant (myColor.Alpha());
       case 6: return isFirstColumn ? QVariant ("Near Name") 
-                                   : "";//Quantity::NameOfColorToString (myColor.GetRGB().Name());
+                                   : Quantity::NameOfColorToString (myColor.GetRGB().Name());
     }
     return QVariant();
   }
@@ -236,8 +236,8 @@ public:
       return QVariant();
 
     if (theRole == Qt::ToolTipRole)
-      return "";//QString("%1 (%2)").arg(Quantity::NameOfColorToString (aNameOfColor))
-                //               .arg (ViewControl_ColorSelector::ColorToString (Quantity_Color (aNameOfColor)));
+      return QString("%1 (%2)").arg(Quantity::NameOfColorToString (aNameOfColor))
+                               .arg (ViewControl_ColorSelector::ColorToString (Quantity_Color (aNameOfColor)));
     return QVariant();
   }
 

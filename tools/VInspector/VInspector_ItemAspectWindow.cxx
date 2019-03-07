@@ -34,6 +34,10 @@
 // =======================================================================
 QVariant VInspector_ItemAspectWindow::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
@@ -45,10 +49,6 @@ QVariant VInspector_ItemAspectWindow::initValue (int theItemRole) const
   {
     case 0: return theItemRole == Qt::DisplayRole ? aWindow->DynamicType()->Name()
                                                   : STANDARD_TYPE (Aspect_Window)->Name();
-    case 1:
-      return rowCount();
-    case 2:
-      return ViewControl_Tools::GetPointerInfo (aWindow, true).ToCString();
     default:
       break;
   }

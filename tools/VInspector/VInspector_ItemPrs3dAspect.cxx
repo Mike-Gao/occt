@@ -40,6 +40,8 @@
 #include <QColor>
 #include <Standard_WarningsRestore.hxx>
 
+int GetMaterialRows() { return 25; }
+
 // =======================================================================
 // function : initValue
 // purpose :
@@ -47,6 +49,10 @@
 
 QVariant VInspector_ItemPrs3dAspect::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole)
   {
     Handle(Prs3d_BasicAspect) anAspect = GetAspect();
@@ -58,14 +64,6 @@ QVariant VInspector_ItemPrs3dAspect::initValue (int theItemRole) const
         return theItemRole == Qt::ToolTipRole
           ? (aNullAspect ? QVariant("Prs3d_BasicAspect is empty") : QVariant (anAspect->DynamicType()->Name()))
           : QVariant (myName.ToCString());
-      }
-      case 1:
-        return rowCount();
-      case 2:
-      {
-        if (!aNullAspect)
-          return VInspector_Tools::GetPointerInfo (anAspect, true).ToCString();
-        break;
       }
       default: break;
     }
@@ -343,7 +341,7 @@ int VInspector_ItemPrs3dAspect::getTableRowCount (const TCollection_AsciiString&
   else if (theAspectKind == STANDARD_TYPE (Prs3d_DimensionAspect)->Name())
     return 10;
   else if (theAspectKind == STANDARD_TYPE (Prs3d_ShadingAspect)->Name())
-    return 17; // TODO: Graphic3d_ShaderProgram, Graphic3d_TextureSet, Graphic3d_MaterialAspect
+    return 17 + 2 * GetMaterialRows(); // TODO: Graphic3d_ShaderProgram, Graphic3d_TextureSet, Graphic3d_MaterialAspect
 
   return 0;
 }
@@ -490,6 +488,20 @@ ViewControl_EditType VInspector_ItemPrs3dAspect::getTableEditType (const int the
       case 16: return ViewControl_EditType_Bool;
       default: break;
     }
+
+    Handle(Prs3d_ShadingAspect) aCustomAspect = Handle(Prs3d_ShadingAspect)::DownCast (anAspect);
+    Handle(Graphic3d_AspectFillArea3d) aFillAreaAspect = aCustomAspect->Aspect();
+
+    ViewControl_EditType aType = ViewControl_EditType_None;
+    // front material
+    aRow = aRow - 17;
+    if (getTableEditTypeMaterial (aRow, aType))
+      return aType;
+
+    // back material
+    aRow = aRow - GetMaterialRows();
+    if (getTableEditTypeMaterial (aRow, aType))
+      return aType;
   }
 
   return ViewControl_EditType_None;
@@ -840,7 +852,8 @@ QVariant VInspector_ItemPrs3dAspect::getTableData (const int theRow,
   else if (theAspectKind == STANDARD_TYPE (Prs3d_ShadingAspect)->Name())
   {
     if (theRole != Qt::DisplayRole && theRole != Qt::BackgroundRole ||
-       (theRole == Qt::BackgroundRole && (isFirstColumn || (aRow != 0 && theRow != 1 && theRow != 2))))
+       (theRole == Qt::BackgroundRole && (isFirstColumn || (aRow != 0 && theRow != 1 && theRow != 2
+                                                            && !isColorMaterialRow (theRow)))))
       return QVariant();
 
     Handle(Prs3d_ShadingAspect) aCustomAspect = Handle(Prs3d_ShadingAspect)::DownCast (anAspect);
@@ -873,10 +886,22 @@ QVariant VInspector_ItemPrs3dAspect::getTableData (const int theRow,
       case 14: return isFirstColumn ? QVariant ("ToDrawEdges") : anAspect->ToDrawEdges();
       case 15: return isFirstColumn ? QVariant ("ToSuppressBackFaces") : anAspect->ToSuppressBackFaces();
       case 16: return isFirstColumn ? QVariant ("ToMapTexture") : anAspect->ToMapTexture();
-      default: break;
+    default: break;
     }
-  }
+    // front material
+    aRow = aRow - 17;
+    const Graphic3d_MaterialAspect& aFrontMaterial = anAspect->FrontMaterial();
+    QVariant aValue = getMaterialValue (aRow, theColumn, theRole, aFrontMaterial, "FrontMaterial");
+    if (aValue.isValid())
+      return aValue;
 
+    // back material
+    aRow = aRow - GetMaterialRows();
+    const Graphic3d_MaterialAspect& aBackMaterial = anAspect->BackMaterial();
+    aValue = getMaterialValue (aRow, theColumn, theRole, aBackMaterial, "BackMaterial");
+    if (aValue.isValid())
+      return aValue;
+  }
   return QVariant();
 }
 
@@ -1082,8 +1107,163 @@ bool VInspector_ItemPrs3dAspect::setTableData (const int theRow,
       case 16: anAspect->SetTextureMapOn (theValue.toBool()); break;
       default: break;
     }
+
+    // front material
+    aRow = aRow - 17;
+    Graphic3d_MaterialAspect& aFrontMaterial = anAspect->ChangeFrontMaterial();
+    if (setMaterialValue (aRow, aFrontMaterial, theValue))
+      return true;
+
+    // back material
+    aRow = aRow - GetMaterialRows();
+    Graphic3d_MaterialAspect& aBackMaterial = anAspect->ChangeBackMaterial();
+    if (setMaterialValue (aRow, aBackMaterial, theValue))
+      return true;
   }
   return true;
+}
+
+// =======================================================================
+// function : isColorMaterialRow
+// purpose :
+// =======================================================================
+Standard_Boolean VInspector_ItemPrs3dAspect::isColorMaterialRow (const int theRow) const
+{
+  // front material
+  int aRow = theRow - 17;
+  if (aRow >= 8 && aRow <= 12)
+    return Standard_True;
+
+  // back material
+  aRow = aRow - GetMaterialRows();
+  if (aRow >= 8 && aRow <= 12)
+    return Standard_True;
+
+  return Standard_False;
+}
+
+// =======================================================================
+// function : getTableEditTypeMaterial
+// purpose :
+// =======================================================================
+Standard_Boolean VInspector_ItemPrs3dAspect::getTableEditTypeMaterial (const int theRow,
+                                                                       ViewControl_EditType& theType) const
+{
+  theType = ViewControl_EditType_None;
+
+  switch (theRow)
+  {
+    case 6:
+    case 7: theType = ViewControl_EditType_Line; break;
+
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12: theType = ViewControl_EditType_Color; break;
+
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17: theType = ViewControl_EditType_Line; break;
+
+    case 18:
+    case 19:
+    case 20:
+    case 21: theType = ViewControl_EditType_Bool; break;
+
+    default: break;
+  }
+
+  return theRow < GetMaterialRows();
+}
+
+// =======================================================================
+// function : getMaterialValue
+// purpose :
+// =======================================================================
+QVariant VInspector_ItemPrs3dAspect::getMaterialValue (const int theRow,
+                                                       const int theColumn,
+                                                       const int theRole,
+                                                       const Graphic3d_MaterialAspect& theMaterial,
+                                                       const TCollection_AsciiString& theInfo) const
+{
+  bool isFirstColumn = theColumn == 0;
+
+  if ((theRole != Qt::DisplayRole && theRole != Qt::BackgroundRole) ||
+      (theRole == Qt::BackgroundRole && (isFirstColumn || (theRow < 8 || theRow > 12))))
+    return QVariant();
+
+  switch (theRow)
+  {
+    case 0: return ViewControl_Tools::TableSeparator();
+    case 1: return isFirstColumn ? QVariant (theInfo.ToCString()) : QVariant ("");
+    case 2: return ViewControl_Tools::TableSeparator();
+    
+    case 3: return isFirstColumn ? QVariant ("Name") : QVariant (theMaterial.Name()); //TODO
+    case 4: return isFirstColumn ? QVariant ("RequestedName") : QVariant (theMaterial.RequestedName()); // TODO
+    case 5: return isFirstColumn ? QVariant ("MaterialName") : QVariant (theMaterial.MaterialName());
+
+    case 6: return isFirstColumn ? QVariant ("Transparency") : QVariant (theMaterial.Transparency());
+    case 7: return isFirstColumn ? QVariant ("Alpha") : QVariant (theMaterial.Alpha());
+
+    case 8: return getColorData("Color", Quantity_ColorRGBA (theMaterial.Color()), isFirstColumn, theRole);
+    case 9: return getColorData("AmbientColor", Quantity_ColorRGBA (theMaterial.AmbientColor()), isFirstColumn, theRole);
+    case 10: return getColorData("DiffuseColor", Quantity_ColorRGBA (theMaterial.DiffuseColor()), isFirstColumn, theRole);
+    case 11: return getColorData("SpecularColor", Quantity_ColorRGBA (theMaterial.SpecularColor()), isFirstColumn, theRole);
+    case 12: return getColorData("EmissiveColor", Quantity_ColorRGBA (theMaterial.EmissiveColor()), isFirstColumn, theRole);
+
+    case 13: return isFirstColumn ? QVariant ("Ambient") : QVariant (theMaterial.Ambient());
+    case 14: return isFirstColumn ? QVariant ("Diffuse") : QVariant (theMaterial.Diffuse());
+    case 15: return isFirstColumn ? QVariant ("Specular") : QVariant (theMaterial.Specular());
+    case 16: return isFirstColumn ? QVariant ("Emissive") : QVariant (theMaterial.Emissive());
+
+    case 17: return isFirstColumn ? QVariant ("Shininess") : QVariant (theMaterial.Shininess());
+
+    case 18: return isFirstColumn ? QVariant ("ReflectionMode (Ambient)") : QVariant (theMaterial.ReflectionMode (Graphic3d_TOR_AMBIENT));
+    case 19: return isFirstColumn ? QVariant ("ReflectionMode (Diffuse)") : QVariant (theMaterial.ReflectionMode (Graphic3d_TOR_DIFFUSE));
+    case 20: return isFirstColumn ? QVariant ("ReflectionMode (Specular)") : QVariant (theMaterial.ReflectionMode (Graphic3d_TOR_SPECULAR));
+    case 21: return isFirstColumn ? QVariant ("ReflectionMode (Emissive)") : QVariant (theMaterial.ReflectionMode (Graphic3d_TOR_EMISSION));
+
+    case 22: return isFirstColumn ? QVariant ("RefractionIndex") : QVariant (theMaterial.RefractionIndex());
+    case 23: return isFirstColumn ? QVariant ("BSDF.FresnelCoat.FresnelType()") : QVariant (theMaterial.BSDF().FresnelCoat.FresnelType()); // TODO
+    case 24: return isFirstColumn ? QVariant ("BSDF.FresnelBase.FresnelType()") : QVariant (theMaterial.BSDF().FresnelBase.FresnelType()); // TODO
+  }
+  return QVariant();
+}
+
+// =======================================================================
+// function : setMaterialValue
+// purpose :
+// =======================================================================
+Standard_Boolean VInspector_ItemPrs3dAspect::setMaterialValue (const int theRow,
+                                                               Graphic3d_MaterialAspect& theMaterial,
+                                                               const QVariant& theValue) const
+{
+  switch (theRow)
+  {
+    case 6: theMaterial.SetTransparency (ViewControl_Tools::ToShortRealValue (theValue)); break;
+    case 7: theMaterial.SetAlpha (ViewControl_Tools::ToShortRealValue (theValue)); break;
+
+    case 8: theMaterial.SetColor (ViewControl_ColorSelector::StringToColor (theValue.toString())); break;
+    case 9: theMaterial.SetAmbientColor (ViewControl_ColorSelector::StringToColor (theValue.toString())); break;
+    case 10: theMaterial.SetDiffuseColor (ViewControl_ColorSelector::StringToColor (theValue.toString())); break;
+    case 11: theMaterial.SetSpecularColor (ViewControl_ColorSelector::StringToColor (theValue.toString())); break;
+    case 12: theMaterial.SetEmissiveColor (ViewControl_ColorSelector::StringToColor (theValue.toString())); break;
+
+    case 13: theMaterial.SetAmbient (ViewControl_Tools::ToShortRealValue (theValue)); break;
+    case 14: theMaterial.SetDiffuse (ViewControl_Tools::ToShortRealValue (theValue)); break;
+    case 15: theMaterial.SetSpecular (ViewControl_Tools::ToShortRealValue (theValue)); break;
+    case 16: theMaterial.SetEmissive (ViewControl_Tools::ToShortRealValue (theValue)); break;
+    case 17: theMaterial.SetShininess (ViewControl_Tools::ToShortRealValue (theValue)); break;
+
+    case 18: theMaterial.SetReflectionMode (Graphic3d_TOR_AMBIENT, theValue.toBool()); break;
+    case 19: theMaterial.SetReflectionMode (Graphic3d_TOR_DIFFUSE, theValue.toBool()); break;
+    case 20: theMaterial.SetReflectionMode (Graphic3d_TOR_SPECULAR, theValue.toBool()); break;
+    case 21: theMaterial.SetReflectionMode (Graphic3d_TOR_EMISSION, theValue.toBool()); break;
+  }
+  return theRow < GetMaterialRows();
 }
 
 // =======================================================================

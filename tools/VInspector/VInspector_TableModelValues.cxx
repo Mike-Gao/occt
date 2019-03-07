@@ -16,6 +16,7 @@
 #include <inspector/VInspector_TableModelValues.hxx>
 
 #include <inspector/ViewControl_Pane.hxx>
+#include <inspector/ViewControl_PaneItem.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
 #include <inspector/VInspector_Tools.hxx>
 
@@ -138,6 +139,31 @@ Qt::ItemFlags VInspector_TableModelValues::Flags (const QModelIndex& theIndex) c
 }
 
 // =======================================================================
+// function : RowCount
+// purpose :
+// =======================================================================
+
+int VInspector_TableModelValues::RowCount (const QModelIndex& theParent) const
+{
+  VInspector_ItemBasePtr anItem = GetItem();
+
+  int aRowCount = anItem->GetTableRowCount();
+  Handle(Standard_Transient) anObject = anItem->GetObject();
+  if (anObject.IsNull())
+    return aRowCount;
+
+  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+  {
+    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+    if (!aPane)
+      continue;
+    aRowCount += aPane->GetTableRowCount (anObject);
+  }
+  return aRowCount;
+}
+
+// =======================================================================
 // function : GetEditType
 // purpose :
 // =======================================================================
@@ -195,6 +221,31 @@ QList<QVariant> VInspector_TableModelValues::GetEnumValues (const int theRow, co
       return aPane->GetTableEnumValues (anObject, aCurrentRow, theColumn);
   }
   return anItem->GetTableEnumValues (aCurrentRow, theColumn);
+}
+
+// =======================================================================
+// function : GetPaneShapes
+// purpose :
+// =======================================================================
+
+void VInspector_TableModelValues::GetPaneShapes (const int theRow, const int theColumn, NCollection_List<TopoDS_Shape>& theShapes)
+{
+  VInspector_ItemBasePtr anItem = GetItem();
+  Handle(Standard_Transient) anObject = anItem->GetObject();
+  if (anObject.IsNull())
+    return;
+
+  for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
+  {
+    Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
+    ViewControl_Pane* aPane = aCreator->GetPane (anObject->DynamicType()->Name());
+    if (!aPane)
+      continue;
+
+    ViewControl_PaneItem* anItem = aPane->GetSelected (anObject, theRow, theColumn);
+    if (anItem && !anItem->GetShape().IsNull())
+      theShapes.Append (anItem->GetShape());
+  }
 }
 
 // =======================================================================

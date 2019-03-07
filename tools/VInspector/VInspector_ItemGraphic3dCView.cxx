@@ -106,6 +106,10 @@ int VInspector_ItemGraphic3dCView::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemGraphic3dCView::initValue (const int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
@@ -117,10 +121,6 @@ QVariant VInspector_ItemGraphic3dCView::initValue (const int theItemRole) const
   {
     case 0: return theItemRole == Qt::DisplayRole ? aCView->DynamicType()->Name()
                                                   : STANDARD_TYPE (Graphic3d_CView)->Name();
-    case 1:
-      return rowCount();
-    case 2:
-      return ViewControl_Tools::GetPointerInfo (aCView, true).ToCString();
     default:
       break;
   }

@@ -78,6 +78,10 @@ Handle(Standard_Transient) VInspector_ItemSelect3DSensitiveSetItem::GetObject() 
 // =======================================================================
 QVariant VInspector_ItemSelect3DSensitiveSetItem::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   Handle(SelectBasics_SensitiveEntity) anEntity = GetSensitiveEntity();
   if (anEntity.IsNull())
     return QVariant();

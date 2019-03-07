@@ -42,35 +42,17 @@ public:
   //! \param theRow a model index row
   //! \param theColumn a model index column
   Standard_EXPORT virtual QVariant GetTableData (const Handle(Standard_Transient)& theObject,
-    const int theRow, const int theColumn, const int theRole) const Standard_OVERRIDE;
-
-  //! Returns type of edit control for the model index. By default, it is an empty control
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  //! \return edit type
-  Standard_EXPORT virtual ViewControl_EditType GetTableEditType (const Handle(Standard_Transient)& theObject,
-    const int theRow, const int theColumn) const Standard_OVERRIDE;
-
-  //! Returns container of string values for enumeration in the model row
-  //! \param theRow table model row index
-  //! \param theColumn a model index column
-  //! \return string values for the enumeration presented in the row or an empty container
-  Standard_EXPORT virtual QList<QVariant> GetTableEnumValues (const Handle(Standard_Transient)& theObject,
-    const int theRow, const int theColumn) const Standard_OVERRIDE;
-
-  //! Sets the value into the table cell. Only 1st column value might be modified.
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  //! \param theValue a new cell value
-  Standard_EXPORT virtual bool SetTableData (const Handle(Standard_Transient)& theObject,
-    const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
+                                                 const int theRow,
+                                                 const int theColumn,
+                                                 const int theRole) const Standard_OVERRIDE;
 
   //! Return selected element in the pane cell
   //! \param theObject current pane object
   //! \param theRow a model index row
   //! \param theColumn a model index column
   Standard_EXPORT virtual ViewControl_PaneItem* GetSelected (const Handle(Standard_Transient)& theObject,
-    const int theRow, const int theColumn) Standard_OVERRIDE;
+                                                             const int theRow,
+                                                             const int theColumn) Standard_OVERRIDE;
 
 protected:
   //! Converts transient object to custom presentation type

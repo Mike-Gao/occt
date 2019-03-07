@@ -107,6 +107,13 @@ public:
   //! \return container of shapes
   NCollection_List<TopoDS_Shape> GetSelectedShapes (const QModelIndexList& theIndices);
 
+  //! Returns selected shapes
+  //! \param theModel selection model
+  //! \return container of shapes
+  void GetSelectedPropertyPanelShapes (const QModelIndexList& theTreeViewIndices,
+                                       const QModelIndexList& thePropertyPanelIndices,
+                                       NCollection_List<TopoDS_Shape>& theShapes);
+
   //! Returns selected elements
   //! \param theModel selection model
   //! \return container of OpenGl elements
@@ -163,6 +170,15 @@ private slots:
   //! Apply activated display action
   void onDisplayActionTypeClicked();
 
+  //! Expand two next levels for all selected item
+  void onExpand();
+
+  //! Expand all levels for all selected items
+  void onExpandAll();
+
+  //! Collapse all levels for all selected items
+  void onCollapseAll();
+
 #ifdef DEBUG_TWO_VIEWS
   //! Processing mouse down in the view
   //! \param theX X mouse position in pixels
@@ -199,6 +215,14 @@ private:
   //! still belongs to the current context until Remove is called.
   //! \param theType display action type
   void displaySelectedPresentations (const VInspector_DisplayActionType theType);
+
+  //! Set items of the pointers highlighted in tree view
+  //! \param theType display action type
+  void highlightTreeViewItems (const QStringList& thePointers);
+
+  //! Set items of the pointers selected in tree view
+  //! \param theType display action type
+  void selectTreeViewItems (const QStringList& thePointers);
 
   //! Creates an istance of 3D view to initialize context.
   //! \return a context of created view.

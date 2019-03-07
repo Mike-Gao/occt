@@ -31,6 +31,8 @@ QString VInspector_ItemHistoryType::PointerInfo() const
 
   VInspector_ItemHistoryRootPtr aParentItem = itemDynamicCast<VInspector_ItemHistoryRoot>(Parent());
   const VInspector_ItemHistoryTypeInfo& aTypeInfo = aParentItem->GetTypeInfo(Row());
+  if (aTypeInfo.myElements.size() < rowCount())
+    return QString();
   QList<QVariant> anElements = aTypeInfo.myElements[rowCount() - 1]; // the last item
   return anElements.size() > 1 ? anElements[1].toString() : QString();
 }
@@ -46,6 +48,8 @@ QString VInspector_ItemHistoryType::OwnerInfo() const
 
   VInspector_ItemHistoryRootPtr aParentItem = itemDynamicCast<VInspector_ItemHistoryRoot>(Parent());
   const VInspector_ItemHistoryTypeInfo& aTypeInfo = aParentItem->GetTypeInfo(Row());
+  if ( aTypeInfo.myElements.size() < rowCount())
+    return QString();
   QList<QVariant> anElements = aTypeInfo.myElements[rowCount() - 1]; // the last item
   return anElements.size() > 3 ? anElements[3].toString() : QString();
 }
@@ -56,12 +60,19 @@ QString VInspector_ItemHistoryType::OwnerInfo() const
 // =======================================================================
 QVariant VInspector_ItemHistoryType::initValue(const int theRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theRole != Qt::DisplayRole && theRole != Qt::EditRole && theRole != Qt::ToolTipRole)
     return QVariant();
 
   VInspector_ItemHistoryRootPtr aParentItem = itemDynamicCast<VInspector_ItemHistoryRoot>(Parent());
   const VInspector_ItemHistoryTypeInfo& aTypeInfo = aParentItem->GetTypeInfo(Row());
   int aRowCount = rowCount();
+  if (aRowCount <= 0 || aTypeInfo.myElements.size() < aRowCount)
+    return QVariant();
+
   QList<QVariant> anElements = rowCount() > 0 ? aTypeInfo.myElements[rowCount() - 1] : QList<QVariant>(); // the last item
   int anInfoSize = anElements.size();
   switch (Column())
