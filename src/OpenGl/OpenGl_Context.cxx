@@ -3183,7 +3183,7 @@ void OpenGl_Context::SetShadingMaterial (const OpenGl_Aspects* theAspect,
                                          const Handle(Graphic3d_PresentationAttributes)& theHighlight)
 {
   const Handle(Graphic3d_Aspects)& anAspect = (!theHighlight.IsNull() && !theHighlight->BasicFillAreaAspect().IsNull())
-                                            ?  theHighlight->BasicFillAreaAspect()
+                                            ?  (const Handle(Graphic3d_Aspects)& )theHighlight->BasicFillAreaAspect()
                                             :  theAspect->Aspect();
 
   const bool toDistinguish = anAspect->Distinguish();
@@ -3266,7 +3266,7 @@ Standard_Boolean OpenGl_Context::CheckIsTransparent (const OpenGl_Aspects* theAs
                                                      Standard_ShortReal& theAlphaBack)
 {
   const Handle(Graphic3d_Aspects)& anAspect = (!theHighlight.IsNull() && !theHighlight->BasicFillAreaAspect().IsNull())
-                                            ?  theHighlight->BasicFillAreaAspect()
+                                            ?  (const Handle(Graphic3d_Aspects)& )theHighlight->BasicFillAreaAspect()
                                             :  theAspect->Aspect();
 
   const bool toDistinguish = anAspect->Distinguish();
