@@ -1,13 +1,10 @@
 puts "======="
-puts "0030497"
+puts "0030497 \[REGRESSION\] Mesh - wrong Poly_Polygon3D within local selection of located shape"
 puts "======="
 puts ""
-##################################################
-# [REGRESSION] Mesh - wrong Poly_Polygon3D within local selection of located shape
-##################################################
 
-pload XDE VISUALIZATION
-testreadstep as1-oc-214-mat.stp s
+pload XDE
+testreadstep [locate_data_file as1-oc-214-mat.stp] s
 
 vclear
 vinit View1
@@ -16,3 +13,5 @@ vdisplay s -dispmode 1
 vfit
 vselmode 2 1
 vmoveto 150 201
+
+vdump ${imagedir}/${casename}.png
