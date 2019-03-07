@@ -600,11 +600,20 @@ static
   void AppendToList(TopTools_ListOfShape& theL,
                     const TopoDS_Shape& theS);
 
-template <class ContainerType, class FenceMapType = TopTools_MapOfShape>
+template <class ContainerType, class FenceMapType>
 static Standard_Boolean TakeModified(const TopoDS_Shape& theS,
                                      const TopTools_DataMapOfShapeListOfShape& theImages,
                                      ContainerType& theMapOut,
-                                     FenceMapType* theMFence = NULL);
+                                     FenceMapType* theMFence);
+
+template <class ContainerType>
+static Standard_Boolean TakeModified(const TopoDS_Shape& theS,
+                                     const TopTools_DataMapOfShapeListOfShape& theImages,
+                                     ContainerType& theMapOut)
+{
+  TopTools_MapOfShape* aDummy = NULL;
+  return TakeModified (theS, theImages, theMapOut, aDummy);
+}
 
 //=======================================================================
 //function : BuildSplitsOfTrimmedFaces
