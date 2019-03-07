@@ -35,6 +35,7 @@
 #include <gp_Ax2.hxx>
 #include <TCollection_ExtendedString.hxx>
 
+class Font_TextFormatter;
 class Graphic3d_Structure;
 class Graphic3d_ArrayOfPrimitives;
 
@@ -186,6 +187,15 @@ public:
                                      const Graphic3d_HorizontalTextAlignment theHTA,
                                      const Graphic3d_VerticalTextAlignment   theVTA,
                                      const Standard_Boolean                  theToEvalMinMax = Standard_True,
+                                     const Standard_Boolean                  theHasOwnAnchor = Standard_True);
+
+  //! Add text element in 3D space.
+  Standard_EXPORT virtual void Text (const Handle(Font_TextFormatter)&       theTextFormatter,
+                                     const gp_Ax2&                           theOrientation,
+                                     const Standard_Real                     theHeight,
+                                     const Standard_Real                     theAngle,
+                                     const Graphic3d_TextPath                theTp,
+                                     const Standard_Boolean                  theToEvalMinMax,
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True);
 
 

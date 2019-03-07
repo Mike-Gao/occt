@@ -17,6 +17,7 @@
 
 #include <gp_Ax2.hxx>
 #include <gp_Pnt.hxx>
+#include <Font_TextFormatter.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Graphic3d_ArrayOfPrimitives.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
@@ -422,6 +423,30 @@ void Graphic3d_Group::Text (const Standard_CString                  /*theText*/,
                                   1.0f));
   }
   Update();
+}
+
+// =======================================================================
+// function : Text
+// purpose  :
+// =======================================================================
+void Graphic3d_Group::Text (const Handle(Font_TextFormatter)&       theTextFormatter,
+                            const gp_Ax2&                           theOrientation,
+                            const Standard_Real                     theHeight,
+                            const Standard_Real                     theAngle,
+                            const Graphic3d_TextPath                theTp,
+                            const Standard_Boolean                  theToEvalMinMax,
+                            const Standard_Boolean                  theHasOwnAnchor)
+{
+
+  Text ("", //theTextFormatter->String().ToCString(),
+        theOrientation,
+        theHeight,
+        theAngle,
+        theTp,
+        theTextFormatter->HorizontalTextAlignment(),
+        theTextFormatter->VerticalTextAlignment(),
+        theToEvalMinMax,
+        theHasOwnAnchor);
 }
 
 // =======================================================================
