@@ -1,6 +1,4 @@
-// Created on: 2012-07-18
-// Created by: Kirill GAVRILOV
-// Copyright (c) 2012-2014 OPEN CASCADE SAS
+// Copyright (c) 2019 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -13,39 +11,31 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef _Image_AlienPixMap_H__
-#define _Image_AlienPixMap_H__
+#ifndef _Image_WinCodec_HeaderFile
+#define _Image_WinCodec_HeaderFile
 
 #include <Image_AlienPixMapI.hxx>
 
-//! Image class that support file reading/writing operations using auxiliary image library.
-//! This is a wrapper over Image_FreeImage or Image_WinCodec basing on availability.
-class Image_AlienPixMap : public Image_AlienPixMapI
+//! Image class that implements file reading/writing operations using WinCodec image library.
+//! Supported image formats:
+//! - *.bmp, *.png, *.jpg, *.tiff, *.gif.
+class Image_WinCodec : public Image_AlienPixMapI
 {
-  DEFINE_STANDARD_RTTIEXT(Image_AlienPixMap, Image_AlienPixMapI)
+  DEFINE_STANDARD_RTTIEXT(Image_WinCodec, Image_AlienPixMapI)
 public:
 
-  //! Return default rows order used by underlying image library.
-  Standard_EXPORT static bool IsTopDownDefault();
+  //! Return TRUE if WinCodec library is available.
+  Standard_EXPORT static bool IsAvailable();
 
-  //! Create default instance of available image library or NULL if no library available.
-  Standard_EXPORT static Handle(Image_AlienPixMapI) CreateDefault();
-
-  //! Setup default image library to be used as factory.
-  //! Note that access to the factory is not protected by mutex,
-  //! make sure to call this method at the early application startup stage before using.
-  //! In this way, application might provide image library replacement implementing
-  //! image reading/writing operations which will be used by standard image tools within OCCT
-  //! (like image dump or texture loads).
-  Standard_EXPORT static void SetDefaultFactory (const Handle(Image_AlienPixMapI)& theLibrary);
-
+  //! Return default rows order used by WinCodec library, which is Top-Down.
+  static bool IsTopDownDefault() { return true; }
 public:
 
   //! Empty constructor.
-  Standard_EXPORT Image_AlienPixMap();
+  Standard_EXPORT Image_WinCodec();
 
   //! Destructor
-  Standard_EXPORT virtual ~Image_AlienPixMap();
+  Standard_EXPORT virtual ~Image_WinCodec();
 
   using Image_AlienPixMapI::Load;
 
@@ -76,38 +66,22 @@ public:
                                           const Standard_Size theSizeY,
                                           const Standard_Size theSizeRowBytes = 0) Standard_OVERRIDE;
 
-  //! Method correctly deallocate internal buffer.
-  Standard_EXPORT virtual void Clear() Standard_OVERRIDE;
+public:
 
-  //! Performs gamma correction on image.
-  //! theGamma - gamma value to use; a value of 1.0 leaves the image alone
-  Standard_EXPORT virtual bool AdjustGamma (Standard_Real theGammaCorr) Standard_OVERRIDE;
-
-  //! Setup scanlines order in memory - top-down or bottom-up.
-  virtual void SetTopDown (bool theIsTopDown) Standard_OVERRIDE
+  //! Create default instance of this class.
+  virtual Handle(Image_AlienPixMapI) createDefault() const Standard_OVERRIDE
   {
-    if (!myLibImage.IsNull())
-    {
-      myLibImage->SetTopDown (theIsTopDown);
-    }
-    base_type::SetTopDown (theIsTopDown);
+    return new Image_WinCodec();
   }
 
 private:
 
-  //! Return NULL.
-  Handle(Image_AlienPixMapI) createDefault() const Standard_OVERRIDE { return Handle(Image_AlienPixMapI)(); }
-
   //! Copying allowed only within Handles
-  Image_AlienPixMap            (const Image_AlienPixMap& );
-  Image_AlienPixMap& operator= (const Image_AlienPixMap& );
-
-private:
-
-  Handle(Image_AlienPixMapI) myLibImage;
+  Image_WinCodec            (const Image_WinCodec& );
+  Image_WinCodec& operator= (const Image_WinCodec& );
 
 };
 
-DEFINE_STANDARD_HANDLE(Image_AlienPixMap, Image_PixMap)
+DEFINE_STANDARD_HANDLE(Image_WinCodec, Image_AlienPixMapI)
 
-#endif // _Image_AlienPixMap_H__
+#endif // _Image_WinCodec_HeaderFile

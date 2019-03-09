@@ -1804,26 +1804,40 @@ static Standard_Boolean SaveBitmap (HBITMAP     theHBitmap,
   {
     return Standard_False;
   }
-  anImage.SetTopDown (false);
 
   // Setup image data
   BITMAPINFOHEADER aBitmapInfo;
   memset (&aBitmapInfo, 0, sizeof(BITMAPINFOHEADER));
   aBitmapInfo.biSize        = sizeof(BITMAPINFOHEADER);
   aBitmapInfo.biWidth       = aBitmap.bmWidth;
-  aBitmapInfo.biHeight      = aBitmap.bmHeight; // positive means bottom-up!
+  aBitmapInfo.biHeight      = anImage.IsTopDown() ? -aBitmap.bmHeight : aBitmap.bmHeight;
   aBitmapInfo.biPlanes      = 1;
   aBitmapInfo.biBitCount    = 24;
   aBitmapInfo.biCompression = BI_RGB;
 
   // Copy the pixels
   HDC aDC = GetDC (NULL);
-  Standard_Boolean isSuccess = GetDIBits (aDC, theHBitmap,
-                                          0,                           // first scan line to set
-                                          aBitmap.bmHeight,            // number of scan lines to copy
-                                          anImage.ChangeData(),        // array for bitmap bits
-                                          (LPBITMAPINFO )&aBitmapInfo, // bitmap data info
-                                          DIB_RGB_COLORS) != 0;
+  Standard_Boolean isSuccess = Standard_True;
+  if (anImage.SizeRowBytes() != aSizeRowBytes)
+  {
+    for (Standard_Size aRowIter = 0; aRowIter < anImage.SizeY(); ++aRowIter)
+    {
+      const Standard_Size aRow = anImage.SizeY() - aRowIter - 1;
+      isSuccess = isSuccess && GetDIBits (aDC, theHBitmap,
+                                          (UINT )aRow, 1,
+                                          anImage.ChangeRow (aRowIter),
+                                          (LPBITMAPINFO )&aBitmapInfo, DIB_RGB_COLORS) != 0;
+    }
+  }
+  else
+  {
+    isSuccess = GetDIBits (aDC, theHBitmap,
+                           0,                           // first scan line to set
+                           aBitmap.bmHeight,            // number of scan lines to copy
+                           anImage.ChangeData(),        // array for bitmap bits
+                           (LPBITMAPINFO )&aBitmapInfo, // bitmap data info
+                           DIB_RGB_COLORS) != 0;
+  }
   ReleaseDC (NULL, aDC);
   return isSuccess && anImage.Save (theFileName);
 }

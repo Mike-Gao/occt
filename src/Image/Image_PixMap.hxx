@@ -174,7 +174,7 @@ public: //! @name low-level API for batch-processing (pixels reading / compariso
   //! Setup scanlines order in memory - top-down or bottom-up.
   //! Drawers should explicitly specify this value if current state IsTopDown() was ignored!
   //! @param theIsTopDown top-down flag
-  inline void SetTopDown (const bool theIsTopDown)
+  virtual void SetTopDown (bool theIsTopDown)
   {
     myData.SetTopDown (theIsTopDown);
   }

@@ -1,6 +1,4 @@
-// Created on: 2012-07-18
-// Created by: Kirill GAVRILOV
-// Copyright (c) 2012-2014 OPEN CASCADE SAS
+// Copyright (c) 2019 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -13,39 +11,40 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef _Image_AlienPixMap_H__
-#define _Image_AlienPixMap_H__
+#ifndef _Image_FreeImage_HeaderFile
+#define _Image_FreeImage_HeaderFile
 
 #include <Image_AlienPixMapI.hxx>
 
-//! Image class that support file reading/writing operations using auxiliary image library.
-//! This is a wrapper over Image_FreeImage or Image_WinCodec basing on availability.
-class Image_AlienPixMap : public Image_AlienPixMapI
+struct FIBITMAP;
+
+//! Image class that implements file reading/writing operations using FreeImage library.
+//! Supported image formats:
+//! - *.bmp - bitmap image, lossless format without compression.
+//! - *.ppm - PPM (Portable Pixmap Format), lossless format without compression.
+//! - *.png - PNG (Portable Network Graphics) lossless format with compression.
+//! - *.jpg, *.jpe, *.jpeg - JPEG/JIFF (Joint Photographic Experts Group) lossy format (compressed with quality losses). YUV color space used (automatically converted from/to RGB).
+//! - *.tif, *.tiff - TIFF (Tagged Image File Format).
+//! - *.tga - TGA (Truevision Targa Graphic), lossless format.
+//! - *.gif - GIF (Graphical Interchange Format), lossy format. Color stored using palette (up to 256 distinct colors).
+//! - *.exr - OpenEXR high dynamic-range format (supports float pixel formats). 
+class Image_FreeImage : public Image_AlienPixMapI
 {
-  DEFINE_STANDARD_RTTIEXT(Image_AlienPixMap, Image_AlienPixMapI)
+  DEFINE_STANDARD_RTTIEXT(Image_FreeImage, Image_AlienPixMapI)
 public:
 
-  //! Return default rows order used by underlying image library.
-  Standard_EXPORT static bool IsTopDownDefault();
+  //! Return TRUE if FreeImage library is available.
+  Standard_EXPORT static bool IsAvailable();
 
-  //! Create default instance of available image library or NULL if no library available.
-  Standard_EXPORT static Handle(Image_AlienPixMapI) CreateDefault();
-
-  //! Setup default image library to be used as factory.
-  //! Note that access to the factory is not protected by mutex,
-  //! make sure to call this method at the early application startup stage before using.
-  //! In this way, application might provide image library replacement implementing
-  //! image reading/writing operations which will be used by standard image tools within OCCT
-  //! (like image dump or texture loads).
-  Standard_EXPORT static void SetDefaultFactory (const Handle(Image_AlienPixMapI)& theLibrary);
-
+  //! Return default rows order used by FreeImage library, which is Bottom-Up.
+  static bool IsTopDownDefault() { return false; }
 public:
 
   //! Empty constructor.
-  Standard_EXPORT Image_AlienPixMap();
+  Standard_EXPORT Image_FreeImage();
 
   //! Destructor
-  Standard_EXPORT virtual ~Image_AlienPixMap();
+  Standard_EXPORT virtual ~Image_FreeImage();
 
   using Image_AlienPixMapI::Load;
 
@@ -70,7 +69,7 @@ public:
   //!                       than nearest supported will be used instead!
   //! @param theSizeX image width
   //! @param theSizeY image height
-  //! @param theSizeRowBytes may be ignored by this class and required alignment will be used instead!
+  //! @param theSizeRowBytes ignored parameter, 4-bytes alignment is enforced by FreeImage library
   Standard_EXPORT virtual bool InitTrash (Image_Format        thePixelFormat,
                                           const Standard_Size theSizeX,
                                           const Standard_Size theSizeY,
@@ -83,31 +82,26 @@ public:
   //! theGamma - gamma value to use; a value of 1.0 leaves the image alone
   Standard_EXPORT virtual bool AdjustGamma (Standard_Real theGammaCorr) Standard_OVERRIDE;
 
-  //! Setup scanlines order in memory - top-down or bottom-up.
-  virtual void SetTopDown (bool theIsTopDown) Standard_OVERRIDE
+public:
+
+  //! Create default instance of this class.
+  virtual Handle(Image_AlienPixMapI) createDefault() const Standard_OVERRIDE
   {
-    if (!myLibImage.IsNull())
-    {
-      myLibImage->SetTopDown (theIsTopDown);
-    }
-    base_type::SetTopDown (theIsTopDown);
+    return new Image_FreeImage();
   }
 
 private:
 
-  //! Return NULL.
-  Handle(Image_AlienPixMapI) createDefault() const Standard_OVERRIDE { return Handle(Image_AlienPixMapI)(); }
-
   //! Copying allowed only within Handles
-  Image_AlienPixMap            (const Image_AlienPixMap& );
-  Image_AlienPixMap& operator= (const Image_AlienPixMap& );
+  Image_FreeImage            (const Image_FreeImage& );
+  Image_FreeImage& operator= (const Image_FreeImage& );
 
 private:
 
-  Handle(Image_AlienPixMapI) myLibImage;
+  FIBITMAP* myLibImage;
 
 };
 
-DEFINE_STANDARD_HANDLE(Image_AlienPixMap, Image_PixMap)
+DEFINE_STANDARD_HANDLE(Image_FreeImage, Image_AlienPixMapI)
 
-#endif // _Image_AlienPixMap_H__
+#endif // _Image_FreeImage_HeaderFile
