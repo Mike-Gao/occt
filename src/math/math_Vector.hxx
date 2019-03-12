@@ -331,6 +331,37 @@ public:
 
   friend class math_Matrix;
 
+#ifndef OCCT_NO_RVALUE_REFERENCE
+  //! Move constructor
+  math_Vector (math_Vector&& theOther)
+  {
+    Move (theOther);
+  }
+
+  //! Move assignment operator; @sa Move()
+  math_Vector& operator= (math_Vector&& theOther)
+  {
+    return Move (theOther);
+  }
+#endif
+
+  //! Move assignment.
+  //! This array will borrow all the data from theOther, so that theOther should not be used anymore.
+  math_Vector& Move (math_Vector& theOther)
+  {
+    if (&theOther == this)
+    {
+      return *this;
+    }
+
+    myLocArray.Move (theOther.myLocArray);
+    NCollection_Array1<Standard_Real> aNewArray (myLocArray[0], theOther.Array.Lower(), theOther.Array.Upper());
+    Array.Move (aNewArray);
+    NCollection_Array1<Standard_Real> anEmptyArray;
+    theOther.Array.Move (anEmptyArray);
+    return *this;
+  }
+
 protected:
 
   //! Is used internally to set the "theLower" value of the vector.

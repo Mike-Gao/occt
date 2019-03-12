@@ -256,6 +256,37 @@ public:
     return theO;
   }
 
+#ifndef OCCT_NO_RVALUE_REFERENCE
+  //! Move constructor
+  math_IntegerVector (math_IntegerVector&& theOther)
+  {
+    Move (theOther);
+  }
+
+  //! Move assignment operator; @sa Move()
+  math_IntegerVector& operator= (math_IntegerVector&& theOther)
+  {
+    return Move (theOther);
+  }
+#endif
+
+  //! Move assignment.
+  //! This array will borrow all the data from theOther, so that theOther should not be used anymore.
+  math_IntegerVector& Move (math_IntegerVector& theOther)
+  {
+    if (&theOther == this)
+    {
+      return *this;
+    }
+
+    myLocArray.Move (theOther.myLocArray);
+    NCollection_Array1<Standard_Integer> aNewArray (myLocArray[0], theOther.Array.Lower(), theOther.Array.Upper());
+    Array.Move (aNewArray);
+    NCollection_Array1<Standard_Integer> anEmptyArray;
+    theOther.Array.Move (anEmptyArray);
+    return *this;
+  }
+
 protected:
 
   //! is used internally to set the Lower value of the IntegerVector.

@@ -59,6 +59,32 @@ public:
     return myPtr;
   }
 
+  //! Move assignment.
+  //! This array will borrow all the data from theOther.
+  NCollection_LocalArray& Move (NCollection_LocalArray& theOther)
+  {
+    if (&theOther == this)
+    {
+      return *this;
+    }
+
+    Deallocate();
+    mySize = theOther.mySize;
+    if (theOther.myPtr == theOther.myBuffer)
+    {
+      // deep copy
+      myPtr = myBuffer;
+      memcpy (myPtr, theOther.myPtr, sizeof(theItem) * theOther.mySize);
+      memset (theOther.myPtr,     0, sizeof(theItem) * theOther.mySize);
+    }
+    else
+    {
+      myPtr = theOther.myPtr;
+      theOther.myPtr = theOther.myBuffer;
+    }
+    return *this;
+  }
+
 private:
 
   NCollection_LocalArray (const NCollection_LocalArray& );
