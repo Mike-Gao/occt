@@ -338,7 +338,7 @@ protected:
 
 private:
 
-  NCollection_LocalArray<Standard_Real, 512> myLocArray;
+  NCollection_LocalArray<Standard_Real, 32> myLocArray;
   NCollection_Array1<Standard_Real> Array;
 
 };

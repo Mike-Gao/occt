@@ -263,7 +263,7 @@ protected:
 
 private:
 
-  NCollection_LocalArray<Standard_Integer, 512> myLocArray;
+  NCollection_LocalArray<Standard_Integer, 32> myLocArray;
   NCollection_Array1<Standard_Integer> Array;
 
 };
