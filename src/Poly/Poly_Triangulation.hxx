@@ -138,7 +138,16 @@ public:
   //! The function HasUVNodes  checks if 2D nodes
   //! are associated with the 3D nodes of this triangulation.
   //! Const reference on the 2d nodes values.
-  const TColgp_Array1OfPnt2d& UVNodes() const { return myUVNodes->Array1(); }
+  const TColgp_Array1OfPnt2d& UVNodes() const
+  {
+    if (!myUVNodes.IsNull())
+    {
+      return myUVNodes->Array1();
+    }
+
+    static const TColgp_Array1OfPnt2d THE_DUMMY;
+    return THE_DUMMY;
+  }
 
   //! Returns the table of 2D nodes (2D points) associated with
   //! each 3D node of this triangulation.
