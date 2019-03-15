@@ -33,6 +33,10 @@ set (BUILD_RELEASE_DISABLE_EXCEPTIONS_DESCR
 Defines No_Exception macros for Release builds when enabled (default).
 These exceptions are always enabled in Debug builds, but disable in Release for better performance")
 
+set (BUILD_ENABLE_SANITIZE_EXCEPTIONS_DESCR
+"Enables extra exceptions for detecting broken code. Should NOT be used for production.
+Defines OCCT_DEBUG_SANITIZE_EXCEPTIONS macros when enabled (OFF by default).")
+
 set (BUILD_ENABLE_FPE_SIGNAL_HANDLER_DESCR
 "Enable/Disable the floating point exceptions (FPE) during DRAW execution only.
 Corresponding environment variable (CSF_FPE) can be changed manually

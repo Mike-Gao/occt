@@ -20,6 +20,10 @@
 
 #include <type_traits>
 
+#ifdef OCCT_DEBUG_SANITIZE_EXCEPTIONS
+  #include <stdexcept>
+#endif
+
 class Standard_Transient;
 
 //! Namespace opencascade is intended for low-level template classes and functions
@@ -181,10 +185,28 @@ namespace opencascade {
     T* get() const { return static_cast<T*>(this->entity); }
 
     //! Member access operator (note non-const)
-    T* operator-> () const { return static_cast<T*>(this->entity); }
+    T* operator-> () const
+    {
+    #ifdef OCCT_DEBUG_SANITIZE_EXCEPTIONS
+      if (entity == 0)
+      {
+        throw std::runtime_error ("null pointer exception");
+      }
+    #endif
+      return static_cast<T*>(this->entity);
+    }
 
     //! Dereferencing operator (note non-const)
-    T& operator* () const { return *get(); }
+    T& operator* () const
+    {
+    #ifdef OCCT_DEBUG_SANITIZE_EXCEPTIONS
+      if (entity == 0)
+      {
+        throw std::runtime_error ("null pointer exception");
+      }
+    #endif
+      return *get();
+    }
 
     //! Check for equality
     template <class T2>

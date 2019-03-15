@@ -93,10 +93,14 @@ static LONG _osd_debug   ( void );
 //# define _OSD_FPX ( _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW )
 # define _OSD_FPX ( _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW )
 
-#ifdef OCC_CONVERT_SIGNALS
-#define THROW_OR_JUMP(Type,Message) Type::NewInstance(Message)->Jump()
+#ifdef OCCT_DEBUG_SANITIZE_EXCEPTIONS
+  #define THROW_OR_JUMP(Type,Message) throw std::runtime_error (Message)
 #else
-#define THROW_OR_JUMP(Type,Message) throw Type(Message)
+#ifdef OCC_CONVERT_SIGNALS
+  #define THROW_OR_JUMP(Type,Message) Type::NewInstance(Message)->Jump()
+#else
+  #define THROW_OR_JUMP(Type,Message) throw Type(Message)
+#endif
 #endif
 
 //=======================================================================

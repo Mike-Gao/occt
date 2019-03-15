@@ -25,7 +25,10 @@
 class Standard_OutOfRange;
 DEFINE_STANDARD_HANDLE(Standard_OutOfRange, Standard_RangeError)
 
-#if !defined No_Exception && !defined No_Standard_OutOfRange
+#ifdef OCCT_DEBUG_SANITIZE_EXCEPTIONS
+#define Standard_OutOfRange_Raise_if(CONDITION, MESSAGE) \
+  if (CONDITION) throw std::runtime_error (MESSAGE);
+#elif !defined No_Exception && !defined No_Standard_OutOfRange
 #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
   // suppress false-positive warnings produced by GCC optimizer
   #define Standard_OutOfRange_Raise_if(CONDITION, MESSAGE) \
