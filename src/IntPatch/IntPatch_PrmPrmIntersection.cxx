@@ -2492,52 +2492,56 @@ void IntPatch_PrmPrmIntersection::Perform (const Handle(Adaptor3d_HSurface)& Sur
 
                             Standard_Boolean removeNext = Standard_False;
                             Standard_Boolean removePrev = Standard_False;
-                            if( ciV == 1)
+                            
+                            if(cnbV > 1)
                             {
-                              Standard_Integer dPar = Abs( VPold.Value(ciV) - VPold.Value(ciV+1));
-                              if(dPar > 10)
+                              if( ciV == 1)
                               {
-                                removeNext = Standard_True;
-                                for( iPo = (ciV+1); iPo <= cnbV; iPo++ )
-                                  VPold.SetValue(iPo, VPold.Value(iPo) - 1 );
-                              }
-                            }
-                            else if( ciV == cnbV)
-                            {
-                              Standard_Integer dPar = Abs( VPold.Value(ciV) - VPold.Value(ciV-1));
-                              if(dPar > 10)
-                              {
-                                removePrev = Standard_True;
-                                VPold.SetValue(ciV, VPold.Value(ciV) - 1 );
-                              }
-                            }
-                            else
-                            {
-                              Standard_Integer dParMi = Abs( VPold.Value(ciV) - VPold.Value(ciV-1));
-                              Standard_Integer dParMa = Abs( VPold.Value(ciV) - VPold.Value(ciV+1));
-                              if(dParMi > 10)
-                              {
-                                removePrev = Standard_True;
-                                VPold.SetValue(ciV, VPold.Value(ciV) - 1 );
-                              }
-
-                              if(dParMa > 10)
-                              {
-                                removeNext = Standard_True;
-                                for( iPo = (ciV+1); iPo <= cnbV; iPo++ )
+                                Standard_Integer dPar = Abs( VPold.Value(ciV) - VPold.Value(ciV+1));
+                                if(dPar > 10)
                                 {
-                                  if(dParMi > 10)
-                                    VPold.SetValue(iPo, VPold.Value(iPo) - 2 );
-                                  else
+                                  removeNext = Standard_True;
+                                  for( iPo = (ciV+1); iPo <= cnbV; iPo++ )
                                     VPold.SetValue(iPo, VPold.Value(iPo) - 1 );
+                                }
+                              }
+                              else if( ciV == cnbV)
+                              {
+                                Standard_Integer dPar = Abs( VPold.Value(ciV) - VPold.Value(ciV-1));
+                                if(dPar > 10)
+                                {
+                                  removePrev = Standard_True;
+                                  VPold.SetValue(ciV, VPold.Value(ciV) - 1 );
                                 }
                               }
                               else
                               {
+                                Standard_Integer dParMi = Abs( VPold.Value(ciV) - VPold.Value(ciV-1));
+                                Standard_Integer dParMa = Abs( VPold.Value(ciV) - VPold.Value(ciV+1));
                                 if(dParMi > 10)
+                                {
+                                  removePrev = Standard_True;
+                                  VPold.SetValue(ciV, VPold.Value(ciV) - 1 );
+                                }
+
+                                if(dParMa > 10)
+                                {
+                                  removeNext = Standard_True;
                                   for( iPo = (ciV+1); iPo <= cnbV; iPo++ )
-                                    VPold.SetValue(iPo, VPold.Value(iPo) - 1 );
-                              } 
+                                  {
+                                    if(dParMi > 10)
+                                      VPold.SetValue(iPo, VPold.Value(iPo) - 2 );
+                                    else
+                                      VPold.SetValue(iPo, VPold.Value(iPo) - 1 );
+                                  }
+                                }
+                                else
+                                {
+                                  if(dParMi > 10)
+                                    for( iPo = (ciV+1); iPo <= cnbV; iPo++ )
+                                      VPold.SetValue(iPo, VPold.Value(iPo) - 1 );
+                                } 
+                              }
                             }
 
                             Standard_Integer pI = ciVpar;
