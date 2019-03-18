@@ -2492,6 +2492,9 @@ void IntPatch_PrmPrmIntersection::Perform (const Handle(Adaptor3d_HSurface)& Sur
 
                             Standard_Boolean removeNext = Standard_False;
                             Standard_Boolean removePrev = Standard_False;
+                            //gka
+                            if(cnbV > 1)
+                            {
                             if( ciV == 1)
                             {
                               Standard_Integer dPar = Abs( VPold.Value(ciV) - VPold.Value(ciV+1));
@@ -2538,6 +2541,7 @@ void IntPatch_PrmPrmIntersection::Perform (const Handle(Adaptor3d_HSurface)& Sur
                                   for( iPo = (ciV+1); iPo <= cnbV; iPo++ )
                                     VPold.SetValue(iPo, VPold.Value(iPo) - 1 );
                               } 
+                            }
                             }
 
                             Standard_Integer pI = ciVpar;
