@@ -14,14 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// 20/02/97 : PMN -> Positionement local sur BSpline (PRO6902)
-// 10/07/97 : PMN -> Pas de calcul de resolution dans Nb(Intervals) (PRO9248)
-// 20/10/97 : JPI -> traitement des offset curves
-
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
-
 #include <Adaptor2d_HCurve2d.hxx>
 #include <BSplCLib.hxx>
 #include <BSplCLib_Cache.hxx>

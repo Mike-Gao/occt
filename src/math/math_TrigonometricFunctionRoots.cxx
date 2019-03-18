@@ -12,17 +12,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// lpa, le 03/09/91
-
-
 // Implementation de la classe resolvant les equations en cosinus-sinus.
 // Equation de la forme a*cos(x)*cos(x)+2*b*cos(x)*sin(x)+c*cos(x)+d*sin(x)+e
-
-//#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-//#endif
 
 #include <math_TrigonometricFunctionRoots.hxx>
 #include <math_TrigonometricEquationFunction.hxx>

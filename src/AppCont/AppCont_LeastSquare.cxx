@@ -14,10 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef OCCT_DEBUG
-#define No_Standard_OutOfRange
-#define No_Standard_RangeError
-#endif
 #include <AppCont_LeastSquare.hxx>
 
 #include <math.hxx>

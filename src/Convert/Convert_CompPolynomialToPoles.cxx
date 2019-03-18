@@ -22,9 +22,6 @@
 // 15-04-97 : PMN : Constructeurs avec un seul segement ou differentes 
 //                  continuitees. 
 
-#define No_Standard_OutOfRange
-
-
 #include <BSplCLib.hxx>
 #include <Convert_CompPolynomialToPoles.hxx>
 #include <PLib.hxx>

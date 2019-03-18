@@ -12,14 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//  10/09/97 : PMN : Correction BUC40192 (pb avec les matrices negatives)
-
-#ifndef OCCT_DEBUG
-#define No_Standard_OutOfRange
-#define No_Standard_ConstructionError
-#endif
-
-
 #include <gp_GTrsf.hxx>
 #include <gp_Mat.hxx>
 #include <gp_Trsf.hxx>

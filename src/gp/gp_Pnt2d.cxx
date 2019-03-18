@@ -12,11 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// JCV 08/01/91 Modifs introduction des classes XY, Mat2d dans le package gp
-
-#define No_Standard_OutOfRange
-
-
 #include <gp_Ax2d.hxx>
 #include <gp_Pnt2d.hxx>
 #include <gp_Trsf2d.hxx>

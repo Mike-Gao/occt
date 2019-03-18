@@ -14,19 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//Passage en classe persistante - 23/01/91
-//Modif suite a la deuxieme revue de projet toolkit Geometry -23/01/91
-// pmn : 21/10/95 ; Correction de la methode segment (PRO5853)
-// pmn : 31-Dec-96; Bonne gestion des poids (bug PRO4622)
-// xab : 07-Jul-97; le cache est instable en degree 21
-//       a partir du degree 15 on ne l'utilise plus
-// RBD : 15/10/98 ; Le cache est desormais defini sur [-1,1] (pro15537).
-// pmn : 10/12/98 ; Update de la methode segment (suite a la modif de cache).
-
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
-
 #include <BSplCLib.hxx>
 #include <Geom_BezierCurve.hxx>
 #include <Geom_BezierSurface.hxx>

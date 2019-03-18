@@ -19,11 +19,6 @@
 // Ce programme utilise les moindres carres pour le cas suivant:
 // passage et tangences aux extremites.
 
-
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
 #include <math_Householder.hxx>
 #include <math_Crout.hxx>
 #include <AppParCurves.hxx>

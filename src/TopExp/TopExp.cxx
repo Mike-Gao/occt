@@ -14,11 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#define No_Standard_NoMoreObject
-#define No_Standard_NoSuchObject
-#define No_Standard_TypeMismatch
-
-
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>

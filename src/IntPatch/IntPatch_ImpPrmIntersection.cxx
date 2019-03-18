@@ -38,11 +38,6 @@
 #include <math_Matrix.hxx>
 #include <math_Vector.hxx>
 
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
 static Standard_Boolean DecomposeResult(const Handle(IntPatch_PointLine)& theLine,
                                         const Standard_Boolean       IsReversed,
                                         const IntSurf_Quadric&       theQuad,

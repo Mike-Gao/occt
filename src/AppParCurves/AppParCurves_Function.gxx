@@ -20,11 +20,6 @@
 // DF(ui, Poles(ui)) ce qui implique un calcul des nouveaux poles 
 //  a chaque appel.
 
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
-
-
 #include <AppParCurves_MultiCurve.hxx>
 #include <AppParCurves_MultiPoint.hxx>
 #include <TColStd_HArray1OfInteger.hxx>

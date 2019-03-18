@@ -12,13 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
-//#endif
-
 #include <math_FunctionSetWithDerivatives.hxx>
 #include <math_Matrix.hxx>
 #include <math_NewtonFunctionSetRoot.hxx>

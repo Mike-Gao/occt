@@ -14,12 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
-
 #include <FairCurve_Energy.hxx>
 #include <gp_Pnt2d.hxx>
 #include <gp_Vec2d.hxx>

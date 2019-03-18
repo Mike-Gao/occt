@@ -19,11 +19,6 @@
 //--          If the intersection is not a conic, 
 //--          analytical methods must be called.
 //----------------------------------------------------------------------
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
 
 #include <ElCLib.hxx>
 #include <ElSLib.hxx>

@@ -14,11 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
-
 #include <FEmTool_ProfileMatrix.hxx>
 #include <gp.hxx>
 #include <Standard_NotImplemented.hxx>

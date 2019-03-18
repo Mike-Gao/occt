@@ -12,15 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// lpa le 20/08/91
-
-//#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
-//#endif
-
 #include <math_Crout.hxx>
 #include <math_Matrix.hxx>
 #include <math_NotSquare.hxx>

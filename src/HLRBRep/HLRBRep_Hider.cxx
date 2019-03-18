@@ -14,9 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#define No_Standard_OutOfRange
-
-
 #include <HLRAlgo_Coincidence.hxx>
 #include <HLRAlgo_Interference.hxx>
 #include <HLRAlgo_InterferenceList.hxx>

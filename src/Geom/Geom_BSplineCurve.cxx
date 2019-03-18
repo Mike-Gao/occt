@@ -14,22 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//Avril 1991 : constructeurs + methodes de lecture.
-//Mai 1991   : revue des specifs + debut de realisation des classes tool =>
-//             implementation des methodes Set et calcul du point courant.
-//Juillet 1991 : voir egalement File Geom_BSplineCurve_1.cxx
-//Juin    1992 : mise a plat des valeurs nodales - amelioration des
-//               performances sur calcul du point courant
-
-//RLE Aug 1993  Remove Swaps, Remove typedefs, Update BSplCLib
-//              debug periodic, IncreaseDegree
-// 21-Mar-95 : xab implemented cache
-// 14-Mar-96 : xab implemented MovePointAndTangent 
-// 13-Oct-96 : pmn Bug dans SetPeriodic (PRO6088) et Segment (PRO6250)
-
-#define No_Standard_OutOfRange
-
-
 #include <BSplCLib.hxx>
 #include <BSplCLib_KnotDistribution.hxx>
 #include <BSplCLib_MultDistribution.hxx>

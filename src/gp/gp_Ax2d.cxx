@@ -12,13 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// JCV 08/01/91 modif introduction des classes XY et Mat dans le package
-// LPA, JCV  07/92 passage sur C1.
-// JCV 07/92 Introduction de la method Dump 
-
-#define No_Standard_OutOfRange
-
-
 #include <gp_Ax2d.hxx>
 #include <gp_Dir2d.hxx>
 #include <gp_Pnt2d.hxx>

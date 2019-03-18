@@ -14,12 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef OCCT_DEBUG
-#define No_Standard_OutOfRange
-#define No_Standard_RangeError
-#endif
-
-
 #include <AppCont_ContMatrices.hxx>
 #include <math_Matrix.hxx>
 #include <Standard_DimensionError.hxx>

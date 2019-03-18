@@ -12,14 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// JCV 30/08/90 Modif passage version C++ 2.0 sur Sun
-// JCV 1/10/90 Changement de nom du package vgeom -> gp
-// JCV 4/10/90 codage sur la forme de la transformation shape,Scaling,negative
-// JCV 10/12/90 Modif introduction des classes Mat et XYZ dans gp
-
-#define No_Standard_OutOfRange
-
-
 #include <gp.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>

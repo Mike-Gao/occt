@@ -14,8 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//#define No_Standard_OutOfRange
-
 #include <CSLib_Class2d.hxx>
 #include <gp_Pnt2d.hxx>
 #include <Standard_ConstructionError.hxx>

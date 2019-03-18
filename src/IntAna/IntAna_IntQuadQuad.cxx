@@ -18,11 +18,6 @@
 
 #include <Standard_Stream.hxx>
 
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
 //======================================================================
 //== I n t e r s e c t i o n   C O N E           Q U A D R I Q U E   
 //==                           C Y L I N D R E   Q U A D R I Q U E

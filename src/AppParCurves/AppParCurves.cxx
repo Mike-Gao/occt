@@ -12,10 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
-
 #include <AppParCurves.hxx>
 #include <BSplCLib.hxx>
 #include <gp_Pnt2d.hxx>

@@ -14,13 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// Evolutions   JCV Dec 1991 ajout de calculs de derivees et traitement
-//              d'entites 2d
-//              JCV Mars 1992 ajout method SetLinearForm
-
-#define No_Standard_OutOfRange
-
-
 #include <ElCLib.hxx>
 #include <gp.hxx>
 #include <gp_Ax1.hxx>

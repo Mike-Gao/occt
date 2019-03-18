@@ -32,11 +32,6 @@
 #include <Standard_OutOfRange.hxx>
 #include <StdFail_NotDone.hxx>
 
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-#define No_Standard_ConstructionError
-
 #include <Standard_Stream.hxx>
 
 #include <AppParCurves.hxx>

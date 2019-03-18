@@ -14,12 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
-
 #include <BSplCLib.hxx>
 #include <FairCurve_Batten.hxx>
 #include <FairCurve_BattenLaw.hxx>

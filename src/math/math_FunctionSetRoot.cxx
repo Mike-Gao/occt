@@ -12,19 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// pmn 15/05/97 pas de Gauss avec des pivot trop petit. SVD fait mieux 
-// l'affaire + limitation de la longeur du pas + qq comentaire issus d'EUCLID3
-// pmn 10/06/97 refonte totale du traitement des bords + ajustement des init 
-// et des tolerances pour brent...
-
-//#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
-//#endif
-//math_FunctionSetRoot.cxx
-
 #include <math_BrentMinimum.hxx>
 #include <math_Function.hxx>
 #include <math_FunctionSetRoot.hxx>

@@ -25,10 +25,6 @@
 // Si ce n est pas le cas, l appel a ResConstraint est equivalent a une 
 // seconde resolution par les moindres carres donc beaucoup de temps perdu.
 
-
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
 #include <AppParCurves_Constraint.hxx>
 #include <math_BFGS.hxx>
 #include <StdFail_NotDone.hxx>

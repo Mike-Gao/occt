@@ -14,12 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//  pmn  16-10-96 : Correction de PolesCoefficient (PRO5782)
-//                  ColLength et RowLength avaient encore frappes !!
-
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
 #include <BSplSLib.hxx>
 #include <BSplCLib.hxx>
 #include <TColStd_Array1OfReal.hxx>

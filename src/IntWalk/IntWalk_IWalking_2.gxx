@@ -17,12 +17,6 @@
 #include <Bnd_Range.hxx>
 #include <TColStd_MapOfInteger.hxx>
 
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
-
 // _______________________________________________
 //
 // Location of point (u, v) in the natural domain of a surface AND update  

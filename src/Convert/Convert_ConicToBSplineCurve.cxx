@@ -12,11 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//JCV 16/10/91
-
-#define No_Standard_OutOfRange
-
-
 #include <BSplCLib.hxx>
 #include <Convert_ConicToBSplineCurve.hxx>
 #include <Convert_CosAndSinEvalFunction.hxx>

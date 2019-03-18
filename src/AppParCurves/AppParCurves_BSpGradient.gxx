@@ -20,10 +20,6 @@
 // La methode de gradient conjugue est programmee dans la bibliotheque 
 // mathematique: math_BFGS.
 
-
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
 #include <AppParCurves_Constraint.hxx>
 #include <AppParCurves_ConstraintCouple.hxx>
 #include <math_BFGS.hxx>

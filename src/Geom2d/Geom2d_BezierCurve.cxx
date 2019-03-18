@@ -14,20 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// Passage en classe persistante - 23/01/91
-// Modif suite a la deuxieme revue de projet toolkit Geometry -23/01/91
-// Infos :
-// Actuellement pour les champs de la courbe le tableau des poles est 
-// declare de 1 a NbPoles et le tableau des poids est declare de 1 a NbPoles
-
-
-// Revised RLE  Aug 19 1993
-// Suppressed Swaps, added Init, removed typedefs
-
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-
-
 #include <Geom2d_BezierCurve.hxx>
 #include <Geom2d_Geometry.hxx>
 #include <gp.hxx>

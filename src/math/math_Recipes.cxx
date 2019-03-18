@@ -21,12 +21,6 @@
 #define	_MEMORY_H
 #endif
 
-//#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#define No_Standard_DimensionError
-//#endif
-
 #include <cmath>
 
 #include <math_Recipes.hxx>

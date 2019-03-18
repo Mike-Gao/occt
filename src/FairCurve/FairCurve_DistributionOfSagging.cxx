@@ -11,14 +11,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// 09-02-1996 : PMN Version originale
-
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
-
 #include <BSplCLib.hxx>
 #include <FairCurve_BattenLaw.hxx>
 #include <FairCurve_DistributionOfSagging.hxx>

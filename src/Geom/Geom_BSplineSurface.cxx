@@ -14,15 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// 14-Mar-96 : xab  portage hp
-// pmn : 28-Jun-96 Distinction entre la continuite en U et V (bug PRO4625)
-// pmn : 07-Jan-97 Centralisation des verif rational (PRO6834)
-//       et ajout des InvalideCache() dans les SetWeight*(PRO6833)
-// RBD : 15-10-98 ; Le cache est maintenant calcule sur [-1,1] (pro15537).
-// jct : 19-01-99 ; permutation de urational et vrational dans Rational.
-#define No_Standard_OutOfRange
-
-
 #include <BSplCLib.hxx>
 #include <BSplSLib.hxx>
 #include <Geom_BSplineSurface.hxx>

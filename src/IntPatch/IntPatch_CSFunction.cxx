@@ -12,7 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
 #include <Adaptor2d_HCurve2d.hxx>
 #include <Adaptor3d_HSurface.hxx>
 #include <Adaptor3d_HSurfaceTool.hxx>
@@ -23,12 +22,6 @@
 #include <IntPatch_CSFunction.hxx>
 #include <IntPatch_HCurve2dTool.hxx>
 #include <math_Matrix.hxx>
-
-#ifndef OCCT_DEBUG
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-#endif
-
 
 #define SURFACE1 (*((Handle(Adaptor3d_HSurface) *)(surface1)))
 #define SURFACE2 (*((Handle(Adaptor3d_HSurface) *)(surface2)))

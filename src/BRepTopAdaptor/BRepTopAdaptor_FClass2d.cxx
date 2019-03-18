@@ -16,9 +16,6 @@
 
 #define AFFICHAGE 0
 
-#define No_Standard_OutOfRange
-
-
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Curve2d.hxx>

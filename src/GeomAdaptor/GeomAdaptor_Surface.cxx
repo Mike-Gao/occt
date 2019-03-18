@@ -14,13 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// Modified:	Thu Nov 26 16:37:18 1998
-//		correction in NbUIntervals for SurfaceOfLinearExtrusion 
-//		(PRO16346)
-
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
 #include <Adaptor3d_HCurve.hxx>
 #include <Adaptor3d_HSurface.hxx>
 #include <BSplCLib.hxx>

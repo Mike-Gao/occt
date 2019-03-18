@@ -12,14 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// JCV 1/10/90 Changement de nom du package vgeom -> gp
-// JCV 12/12/90 modif introduction des classes XYZ et Mat dans le package
-// LPA, JCV  07/92 passage sur C1.
-// JCV 07/92 Introduction de la method Dump 
-
-#define No_Standard_OutOfRange
-
-
 #include <gp.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>

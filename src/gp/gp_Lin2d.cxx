@@ -12,12 +12,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// JCV 10/01/91 modifs suite a la deuxieme revue de projet
-// AGV 03/04/07 bug correction: "pos" origin too far when A is very small
-
-#define No_Standard_OutOfRange
-
-
 #include <gp.hxx>
 #include <gp_Ax2d.hxx>
 #include <gp_Dir2d.hxx>

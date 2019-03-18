@@ -18,9 +18,6 @@
 #include <TColStd_Array1OfInteger.hxx>
 #include <TColStd_Array1OfReal.hxx>
 
-#define No_Standard_RangeError
-#define No_Standard_OutOfRange
-
 //=======================================================================
 //struct : BSplCLib_BezierArrays 
 //purpose: Auxiliary structure providing standard definitions of bspline 

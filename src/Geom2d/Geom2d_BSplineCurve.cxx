@@ -14,21 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//Avril 1991 : constructeurs + methodes de lecture.
-//Mai 1991   : revue des specifs + debut de realisation des classes tool =>
-//             implementation des methodes Set et calcul du point courant.
-//Juillet 1991 : voir egalement File Geom2d_BSplineCurve_1.cxx
-//Juin    1992 : mise a plat des valeurs nodales - amelioration des
-//               performances sur calcul du point courant
-
-//RLE Aug 1993  Remove Swaps, Init methods, Remove typedefs
-//  14-Mar-96 : xab implemented MovePointAndTangent
-
-//SAMTECH Jan 2002 : add text to Raise()
-
-#define No_Standard_OutOfRange
-
-
 #include <BSplCLib.hxx>
 #include <BSplCLib_KnotDistribution.hxx>
 #include <BSplCLib_MultDistribution.hxx>
