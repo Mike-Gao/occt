@@ -741,6 +741,10 @@ Standard_Boolean StdSelect_BRepSelectionTool::GetSensitiveForFace (const TopoDS_
       }
     }
   }
+  if (aWirePoints.IsEmpty())
+  {
+    return Standard_False;
+  }
 
   Handle(TColgp_HArray1OfPnt) aFacePoints = new TColgp_HArray1OfPnt (1, aWirePoints.Length());
   {
