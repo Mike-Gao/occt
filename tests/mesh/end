@@ -46,7 +46,7 @@ if { [string compare $bug_area ""] != 0 } {
     if { $rel_tol == 100 } {
 	puts "TODO $bug_area All:^\\s*Error  : The meshing algo cannot create mesh.\\s*$"
     } else {
-	puts "TODO ?$bug_area All: Error: area difference = .* is not equal to expected"
+	#puts "TODO ?$bug_area All: Error: area difference = .* is not equal to expected"
     }
 }
 
