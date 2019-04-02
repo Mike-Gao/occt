@@ -145,6 +145,12 @@ protected slots:
   //! Import report into document
   void onImportReport();
 
+  //! Unite alerts in view model
+  void onUniteAlerts();
+
+  //! Sets report reversed 
+  void onSetReversedAlerts();
+
   //! Reads if possible report of a selected item and updates this report in tree view
   void onReloadReport();
 

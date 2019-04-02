@@ -76,8 +76,14 @@ public slots:
   //! Set selected report active
   void OnActivateReport();
 
+  //! Clears container of alerts of selected report
+  void OnClearReport();
+
   //! Exports the first selected shape into ShapeViewer plugin.
   void OnExportToShapeView();
+
+  //! Sending several alerts to check message-alert-tool mechanizm
+  void OnTestAlerts();
 
 protected:
   //! Returns report of selected tree view item if a report item is selected

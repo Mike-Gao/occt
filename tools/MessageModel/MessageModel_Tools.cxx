@@ -14,6 +14,7 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/MessageModel_Tools.hxx>
+#include <inspector/MessageModel_ItemAlert.hxx>
 #include <inspector/MessageModel_TableModelValues.hxx>
 
 #include <inspector/ViewControl_Table.hxx>
@@ -137,10 +138,24 @@ TCollection_AsciiString MessageModel_Tools::GetStandardTypeAlertInfo (const Hand
 // function : GetPropertyTableValues
 // purpose :
 // =======================================================================
-void MessageModel_Tools::GetPropertyTableValues (const Handle(Message_Alert)& theAlert,
+void MessageModel_Tools::GetPropertyTableValues (const TreeModel_ItemBasePtr& theItem,
                                                  QList<ViewControl_TableModelValues*>& theTableValues)
 {
-  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(theAlert);
+  Handle(TreeModel_ItemProperties) anItemProperties = theItem->GetProperties();
+  if (!anItemProperties.IsNull())
+  {
+    ViewControl_TableModelValues* aTableValues = new ViewControl_TableModelValues();
+    aTableValues->SetProperties (anItemProperties);
+    theTableValues.append (aTableValues);
+    return;
+  }
+
+  MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(theItem);
+  if (!anAlertItem)
+    return;
+
+  const Handle(Message_Alert)& anAlert = anAlertItem->GetAlert();
+  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(anAlert);
   if (anExtendedAlert.IsNull())
     return;
 
@@ -176,6 +191,36 @@ void MessageModel_Tools::GetPropertyTableValues (const Handle(Message_Alert)& th
       aTableValues->SetDefaultSectionSize(Qt::Vertical, aHeight);
 
       theTableValues.append (aTableValues);
+    }
+  }
+}
+
+// =======================================================================
+// function : GetUnitedAlerts
+// purpose :
+// =======================================================================
+void MessageModel_Tools::GetUnitedAlerts(const Message_ListOfAlert& theAlerts,
+  NCollection_DataMap<Standard_Integer, Message_ListOfAlert>& theUnitedAlerts)
+{
+  //theUnitedAlerts.Clear();
+  TCollection_AsciiString anAlertMessageKey;
+  Standard_Integer aRowIndex = 0;
+  Standard_Integer aCurIndex = 0;
+  for (Message_ListOfAlert::Iterator anAlertsIt (theAlerts); anAlertsIt.More(); anAlertsIt.Next())
+  {
+    aCurIndex++;
+    Handle(Message_Alert) anAlert = anAlertsIt.Value();
+    if (anAlertMessageKey.IsEqual (anAlert->GetMessageKey())) {
+      Message_ListOfAlert anAlerts = theUnitedAlerts.Find(aRowIndex-1); // already in the map
+      anAlerts.Append (anAlert);
+      theUnitedAlerts.Bind(aRowIndex-1, anAlerts);
+    }
+    else {
+      Message_ListOfAlert anAlerts;
+      anAlerts.Append (anAlert);
+      theUnitedAlerts.Bind(aRowIndex, anAlerts);
+      aRowIndex++;
+      anAlertMessageKey = anAlert->GetMessageKey();
     }
   }
 }

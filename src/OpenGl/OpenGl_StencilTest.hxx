@@ -29,7 +29,7 @@ public:
   //! Render primitives to the window
   virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const;
 
-  virtual void Release (OpenGl_Context* theContext);
+  virtual void Release (OpenGl_Context* theContext) Standard_OVERRIDE;
 
   void SetOptions (const Standard_Boolean theIsEnabled);
 

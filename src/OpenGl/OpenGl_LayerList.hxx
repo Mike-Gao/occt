@@ -35,10 +35,10 @@ class OpenGl_LayerList
 public:
 
   //! Constructor
-  OpenGl_LayerList (const Standard_Integer theNbPriorities);
+  Standard_EXPORT OpenGl_LayerList (const Standard_Integer theNbPriorities);
 
   //! Destructor
-  virtual ~OpenGl_LayerList();
+  virtual ~OpenGl_LayerList() {}
 
   //! Method returns the number of available priorities
   Standard_Integer NbPriorities() const { return myNbPriorities; }
@@ -79,10 +79,10 @@ public:
                        const Standard_Integer   theNewPriority);
 
   //! Returns reference to the layer with given ID.
-  OpenGl_Layer& Layer (const Graphic3d_ZLayerId theLayerId);
+  Standard_EXPORT  OpenGl_Layer& Layer (const Graphic3d_ZLayerId theLayerId);
 
   //! Returns reference to the layer with given ID.
-  const OpenGl_Layer& Layer (const Graphic3d_ZLayerId theLayerId) const;
+  Standard_EXPORT const OpenGl_Layer& Layer (const Graphic3d_ZLayerId theLayerId) const;
 
   //! Assign new settings to the layer.
   void SetLayerSettings (const Graphic3d_ZLayerId        theLayerId,

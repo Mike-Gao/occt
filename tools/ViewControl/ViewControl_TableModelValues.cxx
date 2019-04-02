@@ -108,10 +108,48 @@ QVariant ViewControl_TableModelValues::HeaderData (int theSection, Qt::Orientati
 }
 
 // =======================================================================
+// function : GetEditType
+// purpose :
+// =======================================================================
+ViewControl_EditType ViewControl_TableModelValues::GetEditType (const int theRow, const int theColumn) const
+{
+  if (!GetProperties().IsNull())
+  {
+    return GetProperties()->GetTableEditType (theRow, theColumn);
+  }
+  return ViewControl_EditType_None;
+}
+
+// =======================================================================
+// function : GetEnumValues
+// purpose :
+// =======================================================================
+QList<QVariant> ViewControl_TableModelValues::GetEnumValues (const int theRow, const int theColumn) const
+{
+  if (!GetProperties().IsNull())
+  {
+    return GetProperties()->GetTableEnumValues (theRow, theColumn);
+  }
+  return QList<QVariant>();
+}
+
+// =======================================================================
 // function : isItalicHeader
 // purpose :
 // =======================================================================
+Qt::ItemFlags ViewControl_TableModelValues::Flags (const QModelIndex& theIndex) const
+{
+  if (!GetProperties().IsNull())
+  {
+    return GetProperties()->GetTableFlags (theIndex.row(), theIndex.column());
+  }
+  return Qt::NoItemFlags;
+}
 
+// =======================================================================
+// function : isItalicHeader
+// purpose :
+// =======================================================================
 bool ViewControl_TableModelValues::isItalicHeader (const int theRow, const int theColumn) const
 {
   Qt::Orientation anOrientation = myOrientation == Qt::Vertical ? Qt::Horizontal : Qt::Vertical;

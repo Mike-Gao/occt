@@ -76,7 +76,7 @@ public:
                                     const Standard_Integer        theFontSize);
 
   Standard_EXPORT virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const;
-  Standard_EXPORT virtual void Release (OpenGl_Context* theContext);
+  Standard_EXPORT virtual void Release (OpenGl_Context* theContext) Standard_OVERRIDE;
 
   //! Return defined text.
   const NCollection_String& Text() const { return myString; }

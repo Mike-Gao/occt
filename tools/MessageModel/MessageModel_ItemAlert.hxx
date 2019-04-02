@@ -20,6 +20,7 @@
 #include <Message_Alert.hxx>
 #include <Message_ListOfAlert.hxx>
 #include <Message_Report.hxx>
+#include <NCollection_DataMap.hxx>
 #include <Standard.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -55,6 +56,9 @@ public:
   //! Returns the current shape
   const Handle(Message_Alert)& GetAlert() const { return myAlert; }
 
+  //! Returns alert of the report for the parameter row
+  Standard_Boolean GetChildAlerts (const int theRow, Message_ListOfAlert& theAlerts) const { return myChildAlerts.Find(theRow, theAlerts); }
+
   //! Returns united alerts or empty list
   const Message_ListOfAlert& GetUnitedAlerts() const { return myUnitedAlerts; }
 
@@ -84,12 +88,6 @@ public:
   //! \param theAlert a message alert
   //! \return double value
   Standard_EXPORT static double AmountElapsedTime (const Handle(Message_Alert)& theAlert);
-
-  //! Returns alerts united by Message Key
-  //! \param theAlerts source message alert
-  //! \param theUnitedAlerts arranged source message alerts
-  Standard_EXPORT static void GetUnitedAlerts (const Message_ListOfAlert& theAlerts,
-                                               NCollection_Vector<Message_ListOfAlert> & theUnitedAlerts);
 
 protected:
 
@@ -124,6 +122,9 @@ private:
 private:
   Handle(Message_Alert) myAlert;
   Message_ListOfAlert myUnitedAlerts;
+
+  NCollection_DataMap<Standard_Integer, Message_ListOfAlert> myChildAlerts; //!< container of child alerts
+
   TopoDS_Shape myCustomShape;
 };
 

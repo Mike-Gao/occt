@@ -132,7 +132,7 @@ void Message_Report::AddAlert (const Message_Gravity theGravity, const Handle(Me
   // if not merged, just add to the list
   aList.Append (theAlert);
   // remove alerts under the report only
-  if (theParentAlert.IsNull() && aParentAlert.IsNull() && myLimit > 0 && aList.Extent() >= myLimit)
+  if (theParentAlert.IsNull() && aParentAlert.IsNull() && myLimit > 0 && aList.Extent() > myLimit)
     aList.RemoveFirst();
 
   if (thePerfMeter)
@@ -207,8 +207,8 @@ Handle(Message_Alert) Message_Report::getLastAlert (const Message_Gravity theGra
   anExtendedAlert = Handle(Message_AlertExtended)::DownCast (aLastAlert);
   if (anExtendedAlert.IsNull())
     return aLastAlert;
-  if (anExtendedAlert->GetPerfMeter())
-    aLastAlert = anExtendedAlert->GetPerfMeter()->GetAlert();
+  //if (anExtendedAlert->GetPerfMeter())
+  //  aLastAlert = anExtendedAlert->GetPerfMeter()->GetAlert();
 
   return aLastAlert;
 }

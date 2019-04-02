@@ -18,15 +18,37 @@
 #include <inspector/VInspector_ItemV3dView.hxx>
 #include <inspector/VInspector_ItemGraphic3dCamera.hxx>
 #include <inspector/VInspector_ItemGraphic3dClipPlane.hxx>
+#include <inspector/VInspector_ItemOpenGlLayerList.hxx>
 #include <inspector/VInspector_Tools.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
 #include <AIS.hxx>
 #include <Graphic3d_CView.hxx>
+#include <OpenGl_View.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QStringList>
 #include <Standard_WarningsRestore.hxx>
+
+// =======================================================================
+// function : GetLayerList
+// purpose :
+// =======================================================================
+const OpenGl_LayerList& VInspector_ItemGraphic3dCView::GetLayerList (Standard_Boolean& isDefault) const
+{
+  isDefault = Standard_True;
+
+  Handle(Graphic3d_CView) aCView = GetCView();
+  if (aCView.IsNull())
+    return myDefaultLayer;
+
+  Handle(OpenGl_View) aOpenGlView = Handle(OpenGl_View)::DownCast (aCView);
+  if (aOpenGlView.IsNull())
+    return myDefaultLayer;
+
+  isDefault = Standard_False;
+  return aOpenGlView->LayerList();
+}
 
 // =======================================================================
 // function : GetClipPlane
@@ -90,7 +112,7 @@ int VInspector_ItemGraphic3dCView::initRowCount() const
   if (Column() != 0)
     return 0;
 
-  int aNbElements = 1; // Camera
+  int aNbElements = 2; // Camera, OpenGl_LayerList
 
   Handle(Graphic3d_CView) aCView = GetCView();
   const Handle(Graphic3d_SequenceOfHClipPlane)& aClipPlanes = aCView->ClipPlanes();
@@ -268,6 +290,8 @@ TreeModel_ItemBasePtr VInspector_ItemGraphic3dCView::createChild (int theRow, in
 {
   if (theRow == 0)
     return VInspector_ItemGraphic3dCamera::CreateItem (currentItem(), theRow, theColumn);
+  else if (theRow == 1)
+    return VInspector_ItemOpenGlLayerList::CreateItem (currentItem(), theRow, theColumn);
   else
     return VInspector_ItemGraphic3dClipPlane::CreateItem (currentItem(), theRow, theColumn);
 }

@@ -130,6 +130,13 @@ Standard_Boolean Graphic3d::ZLayerIdFromString (Standard_CString theTypeString,
       return Standard_True;
     }
   }
+
+  if (aName.IsIntegerValue())
+  {
+    theType = aName.IntegerValue();
+    return Standard_True;
+  }
+
   return Standard_False;
 }
 

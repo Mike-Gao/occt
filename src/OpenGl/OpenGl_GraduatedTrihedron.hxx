@@ -51,7 +51,7 @@ public:
   virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const;
 
   //! Release OpenGL resources.
-  virtual void Release (OpenGl_Context* theCtx);
+  virtual void Release (OpenGl_Context* theCtx) Standard_OVERRIDE;
 
   //! Setup configuration.
   void SetValues (const Graphic3d_GraduatedTrihedron& theData);

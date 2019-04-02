@@ -15,8 +15,10 @@
 
 #include <inspector/MessageModel_ItemReport.hxx>
 
-#include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemAlert.hxx>
+#include <inspector/MessageModel_ItemReportProperties.hxx>
+#include <inspector/MessageModel_ItemRoot.hxx>
+#include <inspector/MessageModel_Tools.hxx>
 
 #include <OSD_Path.hxx>
 
@@ -86,20 +88,25 @@ int MessageModel_ItemReport::initRowCount() const
   if (aReport.IsNull())
     return 0;
 
-  int aRowCount = 0;
-  NCollection_Vector<Message_ListOfAlert> aUnitedAlerts;
+  MessageModel_ItemReport* aCurrentItem = (MessageModel_ItemReport*)this;
   for (int aGravityId = Message_Trace; aGravityId <= Message_Fail; aGravityId++)
   {
     const Message_ListOfAlert& anAlerts = aReport->GetAlerts ((Message_Gravity)aGravityId);
     if (isUniteAlerts())
     {
-      MessageModel_ItemAlert::GetUnitedAlerts (anAlerts, aUnitedAlerts);
-      aRowCount += aUnitedAlerts.Size();
+      MessageModel_Tools::GetUnitedAlerts (anAlerts, aCurrentItem->myChildAlerts);
     }
     else
-      aRowCount += anAlerts.Size();
+    {
+      for (Message_ListOfAlert::Iterator anIt(anAlerts); anIt.More(); anIt.Next())
+      {
+        Message_ListOfAlert aCurAlerts;
+        aCurAlerts.Append (anIt.Value());
+        aCurrentItem->myChildAlerts.Bind(myChildAlerts.Size(), aCurAlerts);
+      }
+    }
   }
-  return isUniteAlerts() ? aUnitedAlerts.Size() : aRowCount;
+  return aCurrentItem->myChildAlerts.Size();
 }
 
 // =======================================================================
@@ -119,6 +126,11 @@ void MessageModel_ItemReport::Init()
 {
   MessageModel_ItemRootPtr aRootItem = itemDynamicCast<MessageModel_ItemRoot> (Parent());
   myReport = aRootItem ? aRootItem->GetReport (Row(), myDescription) : Handle(Message_Report)();
+
+  TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+  SetProperties (new MessageModel_ItemReportProperties(anItem));
+
+  MessageModel_ItemBase::Init();
 }
 
 // =======================================================================
@@ -139,6 +151,7 @@ void MessageModel_ItemReport::Reset()
 {
   MessageModel_ItemBase::Reset();
   myReport = Handle(Message_Report)();
+  myChildAlerts.Clear();
 }
 
 // =======================================================================

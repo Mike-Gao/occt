@@ -420,6 +420,11 @@ void DFBrowser_Window::Init (const NCollection_List<Handle(Standard_Transient)>&
     }
     return;
   }
+  else
+  {
+    if (anApplication.IsNull() && CDF_Session::Exists())
+      anApplication = Handle(TDocStd_Application)::DownCast (CDF_Session::CurrentSession()->CurrentApplication());
+  }
 
   myModule = new DFBrowser_Module();
   myModule->CreateViewModel (myMainWindow);

@@ -428,8 +428,7 @@ QVariant VInspector_ItemPresentableObject::GetTableData (const int theRow, const
     case 31: return isFirstColumn ? QVariant ("HasOwnPresentations") : QVariant (aPrs->HasOwnPresentations());
     case 32: return isFirstColumn ? QVariant ("ZLayer") : QVariant (Graphic3d::ZLayerIdToString (aPrs->ZLayer()));
     case 33: return isFirstColumn ? QVariant ("TransformationGeom")
-      : (!aPrs->TransformationGeom().IsNull()
-        ? QVariant (ViewControl_Tools::ToString(aPrs->TransformationGeom()->Trsf()).ToCString()) : QVariant());
+      : QVariant (ViewControl_Tools::ToString(aPrs->TransformationGeom()).ToCString());
     case 34: return isFirstColumn ? QVariant ("LocalTransformationGeom")
       : (!aPrs->LocalTransformationGeom().IsNull()
         ? QVariant (ViewControl_Tools::ToString(aPrs->LocalTransformationGeom()->Trsf()).ToCString()) : QVariant());

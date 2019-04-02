@@ -132,8 +132,7 @@ public:
   //! Returns flags for the item: ItemIsEnabled | Qt::ItemIsSelectable
   //! \param theIndex a model index
   //! \return flags
-  virtual Qt::ItemFlags Flags (const QModelIndex& theIndex) const
-  { return theIndex.isValid() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable : Qt::NoItemFlags; }
+  Standard_EXPORT virtual Qt::ItemFlags Flags (const QModelIndex& theIndex) const;
 
   //! Returns item delegate to provide cell editors. By default, it is empty
   //! \return delegate
@@ -143,15 +142,13 @@ public:
   //! \param theRow a model index row
   //! \param theColumn a model index column
   //! \return edit type
-  virtual ViewControl_EditType GetEditType (const int theRow, const int theColumn) const
-  { (void)theRow; (void)theColumn; return ViewControl_EditType_None; }
+  Standard_EXPORT virtual ViewControl_EditType GetEditType (const int theRow, const int theColumn) const;
 
   //! Returns container of string values for enumeration in the model row
   //! \param theRow table model row index
   //! \param theColumn a model index column
   //! \return string values for the enumeration presented in the row or an empty container
-  virtual QList<QVariant> GetEnumValues (const int theRow, const int theColumn) const
-  { (void)theRow; (void)theColumn; return QList<QVariant>(); }
+  Standard_EXPORT virtual QList<QVariant> GetEnumValues (const int theRow, const int theColumn) const;
 
   //! Returns default color for editable cell
   //! \return color value

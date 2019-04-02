@@ -8,6 +8,8 @@ MessageModel_ItemBase.cxx
 MessageModel_ItemBase.hxx
 MessageModel_ItemReport.cxx
 MessageModel_ItemReport.hxx
+MessageModel_ItemReportProperties.cxx
+MessageModel_ItemReportProperties.hxx
 MessageModel_ItemRoot.cxx
 MessageModel_ItemRoot.hxx
 MessageModel_ReportCallBack.cxx

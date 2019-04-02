@@ -182,8 +182,7 @@ QVariant VInspector_ItemGraphic3dCStructure::GetTableData (const int theRow, con
       : QVariant (ViewControl_Tools::GetPointerInfo (aCStructure->GraphicDriver()).ToCString());
     case 1: return isFirstColumn ? QVariant ("Groups") : QVariant (aCStructure->Groups().Length());
     case 2: return isFirstColumn ? QVariant ("Transformation")
-      : (!aCStructure->Transformation().IsNull() ?
-         QVariant (ViewControl_Tools::ToString (aCStructure->Transformation()->Trsf()).ToCString()) : QVariant());
+      : QVariant (ViewControl_Tools::ToString (aCStructure->Transformation()).ToCString());
     case 3: return isFirstColumn ? QVariant ("TransformPersistence")
                                  : QVariant (ViewControl_Tools::GetPointerInfo (aCStructure->TransformPersistence()).ToCString());
     case 4: return isFirstColumn ? QVariant ("ClipPlanes")

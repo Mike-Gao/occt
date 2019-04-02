@@ -16,6 +16,8 @@
 #include <inspector/ViewControl_Tools.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
 
+#include <Geom_Transformation.hxx>
+
 #include <Standard_WarningsDisable.hxx>
 #include <QAction>
 #include <QHeaderView>
@@ -155,6 +157,18 @@ Standard_ShortReal ViewControl_Tools::ToShortRealValue (const QVariant& theValue
 Standard_Real ViewControl_Tools::ToRealValue (const QVariant& theValue)
 {
   return QLocale().toDouble (theValue.toString());
+}
+
+// =======================================================================
+// function : ToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString ViewControl_Tools::ToString (const Handle(Geom_Transformation)& theValue)
+{
+  if (theValue.IsNull())
+    return TCollection_AsciiString();
+
+  return ViewControl_Tools::ToString (theValue->Trsf());
 }
 
 // =======================================================================

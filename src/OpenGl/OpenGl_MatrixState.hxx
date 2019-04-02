@@ -54,26 +54,26 @@ public:
   }
 
   //! @return current matrix.
-  const typename OpenGl::MatrixType<T>::Mat4& Current()
+  const typename OpenGl_Vec::MatrixType<T>::Mat4& Current()
   {
     return myCurrent;
   }
 
   //! Sets given matrix as current.
-  void SetCurrent (const typename OpenGl::MatrixType<T>::Mat4& theNewCurrent)
+  void SetCurrent (const typename OpenGl_Vec::MatrixType<T>::Mat4& theNewCurrent)
   {
     myCurrent = theNewCurrent;
   }
 
   //! Change current matrix.
-  typename OpenGl::MatrixType<T>::Mat4& ChangeCurrent()
+  typename OpenGl_Vec::MatrixType<T>::Mat4& ChangeCurrent()
   {
     return myCurrent;
   }
 
   //! Sets given matrix as current.
   template <typename Other_t>
-  void SetCurrent (const typename OpenGl::MatrixType<Other_t>::Mat4& theNewCurrent)
+  void SetCurrent (const typename OpenGl_Vec::MatrixType<Other_t>::Mat4& theNewCurrent)
   {
     myCurrent.Convert (theNewCurrent);
   }
@@ -81,14 +81,14 @@ public:
   //! Sets current matrix to identity.
   void SetIdentity()
   {
-    myCurrent = typename OpenGl::MatrixType<T>::Mat4();
+    myCurrent = typename OpenGl_Vec::MatrixType<T>::Mat4();
   }
 
 private:
 
-  NCollection_Vector<typename OpenGl::MatrixType<T>::Mat4> myStack;     //!< Collection used to maintenance matrix stack
-  typename OpenGl::MatrixType<T>::Mat4                     myCurrent;   //!< Current matrix
-  Standard_Integer                                         myStackHead; //!< Index of stack head
+  NCollection_Vector<typename OpenGl_Vec::MatrixType<T>::Mat4> myStack;     //!< Collection used to maintenance matrix stack
+  typename OpenGl_Vec::MatrixType<T>::Mat4                     myCurrent;   //!< Current matrix
+  Standard_Integer                                             myStackHead; //!< Index of stack head
 };
 
 #endif // _OpenGl_MatrixState_H__

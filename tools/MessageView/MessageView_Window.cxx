@@ -417,7 +417,16 @@ void MessageView_Window::onTreeViewContextMenuRequested (const QPoint& thePositi
       break;
   }
   if (aRootItem)
+  {
     aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Import Report"), SLOT (onImportReport()), myMainWindow, this));
+    // unite
+    MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+    aMenu->addAction (ViewControl_Tools::CreateAction (aTreeModel->IsUniteAlerts() ? tr ("SetUniteAlerts - OFF") : tr ("SetUniteAlerts - ON"),
+                      SLOT (onUniteAlerts()), myMainWindow, this));
+    // reversed
+    //aMenu->addAction (ViewControl_Tools::CreateAction (aTreeModel->IsReversed() ? tr ("SetReversed - OFF") : tr ("SetReversed - ON"),
+    //                  SLOT (onSetReversedAlerts()), myMainWindow, this));
+  }
   else if (aReportItem)
   {
     aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Export Report"), SLOT (onExportReport()), myMainWindow, this));
@@ -564,6 +573,31 @@ void MessageView_Window::onImportReport()
 }
 
 // =======================================================================
+// function : onImportReport
+// purpose :
+// =======================================================================
+void MessageView_Window::onUniteAlerts()
+{
+  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  Standard_Boolean isUniteAlerts = aTreeModel->IsUniteAlerts();
+
+  aTreeModel->SetUniteAlerts (!isUniteAlerts);
+}
+
+// =======================================================================
+// function : onSetReversedAlerts
+// purpose :
+// =======================================================================
+void MessageView_Window::onSetReversedAlerts()
+{
+  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  Standard_Boolean isReversed = aTreeModel->IsReversed();
+
+  aTreeModel->SetReversed (!isReversed);
+}
+
+
+// =======================================================================
 // function : onReloadReport
 // purpose :
 // =======================================================================
@@ -608,12 +642,8 @@ void MessageView_Window::updatePropertyPanelBySelection()
   if (!anItemBase)
     return;
 
-  MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
-  if (!anAlertItem)
-    return;
-
   QList<ViewControl_TableModelValues*> aTableValues;
-  MessageModel_Tools::GetPropertyTableValues (anAlertItem->GetAlert(), aTableValues);
+  MessageModel_Tools::GetPropertyTableValues (anItemBase, aTableValues);
 
   myPropertyView->Init (aTableValues);
 }

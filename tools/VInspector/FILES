@@ -34,6 +34,10 @@ VInspector_ItemHistoryType.hxx
 VInspector_ItemHistoryTypeInfo.hxx
 VInspector_ItemOpenGlElement.cxx
 VInspector_ItemOpenGlElement.hxx
+VInspector_ItemOpenGlLayer.cxx
+VInspector_ItemOpenGlLayer.hxx
+VInspector_ItemOpenGlLayerList.cxx
+VInspector_ItemOpenGlLayerList.hxx
 VInspector_ItemPresentableObject.cxx
 VInspector_ItemPresentableObject.hxx
 VInspector_ItemPresentations.cxx

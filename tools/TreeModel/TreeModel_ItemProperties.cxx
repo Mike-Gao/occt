@@ -16,3 +16,18 @@
 #include <inspector/TreeModel_ItemProperties.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(TreeModel_ItemProperties, Standard_Transient)
+
+// =======================================================================
+// function : GetTableFlags
+// purpose :
+// =======================================================================
+
+Qt::ItemFlags TreeModel_ItemProperties::GetTableFlags (const int, const int theColumn) const
+{
+  Qt::ItemFlags aFlags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+  if (theColumn == 1)
+    aFlags = aFlags | Qt::ItemIsEditable;
+
+  return aFlags;
+}

@@ -45,7 +45,7 @@ typedef Graphic3d_Vec4d  OpenGl_Vec4d;
 typedef Graphic3d_Mat4   OpenGl_Mat4;
 typedef Graphic3d_Mat4d  OpenGl_Mat4d;
 
-namespace OpenGl
+namespace OpenGl_Vec
 {
   //! Tool class for selecting appropriate vector type.
   //! \tparam T Numeric data type

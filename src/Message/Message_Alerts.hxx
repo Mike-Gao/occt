@@ -60,6 +60,11 @@ static Handle(Message_Alert) OCCT_Message_Alert;
     OS << Value << Message::DumpSeparator(); \
   }
 
+#define DUMP_VALUES_COLUMNS(OS, ObjectName, ColumnCount) \
+  { \
+    OS << ObjectName << Message::DumpSeparator() << ColumnCount << Message::DumpSeparator(); \
+  }
+
 #define DUMP_VALUES(OS, Value1, Value2) \
   { \
     OS << Value1 << Message::DumpSeparator() << Value2 << Message::DumpSeparator(); \

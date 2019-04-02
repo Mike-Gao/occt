@@ -53,6 +53,12 @@ public:
   //! \return an integer value
   virtual int GetTableRowCount() const { return 0; }
 
+  //! Returns table value for the row in form: <function name> <function value>
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  virtual QVariant GetTableData (const int theRow, const int theColumn, const int theRole) const
+  {  (void)theRow; (void)theColumn; (void)theRole; return QVariant(); }
+
   //! Returns type of edit control for the model index. By default, it is an empty control
   //! \param theRow a model index row
   //! \param theColumn a model index column
@@ -67,11 +73,11 @@ public:
   virtual QList<QVariant> GetTableEnumValues (const int theRow, const int theColumn) const
     { (void)theRow; (void)theColumn; return QList<QVariant>(); }
 
-  //! Returns table value for the row in form: <function name> <function value>
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  virtual QVariant GetTableData (const int theRow, const int theColumn, const int theRole) const
-  {  (void)theRow; (void)theColumn; (void)theRole; return QVariant(); }
+  //! Returns flags for the item: ItemIsEnabled | Qt::ItemIsSelectable.
+  //! Additional flag for the column 1 is Qt::ItemIsEditable.
+  //! \param theIndex a model index
+  //! \return flags
+  Standard_EXPORT virtual Qt::ItemFlags GetTableFlags (const int theRow, const int theColumn) const;
 
   //! Sets the value into the table cell. Only 1st column value might be modified.
   //! \param theRow a model index row

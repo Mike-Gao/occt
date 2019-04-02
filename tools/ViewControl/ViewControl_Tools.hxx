@@ -32,6 +32,8 @@
 #include <QVariant>
 #include <Standard_WarningsRestore.hxx>
 
+class Geom_Transformation;
+
 class QAction;
 class QObject;
 class QTableView;
@@ -100,6 +102,11 @@ public:
   //! \param theValue a string value
   //! \return the real value
   Standard_EXPORT static Standard_Real ToRealValue (const QVariant& theValue);
+
+  //! Returns text of orientation
+  //! \param theLocation a location value
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const Handle(Geom_Transformation)& theValue);
 
   //! Returns text of orientation
   //! \param theLocation a location value

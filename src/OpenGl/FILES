@@ -1,4 +1,6 @@
 glext.h
+OpenGl.cxx
+OpenGl.hxx
 OpenGl_ArbDbg.hxx
 OpenGl_ArbFBO.hxx
 OpenGl_ArbIns.hxx
