@@ -143,7 +143,7 @@ Qt::ItemFlags ViewControl_TableModelValues::Flags (const QModelIndex& theIndex) 
   {
     return GetProperties()->GetTableFlags (theIndex.row(), theIndex.column());
   }
-  return Qt::NoItemFlags;
+  return theIndex.isValid() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable : Qt::NoItemFlags;
 }
 
 // =======================================================================
