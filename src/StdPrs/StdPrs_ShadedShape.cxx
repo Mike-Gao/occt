@@ -207,8 +207,9 @@ namespace
         if (!aLoc.IsIdentity())
         {
           aPoint.Transform (aTrsf);
-
           aNormals (aNodeIter) = aNormals (aNodeIter).Transformed (aTrsf);
+          if (isMirrored)
+            aNormals(aNodeIter).Reverse();
         }
 
         if (theHasTexels && aUVNodes.Upper() == aNodes.Upper())
@@ -228,7 +229,7 @@ namespace
       Standard_Integer anIndex[3];
       for (Standard_Integer aTriIter = 1; aTriIter <= aT->NbTriangles(); ++aTriIter)
       {
-        if ((aFace.Orientation() == TopAbs_REVERSED) ^ isMirrored)
+        if ((aFace.Orientation() == TopAbs_REVERSED))
         {
           aTriangles (aTriIter).Get (anIndex[0], anIndex[2], anIndex[1]);
         }
