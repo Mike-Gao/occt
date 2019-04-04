@@ -83,6 +83,9 @@
 #include <Prs3d_Text.hxx>
 #include <Select3D_SensitivePrimitiveArray.hxx>
 
+#include <Vulkan_Caps.hxx>
+#include <Vulkan_GraphicDriver.hxx>
+
 #ifdef _WIN32
 #undef DrawText
 #endif
@@ -718,7 +721,7 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
     theViewToClone->Window()->Size (aPxWidth, aPxHeight);
   }
 
-  Handle(OpenGl_GraphicDriver) aGraphicDriver;
+  Handle(Graphic3d_GraphicDriver) aGraphicDriver;
   ViewerTest_Names aViewNames(theViewName);
   if (ViewerTest_myViews.IsBound1 (aViewNames.GetViewName ()))
     aViewNames.SetViewName (aViewNames.GetViewerName() + "/" + CreateName<Handle(V3d_View)>(ViewerTest_myViews, "View"));
@@ -765,15 +768,29 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
       // alternatively we can disable buffer swap at all, but this might be inappropriate for testing
       //ViewerTest_myDefaultCaps.buffersNoSwap = true;
     }
-    aGraphicDriver = new OpenGl_GraphicDriver (GetDisplayConnection());
-    aGraphicDriver->ChangeOptions() = ViewerTest_myDefaultCaps;
+
+    if (theDisplayName == "vulkan")
+    {
+      /// TODO
+      const uint32_t anAppVer = Vulkan_GraphicDriver::DefineVersion (OCC_VERSION_MAJOR, OCC_VERSION_MINOR, OCC_VERSION_MAINTENANCE);
+      Handle(Vulkan_GraphicDriver) aVkDriver = new Vulkan_GraphicDriver ("Draw Harness", anAppVer, GetDisplayConnection());
+      aVkDriver->Options()->contextDebug = true;
+      //aVkDriver->Options()->contextDebug = ViewerTest_myDefaultCaps.contextDebug;
+      aGraphicDriver = aVkDriver;
+    }
+    else
+    {
+      Handle(OpenGl_GraphicDriver) aGlDriver = new OpenGl_GraphicDriver (GetDisplayConnection());
+      aGlDriver->ChangeOptions() = ViewerTest_myDefaultCaps;
+      aGraphicDriver = aGlDriver;
+    }
 
     ViewerTest_myDrivers.Bind (aViewNames.GetDriverName(), aGraphicDriver);
     toCreateViewer = Standard_True;
   }
   else
   {
-    aGraphicDriver = Handle(OpenGl_GraphicDriver)::DownCast (ViewerTest_myDrivers.Find1 (aViewNames.GetDriverName()));
+    aGraphicDriver = ViewerTest_myDrivers.Find1 (aViewNames.GetDriverName());
   }
 
   //Dispose the window if input parameters are default
@@ -1108,7 +1125,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
 #if defined(_WIN32) || (defined(__APPLE__) && !defined(MACOSX_USE_GLX))
   if (!aDisplayName.IsEmpty())
   {
-    aDisplayName.Clear();
+    ////aDisplayName.Clear();
     std::cout << "Warning: display parameter will be ignored.\n";
   }
 #endif
@@ -12710,6 +12727,23 @@ static int VDumpSelectionImage (Draw_Interpretor& /*theDi*/,
   return 0;
 }
 
+//===============================================================================================
+//function : VkInit
+//purpose  :
+//===============================================================================================
+static int VkInit (Draw_Interpretor& ,
+                   Standard_Integer  theArgsNb,
+                   const char**      theArgVec)
+{
+  (void )theArgsNb;
+  (void )theArgVec;
+  Handle(Aspect_DisplayConnection) aDisp = new Aspect_DisplayConnection();
+  const uint32_t anAppVer = Vulkan_GraphicDriver::DefineVersion (OCC_VERSION_MAJOR, OCC_VERSION_MINOR, OCC_VERSION_MAINTENANCE);
+  Handle(Vulkan_GraphicDriver) aDriver = new Vulkan_GraphicDriver ("Draw Harness", anAppVer, aDisp);
+  aDriver->InitContext();
+  return 0;
+}
+
 //=======================================================================
 //function : ViewerCommands
 //purpose  :
@@ -12719,6 +12753,9 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
 {
 
   const char *group = "ZeViewer";
+
+theCommands.Add("vkinit", "vkinit", __FILE__,VkInit,group); ///
+
   theCommands.Add("vinit",
           "vinit [-name viewName] [-left leftPx] [-top topPx] [-width widthPx] [-height heightPx]"
     "\n\t\t:     [-exitOnClose] [-closeOnEscape] [-cloneActive] [-2d_mode {on|off}=off]"

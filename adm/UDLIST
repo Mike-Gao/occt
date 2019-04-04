@@ -206,6 +206,7 @@ n Image
 n MeshVS
 n OpenGl
 n D3DHost
+n Vulkan
 n Prs3d
 n PrsMgr
 n Select3D
@@ -223,6 +224,7 @@ r Shaders
 t TKMeshVS
 t TKOpenGl
 t TKD3DHost
+t TKVulkan
 t TKService
 t TKV3d
 n BinTObjDrivers
