@@ -1349,6 +1349,8 @@ proc osutils:csfList { theOS theCsfLibsMap theCsfFrmsMap } {
     set aLibsMap(CSF_LIBLZMA) "liblzma"
   }
 
+  set aLibsMap(CSF_vulkan) "vulkan-1"
+
   if { "$theOS" == "wnt" } {
     #  WinAPI libraries
     set aLibsMap(CSF_kernel32)     "kernel32"

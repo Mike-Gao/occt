@@ -33,9 +33,9 @@ void Draw::Commands (Draw_Interpretor& theCommands)
     const Handle(Message_Messenger)& aMsgMgr = Message::DefaultMessenger();
     if (!aMsgMgr.IsNull())
     {
-      aMsgMgr->RemovePrinters (STANDARD_TYPE (Message_PrinterOStream));
-      aMsgMgr->RemovePrinters (STANDARD_TYPE (Draw_Printer));
-      aMsgMgr->AddPrinter (new Draw_Printer (theCommands));
+      //aMsgMgr->RemovePrinters (STANDARD_TYPE (Message_PrinterOStream));
+      //aMsgMgr->RemovePrinters (STANDARD_TYPE (Draw_Printer));
+      //aMsgMgr->AddPrinter (new Draw_Printer (theCommands));
     }
     isFirstTime = Standard_False;
   }

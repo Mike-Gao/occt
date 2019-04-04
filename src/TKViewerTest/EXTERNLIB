@@ -18,6 +18,7 @@ TKMesh
 TKV3d
 TKDraw
 TKOpenGl
+TKVulkan
 CSF_TclLibs
 CSF_TclTkLibs
 CSF_XwLibs
