@@ -168,6 +168,17 @@ void OpenGl_View::Redraw()
   aCtx->FrameStats()->FrameStart (myWorkspace->View(), false);
   aCtx->SetLineFeather (myRenderParams.LineFeather);
 
+#if !defined(GL_ES_VERSION_2_0)
+  if (aCtx->arbClipControl)
+  {
+    if (myCaps->useZeroToOneDepth != myCamera->IsZeroToOneDepth())
+    {
+      myCamera->SetZeroToOneDepth (myCaps->useZeroToOneDepth);
+    }
+    aCtx->Functions()->glClipControl (GL_LOWER_LEFT, myCamera->IsZeroToOneDepth() ? GL_ZERO_TO_ONE : GL_NEGATIVE_ONE_TO_ONE);
+  }
+#endif
+
   // release pending GL resources
   aCtx->ReleaseDelayed();
 

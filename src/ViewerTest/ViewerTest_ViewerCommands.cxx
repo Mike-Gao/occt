@@ -6250,6 +6250,7 @@ static int VCaps (Draw_Interpretor& theDI,
     theDI << "SoftMode:" << (aCaps->contextNoAccel    ? "1" : "0") << "\n";
     theDI << "FFP:     " << (aCaps->ffpEnable         ? "1" : "0") << "\n";
     theDI << "PolygonMode: " << (aCaps->usePolygonMode ? "1" : "0") << "\n";
+    theDI << "DepthZeroToOne: " << (aCaps->useZeroToOneDepth ? "1" : "0") << "\n";
     theDI << "VSync:   " <<  aCaps->swapInterval                   << "\n";
     theDI << "Compatible:" << (aCaps->contextCompatible ? "1" : "0") << "\n";
     theDI << "Stereo:  " << (aCaps->contextStereo ? "1" : "0") << "\n";
@@ -6318,6 +6319,19 @@ static int VCaps (Draw_Interpretor& theDI,
         --anArgIter;
       }
       aCaps->pntSpritesDisable = !toEnable;
+    }
+    else if (anArgCase == "-depthzerotoone"
+          || anArgCase == "-zerotoonedepth"
+          || anArgCase == "-usezerotoonedepth"
+          || anArgCase == "-iszerotoonedepth")
+    {
+      Standard_Boolean toEnable = Standard_True;
+      if (++anArgIter < theArgNb
+      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      {
+        --anArgIter;
+      }
+      aCaps->useZeroToOneDepth = toEnable;
     }
     else if (anArgCase == "-softmode")
     {
@@ -12993,6 +13007,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     __FILE__, VStereo, group);
   theCommands.Add ("vcaps",
             "vcaps [-vbo {0|1}] [-sprites {0|1}] [-ffp {0|1}] [-polygonMode {0|1}]"
+    "\n\t\t:       [-zeroToOneDepth {0|1}]"
     "\n\t\t:       [-compatibleProfile {0|1}]"
     "\n\t\t:       [-vsync {0|1}] [-useWinBuffer {0|1}]"
     "\n\t\t:       [-quadBuffer {0|1}] [-stereo {0|1}]"
@@ -13007,6 +13022,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n\t\t:  sprite   - use textured sprites instead of bitmaps"
     "\n\t\t:  vsync    - switch VSync on or off"
     "\n\t\t:  winBuffer - allow using window buffer for rendering"
+    "\n\t\t:  zeroToOneDepth - use [0,1] depth range instead of [-1,1] range"
     "\n\t\t: Context creation options:"
     "\n\t\t:  softMode          - software OpenGL implementation"
     "\n\t\t:  compatibleProfile - backward-compatible profile"

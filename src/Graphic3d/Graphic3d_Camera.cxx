@@ -87,6 +87,7 @@ Graphic3d_Camera::Graphic3d_Camera()
   myZNear (DEFAULT_ZNEAR),
   myZFar (DEFAULT_ZFAR),
   myAspect (1.0),
+  myIsZeroToOneDepth (false),
   myScale (1000.0),
   myZFocus (1.0),
   myZFocusType (FocusType_Relative),
@@ -979,7 +980,7 @@ void Graphic3d_Camera::OrthoProj (const Elem_t theLeft,
                                   const Elem_t theTop,
                                   const Elem_t theNear,
                                   const Elem_t theFar,
-                                  NCollection_Mat4<Elem_t>& theOutMx)
+                                  NCollection_Mat4<Elem_t>& theOutMx) const
 {
   // row 0
   theOutMx.ChangeValue (0, 0) = Elem_t (2.0) / (theRight - theLeft);
@@ -996,8 +997,16 @@ void Graphic3d_Camera::OrthoProj (const Elem_t theLeft,
   // row 2
   theOutMx.ChangeValue (2, 0) = Elem_t (0.0);
   theOutMx.ChangeValue (2, 1) = Elem_t (0.0);
-  theOutMx.ChangeValue (2, 2) = Elem_t (-2.0) / (theFar - theNear);
-  theOutMx.ChangeValue (2, 3) = - (theFar + theNear) / (theFar - theNear);
+  if (myIsZeroToOneDepth)
+  {
+    theOutMx.ChangeValue (2, 2) = Elem_t (-1.0) / (theFar - theNear);
+    theOutMx.ChangeValue (2, 3) = -theNear / (theFar - theNear);
+  }
+  else
+  {
+    theOutMx.ChangeValue (2, 2) = Elem_t (-2.0) / (theFar - theNear);
+    theOutMx.ChangeValue (2, 3) = - (theFar + theNear) / (theFar - theNear);
+  }
 
   // row 3
   theOutMx.ChangeValue (3, 0) = Elem_t (0.0);
@@ -1017,7 +1026,7 @@ void Graphic3d_Camera::PerspectiveProj (const Elem_t theLeft,
                                         const Elem_t theTop,
                                         const Elem_t theNear,
                                         const Elem_t theFar,
-                                        NCollection_Mat4<Elem_t>& theOutMx)
+                                        NCollection_Mat4<Elem_t>& theOutMx) const
 {
   // column 0
   theOutMx.ChangeValue (0, 0) = (Elem_t (2.0) * theNear) / (theRight - theLeft);
@@ -1034,13 +1043,27 @@ void Graphic3d_Camera::PerspectiveProj (const Elem_t theLeft,
   // column 2
   theOutMx.ChangeValue (0, 2) = (theRight + theLeft) / (theRight - theLeft);
   theOutMx.ChangeValue (1, 2) = (theTop + theBottom) / (theTop - theBottom);
-  theOutMx.ChangeValue (2, 2) = -(theFar + theNear) / (theFar - theNear);
+  if (myIsZeroToOneDepth)
+  {
+    theOutMx.ChangeValue (2, 2) = theFar / (theNear - theFar);
+  }
+  else
+  {
+    theOutMx.ChangeValue (2, 2) = -(theFar + theNear) / (theFar - theNear);
+  }
   theOutMx.ChangeValue (3, 2) = Elem_t (-1.0);
 
   // column 3
   theOutMx.ChangeValue (0, 3) = Elem_t (0.0);
   theOutMx.ChangeValue (1, 3) = Elem_t (0.0);
-  theOutMx.ChangeValue (2, 3) = -(Elem_t (2.0) * theFar * theNear) / (theFar - theNear);
+  if (myIsZeroToOneDepth)
+  {
+    theOutMx.ChangeValue (2, 3) = -(theFar * theNear) / (theFar - theNear);
+  }
+  else
+  {
+    theOutMx.ChangeValue (2, 3) = -(Elem_t (2.0) * theFar * theNear) / (theFar - theNear);
+  }
   theOutMx.ChangeValue (3, 3) = Elem_t (0.0);
 }
 
@@ -1058,7 +1081,7 @@ void Graphic3d_Camera::StereoEyeProj (const Elem_t theLeft,
                                       const Elem_t theIOD,
                                       const Elem_t theZFocus,
                                       const Standard_Boolean theIsLeft,
-                                      NCollection_Mat4<Elem_t>& theOutMx)
+                                      NCollection_Mat4<Elem_t>& theOutMx) const
 {
   Elem_t aDx = theIsLeft ? Elem_t (0.5) * theIOD : Elem_t (-0.5) * theIOD;
   Elem_t aDXStereoShift = aDx * theNear / theZFocus;
@@ -1405,12 +1428,10 @@ void Graphic3d_Camera::FrustumPoints (NCollection_Array1<Graphic3d_Vec3d>& thePo
 
   Standard_Real nLeft = 0.0, nRight = 0.0, nTop = 0.0, nBottom = 0.0;
   Standard_Real fLeft = 0.0, fRight = 0.0, fTop = 0.0, fBottom = 0.0;
-  Standard_Real aNear = 0.0, aFar = 0.0;
+  Standard_Real aNear = myZNear, aFar = myZFar;
   if (!IsOrthographic())
   {
     // handle perspective projection
-    aNear = aProjectionMat.GetValue (2, 3) / (-1.0 + aProjectionMat.GetValue (2, 2));
-    aFar  = aProjectionMat.GetValue (2, 3) / ( 1.0 + aProjectionMat.GetValue (2, 2));
     // Near plane
     nLeft   = aNear * (aProjectionMat.GetValue (0, 2) - 1.0) / aProjectionMat.GetValue (0, 0);
     nRight  = aNear * (aProjectionMat.GetValue (0, 2) + 1.0) / aProjectionMat.GetValue (0, 0);
@@ -1425,8 +1446,6 @@ void Graphic3d_Camera::FrustumPoints (NCollection_Array1<Graphic3d_Vec3d>& thePo
   else
   {
     // handle orthographic projection
-    aNear = (1.0 / aProjectionMat.GetValue (2, 2)) * (aProjectionMat.GetValue (2, 3) + 1.0);
-    aFar  = (1.0 / aProjectionMat.GetValue (2, 2)) * (aProjectionMat.GetValue (2, 3) - 1.0);
     // Near plane
     nLeft   = ( 1.0 + aProjectionMat.GetValue (0, 3)) / (-aProjectionMat.GetValue (0, 0));
     fLeft   = nLeft;

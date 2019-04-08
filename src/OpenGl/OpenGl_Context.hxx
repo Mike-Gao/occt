@@ -881,6 +881,7 @@ public: //! @name extensions
   OpenGl_ArbTexBindless* arbTexBindless;     //!< GL_ARB_bindless_texture
   OpenGl_ArbTBO*         arbTBO;             //!< GL_ARB_texture_buffer_object
   Standard_Boolean       arbTboRGB32;        //!< GL_ARB_texture_buffer_object_rgb32 (3-component TBO), in core since 4.0
+  Standard_Boolean       arbClipControl;     //!< GL_ARB_clip_control, in core since 4.5
   OpenGl_ArbIns*         arbIns;             //!< GL_ARB_draw_instanced
   OpenGl_ArbDbg*         arbDbg;             //!< GL_ARB_debug_output
   OpenGl_ArbFBO*         arbFBO;             //!< GL_ARB_framebuffer_object

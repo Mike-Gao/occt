@@ -136,6 +136,7 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   arbTexBindless (NULL),
   arbTBO (NULL),
   arbTboRGB32 (Standard_False),
+  arbClipControl (Standard_False),
   arbIns (NULL),
   arbDbg (NULL),
   arbFBO (NULL),
@@ -1272,6 +1273,7 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
   core45back = NULL;
   arbTBO     = NULL;
   arbTboRGB32 = Standard_False;
+  arbClipControl = Standard_False;
   arbIns     = NULL;
   arbDbg     = NULL;
   arbFBO     = NULL;
@@ -2549,6 +2551,12 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
     arbTexBindless = (OpenGl_ArbTexBindless* )(&(*myFuncs));
   }
 
+  if (CheckExtension ("GL_ARB_clip_control")
+   && FindProcShort (glClipControl))
+  {
+    arbClipControl = Standard_True;
+  }
+
   if (!has12)
   {
     checkWrongVersion (1, 2);
@@ -2775,6 +2783,7 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
     return;
   }
   core45 = (OpenGl_GlCore45* )(&(*myFuncs));
+  arbClipControl = Standard_True;
   if (!isCoreProfile)
   {
     core45back = (OpenGl_GlCore45Back* )(&(*myFuncs));

@@ -180,6 +180,7 @@ static NCollection_Vec4<Standard_Real> safePointCast (const gp_Pnt& thePnt)
 //=======================================================================
 gp_Pnt SelectMgr_FrustumBuilder::unProject (const gp_Pnt& thePnt) const
 {
+  /// TODO why these are not cached?
   Graphic3d_Mat4d aInvView;
   Graphic3d_Mat4d aInvProj;
 
@@ -217,6 +218,7 @@ gp_Pnt SelectMgr_FrustumBuilder::ProjectPntOnViewPlane (const Standard_Real& the
   {
     aX = 2.0 * theX / myWidth - 1.0;
     anY = (myHeight - 1 - theY) / myHeight * 2.0 - 1.0;
+    /// TODO wrong NDC
     aZ = 2.0 * theZ - 1.0;
   }
   else

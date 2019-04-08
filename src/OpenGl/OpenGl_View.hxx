@@ -662,6 +662,9 @@ protected: //! @name data types related to ray-tracing
     //! Actual ray-tracing depth (number of ray bounces).
     Standard_Integer NbBounces;
 
+    //! Define depth computation
+    Standard_Boolean IsZeroToOneDepth;
+
     //! Enables/disables light propagation through transparent media.
     Standard_Boolean TransparentShadows;
 
@@ -696,6 +699,7 @@ protected: //! @name data types related to ray-tracing
     RaytracingParams()
     : StackSize              (THE_DEFAULT_STACK_SIZE),
       NbBounces              (THE_DEFAULT_NB_BOUNCES),
+      IsZeroToOneDepth       (Standard_False),
       TransparentShadows     (Standard_False),
       GlobalIllumination     (Standard_False),
       UseBindlessTextures    (Standard_False),
