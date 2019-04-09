@@ -19,6 +19,12 @@
 #include <BVH_BinnedBuilder.hxx>
 #include <BVH_LinearBuilder.hxx>
 
+//#define REPORT_SELECTION_BUILD
+#ifdef REPORT_SELECTION_BUILD
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
+
 namespace
 {
   //! Short-cut definition of indexed data map of selectable objects
@@ -45,6 +51,18 @@ namespace
       const Handle(SelectMgr_SelectableObject)& anObject = myObjects.FindKey (theIndex + 1);
       if (!anObject.IsNull() && myDisabledZLayers.Contains (anObject->ZLayer()))
         return Select3D_BndBox3d();
+
+#ifdef REPORT_SELECTION_BUILD
+      Message_PerfMeter aPerfMeter;
+      if (anObject->ZLayer() == Graphic3d_ZLayerId_Default)
+      {
+        MESSAGE_INFO_OBJECT (anObject, "BVHBuilderAdaptorRegular: default layer", "", &aPerfMeter, NULL);
+      }
+      else
+      {
+        MESSAGE_INFO_OBJECT (anObject, "BVHBuilderAdaptorRegular", anObject->ZLayer(), &aPerfMeter, NULL);
+      }
+#endif
 
       Bnd_Box aBox;
       anObject->BoundingBox (aBox);
@@ -133,6 +151,18 @@ namespace
           myBoundings.Add (new Select3D_HBndBox3d());
           continue;
         }
+
+      #ifdef REPORT_SELECTION_BUILD
+      Message_PerfMeter aPerfMeter;
+      if (anObject->ZLayer() == Graphic3d_ZLayerId_Default)
+      {
+        MESSAGE_INFO_OBJECT (anObject, "BVHBuilderAdaptorPersistent: default layer", "", &aPerfMeter, NULL);
+      }
+      else
+      {
+        MESSAGE_INFO_OBJECT (anObject, "BVHBuilderAdaptorPersistent", anObject->ZLayer(), &aPerfMeter, NULL);
+      }
+      #endif
 
         Bnd_Box aBoundingBox;
         anObject->BoundingBox (aBoundingBox);

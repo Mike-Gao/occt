@@ -216,6 +216,9 @@ public:
   //! Sets container of Z layers, that should not be processed by selection
   Standard_EXPORT void SetDisabledZLayers (const NCollection_Map<Graphic3d_ZLayerId>& theLayers);
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
+
 public:
 
   //! Begins an iteration scanning for the owners detected at a position in the view.

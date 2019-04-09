@@ -15,10 +15,12 @@
 // commercial license or contractual agreement.
 
 #include <SelectMgr_ViewerSelector.hxx>
+#include <SelectMgr.hxx>
 
 #include <BVH_Tree.hxx>
 #include <gp_GTrsf.hxx>
 #include <gp_Pnt.hxx>
+#include <Message_Alerts.hxx>
 #include <OSD_Environment.hxx>
 #include <Precision.hxx>
 #include <SelectBasics_EntityOwner.hxx>
@@ -371,6 +373,17 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   if (!theObject.IsNull() && myDisabledZLayers.Contains (theObject->ZLayer()))
     return;
 
+#ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  if (theObject->ZLayer() == Graphic3d_ZLayerId_Default)
+  {
+    MESSAGE_INFO_OBJECT (theObject, "traverseObject: default layer", "", &aPerfMeter, NULL);
+  }
+  else
+  {
+    MESSAGE_INFO_OBJECT (theObject, "BVHBuilderAdaptorRegular", theObject->ZLayer(), &aPerfMeter, NULL);
+  }
+#endif
   Handle(SelectMgr_SensitiveEntitySet)& anEntitySet = myMapOfObjectSensitives.ChangeFind (theObject);
   if (anEntitySet->Size() == 0)
   {
@@ -378,7 +391,6 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   }
 
   #ifdef REPORT_SELECTION_BUILD
-  Message_PerfMeter aPerfMeter;
   MESSAGE_INFO_OBJECT (theObject, "traverseObject", "", &aPerfMeter, NULL);
   Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
   #endif
@@ -528,9 +540,13 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 void SelectMgr_ViewerSelector::TraverseSensitives()
 {
 #ifdef REPORT_SELECTION_BUILD
-  Message_PerfMeter aPerfMeter;
+  Message_PerfMeter aPerfMeter; 
   MESSAGE_INFO ("TraverseSensitives", "", &aPerfMeter, NULL);
   Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+
+  Standard_SStream aStream;
+  Dump (aStream);
+  MESSAGE_INFO_VALUES (aStream, "Parameters", "", &aPerfMeter, aParentAlert);
 #endif
 
   mystored.Clear();
@@ -677,6 +693,11 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
   }
 
   SortResult();
+#ifdef REPORT_SELECTION_BUILD
+  Standard_SStream aStreamDone;
+  Dump (aStreamDone);
+  MESSAGE_INFO_VALUES (aStreamDone, "Parameters", "", &aPerfMeter, aParentAlert);
+#endif
 }
 
 //==================================================
@@ -1072,4 +1093,36 @@ void SelectMgr_ViewerSelector::SetDisabledZLayers (const NCollection_Map<Graphic
 {
   myDisabledZLayers = theLayers;
   mySelectableObjects.SetDisabledZLayers (theLayers);
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void SelectMgr_ViewerSelector::Dump(Standard_OStream& OS)const 
+{
+  DUMP_VALUES (OS, "SelectMgr_ViewerSelector", 2);
+
+  DUMP_VALUES (OS, "IsPickClosest", IsPickClosest());
+  DUMP_VALUES (OS, "ToUpdateTolerance", myToUpdateTolerance);
+  DUMP_VALUES (OS, "mystored", mystored.Extent());
+  //DUMP_VALUES (OS, "mySelectingVolumeMgr", mySelectingVolumeMgr);
+
+  Standard_Integer aNbOfSelected = 0;
+  for (SelectMgr_SelectableObjectSet::Iterator aSelectableIt (mySelectableObjects); aSelectableIt.More(); aSelectableIt.Next())
+  {
+    aNbOfSelected++;
+  }
+  DUMP_VALUES (OS, "mySelectableObjects", aNbOfSelected);
+  DUMP_VALUES (OS, "myTolerances.Tolerance()", myTolerances.Tolerance());
+  DUMP_VALUES (OS, "myTolerances.CustomTolerance()", myTolerances.CustomTolerance());
+  DUMP_VALUES (OS, "myZLayerOrderMap", myZLayerOrderMap.Size());
+
+  TCollection_AsciiString aDisabledLayers;
+  for (NCollection_Map<Graphic3d_ZLayerId>::Iterator anIterator (myDisabledZLayers); anIterator.More(); anIterator.Next())
+  {
+    aDisabledLayers += anIterator.Value();
+    aDisabledLayers += " ";
+  }
+  DUMP_VALUES (OS, "myDisabledZLayers", aDisabledLayers);
 }
