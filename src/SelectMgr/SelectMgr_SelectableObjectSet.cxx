@@ -36,12 +36,16 @@ namespace
   public:
 
     //! Construct adaptor.
-    BVHBuilderAdaptorRegular (ObjectsMap& theObjects) : myObjects (theObjects) {};
+    BVHBuilderAdaptorRegular (ObjectsMap& theObjects, const NCollection_Map<Graphic3d_ZLayerId>& theDisabledZLayers)
+      : myObjects (theObjects), myDisabledZLayers (theDisabledZLayers) {};
 
     //! Returns bounding box of object with index theIndex
     virtual Select3D_BndBox3d Box (const Standard_Integer theIndex) const Standard_OVERRIDE
     {
       const Handle(SelectMgr_SelectableObject)& anObject = myObjects.FindKey (theIndex + 1);
+      if (!anObject.IsNull() && myDisabledZLayers.Contains (anObject->ZLayer()))
+        return Select3D_BndBox3d();
+
       Bnd_Box aBox;
       anObject->BoundingBox (aBox);
       if (aBox.IsVoid())
@@ -92,6 +96,7 @@ namespace
 
   private:
     ObjectsMap& myObjects;
+    NCollection_Map<Graphic3d_ZLayerId> myDisabledZLayers;
     mutable Select3D_BndBox3d myBox;
   };
 
@@ -111,17 +116,23 @@ namespace
     //!        theWidth, theHeight [in] view properties used for computation of
     //!        bounding boxes within the world view camera space.
     BVHBuilderAdaptorPersistent (ObjectsMap& theObjects,
+                                 const NCollection_Map<Graphic3d_ZLayerId>& theDisabledZLayers,
                                  const Handle(Graphic3d_Camera)& theCamera,
                                  const Graphic3d_Mat4d& theProjectionMat,
                                  const Graphic3d_Mat4d& theWorldViewMat,
                                  const Standard_Integer theWidth,
                                  const Standard_Integer theHeight)
-    : myObjects (theObjects)
+    : myObjects (theObjects), myDisabledZLayers (theDisabledZLayers)
     {
       myBoundings.ReSize (myObjects.Size());
       for (Standard_Integer anI = 1; anI <= myObjects.Size(); ++anI)
       {
         const Handle(SelectMgr_SelectableObject)& anObject = myObjects (anI);
+        if (!anObject.IsNull() && myDisabledZLayers.Contains (anObject->ZLayer()))
+        {
+          myBoundings.Add (new Select3D_HBndBox3d());
+          continue;
+        }
 
         Bnd_Box aBoundingBox;
         anObject->BoundingBox (aBoundingBox);
@@ -192,6 +203,7 @@ namespace
 
   private:
     ObjectsMap& myObjects;
+    NCollection_Map<Graphic3d_ZLayerId> myDisabledZLayers;
     mutable Select3D_BndBox3d myBox;
     typedef NCollection_Shared<Select3D_BndBox3d> Select3D_HBndBox3d;
     NCollection_IndexedMap<Handle(Select3D_HBndBox3d)> myBoundings;
@@ -324,7 +336,7 @@ void SelectMgr_SelectableObjectSet::UpdateBVH (const Handle(Graphic3d_Camera)& t
   if (!IsEmpty (BVHSubset_3d) && myIsDirty[BVHSubset_3d])
   {
     // construct adaptor over private fields to provide direct access for the BVH builder
-    BVHBuilderAdaptorRegular anAdaptor (myObjects[BVHSubset_3d]);
+    BVHBuilderAdaptorRegular anAdaptor (myObjects[BVHSubset_3d], myDisabledZLayers);
 
     // update corresponding BVH tree data structure
     myBuilder[BVHSubset_3d]->Build (&anAdaptor, myBVH[BVHSubset_3d].get(), anAdaptor.Box());
@@ -345,7 +357,7 @@ void SelectMgr_SelectableObjectSet::UpdateBVH (const Handle(Graphic3d_Camera)& t
          (myIsDirty[BVHSubset_3dPersistent] || myLastViewState.IsChanged (theViewState) || isWindowSizeChanged))
     {
       // construct adaptor over private fields to provide direct access for the BVH builder
-      BVHBuilderAdaptorPersistent anAdaptor (myObjects[BVHSubset_3dPersistent],
+      BVHBuilderAdaptorPersistent anAdaptor (myObjects[BVHSubset_3dPersistent], myDisabledZLayers,
         theCamera, theProjectionMat, theWorldViewMat, theViewportWidth, theViewportHeight);
 
       // update corresponding BVH tree data structure
@@ -359,7 +371,7 @@ void SelectMgr_SelectableObjectSet::UpdateBVH (const Handle(Graphic3d_Camera)& t
          (myIsDirty[BVHSubset_2dPersistent] || myLastViewState.IsProjectionChanged (theViewState) || isWindowSizeChanged))
     {
       // construct adaptor over private fields to provide direct access for the BVH builder
-      BVHBuilderAdaptorPersistent anAdaptor (myObjects[BVHSubset_2dPersistent],
+      BVHBuilderAdaptorPersistent anAdaptor (myObjects[BVHSubset_2dPersistent], myDisabledZLayers,
         theCamera, theProjectionMat, SelectMgr_SelectableObjectSet_THE_IDENTITY_MAT, theViewportWidth, theViewportHeight);
 
       // update corresponding BVH tree data structure

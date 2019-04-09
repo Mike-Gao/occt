@@ -19,6 +19,7 @@
 
 #include <Standard_Transient.hxx>
 #include <NCollection_DataMap.hxx>
+#include <NCollection_Map.hxx>
 #include <OSD_Chronometer.hxx>
 #include <TColStd_SequenceOfInteger.hxx>
 #include <TColStd_HArray1OfInteger.hxx>
@@ -212,6 +213,9 @@ public:
   //! mark both included and overlapped entities as matched
   Standard_EXPORT void AllowOverlapDetection (const Standard_Boolean theIsToAllow);
 
+  //! Sets container of Z layers, that should not be processed by selection
+  Standard_EXPORT void SetDisabledZLayers (const NCollection_Map<Graphic3d_ZLayerId>& theLayers);
+
 public:
 
   //! Begins an iteration scanning for the owners detected at a position in the view.
@@ -347,6 +351,8 @@ protected:
   gp_Pnt                                        myCameraEye;
   gp_Dir                                        myCameraDir;
   Standard_Real                                 myCameraScale;
+
+  NCollection_Map<Graphic3d_ZLayerId>           myDisabledZLayers;
 
 private:
 

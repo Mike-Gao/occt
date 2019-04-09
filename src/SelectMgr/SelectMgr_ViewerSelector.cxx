@@ -368,6 +368,9 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
                                                const Standard_Integer theViewportWidth,
                                                const Standard_Integer theViewportHeight)
 {
+  if (!theObject.IsNull() && myDisabledZLayers.Contains (theObject->ZLayer()))
+    return;
+
   Handle(SelectMgr_SensitiveEntitySet)& anEntitySet = myMapOfObjectSensitives.ChangeFind (theObject);
   if (anEntitySet->Size() == 0)
   {
@@ -1059,4 +1062,14 @@ void SelectMgr_ViewerSelector::ActiveOwners (NCollection_List<Handle(SelectBasic
 void SelectMgr_ViewerSelector::AllowOverlapDetection (const Standard_Boolean theIsToAllow)
 {
   mySelectingVolumeMgr.AllowOverlapDetection (theIsToAllow);
+}
+
+//=======================================================================
+//function : SetDisabledZLayers
+//purpose  : 
+//=======================================================================
+void SelectMgr_ViewerSelector::SetDisabledZLayers (const NCollection_Map<Graphic3d_ZLayerId>& theLayers)
+{
+  myDisabledZLayers = theLayers;
+  mySelectableObjects.SetDisabledZLayers (theLayers);
 }

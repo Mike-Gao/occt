@@ -180,6 +180,10 @@ public:
     return myBVH[theSubset];
   }
 
+  //! Sets container of Z layers, that should not be processed by selection
+  void SetDisabledZLayers (const NCollection_Map<Graphic3d_ZLayerId>& theLayers)
+  { myDisabledZLayers = theLayers; }
+
 private:
 
   //! Returns an appropriate subset of theObject given depending on its persistence type.
@@ -215,6 +219,7 @@ private:
 private:
 
   NCollection_IndexedMap<Handle(SelectMgr_SelectableObject)> myObjects[BVHSubsetNb]; //!< Map of objects for each subset
+  NCollection_Map<Graphic3d_ZLayerId>                        myDisabledZLayers; //!< layers of not processed objects
   opencascade::handle<BVH_Tree<Standard_Real, 3> >           myBVH[BVHSubsetNb];     //!< BVH tree computed for each subset
   Handle(Select3D_BVHBuilder3d)                              myBuilder[BVHSubsetNb]; //!< Builder allocated for each subset
   Standard_Boolean                                           myIsDirty[BVHSubsetNb]; //!< Dirty flag for each subset
