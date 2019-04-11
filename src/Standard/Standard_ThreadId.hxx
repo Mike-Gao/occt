@@ -23,11 +23,15 @@
 #include <windows.h>
 typedef DWORD Standard_ThreadId;
 
-inline Standard_Integer HashCode(const Standard_ThreadId Value,
-  const Standard_Integer Upper)
+
+//! Computes a hash code for the given thread identifier, in the range [1, theUpperBound]
+//! @param theThreadId the thread identifier which hash code is to be computed
+//! @param theUpperBound the upper bound of the range a computing hash code must be within
+//! @return a computed hash code, in the range [1, theUpperBound]
+inline Standard_Integer HashCode (const Standard_ThreadId theThreadId, const Standard_Integer theUpperBound)
 {
   // Size of int == size of unsigned long == 4 for WIN32 and WIN64
-  return HashCode((Standard_Integer)Value, Upper);
+  return ::HashCode (static_cast<Standard_Size>(theThreadId), theUpperBound);
 }
 
 #else
