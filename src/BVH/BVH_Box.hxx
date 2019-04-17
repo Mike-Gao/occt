@@ -121,6 +121,39 @@ public:
     //DUMP_VALUES (OS, "CornerMin", BVH::ToString (CornerMax()));
   }
 
+public:
+
+  //! Checks if the Box is out of the other box.
+  Standard_Boolean IsOut (const BVH_Box<T, N>& theOther) const
+  {
+    if (!IsValid() || !theOther.IsValid())
+      return Standard_True;
+
+    for (int i = 0; i < N; ++i)
+    {
+      if (myMinPoint[i] > theOther.myMaxPoint[i] ||
+          myMaxPoint[i] < theOther.myMinPoint[i])
+        return Standard_True;
+    }
+    return Standard_False;
+  }
+
+  //! Checks if the Point is out of the box.
+  Standard_Boolean IsOut (const BVH_VecNt& thePoint) const
+  {
+    if (!IsValid())
+      return Standard_True;
+
+    for (int i = 0; i < N; ++i)
+    {
+      if (thePoint[i] < myMinPoint[i] ||
+          thePoint[i] > myMaxPoint[i])
+        return Standard_True;
+    }
+    return Standard_False;
+  }
+
+
 protected:
 
   BVH_VecNt        myMinPoint; //!< Minimum point of bounding box

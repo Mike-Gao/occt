@@ -1,0 +1,38 @@
+puts "======="
+puts "0030655: Modeling Data - Provide interfaces for selection of the elements from BVH tree"
+puts "======="
+puts ""
+
+pload QAcommands
+
+box b 10 10 10
+
+# select elements interfering with each vertex (must be one vertex (itself), three edges and three faces - 7 in total)
+foreach v [explode b v] {
+  QABVH_ShapeSelect r_$v b $v
+  if { [llength [explode r_$v]] != 7} {
+    puts "Error: incorrect selection"
+  }
+}
+
+# select elements interfering with each edge (must be two vertices, five edges and and four faces - 11 in total)
+foreach e [explode b e] {
+  QABVH_ShapeSelect r_$e b $e
+  if { [llength [explode r_$e]] != 11} {
+    puts "Error: incorrect selection"
+  }
+}
+
+# select elements interfering with each face (must be ffour vertices, eight edges and and five faces - 17 in total)
+foreach f [explode b f] {
+  QABVH_ShapeSelect r_$f b $f
+  if { [llength [explode r_$f]] != 17} {
+    puts "Error: incorrect selection"
+  }
+}
+
+# intersect the box with itself - select all interfering pairs (8 * 7 + 12 * 11 + 6 * 17 = 290)
+QABVH_PairSelect r b b
+if { [llength [explode r]] != 290} {
+  puts "Error: incorrect selection"
+}
