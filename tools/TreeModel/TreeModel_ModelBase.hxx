@@ -20,6 +20,8 @@
 #include <inspector/TreeModel_ItemBase.hxx>
 #include <inspector/TreeModel_HeaderSection.hxx>
 
+#include <NCollection_List.hxx>
+
 #include <Standard_WarningsDisable.hxx>
 #include <QAbstractItemModel>
 #include <QExplicitlySharedDataPointer>
@@ -29,6 +31,7 @@
 #include <QVector>
 #include <Standard_WarningsRestore.hxx>
 
+class TreeModel_ItemPropertiesCreator;
 class TreeModel_VisibilityState;
 
 //! \class TreeModel_ModelBase
@@ -149,6 +152,12 @@ public:
   virtual int columnCount (const QModelIndex& theParent = QModelIndex()) const Standard_OVERRIDE
   { (void)theParent; return myHeaderValues.size(); }
 
+  //! Sets item table properties builder
+  Standard_EXPORT void AddPropertiesCreator (const Handle(TreeModel_ItemPropertiesCreator)& theCreator);
+
+  //! Returns item table properties builder
+  Standard_EXPORT const NCollection_List<Handle(TreeModel_ItemPropertiesCreator)>& GetPropertiesCreators() const;
+
   //! Returns default value of the visibility column
   //! \return integer value
   static int ColumnVisibilityWidth() { return 20; }
@@ -198,6 +207,8 @@ protected:
   QIcon myInvisibleIcon; //!< icon of invisible state
 
   QModelIndexList myHighlightedIndices; //!< tree model indices that should be visualized as highlighted
+
+  NCollection_List<Handle(TreeModel_ItemPropertiesCreator)> myPropertiesCreators; //!< property pane creators for items
 };
 
 #endif

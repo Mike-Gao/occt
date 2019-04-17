@@ -80,8 +80,8 @@ QVariant VInspector_ItemPrs3dDrawer::initValue (int theItemRole) const
 
 int VInspector_ItemPrs3dDrawer::initRowCount() const
 {
-  VInspector_ItemFolderObjectPtr aParentItem = itemDynamicCast<VInspector_ItemFolderObject>(Parent());
-  if (!aParentItem)
+  VInspector_ItemPrs3dDrawerPtr aParentDrawerItem = itemDynamicCast<VInspector_ItemPrs3dDrawer>(Parent());
+  if (aParentDrawerItem)
     return 0;
 
   Handle(Prs3d_Drawer) aDrawer = GetDrawer();
@@ -102,9 +102,7 @@ TreeModel_ItemBasePtr VInspector_ItemPrs3dDrawer::createChild (int theRow, int t
 {
   if (theRow == 0)
   {
-    VInspector_ItemFolderObjectPtr aParentItem = itemDynamicCast<VInspector_ItemFolderObject>(Parent());
-    if (aParentItem)
-      return VInspector_ItemPrs3dDrawer::CreateItem (currentItem(), theRow, theColumn); // "Link"
+    return VInspector_ItemPrs3dDrawer::CreateItem (currentItem(), theRow, theColumn); // "Link"
   }
   else
     return VInspector_ItemPrs3dAspect::CreateItem (currentItem(), theRow, theColumn); // "Aspects"

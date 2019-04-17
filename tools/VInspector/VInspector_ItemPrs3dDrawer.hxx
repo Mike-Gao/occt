@@ -110,7 +110,7 @@ protected:
   //! \return the created item
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE;
 
-private:
+protected:
 
   //! Set interactive object into the current field
   //! \param theIO a presentation
@@ -118,7 +118,7 @@ private:
   void setDrawer (const Handle(Prs3d_Drawer)& theDrawer, const TCollection_AsciiString& theName)
   { myDrawer = theDrawer; myName = theName; }
 
-private:
+protected:
 
   //! Constructor
   //! param theParent a parent item

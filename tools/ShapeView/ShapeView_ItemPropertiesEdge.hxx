@@ -42,8 +42,8 @@ class ShapeView_ItemPropertiesEdge : public TreeModel_ItemProperties
 public:
 
   //! Constructor
-  Standard_EXPORT ShapeView_ItemPropertiesEdge (TreeModel_ItemBasePtr theItem)
-    : TreeModel_ItemProperties(), myItem (theItem) {}
+  Standard_EXPORT ShapeView_ItemPropertiesEdge (const TreeModel_ItemBasePtr& theItem)
+    : TreeModel_ItemProperties (theItem) {}
 
   //! Destructor
   virtual ~ShapeView_ItemPropertiesEdge() {}
@@ -67,9 +67,6 @@ protected:
   //! Returns item shape
   TopoDS_Shape getItemShape() const;
 
-protected:
-
-  TreeModel_ItemBasePtr myItem; //!< source item base
 };
 
 #endif

@@ -49,10 +49,6 @@ public:
   //! \return a context
   Standard_EXPORT Handle(AIS_InteractiveContext) GetContext() const;
 
-  //! Returns data object of the item.
-  //! \return object
-  virtual Handle(Standard_Transient) GetObject() const { return NULL; }
-
   //! Returns item information for the given role. Fills internal container if it was not filled yet
   //! \param theItemRole a value role
   //! \return the value
@@ -106,9 +102,6 @@ public:
     { (void)theRow; (void)theColumn; (void)theValue; return false; }
 
 protected:
-
-  //! Initialize the current item. It creates a backup of the specific item information
-  virtual void initItem() const {}
 
   //! Build presentation shape
   //! \return generated shape of the item parameters

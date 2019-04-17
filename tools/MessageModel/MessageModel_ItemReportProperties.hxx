@@ -43,7 +43,7 @@ public:
 
   //! Constructor
   Standard_EXPORT MessageModel_ItemReportProperties (TreeModel_ItemBasePtr theItem)
-    : TreeModel_ItemProperties(), myItem (theItem) {}
+    : TreeModel_ItemProperties (theItem) {}
 
   //! Destructor
   virtual ~MessageModel_ItemReportProperties() {}
@@ -78,10 +78,6 @@ public:
 protected:
   //! Returns report
   Handle(Message_Report) getItemReport() const;
-
-protected:
-
-  TreeModel_ItemBasePtr myItem; //!< source item base
 };
 
 #endif

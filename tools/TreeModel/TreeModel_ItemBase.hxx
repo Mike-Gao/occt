@@ -18,8 +18,8 @@
 
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
+#include <Standard_Handle.hxx>
 #include <inspector/TreeModel_ItemRole.hxx>
-#include <inspector/TreeModel_ItemProperties.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QExplicitlySharedDataPointer>
@@ -33,6 +33,7 @@
 #include <Standard_WarningsRestore.hxx>
 
 class TreeModel_ItemBase;
+class TreeModel_ItemProperties;
 
 typedef QExplicitlySharedDataPointer<TreeModel_ItemBase> TreeModel_ItemBasePtr;
 
@@ -84,6 +85,10 @@ public:
   //! there should be initialized here.
   virtual void Init() { m_bInitialized = true; }
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { return NULL; }
+
   //! Resets the item and the child items content. Sets the initialized state to false.
   //! If the item has internal values, there should be reseted here.
   Standard_EXPORT virtual void Reset();
@@ -129,10 +134,13 @@ public:
   int rowCount() const { return cachedValue(TreeModel_ItemRole_RowCountRole).toInt(); }
 
   //! Sets item table properties builder
-  void SetProperties (const Handle(TreeModel_ItemProperties)& theProperties) { myProperties = theProperties; }
+  Standard_EXPORT void SetProperties (const Handle(TreeModel_ItemProperties)& theProperties);
 
   //! Returns item table properties builder
-  Handle(TreeModel_ItemProperties) GetProperties() const { return myProperties; }
+  Standard_EXPORT Handle(TreeModel_ItemProperties) GetProperties() const;
+
+  //! Returns number of item rows only
+  static Standard_EXPORT int RowCountWithoutProperties (const TreeModel_ItemBasePtr& theItem);
 
 protected:
 
@@ -140,6 +148,9 @@ protected:
   //! \param theRow the item row positition in the parent item
   //! \param theColumn the item column positition in the parent item
   Standard_EXPORT TreeModel_ItemBase (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn);
+
+  //! Initialize the current item. It creates a backup of the specific item information
+  virtual void initItem() const {}
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position
@@ -163,7 +174,7 @@ protected:
   //! Return data value for the role. It should be reimplemented in child
   //! \param theItemRole a value role
   //! \return the value
-  virtual QVariant initValue (const int theItemRole) const = 0;
+  Standard_EXPORT virtual QVariant initValue (const int theItemRole) const;
 
 private:
 

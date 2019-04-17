@@ -14,7 +14,7 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/TreeModel_ItemBase.hxx>
-
+#include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/TreeModel_ItemRole.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -31,6 +31,24 @@ TreeModel_ItemBase::TreeModel_ItemBase (TreeModel_ItemBasePtr theParent, const i
   m_pParent = theParent;
   m_iRow = theRow;
   m_iColumn = theColumn;
+}
+
+// =======================================================================
+// function :  SetProperties
+// purpose :
+// =======================================================================
+void TreeModel_ItemBase::SetProperties (const Handle(TreeModel_ItemProperties)& theProperties)
+{
+  myProperties = theProperties;
+}
+
+// =======================================================================
+// function :  GetProperties
+// purpose :
+// =======================================================================
+Handle(TreeModel_ItemProperties) TreeModel_ItemBase::GetProperties() const
+{
+  return myProperties;
 }
 
 // =======================================================================
@@ -74,7 +92,12 @@ TreeModel_ItemBasePtr TreeModel_ItemBase::Child (int theRow, int theColumn, cons
 
   TreeModel_ItemBasePtr anItem;
   if (isToCreate) {
-    anItem = createChild (theRow, theColumn);
+    int aRowCount = rowCount();
+    if (myProperties.IsNull() || theRow < aRowCount - myProperties->ChildItemCount())
+      anItem = createChild (theRow, theColumn);
+    else if (!myProperties.IsNull())
+      anItem = myProperties->CreateChildItem (theRow, theColumn);
+
     if (anItem)
       m_ChildItems[aPos] = anItem;
   }
@@ -99,8 +122,45 @@ QVariant TreeModel_ItemBase::cachedValue (const int theItemRole) const
   if (myCachedValues.contains (theItemRole))
     return myCachedValues[theItemRole];
 
-  const_cast<TreeModel_ItemBase*>(this)->myCachedValues.insert (theItemRole,
-    theItemRole == TreeModel_ItemRole_RowCountRole ? QVariant (initRowCount()) : initValue (theItemRole));
+  QVariant aValueToCache;
+  if (theItemRole == TreeModel_ItemRole_RowCountRole)
+  {
+    aValueToCache = myProperties.IsNull() ? initRowCount() : (initRowCount() + myProperties->ChildItemCount());
+  }
+  else
+    aValueToCache = initValue (theItemRole);
 
+  const_cast<TreeModel_ItemBase*>(this)->myCachedValues.insert (theItemRole, aValueToCache);
   return myCachedValues.contains (theItemRole) ? myCachedValues[theItemRole] : QVariant();
+}
+
+// =======================================================================
+// function : initValue
+// purpose :
+// =======================================================================
+QVariant TreeModel_ItemBase::initValue (const int theItemRole) const
+{
+  if (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole)
+    return QVariant();
+
+  switch (Column())
+  {
+    case 1: { return rowCount(); }
+    //case 2: return ViewControl_Tools::GetPointerInfo (GetObject(), true).ToCString();
+    case 3: { return Row(); }
+  }
+
+  return QVariant();
+}
+
+// =======================================================================
+// function : RowCountWithoutProperties
+// purpose :
+// =======================================================================
+int TreeModel_ItemBase::RowCountWithoutProperties (const TreeModel_ItemBasePtr& theItem)
+{
+  if (!theItem->GetProperties())
+    return theItem->rowCount();
+
+  return theItem->rowCount() - theItem->GetProperties()->ChildItemCount();
 }

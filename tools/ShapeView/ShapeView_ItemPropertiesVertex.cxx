@@ -66,7 +66,7 @@ QVariant ShapeView_ItemPropertiesVertex::GetTableData (const int theRow, const i
 
 TopoDS_Shape ShapeView_ItemPropertiesVertex::getItemShape() const
 {
-  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(myItem);
+  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(getItem());
   if (!aShapeItem)
     return TopoDS_Shape();
 

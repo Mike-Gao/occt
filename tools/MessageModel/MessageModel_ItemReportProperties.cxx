@@ -63,7 +63,7 @@ QVariant MessageModel_ItemReportProperties::GetTableData (const int theRow, cons
 // function : GetTableEditType
 // purpose :
 // =======================================================================
-ViewControl_EditType MessageModel_ItemReportProperties::GetTableEditType (const int theRow, const int theColumn) const
+ViewControl_EditType MessageModel_ItemReportProperties::GetTableEditType (const int theRow, const int) const
 {
   switch (theRow)
   {
@@ -94,7 +94,7 @@ bool MessageModel_ItemReportProperties::SetTableData (const int theRow, const in
 
 Handle(Message_Report) MessageModel_ItemReportProperties::getItemReport() const
 {
-  MessageModel_ItemReportPtr aReportItem = itemDynamicCast<MessageModel_ItemReport>(myItem);
+  MessageModel_ItemReportPtr aReportItem = itemDynamicCast<MessageModel_ItemReport>(getItem());
   if (!aReportItem)
     return NULL;
 

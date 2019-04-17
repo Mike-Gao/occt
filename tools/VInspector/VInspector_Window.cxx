@@ -15,6 +15,7 @@
 
 #include <inspector/VInspector_Window.hxx>
 
+#include <AIS_ColoredShape.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_Trihedron.hxx>
 #include <BRep_Builder.hxx>
@@ -22,13 +23,17 @@
 #include <Prs3d_PointAspect.hxx>
 #include <TopoDS_Compound.hxx>
 
+#include <TopExp_Explorer.hxx>
+
 #include <inspector/TreeModel_ColumnType.hxx>
 #include <inspector/TreeModel_ContextMenu.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <inspector/ViewControl_MessageDialog.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
 #include <inspector/ViewControl_Tools.hxx>
+#include <inspector/ViewControl_TransientShape.hxx>
 
 #include <inspector/VInspector_ToolBar.hxx>
 #include <inspector/VInspector_Tools.hxx>
@@ -48,6 +53,7 @@
 #include <inspector/VInspector_ViewModelHistory.hxx>
 
 #include <inspector/VInspectorPaneAIS_PaneCreator.hxx>
+#include <inspector/VInspectorPaneAIS_PropertiesCreator.hxx>
 
 #include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
@@ -142,6 +148,7 @@ VInspector_Window::VInspector_Window()
 
   // property view
   myPaneCreators.Append (new VInspectorPaneAIS_PaneCreator());
+  aTreeModel->AddPropertiesCreator (new VInspectorPaneAIS_PropertiesCreator());
 
   myPropertyView = new ViewControl_PropertyView (myMainWindow,
     QSize(VINSPECTOR_DEFAULT_PROPERTY_VIEW_WIDTH, VINSPECTOR_DEFAULT_PROPERTY_VIEW_HEIGHT));
@@ -373,7 +380,7 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
   {
     TreeModel_ItemBasePtr anItem = *anItemIt;
     VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
-    if (!aVItem && aVItem->Row() == 0)
+    if (!aVItem || aVItem->Row() == 0)
       continue;
 
     TopoDS_Shape aShape = aVItem->GetPresentationShape();
@@ -411,18 +418,19 @@ void VInspector_Window::GetSelectedPropertyPanelShapes (const QModelIndexList& t
                                                         NCollection_List<TopoDS_Shape>& theShapes)
 {
   QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (theTreeViewIndices);
+  NCollection_List<Handle(Standard_Transient)> aPropertyPresentations;
   for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
   {
     TreeModel_ItemBasePtr anItem = *anItemIt;
-    VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
-    if (!aVItem || aVItem->Column() != 0)
+    if (!anItem || anItem->Column() != 0)
       continue;
 
     QList<ViewControl_TableModelValues*> aTableValues;
-    VInspector_Tools::GetPropertyTableValues (aVItem, myPaneCreators, aTableValues);
+    VInspector_Tools::GetPropertyTableValues (anItem, myPaneCreators, aTableValues);
     if (aTableValues.isEmpty())
       continue;
 
+    Handle(TreeModel_ItemProperties) anItemProperties = anItem->GetProperties();
     for (int aTableIt = 0; aTableIt < aTableValues.size(); aTableIt++)
     {
       VInspector_TableModelValues* aTableVals = dynamic_cast<VInspector_TableModelValues*>(aTableValues[aTableIt]);
@@ -436,7 +444,22 @@ void VInspector_Window::GetSelectedPropertyPanelShapes (const QModelIndexList& t
       {
         QModelIndex anIndex = *anIndicesIt;
         aTableVals->GetPaneShapes (anIndex.row(), anIndex.column(), theShapes);
+
+        if (!anItemProperties.IsNull())
+        {
+          anItemProperties->GetPresentations (anIndex.row(), anIndex.column(), aPropertyPresentations);
+        }
       }
+    }
+  }
+
+  if (!aPropertyPresentations.IsEmpty())
+  {
+    for (NCollection_List<Handle(Standard_Transient)>::Iterator aPrsIterator (aPropertyPresentations); aPrsIterator.More(); aPrsIterator.Next())
+    {
+      Handle(ViewControl_TransientShape) aShapePrs = Handle(ViewControl_TransientShape)::DownCast (aPrsIterator.Value());
+      if (!aShapePrs.IsNull())
+        theShapes.Append (aShapePrs->GetShape());
     }
   }
 }
@@ -530,6 +553,12 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
       if (!myPaneCreators.Contains (aPaneCreator))
         myPaneCreators.Append (aPaneCreator);
     }
+    if (!Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject).IsNull())
+    {
+       Handle(TreeModel_ItemPropertiesCreator) aPropCreator = Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject);
+       VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*>(myTreeView->model());
+       aViewModel->AddPropertiesCreator (aPropCreator);
+    }
   }
   if (aContext.IsNull())
     return false;
@@ -587,8 +616,17 @@ bool VInspector_Window::OpenFile(const TCollection_AsciiString& theFileName)
   if (aShape.IsNull())
     return isModelUpdated;
 
+#ifndef DEBUG_COLORED_SHAPE
   Handle(AIS_Shape) aPresentation = new AIS_Shape (aShape);
+#else
+  Handle(AIS_ColoredShape) aPresentation = new AIS_ColoredShape (aShape);
 
+  TopExp_Explorer expS(aShape, TopAbs_EDGE);
+  for (; expS.More(); expS.Next())
+  {
+    aPresentation->SetCustomColor (expS.Current(), Quantity_Color (Quantity_NOC_GREEN));
+  }
+#endif
   View_Displayer* aDisplayer = myViewWindow->GetDisplayer();
   aDisplayer->DisplayPresentation (aPresentation);
 

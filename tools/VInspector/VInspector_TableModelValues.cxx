@@ -51,6 +51,15 @@ VInspector_TableModelValues::VInspector_TableModelValues (const TreeModel_ItemBa
 
 QVariant VInspector_TableModelValues::Data (const int theRow, const int theColumn, int theRole) const
 {
+  int aRow = theRow;
+  if (!myItem->GetProperties().IsNull())
+  {
+    int aPropertiesCount = myItem->GetProperties()->GetTableRowCount();
+    if (aRow < aPropertiesCount)
+      return myItem->GetProperties()->GetTableData (theRow, theColumn, theRole);
+    else
+      aRow = aRow - aPropertiesCount;
+  }
   switch (theRole)
   {
     case Qt::FontRole:
@@ -66,17 +75,19 @@ QVariant VInspector_TableModelValues::Data (const int theRow, const int theColum
     {
       if (theColumn == 0)
         return QColor (Qt::darkGray).darker(150);
-      else if (GetEditType (theRow, theColumn) != ViewControl_EditType_None)
+      else if (GetEditType (aRow, theColumn) != ViewControl_EditType_None)
         return ViewControl_TableModelValues::EditCellColor();
     }
     default:
     {
       VInspector_ItemBasePtr anItem = GetItem();
+      if (!anItem)
+        return QVariant();
       Handle(Standard_Transient) anObject = anItem->GetObject();
       if (anObject.IsNull())
-        return anItem->GetTableData (theRow, theColumn, theRole);
+        return anItem->GetTableData (aRow, theColumn, theRole);
 
-      int aCurrentRow = theRow;
+      int aCurrentRow = aRow;
       for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
       {
         Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
@@ -103,12 +114,25 @@ bool VInspector_TableModelValues::SetData (const int theRow, const int theColumn
   if (theRole != Qt::EditRole)
     return false;
 
+  int aRow = theRow;
+  if (!myItem->GetProperties().IsNull())
+  {
+    int aPropertiesCount = myItem->GetProperties()->GetTableRowCount();
+    if (aRow < aPropertiesCount)
+      return myItem->GetProperties()->SetTableData (theRow, theColumn, theValue);
+    else
+      aRow = aRow - aPropertiesCount;
+  }
+
   VInspector_ItemBasePtr anItem = GetItem();
+  if (!anItem)
+    return false;
+
   Handle(Standard_Transient) anObject = anItem->GetObject();
   if (anObject.IsNull())
-    return anItem->SetTableData (theRow, theColumn, theValue);
+    return anItem->SetTableData (aRow, theColumn, theValue);
 
-  int aCurrentRow = theRow;
+  int aCurrentRow = aRow;
   for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
   {
     Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
@@ -145,9 +169,15 @@ Qt::ItemFlags VInspector_TableModelValues::Flags (const QModelIndex& theIndex) c
 
 int VInspector_TableModelValues::RowCount (const QModelIndex& theParent) const
 {
-  VInspector_ItemBasePtr anItem = GetItem();
+  int aRowCount = 0;
+  if (!myItem->GetProperties().IsNull())
+    aRowCount = myItem->GetProperties()->GetTableRowCount();
 
-  int aRowCount = anItem->GetTableRowCount();
+  VInspector_ItemBasePtr anItem = GetItem();
+  if (!anItem)
+    return aRowCount;
+
+  aRowCount += anItem->GetTableRowCount();
   Handle(Standard_Transient) anObject = anItem->GetObject();
   if (anObject.IsNull())
     return aRowCount;
@@ -170,15 +200,28 @@ int VInspector_TableModelValues::RowCount (const QModelIndex& theParent) const
 
 ViewControl_EditType VInspector_TableModelValues::GetEditType (const int theRow, const int theColumn) const
 {
+  int aRow = theRow;
+  if (!myItem->GetProperties().IsNull())
+  {
+    int aPropertiesCount = myItem->GetProperties()->GetTableRowCount();
+    if (aRow < aPropertiesCount)
+      return myItem->GetProperties()->GetTableEditType (theRow, theColumn);
+    else
+      aRow = aRow - aPropertiesCount;
+  }
+
   if (theColumn == 0)
     return ViewControl_EditType_None;
 
   VInspector_ItemBasePtr anItem = GetItem();
+  if (!anItem)
+    return ViewControl_EditType_None;
+
   Handle(Standard_Transient) anObject = anItem->GetObject();
   if (anObject.IsNull())
-    return anItem->GetTableEditType (theRow, theColumn);
+    return anItem->GetTableEditType (aRow, theColumn);
 
-  int aCurrentRow = theRow;
+  int aCurrentRow = aRow;
   for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
   {
     Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
@@ -203,12 +246,25 @@ QList<QVariant> VInspector_TableModelValues::GetEnumValues (const int theRow, co
   if (theColumn != 1)
     return QList<QVariant>();
 
+  int aRow = theRow;
+  if (!myItem->GetProperties().IsNull())
+  {
+    int aPropertiesCount = myItem->GetProperties()->GetTableRowCount();
+    if (aRow < aPropertiesCount)
+      return myItem->GetProperties()->GetTableEnumValues (theRow, theColumn);
+    else
+      aRow = aRow - aPropertiesCount;
+  }
+
   VInspector_ItemBasePtr anItem = GetItem();
+  if (!anItem)
+    return QList<QVariant>();
+
   Handle(Standard_Transient) anObject = anItem->GetObject();
   if (anObject.IsNull())
-    return anItem->GetTableEnumValues (theRow, theColumn);
+    return anItem->GetTableEnumValues (aRow, theColumn);
 
-  int aCurrentRow = theRow;
+  int aCurrentRow = aRow;
   for (NCollection_List<Handle(ViewControl_PaneCreator)>::Iterator anIterator (myCreators); anIterator.More(); anIterator.Next())
   {
     Handle(ViewControl_PaneCreator) aCreator = anIterator.Value();
@@ -230,7 +286,20 @@ QList<QVariant> VInspector_TableModelValues::GetEnumValues (const int theRow, co
 
 void VInspector_TableModelValues::GetPaneShapes (const int theRow, const int theColumn, NCollection_List<TopoDS_Shape>& theShapes)
 {
+  int aRow = theRow;
+  if (!myItem->GetProperties().IsNull())
+  {
+    int aPropertiesCount = myItem->GetProperties()->GetTableRowCount();
+    if (aRow < aPropertiesCount)
+      return;// myItem->GetProperties()->GetEnumValues (theRow, theColumn);
+    else
+      aRow = aRow - aPropertiesCount;
+  }
+
   VInspector_ItemBasePtr anItem = GetItem();
+  if (!anItem)
+    return;
+
   Handle(Standard_Transient) anObject = anItem->GetObject();
   if (anObject.IsNull())
     return;
@@ -242,7 +311,7 @@ void VInspector_TableModelValues::GetPaneShapes (const int theRow, const int the
     if (!aPane)
       continue;
 
-    ViewControl_PaneItem* anItem = aPane->GetSelected (anObject, theRow, theColumn);
+    ViewControl_PaneItem* anItem = aPane->GetSelected (anObject, aRow, theColumn);
     if (anItem && !anItem->GetShape().IsNull())
       theShapes.Append (anItem->GetShape());
   }

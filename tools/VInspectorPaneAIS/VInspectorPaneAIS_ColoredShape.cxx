@@ -1,4 +1,4 @@
-// Created on: 2019-02-25
+// Created on: 2019-04-14
 // Created by: Natalia ERMOLAEVA
 // Copyright (c) 2019 OPEN CASCADE SAS
 //
@@ -13,54 +13,47 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/ShapeView_ItemPropertiesFace.hxx>
-#include <inspector/ShapeView_ItemShape.hxx>
-#include <inspector/ShapeView_Tools.hxx>
+#include <inspector/VInspectorPaneAIS_ColoredShape.hxx>
+#include <inspector/VInspectorPaneAIS_ItemPrs3dDrawer.hxx>
 
-#include <Standard_WarningsDisable.hxx>
-#include <QApplication>
-#include <QFont>
-#include <Standard_WarningsRestore.hxx>
+#include <inspector/ViewControl_Table.hxx>
+#include <inspector/ViewControl_Tools.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(ShapeView_ItemPropertiesFace, TreeModel_ItemProperties)
+#include <inspector/VInspector_Tools.hxx>
+
+#include <AIS_ColoredShape.hxx>
 
 // =======================================================================
-// function : RowCount
+// function : ChildItemCount
 // purpose :
 // =======================================================================
-
-int ShapeView_ItemPropertiesFace::GetTableRowCount() const
+int VInspectorPaneAIS_ColoredShape::ChildItemCount() const
 {
-  return ShapeView_Tools::GetShapeGlobalPropertiesCount();
+  Handle(AIS_ColoredShape) aPrs = GetPresentation();
+  if (aPrs.IsNull())
+    return 0;
+
+  return aPrs->CustomAspectsMap().Size();
 }
 
 // =======================================================================
-// function : Data
+// function : CreateChildItem
 // purpose :
 // =======================================================================
-
-QVariant ShapeView_ItemPropertiesFace::GetTableData (const int theRow, const int theColumn, int theRole) const
+TreeModel_ItemBasePtr VInspectorPaneAIS_ColoredShape::CreateChildItem (int theRow, int theColumn) const
 {
-  if (theRole != Qt::DisplayRole)
-    return QVariant();
+  Handle(AIS_ColoredShape) aPrs = GetPresentation();
+  if (aPrs.IsNull())
+    return TreeModel_ItemBasePtr();
 
-  TopoDS_Shape aShape = getItemShape();
-
-  QVariant aValue = ShapeView_Tools::GetShapeGlobalProperties (aShape, theRow, theColumn);
-
-  return aValue;
+  return VInspectorPaneAIS_ItemPrs3dDrawer::CreateItem (getItem(), theRow, theColumn);
 }
 
 // =======================================================================
-// function : getItemShape
+// function : GetPresentation
 // purpose :
 // =======================================================================
-
-TopoDS_Shape ShapeView_ItemPropertiesFace::getItemShape() const
+Handle(AIS_ColoredShape) VInspectorPaneAIS_ColoredShape::GetPresentation() const
 {
-  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(getItem());
-  if (!aShapeItem)
-    return TopoDS_Shape();
-
-  return aShapeItem->GetItemShape();
+  return Handle(AIS_ColoredShape)::DownCast (getItem()->GetObject());
 }

@@ -55,6 +55,9 @@ int ShapeView_ItemPropertiesEdge::GetTableRowCount() const
 // function : Data
 // purpose :
 // =======================================================================
+#include <BRep_CurveRepresentation.hxx>
+#include <BRep_ListIteratorOfListOfCurveRepresentation.hxx>
+#include <BRep_TEdge.hxx>
 
 QVariant ShapeView_ItemPropertiesEdge::GetTableData (const int theRow, const int theColumn, int theRole) const
 {
@@ -90,8 +93,41 @@ QVariant ShapeView_ItemPropertiesEdge::GetTableData (const int theRow, const int
                                                                         : ShapeView_Tools::ToString (aCurve->IsPeriodic());
     default: break;
   }
-  int anOwnRows = 7;
 
+  int anOwnRows = 7;
+  /*int aTableRow = theRow - anOwnRows;
+  // BRep_Tool::PolygonOnTriangulation // find the representation
+
+  TopoDS_Edge E = TopoDS::Edge(aShape);
+  Handle(Poly_PolygonOnTriangulation) P;
+  Handle(Poly_Triangulation) T;
+  TopLoc_Location L;
+
+  const BRep_TEdge* TE = static_cast<const BRep_TEdge*>(anEdge.TShape().get());
+  BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
+
+  int aCurRow = 0;
+  while (itcr.More()) {
+    const Handle(BRep_CurveRepresentation)& cr = itcr.Value();
+    if (cr->IsPolygonOnTriangulation()) {
+      if (aCurRow < aTableRow)
+        continue;
+      const BRep_PolygonOnTriangulation* PT =
+        static_cast<const BRep_PolygonOnTriangulation*>(cr.get());
+      P = PT->PolygonOnTriangulation();
+      T = PT->Triangulation();
+      L = E.Location() * PT->Location();
+      return isFirstColumn ? QVariant("Polygon: ") : P.;
+    }
+    itcr.Next();
+  }
+  L.Identity();
+  P.Nullify();
+  T.Nullify();
+
+
+  anOwnRows += aTableRow;
+  */
   return ShapeView_Tools::GetShapeGlobalProperties (aShape, theRow - anOwnRows, theColumn);
 }
 
@@ -102,7 +138,7 @@ QVariant ShapeView_ItemPropertiesEdge::GetTableData (const int theRow, const int
 
 TopoDS_Shape ShapeView_ItemPropertiesEdge::getItemShape() const
 {
-  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(myItem);
+  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(getItem());
   if (!aShapeItem)
     return TopoDS_Shape();
 

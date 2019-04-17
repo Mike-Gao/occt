@@ -22,6 +22,9 @@
 #include <Standard_Type.hxx>
 #include <Standard_Transient.hxx>
 
+#include <NCollection_List.hxx>
+
+#include <inspector/TreeModel_ItemBase.hxx>
 #include <inspector/ViewControl_EditType.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -40,10 +43,21 @@ class TreeModel_ItemProperties : public Standard_Transient
 {
 public:
   //! Constructor
-  TreeModel_ItemProperties() {}
+  TreeModel_ItemProperties (const TreeModel_ItemBasePtr& theItem) : myItem (theItem) {}
 
   //! Destructor
   ~TreeModel_ItemProperties() {}
+
+  //! Returns number of item children
+  //! \return an integer value, ZERO by default
+  virtual int ChildItemCount() const { return 0; }
+
+  //! Creates a child item in the given position.
+  //! \param theRow the child row position
+  //! \param theColumn the child column position
+  //! \return the created item
+  virtual TreeModel_ItemBasePtr CreateChildItem (int theRow, int theColumn) const
+  { (void)theRow; (void)theColumn; return TreeModel_ItemBasePtr(); }
 
   //! Returns number of table rows
   //! \return an integer value
@@ -73,12 +87,6 @@ public:
   virtual QList<QVariant> GetTableEnumValues (const int theRow, const int theColumn) const
     { (void)theRow; (void)theColumn; return QList<QVariant>(); }
 
-  //! Returns flags for the item: ItemIsEnabled | Qt::ItemIsSelectable.
-  //! Additional flag for the column 1 is Qt::ItemIsEditable.
-  //! \param theIndex a model index
-  //! \return flags
-  Standard_EXPORT virtual Qt::ItemFlags GetTableFlags (const int theRow, const int theColumn) const;
-
   //! Sets the value into the table cell. Only 1st column value might be modified.
   //! \param theRow a model index row
   //! \param theColumn a model index column
@@ -86,7 +94,29 @@ public:
   virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue)
     { (void)theRow; (void)theColumn; (void)theValue; return false; }
 
+  //! Returns presentation of the attribute to be visualized in the view
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \thePresentations [out] container of presentation handles to be visualized
+  virtual void GetPresentations (const int theRow, const int theColumn,
+                                 NCollection_List<Handle(Standard_Transient)>& thePresentations)
+  { (void)theRow; (void)theColumn; (void)thePresentations; }
+
+  //! Returns flags for the item: ItemIsEnabled | Qt::ItemIsSelectable.
+  //! Additional flag for the column 1 is Qt::ItemIsEditable.
+  //! \param theIndex a model index
+  //! \return flags
+  Standard_EXPORT virtual Qt::ItemFlags GetTableFlags (const int theRow, const int theColumn) const;
+
+
   DEFINE_STANDARD_RTTIEXT (TreeModel_ItemProperties, Standard_Transient)
+
+protected:
+  //! Returns current item
+  TreeModel_ItemBasePtr getItem() const { return myItem; }
+
+private:
+  TreeModel_ItemBasePtr myItem; //! current item
 };
 
 #endif

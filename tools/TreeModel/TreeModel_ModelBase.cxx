@@ -16,8 +16,12 @@
 #include <inspector/TreeModel_ModelBase.hxx>
 
 #include <inspector/TreeModel_ItemBase.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
+#include <inspector/TreeModel_ItemPropertiesCreator.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 #include <inspector/TreeModel_VisibilityState.hxx>
+
+#include <Standard_Transient.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QIcon>
@@ -180,6 +184,24 @@ int TreeModel_ModelBase::rowCount (const QModelIndex& theParent) const
   else
     aParentItem = GetItemByIndex (theParent);
 
+  if (!aParentItem)
+    return 0;
+  if (!aParentItem->IsInitialized())
+  {
+    TreeModel_ItemProperties* aProperties = 0;
+    if (!myPropertiesCreators.IsEmpty())
+    {
+      for (NCollection_List<Handle(TreeModel_ItemPropertiesCreator)>::Iterator anIterator (myPropertiesCreators); anIterator.More(); anIterator.Next())
+      {
+        Handle(TreeModel_ItemPropertiesCreator) aCreator = anIterator.Value();
+        aProperties = aCreator->GetProperties (aParentItem);
+        if (aProperties)
+          break;
+      }
+    }
+    aParentItem->SetProperties (aProperties);
+  }
+
   return aParentItem ? aParentItem->rowCount() : 0;
 }
 
@@ -210,6 +232,26 @@ void TreeModel_ModelBase::EmitDataChanged (const QModelIndex& theTopLeft, const 
 #else
   emit dataChanged (theTopLeft, theBottomRight, theRoles);
 #endif
+}
+
+// =======================================================================
+// function :  SetPropertiesCreator
+// purpose :
+// =======================================================================
+void TreeModel_ModelBase::AddPropertiesCreator (const Handle(TreeModel_ItemPropertiesCreator)& theCreator)
+{
+  if (myPropertiesCreators.Contains (theCreator))
+    return;
+  myPropertiesCreators.Append (theCreator);
+}
+
+// =======================================================================
+// function :  GetProperties
+// purpose :
+// =======================================================================
+const NCollection_List<Handle(TreeModel_ItemPropertiesCreator)>& TreeModel_ModelBase::GetPropertiesCreators() const
+{
+  return myPropertiesCreators;
 }
 
 // =======================================================================

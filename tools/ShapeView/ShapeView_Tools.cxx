@@ -135,12 +135,13 @@ QVariant ShapeView_Tools::GetShapeGlobalProperties (const TopoDS_Shape& theShape
 
   switch (theRow)
   {
-    case 0: return isFirstColumn ? "Checked" : ToString (theShape.Checked());
-    case 1: return isFirstColumn ? "Closed" : ToString (theShape.Closed());
-    case 2: return isFirstColumn ? "Infinite" : ToString (theShape.Infinite());
-    case 3: return isFirstColumn ? "Locked" : ToString (theShape.Locked());
-    case 4: return isFirstColumn ? "Modified" : ToString (theShape.Modified());
-    case 5: return isFirstColumn ? "Orientable" : ToString (theShape.Orientable());
+    case 0: return isFirstColumn ? "COMMON PROPERTIES" : "";
+    case 1: return isFirstColumn ? "Checked" : ToString (theShape.Checked());
+    case 2: return isFirstColumn ? "Closed" : ToString (theShape.Closed());
+    case 3: return isFirstColumn ? "Infinite" : ToString (theShape.Infinite());
+    case 4: return isFirstColumn ? "Locked" : ToString (theShape.Locked());
+    case 5: return isFirstColumn ? "Modified" : ToString (theShape.Modified());
+    case 6: return isFirstColumn ? "Orientable" : ToString (theShape.Orientable());
   }
   return QVariant();
 }
