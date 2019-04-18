@@ -284,7 +284,7 @@ void BOPAlgo_PaveFiller::PerformInternal()
   //
   MakeSplitEdges();
   if (HasErrors()) {
-    return; 
+    return;
   }
   //
   UpdatePaveBlocksWithSDVertices();

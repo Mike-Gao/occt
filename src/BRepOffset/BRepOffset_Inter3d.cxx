@@ -16,6 +16,7 @@
 
 //  Modified by skv - Fri Dec 26 12:20:14 2003 OCC4455
 
+#include <Bnd_Tools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Curve.hxx>
@@ -46,8 +47,7 @@
 #include <TopTools_MapOfShape.hxx>
 //
 #include <BRepBndLib.hxx>
-#include <BOPTools_BoxBndTree.hxx>
-#include <NCollection_UBTreeFiller.hxx>
+#include <BOPTools_BoxTree.hxx>
 //
 #include <BOPTools_AlgoTools.hxx>
 
@@ -114,8 +114,8 @@ void BRepOffset_Inter3d::CompletInt(const TopTools_ListOfShape& SetOfFaces,
   //---------------------------------------------------------------
 
   // Prepare tools for sorting the bounding boxes
-  BOPTools_BoxBndTree aBBTree;
-  NCollection_UBTreeFiller <Standard_Integer, Bnd_Box> aTreeFiller(aBBTree);
+  Handle(BOPTools_BoxTree) aBBTree = new BOPTools_BoxTree();
+  aBBTree->SetSize (SetOfFaces.Extent());
   //
   NCollection_IndexedDataMap<TopoDS_Shape, Bnd_Box, TopTools_ShapeMapHasher> aMFaces;
   // Construct bounding boxes for faces and add them to the tree
@@ -129,11 +129,11 @@ void BRepOffset_Inter3d::CompletInt(const TopTools_ListOfShape& SetOfFaces,
     //
     Standard_Integer i = aMFaces.Add(aF, aBoxF);
     //
-    aTreeFiller.Add(i, aBoxF);
+    aBBTree->Add(i, Bnd_Tools::Bnd2BVH(aBoxF));
   }
   //
   // shake tree filler
-  aTreeFiller.Fill();
+  aBBTree->Build();
   //
   // get faces with interfering bounding boxes
   aItL.Initialize(SetOfFaces);
@@ -141,9 +141,10 @@ void BRepOffset_Inter3d::CompletInt(const TopTools_ListOfShape& SetOfFaces,
     const TopoDS_Face& aF1 = TopoDS::Face(aItL.Value());
     const Bnd_Box& aBoxF1 = aMFaces.FindFromKey(aF1);
     //
-    BOPTools_BoxBndTreeSelector aSelector;
-    aSelector.SetBox(aBoxF1);
-    aBBTree.Select(aSelector);
+    BOPTools_BoxTreeSelector aSelector;
+    aSelector.SetBox (Bnd_Tools::Bnd2BVH(aBoxF1));
+    aSelector.SetBVHSet (aBBTree.get());
+    aSelector.Select ();
     //
     const TColStd_ListOfInteger& aLI = aSelector.Indices();
     TColStd_ListIteratorOfListOfInteger aItLI(aLI);

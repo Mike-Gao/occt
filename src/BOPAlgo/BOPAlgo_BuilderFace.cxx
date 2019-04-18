@@ -24,7 +24,8 @@
 #include <BOPAlgo_Alerts.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BOPTools_AlgoTools2D.hxx>
-#include <BOPTools_BoxSelector.hxx>
+#include <BOPTools_BoxTree.hxx>
+#include <Bnd_Tools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepBndLib.hxx>
@@ -38,8 +39,7 @@
 #include <IntTools_Context.hxx>
 #include <IntTools_FClass2d.hxx>
 #include <NCollection_DataMap.hxx>
-#include <NCollection_UBTreeFiller.hxx>
-#include <TColStd_MapIntegerHasher.hxx>
+#include <TColStd_MapOfInteger.hxx>
 #include <TopAbs.hxx>
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
@@ -443,32 +443,33 @@ void BOPAlgo_BuilderFace::PerformAreas()
   {
     // No holes, stop the analysis
     myAreas.Append(aNewFaces);
+    return;
   }
 
   // Classify holes relatively faces
 
   // Prepare tree filler with the boxes of the hole faces
-  NCollection_UBTree<Standard_Integer, Bnd_Box2d> aBBTree;
-  NCollection_UBTreeFiller <Standard_Integer, Bnd_Box2d> aTreeFiller(aBBTree);
-
+  Handle(BOPTools_Box2dTree) aBoxTree = new BOPTools_Box2dTree();
   Standard_Integer i, aNbH = aHoleFaces.Extent();
+  aBoxTree->SetSize (aNbH);
   for (i = 1; i <= aNbH; ++i)
   {
     const TopoDS_Face& aHFace = TopoDS::Face(aHoleFaces(i));
     //
     Bnd_Box2d aBox;
     BRepTools::AddUVBounds(aHFace, aBox);
-    aTreeFiller.Add(i, aBox);
+    aBoxTree->Add(i, Bnd_Tools::Bnd2BVH (aBox));
   }
 
-  // Shake TreeFiller
-  aTreeFiller.Fill();
+  // Build BVH
+  aBoxTree->Build();
 
   // Find outer growth face that is most close to each hole face
   TopTools_IndexedDataMapOfShapeShape aHoleFaceMap;
 
   // Selector
-  BOPTools_BoxSelector<Bnd_Box2d> aSelector;
+  BOPTools_Box2dTreeSelector aSelector;
+  aSelector.SetBVHSet (aBoxTree.get());
 
   TopTools_ListIteratorOfListOfShape aItLS(aNewFaces);
   for (; aItLS.More(); aItLS.Next())
@@ -480,8 +481,8 @@ void BOPAlgo_BuilderFace::PerformAreas()
     BRepTools::AddUVBounds(aFace, aBox);
 
     aSelector.Clear();
-    aSelector.SetBox(aBox);
-    aBBTree.Select(aSelector);
+    aSelector.SetBox(Bnd_Tools::Bnd2BVH (aBox));
+    aSelector.Select();
 
     const TColStd_ListOfInteger& aLI = aSelector.Indices();
     TColStd_ListIteratorOfListOfInteger aItLI(aLI);

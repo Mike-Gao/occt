@@ -14,6 +14,7 @@
 
 #include <Bnd_Box.hxx>
 #include <Bnd_OBB.hxx>
+#include <Bnd_Tools.hxx>
 #include <BOPDS_DS.hxx>
 #include <BOPDS_IndexRange.hxx>
 #include <BOPDS_IteratorSI.hxx>
@@ -21,11 +22,10 @@
 #include <BOPDS_Pair.hxx>
 #include <BOPDS_ShapeInfo.hxx>
 #include <BOPDS_Tools.hxx>
-#include <BOPTools_BoxBndTree.hxx>
+#include <BOPTools_BoxTree.hxx>
 #include <BRep_Tool.hxx>
 #include <gp_Pnt.hxx>
 #include <IntTools_Context.hxx>
-#include <NCollection_UBTreeFiller.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TColStd_DataMapOfIntegerInteger.hxx>
 #include <TColStd_DataMapOfIntegerListOfInteger.hxx>
@@ -87,11 +87,9 @@ void BOPDS_IteratorSI::Intersect(const Handle(IntTools_Context)& theCtx,
   Standard_Integer iTi, iTj;
   TopAbs_ShapeEnum aTi, aTj;
   //
-  BOPTools_BoxBndTreeSelector aSelector;
-  BOPTools_BoxBndTree aBBTree;
-  NCollection_UBTreeFiller <Standard_Integer, Bnd_Box> aTreeFiller(aBBTree);
-  //
+  Handle(BOPTools_BoxTree) aBBTree = new BOPTools_BoxTree();
   aNbS = myDS->NbSourceShapes();
+  aBBTree->SetSize (aNbS);
   for (i=0; i<aNbS; ++i) {
     const BOPDS_ShapeInfo& aSI=myDS->ShapeInfo(i);
     if (!aSI.IsInterfering()) {
@@ -99,10 +97,10 @@ void BOPDS_IteratorSI::Intersect(const Handle(IntTools_Context)& theCtx,
     }
     //
     const Bnd_Box& aBoxEx = aSI.Box();
-    aTreeFiller.Add(i, aBoxEx);
+    aBBTree->Add(i, Bnd_Tools::Bnd2BVH(aBoxEx));
   }
   //
-  aTreeFiller.Fill();
+  aBBTree->Build();
   //
   BOPDS_MapOfPair aMPFence;
   //
@@ -114,10 +112,11 @@ void BOPDS_IteratorSI::Intersect(const Handle(IntTools_Context)& theCtx,
     //
     const Bnd_Box& aBoxEx = aSI.Box();
     //
-    aSelector.Clear();
-    aSelector.SetBox(aBoxEx);
+    BOPTools_BoxTreeSelector aSelector;
+    aSelector.SetBox (Bnd_Tools::Bnd2BVH (aBoxEx));
+    aSelector.SetBVHSet (aBBTree.get());
     //
-    Standard_Integer aNbSD = aBBTree.Select(aSelector);
+    Standard_Integer aNbSD = aSelector.Select();
     if (!aNbSD) {
       continue;
     }

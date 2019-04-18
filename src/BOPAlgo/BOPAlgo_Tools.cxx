@@ -25,7 +25,7 @@
 #include <BOPDS_PaveBlock.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BOPTools_AlgoTools2D.hxx>
-#include <BOPTools_BoxBndTree.hxx>
+#include <BOPTools_BoxTree.hxx>
 #include <BOPTools_Parallel.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
@@ -33,6 +33,7 @@
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepLib.hxx>
+#include <Bnd_Tools.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <gp_Circ.hxx>
@@ -45,7 +46,6 @@
 #include <gp_Vec.hxx>
 #include <IntTools_Context.hxx>
 #include <NCollection_IncAllocator.hxx>
-#include <NCollection_UBTreeFiller.hxx>
 #include <NCollection_Vector.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
@@ -957,14 +957,14 @@ typedef BOPTools_Cnt
   <BOPAlgo_TNVFunctor,
   BOPAlgo_VectorOfTNV> BOPAlgo_TNVCnt;
 //=======================================================================
-class BOPAlgo_TNV : public BOPTools_BoxBndTreeSelector{
+class BOPAlgo_TNV : public BOPTools_BoxTreeSelector{
  public:
   BOPAlgo_TNV() 
-    : BOPTools_BoxBndTreeSelector(),
-      myTol (0.), myFuzzyValue(0.), myTree(NULL), myVecTNV(NULL) {
+    : BOPTools_BoxTreeSelector(),
+      myTol (0.), myFuzzyValue(0.), myVecTNV(NULL) {
   };
   //
-  ~BOPAlgo_TNV(){
+  virtual ~BOPAlgo_TNV(){
   };
   //
   void SetVertex(const TopoDS_Vertex& aV) {
@@ -974,10 +974,6 @@ class BOPAlgo_TNV : public BOPTools_BoxBndTreeSelector{
   //
   const TopoDS_Vertex& Vertex()const {
     return myV;
-  }
-  //
-  void SetTree(BOPTools_BoxBndTree& aTree) {
-    myTree=&aTree;
   }
   //
   void SetTolerance(const Standard_Real theTol) {
@@ -1000,19 +996,24 @@ class BOPAlgo_TNV : public BOPTools_BoxBndTreeSelector{
     myVecTNV = &theVec;
   }
   //
-  virtual Standard_Boolean Accept(const Standard_Integer& theIndex)
+  virtual Standard_Boolean Accept(const Standard_Integer theIndex,
+                                  const Standard_Boolean& theIsInside) override
   {
-    const BOPAlgo_TNV& aTNV = myVecTNV->Value(theIndex - 1);
-    Standard_Real aTolSum2 = myTol + aTNV.Tolerance() + myFuzzyValue;
-    aTolSum2 *= aTolSum2;
-    Standard_Real aD2 = myPnt.SquareDistance(aTNV.Pnt());
-    if (aD2 < aTolSum2)
-      return BOPTools_BoxBndTreeSelector::Accept(theIndex);
+    if (theIsInside || !RejectElement (theIndex))
+    {
+      const Standard_Integer anInd = myBVHSet->Element (theIndex);
+      const BOPAlgo_TNV& aTNV = myVecTNV->Value(anInd - 1);
+      Standard_Real aTolSum2 = myTol + aTNV.Tolerance() + myFuzzyValue;
+      aTolSum2 *= aTolSum2;
+      Standard_Real aD2 = myPnt.SquareDistance(aTNV.Pnt());
+      if (aD2 < aTolSum2)
+        return BOPTools_BoxTreeSelector::Accept(theIndex, Standard_True);
+    }
     return Standard_False;
   }
   //
   void Perform() {
-    myTree->Select(*this);
+    Select();
   }
   //
  protected:
@@ -1020,7 +1021,6 @@ class BOPAlgo_TNV : public BOPTools_BoxBndTreeSelector{
   Standard_Real myFuzzyValue;
   gp_Pnt        myPnt;
   TopoDS_Vertex myV;
-  BOPTools_BoxBndTree *myTree;
   const BOPAlgo_VectorOfTNV *myVecTNV;
 };
 //
@@ -1044,9 +1044,8 @@ void BOPAlgo_Tools::IntersectVertices(const TopTools_IndexedDataMapOfShapeReal& 
   }
   //
   // Use unbalanced binary tree of bounding boxes for sorting of the vertices.
-  BOPTools_BoxBndTree aBBTree;
-  NCollection_UBTreeFiller <Standard_Integer, 
-                            Bnd_Box> aTreeFiller(aBBTree);
+  Handle(BOPTools_BoxTree) aBBTree = new BOPTools_BoxTree();
+  aBBTree->SetSize (aNbV);
   // Perform intersection of the vertices
   BOPAlgo_VectorOfTNV aVTNV;
   //
@@ -1064,18 +1063,18 @@ void BOPAlgo_Tools::IntersectVertices(const TopTools_IndexedDataMapOfShapeReal& 
     aBox.Add(BRep_Tool::Pnt(aV));
     aBox.SetGap(aTol + aTolAdd);
     //
-    aTreeFiller.Add(i, aBox);
+    aBBTree->Add(i, Bnd_Tools::Bnd2BVH(aBox));
     //
     BOPAlgo_TNV& aTNV=aVTNV.Appended();
-    aTNV.SetTree(aBBTree);
-    aTNV.SetBox(aBox);
+    aTNV.SetBVHSet (aBBTree.get());
+    aTNV.SetBox(Bnd_Tools::Bnd2BVH(aBox));
     aTNV.SetVertex(aV);
     aTNV.SetTolerance(aTol);
     aTNV.SetFuzzyValue(theFuzzyValue);
     aTNV.SetVectorOfTNV(aVTNV);
   }
   // Shake the tree
-  aTreeFiller.Fill();
+  aBBTree->Build();
   //
   // Perform intersection
   BOPAlgo_TNVCnt::Perform(theRunParallel, aVTNV);
@@ -1232,9 +1231,9 @@ public:
   };
 
   //! Sets the Bounding Box tree
-  void SetBBTree(const BOPTools_BoxBndTree& theBBTree)
+  void SetBBTree(const Handle(BOPTools_BoxTree)& theBBTree)
   {
-    myBBTree = (BOPTools_BoxBndTree*)&theBBTree;
+    myBBTree = theBBTree;
   };
 
   //! Sets the ShapeBox structure
@@ -1284,7 +1283,7 @@ private:
   TopTools_ListOfShape myOwnIF; //! Own INTERNAL faces of the solid
   TopTools_ListOfShape myInFaces; //! Faces classified as IN
 
-  BOPTools_BoxBndTree* myBBTree; //! UB tree of bounding boxes
+  Handle(BOPTools_BoxTree) myBBTree; //! UB tree of bounding boxes
   BOPAlgo_VectorOfShapeBox* myVShapeBox; //! ShapeBoxMap
 
   TopoDS_Iterator myItF; //! Iterators
@@ -1304,10 +1303,11 @@ void BOPAlgo_FillIn3DParts::Perform()
   myInFaces.Clear();
 
   // 1. Select boxes of faces that are not out of aBoxS
-  BOPTools_BoxBndTreeSelector aSelector;
-  aSelector.SetBox(myBoxS);
+  BOPTools_BoxTreeSelector aSelector;
+  aSelector.SetBox(Bnd_Tools::Bnd2BVH(myBoxS));
+  aSelector.SetBVHSet (myBBTree.get());
   //
-  if (!myBBTree->Select(aSelector))
+  if (!aSelector.Select())
     return;
 
   const TColStd_ListOfInteger& aLIFP = aSelector.Indices();
@@ -1567,17 +1567,16 @@ void BOPAlgo_Tools::ClassifyFaces(const TopTools_ListOfShape& theFaces,
 
   // Prepare UB tree of bounding boxes of the faces to classify
   // taking the bounding boxes from the just prepared vector
-  BOPTools_BoxBndTree aBBTree;
-  NCollection_UBTreeFiller <Standard_Integer, Bnd_Box> aTreeFiller(aBBTree);
+  Handle(BOPTools_BoxTree) aBBTree = new BOPTools_BoxTree();
 
   Standard_Integer aNbF = aVSB.Length();
   for (Standard_Integer i = 0; i < aNbF; ++i)
   {
-    aTreeFiller.Add(i, aVSB(i).Box());
+    aBBTree->Add(i, Bnd_Tools::Bnd2BVH(aVSB(i).Box()));
   }
 
   // Shake tree filler
-  aTreeFiller.Fill();
+  aBBTree->Build();
 
   // Prepare vector of solids to classify
   BOPAlgo_VectorOfFillIn3DParts aVFIP;

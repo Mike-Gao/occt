@@ -16,14 +16,13 @@
 #include <BOPDS_SubIterator.hxx>
 
 #include <Bnd_Box.hxx>
+#include <Bnd_Tools.hxx>
 
 #include <BOPDS_DS.hxx>
 #include <BOPDS_Pair.hxx>
 #include <BOPDS_MapOfPair.hxx>
 
-#include <BOPTools_BoxBndTree.hxx>
-
-#include <NCollection_UBTreeFiller.hxx>
+#include <BOPTools_BoxTree.hxx>
 
 #include <TopoDS_Shape.hxx>
 
@@ -118,9 +117,9 @@ void BOPDS_SubIterator::Initialize()
   void BOPDS_SubIterator::Intersect()
 {
   Standard_Integer i, j, iTi, iTj;
-  BOPTools_BoxBndTree aBBTree;
-  NCollection_UBTreeFiller <Standard_Integer, Bnd_Box> aTreeFiller(aBBTree);
-  //
+  Handle(BOPTools_BoxTree) aBBTree = new BOPTools_BoxTree();
+  aBBTree->SetSize (mySubSet1->Extent());
+
   TColStd_ListIteratorOfListOfInteger aIt(*mySubSet1);
   for (; aIt.More(); aIt.Next()) {
     i = aIt.Value();
@@ -128,10 +127,10 @@ void BOPDS_SubIterator::Initialize()
     const BOPDS_ShapeInfo& aSI = myDS->ShapeInfo(i);
     const Bnd_Box& aBoxEx = aSI.Box();
     //
-    aTreeFiller.Add(i, aBoxEx);
+    aBBTree->Add(i, Bnd_Tools::Bnd2BVH (aBoxEx));
   }
   //
-  aTreeFiller.Fill();
+  aBBTree->Build();
   //
   BOPDS_MapOfPair aMPKFence;
   //
@@ -142,9 +141,10 @@ void BOPDS_SubIterator::Initialize()
     const BOPDS_ShapeInfo& aSI = myDS->ShapeInfo(i);
     const Bnd_Box& aBoxEx = aSI.Box();
     //
-    BOPTools_BoxBndTreeSelector aSelector;
-    aSelector.SetBox(aBoxEx);
-    Standard_Integer aNbSD = aBBTree.Select(aSelector);
+    BOPTools_BoxTreeSelector aSelector;
+    aSelector.SetBox(Bnd_Tools::Bnd2BVH(aBoxEx));
+    aSelector.SetBVHSet (aBBTree.get());
+    Standard_Integer aNbSD = aSelector.Select();
     if (!aNbSD) {
       continue;
     }
