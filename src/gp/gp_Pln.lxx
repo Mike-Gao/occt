@@ -69,15 +69,20 @@ inline const gp_Pnt& gp_Pln::Location() const
 inline   const gp_Ax3& gp_Pln::Position() const
 { return pos; }
 
-inline Standard_Real gp_Pln::Distance(const gp_Pnt& P) const
+inline Standard_Real gp_Pln::SignedDistance (const gp_Pnt& thePoint) const
 {
-  const gp_Pnt& loc = pos.Location ();
-  const gp_Dir& dir = pos.Direction();
-  Standard_Real D = (dir.X() * (P.X() - loc.X()) +
-		     dir.Y() * (P.Y() - loc.Y()) +
-		     dir.Z() * (P.Z() - loc.Z()));
-  if (D < 0) D = - D;
-  return D;
+  const gp_Pnt&       aPlaneLocation      = pos.Location();
+  const gp_Dir&       aPlaneAxisDirection = pos.Direction();
+  const Standard_Real aSignedDistance     = aPlaneAxisDirection.X() * (thePoint.X() - aPlaneLocation.X())
+                                        + aPlaneAxisDirection.Y() * (thePoint.Y() - aPlaneLocation.Y())
+                                        + aPlaneAxisDirection.Z() * (thePoint.Z() - aPlaneLocation.Z());
+  return aSignedDistance;
+}
+
+inline Standard_Real gp_Pln::Distance (const gp_Pnt& thePoint) const
+{
+  const Standard_Real aSignedDistance = SignedDistance (thePoint);
+  return Abs( aSignedDistance);
 }
 
 inline Standard_Real gp_Pln::Distance (const gp_Lin& L)  const

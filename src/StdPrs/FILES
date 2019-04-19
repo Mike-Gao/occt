@@ -17,6 +17,8 @@ StdPrs_Plane.hxx
 StdPrs_Point.hxx
 StdPrs_PoleCurve.cxx
 StdPrs_PoleCurve.hxx
+StdPrs_SectionLines.cxx
+StdPrs_SectionLines.hxx
 StdPrs_ShadedShape.cxx
 StdPrs_ShadedShape.hxx
 StdPrs_ShadedSurface.cxx

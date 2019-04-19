@@ -19,10 +19,11 @@
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
 
-#include <gp_Ax3.hxx>
-#include <Standard_Real.hxx>
 #include <Standard_Boolean.hxx>
+#include <Standard_Real.hxx>
 #include <gp_Ax1.hxx>
+#include <gp_Ax3.hxx>
+
 class Standard_ConstructionError;
 class gp_Ax3;
 class gp_Pnt;
@@ -32,7 +33,6 @@ class gp_Lin;
 class gp_Ax2;
 class gp_Trsf;
 class gp_Vec;
-
 
 //! Describes a plane.
 //! A plane is positioned in space with a coordinate system
@@ -55,17 +55,14 @@ class gp_Vec;
 //! Geom_Plane which provides additional functions for
 //! constructing planes and works, in particular, with the
 //! parametric equations of planes
-class gp_Pln 
+class gp_Pln
 {
 public:
-
   DEFINE_STANDARD_ALLOC
 
-  
   //! Creates a plane coincident with OXY plane of the
   //! reference coordinate system.
-    gp_Pln();
-  
+  gp_Pln();
 
   //! The coordinate system of the plane is defined with the axis
   //! placement A3.
@@ -73,83 +70,84 @@ public:
   //! The "Location" of A3 defines the location (origin) of the plane.
   //! The "XDirection" and "YDirection" of A3 define the "XAxis" and
   //! the "YAxis" of the plane used to parametrize the plane.
-    gp_Pln(const gp_Ax3& A3);
-  
+  gp_Pln (const gp_Ax3& A3);
 
   //! Creates a plane with the  "Location" point <P>
   //! and the normal direction <V>.
-  Standard_EXPORT gp_Pln(const gp_Pnt& P, const gp_Dir& V);
-  
+  Standard_EXPORT gp_Pln (const gp_Pnt& P, const gp_Dir& V);
 
   //! Creates a plane from its cartesian equation :
   //! A * X + B * Y + C * Z + D = 0.0
   //! Raises ConstructionError if Sqrt (A*A + B*B + C*C) <= Resolution from gp.
-  Standard_EXPORT gp_Pln(const Standard_Real A, const Standard_Real B, const Standard_Real C, const Standard_Real D);
-  
+  Standard_EXPORT gp_Pln (const Standard_Real A, const Standard_Real B, const Standard_Real C, const Standard_Real D);
 
   //! Returns the coefficients of the plane's cartesian equation :
   //! A * X + B * Y + C * Z + D = 0.
-    void Coefficients (Standard_Real& A, Standard_Real& B, Standard_Real& C, Standard_Real& D) const;
-  
+  void Coefficients (Standard_Real& A, Standard_Real& B, Standard_Real& C, Standard_Real& D) const;
+
   //! Modifies this plane, by redefining its local coordinate system so that
   //! -   its origin and "main Direction" become those of the
   //! axis A1 (the "X Direction" and "Y Direction" are then recomputed).
   //! Raises ConstructionError if the A1 is parallel to the "XAxis" of the plane.
-    void SetAxis (const gp_Ax1& A1);
-  
+  void SetAxis (const gp_Ax1& A1);
+
   //! Changes the origin of the plane.
-    void SetLocation (const gp_Pnt& Loc);
-  
+  void SetLocation (const gp_Pnt& Loc);
+
   //! Changes the local coordinate system of the plane.
-    void SetPosition (const gp_Ax3& A3);
-  
+  void SetPosition (const gp_Ax3& A3);
+
   //! Reverses the   U   parametrization of   the  plane
   //! reversing the XAxis.
-    void UReverse();
-  
+  void UReverse();
+
   //! Reverses the   V   parametrization of   the  plane
   //! reversing the YAxis.
-    void VReverse();
-  
+  void VReverse();
+
   //! returns true if the Ax3 is right handed.
-    Standard_Boolean Direct() const;
-  
+  Standard_Boolean Direct() const;
+
   //! Returns the plane's normal Axis.
-    const gp_Ax1& Axis() const;
-  
+  const gp_Ax1& Axis() const;
+
   //! Returns the plane's location (origin).
-    const gp_Pnt& Location() const;
-  
+  const gp_Pnt& Location() const;
+
   //! Returns the local coordinate system of the plane .
-    const gp_Ax3& Position() const;
-  
-  //! Computes the distance between <me> and the point <P>.
-    Standard_Real Distance (const gp_Pnt& P) const;
-  
+  const gp_Ax3& Position() const;
+
+  //! Computes the signed distance between this plane and the given point
+  //! @param thePoint the point the signed distance to which from this plane is computed
+  //! @return the signed distance between the given point and this plane
+  Standard_Real SignedDistance (const gp_Pnt& thePoint) const;
+
+  //! Computes the distance between this plane and the given point
+  //! @param thePoint the point the distance to which from this plane is computed
+  //! @return the distance between the given point and this plane
+  Standard_Real Distance (const gp_Pnt& thePoint) const;
+
   //! Computes the distance between <me> and the line <L>.
-    Standard_Real Distance (const gp_Lin& L) const;
-  
+  Standard_Real Distance (const gp_Lin& L) const;
+
   //! Computes the distance between two planes.
-    Standard_Real Distance (const gp_Pln& Other) const;
-  
+  Standard_Real Distance (const gp_Pln& Other) const;
 
   //! Computes the square distance between <me> and the point <P>.
-    Standard_Real SquareDistance (const gp_Pnt& P) const;
-  
+  Standard_Real SquareDistance (const gp_Pnt& P) const;
 
   //! Computes the square distance between <me> and the line <L>.
-    Standard_Real SquareDistance (const gp_Lin& L) const;
-  
+  Standard_Real SquareDistance (const gp_Lin& L) const;
 
   //! Computes the square distance between two planes.
-    Standard_Real SquareDistance (const gp_Pln& Other) const;
-  
+  Standard_Real SquareDistance (const gp_Pln& Other) const;
+
   //! Returns the X axis of the plane.
-    gp_Ax1 XAxis() const;
-  
+  gp_Ax1 XAxis() const;
+
   //! Returns the Y axis  of the plane.
-    gp_Ax1 YAxis() const;
-  
+  gp_Ax1 YAxis() const;
+
   //! Returns true if this plane contains the point P. This means that
   //! -   the distance between point P and this plane is less
   //! than or equal to LinearTolerance, or
@@ -158,8 +156,8 @@ public:
   //! AngularTolerance, and the distance between the origin
   //! of line L and this plane is less than or equal to
   //! LinearTolerance.
-    Standard_Boolean Contains (const gp_Pnt& P, const Standard_Real LinearTolerance) const;
-  
+  Standard_Boolean Contains (const gp_Pnt& P, const Standard_Real LinearTolerance) const;
+
   //! Returns true if this plane contains the line L. This means that
   //! -   the distance between point P and this plane is less
   //! than or equal to LinearTolerance, or
@@ -168,10 +166,11 @@ public:
   //! AngularTolerance, and the distance between the origin
   //! of line L and this plane is less than or equal to
   //! LinearTolerance.
-    Standard_Boolean Contains (const gp_Lin& L, const Standard_Real LinearTolerance, const Standard_Real AngularTolerance) const;
-  
+  Standard_Boolean Contains (const gp_Lin&       L,
+                             const Standard_Real LinearTolerance,
+                             const Standard_Real AngularTolerance) const;
+
   Standard_EXPORT void Mirror (const gp_Pnt& P);
-  
 
   //! Performs the symmetrical transformation of a plane with respect
   //! to the point <P> which is the center of the symmetry
@@ -179,9 +178,9 @@ public:
   //! The normal direction to the plane is not changed.
   //! The "XAxis" and the "YAxis" are reversed.
   Standard_EXPORT Standard_NODISCARD gp_Pln Mirrored (const gp_Pnt& P) const;
-  
+
   Standard_EXPORT void Mirror (const gp_Ax1& A1);
-  
+
   //! Performs   the symmetrical transformation  of a
   //! plane with respect to an axis placement  which is the axis
   //! of  the symmetry.  The  transformation is performed on the
@@ -191,9 +190,9 @@ public:
   //! if  the  initial plane was right  handed,  else  it is the
   //! opposite.
   Standard_EXPORT Standard_NODISCARD gp_Pln Mirrored (const gp_Ax1& A1) const;
-  
+
   Standard_EXPORT void Mirror (const gp_Ax2& A2);
-  
+
   //! Performs the  symmetrical transformation  of  a
   //! plane    with respect to    an axis  placement.   The axis
   //! placement  <A2> locates the plane  of  the symmetry.   The
@@ -203,66 +202,42 @@ public:
   //! and the "YDirection"  after  transformation if the initial
   //! plane was right handed, else it is the opposite.
   Standard_EXPORT Standard_NODISCARD gp_Pln Mirrored (const gp_Ax2& A2) const;
-  
-    void Rotate (const gp_Ax1& A1, const Standard_Real Ang);
-  
+
+  void Rotate (const gp_Ax1& A1, const Standard_Real Ang);
 
   //! rotates a plane. A1 is the axis of the rotation.
   //! Ang is the angular value of the rotation in radians.
-    Standard_NODISCARD gp_Pln Rotated (const gp_Ax1& A1, const Standard_Real Ang) const;
-  
-    void Scale (const gp_Pnt& P, const Standard_Real S);
-  
+  Standard_NODISCARD gp_Pln Rotated (const gp_Ax1& A1, const Standard_Real Ang) const;
+
+  void Scale (const gp_Pnt& P, const Standard_Real S);
 
   //! Scales a plane. S is the scaling value.
-    Standard_NODISCARD gp_Pln Scaled (const gp_Pnt& P, const Standard_Real S) const;
-  
-    void Transform (const gp_Trsf& T);
-  
+  Standard_NODISCARD gp_Pln Scaled (const gp_Pnt& P, const Standard_Real S) const;
+
+  void Transform (const gp_Trsf& T);
 
   //! Transforms a plane with the transformation T from class Trsf.
   //! The transformation is performed on the "Location"
   //! point, on the "XAxis" and the "YAxis".
   //! The resulting normal direction is the cross product between
   //! the "XDirection" and the "YDirection" after transformation.
-    Standard_NODISCARD gp_Pln Transformed (const gp_Trsf& T) const;
-  
-    void Translate (const gp_Vec& V);
-  
+  Standard_NODISCARD gp_Pln Transformed (const gp_Trsf& T) const;
+
+  void Translate (const gp_Vec& V);
 
   //! Translates a plane in the direction of the vector V.
   //! The magnitude of the translation is the vector's magnitude.
-    Standard_NODISCARD gp_Pln Translated (const gp_Vec& V) const;
-  
-    void Translate (const gp_Pnt& P1, const gp_Pnt& P2);
-  
+  Standard_NODISCARD gp_Pln Translated (const gp_Vec& V) const;
+
+  void Translate (const gp_Pnt& P1, const gp_Pnt& P2);
 
   //! Translates a plane from the point P1 to the point P2.
-    Standard_NODISCARD gp_Pln Translated (const gp_Pnt& P1, const gp_Pnt& P2) const;
-
-
-
-
-protected:
-
-
-
-
+  Standard_NODISCARD gp_Pln Translated (const gp_Pnt& P1, const gp_Pnt& P2) const;
 
 private:
-
-
-
   gp_Ax3 pos;
-
-
 };
 
-
 #include <gp_Pln.lxx>
-
-
-
-
 
 #endif // _gp_Pln_HeaderFile

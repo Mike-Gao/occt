@@ -211,6 +211,20 @@ gp_Pnt Bnd_Box::CornerMin() const
 }
 
 //=======================================================================
+// function : CornerMin
+// purpose  :
+//=======================================================================
+
+gp_Pnt Bnd_Box::Center() const
+{
+  if (IsVoid())
+  {
+    throw Standard_ConstructionError("Bnd_Box is void");
+  }
+  return (CornerMin().Coord() + CornerMax().Coord()) / 2.0;
+}
+
+//=======================================================================
 //function : CornerMax
 //purpose  :
 //=======================================================================

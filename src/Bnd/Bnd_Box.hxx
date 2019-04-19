@@ -142,6 +142,12 @@ public:
   //! Standard_ConstructionError exception will be thrown if the box is void.
   //! if IsVoid()
   Standard_EXPORT gp_Pnt CornerMax() const;
+  
+  //! Returns the center of this bounding box.
+  //! If this bounding box is infinite (i.e. "open"), returned values
+  //! may be equal to +/- Precision::Infinite().
+  //! Standard_ConstructionError exception will be thrown if the box is void.
+  Standard_EXPORT gp_Pnt Center() const;
 
   //! The   Box will be   infinitely   long  in the Xmin
   //! direction.
