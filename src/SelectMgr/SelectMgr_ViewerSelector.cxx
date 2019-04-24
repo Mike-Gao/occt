@@ -36,7 +36,7 @@
 
 #include <algorithm>
 
-//#define REPORT_SELECTION_BUILD
+#define REPORT_SELECTION_BUILD
 #ifdef REPORT_SELECTION_BUILD
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
@@ -280,6 +280,16 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
     return;
   }
 
+  if (!mySelectingVolumeMgr.ViewClipping().IsNull())
+  {
+    Standard_Real aDepth = /*aPickResult.HasPickedPoint() ?*+/ aPickResult.Depth();// :*/ aPickResult.DistToGeomCenter();
+    Standard_Boolean isClipped = mySelectingVolumeMgr.IsClipped (*mySelectingVolumeMgr.ViewClipping(),
+                                                                  aDepth);
+    if (isClipped)
+      return;
+    else
+      int aValue = 9;
+  }
   if (HasDepthClipping (anOwner)
   && !aSelectable.IsNull()
   &&  theMgr.GetActiveSelectionType() == SelectMgr_SelectingVolumeManager::Point)

@@ -69,7 +69,7 @@
 
 #include <OSD_Timer.hxx>
 
-//#define REPORT_SELECTION_BUILD
+#define REPORT_SELECTION_BUILD
 #ifdef REPORT_SELECTION_BUILD
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
@@ -175,6 +175,8 @@ void StdSelect_ViewerSelector3d::Pick (const Standard_Integer theXPMin,
   mySelectingVolumeMgr.BuildSelectingVolume (aMinMousePos,
                                              aMaxMousePos);
 
+  mySelectingVolumeMgr.SetViewClipping (theView->ClipPlanes());
+
   TraverseSensitives();
 }
 
@@ -192,6 +194,8 @@ void StdSelect_ViewerSelector3d::Pick (const TColgp_Array1OfPnt2d& thePolyline,
   theView->Window()->Size (aWidth, aHeight);
   mySelectingVolumeMgr.SetWindowSize (aWidth, aHeight);
   mySelectingVolumeMgr.BuildSelectingVolume (thePolyline);
+
+  mySelectingVolumeMgr.SetViewClipping (theView->ClipPlanes());
 
   TraverseSensitives();
 }

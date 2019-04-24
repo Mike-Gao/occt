@@ -19,7 +19,7 @@
 #include <BVH_BinnedBuilder.hxx>
 #include <BVH_LinearBuilder.hxx>
 
-//#define REPORT_SELECTION_BUILD
+#define REPORT_SELECTION_BUILD
 #ifdef REPORT_SELECTION_BUILD
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
