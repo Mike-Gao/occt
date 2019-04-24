@@ -535,8 +535,13 @@ Handle(Graphic3d_TransformPers) VInspector_Window::GetSelectedTransformPers()
 // =======================================================================
 bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>& theParameters)
 {
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  if (!aViewModel)
+    return Standard_False;
+
   Handle(AIS_InteractiveContext) aContext;
   Handle(VInspector_CallBack) aCallBack;
+  Standard_Boolean isModelUpdated = Standard_False;
 
   for (NCollection_List<Handle(Standard_Transient)>::Iterator aParamsIt (theParameters); aParamsIt.More(); aParamsIt.Next())
   {
@@ -552,21 +557,20 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
       Handle(ViewControl_PaneCreator) aPaneCreator = Handle(ViewControl_PaneCreator)::DownCast (anObject);
       if (!myPaneCreators.Contains (aPaneCreator))
         myPaneCreators.Append (aPaneCreator);
+      isModelUpdated = Standard_True;
     }
     if (!Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject).IsNull())
     {
-       Handle(TreeModel_ItemPropertiesCreator) aPropCreator = Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject);
-       VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*>(myTreeView->model());
-       aViewModel->AddPropertiesCreator (aPropCreator);
+      Handle(TreeModel_ItemPropertiesCreator) aPropCreator = Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject);
+      VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*>(myTreeView->model());
+      aViewModel->AddPropertiesCreator (aPropCreator);
+      isModelUpdated = Standard_True;
     }
   }
-  if (aContext.IsNull())
-    return false;
-  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
-  if (aViewModel && aViewModel->GetContext() == aContext)
-    UpdateTreeModel();
+  if (aViewModel->GetContext() != aContext)
+    SetContext(aContext);
   else
-    SetContext (aContext);
+    isModelUpdated = Standard_True;
 
   if (!aCallBack.IsNull() && aCallBack != myCallBack)
   {
@@ -576,6 +580,10 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
     myCallBack->SetContext(aContext);
     myCallBack->SetHistoryModel(aHistoryModel);
   }
+
+  if (isModelUpdated)
+    UpdateTreeModel();
+
   return true;
 }
 
@@ -585,6 +593,9 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
 // =======================================================================
 void VInspector_Window::SetContext (const Handle(AIS_InteractiveContext)& theContext)
 {
+  if (theContext.IsNull())
+    return;
+
   VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
   aViewModel->SetContext (theContext);
   myTreeView->setExpanded (aViewModel->index (0, 0), true);

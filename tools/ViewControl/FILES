@@ -12,6 +12,8 @@ ViewControl_PropertyView.cxx
 ViewControl_PropertyView.hxx
 ViewControl_Table.cxx
 ViewControl_Table.hxx
+ViewControl_TableDoubleVector.cxx
+ViewControl_TableDoubleVector.hxx
 ViewControl_TableItemDelegate.cxx
 ViewControl_TableItemDelegate.hxx
 ViewControl_TableModel.cxx

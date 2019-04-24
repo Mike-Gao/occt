@@ -24,6 +24,7 @@
 #include <V3d_ListOfLight.hxx>
 
 #include <inspector/ViewControl_Tools.hxx>
+#include <inspector/ViewControl_TableDoubleVector.hxx>
 #include <inspector/VInspector_ItemAspectWindow.hxx>
 #include <inspector/VInspector_ItemContext.hxx>
 #include <inspector/VInspector_ItemGraphic3dCamera.hxx>
@@ -130,8 +131,13 @@ int VInspector_ItemV3dView::GetTableRowCount() const
 // function : GetTableEditType
 // purpose :
 // =======================================================================
-ViewControl_EditType VInspector_ItemV3dView::GetTableEditType (const int, const int) const
+ViewControl_EditType VInspector_ItemV3dView::GetTableEditType (const int theRow, const int) const
 {
+  switch (theRow)
+  {
+    case 2: return ViewControl_EditType_DoubleVector;
+  }
+
   return ViewControl_EditType_None;
 }
 
@@ -217,8 +223,36 @@ QVariant VInspector_ItemV3dView::GetTableData (const int theRow, const int theCo
 // function : SetTableData
 // purpose :
 // =======================================================================
-bool VInspector_ItemV3dView::SetTableData (const int, const int, const QVariant&)
+bool VInspector_ItemV3dView::SetTableData (const int theRow, const int theColumn, const QVariant& theValue)
 {
+  Handle(V3d_View) aView = GetView();
+  if (aView.IsNull())
+    return false;
+
+  if (theColumn == 0)
+    return false;
+
+  switch (theRow)
+  {
+    case 2:
+    {
+      QString aValue = theValue.toString();
+      Standard_Real aX, anY, aZ, aVx, aVy, aVz;
+      QList<QVariant> aValues = ViewControl_TableDoubleVector::GetListVector(aValue);
+
+      if (aValues.size() == 3)
+      {
+        aX  = aValues[0].toFloat();
+        anY = aValues[1].toFloat();
+        aZ  = aValues[2].toFloat();
+
+        Standard_Real aTmpX, aTmpY, aTmpZ;
+        aView->Axis(aTmpX, aTmpY, aTmpZ, aVx, aVy, aVz);
+
+        aView->SetAxis(aX, anY, aZ, aVx, aVy, aVz);
+      }
+    }
+  }
   return true;
 }
 
