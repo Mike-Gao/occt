@@ -45,6 +45,7 @@
 #include <inspector/VInspector_ItemFolderObject.hxx>
 #include <inspector/VInspector_ItemOpenGlElement.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
+#include <inspector/VInspector_PropertiesCreator.hxx>
 #include <inspector/VInspector_PrsOpenGlElement.hxx>
 #include <inspector/VInspector_TableModelValues.hxx>
 #include <inspector/VInspector_ToolBar.hxx>
@@ -127,6 +128,7 @@ VInspector_Window::VInspector_Window()
   //((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (VINSPECTOR_DEFAULT_TREE_VIEW_WIDTH,
   //                                                               VINSPECTOR_DEFAULT_TREE_VIEW_HEIGHT));
   VInspector_ViewModel* aTreeModel = new VInspector_ViewModel (myTreeView);
+  aTreeModel-> AddPropertiesCreator(new VInspector_PropertiesCreator());
   myTreeView->setModel (aTreeModel);
   // hide Visibility column
   TreeModel_HeaderSection anItem = aTreeModel->GetHeaderItem ((int)TreeModel_ColumnType_Visibility);
@@ -830,8 +832,6 @@ void VInspector_Window::onExportToShapeView()
 {
   const QModelIndexList anIndices;
   NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (myTreeView->selectionModel()->selectedIndexes());
-  if (aSelectedShapes.Extent() <= 0)
-    return;
 
   TCollection_AsciiString aPluginName ("TKShapeView");
   NCollection_List<Handle(Standard_Transient)> aParameters;
@@ -843,20 +843,42 @@ void VInspector_Window::onExportToShapeView()
     anItemNames = myParameters->GetSelectedNames (aPluginName);
 
   QStringList anExportedPointers;
-  for (NCollection_List<TopoDS_Shape>::Iterator anIOIt (aSelectedShapes); anIOIt.More(); anIOIt.Next())
+  if (aSelectedShapes.Extent() > 0)
   {
-    const TopoDS_Shape& aShape = anIOIt.Value();
-    if (aShape.IsNull())
-      continue;
-    aParameters.Append (aShape.TShape());
-    anItemNames.Append (TInspectorAPI_PluginParameters::ParametersToString(aShape));
-    anExportedPointers.append (VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString());
+    for (NCollection_List<TopoDS_Shape>::Iterator anIOIt (aSelectedShapes); anIOIt.More(); anIOIt.Next())
+    {
+      const TopoDS_Shape& aShape = anIOIt.Value();
+      if (aShape.IsNull())
+        continue;
+      aParameters.Append (aShape.TShape());
+      anItemNames.Append (TInspectorAPI_PluginParameters::ParametersToString(aShape));
+      anExportedPointers.append (VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString());
+    }
   }
-  if (anExportedPointers.empty())
+
+  // seach for objects to be exported
+  QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (myTreeView->selectionModel()->selectedIndexes());
+  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
+  {
+    TreeModel_ItemBasePtr anItem = *anItemIt;
+    VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
+    if (!aVItem)
+    continue;
+
+    Handle(Standard_Transient) anObject = aVItem->GetObject();
+    if (anObject.IsNull())
+      continue;
+
+    aParameters.Append (anObject);
+    anItemNames.Append (anObject->DynamicType()->Name());
+    anExportedPointers.append (VInspector_Tools::GetPointerInfo (anObject, true).ToCString());
+  }
+
+  if (anExportedPointers.isEmpty())
     return;
 
   TCollection_AsciiString aPluginShortName = aPluginName.SubString (3, aPluginName.Length());
-  QString aMessage = QString ("TShape %1 is sent to %2.")
+  QString aMessage = QString ("Objects %1 are sent to %2.")
     .arg (anExportedPointers.join(", "))
     .arg (aPluginShortName.ToCString());
   QString aQuestion = QString ("Would you like to activate %1 immediately?\n")

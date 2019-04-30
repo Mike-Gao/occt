@@ -8,6 +8,8 @@ ViewControl_Pane.hxx
 ViewControl_PaneCreator.cxx
 ViewControl_PaneCreator.hxx
 ViewControl_PaneItem.hxx
+ViewControl_PropertiesStream.cxx
+ViewControl_PropertiesStream.hxx
 ViewControl_PropertyView.cxx
 ViewControl_PropertyView.hxx
 ViewControl_Table.cxx

@@ -18,6 +18,7 @@
 
 #include <AIS_InteractiveContext.hxx>
 #include <Bnd_Box.hxx>
+#include <Bnd_OBB.hxx>
 #include <Graphic3d_Buffer.hxx>
 #include <Graphic3d_Mat4.hxx>
 #include <Graphic3d_Mat4d.hxx>
@@ -187,6 +188,11 @@ public:
   //! \param theBoundingBox box shape parameters
   //! \return created shape
   Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_Box& theBoundingBox);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_OBB& theBoundingBox);
 
   //! Creates box shape
   //! \param theBoundingBox box shape parameters

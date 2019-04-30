@@ -18,6 +18,7 @@
 
 #include <SelectMgr_Frustum.hxx>
 #include <SelectMgr_ViewClipRange.hxx>
+#include <Standard_OStream.hxx>
 
 //! This class contains representation of rectangular selecting frustum, created in case
 //! of point and box selection, and algorithms for overlap detection between selecting
@@ -137,6 +138,9 @@ public:
   //! Ax + By + Cz + D = 0) to the given vector
   Standard_EXPORT virtual void GetPlanes (NCollection_Vector<SelectMgr_Vec4>& thePlaneEquations) const Standard_OVERRIDE;
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
+
 protected:
 
   Standard_EXPORT void segmentSegmentDistance (const gp_Pnt& theSegPnt1,
@@ -163,6 +167,9 @@ private:
          LeftBottomNear, LeftBottomFar,
          RightTopNear, RightTopFar,
          RightBottomNear, RightBottomFar };
+
+public:
+  DEFINE_STANDARD_RTTIEXT(SelectMgr_RectangularFrustum, SelectMgr_Frustum<4>)
 
 private:
 

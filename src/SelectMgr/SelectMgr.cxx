@@ -21,6 +21,11 @@ namespace
   {
     "FIRST_ACCEPTABLE", "ONLY_TOPMOST"
   };
+
+  static Standard_CString SelectMgr_Table_PrintBVHSubset[4] =
+  {
+    "3d", "3dPersistent", "2dPersistent", "Nb"
+  };
 }
 
 //=======================================================================
@@ -47,6 +52,36 @@ Standard_Boolean SelectMgr::PickingStrategyFromString (Standard_CString theTypeS
     if (aName == aTypeName)
     {
       theType = SelectMgr_PickingStrategy (aTypeIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : BVHSubsetToString
+//purpose  :
+//=======================================================================
+Standard_CString SelectMgr::BVHSubsetToString (SelectMgr_SelectableObjectSet::BVHSubset theType)
+{
+  return SelectMgr_Table_PrintBVHSubset[theType];
+}
+
+//=======================================================================
+//function : BVHSubsetFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean SelectMgr::BVHSubsetFromString (Standard_CString theTypeString,
+                                                 SelectMgr_SelectableObjectSet::BVHSubset& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = 0; aTypeIter <= SelectMgr_SelectableObjectSet::BVHSubsetNb; ++aTypeIter)
+  {
+    Standard_CString aTypeName = SelectMgr_Table_PrintBVHSubset[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = SelectMgr_SelectableObjectSet::BVHSubset (aTypeIter);
       return Standard_True;
     }
   }

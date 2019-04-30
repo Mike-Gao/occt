@@ -15,7 +15,10 @@
 
 #include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
 
+#include <inspector/VInspector_ItemContainer.hxx>
+#include <inspector/VInspector_ItemSelectMgrSelectableObjectSet.hxx>
 #include <inspector/VInspector_ItemSelectMgrSelectingVolumeManager.hxx>
+#include <inspector/VInspector_ItemSelectMgrSensitiveEntitySet.hxx>
 #include <inspector/VInspector_ItemSelectMgrViewerSelectorPicked.hxx>
 
 #include <inspector/VInspector_ItemFolderObject.hxx>
@@ -50,7 +53,8 @@ int VInspector_ItemSelectMgrViewerSelector::initRowCount() const
   if (Column() != 0)
     return 0;
 
-  Standard_Integer aNbRows = GetFirstChildOfPicked(); // SelectMgr_SelectingVolumeManager
+  // SelectMgr_SelectingVolumeManager, VInspector_ItemSelectMgrSelectableObjectSet, VInspector_ItemContainer
+  Standard_Integer aNbRows = GetFirstChildOfPicked();
 
   Handle(SelectMgr_ViewerSelector) aViewSelector = GetViewerSelector();
   if (!aViewSelector.IsNull())
@@ -123,6 +127,80 @@ void VInspector_ItemSelectMgrViewerSelector::Reset()
   VInspector_ItemBase::Reset();
 
   setViewerSelector (NULL);
+}
+
+// =======================================================================
+// function : GetContainerRowCount
+// purpose :
+// =======================================================================
+
+int VInspector_ItemSelectMgrViewerSelector::GetContainerRowCount (const int theContainerRow) const
+{
+  if (theContainerRow != 2)
+    return 0;
+
+  Handle(SelectMgr_ViewerSelector) aViewSelector = GetViewerSelector();
+  if (aViewSelector.IsNull())
+    return 0;
+
+  return aViewSelector->GetObjectSensitives().Extent();
+}
+
+// =======================================================================
+// function : GetSensitiveEntitySet
+// purpose :
+// =======================================================================
+Handle(SelectMgr_SensitiveEntitySet) VInspector_ItemSelectMgrViewerSelector::GetSensitiveEntitySet (const int theRow,
+  Handle(SelectMgr_SelectableObject)& theObject)
+{
+  Standard_Integer anIndex = 0;
+
+  Handle(SelectMgr_ViewerSelector) aViewSelector = GetViewerSelector();
+  if (!aViewSelector.IsNull())
+    return NULL;
+
+  for (SelectMgr_MapOfObjectSensitivesIterator anIterator (aViewSelector->GetObjectSensitives()); anIterator.More(); anIterator.Next(), anIndex++)
+  {
+    if (anIndex != theRow)
+      continue;
+
+    theObject = anIterator.Key();
+    return anIterator.Value();
+  }
+  return NULL;
+}
+
+// =======================================================================
+// function : GetContainerValue
+// purpose :
+// =======================================================================
+
+QVariant VInspector_ItemSelectMgrViewerSelector::GetContainerValue (const int theContainerRow, const int theItemRole) const
+{
+  if (theContainerRow != 2)
+    return 0;
+
+  if (theItemRole != Qt::DisplayRole)
+    return QVariant();
+
+  Handle(SelectMgr_ViewerSelector) aViewSelector = GetViewerSelector();
+  if (aViewSelector.IsNull())
+    return QVariant();
+
+  return "SelectMgr_MapOfObjectSensitives";
+}
+
+// =======================================================================
+// function : CreateContainerChild
+// purpose :
+// =======================================================================
+
+TreeModel_ItemBasePtr VInspector_ItemSelectMgrViewerSelector::CreateContainerChild (const TreeModel_ItemBasePtr& theParent, const int theContainerRow, int theRow, int theColumn)
+{
+  if (theContainerRow != 2)
+    return TreeModel_ItemBasePtr();
+
+  return VInspector_ItemSelectMgrSensitiveEntitySet::CreateItem (theParent, theRow, theColumn);
 }
 
 // =======================================================================
@@ -246,6 +324,20 @@ bool VInspector_ItemSelectMgrViewerSelector::SetTableData (const int theRow, con
 }
 
 // =======================================================================
+// function : Dump
+// purpose :
+// =======================================================================
+Standard_Boolean VInspector_ItemSelectMgrViewerSelector::Dump (Standard_OStream& OS) const
+{
+  Handle(SelectMgr_ViewerSelector) aViewerSelector = GetViewerSelector();
+  if (aViewerSelector.IsNull())
+    return Standard_False;
+
+  aViewerSelector->Dump (OS);
+  return Standard_True;
+}
+
+// =======================================================================
 // function : buildPresentationShape
 // purpose :
 // =======================================================================
@@ -272,12 +364,10 @@ TreeModel_ItemBasePtr VInspector_ItemSelectMgrViewerSelector::createChild (int t
 {
   if (theRow == 0)
     return VInspector_ItemSelectMgrSelectingVolumeManager::CreateItem (currentItem(), theRow, theColumn);
+  else if (theRow == 1)
+    return VInspector_ItemSelectMgrSelectableObjectSet::CreateItem (currentItem(), theRow, theColumn);
+  else if (theRow == 2)
+    return VInspector_ItemContainer::CreateItem (currentItem(), theRow, theColumn);
   else
     return VInspector_ItemSelectMgrViewerSelectorPicked::CreateItem (currentItem(), theRow, theColumn);
-  //else if (theRow == 1)
-  //  return VInspector_ItemAspectWindow::CreateItem (currentItem(), theRow, theColumn);
-  //else if (theRow == 2)
-  //  return VInspector_ItemGraphic3dCView::CreateItem (currentItem(), theRow, theColumn);
-  //
-  return TreeModel_ItemBasePtr();
 }

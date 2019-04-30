@@ -79,6 +79,9 @@ public slots:
   //! Clears container of alerts of selected report
   void OnClearReport();
 
+  //! Deletes container of alerts of selected reports
+  void OnDeleteAlerts();
+
   //! Exports the first selected shape into ShapeViewer plugin.
   void OnExportToShapeView();
 

@@ -360,11 +360,17 @@ void SelectMgr_SelectableObjectSet::UpdateBVH (const Handle(Graphic3d_Camera)& t
                                                const Standard_Integer theViewportWidth,
                                                const Standard_Integer theViewportHeight)
 {
+#ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("UpdateBVH", "", &aPerfMeter, NULL);
+#endif
+
   // -----------------------------------------
   // check and update 3D BVH tree if necessary
   // -----------------------------------------
   if (!IsEmpty (BVHSubset_3d) && myIsDirty[BVHSubset_3d])
   {
+    MESSAGE_INFO ("Check and update 3D BVH", "", &aPerfMeter, NULL);
     // construct adaptor over private fields to provide direct access for the BVH builder
     BVHBuilderAdaptorRegular anAdaptor (myObjects[BVHSubset_3d], myDisabledZLayers);
 
@@ -386,6 +392,7 @@ void SelectMgr_SelectableObjectSet::UpdateBVH (const Handle(Graphic3d_Camera)& t
     if (!IsEmpty (BVHSubset_3dPersistent) &&
          (myIsDirty[BVHSubset_3dPersistent] || myLastViewState.IsChanged (theViewState) || isWindowSizeChanged))
     {
+      MESSAGE_INFO ("Check and update 3D persistence BVH tree", "", &aPerfMeter, NULL);
       // construct adaptor over private fields to provide direct access for the BVH builder
       BVHBuilderAdaptorPersistent anAdaptor (myObjects[BVHSubset_3dPersistent], myDisabledZLayers,
         theCamera, theProjectionMat, theWorldViewMat, theViewportWidth, theViewportHeight);
@@ -400,6 +407,7 @@ void SelectMgr_SelectableObjectSet::UpdateBVH (const Handle(Graphic3d_Camera)& t
     if (!IsEmpty (BVHSubset_2dPersistent) &&
          (myIsDirty[BVHSubset_2dPersistent] || myLastViewState.IsProjectionChanged (theViewState) || isWindowSizeChanged))
     {
+      MESSAGE_INFO ("Check and update 2D persistence BVH tree", "", &aPerfMeter, NULL);
       // construct adaptor over private fields to provide direct access for the BVH builder
       BVHBuilderAdaptorPersistent anAdaptor (myObjects[BVHSubset_2dPersistent], myDisabledZLayers,
         theCamera, theProjectionMat, SelectMgr_SelectableObjectSet_THE_IDENTITY_MAT, theViewportWidth, theViewportHeight);

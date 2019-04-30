@@ -32,9 +32,11 @@
 #include <inspector/ViewControl_TreeView.hxx>
 
 #include <inspector/View_Tools.hxx>
+#include <inspector/View_Viewer.hxx>
+#include <inspector/View_Widget.hxx>
 
 #include <AIS_Shape.hxx>
-
+#include <Graphic3d_Camera.hxx>
 #include <OSD_Environment.hxx>
 
 #include <OSD_Directory.hxx>
@@ -294,6 +296,7 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
   NCollection_List<Handle(Standard_Transient)> aParameters;
 
   Handle(Message_ReportCallBack) aReportCallBack;
+  Handle(Graphic3d_Camera) aViewCamera;
 
   for (NCollection_List<Handle(Standard_Transient)>::Iterator aParamsIt (theParameters);
        aParamsIt.More(); aParamsIt.Next())
@@ -305,23 +308,28 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
       aMessageReport->SetCallBack (myCallBack);
       addReport (aMessageReport);
     }
-    else
+    else if (!Handle(AIS_InteractiveContext)::DownCast (anObject).IsNull())
     {
       aParameters.Append (anObject);
       if (aContext.IsNull())
         aContext = Handle(AIS_InteractiveContext)::DownCast (anObject);
     }
+    else if (!Handle(Graphic3d_Camera)::DownCast (anObject).IsNull())
+    {
+      aViewCamera = Handle(Graphic3d_Camera)::DownCast (anObject);
+    }
   }
-  QAbstractItemModel* aModel = myTreeView->model();
-  if (!aModel)
-    return;
-  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (aModel);
+  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
   if (!aTreeModel)
     return;
+
   aTreeModel->EmitLayoutChanged();
 
   if (!aContext.IsNull())
     myViewWindow->SetContext (View_ContextType_External, aContext);
+
+  if (!aViewCamera.IsNull())
+    myViewWindow->GetView()->GetViewer()->GetView()->Camera()->Copy (aViewCamera);
 
   theParameters = aParameters;
 }

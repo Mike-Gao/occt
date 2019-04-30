@@ -92,6 +92,9 @@ public:
   //! Clears collected alerts with specified type
   Standard_EXPORT void Clear (const Handle(Standard_Type)& theType);
 
+  //! Returns list of collected alerts with specified gravity
+  Standard_EXPORT void Delete (Message_Gravity theGravity, const Message_ListOfAlert& theAlerts);
+
   //! Dumps all collected alerts to stream
   Standard_EXPORT void Dump (Standard_OStream& theOS);
 

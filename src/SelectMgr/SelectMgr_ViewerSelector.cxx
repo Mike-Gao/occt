@@ -564,6 +564,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
   Standard_Integer aWidth;
   Standard_Integer aHeight;
   mySelectingVolumeMgr.WindowSize (aWidth, aHeight);
+  MESSAGE_INFO ("UpdateBVH", "", &aPerfMeter, aParentAlert);
   mySelectableObjects.UpdateBVH (mySelectingVolumeMgr.Camera(),
                                  mySelectingVolumeMgr.ProjectionMatrix(),
                                  mySelectingVolumeMgr.WorldViewMatrix(),
@@ -583,13 +584,13 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
 
   for (Standard_Integer aBVHSetIt = 0; aBVHSetIt < SelectMgr_SelectableObjectSet::BVHSubsetNb; ++aBVHSetIt)
   {
-    #ifdef REPORT_SELECTION_BUILD
-    MESSAGE_INFO (TCollection_AsciiString ("aBVHSetIt") + aBVHSetIt, "", &aPerfMeter, aParentAlert);
-    Handle(Message_Alert) aParentAlertLevel1 = OCCT_Message_Alert;
-    #endif
-
     SelectMgr_SelectableObjectSet::BVHSubset aBVHSubset =
       static_cast<SelectMgr_SelectableObjectSet::BVHSubset> (aBVHSetIt);
+
+    #ifdef REPORT_SELECTION_BUILD
+    MESSAGE_INFO (TCollection_AsciiString ("aBVHSetIt"), SelectMgr::BVHSubsetToString (aBVHSubset), &aPerfMeter, aParentAlert);
+    Handle(Message_Alert) aParentAlertLevel1 = OCCT_Message_Alert;
+    #endif
 
     if (mySelectableObjects.IsEmpty (aBVHSubset))
     {
@@ -702,6 +703,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
     }
   }
 
+  MESSAGE_INFO ("SortResult", "", &aPerfMeter, aParentAlert);
   SortResult();
 #ifdef REPORT_SELECTION_BUILD
   Standard_SStream aStreamDone;

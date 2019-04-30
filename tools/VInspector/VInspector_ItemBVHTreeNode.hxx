@@ -1,4 +1,4 @@
-// Created on: 2019-02-04
+// Created on: 2019-04-29
 // Created by: Natalia ERMOLAEVA
 // Copyright (c) 2019 OPEN CASCADE SAS
 //
@@ -13,31 +13,33 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspector_ItemSelectMgrBaseFrustum_H
-#define VInspector_ItemSelectMgrBaseFrustum_H
+#ifndef VInspector_ItemBVHTreeNode_H
+#define VInspector_ItemBVHTreeNode_H
 
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 
-#include <TopoDS_Shape.hxx>
-#include <SelectMgr_BaseFrustum.hxx>
+//#include <TopoDS_Shape.hxx>
+//#include <SelectMgr_SelectingVolumeManager.hxx>
 
-class VInspector_ItemSelectMgrBaseFrustum;
-typedef QExplicitlySharedDataPointer<VInspector_ItemSelectMgrBaseFrustum> VInspector_ItemSelectMgrBaseFrustumPtr;
+class SelectMgr_BaseFrustum;
 
-//! \class VInspector_ItemSelectMgrBaseFrustum
+class VInspector_ItemBVHTreeNode;
+typedef QExplicitlySharedDataPointer<VInspector_ItemBVHTreeNode> VInspector_ItemBVHTreeNodePtr;
+
+//! \class VInspector_ItemBVHTreeNode
 //! Parent item, that corresponds Folder under the AIS_InteractiveContext
 //! Children of the item are: none
-class VInspector_ItemSelectMgrBaseFrustum : public VInspector_ItemBase
+class VInspector_ItemBVHTreeNode : public VInspector_ItemBase
 {
 public:
 
   //! Creates an item wrapped by a shared pointer
-  static VInspector_ItemSelectMgrBaseFrustumPtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  { return VInspector_ItemSelectMgrBaseFrustumPtr (new VInspector_ItemSelectMgrBaseFrustum (theParent, theRow, theColumn)); }
+  static VInspector_ItemBVHTreeNodePtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  { return VInspector_ItemBVHTreeNodePtr (new VInspector_ItemBVHTreeNode (theParent, theRow, theColumn)); }
 
   //! Destructor
-  virtual ~VInspector_ItemSelectMgrBaseFrustum() Standard_OVERRIDE {};
+  virtual ~VInspector_ItemBVHTreeNode() Standard_OVERRIDE {};
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
@@ -47,14 +49,7 @@ public:
 
   //! Returns data object of the item.
   //! \return object
-  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myFrustum; }
-
-  //! Returns current drawer, initialize the drawer if it was not initialized yet
-  Standard_EXPORT Handle(SelectMgr_BaseFrustum) GetFrustum() const
-  { return Handle(SelectMgr_BaseFrustum)::DownCast (GetObject()); }
-
-  //! Dumps the content of me on the stream <OS>.
-  virtual Standard_Boolean Dump (Standard_OStream& OS) const;
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return NULL; }
 
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
@@ -69,15 +64,6 @@ protected:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
-  //! Returns number of table rows
-  //! \return an integer value
-  virtual int GetTableRowCount() const Standard_OVERRIDE;
-
-  //! Returns table value for the row in form: <function name> <function value>
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  virtual QVariant GetTableData (const int theRow, const int theColumn, const int theRole) const Standard_OVERRIDE;
-
 protected:
 
   //! Creates a child item in the given position.
@@ -88,22 +74,13 @@ protected:
 
 private:
 
-  //! Set V3d viewer selector into the current field
-  //! \param theFrustum a viewer selector
-  void setFrustum (const Handle(SelectMgr_BaseFrustum)& theFrustum) { myFrustum = theFrustum; }
-
-private:
-
   //! Constructor
   //! param theParent a parent item
   //! \param theRow the item row positition in the parent item
   //! \param theColumn the item column positition in the parent item
-  VInspector_ItemSelectMgrBaseFrustum(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  VInspector_ItemBVHTreeNode(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
     : VInspector_ItemBase(theParent, theRow, theColumn) {}
 
-protected:
-
-  Handle(SelectMgr_BaseFrustum) myFrustum; //!< the current viewer selector
 };
 
 #endif

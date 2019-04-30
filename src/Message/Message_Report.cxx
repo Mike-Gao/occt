@@ -294,6 +294,25 @@ void Message_Report::Clear (const Handle(Standard_Type)& theType)
 }
 
 //=======================================================================
+//function : Delete
+//purpose  :
+//=======================================================================
+
+void Message_Report::Delete (Message_Gravity theGravity, const Message_ListOfAlert& theAlerts)
+{
+  if (theAlerts.IsEmpty())
+    return;
+
+  Message_ListOfAlert anAlerts = myAlerts[theGravity];
+
+  for (Message_ListOfAlert::Iterator anIt (theAlerts); anIt.More(); anIt.Next())
+  {
+    if (myAlerts[theGravity].Contains (anIt.Value()))
+      myAlerts[theGravity].Remove (anIt.Value());
+  }
+}
+
+//=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================

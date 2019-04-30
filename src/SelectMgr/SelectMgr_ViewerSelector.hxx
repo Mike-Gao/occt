@@ -205,6 +205,12 @@ public:
   //! Returns instance of selecting volume manager of the viewer selector
   SelectMgr_SelectingVolumeManager& GetManager() { return mySelectingVolumeMgr; }
 
+  //! Returns container of selectable objects
+  const SelectMgr_SelectableObjectSet& GetSelectableObjects() const { return mySelectableObjects; }
+
+  //! Returns container of sensitives
+  const SelectMgr_MapOfObjectSensitives&  GetObjectSensitives() const { return myMapOfObjectSensitives; }
+
   //! Marks all added sensitive entities of all objects as non-selectable
   Standard_EXPORT void ResetSelectionActivationStatus();
 

@@ -80,6 +80,9 @@ public:
   //! \return double value
   Standard_EXPORT static double AmountElapsedTime (const Handle(Message_Report)& theReport);
 
+  //! Returns report of the item
+  static Handle(Message_Report) FindReport (const MessageModel_ItemBasePtr& thetItem);
+
 protected:
 
   //! Initialize the current item. It is empty because Reset() is also empty.

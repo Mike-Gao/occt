@@ -1,4 +1,4 @@
-// Created on: 2019-02-04
+// Created on: 2019-04-29
 // Created by: Natalia ERMOLAEVA
 // Copyright (c) 2019 OPEN CASCADE SAS
 //
@@ -13,30 +13,33 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/VInspector_ItemSelectMgrSelectingVolumeManager.hxx>
+#include <inspector/VInspector_ItemSelectMgrSelectableObjectSet.hxx>
 
+#include <inspector/VInspector_ItemBVHTree.hxx>
 #include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
 #include <inspector/VInspector_ItemSelectMgrBaseFrustum.hxx>
 
 #include <inspector/ViewControl_Tools.hxx>
 
+#include <SelectMgr.hxx>
+
 // =======================================================================
 // function : initRowCount
 // purpose :
 // =======================================================================
-int VInspector_ItemSelectMgrSelectingVolumeManager::initRowCount() const
+int VInspector_ItemSelectMgrSelectableObjectSet::initRowCount() const
 {
   if (Column() != 0)
     return 0;
 
-  return 2;
+  return SelectMgr_SelectableObjectSet::BVHSubsetNb; // VInspector_ItemBVHTree items
 }
 
 // =======================================================================
 // function : initValue
 // purpose :
 // =======================================================================
-QVariant VInspector_ItemSelectMgrSelectingVolumeManager::initValue (const int theItemRole) const
+QVariant VInspector_ItemSelectMgrSelectableObjectSet::initValue (const int theItemRole) const
 {
   QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
   if (aParentValue.isValid())
@@ -45,13 +48,13 @@ QVariant VInspector_ItemSelectMgrSelectingVolumeManager::initValue (const int th
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
-  SelectMgr_SelectingVolumeManager aVolumeManager;
-  if (!GetViewerSelector (aVolumeManager))
-    return Column() == 0 ? "Empty volume manager" : "";
+  SelectMgr_SelectableObjectSet aSet;
+  if (!GetSelectableObjectSet (aSet))
+    return Column() == 0 ? "Empty selectable object set" : "";
 
   switch (Column())
   {
-    case 0: return "SelectMgr_SelectingVolumeManager";
+    case 0: return "SelectMgr_SelectableObjectSet";
     default:
       break;
   }
@@ -63,7 +66,7 @@ QVariant VInspector_ItemSelectMgrSelectingVolumeManager::initValue (const int th
 // purpose :
 // =======================================================================
 
-void VInspector_ItemSelectMgrSelectingVolumeManager::Init()
+void VInspector_ItemSelectMgrSelectableObjectSet::Init()
 {
   //VInspector_ItemFolderObjectPtr aParentItem = itemDynamicCast<VInspector_ItemFolderObject>(Parent());
   //Handle(SelectMgr_SelectingVolumeManager) aVolumeMgr;
@@ -87,7 +90,7 @@ void VInspector_ItemSelectMgrSelectingVolumeManager::Init()
 // purpose :
 // =======================================================================
 
-void VInspector_ItemSelectMgrSelectingVolumeManager::Reset()
+void VInspector_ItemSelectMgrSelectableObjectSet::Reset()
 {
   VInspector_ItemBase::Reset();
 }
@@ -97,51 +100,53 @@ void VInspector_ItemSelectMgrSelectingVolumeManager::Reset()
 // purpose :
 // =======================================================================
 
-void VInspector_ItemSelectMgrSelectingVolumeManager::initItem() const
+void VInspector_ItemSelectMgrSelectableObjectSet::initItem() const
 {
   if (IsInitialized())
     return;
-  const_cast<VInspector_ItemSelectMgrSelectingVolumeManager*>(this)->Init();
+  const_cast<VInspector_ItemSelectMgrSelectableObjectSet*>(this)->Init();
 }
 
 // =======================================================================
-// function : GetTableRowCount
+// function : GetSelectableObjectSet
 // purpose :
 // =======================================================================
-Standard_Boolean VInspector_ItemSelectMgrSelectingVolumeManager::GetViewerSelector (SelectMgr_SelectingVolumeManager& theVolumeManager) const
+Standard_Boolean VInspector_ItemSelectMgrSelectableObjectSet::GetSelectableObjectSet (SelectMgr_SelectableObjectSet& theSet) const
 {
   VInspector_ItemSelectMgrViewerSelectorPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrViewerSelector>(Parent());
 
   if (!aParentItem || aParentItem->GetViewerSelector().IsNull())
     return Standard_False;
 
-  theVolumeManager = aParentItem->GetViewerSelector()->GetManager();
+  theSet = aParentItem->GetViewerSelector()->GetSelectableObjects();
   return Standard_True;
 }
 
 // =======================================================================
-// function : GetTableRowCount
+// function : GetBVHTree
 // purpose :
 // =======================================================================
-Handle(SelectMgr_BaseFrustum) VInspector_ItemSelectMgrSelectingVolumeManager::GetFrustum (const int theRow) const
+opencascade::handle<BVH_Tree<Standard_Real, 3> > VInspector_ItemSelectMgrSelectableObjectSet::GetBVHTree (const int theRow,
+  TCollection_AsciiString& theName) const
 {
-  SelectMgr_SelectingVolumeManager aVolumeManager;
-  if (!GetViewerSelector (aVolumeManager))
+  SelectMgr_SelectableObjectSet aSet;
+  if (!GetSelectableObjectSet (aSet))
     return NULL;
 
-  if (theRow == 0)
-    return aVolumeManager.GetVolume (SelectBasics_SelectingVolumeManager::Box);
-  else if (theRow == 1)
-    return aVolumeManager.GetVolume (SelectBasics_SelectingVolumeManager::Polyline);
+  if (theRow >= SelectMgr_SelectableObjectSet::BVHSubsetNb)
+    return NULL;
 
-  return NULL;
+  SelectMgr_SelectableObjectSet::BVHSubset aBVHSubset = (SelectMgr_SelectableObjectSet::BVHSubset)theRow;
+  theName = TCollection_AsciiString ("BVH_Tree_") + SelectMgr::BVHSubsetToString (aBVHSubset);
+
+  return aSet.BVH (SelectMgr_SelectableObjectSet::BVHSubset_2dPersistent);
 }
 
 // =======================================================================
 // function : GetTableRowCount
 // purpose :
 // =======================================================================
-int VInspector_ItemSelectMgrSelectingVolumeManager::GetTableRowCount() const
+int VInspector_ItemSelectMgrSelectableObjectSet::GetTableRowCount() const
 {
   return 60;
 }
@@ -150,24 +155,24 @@ int VInspector_ItemSelectMgrSelectingVolumeManager::GetTableRowCount() const
 // function : GetTableData
 // purpose :
 // =======================================================================
-QVariant VInspector_ItemSelectMgrSelectingVolumeManager::GetTableData (const int theRow, const int theColumn, const int theRole) const
+QVariant VInspector_ItemSelectMgrSelectableObjectSet::GetTableData (const int theRow, const int theColumn, const int theRole) const
 {
   if (theRole != Qt::DisplayRole)
     return QVariant();
 
-  SelectMgr_SelectingVolumeManager aVolumeMgr;
-  if (!GetViewerSelector (aVolumeMgr))
-    return QVariant();
+  //SelectMgr_SelectingVolumeManager aVolumeMgr;
+  //if (!GetViewerSelector (aVolumeMgr))
+  //  return QVariant();
 
-  bool isFirstColumn = theColumn == 0;
-  switch (theRow)
-  {
-    case 0: return isFirstColumn ? QVariant ("GetActiveSelectionType") : QVariant (aVolumeMgr.GetActiveSelectionType());
-    case 1: return isFirstColumn ? QVariant ("IsOverlapAllowed()") : QVariant (aVolumeMgr.IsOverlapAllowed());
-    case 2: return isFirstColumn ? "GetNearPickedPnt" : ViewControl_Tools::ToString (aVolumeMgr.GetNearPickedPnt()).ToCString();
-    case 3: return isFirstColumn ? "GetFarPickedPnt" : ViewControl_Tools::ToString (aVolumeMgr.GetFarPickedPnt()).ToCString();
-    default: break;
-  }
+  //bool isFirstColumn = theColumn == 0;
+  //switch (theRow)
+  //{
+  //  case 0: return isFirstColumn ? QVariant ("GetActiveSelectionType") : QVariant (aVolumeMgr.GetActiveSelectionType());
+  //  case 1: return isFirstColumn ? QVariant ("IsOverlapAllowed()") : QVariant (aVolumeMgr.IsOverlapAllowed());
+  //  case 2: return isFirstColumn ? "GetNearPickedPnt" : ViewControl_Tools::ToString (aVolumeMgr.GetNearPickedPnt()).ToCString();
+  //  case 3: return isFirstColumn ? "GetFarPickedPnt" : ViewControl_Tools::ToString (aVolumeMgr.GetFarPickedPnt()).ToCString();
+  //  default: break;
+  //}
   return QVariant();
 }
 
@@ -175,14 +180,9 @@ QVariant VInspector_ItemSelectMgrSelectingVolumeManager::GetTableData (const int
 // function : createChild
 // purpose :
 // =======================================================================
-TreeModel_ItemBasePtr VInspector_ItemSelectMgrSelectingVolumeManager::createChild (int theRow, int theColumn)
+TreeModel_ItemBasePtr VInspector_ItemSelectMgrSelectableObjectSet::createChild (int theRow, int theColumn)
 {
-  if (theRow == 0 || theRow == 1)
-    return VInspector_ItemSelectMgrBaseFrustum::CreateItem (currentItem(), theRow, theColumn);
-  //else if (theRow == 1)
-  //  return VInspector_ItemAspectWindow::CreateItem (currentItem(), theRow, theColumn);
-  //else if (theRow == 2)
-  //  return VInspector_ItemGraphic3dCView::CreateItem (currentItem(), theRow, theColumn);
-  //
+  if (theRow == 0 || theRow == 1 || theRow == 2)
+    return VInspector_ItemBVHTree::CreateItem (currentItem(), theRow, theColumn);
   return TreeModel_ItemBasePtr();
 }

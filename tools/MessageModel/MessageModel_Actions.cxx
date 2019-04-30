@@ -59,6 +59,8 @@ MessageModel_Actions::MessageModel_Actions (QWidget* theParent,
                     ViewControl_Tools::CreateAction ("Activate", SLOT (OnActivateReport()), parent(), this));
   myActions.insert (MessageModel_ActionType_Clear,
                     ViewControl_Tools::CreateAction ("Clear", SLOT (OnClearReport()), parent(), this));
+  myActions.insert (MessageModel_ActionType_Delete,
+                    ViewControl_Tools::CreateAction ("Delete", SLOT (OnDeleteAlerts()), parent(), this));
   myActions.insert (MessageModel_ActionType_ExportToShapeView,
                     ViewControl_Tools::CreateAction (tr ("Export to ShapeView"), SLOT (OnExportToShapeView()), parent(), this));
 #ifdef DEBUG_ALERTS
@@ -121,7 +123,10 @@ void MessageModel_Actions::AddMenuActions (const QModelIndexList& theSelectedInd
 #endif
   }
   else if (anAlertItem)
+  {
     theMenu->addAction (myActions[MessageModel_ActionType_ExportToShapeView]);
+    theMenu->addAction (myActions[MessageModel_ActionType_Delete]);
+  }
 
   theMenu->addSeparator();
 }
@@ -198,6 +203,42 @@ void MessageModel_Actions::OnClearReport()
 
   aReport->Clear();
   ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
+}
+
+// =======================================================================
+// function : OnDeleteAlerts
+// purpose :
+// =======================================================================
+void MessageModel_Actions::OnDeleteAlerts()
+{
+  Handle(Message_Report) aReport;
+  Message_ListOfAlert anAlerts;
+
+  QModelIndexList aSelectedIndices = mySelectionModel->selectedIndexes();
+  QStringList anExportedPointers;
+  for (QModelIndexList::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
+  {
+    QModelIndex anIndex = *aSelIt;
+    if (anIndex.column() != 0)
+      continue;
+
+    TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+    if (!anItemBase)
+      continue;
+
+    MessageModel_ItemAlertPtr anItem = itemDynamicCast<MessageModel_ItemAlert> (anItemBase);
+    if (!anItem)
+      break;
+
+    if (aReport.IsNull())
+      MessageModel_ItemReport::FindReport (anItem);
+    anAlerts.Append(anItem->GetAlert());
+  }
+
+  if (aReport.IsNull())
+    return;
+
+  aReport->Delete (Message_Info, anAlerts);
 }
 
 // =======================================================================

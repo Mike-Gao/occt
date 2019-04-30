@@ -1,4 +1,4 @@
-// Created on: 2019-04-14
+// Created on: 2019-04-28
 // Created by: Natalia ERMOLAEVA
 // Copyright (c) 2019 OPEN CASCADE SAS
 //
@@ -13,34 +13,34 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspectorPaneAIS_PropertiesCreator_H
-#define VInspectorPaneAIS_PropertiesCreator_H
+#ifndef VInspector_PropertiesCreator_H
+#define VInspector_PropertiesCreator_H
 
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 
 #include <inspector/TreeModel_ItemPropertiesCreator.hxx>
 
-DEFINE_STANDARD_HANDLE (VInspectorPaneAIS_PropertiesCreator, TreeModel_ItemPropertiesCreator)
+DEFINE_STANDARD_HANDLE (VInspector_PropertiesCreator, TreeModel_ItemPropertiesCreator)
 
-//! \class VInspectorPaneAIS_PropertiesCreator
+//! \class VInspector_PropertiesCreator
 //! \brief An interface to create custom panes by transient object name.
-class VInspectorPaneAIS_PropertiesCreator : public TreeModel_ItemPropertiesCreator
+class VInspector_PropertiesCreator : public TreeModel_ItemPropertiesCreator
 {
 public:
 
   //! Constructor
-  VInspectorPaneAIS_PropertiesCreator() {}
+  VInspector_PropertiesCreator() {}
 
   //! Destructor
-  virtual ~VInspectorPaneAIS_PropertiesCreator() {}
+  virtual ~VInspector_PropertiesCreator() {}
 
   //! Returns pane for the name, creates a new pane if it does not exist and possible to create
   //! \param theName type of the pane
   //! \return a pane instance or NULL
   virtual TreeModel_ItemProperties* GetProperties (const TreeModel_ItemBasePtr& theItem) Standard_OVERRIDE;
 
-  DEFINE_STANDARD_RTTIEXT(VInspectorPaneAIS_PropertiesCreator, TreeModel_ItemPropertiesCreator)
+  DEFINE_STANDARD_RTTIEXT(VInspector_PropertiesCreator, TreeModel_ItemPropertiesCreator)
 
 };
 

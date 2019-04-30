@@ -65,6 +65,9 @@ void TreeModel_ItemBase::Reset()
   }
   m_bInitialized = false;
   myCachedValues.clear();
+
+  if (!GetProperties().IsNull())
+    GetProperties()->Reset();
 }
 
 // =======================================================================
