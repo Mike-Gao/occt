@@ -505,10 +505,6 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 
         for (Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt (*aViewPlanes); aPlaneIt.More(); aPlaneIt.Next())
         {
-          const Handle(SelectBasics_SensitiveEntity)& anEnt = aSensitive->BaseSensitive();
-          SelectMgr_SelectingVolumeManager aTmpMgr = aMgr;
-          computeFrustum (anEnt, theMgr, aInversedTrsf, aScaledTrnsfFrustums, aTmpMgr);
-          checkOverlap (anEnt, aInversedTrsf, aTmpMgr);
           const Handle(Graphic3d_ClipPlane)& aPlane = aPlaneIt.Value();
           if (!aPlane->IsOn())
           {
