@@ -4310,6 +4310,54 @@ static Standard_Integer OCC26313(Draw_Interpretor& di,Standard_Integer n,const c
   return 0;
 }
 
+//=======================================================================
+//function : OCC30708_1 
+//purpose  : Tests initialization of the TopoDS_Iterator with null shape
+//=======================================================================
+static Standard_Integer OCC30708_1 (Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  TopoDS_Iterator it;
+  try
+  {
+    OCC_CATCH_SIGNALS
+
+    TopoDS_Shape empty;
+    it.Initialize (empty);
+
+  }
+  catch (Standard_Failure)
+  {
+    di << "Cannot initialize TopoDS_Iterator with null shape\n";
+    return 0;
+  }
+
+  if (it.More())
+    di << "Incorrect Iterator initialization: method More() returns true on null shape\n";
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC30708_2
+//purpose  : Tests initialization of the BRepLib_MakeWire with null wire
+//=======================================================================
+static Standard_Integer OCC30708_2 (Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  try
+  {
+    OCC_CATCH_SIGNALS
+
+    TopoDS_Wire empty;
+    BRepLib_MakeWire aWBuilder (empty);
+  }
+  catch (Standard_Failure)
+  {
+    di << "Cannot initialize BRepLib_MakeWire with null wire\n";
+  }
+
+  return 0;
+}
+
 void QABugs::Commands_19(Draw_Interpretor& theCommands) {
   const char *group = "QABugs";
 
@@ -4400,6 +4448,12 @@ void QABugs::Commands_19(Draw_Interpretor& theCommands) {
                    __FILE__, OCC26462, group);
 
   theCommands.Add ("OCC26313", "OCC26313 result shape", __FILE__, OCC26313, group);
+
+  theCommands.Add ("OCC30708_1", "Tests initialization of the TopoDS_Iterator with null shape",
+                   __FILE__, OCC30708_1, group);
+
+  theCommands.Add ("OCC30708_2", "Tests initialization of the BRepLib_MakeWire with null shape",
+                   __FILE__, OCC30708_2, group);
 
   return;
 }
