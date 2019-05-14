@@ -957,7 +957,9 @@ void AIS_InteractiveContext::AddOrRemoveSelected (const Handle(SelectMgr_EntityO
   {
     const Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (theOwner->Selectable());
     const Standard_Boolean isGlobal = anObj->GlobalSelOwner() == theOwner;
-    Handle(AIS_GlobalStatus)& aStatus = myObjects.ChangeFind (anObj);
+    if (!myObjects.IsBound(anObj)) // e.g. AIS_ViewCubeFlat is not displayed
+      return;
+   Handle(AIS_GlobalStatus)& aStatus = myObjects.ChangeFind (anObj);
     if (theOwner->IsSelected())
     {
       highlightSelected (theOwner);
