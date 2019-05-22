@@ -818,7 +818,7 @@ void AIS_InteractiveContext::SetSelected (const Handle(AIS_InteractiveObject)& t
 
   if (!myObjects.IsBound (theObject))
   {
-    Display (theObject, Standard_False);
+    return;
   }
 
   Handle(SelectMgr_EntityOwner) anOwner = theObject->GlobalSelOwner();
@@ -910,7 +910,7 @@ void AIS_InteractiveContext::SetSelected (const Handle(SelectMgr_EntityOwner)& t
   }
 
   if (!myObjects.IsBound (anObject))
-    Display (anObject, Standard_False);
+    return;
 
   if (myAutoHilight)
   {
