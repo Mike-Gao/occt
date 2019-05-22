@@ -2000,10 +2000,10 @@ void AIS_InteractiveContext::EraseGlobal (const Handle(AIS_InteractiveObject)& t
 }
 
 //=======================================================================
-//function : unhighlightOwners
+//function : unselectOwners
 //purpose  :
 //=======================================================================
-void AIS_InteractiveContext::unhighlightOwners (const Handle(AIS_InteractiveObject)& theObject)
+void AIS_InteractiveContext::unselectOwners (const Handle(AIS_InteractiveObject)& theObject)
 {
   SelectMgr_SequenceOfOwner aSeq;
   for (AIS_NListOfEntityOwner::Iterator aSelIter (mySelection->Objects()); aSelIter.More(); aSelIter.Next())
@@ -2037,7 +2037,7 @@ void AIS_InteractiveContext::ClearGlobal (const Handle(AIS_InteractiveObject)& t
     return;
   }
 
-  unhighlightOwners (theIObj);
+  unselectOwners (theIObj);
 
   myMainPM->Erase (theIObj, -1);
   theIObj->ErasePresentations (true); // make sure highlighting presentations are properly erased
