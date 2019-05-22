@@ -163,12 +163,6 @@ myIsAutoActivateSelMode(Standard_True)
     aStyle->SetMethod(Aspect_TOHM_COLOR);
     aStyle->SetColor (Quantity_NOC_GRAY40);
   }
-  SetSelectionScheme (AIS_SelectionType_Select,       AIS_SelectionScheme_ClearAndAdd);
-  SetSelectionScheme (AIS_SelectionType_SelectInRect, AIS_SelectionScheme_ClearAndAdd);
-  SetSelectionScheme (AIS_SelectionType_SelectInPoly, AIS_SelectionScheme_ClearAndAdd); 
-  SetSelectionScheme (AIS_SelectionType_ShiftSelect,       AIS_SelectionScheme_Switch);
-  SetSelectionScheme (AIS_SelectionType_ShiftSelectInRect, AIS_SelectionScheme_Switch);
-  SetSelectionScheme (AIS_SelectionType_ShiftSelectInPoly, AIS_SelectionScheme_Switch);
 
   InitAttributes();
 }

@@ -454,22 +454,18 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMi
 
   // all objects detected by the selector are taken, previous current objects are emptied,
   // new objects are put...
-  if (myAutoHilight)
-  {
-    clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
-  }
+  ClearSelected (Standard_False);
   myWasLastMain = Standard_True;
-
   myMainSel->Pick (theXPMin, theYPMin, theXPMax, theYPMax, theView);
-
-  AIS_NListOfEntityOwner aPickedOwners;
   for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
   {
-    aPickedOwners.Append (myMainSel->Picked (aPickIter));
+    const Handle(SelectMgr_EntityOwner)& aCurOwner = myMainSel->Picked (aPickIter);
+    if (aCurOwner.IsNull() || !aCurOwner->HasSelectable() || !myFilters->IsOk (aCurOwner))
+      continue;
+
+    mySelection->Select (aCurOwner);
     aCurOwner->SetSelected (Standard_True);
   }
-  mySelection->SelectOwners (aPickedOwners, SelectionScheme (AIS_SelectionType_SelectInRect), myFilters);
 
   if (myAutoHilight)
   {
@@ -499,22 +495,18 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
 
   // all objects detected by the selector are taken, previous current objects are emptied,
   // new objects are put...
-  if (myAutoHilight)
-  {
-    clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
-  }
-
+  ClearSelected (Standard_False);
   myWasLastMain = Standard_True;
   myMainSel->Pick (thePolyline, theView);
-
-  AIS_NListOfEntityOwner aPickedOwners;
   for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
   {
-    aPickedOwners.Append (myMainSel->Picked (aPickIter));
+    const Handle(SelectMgr_EntityOwner) anOwner = myMainSel->Picked (aPickIter);
+    if (anOwner.IsNull() || !anOwner->HasSelectable() || !myFilters->IsOk (anOwner))
+      continue;
+
+    mySelection->Select (anOwner);
     anOwner->SetSelected (Standard_True);
   }
-  mySelection->SelectOwners (aPickedOwners, SelectionScheme (AIS_SelectionType_SelectInPoly), myFilters);
 
   if (myAutoHilight)
   {
@@ -535,34 +527,26 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdateViewer)
 {
-  // special case: single selection of detected owner - is it necessary ?
-  /*if (myWasLastMain && !myLastinMain.IsNull() && !myAutoHilight &&
-      (myLastinMain->IsSelected()
-      && !myLastinMain->IsForcedHilight()
-      && NbSelected() <= 1))
+  if (myWasLastMain && !myLastinMain.IsNull())
   {
-    mySelection->selectOwner(myLastinMain, aPrevSelected, SelectionScheme (AIS_SelectionType_Select));
-    return getStatusOfPick (NbSelected());
-  }*/
-
-  if (myAutoHilight)
-  {
-    clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
+    if (myAutoHilight)
+    {
+      clearDynamicHighlight();
+    }
+    if (!myLastinMain->IsSelected()
+      || myLastinMain->IsForcedHilight()
+      || NbSelected() > 1)
+    {
+      SetSelected (myLastinMain, Standard_False);
+      if(toUpdateViewer)
+      {
+        UpdateCurrentViewer();
+      }
+    }
   }
-
-  AIS_NListOfEntityOwner aPickedOwners;
-  aPickedOwners.Append (myLastinMain);
-  mySelection->SelectOwners (aPickedOwners, SelectionScheme (AIS_SelectionType_Select), myFilters);
-
-  if (myAutoHilight)
+  else
   {
-    HilightSelected (toUpdateViewer);
-  }
-
-  if(toUpdateViewer)
-  {
-    UpdateCurrentViewer();
+    ClearSelected (toUpdateViewer);
   }
 
   Standard_Integer aSelNum = NbSelected();
@@ -578,24 +562,14 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdate
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Boolean toUpdateViewer)
 {
-  AIS_NListOfEntityOwner aPrevSelected = mySelection->Objects();
   if (myAutoHilight)
   {
     clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
   }
-
-  AIS_NListOfEntityOwner aPickedOwners;
-  aPickedOwners.Append (myLastinMain);
-  mySelection->SelectOwners (aPickedOwners, SelectionScheme (AIS_SelectionType_ShiftSelect), myFilters);
-
-  if (myAutoHilight)
+  if (myWasLastMain && !myLastinMain.IsNull())
   {
-    HilightSelected (toUpdateViewer);
+    AddOrRemoveSelected (myLastinMain, toUpdateViewer);
   }
-
-  if (toUpdateViewer)
-    UpdateCurrentViewer();
 
   Standard_Integer aSelNum = NbSelected();
 
@@ -620,21 +594,21 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Integer the
     throw Standard_ProgramError ("AIS_InteractiveContext::ShiftSelect() - invalid argument");
   }
 
-  AIS_NListOfEntityOwner aPrevSelected = mySelection->Objects();
   if (myAutoHilight)
   {
-    clearDynamicHighlight();
     UnhilightSelected (Standard_False);
   }
   myWasLastMain = Standard_True;
   myMainSel->Pick (theXPMin, theYPMin, theXPMax, theYPMax, theView);
-
-  AIS_NListOfEntityOwner aPickedOwners;
   for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
   {
-    aPickedOwners.Append (myMainSel->Picked (aPickIter));
+    const Handle(SelectMgr_EntityOwner) anOwner = myMainSel->Picked (aPickIter);
+    if (anOwner.IsNull() || !anOwner->HasSelectable() || !myFilters->IsOk (anOwner))
+      continue;
+
+    AIS_SelectStatus aSelStatus = mySelection->Select (anOwner);
+    anOwner->SetSelected (aSelStatus == AIS_SS_Added);
   }
-  mySelection->SelectOwners (aPickedOwners, SelectionScheme (AIS_SelectionType_ShiftSelectInRect), myFilters);
 
   if (myAutoHilight)
   {
@@ -662,21 +636,21 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const TColgp_Array1OfPnt2d
     throw Standard_ProgramError ("AIS_InteractiveContext::ShiftSelect() - invalid argument");
   }
 
-  AIS_NListOfEntityOwner aPrevSelected = mySelection->Objects();
   if (myAutoHilight)
   {
-    clearDynamicHighlight();
     UnhilightSelected (Standard_False);
   }
   myWasLastMain = Standard_True;
   myMainSel->Pick (thePolyline, theView);
-
-  AIS_NListOfEntityOwner aPickedOwners;
   for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
   {
-    aPickedOwners.Append (myMainSel->Picked (aPickIter));
+    const Handle(SelectMgr_EntityOwner) anOwner = myMainSel->Picked (aPickIter);
+    if (anOwner.IsNull() || !anOwner->HasSelectable() || !myFilters->IsOk (anOwner))
+      continue;
+
+    AIS_SelectStatus aSelStatus = mySelection->Select (anOwner);
+    anOwner->SetSelected (aSelStatus == AIS_SS_Added);
   }
-  mySelection->SelectOwners (aPickedOwners, SelectionScheme (AIS_SelectionType_ShiftSelectInPoly), myFilters);
 
   if (myAutoHilight)
   {
