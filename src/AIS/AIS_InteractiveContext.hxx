@@ -25,6 +25,8 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_Selection.hxx>
 #include <AIS_SelectionModesConcurrency.hxx>
+#include <AIS_SelectionScheme.hxx>
+#include <AIS_SelectionType.hxx>
 #include <AIS_StatusOfDetection.hxx>
 #include <AIS_StatusOfPick.hxx>
 #include <AIS_TypeOfIso.hxx>
@@ -442,6 +444,14 @@ public: //! @name Selection management
   {
     return AddSelect (theObject->GlobalSelOwner());
   }
+
+  //! Returns selection scheme used in Select
+  AIS_SelectionScheme SelectionScheme (const AIS_SelectionType theType) const
+  { return mySelectionSchemes.Find (theType); }
+
+  //! Returns selection scheme used in Select
+  void SetSelectionScheme (const AIS_SelectionType theType, const AIS_SelectionScheme theScheme)
+  { mySelectionSchemes.Bind (theType, theScheme); }
 
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
   //! The objects detected are passed to the main viewer, which is then updated.
@@ -1361,6 +1371,7 @@ protected: //! @name internal fields
   Standard_Boolean myAutoHilight;
   Standard_Boolean myIsAutoActivateSelMode;
 
+  NCollection_DataMap<AIS_SelectionType, AIS_SelectionScheme> mySelectionSchemes;
 };
 
 DEFINE_STANDARD_HANDLE(AIS_InteractiveContext, Standard_Transient)
