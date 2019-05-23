@@ -53,31 +53,28 @@ void TDF_Label::Imported(const Standard_Boolean aStatus) const
 //purpose  : Finds an attributes according to an ID.
 //=======================================================================
 
-Standard_Boolean TDF_Label::FindAttribute
-(const Standard_GUID& anID,
- Handle(TDF_Attribute)& anAttribute) const
+TDF_Attribute* TDF_Label::FindAttribute (const Standard_GUID& theID) const
 {
   if (IsNull()) throw Standard_NullObject("A null Label has no attribute.");
-  TDF_AttributeIterator itr (myLabelNode); // Without removed attributes.
-  for ( ; itr.More(); itr.Next()) {
-    if (itr.Value()->ID() == anID) {
-      anAttribute = itr.Value();
-      return Standard_True;
+  // Without removed attributes.
+  for (TDF_AttributeIterator itr (myLabelNode); itr.More(); itr.Next())
+  {
+    if (itr.Value()->ID() == theID)
+    {
+      return itr.Value();
     }
   }
-  return Standard_False;
+  return NULL;
 }
-
 
 //=======================================================================
 //function : FindAttribute
 //purpose  : Finds an attributes according to an ID and a Transaction.
 //=======================================================================
 
-Standard_Boolean TDF_Label::FindAttribute
-(const Standard_GUID& anID,
- const Standard_Integer aTransaction,
- Handle(TDF_Attribute)& anAttribute) const
+Standard_Boolean TDF_Label::FindAttribute (const Standard_GUID& anID,
+                                           const Standard_Integer aTransaction,
+                                           Handle(TDF_Attribute)& anAttribute) const
 {
   Handle(TDF_Attribute) locAtt;
   if (FindAttribute(anID, locAtt)) {

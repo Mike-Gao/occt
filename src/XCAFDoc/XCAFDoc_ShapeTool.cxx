@@ -757,8 +757,21 @@ Standard_Boolean XCAFDoc_ShapeTool::IsSimpleShape (const TDF_Label& L)
 
 Standard_Boolean XCAFDoc_ShapeTool::IsReference (const TDF_Label& L)
 {
-  Handle(TDataStd_TreeNode) Node;
-  return L.FindAttribute(XCAFDoc::ShapeRefGUID(), Node) && Node->HasFather();
+  static const Standard_GUID& aShapeGuid = XCAFDoc::ShapeRefGUID();
+  static const Handle(Standard_Type) aDynType = STANDARD_TYPE(TDataStd_TreeNode);
+  if (TDF_Attribute* anAttrib = L.FindAttribute (aShapeGuid))
+  {
+    if (anAttrib->IsKind (aDynType))
+    {
+      TDataStd_TreeNode* aNode = (TDataStd_TreeNode* )anAttrib;
+      return aNode->HasFather();
+    }
+  }
+  return Standard_False;
+  //return L.FindAttribute (aShapeGuid, aNode)
+  //    && aNode->HasFather();
+  //Handle(TDataStd_TreeNode) Node;
+  //return L.FindAttribute(XCAFDoc::ShapeRefGUID(), Node) && Node->HasFather();
 }
 
 //=======================================================================

@@ -141,21 +141,40 @@ public:
   //! attribute is not in the structure.
   Standard_EXPORT void ResumeAttribute (const Handle(TDF_Attribute)& anAttribute) const;
   
-  //! Finds an attribute of the current label, according
-  //! to <anID>.
-  //! If anAttribute is not a valid one, false is returned.
-  //!
+  //! Finds an attribute of the current label, according to given ID.
   //! The method returns True if found, False otherwise.
-  //!
   //! A removed attribute cannot be found.
-  Standard_EXPORT Standard_Boolean FindAttribute (const Standard_GUID& anID, Handle(TDF_Attribute)& anAttribute) const;
-  
+  Standard_Boolean FindAttribute (const Standard_GUID& theID,
+                                  Handle(TDF_Attribute)& theAttribute) const
+  {
+    if (TDF_Attribute* anAttrib = FindAttribute (theID))
+    {
+      theAttribute = anAttrib;
+      return Standard_True;
+    }
+    return Standard_False;
+  }
+
+  //! Finds an attribute of the current label, according to given ID.
+  //! The method returns NULL if ID is not found.
+  //! A removed attribute cannot be found.
+  Standard_EXPORT TDF_Attribute* FindAttribute (const Standard_GUID& anID) const;
+
   //! Safe variant of FindAttribute() for arbitrary type of argument
   template <class T> 
   Standard_Boolean FindAttribute (const Standard_GUID& theID, Handle(T)& theAttr) const
   { 
-    Handle(TDF_Attribute) anAttr = theAttr;
+    Handle(TDF_Attribute) anAttr;
     return FindAttribute (theID, anAttr) && ! (theAttr = Handle(T)::DownCast(anAttr)).IsNull();
+  }
+
+  //! Safe variant of FindAttribute() for arbitrary type of argument (pointer)
+  template <class T>
+  Standard_Boolean FindAttribute (const Standard_GUID& theID, T*& theAttr) const
+  {
+    TDF_Attribute* anAttr = FindAttribute (theID);
+    theAttr = dynamic_cast<T*> (anAttr);
+    return theAttr != NULL;
   }
 
   //! Finds an attribute of the current label, according

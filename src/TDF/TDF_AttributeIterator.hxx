@@ -57,20 +57,16 @@ public:
   Standard_EXPORT   void Initialize
     (const TDF_Label& aLabel,
      const Standard_Boolean withoutForgotten = Standard_True) ;
-  inline   Standard_Boolean More() const;
-  Standard_EXPORT   void Next() ;
-  inline   Handle(TDF_Attribute) Value() const;
 
+  Standard_Boolean More() const { return myValue != NULL; }
 
-protected:
+  Standard_EXPORT void Next();
 
- // Methods PROTECTED
- // 
+  //! Return current value as handle.
+  Handle(TDF_Attribute) ValueHandle() const { return myValue; }
 
-
- // Fields PROTECTED
- //
-
+  //! Return current value as pointer.
+  TDF_Attribute* Value() const { return myValue; }
 
 private: 
 
@@ -84,15 +80,5 @@ private:
   TDF_Attribute    * myValue;
   Standard_Boolean myWithoutForgotten;
 };
-
-
-// other inline functions and methods (like "C++: function call" methods)
-//
-
-inline Standard_Boolean TDF_AttributeIterator::More() const
-{ return (myValue != 0L); }
-
-inline Handle(TDF_Attribute) TDF_AttributeIterator::Value() const
-{ return myValue; }
 
 #endif
