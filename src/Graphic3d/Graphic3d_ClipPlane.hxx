@@ -226,16 +226,36 @@ public:
       }
       else if (!aPlaneIter->IsBoxFullOutHalfspace (theBox))
       {
-        // the box is not fully out, and not fully in, check is it on (but not intersect)
-        if (ProbeBoxMaxPointHalfspace (theBox) != Graphic3d_ClipState_Out)
-        {
-          return Graphic3d_ClipState_In;
-        }
         // if at least one full out test fail, clipping state is inconclusive (partially clipped)
         aState = Graphic3d_ClipState_On;
       }
     }
     return aState;
+  }
+
+  //! Check if the given bounding box is In and touch the clipping planes
+  Standard_Boolean ProbeBoxTouch (const Graphic3d_BndBox3d& theBox) const
+  {
+    Graphic3d_ClipState aState = Graphic3d_ClipState_Out;
+    for (const Graphic3d_ClipPlane* aPlaneIter = this; aPlaneIter != NULL; aPlaneIter = aPlaneIter->myNextInChain.get())
+    {
+      if (aPlaneIter->IsBoxFullInHalfspace (theBox))
+      {
+        // within union operation, if box is entirely inside at least one half-space, others can be ignored
+        return Standard_False;
+      }
+      else if (!aPlaneIter->IsBoxFullOutHalfspace (theBox))
+      {
+        // the box is not fully out, and not fully in, check is it on (but not intersect)
+        if (ProbeBoxMaxPointHalfspace (theBox) != Graphic3d_ClipState_Out)
+        {
+          return Standard_True;
+        }
+        // if at least one full out test fail, clipping state is inconclusive (partially clipped)
+        aState = Graphic3d_ClipState_On;
+      }
+    }
+    return Standard_False;
   }
 
 public:

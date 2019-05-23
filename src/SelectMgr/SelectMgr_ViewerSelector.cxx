@@ -518,6 +518,8 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
           }
           if (aState == Graphic3d_ClipState_On && !mySelectingVolumeMgr.IsOverlapAllowed()) // partially clipped
           {
+            if (aPlane->ProbeBoxTouch (aBBox))
+              continue;
             aClipped = true;
             break;
           }
