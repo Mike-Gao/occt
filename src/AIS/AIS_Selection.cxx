@@ -156,11 +156,11 @@ void AIS_Selection::SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
       Standard_Boolean anOtherFound = Standard_False;
       for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
       {
-        anOtherFound = !thePickedOwners.Contains (aSelIter.Value());
+        anOtherFound = !aPrevSelected.Contains (aSelIter.Value());
         if (anOtherFound)
           break;
       }
-      if (anOtherFound)
+      if (!anOtherFound)
         aSelScheme = AIS_SelectionScheme_Add;
     }
   }
