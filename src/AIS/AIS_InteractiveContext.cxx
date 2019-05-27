@@ -163,13 +163,6 @@ myIsAutoActivateSelMode(Standard_True)
     aStyle->SetMethod(Aspect_TOHM_COLOR);
     aStyle->SetColor (Quantity_NOC_GRAY40);
   }
-  SetSelectionScheme (AIS_SelectionType_Select,       AIS_SelectionScheme_ClearAndAdd);
-  SetSelectionScheme (AIS_SelectionType_SelectInRect, AIS_SelectionScheme_ClearAndAdd);
-  SetSelectionScheme (AIS_SelectionType_SelectInPoly, AIS_SelectionScheme_ClearAndAdd); 
-  SetSelectionScheme (AIS_SelectionType_ShiftSelect,       AIS_SelectionScheme_Switch);
-  SetSelectionScheme (AIS_SelectionType_ShiftSelectInRect, AIS_SelectionScheme_Switch);
-  SetSelectionScheme (AIS_SelectionType_ShiftSelectInPoly, AIS_SelectionScheme_Switch);
-
   InitAttributes();
 }
 
@@ -432,8 +425,7 @@ void AIS_InteractiveContext::Display (const Handle(AIS_InteractiveObject)& theIO
   setContextToObject (theIObj);
   if (!myObjects.IsBound (theIObj))
   {
-    Handle(AIS_GlobalStatus) aStatus = new AIS_GlobalStatus (AIS_DS_Displayed, theDispMode, theSelectionMode);
-    myObjects.Bind   (theIObj, aStatus);
+    setObjectStatus (theIObj, AIS_DS_Displayed, theDispMode, theSelectionMode);
     myMainVwr->StructureManager()->RegisterObject (theIObj);
     myMainPM->Display(theIObj, theDispMode);
     if (theSelectionMode != -1)
@@ -510,8 +502,7 @@ void AIS_InteractiveContext::Load (const Handle(AIS_InteractiveObject)& theIObj,
   {
     Standard_Integer aDispMode, aHiMod, aSelModeDef;
     GetDefModes (theIObj, aDispMode, aHiMod, aSelModeDef);
-    Handle(AIS_GlobalStatus) aStatus = new AIS_GlobalStatus (AIS_DS_Erased, aDispMode, theSelMode != -1 ? theSelMode : aSelModeDef);
-    myObjects.Bind (theIObj, aStatus);
+    setObjectStatus (theIObj, AIS_DS_Erased, aDispMode, theSelMode != -1 ? theSelMode : aSelModeDef);
     myMainVwr->StructureManager()->RegisterObject (theIObj);
   }
 
@@ -2101,7 +2092,7 @@ void AIS_InteractiveContext::ClearGlobal (const Handle(AIS_InteractiveObject)& t
   const Handle(SelectMgr_SelectableObject)& anObj = theIObj; // to avoid ambiguity
   mgrSelector->Remove (anObj);
 
-  myObjects.UnBind (theIObj);
+  setObjectStatus (theIObj, AIS_DS_None, -1, -1);
   myMainVwr->StructureManager()->UnregisterObject (theIObj);
 
   for (V3d_ListOfViewIterator aDefViewIter (myMainVwr->DefinedViewIterator()); aDefViewIter.More(); aDefViewIter.Next())
@@ -2565,5 +2556,31 @@ void AIS_InteractiveContext::SetTransformPersistence (const Handle(AIS_Interacti
   {
     anActiveViewIter.Value()->View()->InvalidateBVHData (aLayerId);
     anActiveViewIter.Value()->View()->InvalidateZLayerBoundingBox (aLayerId);
+  }
+}
+//=======================================================================
+//function : setObjectStatus
+//purpose  :
+//=======================================================================
+void AIS_InteractiveContext::setObjectStatus (const Handle(AIS_InteractiveObject)& theIObj,
+                                              const AIS_DisplayStatus theStatus,
+                                              const Standard_Integer theDispMode,
+                                              const Standard_Integer theSelectionMode)
+{
+  if (theStatus != AIS_DS_None)
+  {
+    Handle(AIS_GlobalStatus) aStatus = new AIS_GlobalStatus (AIS_DS_Displayed, theDispMode, theSelectionMode);
+    myObjects.Bind (theIObj, aStatus);
+  }
+  else
+    myObjects.UnBind (theIObj);
+
+  for (PrsMgr_ListOfPresentableObjectsIter aPrsIter (theIObj->Children()); aPrsIter.More(); aPrsIter.Next())
+  {
+    Handle(AIS_InteractiveObject) aChild (Handle(AIS_InteractiveObject)::DownCast (aPrsIter.Value()));
+    if (aChild.IsNull())
+      continue;
+
+    setObjectStatus (aChild, theStatus, theDispMode, theSelectionMode);
   }
 }
