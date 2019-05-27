@@ -445,13 +445,23 @@ public: //! @name Selection management
     return AddSelect (theObject->GlobalSelOwner());
   }
 
-  //! Returns selection scheme used in Select
-  AIS_SelectionScheme SelectionScheme (const AIS_SelectionType theType) const
-  { return mySelectionSchemes.Find (theType); }
+  //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
+  //! The objects detected are passed to the main viewer, which is then updated.
+  Standard_EXPORT AIS_StatusOfPick Select (const Standard_Integer  theXPMin,
+                                           const Standard_Integer  theYPMin,
+                                           const Standard_Integer  theXPMax,
+                                           const Standard_Integer  theYPMax,
+                                           const Handle(V3d_View)& theView,
+                                           const AIS_SelectionScheme theSelScheme);
+  
+  //! polyline selection; clears the previous picked list
+  Standard_EXPORT AIS_StatusOfPick Select (const TColgp_Array1OfPnt2d& thePolyline,
+                                           const Handle(V3d_View)&     theView,
+                                           const AIS_SelectionScheme   theSelScheme);
 
-  //! Returns selection scheme used in Select
-  void SetSelectionScheme (const AIS_SelectionType theType, const AIS_SelectionScheme theScheme)
-  { mySelectionSchemes.Bind (theType, theScheme); }
+  //! Stores and hilights the previous detected; Unhilights the previous picked.
+  //! @sa MoveTo().
+  Standard_EXPORT AIS_StatusOfPick Select (const AIS_SelectionScheme theSelScheme);
 
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
   //! The objects detected are passed to the main viewer, which is then updated.
@@ -1359,6 +1369,14 @@ protected: //! @name internal methods
     }
   }
 
+  //! Bind/Unbind status to object and object children
+  //! \param theIObj object
+  //! \param theStatus status, if NULL, unbind object
+  Standard_EXPORT void setObjectStatus (const Handle(AIS_InteractiveObject)& theIObj,
+                                        const AIS_DisplayStatus theStatus,
+                                        const Standard_Integer theDispyMode,
+                                        const Standard_Integer theSelectionMode);
+
 protected: //! @name internal fields
 
   AIS_DataMapOfIOStatus myObjects;
@@ -1380,8 +1398,6 @@ protected: //! @name internal fields
   SelectMgr_PickingStrategy myPickingStrategy; //!< picking strategy to be applied within MoveTo()
   Standard_Boolean myAutoHilight;
   Standard_Boolean myIsAutoActivateSelMode;
-
-  NCollection_DataMap<AIS_SelectionType, AIS_SelectionScheme> mySelectionSchemes;
 };
 
 DEFINE_STANDARD_HANDLE(AIS_InteractiveContext, Standard_Transient)
