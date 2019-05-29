@@ -14,6 +14,7 @@
 #include <Standard_GUID.hxx>
 #include <NCollection_Map.hxx>
 #include <TColStd_HArray1OfByte.hxx>
+#include <TDataStd_Name.hxx>
 #include <TDF_Label.hxx>
 #include <TDF_LabelMapHasher.hxx>
 #include <TDF_ChildIDIterator.hxx>
@@ -25,6 +26,7 @@
 #include <XCAFDoc_NoteBalloon.hxx>
 #include <XCAFDoc_NoteComment.hxx>
 #include <XCAFDoc_NoteBinData.hxx>
+#include <XCAFDoc_AssemblyItemId.hxx>
 #include <XCAFDoc_AssemblyItemRef.hxx>
 
 namespace {
@@ -43,7 +45,8 @@ IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_NotesTool, TDF_Attribute)
 enum NotesTool_RootLabels
 {
   NotesTool_NotesRoot = 1,
-  NotesTool_AnnotatedItemsRoot
+  NotesTool_AnnotatedItemsRoot,
+  NotesTool_NoteGroupsRoot
 };
 
 // =======================================================================
@@ -101,6 +104,15 @@ TDF_Label XCAFDoc_NotesTool::GetAnnotatedItemsLabel() const
 }
 
 // =======================================================================
+// function : GetNoteGroupsLabel
+// purpose  :
+// =======================================================================
+TDF_Label XCAFDoc_NotesTool::GetGroupsLabel() const
+{
+  return Label().FindChild(NotesTool_NoteGroupsRoot);
+}
+
+// =======================================================================
 // function : NbNotes
 // purpose  :
 // =======================================================================
@@ -127,9 +139,24 @@ XCAFDoc_NotesTool::NbAnnotatedItems() const
   Standard_Integer nbItems = 0;
   for (TDF_ChildIDIterator anIter(GetAnnotatedItemsLabel(), XCAFDoc_AssemblyItemRef::GetID()); anIter.More(); anIter.Next())
   {
-      ++nbItems;
+    ++nbItems;
   }
   return nbItems;
+}
+
+// =======================================================================
+// function : NbNoteGroups
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::NbGroups() const
+{
+  Standard_Integer nbGroups = 0;
+  for (TDF_ChildIterator anIter(GetGroupsLabel()); anIter.More(); anIter.Next())
+  {
+    ++nbGroups;
+  }
+  return nbGroups;
 }
 
 // =======================================================================
@@ -157,6 +184,19 @@ XCAFDoc_NotesTool::GetAnnotatedItems(TDF_LabelSequence& theItemLabels) const
   for (TDF_ChildIDIterator anIter(GetAnnotatedItemsLabel(), XCAFDoc_AssemblyItemRef::GetID()); anIter.More(); anIter.Next())
   {
     theItemLabels.Append(anIter.Value()->Label());
+  }
+}
+
+// =======================================================================
+// function : GetNoteGroups
+// purpose  :
+// =======================================================================
+void
+XCAFDoc_NotesTool::GetGroups(TDF_LabelSequence& theNoteGroupLabels) const
+{
+  for (TDF_ChildIterator anIter(GetGroupsLabel()); anIter.More(); anIter.Next())
+  {
+    theNoteGroupLabels.Append(anIter.Value());
   }
 }
 
@@ -193,6 +233,7 @@ XCAFDoc_NotesTool::FindAnnotatedItem(const XCAFDoc_AssemblyItemId& theItemId) co
     if (!anItemRef.IsNull() && anItemRef->GetItem().IsEqual(theItemId) && !anItemRef->HasExtraRef())
       return anItemRef->Label();
   }
+
   return TDF_Label();
 }
 
@@ -217,10 +258,11 @@ XCAFDoc_NotesTool::FindAnnotatedItemAttr(const XCAFDoc_AssemblyItemId& theItemId
   for (TDF_ChildIDIterator anIter(GetAnnotatedItemsLabel(), XCAFDoc_AssemblyItemRef::GetID()); anIter.More(); anIter.Next())
   {
     Handle(XCAFDoc_AssemblyItemRef) anItemRef = Handle(XCAFDoc_AssemblyItemRef)::DownCast(anIter.Value());
-    if (!anItemRef.IsNull() && anItemRef->GetItem().IsEqual(theItemId) && 
+    if (!anItemRef.IsNull() && anItemRef->GetItem().IsEqual(theItemId) &&
       anItemRef->HasExtraRef() && anItemRef->GetGUID() == theGUID)
       return anItemRef->Label();
   }
+
   return TDF_Label();
 }
 
@@ -250,6 +292,7 @@ XCAFDoc_NotesTool::FindAnnotatedItemSubshape(const XCAFDoc_AssemblyItemId& theIt
       anItemRef->HasExtraRef() && anItemRef->GetSubshapeIndex() == theSubshapeIndex)
       return anItemRef->Label();
   }
+
   return TDF_Label();
 }
 
@@ -329,6 +372,344 @@ XCAFDoc_NotesTool::CreateBinData(const TCollection_ExtendedString&    theUserNam
 }
 
 // =======================================================================
+// function : IsGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::IsGroup(const TDF_Label& theLabel) const
+{
+  return !theLabel.IsNull() && !theLabel.Father().IsNull() 
+    && theLabel.Father().IsEqual(GetGroupsLabel());
+}
+
+// =======================================================================
+// function : CreateGroup
+// purpose  :
+// =======================================================================
+TDF_Label
+XCAFDoc_NotesTool::CreateGroup(const TCollection_ExtendedString& theGroupName)
+{
+  TDF_TagSource aTag;
+  TDF_Label aGroupLabel = aTag.NewChild(GetGroupsLabel());
+  if (!aGroupLabel.IsNull())
+  {
+    if (TDataStd_Name::Set(aGroupLabel, theGroupName).IsNull())
+      aGroupLabel.Nullify();
+  }
+  return aGroupLabel;
+}
+
+// =======================================================================
+// function : AddToGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::GetGroupName(const TDF_Label& theGroupLabel,
+                                TCollection_ExtendedString& theGroupName)
+{
+  if (!IsGroup(theGroupLabel))
+    return Standard_False;
+
+  Handle(TDataStd_Name) aName;
+  if (!theGroupLabel.FindAttribute(TDataStd_Name::GetID(), aName))
+    return Standard_False;
+
+  theGroupName = aName->Get();
+  return Standard_True;
+}
+
+// =======================================================================
+// function : NbGroupNotes
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::NbGroupNotes(const TDF_Label& theGroupLabel) const
+{
+  if (!IsGroup(theGroupLabel))
+    return 0;
+
+  Standard_Integer aNbNotes = 0;
+
+  Handle(XCAFDoc_GraphNode) aFather;
+  if (theGroupLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aFather) && !aFather.IsNull())
+  {
+    aNbNotes = aFather->NbChildren();
+  }
+
+  return aNbNotes;
+}
+
+// =======================================================================
+// function : AddToGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::AddToGroup(const TDF_Label& theGroupLabel,
+                              const Handle(XCAFDoc_Note)& theNote)
+{
+  return !theNote.IsNull() && AddToGroup(theGroupLabel, theNote->Label());
+}
+
+// =======================================================================
+// function : AddToGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::AddToGroup(const TDF_Label& theGroupLabel,
+                              const TDF_Label& theNoteLabel)
+{
+  if (!XCAFDoc_Note::IsMine(theNoteLabel))
+    return Standard_False;
+
+  Handle(XCAFDoc_GraphNode) aFather;
+  if (!theGroupLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aFather))
+  {
+    aFather = XCAFDoc_GraphNode::Set(theGroupLabel, XCAFDoc::NoteRefGUID());
+    if (aFather.IsNull())
+      return Standard_False;
+  }
+
+  Handle(XCAFDoc_GraphNode) aChild;
+  if (!theNoteLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aChild))
+  {
+    aChild = XCAFDoc_GraphNode::Set(theNoteLabel, XCAFDoc::NoteRefGUID());
+    if (aChild.IsNull())
+      return Standard_False;
+  }
+
+  aFather->SetChild(aChild);
+  aChild->SetFather(aFather);
+
+  return Standard_True;
+}
+
+// =======================================================================
+// function : AddToGroup
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::AddToGroup(const TDF_Label& theGroupLabel,
+                              const TDF_LabelSequence& theNoteLabels)
+{
+  Standard_Integer aNbAdded = 0;
+  for (TDF_LabelSequence::Iterator anIter(theNoteLabels); anIter.More(); anIter.Next())
+  {
+    if (AddToGroup(theGroupLabel, anIter.Value()))
+      ++aNbAdded;
+  }
+  return aNbAdded;
+}
+
+// =======================================================================
+// function : RemoveFromGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::RemoveFromGroup(const TDF_Label& theGroupLabel,
+                                   const Handle(XCAFDoc_Note)& theNote)
+{
+  return !theNote.IsNull() && RemoveFromGroup(theGroupLabel, theNote->Label());
+}
+
+// =======================================================================
+// function : RemoveFromGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::RemoveFromGroup(const TDF_Label& theGroupLabel,
+                                   const TDF_Label& theNoteLabel)
+{
+  if (!IsGroup(theGroupLabel))
+    return Standard_False;
+
+  Handle(XCAFDoc_GraphNode) aFather;
+  if (theGroupLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aFather) && !aFather.IsNull())
+  {
+    Standard_Integer nbChildren = aFather->NbChildren();
+    for (Standard_Integer iChild = 1; iChild <= nbChildren; ++iChild)
+    {
+      Handle(XCAFDoc_GraphNode) aChild = aFather->GetFather(iChild);
+      if (!aChild.IsNull() && theNoteLabel.IsEqual(aChild->Label()))
+      {
+        aFather->UnSetChild(aChild);
+        return Standard_True;
+      }
+    }
+  }
+
+  return Standard_False;
+}
+
+// =======================================================================
+// function : RemoveFromGroup
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::RemoveFromGroup(const TDF_Label& theGroupLabel,
+                                   const TDF_LabelSequence& theNoteLabels)
+{
+  Standard_Integer aNbRemoved = 0;
+  for (TDF_LabelSequence::Iterator anIter(theNoteLabels); anIter.More(); anIter.Next())
+  {
+    if (RemoveFromGroup(theGroupLabel, anIter.Value()))
+      ++aNbRemoved;
+  }
+  return aNbRemoved;
+}
+
+// =======================================================================
+// function : ClearGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::ClearGroup(const TDF_Label& theGroupLabel,
+                              Standard_Boolean theDeleteNotes)
+{
+  if (!IsGroup(theGroupLabel))
+    return Standard_False;
+
+  Handle(XCAFDoc_GraphNode) aFather;
+  if (theGroupLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aFather) && !aFather.IsNull())
+  {
+    while (aFather->NbChildren() > 0)
+    {
+      Handle(XCAFDoc_GraphNode) aChild = aFather->GetChild(1);
+      if (!aChild.IsNull())
+        aFather->UnSetChild(aChild);
+      if (theDeleteNotes)
+        DeleteNote(aChild->Label());
+    }
+  }
+
+  return Standard_True;
+}
+
+// =======================================================================
+// function : GetGroupNotes
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::GetGroupNotes(const TDF_Label& theGroupLabel,
+                                 TDF_LabelSequence& theNoteLabels) const
+{
+  if (!IsGroup(theGroupLabel))
+    return 0;
+
+  Standard_Integer aNbNotes = 0;
+
+  Handle(XCAFDoc_GraphNode) aFather;
+  if (theGroupLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aFather) && !aFather.IsNull())
+  {
+    Standard_Integer nbChildren = aFather->NbChildren();
+    for (Standard_Integer iChild = 1; iChild <= nbChildren; ++iChild)
+    {
+      Handle(XCAFDoc_GraphNode) aChild = aFather->GetChild(iChild);
+      theNoteLabels.Append(aChild->Label());
+    }
+  }
+
+  return aNbNotes;
+}
+
+// =======================================================================
+// function : GetUngropedNotes
+// purpose  :
+// =======================================================================
+Standard_Integer 
+XCAFDoc_NotesTool::GetUngropedNotes(TDF_LabelSequence& theNoteLabels) const
+{
+  TDF_LabelSequence aNotes;
+  GetNotes(aNotes);
+  if (aNotes.IsEmpty())
+    return 0;
+
+  Standard_Integer nbNotes = 0;
+  for (TDF_LabelSequence::Iterator anIter(aNotes); anIter.More(); anIter.Next())
+  {
+    TDF_LabelSequence aGroups;
+    if (GetNoteGroups(anIter.Value(), aGroups) == 0)
+    {
+      theNoteLabels.Append(anIter.Value());
+      ++nbNotes;
+    }
+  }
+  return nbNotes;
+}
+
+// =======================================================================
+// function : GetNoteGroups
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::GetNoteGroups(const Handle(XCAFDoc_Note)& theNote,
+                                 TDF_LabelSequence& theGroupLabels) const
+{
+  return !theNote.IsNull() ? GetNoteGroups(theNote->Label(), theGroupLabels) : 0;
+}
+
+// =======================================================================
+// function : GetNoteGroups
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::GetNoteGroups(const TDF_Label& theNoteLabel,
+                                 TDF_LabelSequence& theGroupLabels) const
+{
+  if (!XCAFDoc_Note::IsMine(theNoteLabel))
+    return 0;
+
+  Standard_Integer nbGroups = 0;
+  Handle(XCAFDoc_GraphNode) aChild;
+  if (theNoteLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aChild) && !aChild.IsNull())
+  {
+    Standard_Integer nbFathers = aChild->NbFathers();
+    for (Standard_Integer iFather = 1; iFather <= nbFathers; ++iFather)
+    {
+      Handle(XCAFDoc_GraphNode) aFather = aChild->GetFather(iFather);
+      if (IsGroup(aFather->Label()))
+      {
+        theGroupLabels.Append(aFather->Label());
+        ++nbGroups;
+      }
+    }
+  }
+  return nbGroups;
+}
+
+// =======================================================================
+// function : DeleteGroup
+// purpose  :
+// =======================================================================
+Standard_Boolean
+XCAFDoc_NotesTool::DeleteGroup(const TDF_Label& theGroupLabel, 
+                               Standard_Boolean theDeleteNotes)
+{
+  if (ClearGroup(theGroupLabel, theDeleteNotes))
+  {
+    theGroupLabel.ForgetAllAttributes();
+    return Standard_True;
+  }
+
+  return Standard_False;
+}
+
+// =======================================================================
+// function : DeleteAllGroups
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::DeleteAllGroups(Standard_Boolean theDeleteNotes)
+{
+  Standard_Integer nbGroups = 0;
+  for (TDF_ChildIterator anIter(GetGroupsLabel()); anIter.More(); anIter.Next())
+  {
+    if (DeleteGroup(anIter.Value(), theDeleteNotes))
+      ++nbGroups;
+  }
+  return nbGroups;
+}
+
+// =======================================================================
 // function : GetNotes
 // purpose  :
 // =======================================================================
@@ -344,14 +725,16 @@ XCAFDoc_NotesTool::GetNotes(const XCAFDoc_AssemblyItemId& theItemId,
   if (!anAnnotatedItem.FindAttribute(XCAFDoc::NoteRefGUID(), aChild))
     return 0;
 
+  Standard_Integer nbNotes = 0;
   Standard_Integer nbFathers = aChild->NbFathers();
   for (Standard_Integer iFather = 1; iFather <= nbFathers; ++iFather)
   {
     Handle(XCAFDoc_GraphNode) aFather = aChild->GetFather(iFather);
     theNoteLabels.Append(aFather->Label());
+    ++nbNotes;
   }
 
-  return theNoteLabels.Length();
+  return nbNotes;
 }
 
 // =======================================================================
@@ -382,14 +765,16 @@ XCAFDoc_NotesTool::GetAttrNotes(const XCAFDoc_AssemblyItemId& theItemId,
   if (!anAnnotatedItem.FindAttribute(XCAFDoc::NoteRefGUID(), aChild))
     return 0;
 
+  Standard_Integer nbNotes = 0;
   Standard_Integer nbFathers = aChild->NbFathers();
   for (Standard_Integer iFather = 1; iFather <= nbFathers; ++iFather)
   {
     Handle(XCAFDoc_GraphNode) aFather = aChild->GetFather(iFather);
     theNoteLabels.Append(aFather->Label());
+    ++nbNotes;
   }
 
-  return theNoteLabels.Length();
+  return nbNotes;
 }
 
 // =======================================================================
@@ -421,14 +806,16 @@ XCAFDoc_NotesTool::GetSubshapeNotes(const XCAFDoc_AssemblyItemId& theItemId,
   if (!anAnnotatedItem.FindAttribute(XCAFDoc::NoteRefGUID(), aChild))
     return 0;
 
+  Standard_Integer nbNotes = 0;
   Standard_Integer nbFathers = aChild->NbFathers();
   for (Standard_Integer iFather = 1; iFather <= nbFathers; ++iFather)
   {
     Handle(XCAFDoc_GraphNode) aFather = aChild->GetFather(iFather);
     theNoteLabels.Append(aFather->Label());
+    ++nbNotes;
   }
 
-  return theNoteLabels.Length();
+  return nbNotes;
 }
 
 // =======================================================================
@@ -444,7 +831,6 @@ XCAFDoc_NotesTool::AddNote(const TDF_Label&              theNoteLabel,
   if (!XCAFDoc_Note::IsMine(theNoteLabel))
     return anItemRef;
 
-  Handle(XCAFDoc_GraphNode) aChild;
   TDF_Label anAnnotatedItem = FindAnnotatedItem(theItemId);
   if (anAnnotatedItem.IsNull())
   {
@@ -454,6 +840,7 @@ XCAFDoc_NotesTool::AddNote(const TDF_Label&              theNoteLabel,
       return anItemRef;
   }
 
+  Handle(XCAFDoc_GraphNode) aChild;
   if (!anAnnotatedItem.FindAttribute(XCAFDoc::NoteRefGUID(), aChild))
   {
     aChild = XCAFDoc_GraphNode::Set(anAnnotatedItem, XCAFDoc::NoteRefGUID());
@@ -915,10 +1302,10 @@ XCAFDoc_NotesTool::DeleteNote(const TDF_Label& theNoteLabel)
         Handle(XCAFDoc_GraphNode) aChild = aFather->GetChild(1);
         aFather->UnSetChild(aChild);
         if (aChild->NbFathers() == 0)
-          aChild->Label().ForgetAllAttributes(Standard_True);
+          aChild->Label().ForgetAllAttributes();
       }
     }
-    theNoteLabel.ForgetAllAttributes(Standard_True);
+    theNoteLabel.ForgetAllAttributes();
     return Standard_True;
   }
   return Standard_False;

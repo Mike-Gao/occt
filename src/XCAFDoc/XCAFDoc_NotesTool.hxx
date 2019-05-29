@@ -17,6 +17,7 @@
 #include <Standard.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
+#include <TDF_AttributeMap.hxx>
 #include <TDF_LabelSequence.hxx>
 
 class OSD_File;
@@ -48,17 +49,23 @@ class XCAFDoc_AssemblyItemRef;
 //! |         0:1:9        |
 //! ------------------------
 //!             |1
-//!             |   -------------------     ---------------------------
-//!             +___|      Notes      |-----|       XCAFDoc_Note      |
-//!             |  1|     0:1:9:1     |1   *|         0:1:9:1:*       |
-//!             |   -------------------     ---------------------------
-//!             |                                        !*
-//!             |                              { XCAFDoc_GraphNode }
-//!             |                                       *!
-//!             |   -------------------     ---------------------------
-//!             +___| Annotated items |-----| XCAFDoc_AssemblyItemRef |
-//!                1|     0:1:9:2     |1   *|         0:1:9:2:*       |
-//!                 -------------------     ---------------------------
+//!             |   -------------------      ---------------------------
+//!             +___|      Notes      |------|       XCAFDoc_Note      |
+//!             |  1|     0:1:9:1     |1    *|         0:1:9:1:*       |
+//!             |   -------------------      ---------------------------
+//!             |                                     [C] * [F]
+//!             |            --- { XCAFDoc_GraphNode } ---|
+//!             |       [F] *                             |
+//!             |   -------------------                   |
+//!             +___|   Note groups   |         { XCAFDoc_GraphNode }
+//!             |  1|     0:1:9:3     |                   |  
+//!             |   -------------------                   |
+//!             |                                         |
+//!             |                                         * [C]
+//!             |   -------------------      ---------------------------
+//!             +___| Annotated items |------| XCAFDoc_AssemblyItemRef |
+//!                1|     0:1:9:2     |1    *|         0:1:9:2:*       |
+//!                 -------------------      ---------------------------
 //!
 //! A typical annotation procedure is illustrated by the code example below:
 //! \code{.c++}
@@ -94,11 +101,17 @@ public:
   //! Returns the label of the annotated items hive.
   Standard_EXPORT TDF_Label GetAnnotatedItemsLabel() const;
 
+  //! Returns the label of the note groups hive.
+  Standard_EXPORT TDF_Label GetGroupsLabel() const;
+
   //! Returns the number of labels in the notes hive.
   Standard_EXPORT Standard_Integer NbNotes() const;
 
   //! Returns the number of labels in the annotated items hive.
   Standard_EXPORT Standard_Integer NbAnnotatedItems() const;
+
+  //! Returns the number of labels in the note groups hive.
+  Standard_EXPORT Standard_Integer NbGroups() const;
 
   //! Returns all labels from the notes hive.
   //! The label sequence isn't cleared beforehand.
@@ -109,6 +122,11 @@ public:
   //! The label sequence isn't cleared beforehand.
   //! \param [out] theNoteLabels - sequence of labels.
   Standard_EXPORT void GetAnnotatedItems(TDF_LabelSequence& theLabels) const;
+
+  //! Returns all labels from the note groups hive.
+  //! The label sequence isn't cleared beforehand.
+  //! \param [out] theGroupLabels - sequence of labels.
+  Standard_EXPORT void GetGroups(TDF_LabelSequence& theGroupLabels) const;
 
   //! Checks if the given assembly item is annotated.
   //! \param [in] theItemId - assembly item ID.
@@ -217,6 +235,120 @@ public:
                                                      const TCollection_ExtendedString&    theTitle,
                                                      const TCollection_AsciiString&       theMIMEtype,
                                                      const Handle(TColStd_HArray1OfByte)& theData);
+
+  //! @}
+
+  //! @name Note groups functions
+  //! @{
+
+  //! Checks if the label is a note group.
+  //! \param [in] theLabel - label.
+  //! \return true if the label is a child of the note groups hive, otherwise - false.
+  Standard_EXPORT Standard_Boolean IsGroup(const TDF_Label& theLabel) const;
+
+  //! Create a new note group.
+  //! \param [in] theGroupName - the user associated with the note.
+  //! \return new group label.
+  Standard_EXPORT TDF_Label CreateGroup(const TCollection_ExtendedString& theGroupName);
+
+  //! Get group name.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [out] theGroupName - group name.
+  //! \return true if the label is group, otherwise - false.
+  Standard_EXPORT Standard_Boolean GetGroupName(const TDF_Label& theGroupLabel,
+                                                TCollection_ExtendedString& theGroupName);
+
+  //! Returns the number of notes in the group.
+  //! \param [in] theGroupLabel - group label.
+  Standard_EXPORT Standard_Integer NbGroupNotes(const TDF_Label& theGroupLabel) const;
+
+  //! Adds note to group.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [in] theNote       - attribute identifying the note.
+  //! \return true if theNote was successfully added to the specified group, otherwise - false.
+  Standard_EXPORT Standard_Boolean AddToGroup(const TDF_Label& theGroupLabel,
+                                              const Handle(XCAFDoc_Note)& theNote);
+
+  //! Adds note to group.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [in] theNoteLabel  - note label.
+  //! \return true if theNote was successfully added to the specified group, otherwise - false.
+  Standard_EXPORT Standard_Boolean AddToGroup(const TDF_Label& theGroupLabel,
+                                              const TDF_Label& theNoteLabel);
+
+  //! Adds notes to group.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [in] theNoteLabels - note label sequence.
+  //! \return the number of notes added to the group.
+  Standard_EXPORT Standard_Integer AddToGroup(const TDF_Label& theGroupLabel,
+                                              const TDF_LabelSequence& theNoteLabels);
+
+  //! Removes note from the group.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [in] theNote       - attribute identifying the note.
+  //! \return true if the note was successfully from the group, otherwise - false.
+  Standard_EXPORT Standard_Boolean RemoveFromGroup(const TDF_Label& theGroupLabel,
+                                                   const Handle(XCAFDoc_Note)& theNote);
+
+  //! Removes note from the group.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [in] theNoteLabel  - note label.
+  //! \return true if the note was successfully from the group, otherwise - false.
+  Standard_EXPORT Standard_Boolean RemoveFromGroup(const TDF_Label& theGroupLabel,
+                                                   const TDF_Label& theNoteLabel);
+
+  //! Removes notes from the group.
+  //! \param [in] theGroupLabel - group label.
+  //! \param [in] theNoteLabels - note label sequence.
+  //! \return the number of removed notes.
+  Standard_EXPORT Standard_Integer RemoveFromGroup(const TDF_Label& theGroupLabel,
+                                                   const TDF_LabelSequence& theNoteLabels);
+  
+  //! Removes all notes from the group.
+  //! \param [in] theGroupLabel - group label.
+  //! \return the number of removed notes.
+  Standard_EXPORT Standard_Boolean ClearGroup(const TDF_Label& theGroupLabel,
+                                              Standard_Boolean theDeleteNotes = Standard_False);
+
+  //! Retrieves notes from group.
+  //! Out label sequence isn't cleared.
+  //! \param [in] theGroupLabel  - group label.
+  //! \param [out] theNoteLabels - note label sequence.
+  //! \return the number of retrieved notes.
+  Standard_EXPORT Standard_Integer GetGroupNotes(const TDF_Label& theGroupLabel,
+                                                 TDF_LabelSequence& theNoteLabels) const;
+
+  //! Retrieves groups, to which the note belongs.
+  //! Out label sequence isn't cleared.
+  //! \param [in] theNote         - attribute identifying the note.
+  //! \param [out] theGroupLabels - group label sequence.
+  //! \return the number of retrieved groups.
+  Standard_EXPORT Standard_Integer GetNoteGroups(const Handle(XCAFDoc_Note)& theNote,
+                                                 TDF_LabelSequence& theGroupLabels) const;
+
+  //! Retrieves groups, to which the note belongs.
+  //! Out label sequence isn't cleared.
+  //! \param [in] theNoteLabel    - note label.
+  //! \param [out] theGroupLabels - group label sequence.
+  //! \return the number of retrieved groups.
+  Standard_EXPORT Standard_Integer GetNoteGroups(const TDF_Label& theNoteLabel,
+                                                 TDF_LabelSequence& theGroupLabels) const;
+
+  //! Retrieves notes, which don't belong to any group.
+  //! Out label sequence isn't cleared.
+  //! \param [out] theNoteLabels - note label sequence.
+  //! \return the number of retrieved notes.
+  Standard_EXPORT Standard_Integer GetUngropedNotes(TDF_LabelSequence& theNoteLabels) const;
+
+  //! Delete group.
+  //! \param [in] theGroupLabel - group label.
+  //! \return true if the group was successfully deleted, otherwise - false.
+  Standard_EXPORT Standard_Boolean DeleteGroup(const TDF_Label& theGroupLabel,
+                                               Standard_Boolean theDeleteNotes = Standard_False);
+
+  //! Delete all groups.
+  //! \return the number of deleted groups.
+  Standard_EXPORT Standard_Integer DeleteAllGroups(Standard_Boolean theDeleteNotes = Standard_False);
 
   //! @}
 
@@ -509,7 +641,6 @@ public:
   Standard_EXPORT void Paste(const Handle(TDF_Attribute)&       theAttrInto, 
                              const Handle(TDF_RelocationTable)& theRT) const Standard_OVERRIDE;
   Standard_EXPORT Standard_OStream& Dump(Standard_OStream& theOS) const Standard_OVERRIDE;
-
 };
 
 DEFINE_STANDARD_HANDLE(XCAFDoc_NotesTool, TDF_Attribute)
