@@ -418,15 +418,6 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMi
     throw Standard_ProgramError ("AIS_InteractiveContext::Select() - invalid argument");
   }
 
-  // all objects detected by the selector are taken, previous current objects are emptied,
-  // new objects are put...
-  if (myAutoHilight)
-  {
-    clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
-  }
-  myWasLastMain = Standard_True;
-
   myMainSel->Pick (theXPMin, theYPMin, theXPMax, theYPMax, theView);
 
   AIS_NListOfEntityOwner aPickedOwners;
@@ -434,19 +425,8 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMi
   {
     aPickedOwners.Append (myMainSel->Picked (aPickIter));
   }
-  mySelection->SelectOwners (aPickedOwners, theSelScheme, myFilters);
 
-  if (myAutoHilight)
-  {
-    HilightSelected (Standard_False);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
-  
+  return Select (aPickedOwners, theSelScheme);
 }
 
 //=======================================================================
@@ -462,15 +442,6 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
     throw Standard_ProgramError ("AIS_InteractiveContext::Select() - invalid argument");
   }
 
-  // all objects detected by the selector are taken, previous current objects are emptied,
-  // new objects are put...
-  if (myAutoHilight)
-  {
-    clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
-  }
-
-  myWasLastMain = Standard_True;
   myMainSel->Pick (thePolyline, theView);
 
   AIS_NListOfEntityOwner aPickedOwners;
@@ -478,19 +449,8 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
   {
     aPickedOwners.Append (myMainSel->Picked (aPickIter));
   }
-  mySelection->SelectOwners (aPickedOwners, theSelScheme, myFilters);
 
-  if (myAutoHilight)
-  {
-    HilightSelected (Standard_False);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
-  
+  return Select (aPickedOwners, theSelScheme);
 }
 
 //=======================================================================
@@ -509,26 +469,10 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_SelectionScheme theSe
     return getStatusOfPick (NbSelected());
   }*/
 
-  if (myAutoHilight)
-  {
-    clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
-  }
-
   AIS_NListOfEntityOwner aPickedOwners;
   aPickedOwners.Append (myLastinMain);
-  mySelection->SelectOwners (aPickedOwners, theSelScheme, myFilters);
 
-  if (myAutoHilight)
-  {
-    HilightSelected (Standard_False);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
+  return Select (aPickedOwners, theSelScheme);
 }
 
 //=======================================================================
@@ -597,6 +541,36 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const TColgp_Array1OfPnt2d
                                                       const Standard_Boolean)
 {
   return Select (thePolyline, theView, AIS_SelectionScheme_Switch);
+}
+
+//=======================================================================
+//function : Select
+//purpose  :
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_NListOfEntityOwner& theOwners,
+                                                 const AIS_SelectionScheme theSelScheme)
+{
+  // all objects detected by the selector are taken, previous current objects are emptied,
+  // new objects are put...
+  if (myAutoHilight)
+  {
+    clearDynamicHighlight();
+    UnhilightSelected (Standard_False);
+  }
+  myWasLastMain = Standard_True;
+
+  mySelection->SelectOwners (theOwners, theSelScheme, myFilters);
+
+  if (myAutoHilight)
+  {
+    HilightSelected (Standard_False);
+  }
+
+  Standard_Integer aSelNum = NbSelected();
+
+  return (aSelNum == 0) ? AIS_SOP_NothingSelected
+                        : (aSelNum == 1) ? AIS_SOP_OneSelected
+                                         : AIS_SOP_SeveralSelected;
 }
 
 //=======================================================================

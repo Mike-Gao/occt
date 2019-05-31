@@ -501,6 +501,13 @@ public: //! @name Selection management
                                                 const Handle(V3d_View)& theView,
                                                 const Standard_Boolean  theToUpdateViewer);
 
+  //! Sets list of owner selected/deselected using selection scheme
+  //! It is possible that selection of other objects is changed relatively selection scheme   .
+  //! \param theOwner owners to change selection state
+  //! \param theSelScheme selection scheme
+  Standard_EXPORT AIS_StatusOfPick Select (const AIS_NListOfEntityOwner& theOwners,
+                                           const AIS_SelectionScheme theSelScheme);
+
   //! Fits the view correspondingly to the bounds of selected objects.
   //! Infinite objects are ignored if infinite state of AIS_InteractiveObject is set to true.
   Standard_EXPORT void FitSelected (const Handle(V3d_View)& theView,
