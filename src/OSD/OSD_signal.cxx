@@ -653,6 +653,7 @@ typedef void (* SIG_PFV) (int);
 typedef void (* SIG_PFV) (int);
 
 #include <signal.h>
+#include <execinfo.h>
 
 #if !defined(__ANDROID__) && !defined(__QNX__)
   #include <sys/signal.h>
@@ -827,10 +828,36 @@ static void SegvHandler(const int theSignal,
      sigprocmask (SIG_UNBLOCK, &set, NULL) ;
      void *address = ip->si_addr ;
      {
-       char Msg[100];
-       sprintf(Msg,"SIGSEGV 'segmentation violation' detected. Address %lx",
-         (long ) address ) ;
-       OSD_SIGSEGV::NewInstance(Msg)->Jump();
+       //char Msg[100];
+       char aMsg[4096];
+       sprintf(aMsg,"SIGSEGV 'segmentation violation' detected. Address %lx", (long )address);
+
+       void* aStackArr[10];
+       size_t aSize = ::backtrace (aStackArr, 10);
+       if (aSize > 0)
+       {
+         if (char** aStrings = ::backtrace_symbols (aStackArr, aSize))
+         {
+           //size_t aLimit = 4096 - 100;
+           size_t aLimit = 50;
+           for (size_t aLineIter = 0; aLineIter < aSize; ++aLineIter)
+           {
+             const size_t aLen = strlen (aStrings[aLineIter]);
+             if (aLen + 1 < aLimit)
+             {
+               strcat (aMsg, "\n");
+               strcat (aMsg, aStrings[aLineIter]);
+             }
+             aLimit -= aLen + 1;
+           }
+           /*snprintf (aMsg, 4096, "SIGSEGV 'segmentation violation' detected. Address %lx\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+                     (long )address,
+                     aStrings[0], aStrings[1], aStrings[2], aStrings[3], aStrings[4],
+                     aStrings[5], aStrings[6], aStrings[7], aStrings[8], aStrings[9]);*/
+           free (aStrings);
+         }
+       }
+       OSD_SIGSEGV::NewInstance(aMsg)->Jump();
      }
   }
 #ifdef OCCT_DEBUG

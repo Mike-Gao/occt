@@ -175,12 +175,13 @@ bool OpenGl_Font::renderGlyph (const Handle(OpenGl_Context)& theCtx,
     return false;
   }
 
-  Handle(OpenGl_Texture)& aTexture = myTextures.ChangeLast();
+  /*Handle(OpenGl_Texture)& aTexture = myTextures.ChangeLast();
   if (aTexture.IsNull()
   || !aTexture->IsValid())
   {
     return false;
-  }
+  }*/
+Handle(OpenGl_Texture) aTexture; ///
 
   const Image_PixMap& anImg = myFont->GlyphImage();
   const Standard_Integer aTileId = myLastTileId + 1;
