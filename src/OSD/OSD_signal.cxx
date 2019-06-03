@@ -863,10 +863,10 @@ static void SegvHandler(const int theSignal,
      sigprocmask (SIG_UNBLOCK, &set, NULL) ;
      void *address = ip->si_addr ;
      {
-       char Msg[100];
-       sprintf(Msg,"SIGSEGV 'segmentation violation' detected. Address %lx",
-         (long ) address ) ;
-       OSD_SIGSEGV::NewInstance(Msg)->Jump();
+       char aMsg[4096];
+       sprintf(aMsg,"SIGSEGV 'segmentation violation' detected. Address %lx.", (long )address);
+       Standard_Failure::BacktraceCat (aMsg, sizeof(aMsg));
+       OSD_SIGSEGV::NewInstance(aMsg)->Jump();
      }
   }
 #ifdef OCCT_DEBUG

@@ -22,6 +22,11 @@
 #include <Standard_TypeMismatch.hxx>
 
 #include <string.h>
+
+#ifndef _WIN32
+  #include <execinfo.h>
+#endif
+
 IMPLEMENT_STANDARD_RTTIEXT(Standard_Failure,Standard_Transient)
 
 static Standard_CString allocate_message(const Standard_CString AString)
@@ -163,6 +168,66 @@ void Standard_Failure::Jump()
 void Standard_Failure::Throw() const
 {
   throw *this;
+}
+
+//=======================================================================
+//function : BacktraceCat
+//purpose  :
+//=======================================================================
+void Standard_Failure::BacktraceCat (char* theBuffer,
+                                     const int theBufferSize,
+                                     const int theNbTraces)
+{
+  if (theBufferSize < 1
+   || theNbTraces < 1
+   || theBuffer == NULL)
+  {
+    return;
+  }
+
+#ifdef _WIN32
+  // not implemented
+#else
+  void* aStackArr[128];
+  int aNbTraces = Min (theNbTraces + 1, 128);
+  aNbTraces = ::backtrace (aStackArr, aNbTraces);
+  if (aNbTraces <= 1)
+  {
+    return;
+  }
+
+  // exclude this function call from stack
+  --aNbTraces;
+  char** aStrings = ::backtrace_symbols (aStackArr + 1, aNbTraces);
+  if (aStrings == NULL)
+  {
+    return;
+  }
+
+  const size_t aLenInit = strlen (theBuffer);
+  size_t aLimit = (size_t )theBufferSize - aLenInit - 1;
+  if (aLimit > 16)
+  {
+    strcat (theBuffer, "\n==Backtrace==");
+  }
+  for (int aLineIter = 0; aLineIter < aNbTraces; ++aLineIter)
+  {
+    const size_t aLen = strlen (aStrings[aLineIter]);
+    if (aLen + 1 >= aLimit)
+    {
+      break;
+    }
+
+    strcat (theBuffer, "\n");
+    strcat (theBuffer, aStrings[aLineIter]);
+    aLimit -= aLen + 1;
+  }
+  free (aStrings);
+  if (aLimit > 16)
+  {
+    strcat (theBuffer, "\n=============");
+  }
+#endif
 }
 
 // ------------------------------------------------------------------
