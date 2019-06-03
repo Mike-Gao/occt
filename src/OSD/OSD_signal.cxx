@@ -106,9 +106,15 @@ static LONG _osd_debug   ( void );
 //purpose  :
 //=======================================================================
 static LONG CallHandler (DWORD dwExceptionCode,
-                         ptrdiff_t ExceptionInformation1,
-                         ptrdiff_t ExceptionInformation0)
+                         EXCEPTION_POINTERS* theExcPtr)
 {
+  ptrdiff_t ExceptionInformation1 = 0, ExceptionInformation0 = 0;
+  if (theExcPtr)
+  {
+    ExceptionInformation1 = theExcPtr->ExceptionRecord->ExceptionInformation[1];
+    ExceptionInformation0 = theExcPtr->ExceptionRecord->ExceptionInformation[0];
+  }
+
   Standard_Mutex::Sentry aSentry (THE_SIGNAL_MUTEX); // lock the mutex to prevent simultaneous handling
 
   static wchar_t         buffer[2048];
@@ -261,6 +267,11 @@ static LONG CallHandler (DWORD dwExceptionCode,
 
   char aBufferA[2048];
   WideCharToMultiByte(CP_UTF8, 0, buffer, -1, aBufferA, sizeof(aBufferA), NULL, NULL);
+  if (theExcPtr != NULL
+   && dwExceptionCode == EXCEPTION_ACCESS_VIOLATION)
+  {
+    Standard_Failure::BacktraceCat (aBufferA, (int )sizeof(aBufferA), 10, theExcPtr->ContextRecord);
+  }
   return _osd_raise(dwExceptionCode, aBufferA);
 }
 
@@ -279,22 +290,22 @@ static void SIGWntHandler (int signum, int sub_code)
         std::cout << "signal error" << std::endl ;
       switch( sub_code ) {
         case _FPE_INVALID :
-          CallHandler( EXCEPTION_FLT_INVALID_OPERATION ,0,0) ;
+          CallHandler (EXCEPTION_FLT_INVALID_OPERATION, NULL);
           break ;
         case _FPE_DENORMAL :
-          CallHandler( EXCEPTION_FLT_DENORMAL_OPERAND ,0,0) ;
+          CallHandler (EXCEPTION_FLT_DENORMAL_OPERAND, NULL);
           break ;
         case _FPE_ZERODIVIDE :
-          CallHandler( EXCEPTION_FLT_DIVIDE_BY_ZERO ,0,0) ;
+          CallHandler (EXCEPTION_FLT_DIVIDE_BY_ZERO, NULL);
           break ;
         case _FPE_OVERFLOW :
-          CallHandler( EXCEPTION_FLT_OVERFLOW ,0,0) ;
+          CallHandler (EXCEPTION_FLT_OVERFLOW, NULL);
           break ;
         case _FPE_UNDERFLOW :
-          CallHandler( EXCEPTION_FLT_UNDERFLOW ,0,0) ;
+          CallHandler (EXCEPTION_FLT_UNDERFLOW, NULL);
           break ;
         case _FPE_INEXACT :
-          CallHandler( EXCEPTION_FLT_INEXACT_RESULT ,0,0) ;
+          CallHandler (EXCEPTION_FLT_INEXACT_RESULT, NULL);
           break ;
         default:
           std::cout << "SIGWntHandler(default) -> throw Standard_NumericError(\"Floating Point Error\");" << std::endl;
@@ -305,12 +316,12 @@ static void SIGWntHandler (int signum, int sub_code)
     case SIGSEGV :
       if ( signal( signum, (void(*)(int))SIGWntHandler ) == SIG_ERR )
         std::cout << "signal error" << std::endl ;
-      CallHandler( EXCEPTION_ACCESS_VIOLATION ,0,0) ;
+      CallHandler (EXCEPTION_ACCESS_VIOLATION, NULL);
       break ;
     case SIGILL :
       if ( signal( signum, (void(*)(int))SIGWntHandler ) == SIG_ERR )
         std::cout << "signal error" << std::endl ;
-      CallHandler( EXCEPTION_ILLEGAL_INSTRUCTION ,0,0) ;
+      CallHandler (EXCEPTION_ILLEGAL_INSTRUCTION, NULL);
       break ;
     default:
       std::cout << "SIGWntHandler unexpected signal : " << signum << std::endl ;
@@ -337,12 +348,7 @@ static void SIGWntHandler (int signum, int sub_code)
 static void TranslateSE( unsigned int theCode, EXCEPTION_POINTERS* theExcPtr )
 {
   Standard_Mutex::Sentry aSentry (THE_SIGNAL_MUTEX); // lock the mutex to prevent simultaneous handling
-  ptrdiff_t info1 = 0, info0 = 0;
-  if ( theExcPtr ) {
-    info1 = theExcPtr->ExceptionRecord->ExceptionInformation[1];
-    info0 = theExcPtr->ExceptionRecord->ExceptionInformation[0];
-  }
-  CallHandler(theCode, info1, info0);
+  CallHandler (theCode, theExcPtr);
 }
 #endif
 
@@ -354,11 +360,8 @@ static void TranslateSE( unsigned int theCode, EXCEPTION_POINTERS* theExcPtr )
 //=======================================================================
 static LONG WINAPI WntHandler (EXCEPTION_POINTERS *lpXP)
 {
-  DWORD               dwExceptionCode = lpXP->ExceptionRecord->ExceptionCode;
-
-  return CallHandler (dwExceptionCode,
-                      lpXP->ExceptionRecord->ExceptionInformation[1],
-                      lpXP->ExceptionRecord->ExceptionInformation[0]);
+  DWORD dwExceptionCode = lpXP->ExceptionRecord->ExceptionCode;
+  return CallHandler (dwExceptionCode, lpXP);
 }
 
 //=======================================================================
@@ -863,10 +866,10 @@ static void SegvHandler(const int theSignal,
      sigprocmask (SIG_UNBLOCK, &set, NULL) ;
      void *address = ip->si_addr ;
      {
-       char Msg[100];
-       sprintf(Msg,"SIGSEGV 'segmentation violation' detected. Address %lx",
-         (long ) address ) ;
-       OSD_SIGSEGV::NewInstance(Msg)->Jump();
+       char aMsg[4096];
+       sprintf(aMsg,"SIGSEGV 'segmentation violation' detected. Address %lx.", (long )address);
+       Standard_Failure::BacktraceCat (aMsg, (int )sizeof(aMsg));
+       OSD_SIGSEGV::NewInstance(aMsg)->Jump();
      }
   }
 #ifdef OCCT_DEBUG

@@ -12,6 +12,15 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#if defined(_WIN32) && defined(HAVE_DBGHELP)
+  #include <windows.h>
+  #include <Standard_WarningsDisable.hxx>
+  #include <DbgHelp.h>
+  #include <Standard_WarningsRestore.hxx>
+  #ifdef _MSC_VER
+    #pragma comment(lib, "DbgHelp.lib")
+  #endif
+#endif
 
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
@@ -22,6 +31,11 @@
 #include <Standard_TypeMismatch.hxx>
 
 #include <string.h>
+
+#ifndef _WIN32
+  #include <execinfo.h>
+#endif
+
 IMPLEMENT_STANDARD_RTTIEXT(Standard_Failure,Standard_Transient)
 
 static Standard_CString allocate_message(const Standard_CString AString)
@@ -163,6 +177,170 @@ void Standard_Failure::Jump()
 void Standard_Failure::Throw() const
 {
   throw *this;
+}
+
+//=======================================================================
+//function : BacktraceCat
+//purpose  :
+//=======================================================================
+void Standard_Failure::BacktraceCat (char* theBuffer,
+                                     const int theBufferSize,
+                                     const int theNbTraces,
+                                     void* theContext)
+{
+  if (theBufferSize < 1
+   || theNbTraces < 1
+   || theBuffer == NULL)
+  {
+    return;
+  }
+
+#ifdef _WIN32
+  // DbgHelp is coming with Windows SDK, so that technically it is always available.
+  // However, it's usage requires extra steps:
+  // - .pdb files are necessary to resolve function names;
+  //   Normal release DLLs without PDBs will show no much useful info.
+  // - DbgHelp.dll and friends (SymSrv.dll, SrcSrv.dll) should be packaged with application;
+  //   DbgHelp.dll coming with system might be of other incompatible version
+  //   (some applications load it dynamically to avoid packaging extra DLL,
+  //    with a extra hacks determining library version)
+  //
+  // Considering these limitations, do not enable it in OCCT by default.
+  //
+  // In addition, each CPU architecture requires manual stack frame setup,
+  // and 32-bit version requires also additional hacks to retrieve current context;
+  // this implementation currently covers only x86_64 architecture.
+#if defined(HAVE_DBGHELP) && defined(_M_X64)
+  int aNbTraces = theNbTraces;
+  const HANDLE anHProcess = GetCurrentProcess();
+  const HANDLE anHThread  = GetCurrentThread();
+  CONTEXT aCtx;
+  if (theContext != NULL)
+  {
+    memcpy (&aCtx, theContext, sizeof(aCtx));
+  }
+  else
+  {
+    ++aNbTraces;
+    memset (&aCtx, 0, sizeof(aCtx));
+    aCtx.ContextFlags = CONTEXT_FULL;
+    RtlCaptureContext (&aCtx);
+  }
+
+  SymInitialize (anHProcess, NULL, TRUE);
+
+  DWORD anImage = 0;
+  STACKFRAME64 aStackFrame;
+  memset (&aStackFrame, 0, sizeof(aStackFrame));
+#if defined(_M_X64)
+  anImage = IMAGE_FILE_MACHINE_AMD64;
+  aStackFrame.AddrPC.Offset     = aCtx.Rip;
+  aStackFrame.AddrPC.Mode       = AddrModeFlat;
+  aStackFrame.AddrFrame.Offset  = aCtx.Rsp;
+  aStackFrame.AddrFrame.Mode    = AddrModeFlat;
+  aStackFrame.AddrStack.Offset  = aCtx.Rsp;
+  aStackFrame.AddrStack.Mode    = AddrModeFlat;
+#else
+  #error "Unsupported platform"
+#endif
+
+  char aModBuffer[MAX_PATH] = {};
+  char aSymBuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(CHAR)];
+  SYMBOL_INFO* aSymbol = (SYMBOL_INFO* )aSymBuffer;
+  aSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+  aSymbol->MaxNameLen   = MAX_SYM_NAME;
+
+  strcat_s (theBuffer, theBufferSize, "\n==Backtrace==");
+  for (int aLineIter = 0; aLineIter < aNbTraces; ++aLineIter)
+  {
+    BOOL aRes = StackWalk64 (anImage, anHProcess, anHThread,
+                             &aStackFrame, &aCtx, NULL,
+                             SymFunctionTableAccess64, SymGetModuleBase64, NULL);
+    if (!aRes)
+    {
+      break;
+    }
+
+    if (theContext == NULL && aLineIter == 0)
+    {
+      // exclude this function call from stack
+      continue;
+    }
+    if (aStackFrame.AddrPC.Offset == 0)
+    {
+      break;
+    }
+
+    strcat_s (theBuffer, theBufferSize, "\n");
+
+    const DWORD64 aModuleBase = SymGetModuleBase64 (anHProcess, aStackFrame.AddrPC.Offset);
+    if (aModuleBase != 0
+     && GetModuleFileNameA ((HINSTANCE)aModuleBase, aModBuffer, MAX_PATH))
+    {
+      strcat_s (theBuffer, theBufferSize, aModBuffer);
+    }
+
+    DWORD64 aDisp = 0;
+    strcat_s (theBuffer, theBufferSize, "(");
+    if (SymFromAddr (anHProcess, aStackFrame.AddrPC.Offset, &aDisp, aSymbol))
+    {
+      strcat_s (theBuffer, theBufferSize, aSymbol->Name);
+    }
+    else
+    {
+      strcat_s (theBuffer, theBufferSize, "???");
+    }
+    strcat_s (theBuffer, theBufferSize, ")");
+  }
+  strcat_s (theBuffer, theBufferSize, "\n=============");
+
+  SymCleanup (anHProcess);
+#else
+  (void )theContext;
+#endif
+#else
+  (void )theContext;
+  void* aStackArr[128];
+  int aNbTraces = Min (theNbTraces + 1, 128);
+  aNbTraces = ::backtrace (aStackArr, aNbTraces);
+  if (aNbTraces <= 1)
+  {
+    return;
+  }
+
+  // exclude this function call from stack
+  --aNbTraces;
+  char** aStrings = ::backtrace_symbols (aStackArr + 1, aNbTraces);
+  if (aStrings == NULL)
+  {
+    return;
+  }
+
+  const size_t aLenInit = strlen (theBuffer);
+  size_t aLimit = (size_t )theBufferSize - aLenInit - 1;
+  if (aLimit > 14)
+  {
+    strcat (theBuffer, "\n==Backtrace==");
+    aLimit -= 14;
+  }
+  for (int aLineIter = 0; aLineIter < aNbTraces; ++aLineIter)
+  {
+    const size_t aLen = strlen (aStrings[aLineIter]);
+    if (aLen + 1 >= aLimit)
+    {
+      break;
+    }
+
+    strcat (theBuffer, "\n");
+    strcat (theBuffer, aStrings[aLineIter]);
+    aLimit -= aLen + 1;
+  }
+  free (aStrings);
+  if (aLimit > 14)
+  {
+    strcat (theBuffer, "\n=============");
+  }
+#endif
 }
 
 // ------------------------------------------------------------------

@@ -24,20 +24,15 @@
 #include <Standard_Transient.hxx>
 #include <Standard_OStream.hxx>
 #include <Standard_SStream.hxx>
+
 class Standard_NoSuchObject;
 
-
-class Standard_Failure;
 DEFINE_STANDARD_HANDLE(Standard_Failure, Standard_Transient)
-
 
 //! Forms the root of the entire exception hierarchy.
 class Standard_Failure : public Standard_Transient
 {
-
 public:
-
-  
 
   //! Creates a status object of type "Failure".
   Standard_EXPORT Standard_Failure();
@@ -46,6 +41,7 @@ public:
   Standard_EXPORT Standard_Failure (const Standard_Failure& f);
 
   //! Creates a status object of type "Failure".
+  //!
   Standard_EXPORT Standard_Failure(const Standard_CString aString);
 
   //! Assignment operator
@@ -71,7 +67,9 @@ public:
   
   //! Reraises a caught exception and changes its error message.
   Standard_EXPORT void Reraise (const Standard_SStream& aReason);
-  
+
+public:
+
   //! Raises an exception of type "Failure" and associates
   //! an error message to it. The message can be printed
   //! in an exception handler.
@@ -88,7 +86,22 @@ public:
   //! dangerous since some of methods require that object
   //! was allocated dynamically.
   Standard_EXPORT static Handle(Standard_Failure) NewInstance (const Standard_CString aMessage);
-  
+
+  //! Appends backtrace to a message buffer.
+  //! This method relies on platform-dependent features and might be not implemented.
+  //! Stack information might be incomplete in case of stripped binaries.
+  //! @param theBuffer [in] [out] message buffer to extend
+  //! @param theBufferSize [in] message buffer size
+  //! @param theNbTraces [in] maximum number of stack traces
+  //! @param theContext [in] optional platform-dependent frame context;
+  //!                        in case of DbgHelp (Windows) should be a pointer to CONTEXT
+  Standard_EXPORT static void BacktraceCat (char* theBuffer,
+                                            const int theBufferSize,
+                                            const int theNbTraces = 10,
+                                            void* theContext = NULL);
+
+public:
+
   //! Used to throw CASCADE exception from C signal handler.
   //! On platforms that do not allow throwing C++ exceptions
   //! from this handler (e.g. Linux), uses longjump to get to
@@ -102,26 +115,19 @@ public:
   Standard_DEPRECATED("This method is deprecated (not thread-safe), use standard C++ mechanism instead")
   Standard_EXPORT static Handle(Standard_Failure) Caught();
 
-
-
   DEFINE_STANDARD_RTTIEXT(Standard_Failure,Standard_Transient)
 
 protected:
 
-  
   //! Used only if standard C++ exceptions are used.
   //! Throws exception of the same type as this by C++ throw,
   //! and stores current object as last thrown exception,
   //! to be accessible by method Caught()
   Standard_EXPORT virtual void Throw() const;
 
-
-
 private:
 
-
   Standard_CString myMessage;
-
 
 };
 
