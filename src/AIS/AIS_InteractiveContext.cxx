@@ -1947,7 +1947,9 @@ void AIS_InteractiveContext::EraseGlobal (const Handle(AIS_InteractiveObject)& t
   }
 
   const Standard_Integer aDispMode = theIObj->HasHilightMode() ? theIObj->HilightMode() : 0;
-  unhighlightOwners (theIObj);
+  AIS_NListOfEntityOwner anOwners;
+  anOwners.Append(theIObj->GlobalSelOwner());
+  unhighlightOwners (anOwners);
   myMainPM->SetVisibility (theIObj, aStatus->DisplayMode(), Standard_False);
 
   if (!myLastPicked.IsNull()
@@ -1979,10 +1981,10 @@ void AIS_InteractiveContext::EraseGlobal (const Handle(AIS_InteractiveObject)& t
 }
 
 //=======================================================================
-//function : unhighlightOwners
+//function : unselectOwners
 //purpose  :
 //=======================================================================
-void AIS_InteractiveContext::unhighlightOwners (const Handle(AIS_InteractiveObject)& theObject)
+void AIS_InteractiveContext::unselectOwners (const Handle(AIS_InteractiveObject)& theObject)
 {
   SelectMgr_SequenceOfOwner aSeq;
   for (AIS_NListOfEntityOwner::Iterator aSelIter (mySelection->Objects()); aSelIter.More(); aSelIter.Next())
@@ -2016,7 +2018,7 @@ void AIS_InteractiveContext::ClearGlobal (const Handle(AIS_InteractiveObject)& t
     return;
   }
 
-  unhighlightOwners (theIObj);
+  unselectOwners (theIObj);
 
   myMainPM->Erase (theIObj, -1);
   theIObj->ErasePresentations (true); // make sure highlighting presentations are properly erased
