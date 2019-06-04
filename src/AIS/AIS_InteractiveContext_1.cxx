@@ -501,7 +501,7 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
 AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_SelectionScheme theSelScheme)
 {
   AIS_NListOfEntityOwner aPickedOwners;
-  aPickedOwners.Append (myLastinMain);
+  aPickedOwners.Append (myLastPicked);
 
   return Select (aPickedOwners, theSelScheme);
 }
