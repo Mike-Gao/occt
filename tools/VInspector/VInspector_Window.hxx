@@ -35,12 +35,14 @@
 
 class OpenGl_Element;
 
-class VInspector_PrsOpenGlElement;
+class VInspector_PreviewParameters;
 
 class ViewControl_MessageDialog;
 class ViewControl_PropertyView;
 
+class VInspector_PrsOpenGlElement;
 class VInspector_ToolBar;
+
 class View_Window;
 
 class QAbstractItemModel;
@@ -164,8 +166,14 @@ private slots:
   //! \param theDeselected a deselected items
   void onTreeViewSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
+  //! Exports the selected context into MessageView for have preview in the context.
+  void onExportToMessageView();
+
   //! Exports the first selected shape into ShapeViewer plugin.
   void onExportToShapeView();
+
+  //! Displays default preview presentation
+  void onDefaultPreview();
 
   //! Apply activated display action
   void onDisplayActionTypeClicked();
@@ -259,6 +267,7 @@ private:
   View_Window* myViewWindow; //!< temporary view window, it is created if Open is called but context is still NULL
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
+  VInspector_PreviewParameters* myPreviewParameters; //!< drawer of preview presentation
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
   Handle(VInspector_PrsOpenGlElement) myOpenGlPreviewPresentation; //!< presentation of preview for OpenGl elements
 

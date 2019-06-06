@@ -121,7 +121,9 @@ void MessageModel_Actions::AddMenuActions (const QModelIndexList& theSelectedInd
 #endif
   }
   else if (anAlertItem)
+  {
     theMenu->addAction (myActions[MessageModel_ActionType_ExportToShapeView]);
+  }
 
   theMenu->addSeparator();
 }

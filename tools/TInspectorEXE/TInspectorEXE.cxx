@@ -66,7 +66,7 @@ void setPluginSampleDirectory (const TCollection_AsciiString& theName, TInspecto
       aFileName = fileNameInDataDir ("CSF_OCCTDataPath", "occ/hammer.brep");
     else if (theName.IsEqual ("TKVInspector"))
     {
-      aFileName = fileNameInDataDir ("CSF_OCCTDataPath", "occ/face1.brep");
+      //aFileName = fileNameInDataDir ("CSF_OCCTDataPath", "occ/face1.brep");
       anAdditionalFileName = fileNameInDataDir ("CSF_OCCTDataPath", "occ/face2.brep");
     }
     aRecentlyOpenedFiles.append (aFileName.ToCString());
@@ -127,8 +127,8 @@ int main (int argc, char** argv)
     aPlugins.insert("TKVInspector");
 
     Handle(Message_Report) aReport = Message_Report::CurrentReport (Standard_True);
-    aReport->SetLimit(30);
-    aReport->SetActive (Standard_False);
+    aReport->SetLimit (100);//30);
+    aReport->SetActive (Standard_True);//Standard_False);
     aPlugins.insert("TKMessageView");
 
     anActivatedPluginName = "TKVInspector";

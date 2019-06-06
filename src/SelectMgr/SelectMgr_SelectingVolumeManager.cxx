@@ -14,6 +14,8 @@
 // commercial license or contractual agreement.
 
 #include <SelectMgr_SelectingVolumeManager.hxx>
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
 
 //=======================================================================
 // function : SelectMgr_SelectingVolumeManager
@@ -396,6 +398,9 @@ gp_Pnt SelectMgr_SelectingVolumeManager::DetectedPoint (const Standard_Real theD
 Standard_Boolean SelectMgr_SelectingVolumeManager::IsClipped (const Graphic3d_SequenceOfHClipPlane& thePlanes,
                                                               const Standard_Real& theDepth) const
 {
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("SelectMgr_SelectingVolumeManager::IsClipped", "", &aPerfMeter, NULL);
+
   if (myActiveSelectionType != Point)
     return Standard_False;
 

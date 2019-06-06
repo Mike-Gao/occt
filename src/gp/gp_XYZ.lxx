@@ -307,7 +307,50 @@ inline gp_XYZ operator* (const Standard_Real Scalar, const gp_XYZ& Coord1) {
 }
 
 
+inline TCollection_AsciiString gp_XYZ::ToString() const
+{
+  return TCollection_AsciiString ("(") + x + ", " + y + ", " + z + ")";
+}
 
+inline Standard_Boolean gp_XYZ::FromString (const TCollection_AsciiString& theValue)
+{
+  TCollection_AsciiString aCurrentString = theValue, aValueString;
 
+  Standard_Integer aPosition = aCurrentString.Search ("(");
+  if (aPosition != 1)
+    return Standard_False;
 
+  aCurrentString = aCurrentString.Split (aPosition);
+  Standard_Real aX, anY, aZ;
+  // x value
+  aPosition = aCurrentString.Search (", ");
+  if (aPosition < 0)
+    return Standard_False;
+  aValueString = aCurrentString;
+  aCurrentString = aValueString.Split (aPosition - 1);
+  aX = aValueString.RealValue();
+  aCurrentString = aCurrentString.Split (2);
+
+  // y value
+  aPosition = aCurrentString.Search (", ");
+  if (aPosition < 0)
+    return Standard_False;
+  aValueString = aCurrentString;
+  aCurrentString = aValueString.Split (aPosition - 1);
+  anY = aValueString.RealValue();
+  aCurrentString = aCurrentString.Split (2);
+
+  // z value
+  aPosition = aCurrentString.Search (")");
+  if (aPosition < 0)
+    return Standard_False;
+  aValueString = aCurrentString;
+  aCurrentString = aValueString.Split (aPosition);
+  aZ = aValueString.RealValue();
+
+  x = aX;
+  y = anY;
+  z = aZ;
+  return Standard_True;
+}
 

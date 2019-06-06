@@ -29,7 +29,7 @@ int VInspector_ItemSelectMgrSelectingVolumeManager::initRowCount() const
   if (Column() != 0)
     return 0;
 
-  return 1;
+  return 2;
 }
 
 // =======================================================================
@@ -123,6 +123,24 @@ Standard_Boolean VInspector_ItemSelectMgrSelectingVolumeManager::GetViewerSelect
 // function : GetTableRowCount
 // purpose :
 // =======================================================================
+Handle(SelectMgr_BaseFrustum) VInspector_ItemSelectMgrSelectingVolumeManager::GetFrustum (const int theRow) const
+{
+  SelectMgr_SelectingVolumeManager aVolumeManager;
+  if (!GetViewerSelector (aVolumeManager))
+    return NULL;
+
+  if (theRow == 0)
+    return aVolumeManager.GetVolume (SelectBasics_SelectingVolumeManager::Box);
+  else if (theRow == 1)
+    return aVolumeManager.GetVolume (SelectBasics_SelectingVolumeManager::Polyline);
+
+  return NULL;
+}
+
+// =======================================================================
+// function : GetTableRowCount
+// purpose :
+// =======================================================================
 int VInspector_ItemSelectMgrSelectingVolumeManager::GetTableRowCount() const
 {
   return 60;
@@ -159,7 +177,7 @@ QVariant VInspector_ItemSelectMgrSelectingVolumeManager::GetTableData (const int
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemSelectMgrSelectingVolumeManager::createChild (int theRow, int theColumn)
 {
-  if (theRow == 0)
+  if (theRow == 0 || theRow == 1)
     return VInspector_ItemSelectMgrBaseFrustum::CreateItem (currentItem(), theRow, theColumn);
   //else if (theRow == 1)
   //  return VInspector_ItemAspectWindow::CreateItem (currentItem(), theRow, theColumn);

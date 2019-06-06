@@ -14,8 +14,12 @@
 // commercial license or contractual agreement.
 
 #include <NCollection_Vector.hxx>
+
+#include <Message_Alerts.hxx>
 #include <Poly_Array1OfTriangle.hxx>
 #include <Standard_Assert.hxx>
+
+//IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_Frustum, SelectMgr_BaseFrustum)
 
 // =======================================================================
 // function : isSeparated
@@ -460,4 +464,44 @@ Standard_Boolean SelectMgr_Frustum<N>::hasOverlap (const gp_Pnt& thePnt1,
   }
 
   return Standard_True;
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+template <int N>
+void SelectMgr_Frustum<N>::Dump(Standard_OStream& OS)const 
+{
+  DUMP_VALUES (OS, "SelectMgr_Frustum<N>", 2);
+
+  DUMP_VALUES (OS, "myPlanes", N + 2);
+  for (int anIndex = 0; anIndex < N + 2; anIndex++)
+    DUMP_VALUES (OS, anIndex, myPlanes[anIndex].XYZ().ToString());
+
+  DUMP_VALUES (OS, "myVertices", N * 2);
+  for (int anIndex = 0; anIndex < N * 2; anIndex++)
+    DUMP_VALUES (OS, anIndex, myVertices[anIndex].XYZ().ToString());
+
+  DUMP_VALUES (OS, "myMaxVertsProjections", N + 2);
+  for (int anIndex = 0; anIndex < N + 2; anIndex++)
+    DUMP_VALUES (OS, anIndex, myMaxVertsProjections[anIndex]);
+
+  DUMP_VALUES (OS, "myMinVertsProjections", N + 2);
+  for (int anIndex = 0; anIndex < N + 2; anIndex++)
+    DUMP_VALUES (OS, anIndex, myMinVertsProjections[anIndex]);
+
+  DUMP_VALUES (OS, "myMaxOrthoVertsProjections", 3);
+  for (int anIndex = 0; anIndex < 3; anIndex++)
+    DUMP_VALUES (OS, anIndex, myMaxOrthoVertsProjections[anIndex]);
+
+  DUMP_VALUES (OS, "myMinOrthoVertsProjections", 3);
+  for (int anIndex = 0; anIndex < 3; anIndex++)
+    DUMP_VALUES (OS, anIndex, myMinOrthoVertsProjections[anIndex]);
+
+  DUMP_VALUES (OS, "myEdgeDirs", 6);
+  for (int anIndex = 0; anIndex < 6; anIndex++)
+    DUMP_VALUES (OS, anIndex, myEdgeDirs[anIndex].XYZ().ToString());
+
+  SelectMgr_BaseFrustum::Dump (OS);
 }

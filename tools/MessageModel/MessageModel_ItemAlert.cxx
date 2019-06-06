@@ -18,12 +18,16 @@
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/MessageModel_Tools.hxx>
+#include <inspector/ViewControl_Tools.hxx>
+#include <inspector/ViewControl_TransientShape.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <Message_AlertExtended.hxx>
+#include <Message_AttributeObject.hxx>
 #include <Message_AttributeVectorOfValues.hxx>
 #include <Message_CompositeAlerts.hxx>
 
+#include <Bnd_Box.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_AlertAttribute.hxx>
 
@@ -31,6 +35,7 @@
 #include <QColor>
 #include <QIcon>
 #include <Standard_WarningsRestore.hxx>
+
 
 // =======================================================================
 // function : initValue
@@ -208,6 +213,23 @@ void MessageModel_ItemAlert::Init()
       }
     }
   }
+
+  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(myAlert);
+  if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
+  {
+    Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+    if (!anAttribute.IsNull())
+    {
+      if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
+        myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
+      if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+        myPresentations.Append (new ViewControl_TransientShape (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape()));
+    }
+    TCollection_AsciiString aDescription = anExtendedAlert->Attribute()->GetDescription();
+    Bnd_Box aBox;
+    if (aBox.FromString (aDescription))
+      myPresentations.Append (new ViewControl_TransientShape (ViewControl_Tools::CreateShape (aBox)));
+  }
   MessageModel_ItemBase::Init();
 }
 
@@ -221,6 +243,7 @@ void MessageModel_ItemAlert::Reset()
   myAlert = Handle(Message_Alert)();
   myUnitedAlerts.Clear();
   myChildAlerts.Clear();
+  myPresentations.Clear();
 }
 
 // =======================================================================

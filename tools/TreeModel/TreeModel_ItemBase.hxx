@@ -19,6 +19,8 @@
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <Standard_Handle.hxx>
+#include <Standard_OStream.hxx>
+
 #include <inspector/TreeModel_ItemRole.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -139,8 +141,12 @@ public:
   //! Returns item table properties builder
   Standard_EXPORT Handle(TreeModel_ItemProperties) GetProperties() const;
 
+  //! Dumps the content of me on the stream <OS>.
+  virtual Standard_Boolean Dump (Standard_OStream& OS) const { (void)OS; return Standard_False; }
+
   //! Returns number of item rows only
   static Standard_EXPORT int RowCountWithoutProperties (const TreeModel_ItemBasePtr& theItem);
+
 
 protected:
 

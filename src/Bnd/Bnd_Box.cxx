@@ -44,6 +44,19 @@ Bnd_Box::Bnd_Box()
 }
 
 //=======================================================================
+//function : Bnd_Box
+//purpose  : 
+//=======================================================================
+
+Bnd_Box::Bnd_Box (const Standard_Real theXmin, const Standard_Real theYmin, const Standard_Real theZmin,
+                  const Standard_Real theXmax, const Standard_Real theYmax, const Standard_Real theZmax)
+: Gap (0.0)
+{
+  SetVoid();
+  Update (theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
+}
+
+//=======================================================================
 //function : Set
 //purpose  : 
 //=======================================================================
@@ -956,4 +969,50 @@ void Bnd_Box::Dump () const
   }
   cout << "\n Gap : " << Gap;
   cout << "\n";
+}
+
+//=======================================================================
+//function : PointsSeparator
+//purpose  : 
+//=======================================================================
+TCollection_AsciiString PointsSeparator()
+{
+  return " - ";
+}
+
+//=======================================================================
+//function : ToString
+//purpose  : 
+//=======================================================================
+
+TCollection_AsciiString Bnd_Box::ToString() const
+{
+  return gp_XYZ (Xmin, Ymin, Zmin).ToString()
+        + PointsSeparator()
+        + gp_XYZ (Xmax, Ymax, Zmax).ToString();
+}
+
+//=======================================================================
+//function : FromString
+//purpose  : 
+//=======================================================================
+
+Standard_Boolean Bnd_Box::FromString (const TCollection_AsciiString& theValue)
+{
+  TCollection_AsciiString aCurrentString = theValue;
+  Standard_Integer aPosition = aCurrentString.Search (PointsSeparator());
+  if (aPosition < 0)
+    return Standard_False;
+
+  TCollection_AsciiString aLeftString = aCurrentString;
+  TCollection_AsciiString aRightString = aLeftString.Split (aPosition - 1);
+  aCurrentString = aRightString;
+  aRightString = aCurrentString.Split (PointsSeparator().Length());
+
+  gp_XYZ aMinPoint, aMaxPoint;
+  if (!aMinPoint.FromString (aLeftString) || !aMaxPoint.FromString (aRightString))
+    return Standard_False;
+
+  Update (aMinPoint.X(), aMinPoint.Y(), aMinPoint.Z(), aMaxPoint.X(), aMaxPoint.Y(), aMaxPoint.Z());
+  return Standard_True;
 }

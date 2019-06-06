@@ -21,10 +21,12 @@
 
 #include <vector>
 
+#include <Bnd_Box.hxx>
 #include <NCollection_Mat4.hxx>
 #include <NCollection_Vec2.hxx>
 #include <NCollection_Vec3.hxx>
 #include <NCollection_Vector.hxx>
+#include <Standard_OStream.hxx>
 #include <Standard_Type.hxx>
 
 // GCC supports shrink function only in C++11 mode
@@ -56,6 +58,32 @@ namespace BVH
   {
     typedef NCollection_Vec3<T> Type;
   };
+
+  template<class T> Bnd_Box ToBndBox (const T& theType1, const T& theType2)
+  {
+    return Bnd_Box (theType1, 0., 0., theType2, 0., 0.);
+  }
+
+  template<class T> Bnd_Box ToBndBox (const NCollection_Vec2<T>& theType1,
+                                      const NCollection_Vec2<T>& theType2)
+  {
+    return Bnd_Box (theType1.x(), theType1.y(), 0.,
+                    theType2.x(), theType2.y(), 0.);
+  }
+
+  template<class T> Bnd_Box ToBndBox (const NCollection_Vec3<T>& theType1,
+                                      const NCollection_Vec3<T>& theType2)
+  {
+    return Bnd_Box (theType1.x(), theType1.y(), theType1.z(),
+                    theType2.x(), theType2.y(), theType2.z());
+  }
+
+  template<class T> Bnd_Box ToBndBox (const NCollection_Vec4<T>& theType1,
+                                      const NCollection_Vec4<T>& theType2)
+  {
+    return Bnd_Box (theType1.x(), theType1.y(), theType1.z(),
+                    theType2.x(), theType2.y(), theType2.z());
+  }
 
   template<class T> struct VectorType<T, 4>
   {

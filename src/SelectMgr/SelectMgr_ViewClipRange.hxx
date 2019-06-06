@@ -18,6 +18,7 @@
 
 #include <Bnd_Range.hxx>
 #include <Standard_TypeDef.hxx>
+#include <Standard_OStream.hxx>
 
 //! Class for handling depth clipping range.
 //! It is used to perform checks in case if global (for the whole view)
@@ -61,6 +62,16 @@ public:
 
   //! Adds a clipping sub-range (for clipping chains).
   void AddClipSubRange (const Bnd_Range& theRange) { myClipRanges.push_back (theRange); }
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const
+  {
+    DUMP_VALUES (OS, "SelectMgr_ViewClipRange", 2);
+    DUMP_VALUES (OS, "myUnclipRange", myUnclipRange.ToString());
+    DUMP_VALUES (OS, "myClipRanges", myClipRanges.size());
+    for (size_t aRangeIter = 0; aRangeIter < myClipRanges.size(); ++aRangeIter)
+      DUMP_VALUES (OS, aRangeIter, myClipRanges[aRangeIter].ToString());
+  }
 
 private:
 

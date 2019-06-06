@@ -313,7 +313,7 @@ Handle(Standard_Transient) View_Displayer::CreatePresentation (const TopoDS_Shap
 {
   Handle(AIS_Shape) aShape = new AIS_Shape (theShape);
 
-  aShape->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_WHITE, 1.0));
+  //aShape->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_WHITE, 1.0));
 
   return aShape;
 }

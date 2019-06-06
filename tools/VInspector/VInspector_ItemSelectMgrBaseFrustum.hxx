@@ -53,6 +53,9 @@ public:
   Standard_EXPORT Handle(SelectMgr_BaseFrustum) GetFrustum() const
   { return Handle(SelectMgr_BaseFrustum)::DownCast (GetObject()); }
 
+  //! Dumps the content of me on the stream <OS>.
+  virtual Standard_Boolean Dump (Standard_OStream& OS) const;
+
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;

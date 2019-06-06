@@ -29,6 +29,7 @@
 #include <QVariant>
 #include <Standard_WarningsRestore.hxx>
 
+#include <NCollection_List.hxx>
 #include <NCollection_Vector.hxx>
 
 class QAbstractTableModel;
@@ -84,6 +85,14 @@ public:
   //! \return instance of the shape
   const TopoDS_Shape& GetCustomShape() const { return myCustomShape; }
 
+  //! Returns presentation of the attribute to be visualized in the view
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \thePresentations [out] container of presentation handles to be visualized
+  void GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations)
+  { thePresentations.Append (myPresentations); }
+
+
   //! Returns summ of children alert elapsed times. The method is recusive.
   //! \param theAlert a message alert
   //! \return double value
@@ -126,6 +135,7 @@ private:
   NCollection_DataMap<Standard_Integer, Message_ListOfAlert> myChildAlerts; //!< container of child alerts
 
   TopoDS_Shape myCustomShape;
+  NCollection_List<Handle(Standard_Transient)> myPresentations;
 };
 
 #endif

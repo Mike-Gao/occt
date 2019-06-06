@@ -17,6 +17,7 @@
 #include <inspector/ViewControl_ColorSelector.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
 #include <inspector/ViewControl_EditType.hxx>
+#include <inspector/ViewControl_TableDoubleVector.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QFont>
@@ -121,6 +122,7 @@ QWidget* ViewControl_TableItemDelegate::createEditorControl (QWidget* theParent,
       return aSpinBox;
     }
     case ViewControl_EditType_DoAction: return new QPushButton (theParent);
+    case ViewControl_EditType_DoubleVector: return new ViewControl_TableDoubleVector(theParent);
 
     default: return 0;
   }
@@ -185,6 +187,7 @@ void ViewControl_TableItemDelegate::setEditorValue (QWidget* theEditor, const Vi
     case ViewControl_EditType_Line: (qobject_cast<QLineEdit*>(theEditor))->setText (theValue.toString()); break;
     case ViewControl_EditType_Spin: (qobject_cast<QSpinBox*>(theEditor))->setValue (theValue.toInt()); break;
     case ViewControl_EditType_DoAction: (qobject_cast<QPushButton*>(theEditor))->setText ("UnSelect"); break;
+    case ViewControl_EditType_DoubleVector: (qobject_cast<ViewControl_TableDoubleVector*>(theEditor))->SetVectorValue(theValue.toString()); break;
 
     default: break;
   }
@@ -207,6 +210,7 @@ QVariant ViewControl_TableItemDelegate::getEditorValue (QWidget* theEditor, cons
     case ViewControl_EditType_Line: return (qobject_cast<QLineEdit*>(theEditor))->text();
     case ViewControl_EditType_Spin: return (qobject_cast<QSpinBox*>(theEditor))->value();
     case ViewControl_EditType_DoAction: return QVariant ("Clicked");
+    case ViewControl_EditType_DoubleVector: return (qobject_cast<ViewControl_TableDoubleVector*>(theEditor))->GetVector();
 
     default: return QVariant();
   }

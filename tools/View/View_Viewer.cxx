@@ -19,6 +19,13 @@
 #include <Standard_ExtString.hxx>
 #include <Standard_Version.hxx>
 
+//#define USE_CLIPPLANE
+
+#ifdef USE_CLIPPLANE
+#include <Graphic3d_ClipPlane.hxx>
+#include <gp_Pln.hxx>
+#endif
+
 // =======================================================================
 // function : CreateView
 // purpose :
@@ -26,7 +33,15 @@
 void View_Viewer::CreateView()
 {
   if (myView.IsNull())
+  {
     myView = myContext->CurrentViewer()->CreateView();
+
+#ifdef USE_CLIPPLANE
+    gp_Pln aPln (gp_Pnt (50, 0, 0), gp_Dir (-1., 0., 0.));
+    Handle(Graphic3d_ClipPlane) aClipPlane = new Graphic3d_ClipPlane(aPln);
+    myView->AddClipPlane (aClipPlane);
+#endif
+  }
 }
 
 // =======================================================================

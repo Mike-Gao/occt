@@ -19,8 +19,10 @@
 #include <AIS_Shape.hxx>
 #include <AIS_Trihedron.hxx>
 #include <BRep_Builder.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom_Axis2Placement.hxx>
-#include <Prs3d_PointAspect.hxx>
 #include <TopoDS_Compound.hxx>
 
 #include <TopExp_Explorer.hxx>
@@ -45,6 +47,8 @@
 #include <inspector/VInspector_ItemFolderObject.hxx>
 #include <inspector/VInspector_ItemOpenGlElement.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
+#include <inspector/VInspector_PreviewParameters.hxx>
+#include <inspector/VInspector_PropertiesCreator.hxx>
 #include <inspector/VInspector_PrsOpenGlElement.hxx>
 #include <inspector/VInspector_TableModelValues.hxx>
 #include <inspector/VInspector_ToolBar.hxx>
@@ -106,6 +110,8 @@ const int VINSPECTOR_DEFAULT_VIEW_POSITION_Y = 60; // TINSPECTOR_DEFAULT_POSITIO
 VInspector_Window::VInspector_Window()
 : myParent (0), myExportToShapeViewDialog (0), myViewWindow (0)
 {
+  myPreviewParameters = new VInspector_PreviewParameters();
+
   myMainWindow = new QMainWindow (0);
 
   QWidget* aCentralWidget = new QWidget (myMainWindow);
@@ -127,6 +133,7 @@ VInspector_Window::VInspector_Window()
   //((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (VINSPECTOR_DEFAULT_TREE_VIEW_WIDTH,
   //                                                               VINSPECTOR_DEFAULT_TREE_VIEW_HEIGHT));
   VInspector_ViewModel* aTreeModel = new VInspector_ViewModel (myTreeView);
+  aTreeModel-> AddPropertiesCreator(new VInspector_PropertiesCreator());
   myTreeView->setModel (aTreeModel);
   // hide Visibility column
   TreeModel_HeaderSection anItem = aTreeModel->GetHeaderItem ((int)TreeModel_ColumnType_Visibility);
@@ -247,9 +254,16 @@ void VInspector_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIte
   }
 
   anItems.clear();
-  TreeModel_Tools::SaveState (myHistoryView, anItems, "history_view_");
+  VInspector_PreviewParameters::SaveState (myPreviewParameters, anItems, "preview_parameters_");
   for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
     theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
+
+  anItems.clear();
+  TreeModel_Tools::SaveState (myTreeView, anItems);
+  for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
+  {
+    theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
+  }
 }
 
 // =======================================================================
@@ -273,6 +287,9 @@ void VInspector_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap& 
       continue;
     else if (TreeModel_Tools::RestoreState (myHistoryView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString(),
                                             "history_view_"))
+      continue;
+    else if (VInspector_PreviewParameters::RestoreState (myPreviewParameters, anItemIt.Key().ToCString(), anItemIt.Value().ToCString(),
+                                            "preview_parameters_"))
       continue;
   }
 }
@@ -380,7 +397,7 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
   {
     TreeModel_ItemBasePtr anItem = *anItemIt;
     VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
-    if (!aVItem || aVItem->Row() == 0)
+    if (!aVItem /*|| aVItem->Row() == 0*/)
       continue;
 
     TopoDS_Shape aShape = aVItem->GetPresentationShape();
@@ -535,8 +552,13 @@ Handle(Graphic3d_TransformPers) VInspector_Window::GetSelectedTransformPers()
 // =======================================================================
 bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>& theParameters)
 {
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  if (!aViewModel)
+    return Standard_False;
+
   Handle(AIS_InteractiveContext) aContext;
   Handle(VInspector_CallBack) aCallBack;
+  Standard_Boolean isModelUpdated = Standard_False;
 
   for (NCollection_List<Handle(Standard_Transient)>::Iterator aParamsIt (theParameters); aParamsIt.More(); aParamsIt.Next())
   {
@@ -552,21 +574,20 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
       Handle(ViewControl_PaneCreator) aPaneCreator = Handle(ViewControl_PaneCreator)::DownCast (anObject);
       if (!myPaneCreators.Contains (aPaneCreator))
         myPaneCreators.Append (aPaneCreator);
+      isModelUpdated = Standard_True;
     }
     if (!Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject).IsNull())
     {
-       Handle(TreeModel_ItemPropertiesCreator) aPropCreator = Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject);
-       VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*>(myTreeView->model());
-       aViewModel->AddPropertiesCreator (aPropCreator);
+      Handle(TreeModel_ItemPropertiesCreator) aPropCreator = Handle(TreeModel_ItemPropertiesCreator)::DownCast (anObject);
+      VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*>(myTreeView->model());
+      aViewModel->AddPropertiesCreator (aPropCreator);
+      isModelUpdated = Standard_True;
     }
   }
-  if (aContext.IsNull())
-    return false;
-  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
-  if (aViewModel && aViewModel->GetContext() == aContext)
-    UpdateTreeModel();
+  if (aViewModel->GetContext() != aContext)
+    SetContext(aContext);
   else
-    SetContext (aContext);
+    isModelUpdated = Standard_True;
 
   if (!aCallBack.IsNull() && aCallBack != myCallBack)
   {
@@ -576,6 +597,10 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
     myCallBack->SetContext(aContext);
     myCallBack->SetHistoryModel(aHistoryModel);
   }
+
+  if (isModelUpdated)
+    UpdateTreeModel();
+
   return true;
 }
 
@@ -585,12 +610,22 @@ bool VInspector_Window::Init (const NCollection_List<Handle(Standard_Transient)>
 // =======================================================================
 void VInspector_Window::SetContext (const Handle(AIS_InteractiveContext)& theContext)
 {
+  if (theContext.IsNull())
+    return;
+
   VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  bool isFirst = aViewModel->GetContext().IsNull();
+
   aViewModel->SetContext (theContext);
   myTreeView->setExpanded (aViewModel->index (0, 0), true);
 
   if (!myCallBack.IsNull())
     myCallBack->SetContext (theContext);
+
+  myPreviewParameters->GetDrawer()->Link (theContext->DefaultDrawer());
+
+  if (isFirst)
+    onExportToMessageView();
 }
 
 // =======================================================================
@@ -647,6 +682,20 @@ void VInspector_Window::onTreeViewContextMenuRequested(const QPoint& thePosition
 {
   QMenu* aMenu = new QMenu (GetMainWindow());
   aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Export to ShapeView"), SLOT (onExportToShapeView()), GetMainWindow(), this));
+  aMenu->addSeparator();
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+  if (anItemBase)
+  {
+    if (itemDynamicCast<VInspector_ItemContext> (anItemBase))
+    {
+      aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Export to MessageView"), SLOT (onExportToMessageView()), GetMainWindow(), this));
+      aMenu->addSeparator();
+
+      aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Default preview"), SLOT (onDefaultPreview()), GetMainWindow(), this));
+    }
+  }
 
   aMenu->addSeparator();
   for (int aTypeId = (int)VInspector_DisplayActionType_DisplayId; aTypeId <= (int)VInspector_DisplayActionType_RemoveId; aTypeId++)
@@ -815,12 +864,33 @@ void VInspector_Window::onHistoryViewSelectionChanged (const QItemSelection& the
 // function : onExportToShapeView
 // purpose :
 // =======================================================================
+void VInspector_Window::onExportToMessageView()
+{
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  if (!aViewModel)
+    return;
+  Handle(AIS_InteractiveContext) aContext = aViewModel->GetContext();
+
+  TCollection_AsciiString aPluginName ("TKMessageView");
+  NCollection_List<Handle(Standard_Transient)> aParameters;
+  if (myParameters->FindParameters (aPluginName))
+    aParameters = myParameters->Parameters (aPluginName);
+
+  QStringList anExportedPointers;
+  anExportedPointers.append (VInspector_Tools::GetPointerInfo (aContext, true).ToCString());
+  aParameters.Append (aContext);
+
+  myParameters->SetParameters (aPluginName, aParameters, false);//myExportToShapeViewDialog->IsAccepted());
+}
+
+// =======================================================================
+// function : onExportToShapeView
+// purpose :
+// =======================================================================
 void VInspector_Window::onExportToShapeView()
 {
   const QModelIndexList anIndices;
   NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (myTreeView->selectionModel()->selectedIndexes());
-  if (aSelectedShapes.Extent() <= 0)
-    return;
 
   TCollection_AsciiString aPluginName ("TKShapeView");
   NCollection_List<Handle(Standard_Transient)> aParameters;
@@ -832,20 +902,42 @@ void VInspector_Window::onExportToShapeView()
     anItemNames = myParameters->GetSelectedNames (aPluginName);
 
   QStringList anExportedPointers;
-  for (NCollection_List<TopoDS_Shape>::Iterator anIOIt (aSelectedShapes); anIOIt.More(); anIOIt.Next())
+  if (aSelectedShapes.Extent() > 0)
   {
-    const TopoDS_Shape& aShape = anIOIt.Value();
-    if (aShape.IsNull())
-      continue;
-    aParameters.Append (aShape.TShape());
-    anItemNames.Append (TInspectorAPI_PluginParameters::ParametersToString(aShape));
-    anExportedPointers.append (VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString());
+    for (NCollection_List<TopoDS_Shape>::Iterator anIOIt (aSelectedShapes); anIOIt.More(); anIOIt.Next())
+    {
+      const TopoDS_Shape& aShape = anIOIt.Value();
+      if (aShape.IsNull())
+        continue;
+      aParameters.Append (aShape.TShape());
+      anItemNames.Append (TInspectorAPI_PluginParameters::ParametersToString(aShape));
+      anExportedPointers.append (VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString());
+    }
   }
-  if (anExportedPointers.empty())
+
+  // seach for objects to be exported
+  QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (myTreeView->selectionModel()->selectedIndexes());
+  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
+  {
+    TreeModel_ItemBasePtr anItem = *anItemIt;
+    VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
+    if (!aVItem)
+    continue;
+
+    Handle(Standard_Transient) anObject = aVItem->GetObject();
+    if (anObject.IsNull())
+      continue;
+
+    aParameters.Append (anObject);
+    anItemNames.Append (anObject->DynamicType()->Name());
+    anExportedPointers.append (VInspector_Tools::GetPointerInfo (anObject, true).ToCString());
+  }
+
+  if (anExportedPointers.isEmpty())
     return;
 
   TCollection_AsciiString aPluginShortName = aPluginName.SubString (3, aPluginName.Length());
-  QString aMessage = QString ("TShape %1 is sent to %2.")
+  QString aMessage = QString ("Objects %1 are sent to %2.")
     .arg (anExportedPointers.join(", "))
     .arg (aPluginShortName.ToCString());
   QString aQuestion = QString ("Would you like to activate %1 immediately?\n")
@@ -858,6 +950,36 @@ void VInspector_Window::onExportToShapeView()
 
   myParameters->SetSelectedNames (aPluginName, anItemNames);
   myParameters->SetParameters (aPluginName, aParameters, myExportToShapeViewDialog->IsAccepted());
+}
+
+// =======================================================================
+// function : onDefaultPreview
+// purpose :
+// =======================================================================
+void VInspector_Window::onDefaultPreview()
+{
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  if (!aViewModel)
+    return;
+
+  Handle(AIS_InteractiveContext) aContext = aViewModel->GetContext();
+  if (aContext.IsNull())
+    return;
+
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (gp_Pnt(25., 10., 0.)));
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt(20., 20., 0.), gp_Pnt(30., 20., 10.)));
+  //aBuilder.Add (aCompound, BRepBuilderAPI_MakeFace (gp_Pln (gp_Pnt (20., 30., 0.), gp_Dir (1., 0., 0.))).Face());
+  aBuilder.Add (aCompound, VInspector_Tools::CreateBoxShape (gp_Pnt(20., 40., 0.), gp_Pnt(30., 60., 10.)));
+
+  Handle(AIS_Shape) aDefaultPreview = new AIS_Shape (aCompound);
+  aDefaultPreview->SetAttributes (myPreviewParameters->GetDrawer());
+  if (!aContext.IsNull())
+    aContext->Display (aDefaultPreview, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+
+  UpdateTreeModel();
 }
 
 // =======================================================================
@@ -1128,7 +1250,7 @@ Handle(AIS_InteractiveContext) VInspector_Window::createView()
   aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
   aContext->Display (aTrihedron, Standard_True);
 
-  myViewWindow = new View_Window (0, aContext);
+  myViewWindow = new View_Window (0, aContext, false /*for opening several BREP files*/, true);
   myViewWindow->GetView()->SetPredefinedSize (VINSPECTOR_DEFAULT_VIEW_WIDTH, VINSPECTOR_DEFAULT_VIEW_HEIGHT);
   myViewWindow->move (VINSPECTOR_DEFAULT_VIEW_POSITION_X, VINSPECTOR_DEFAULT_VIEW_POSITION_Y);
   myViewWindow->show();
@@ -1186,12 +1308,8 @@ void VInspector_Window::updatePreviewPresentation (const NCollection_List<TopoDS
 
   if (myPreviewPresentation.IsNull())
   {
-    Quantity_Color aColor(Quantity_NOC_TOMATO);//Quantity_NOC_GREENYELLOW));//Quantity_NOC_BLUE1));
-
     myPreviewPresentation = new AIS_Shape (aCompound);
-    myPreviewPresentation->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_O_PLUS, aColor, 3.0));
-    myPreviewPresentation->SetColor (aColor);
-    myPreviewPresentation->SetZLayer (Graphic3d_ZLayerId_Topmost);
+    myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
 
     myPreviewPresentation->SetTransformPersistence(thePersistent);
     if (!aContext.IsNull())
@@ -1229,10 +1347,9 @@ void VInspector_Window::updatePreviewPresentation (const NCollection_List<Handle
   if (myOpenGlPreviewPresentation.IsNull())
   {
     myOpenGlPreviewPresentation = new VInspector_PrsOpenGlElement();
+    myOpenGlPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
     myOpenGlPreviewPresentation->Set (theElements);
 
-    myOpenGlPreviewPresentation->SetColor (Quantity_Color (Quantity_NOC_BLUE1));
-    myOpenGlPreviewPresentation->SetZLayer (Graphic3d_ZLayerId_Topmost);
     myOpenGlPreviewPresentation->SetTransformPersistence(thePersistent);
     if (!aContext.IsNull())
       aContext->Display (myOpenGlPreviewPresentation, Standard_True);

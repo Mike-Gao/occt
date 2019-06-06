@@ -69,7 +69,7 @@
 
 #include <OSD_Timer.hxx>
 
-//#define REPORT_SELECTION_BUILD
+#define REPORT_SELECTION_BUILD
 #ifdef REPORT_SELECTION_BUILD
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
@@ -162,6 +162,15 @@ void StdSelect_ViewerSelector3d::Pick (const Standard_Integer theXPMin,
                                        const Standard_Integer theYPMax,
                                        const Handle(V3d_View)& theView)
 {
+#ifdef REPORT_SELECTION_BUILD
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("Pick", TCollection_AsciiString ("min/max:  (") +
+                        theXPMin + ", " + theYPMin + ") / (" +
+                        theXPMax + ", " + theYPMax + ") "
+                        , &aPerfMeter, NULL);
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+#endif
+
   updateZLayers (theView);
   mySelectingVolumeMgr.SetCamera (theView->Camera());
   mySelectingVolumeMgr.SetActiveSelectionType (SelectMgr_SelectingVolumeManager::Box);

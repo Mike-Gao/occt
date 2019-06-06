@@ -204,3 +204,24 @@ double MessageModel_ItemReport::AmountElapsedTime (const Handle(Message_Report)&
   }
   return anAmountTime;
 }
+
+// =======================================================================
+// function : FindReport
+// purpose :
+// =======================================================================
+Handle(Message_Report) MessageModel_ItemReport::FindReport (const MessageModel_ItemBasePtr& theItem)
+{
+  Handle(Message_Report) aReport;
+
+  MessageModel_ItemBasePtr anItem = theItem;
+  while (anItem)
+  {
+    MessageModel_ItemReportPtr aReportItem = itemDynamicCast<MessageModel_ItemReport>(anItem);
+
+    if (aReportItem)
+      return aReportItem->GetReport();
+
+    anItem = itemDynamicCast<MessageModel_ItemBase>(anItem->Parent());
+  }
+  return NULL;
+}

@@ -23,6 +23,7 @@
 #include <SelectMgr_BaseFrustum.hxx>
 #include <TColgp_HArray1OfPnt.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
+#include <Standard_OStream.hxx>
 
 //! This is an internal class containing representation of rectangular selecting frustum, created in case
 //! of point and box selection, and algorithms for overlap detection between selecting
@@ -57,6 +58,9 @@ class SelectMgr_Frustum : public SelectMgr_BaseFrustum
 public:
 
   SelectMgr_Frustum() : SelectMgr_BaseFrustum() {};
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
 
 protected:
 
