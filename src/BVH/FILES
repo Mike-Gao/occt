@@ -1,7 +1,6 @@
 BVH.cxx
 BVH_BinnedBuilder.hxx
 BVH_Box.hxx
-BVH_BoxSet.hxx
 BVH_Builder.hxx
 BVH_BuildQueue.hxx
 BVH_BuildQueue.cxx

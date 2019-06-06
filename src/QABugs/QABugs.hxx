@@ -75,7 +75,6 @@ public:
 
   Standard_EXPORT static void Commands_20 (Draw_Interpretor& DI);
 
-  Standard_EXPORT static void Commands_BVH (Draw_Interpretor& DI);
 
 
 protected:
