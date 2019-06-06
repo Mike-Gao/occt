@@ -16,7 +16,8 @@
 
 #include <inspector/VInspector_ItemSelectMgrSensitiveEntitySet.hxx>
 #include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
-#include <inspector/VInspector_ItemSelect3DSensitiveSetItem.hxx>
+#include <inspector/VInspector_ItemBVHTree.hxx>
+#include <inspector/ViewControl_Tools.hxx>
 
 #include <AIS_ListOfInteractive.hxx>
 #include <SelectMgr_SensitiveEntitySet.hxx>
@@ -27,11 +28,11 @@
 // =======================================================================
 int VInspector_ItemSelectMgrSensitiveEntitySet::initRowCount() const
 {
-  Handle(SelectMgr_SensitiveEntitySet) aSensitiveSet = Handle(SelectMgr_SensitiveEntitySet)::DownCast (GetSensitiveEntitySet());
-  if (!aSensitiveSet.IsNull())
-    return aSensitiveSet->Size();
+  //Handle(SelectMgr_SensitiveEntitySet) aSensitiveSet = Handle(SelectMgr_SensitiveEntitySet)::DownCast (GetSensitiveEntitySet());
+  //if (!aSensitiveSet.IsNull())
+  //  return aSensitiveSet->Size();
 
-  return 2;
+  return 1; // for BVH_Tree
 }
 
 // =======================================================================
@@ -40,6 +41,9 @@ int VInspector_ItemSelectMgrSensitiveEntitySet::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemSelectMgrSensitiveEntitySet::initValue (int theItemRole) const
 {
+  if (theItemRole == Qt::DisplayRole && theItemRole == Qt::ToolTipRole && Column() == 2)
+    return ViewControl_Tools::GetPointerInfo (GetSelectableObject(), true).ToCString();
+
   QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
   if (aParentValue.isValid())
     return aParentValue;
@@ -82,7 +86,7 @@ QVariant VInspector_ItemSelectMgrSensitiveEntitySet::initValue (int theItemRole)
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemSelectMgrSensitiveEntitySet::createChild (int theRow, int theColumn)
 {
-  return VInspector_ItemSelect3DSensitiveSetItem::CreateItem (currentItem(), theRow, theColumn);
+  return VInspector_ItemBVHTree::CreateItem (currentItem(), theRow, theColumn);
 }
 
 // =======================================================================
@@ -116,6 +120,21 @@ void VInspector_ItemSelectMgrSensitiveEntitySet::Reset()
 }
 
 // =======================================================================
+// function : GetBVHTree
+// purpose :
+// =======================================================================
+opencascade::handle<BVH_Tree<Standard_Real, 3> > VInspector_ItemSelectMgrSensitiveEntitySet::GetBVHTree (const int theRow,
+  TCollection_AsciiString& theName) const
+{
+  Handle(SelectMgr_SensitiveEntitySet) anEntitySet = GetSensitiveEntitySet();
+
+  if (anEntitySet.IsNull())
+    return NULL;
+
+  return anEntitySet->BVH();
+}
+
+// =======================================================================
 // function : initItem
 // purpose :
 // =======================================================================
@@ -123,6 +142,7 @@ void VInspector_ItemSelectMgrSensitiveEntitySet::initItem() const
 {
   if (IsInitialized())
     return;
+
   const_cast<VInspector_ItemSelectMgrSensitiveEntitySet*>(this)->Init();
 }
 

@@ -441,7 +441,9 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const SelectMgr_Vec3& t
                                                          Standard_Boolean*     theInside) const
 {
   Message_PerfMeter aPerfMeter; 
-  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_vvb", "", &aPerfMeter, NULL);
+  Bnd_Box aBox (theBoxMin.x(), theBoxMin.y(), theBoxMin.z(),
+                theBoxMax.x(), theBoxMax.y(), theBoxMax.z());
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_vvb", aBox.ToString(), &aPerfMeter, NULL);
   return hasOverlap (theBoxMin, theBoxMax, theInside);
 }
 

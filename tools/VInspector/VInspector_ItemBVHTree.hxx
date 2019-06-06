@@ -51,12 +51,12 @@ public:
   virtual Handle(Standard_Transient) GetObject() const { initItem(); return myTree; }
 
   //! Returns current drawer, initialize the drawer if it was not initialized yet
-  Standard_EXPORT opencascade::handle<BVH_Tree<Standard_Real, 3> > GetTree() const
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > GetTree() const
   { return opencascade::handle<BVH_Tree<Standard_Real, 3> >::DownCast (GetObject()); }
 
-  //! Returns the span from the 0 row to the first item corresponded to the picked item
-  //! the 0 item is SelectMgr_SelectingVolumeManager
-  Standard_Integer GetFirstChildOfPicked() const { return 1; }
+  //! Dumps the content of me on the stream <OS>.
+  virtual Standard_Boolean Dump (Standard_OStream& OS) const;
+
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
@@ -70,29 +70,9 @@ protected:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
-  //! Returns number of table rows
-  //! \return an integer value
-  virtual int GetTableRowCount() const Standard_OVERRIDE;
-
-  //! Returns table value for the row in form: <function name> <function value>
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  virtual QVariant GetTableData (const int theRow, const int theColumn, const int theRole) const Standard_OVERRIDE;
-
-  //! Returns type of edit control for the model index. By default, it is an empty control
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  //! \return edit type
-  virtual ViewControl_EditType GetTableEditType (const int theRow, const int theColumn) const Standard_OVERRIDE;
-
-  //! Sets the value into the table cell. Only 1st column value might be modified.
-  //! \param theRow a model index row
-  //! \param theColumn a model index column
-  //! \param theValue a new cell value
-  virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
-
-  //! Dumps the content of me on the stream <OS>.
-  virtual Standard_Boolean Dump (Standard_OStream& OS) const;
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() Standard_OVERRIDE;
 
 protected:
 

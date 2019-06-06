@@ -18,6 +18,11 @@
 
 #include <BVH_Box.hxx>
 
+#include <Message_Alerts.hxx>
+
+#include <Standard_Macro.hxx>
+#include <Standard_OStream.hxx>
+
 template<class T, int N> class BVH_Builder;
 
 //! A non-template class for using as base for BVH_TreeBase
@@ -27,6 +32,13 @@ class BVH_TreeBaseTransient : public Standard_Transient
   DEFINE_STANDARD_RTTIEXT(BVH_TreeBaseTransient, Standard_Transient)
 protected:
   BVH_TreeBaseTransient() {}
+
+  //! Dumps the content of me on the stream <OS>.
+  virtual void Dump (Standard_OStream& OS) const { (void)OS; }
+
+  //! Dumps the content of the given node on the stream <OS>.
+  virtual void DumpNode (const int theNodeIndex, Standard_OStream& OS) const
+  { (void)theNodeIndex; (void)OS; }
 };
 
 //! Stores parameters of bounding volume hierarchy (BVH).
@@ -177,6 +189,35 @@ public: //! @name methods for accessing serialized tree data
   {
     return myMaxPointBuffer;
   }
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE
+  {
+    DUMP_VALUES (OS, "BVH_Tree", 2);
+
+    DUMP_VALUES (OS, "Depth", Depth());
+    DUMP_VALUES (OS, "Length", Length());
+
+    for (Standard_Integer aNodeIdx = 0; aNodeIdx < Length(); ++aNodeIdx)
+    {
+       DumpNode (aNodeIdx, OS);
+    }
+  }
+
+  //! Dumps the content of the given node on the stream <OS>.
+  Standard_EXPORT virtual void DumpNode (const int theNodeIndex, Standard_OStream& OS) const Standard_OVERRIDE
+  {
+    DUMP_VALUES (OS, "BVH_TreeNode", 2);
+    DUMP_VALUES (OS, "NodeIndex", theNodeIndex);
+
+    DUMP_VALUES (OS, "MinPoint - MaxPoint", BVH::ToBndBox (MinPoint (theNodeIndex), MaxPoint (theNodeIndex)).ToString());
+
+    DUMP_VALUES (OS, "BegPrimitive", BegPrimitive (theNodeIndex));
+    DUMP_VALUES (OS, "EndPrimitive", EndPrimitive (theNodeIndex));
+    DUMP_VALUES (OS, "Level",        Level (theNodeIndex));
+    DUMP_VALUES (OS, "IsOuter",      IsOuter (theNodeIndex));
+  }
+
 
 public: //! @name protected fields
 

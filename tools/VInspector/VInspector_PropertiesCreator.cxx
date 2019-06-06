@@ -27,10 +27,6 @@ IMPLEMENT_STANDARD_RTTIEXT(VInspector_PropertiesCreator, TreeModel_ItemPropertie
 // =======================================================================
 TreeModel_ItemProperties* VInspector_PropertiesCreator::GetProperties (const TreeModel_ItemBasePtr& theItem)
 {
-  Handle(Standard_Transient) anObject = theItem->GetObject();
-  if (anObject.IsNull())
-    return NULL;
-
   Standard_SStream aSStream;
   if (theItem->Dump (aSStream))
     return new ViewControl_PropertiesStream (theItem);

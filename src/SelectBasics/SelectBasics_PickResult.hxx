@@ -17,6 +17,9 @@
 #define _SelectBasics_PickResult_HeaderFile
 
 #include <Standard.hxx>
+#include <Standard_OStream.hxx>
+
+#include <Message_Alerts.hxx>
 #include <NCollection_Vec4.hxx>
 
 //! This structure provides unified access to the results of Matches() method in all sensitive entities,
@@ -79,6 +82,15 @@ public:
 
   //! Set distance to geometry center.
   void SetDistToGeomCenter (Standard_Real theDistToCenter) { myDistToCenter = theDistToCenter; }
+
+  //! Dumps the content of me on the stream <OS>.
+  void Dump (Standard_OStream& OS) const
+  {
+    DUMP_VALUES (OS, "SelectBasics_PickResult", 2);
+    DUMP_VALUES (OS, "myObjPickedPnt", myObjPickedPnt.XYZ().ToString());
+    DUMP_VALUES (OS, "myDepth", myDepth);
+    DUMP_VALUES (OS, "myDistToCenter", myDistToCenter);
+  }
 
 private:
   gp_Pnt        myObjPickedPnt; //!< User-picked selection point onto object

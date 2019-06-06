@@ -17,6 +17,7 @@
 #define VInspector_ItemSelectMgrSensitiveEntitySet_H
 
 #include <AIS_InteractiveObject.hxx>
+#include <BVH_Tree.hxx>
 #include <SelectMgr_SensitiveEntitySet.hxx>
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
@@ -58,6 +59,9 @@ public:
 
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
+
+  //! Returns child BVH tree of the row
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > GetBVHTree (const int theRow, TCollection_AsciiString& theName) const;
 
 protected:
 

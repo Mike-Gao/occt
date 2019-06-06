@@ -139,7 +139,7 @@ opencascade::handle<BVH_Tree<Standard_Real, 3> > VInspector_ItemSelectMgrSelecta
   SelectMgr_SelectableObjectSet::BVHSubset aBVHSubset = (SelectMgr_SelectableObjectSet::BVHSubset)theRow;
   theName = TCollection_AsciiString ("BVH_Tree_") + SelectMgr::BVHSubsetToString (aBVHSubset);
 
-  return aSet.BVH (SelectMgr_SelectableObjectSet::BVHSubset_2dPersistent);
+  return aSet.BVH (aBVHSubset);
 }
 
 // =======================================================================

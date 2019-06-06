@@ -35,52 +35,7 @@ void ViewControl_PropertiesStream::Init()
   Standard_SStream aSStream;
   getItem()->Dump (aSStream);
 
-  TCollection_AsciiString aStream (aSStream.str().c_str());
-  Standard_Character aSeparator = Message::DumpSeparator();
-  Standard_Integer aColumnCount = 0;
-
-  TCollection_AsciiString aCurrentString = aStream;
-  Standard_Integer aPosition = aCurrentString.Search (aSeparator);
-  if (aPosition >= 1)
-  {
-    TCollection_AsciiString aTailString = aCurrentString.Split (aPosition);
-    Standard_Boolean aClassNameFound = Standard_False;
-    while (!aCurrentString.IsEmpty())
-    {
-      TCollection_AsciiString aValueString = aCurrentString;
-      aPosition = aValueString.Search (aSeparator);
-      if (aPosition < 0 )
-        break;
-      aCurrentString = aValueString.Split (aPosition - 1);
-
-      if (!aColumnCount)
-      {
-        if (!aClassNameFound)
-          aClassNameFound = Standard_True;
-        else
-        {
-          if (!aValueString.IsIntegerValue())
-            break; // not correct Dump, in correct the first value is number of property columns
-          aColumnCount = aValueString.IntegerValue();
-        }
-      }
-      else
-        myValues.Append (aValueString);
-
-      if (aTailString.IsEmpty())
-        break;
-      aCurrentString = aTailString;
-      aPosition = aCurrentString.Search (aSeparator);
-      if (aPosition < 0 )
-      {
-        aCurrentString = aTailString;
-        aTailString = TCollection_AsciiString();
-      }
-      else
-        aTailString = aCurrentString.Split (aPosition);
-    }
-  }
-  myColumnCount = aColumnCount;
+  Message::ConvertStream (aSStream, myColumnCount, myValues); 
 }
 
 // =======================================================================

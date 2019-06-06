@@ -16,7 +16,14 @@
 #include <inspector/VInspector_ItemBVHTree.hxx>
 
 #include <inspector/VInspector_ItemSelectMgrSelectableObjectSet.hxx>
+#include <inspector/VInspector_ItemSelectMgrSensitiveEntitySet.hxx>
 #include <inspector/VInspector_ItemBVHTreeNode.hxx>
+#include <inspector/VInspector_Tools.hxx>
+#include <inspector/ViewControl_PropertiesStream.hxx>
+
+#include <Bnd_Box.hxx>
+#include <BRep_Builder.hxx>
+#include <TopoDS_Compound.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -81,24 +88,22 @@ QVariant VInspector_ItemBVHTree::initValue (const int theItemRole) const
 
 void VInspector_ItemBVHTree::Init()
 {
-  VInspector_ItemSelectMgrSelectableObjectSetPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrSelectableObjectSet>(Parent());
+  VInspector_ItemSelectMgrSelectableObjectSetPtr anObjectParent = itemDynamicCast<VInspector_ItemSelectMgrSelectableObjectSet>(Parent());
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree;
+  if (anObjectParent)
+  {
+    aBVHTree = anObjectParent->GetBVHTree (Row(), myName);
+  }
+  else
+  {
+    VInspector_ItemSelectMgrSensitiveEntitySetPtr anEntityParent = itemDynamicCast<VInspector_ItemSelectMgrSensitiveEntitySet>(Parent());
+    if (anEntityParent)
+      aBVHTree = anEntityParent->GetBVHTree (Row(), myName);
+  }
 
-  //! Returns child BVH tree of the row
-  setTree (aParentItem->GetBVHTree (Row(), myName));
+  setTree (aBVHTree);
 
-  //Handle(SelectMgr_ViewerSelector) aViewerSelector;
-  //if (aParentItem)
-  //{
-  //  VInspector_ItemContextPtr aParentContextItem = itemDynamicCast<VInspector_ItemContext>(aParentItem->Parent());
-  //  if (aParentContextItem)
-  //  {
-  //    Handle(AIS_InteractiveContext) aContext = aParentContextItem->GetContext();
-  //    aViewerSelector = aContext->MainSelector();
-  //  }
-  //}
-  //setViewerSelector (aViewerSelector);
-
-  //UpdatePresentationShape();
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }
 
@@ -128,124 +133,16 @@ void VInspector_ItemBVHTree::initItem() const
 }
 
 // =======================================================================
-// function : GetTableRowCount
-// purpose :
-// =======================================================================
-int VInspector_ItemBVHTree::GetTableRowCount() const
-{
-  return 60;
-}
-
-// =======================================================================
-// function : GetTableData
-// purpose :
-// =======================================================================
-QVariant VInspector_ItemBVHTree::GetTableData (const int theRow, const int theColumn, const int theRole) const
-{
-  //if (theRole != Qt::DisplayRole)
-  //  return QVariant();
-
-  //Handle(SelectMgr_ViewerSelector) aViewerSelector = GetViewerSelector();
-  //if (aViewerSelector.IsNull())
-  //  return QVariant();
-
-  //bool isFirstColumn = theColumn == 0;
-  //switch (theRow)
-  //{
-  //  case 0: return isFirstColumn ? QVariant ("Sensitivity") : QVariant (aViewerSelector->Sensitivity());
-  //  case 1: return isFirstColumn ? QVariant ("IsPickClosest") : QVariant (aViewerSelector->IsPickClosest());
-  //  case 2: return isFirstColumn ? QVariant ("NbPicked") : QVariant (aViewerSelector->NbPicked());
-
-  //  case 3: return ViewControl_Table::SeparatorData();
-  //  case 4: return isFirstColumn ? QVariant ("ClearPicked") : QVariant ("DO");
-
-  //  case 5: return ViewControl_Table::SeparatorData();
-  //  case 6: return isFirstColumn ? QVariant ("X (pixel)") : QVariant (myXPix);
-  //  case 7: return isFirstColumn ? QVariant ("Y (pixel)") : QVariant (myYPix);
-  //  case 8: return isFirstColumn ? QVariant ("Pick") : QVariant ("DO");
-
-  //  case 9: return ViewControl_Table::SeparatorData();
-  //  case 10: return isFirstColumn ? QVariant ("X Min (pixel)") : QVariant (myXMinPix);
-  //  case 11: return isFirstColumn ? QVariant ("Y Min (pixel)") : QVariant (myXMinPix);
-  //  case 12: return isFirstColumn ? QVariant ("X Max (pixel)") : QVariant (myXMaxPix);
-  //  case 13: return isFirstColumn ? QVariant ("Y Max (pixel)") : QVariant (myYMaxPix);
-  //  case 14: return isFirstColumn ? QVariant ("Pick") : QVariant ("DO");
-
-  //  default: break;
-  //}
-  return QVariant();
-}
-
-// =======================================================================
-// function : GetTableEditType
-// purpose :
-// =======================================================================
-ViewControl_EditType VInspector_ItemBVHTree::GetTableEditType (const int theRow, const int) const
-{
-  switch (theRow)
-  {
-    //case 4: return ViewControl_EditType_DoAction;
-    //case 6: return ViewControl_EditType_Spin;
-    //case 7: return ViewControl_EditType_Spin;
-    //case 8: return ViewControl_EditType_DoAction;
-    //case 10: return ViewControl_EditType_Spin;
-    //case 11: return ViewControl_EditType_Spin;
-    //case 12: return ViewControl_EditType_Spin;
-    //case 13: return ViewControl_EditType_Spin;
-    //case 14: return ViewControl_EditType_DoAction;
-    default: return ViewControl_EditType_None;
-  }
-}
-
-// =======================================================================
-// function : SetTableData
-// purpose :
-// =======================================================================
-bool VInspector_ItemBVHTree::SetTableData (const int theRow, const int, const QVariant& theValue)
-{
-  //Handle(SelectMgr_ViewerSelector) aViewerSelector = GetViewerSelector();
-  //if (aViewerSelector.IsNull())
-  //  return Standard_False;
-
-  //switch (theRow)
-  //{
-  //  case 4: aViewerSelector->ClearPicked(); break;
-  //  case 6: myXPix = theValue.toInt();
-  //  case 7: myYPix = theValue.toInt();
-  //  case 8:
-  //  {
-  //    Handle(StdSelect_ViewerSelector3d) aSelector3d = Handle(StdSelect_ViewerSelector3d)::DownCast(aViewerSelector);
-  //    if (!aSelector3d.IsNull())
-  //      aSelector3d->Pick (myXPix, myYPix, View_Tools::FindActiveView (GetContext()));
-  //    break;
-  //  }
-  //  case 10: myXMinPix = theValue.toInt();
-  //  case 11: myXMinPix = theValue.toInt();
-  //  case 12: myXMaxPix = theValue.toInt();
-  //  case 13: myYMaxPix = theValue.toInt();
-  //  case 14:
-  //  {
-  //    Handle(StdSelect_ViewerSelector3d) aSelector3d = Handle(StdSelect_ViewerSelector3d)::DownCast(aViewerSelector);
-  //    if (!aSelector3d.IsNull())
-  //      aSelector3d->Pick (myXMinPix, myYMinPix, myXMaxPix, myYMaxPix, View_Tools::FindActiveView (GetContext()));
-  //    break;
-  //  }
-  //  default: break;
-  //}
-  return Standard_True;
-}
-
-// =======================================================================
 // function : Dump
 // purpose :
 // =======================================================================
 Standard_Boolean VInspector_ItemBVHTree::Dump (Standard_OStream& OS) const
 {
-  //Handle(SelectMgr_ViewerSelector) aViewerSelector = GetViewerSelector();
-  //if (aViewerSelector.IsNull())
-  //  return Standard_False;
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = GetTree();
+  if (aBVHTree.IsNull())
+    return Standard_False;
 
-  //aViewerSelector->Dump (OS);
+  aBVHTree->Dump (OS);
   return Standard_True;
 }
 
@@ -256,4 +153,44 @@ Standard_Boolean VInspector_ItemBVHTree::Dump (Standard_OStream& OS) const
 TreeModel_ItemBasePtr VInspector_ItemBVHTree::createChild (int theRow, int theColumn)
 {
   return VInspector_ItemBVHTreeNode::CreateItem (currentItem(), theRow, theColumn);
+}
+
+// =======================================================================
+// function : buildPresentationShape
+// purpose :
+// =======================================================================
+TopoDS_Shape VInspector_ItemBVHTree::buildPresentationShape()
+{
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = myTree;
+  if (aBVHTree.IsNull())
+    return TopoDS_Shape();
+
+  Standard_SStream OS;
+  //aBVHTree->DumpNode (Row(), OS);
+  aBVHTree->Dump (OS);
+
+  Standard_Integer aColumnCount;
+  NCollection_Vector<TCollection_AsciiString> aValues;
+  Message::ConvertStream (OS, aColumnCount, aValues);
+
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+  for (int aValueId = 0; aValueId < aValues.Size(); )
+  {
+    for (int aColumnId = 0; aColumnId < aColumnCount; aColumnId++, aValueId++)
+    {
+      if (aColumnId != 1)
+        continue;
+
+      TCollection_AsciiString aValue = aValues.Value (aValueId);
+      Bnd_Box aBox;
+      if (!aBox.FromString (aValue))
+        continue;
+
+      TopoDS_Shape aShape = VInspector_Tools::CreateShape (aBox);
+      aBuilder.Add (aCompound, aShape);
+    }
+  }
+  return aCompound;
 }

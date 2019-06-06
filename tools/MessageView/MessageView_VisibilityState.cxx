@@ -27,6 +27,15 @@
 // =======================================================================
 bool MessageView_VisibilityState::CanBeVisible (const QModelIndex& theIndex) const
 {
+  MessageModel_ItemAlertPtr anAlertItem = getAlertItem (theIndex);
+  if (anAlertItem)
+  {
+    NCollection_List<Handle(Standard_Transient)> aPresentations;
+    anAlertItem->GetPresentations (aPresentations);
+    if (!aPresentations.IsEmpty())
+      return true;
+  }
+
   return !getShape (theIndex).IsNull();// || hasTableValues (theIndex);
 }
 

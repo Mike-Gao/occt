@@ -15,10 +15,13 @@
 
 #include <inspector/VInspector_ItemBVHTreeNode.hxx>
 
-//#include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
+#include <inspector/VInspector_ItemBVHTree.hxx>
 //#include <inspector/VInspector_ItemSelectMgrBaseFrustum.hxx>
 //
-//#include <inspector/ViewControl_Tools.hxx>
+#include <inspector/VInspector_Tools.hxx>
+
+#include <BRep_Builder.hxx>
+#include <TopoDS_Compound.hxx>
 
 // =======================================================================
 // function : initRowCount
@@ -26,10 +29,7 @@
 // =======================================================================
 int VInspector_ItemBVHTreeNode::initRowCount() const
 {
-  if (Column() != 0)
-    return 0;
-
-  return 2;
+  return 0;
 }
 
 // =======================================================================
@@ -47,7 +47,7 @@ QVariant VInspector_ItemBVHTreeNode::initValue (const int theItemRole) const
 
   switch (Column())
   {
-    case 0: return QString ("TreeNode_" + Row()); break;
+    case 0: return QString ("TreeNode_%1").arg (Row()); break;
     default:
       break;
   }
@@ -61,6 +61,7 @@ QVariant VInspector_ItemBVHTreeNode::initValue (const int theItemRole) const
 
 void VInspector_ItemBVHTreeNode::Init()
 {
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }
 
@@ -72,6 +73,18 @@ void VInspector_ItemBVHTreeNode::Init()
 void VInspector_ItemBVHTreeNode::Reset()
 {
   VInspector_ItemBase::Reset();
+}
+
+// =======================================================================
+// function : GetTree
+// purpose :
+// =======================================================================
+
+opencascade::handle<BVH_Tree<Standard_Real, 3> > VInspector_ItemBVHTreeNode::GetTree() const
+{
+  VInspector_ItemBVHTreePtr anObjectParent = itemDynamicCast<VInspector_ItemBVHTree>(Parent());
+
+  return anObjectParent->GetTree();
 }
 
 // =======================================================================
@@ -90,7 +103,60 @@ void VInspector_ItemBVHTreeNode::initItem() const
 // function : createChild
 // purpose :
 // =======================================================================
-TreeModel_ItemBasePtr VInspector_ItemBVHTreeNode::createChild (int theRow, int theColumn)
+TreeModel_ItemBasePtr VInspector_ItemBVHTreeNode::createChild (int, int)
 {
   return TreeModel_ItemBasePtr();
+}
+
+// =======================================================================
+// function : buildPresentationShape
+// purpose :
+// =======================================================================
+TopoDS_Shape VInspector_ItemBVHTreeNode::buildPresentationShape()
+{
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = GetTree();
+  if (aBVHTree.IsNull())
+    return TopoDS_Shape();
+
+  Standard_SStream OS;
+  aBVHTree->DumpNode (Row(), OS);
+
+  Standard_Integer aColumnCount;
+  NCollection_Vector<TCollection_AsciiString> aValues;
+  Message::ConvertStream (OS, aColumnCount, aValues);
+
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+  for (int aValueId = 0; aValueId < aValues.Size(); )
+  {
+    for (int aColumnId = 0; aColumnId < aColumnCount; aColumnId++, aValueId++)
+    {
+      if (aColumnId != 1)
+        continue;
+
+      TCollection_AsciiString aValue = aValues.Value (aValueId);
+      Bnd_Box aBox;
+      if (!aBox.FromString (aValue))
+        continue;
+
+      TopoDS_Shape aShape = VInspector_Tools::CreateShape (aBox);
+      aBuilder.Add (aCompound, aShape);
+    }
+  }
+  return aCompound;
+}
+
+// =======================================================================
+// function : Dump
+// purpose :
+// =======================================================================
+Standard_Boolean VInspector_ItemBVHTreeNode::Dump (Standard_OStream& OS) const
+{
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = GetTree();
+  if (aBVHTree.IsNull())
+    return Standard_False;
+
+  aBVHTree->DumpNode (Row(), OS);
+  return Standard_True;
 }

@@ -51,6 +51,12 @@ public:
   //! \return object
   virtual Handle(Standard_Transient) GetObject() const { initItem(); return NULL; }
 
+  //! Returns parent tree, the node information is obtained from the tree by the given index
+  Standard_EXPORT opencascade::handle<BVH_Tree<Standard_Real, 3> > GetTree() const;
+
+  //! Dumps the content of me on the stream <OS>.
+  virtual Standard_Boolean Dump (Standard_OStream& OS) const;
+
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
@@ -63,6 +69,10 @@ protected:
   //! \param theItemRole a value role
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
+
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() Standard_OVERRIDE;
 
 protected:
 

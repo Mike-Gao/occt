@@ -87,6 +87,8 @@ VInspector_ItemV3dView.cxx
 VInspector_ItemV3dView.hxx
 VInspector_ItemV3dViewer.cxx
 VInspector_ItemV3dViewer.hxx
+VInspector_PreviewParameters.cxx
+VInspector_PreviewParameters.hxx
 VInspector_PropertiesCreator.cxx
 VInspector_PropertiesCreator.hxx
 VInspector_PrsOpenGlElement.cxx

@@ -21,11 +21,13 @@
 #include <gp_Trsf.hxx>
 #include <gp_XYZ.hxx>
 #include <Bnd_Box.hxx>
+#include <Bnd_OBB.hxx>
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <TColgp_HArray1OfPnt.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopLoc_Location.hxx>
+#include <TopoDS_Shape.hxx> 
 
 #include <Standard_WarningsDisable.hxx>
 #include <QString>
@@ -142,6 +144,22 @@ public:
   //! \param theLocation object location
   //! \return text value
   Standard_EXPORT static TCollection_AsciiString ToString (const TopLoc_Location& theLocation);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_Box& theBoundingBox);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_OBB& theBoundingBox);
+
+  //! Creates box shape
+  //! \param thePntMin minimum point on the bounding box
+  //! \param thePntMax maximum point on the bounding box
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax);
 
 };
 

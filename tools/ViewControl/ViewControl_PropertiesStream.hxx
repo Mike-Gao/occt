@@ -17,6 +17,7 @@
 #define ViewControl_PropertiesStream_H
 
 #include <Standard.hxx>
+#include <Standard_SStream.hxx>
 #include <NCollection_Vector.hxx>
 #include <TCollection_AsciiString.hxx>
 

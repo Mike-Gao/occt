@@ -195,15 +195,15 @@ public:
   Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_OBB& theBoundingBox);
 
   //! Creates box shape
-  //! \param theBoundingBox box shape parameters
-  //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateShape (const Select3D_BndBox3d& theBoundingBox);
-
-  //! Creates box shape
   //! \param thePntMin minimum point on the bounding box
   //! \param thePntMax maximum point on the bounding box
   //! \return created shape
   Standard_EXPORT static TopoDS_Shape CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Select3D_BndBox3d& theBoundingBox);
 
   //! Build string presentation of Graphic3D index buffer
   //! \param theIndexBuffer index buffer

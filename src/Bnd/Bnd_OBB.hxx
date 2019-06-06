@@ -20,6 +20,7 @@
 #include <Standard_Handle.hxx>
 #include <Standard_Real.hxx>
 #include <Standard_Boolean.hxx>
+#include <Standard_OStream.hxx>
 
 #include <Bnd_Box.hxx>
 #include <gp_Ax3.hxx>
@@ -275,6 +276,12 @@ public:
   //! Rebuilds this in order to include all previous objects
   //! (which it was created from) and theP.
   Standard_EXPORT void Add(const gp_Pnt& theP);
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT Standard_Boolean Init (const Standard_OStream& OS);
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
 protected:
 

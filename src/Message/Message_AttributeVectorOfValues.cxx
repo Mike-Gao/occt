@@ -40,7 +40,6 @@ Message_AttributeVectorOfValues::Message_AttributeVectorOfValues (const Standard
   if (aPosition >= 1)
   {
     TCollection_AsciiString aTailString = aCurrentString.Split (aPosition);
-    Standard_Integer aRow = 0;
     Standard_Boolean aClassNameFound = Standard_False;
     while (!aCurrentString.IsEmpty())
     {

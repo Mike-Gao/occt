@@ -130,6 +130,30 @@ void VInspector_ItemSelectMgrViewerSelector::Reset()
 }
 
 // =======================================================================
+// function : GetSensitiveEntitySet
+// purpose :
+// =======================================================================
+Handle(SelectMgr_SensitiveEntitySet) VInspector_ItemSelectMgrViewerSelector::GetSensitiveEntitySet (const int theRow,
+  Handle(SelectMgr_SelectableObject)& theObject)
+{
+  Standard_Integer anIndex = 0;
+
+  Handle(SelectMgr_ViewerSelector) aViewSelector = GetViewerSelector();
+  if (aViewSelector.IsNull())
+    return NULL;
+
+  for (SelectMgr_MapOfObjectSensitivesIterator anIterator (aViewSelector->GetObjectSensitives()); anIterator.More(); anIterator.Next(), anIndex++)
+  {
+    if (anIndex != theRow)
+      continue;
+
+    theObject = anIterator.Key();
+    return anIterator.Value();
+  }
+  return NULL;
+}
+
+// =======================================================================
 // function : GetContainerRowCount
 // purpose :
 // =======================================================================
@@ -144,30 +168,6 @@ int VInspector_ItemSelectMgrViewerSelector::GetContainerRowCount (const int theC
     return 0;
 
   return aViewSelector->GetObjectSensitives().Extent();
-}
-
-// =======================================================================
-// function : GetSensitiveEntitySet
-// purpose :
-// =======================================================================
-Handle(SelectMgr_SensitiveEntitySet) VInspector_ItemSelectMgrViewerSelector::GetSensitiveEntitySet (const int theRow,
-  Handle(SelectMgr_SelectableObject)& theObject)
-{
-  Standard_Integer anIndex = 0;
-
-  Handle(SelectMgr_ViewerSelector) aViewSelector = GetViewerSelector();
-  if (!aViewSelector.IsNull())
-    return NULL;
-
-  for (SelectMgr_MapOfObjectSensitivesIterator anIterator (aViewSelector->GetObjectSensitives()); anIterator.More(); anIterator.Next(), anIndex++)
-  {
-    if (anIndex != theRow)
-      continue;
-
-    theObject = anIterator.Key();
-    return anIterator.Value();
-  }
-  return NULL;
 }
 
 // =======================================================================
