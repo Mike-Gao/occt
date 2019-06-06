@@ -104,6 +104,21 @@ void VInspector_ItemSelectMgrBaseFrustum::initItem() const
 }
 
 // =======================================================================
+// function : Dump
+// purpose :
+// =======================================================================
+Standard_Boolean VInspector_ItemSelectMgrBaseFrustum::Dump (Standard_OStream& OS) const
+{
+  Handle(SelectMgr_BaseFrustum) aFrustum = GetFrustum();
+
+  if (aFrustum.IsNull())
+    return Standard_False;
+
+  aFrustum->Dump (OS);
+  return Standard_True;
+}
+
+// =======================================================================
 // function : GetTableRowCount
 // purpose :
 // =======================================================================

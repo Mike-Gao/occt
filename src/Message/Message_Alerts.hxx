@@ -23,6 +23,9 @@
 #include <Message_Gravity.hxx>
 #include <Message_Report.hxx>
 
+#include <NCollection_Vector.hxx>
+#include <TCollection_AsciiString.hxx>
+
 static Handle(Message_Alert) OCCT_Message_Alert;
 
 #define MESSAGE_INFO(Name, Description, PerfMeter, ParentAlert) \
@@ -70,5 +73,30 @@ static Handle(Message_Alert) OCCT_Message_Alert;
     OS << Value1 << Message::DumpSeparator() << Value2 << Message::DumpSeparator(); \
   }
 
+#define DUMP_VEC_COLOR(Values, Value) \
+  { \
+    Value = Message::ColorVectorToString (aValues); \
+  }
+
+#define DUMP_VEC_COLOR_SPLIT(Value, Values) \
+  { \
+    Message::ColorVectorFromString (Value, Values); \
+  }
+
+#define DUMP_VEC_COORD(Values, Value) \
+  { \
+    Value = Message::CoordVectorToString (aValues); \
+  }
+
+#define DUMP_VEC_COORD_SPLIT(Value, Values) \
+  { \
+    Message::CoordVectorFromString (Value, Values); \
+  }
+
+
+#define DUMP_VALUES_SPLIT(OS, ColumnCount, Values) \
+  { \
+    Message::ConvertStream (OS, aColumnCount, aValues); \
+  }
 
 #endif // _Message_Alerts_HeaderFile

@@ -48,6 +48,12 @@ public:
   //! Destructor
   ~TreeModel_ItemProperties() {}
 
+  //! If me has internal values, it should be initialized here.
+  virtual void Init() {}
+
+  //! If the item has internal values, there should be reseted here.
+  Standard_EXPORT virtual void Reset() {}
+
   //! Returns number of item children
   //! \return an integer value, ZERO by default
   virtual int ChildItemCount() const { return 0; }
@@ -59,7 +65,7 @@ public:
   virtual TreeModel_ItemBasePtr CreateChildItem (int theRow, int theColumn) const
   { (void)theRow; (void)theColumn; return TreeModel_ItemBasePtr(); }
 
-  //! Returns number of table rows
+  //! Returns number of table columns. Default value is two columns: title to value
   //! \return an integer value
   virtual int GetTableColumnCount() const { return 2; }
 

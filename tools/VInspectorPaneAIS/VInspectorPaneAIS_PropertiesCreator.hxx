@@ -20,10 +20,6 @@
 #include <Standard_Macro.hxx>
 
 #include <inspector/TreeModel_ItemPropertiesCreator.hxx>
-#include <inspector/ViewControl_Pane.hxx>
-
-#include <NCollection_DataMap.hxx>
-#include <TCollection_AsciiString.hxx>
 
 DEFINE_STANDARD_HANDLE (VInspectorPaneAIS_PropertiesCreator, TreeModel_ItemPropertiesCreator)
 
@@ -46,8 +42,6 @@ public:
 
   DEFINE_STANDARD_RTTIEXT(VInspectorPaneAIS_PropertiesCreator, TreeModel_ItemPropertiesCreator)
 
-private:
-  NCollection_DataMap<TCollection_AsciiString, ViewControl_Pane*> myPanes; //!< created panes
 };
 
 #endif 

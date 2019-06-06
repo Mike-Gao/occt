@@ -604,6 +604,30 @@ TopoDS_Shape VInspector_Tools::CreateShape (const Bnd_Box& theBoundingBox)
 //function : CreateShape
 //purpose  :
 //=======================================================================
+TopoDS_Shape VInspector_Tools::CreateShape (const Bnd_OBB& theBoundingBox)
+{
+  if (theBoundingBox.IsVoid())
+    return TopoDS_Shape();
+
+  TColgp_Array1OfPnt anArrPnts(0, 8);
+  theBoundingBox.GetVertex(&anArrPnts(0));
+
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt (anArrPnts.Value(0)), gp_Pnt (anArrPnts.Value(1))));
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt (anArrPnts.Value(0)), gp_Pnt (anArrPnts.Value(2))));
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt (anArrPnts.Value(1)), gp_Pnt (anArrPnts.Value(3))));
+  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt (anArrPnts.Value(2)), gp_Pnt (anArrPnts.Value(3))));
+
+  return aCompound;
+}
+
+//=======================================================================
+//function : CreateShape
+//purpose  :
+//=======================================================================
 TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBoundingBox)
 {
   if (!theBoundingBox.IsValid())

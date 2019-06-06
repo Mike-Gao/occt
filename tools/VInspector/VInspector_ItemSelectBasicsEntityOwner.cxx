@@ -215,20 +215,23 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::GetTableData(const int theRow, 
   bool isFirstColumn = theColumn == 0;
 
   Handle(SelectBasics_EntityOwner) anOwner = getEntityOwner();
+  Handle(SelectMgr_EntityOwner) anEntityOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwner);
   switch (theRow)
   {
     case 0: return isFirstColumn ? QVariant ("Priority") : QVariant (anOwner->Priority());
     case 1: return isFirstColumn ? QVariant ("HasLocation") : QVariant (anOwner->HasLocation());
     case 2: return isFirstColumn ? QVariant ("Location") :
       (anOwner->HasLocation() ? QVariant (ViewControl_Tools::ToString (anOwner->Location()).ToCString()) : QVariant());
+    case 3: return isFirstColumn ? QVariant ("IsSelected") : QVariant (!anEntityOwner.IsNull() ? anEntityOwner->IsSelected() : "");
     default: break;
   }
+
 
   Handle(StdSelect_BRepOwner) aBROwner = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
   if (aBROwner.IsNull())
     return QVariant();
 
-  int aBRepOwnerRow = theRow - 3;
+  int aBRepOwnerRow = theRow - 4;
   switch (aBRepOwnerRow)
   {
     case 0: return ViewControl_Table::SeparatorData();

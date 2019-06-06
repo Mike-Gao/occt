@@ -227,3 +227,37 @@ inline gp_XY operator* (const Standard_Real Scalar,
   return Coord1.Multiplied(Scalar);
 }
 
+inline TCollection_AsciiString gp_XY::ToString() const
+{
+  return TCollection_AsciiString ("(") + x + ", " + y + ")";
+}
+
+inline Standard_Boolean gp_XY::FromString (const TCollection_AsciiString& theValue)
+{
+  TCollection_AsciiString aCurrentString = theValue, aValueString;
+
+  Standard_Integer aPosition = aCurrentString.Search ("(");
+  if (aPosition != 1)
+    return Standard_False;
+
+  aCurrentString = aCurrentString.Split (aPosition);
+  Standard_Real aX, anY;
+  // x value
+  aPosition = aCurrentString.Search (", ");
+  if (aPosition < 0)
+    return Standard_False;
+  aCurrentString = aValueString.Split (aPosition);
+  aX = aValueString.RealValue();
+  aCurrentString = aCurrentString.Split (2);
+
+  // y value
+  aPosition = aCurrentString.Search (")");
+  if (aPosition < 0)
+    return Standard_False;
+  aCurrentString = aValueString.Split (aPosition);
+  anY = aValueString.RealValue();
+
+  x = aX;
+  y = anY;
+  return Standard_True;
+}

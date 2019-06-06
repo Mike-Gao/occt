@@ -36,7 +36,7 @@
 
 #include <algorithm>
 
-//#define REPORT_SELECTION_BUILD
+#define REPORT_SELECTION_BUILD
 #ifdef REPORT_SELECTION_BUILD
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
@@ -280,6 +280,16 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
     return;
   }
 
+  if (!mySelectingVolumeMgr.ViewClipping().IsNull())
+  {
+    Standard_Real aDepth = /*aPickResult.HasPickedPoint() ?*+/ aPickResult.Depth();// :*/ aPickResult.DistToGeomCenter();
+    Standard_Boolean isClipped = mySelectingVolumeMgr.IsClipped (*mySelectingVolumeMgr.ViewClipping(),
+                                                                  aDepth);
+    if (isClipped)
+      return;
+    else
+      int aValue = 9;
+  }
   if (HasDepthClipping (anOwner)
   && !aSelectable.IsNull()
   &&  theMgr.GetActiveSelectionType() == SelectMgr_SelectingVolumeManager::Point)
@@ -618,6 +628,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
   Standard_Integer aWidth;
   Standard_Integer aHeight;
   mySelectingVolumeMgr.WindowSize (aWidth, aHeight);
+  MESSAGE_INFO ("UpdateBVH", "", &aPerfMeter, aParentAlert);
   mySelectableObjects.UpdateBVH (mySelectingVolumeMgr.Camera(),
                                  mySelectingVolumeMgr.ProjectionMatrix(),
                                  mySelectingVolumeMgr.WorldViewMatrix(),
@@ -637,13 +648,13 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
 
   for (Standard_Integer aBVHSetIt = 0; aBVHSetIt < SelectMgr_SelectableObjectSet::BVHSubsetNb; ++aBVHSetIt)
   {
-    #ifdef REPORT_SELECTION_BUILD
-    MESSAGE_INFO (TCollection_AsciiString ("aBVHSetIt") + aBVHSetIt, "", &aPerfMeter, aParentAlert);
-    Handle(Message_Alert) aParentAlertLevel1 = OCCT_Message_Alert;
-    #endif
-
     SelectMgr_SelectableObjectSet::BVHSubset aBVHSubset =
       static_cast<SelectMgr_SelectableObjectSet::BVHSubset> (aBVHSetIt);
+
+    #ifdef REPORT_SELECTION_BUILD
+    MESSAGE_INFO (TCollection_AsciiString ("aBVHSetIt"), SelectMgr::BVHSubsetToString (aBVHSubset), &aPerfMeter, aParentAlert);
+    Handle(Message_Alert) aParentAlertLevel1 = OCCT_Message_Alert;
+    #endif
 
     if (mySelectableObjects.IsEmpty (aBVHSubset))
     {
@@ -756,6 +767,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
     }
   }
 
+  MESSAGE_INFO ("SortResult", "", &aPerfMeter, aParentAlert);
   SortResult();
 #ifdef REPORT_SELECTION_BUILD
   Standard_SStream aStreamDone;

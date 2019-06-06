@@ -18,9 +18,11 @@
 
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
+#include <inspector/VInspector_ItemContainerAPI.hxx>
 
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_ViewerSelector.hxx>
+#include <Standard_OStream.hxx>
 
 class VInspector_ItemSelectMgrViewerSelector;
 typedef QExplicitlySharedDataPointer<VInspector_ItemSelectMgrViewerSelector> VInspector_ItemSelectMgrViewerSelectorPtr;
@@ -28,7 +30,7 @@ typedef QExplicitlySharedDataPointer<VInspector_ItemSelectMgrViewerSelector> VIn
 //! \class VInspector_ItemSelectMgrViewerSelector
 //! Parent item, that corresponds Folder under the AIS_InteractiveContext
 //! Children of the item are: none
-class VInspector_ItemSelectMgrViewerSelector : public VInspector_ItemBase
+class VInspector_ItemSelectMgrViewerSelector : public VInspector_ItemBase, public VInspector_ItemContainerAPI
 {
 public:
 
@@ -55,7 +57,31 @@ public:
 
   //! Returns the span from the 0 row to the first item corresponded to the picked item
   //! the 0 item is SelectMgr_SelectingVolumeManager
-  Standard_Integer GetFirstChildOfPicked() const { return 1; }
+  //! the 1 item is VInspector_ItemSelectMgrSelectableObjectSet
+  //! the 2 item is VInspector_ItemContainer for SelectMgr_MapOfObjectSensitives
+  Standard_Integer GetFirstChildOfPicked() const { return 3; }
+
+  //! Returns entity set if possible from SelectMgr_MapOfObjectSensitives
+  //! \param theRow row index
+  //! \param theObject [out] object connected to the sensitive entity set
+  Standard_EXPORT Handle(SelectMgr_SensitiveEntitySet) GetSensitiveEntitySet (const int theRow,
+    Handle(SelectMgr_SelectableObject)& theObject);
+
+  //! Returns number of item selected
+  //! \return rows count
+  virtual int GetContainerRowCount (const int theContainerRow) const Standard_OVERRIDE;
+
+  //! Returns item information for the given role. Fills internal container if it was not filled yet
+  //! \param theItemRole a value role
+  //! \return the value
+  virtual QVariant GetContainerValue (const int theContainerRow, const int theItemRole) const Standard_OVERRIDE;
+
+  //! Creates a child item in the given position.
+  //! \param theRow the child row position
+  //! \param theColumn the child column position
+  //! \return the created item
+  virtual TreeModel_ItemBasePtr CreateContainerChild (const TreeModel_ItemBasePtr& theParent, const int theContainerRow, int theRow, int theColumn) Standard_OVERRIDE;
+
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
@@ -89,6 +115,9 @@ protected:
   //! \param theColumn a model index column
   //! \param theValue a new cell value
   virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
+
+  //! Dumps the content of me on the stream <OS>.
+  virtual Standard_Boolean Dump (Standard_OStream& OS) const;
 
 protected:
 

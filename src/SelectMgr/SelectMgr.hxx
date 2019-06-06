@@ -15,6 +15,7 @@
 #define _SelectMgr_HeaderFile
 
 #include <SelectMgr_PickingStrategy.hxx>
+#include <SelectMgr_SelectableObjectSet.hxx>
 #include <SelectMgr_StateOfSelection.hxx>
 #include <SelectMgr_TypeOfBVHUpdate.hxx>
 #include <SelectMgr_TypeOfUpdate.hxx>
@@ -51,6 +52,30 @@ public:
   //! @return TRUE if string identifier is known
   Standard_EXPORT static Standard_Boolean PickingStrategyFromString (const Standard_CString theTypeString,
                                                                      SelectMgr_PickingStrategy& theType);
+
+
+
+  //! Returns the string name for a given orientation type.
+  //! @param theType orientation type
+  //! @return string identifier from the list Xpos, Ypos, Zpos and others
+  Standard_EXPORT static Standard_CString BVHSubsetToString (SelectMgr_SelectableObjectSet::BVHSubset theType);
+
+  //! Returns the orientation type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return orientation type or BVHSubset_3d if string identifier is invalid
+  static SelectMgr_SelectableObjectSet::BVHSubset BVHSubsetFromString (Standard_CString theTypeString)
+  {
+    SelectMgr_SelectableObjectSet::BVHSubset aType = SelectMgr_SelectableObjectSet::BVHSubset_3d;
+    BVHSubsetFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the shape type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected shape type
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean BVHSubsetFromString (const Standard_CString theTypeString,
+                                                               SelectMgr_SelectableObjectSet::BVHSubset& theType);
 
 };
 

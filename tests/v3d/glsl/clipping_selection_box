@@ -1,0 +1,41 @@
+# creating three 3D objects
+# cut view scene by clipping plane
+# expecting two objects selected
+
+pload ALL
+vinit View1
+
+box b 10 10 10
+vdisplay b
+
+box b1 -5 0 0 2 2 2
+vdisplay b1
+
+box b2 13 0 0 2 2 2
+vdisplay b2
+
+vsetdispmode 1
+
+vclipplane create pln
+vclipplane set pln view Driver1/Viewer1/View1
+vclipplane change pln equation -1 0 0 5
+
+vtop
+vfit
+vzoom 0.5
+vselect 40 100 370 300
+
+# expected result is 2 objects, but clipping is not applyed for selection by box
+vnbselected
+
+# check selected elements in Inspector
+pload INSPECTOR
+tinspector –plugins vinspector
+tinspector –plugins messageview
+tinspector –activate messageview
+activateReport
+tinspector -update
+
+# see messages from selection preparing in Inspector
+vselect 40 100 370 300
+

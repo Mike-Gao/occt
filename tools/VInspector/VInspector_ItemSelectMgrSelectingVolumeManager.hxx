@@ -22,6 +22,8 @@
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_SelectingVolumeManager.hxx>
 
+class SelectMgr_BaseFrustum;
+
 class VInspector_ItemSelectMgrSelectingVolumeManager;
 typedef QExplicitlySharedDataPointer<VInspector_ItemSelectMgrSelectingVolumeManager> VInspector_ItemSelectMgrSelectingVolumeManagerPtr;
 
@@ -51,6 +53,9 @@ public:
 
   //! Returns current drawer, initialize the drawer if it was not initialized yet
   Standard_EXPORT Standard_Boolean GetViewerSelector (SelectMgr_SelectingVolumeManager& theVolumeManager) const;
+
+  //! Returns frustum Frustum for row = 0, FrustumSet for row = 1   
+  Handle(SelectMgr_BaseFrustum) GetFrustum (const int theRow) const;
 
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.

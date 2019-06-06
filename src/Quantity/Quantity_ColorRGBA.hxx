@@ -14,6 +14,8 @@
 #ifndef _Quantity_ColorRGBA_HeaderFile
 #define _Quantity_ColorRGBA_HeaderFile
 
+#include <Message_Alerts.hxx>
+#include <NCollection_Vector.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Assert.hxx>
 
@@ -90,6 +92,40 @@ public:
 
   //! Two colors are considered to be equal if their distance is no greater than Epsilon().
   bool operator== (const Quantity_ColorRGBA& theOther) const { return IsEqual (theOther); }
+
+
+  //! Covers point into string in format: (X, Y, Z)
+  //! \return the string value
+  Standard_EXPORT TCollection_AsciiString ToString() const
+  {
+    NCollection_Vector<Standard_Real> aValues;
+    aValues.Append (myRgb.Red());
+    aValues.Append (myRgb.Green());
+    aValues.Append (myRgb.Blue());
+    aValues.Append (myAlpha);
+
+    TCollection_AsciiString aValue;
+    DUMP_VEC_COORD (aValues, aValue);
+    return aValue;
+  }
+
+
+  //! Converts text value into parameters if possible, the string format is: (X, Y, Z)
+  //! \return true if conversion is done
+  Standard_EXPORT Standard_Boolean FromString (const TCollection_AsciiString& theValue)
+  {
+    NCollection_Vector<Standard_Real> aValues;
+    DUMP_VEC_COORD_SPLIT (theValue, aValues)
+
+    if (aValues.Size() != 3)
+      return Standard_False;
+
+    myRgb = Quantity_Color (aValues.Value (0), aValues.Value (1), aValues.Value (2),
+                            Quantity_TOC_RGB);
+    myAlpha = (Standard_ShortReal)aValues.Value (3);
+
+    return Standard_True;
+  }
 
 private:
 

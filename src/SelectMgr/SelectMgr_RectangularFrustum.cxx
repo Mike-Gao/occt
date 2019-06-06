@@ -15,8 +15,11 @@
 
 #include <NCollection_Vector.hxx>
 #include <Poly_Array1OfTriangle.hxx>
-
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
 #include <SelectMgr_RectangularFrustum.hxx>
+
+IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_RectangularFrustum, SelectMgr_Frustum<4> )
 
 // =======================================================================
 // function : segmentSegmentDistance
@@ -138,6 +141,8 @@ namespace
                        const Handle(SelectMgr_FrustumBuilder)& theBuilder,
                        gp_Pnt* theVertices, gp_Vec* theEdges)
   {
+    Message_PerfMeter aPerfMeter; 
+    MESSAGE_INFO ("SelectMgr_RectangularFrustum::computeFrustum", "", &aPerfMeter, NULL);
     // LeftTopNear
     theVertices[0] = theBuilder->ProjectPntOnViewPlane (theMinPnt.X(),
                                                         theMaxPnt.Y(),
@@ -272,6 +277,8 @@ void SelectMgr_RectangularFrustum::cacheVertexProjections (SelectMgr_Rectangular
 // =======================================================================
 void SelectMgr_RectangularFrustum::Build (const gp_Pnt2d &thePoint)
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Build_1", "", &aPerfMeter, NULL);
   myNearPickedPnt = myBuilder->ProjectPntOnViewPlane (thePoint.X(), thePoint.Y(), 0.0);
   myFarPickedPnt = myBuilder->ProjectPntOnViewPlane (thePoint.X(), thePoint.Y(), 1.0);
   myViewRayDir = myFarPickedPnt.XYZ() - myNearPickedPnt.XYZ();
@@ -304,6 +311,8 @@ void SelectMgr_RectangularFrustum::Build (const gp_Pnt2d &thePoint)
 void SelectMgr_RectangularFrustum::Build (const gp_Pnt2d& theMinPnt,
                                           const gp_Pnt2d& theMaxPnt)
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Build_2", "", &aPerfMeter, NULL);
   myNearPickedPnt = myBuilder->ProjectPntOnViewPlane ((theMinPnt.X() + theMaxPnt.X()) * 0.5,
                                                       (theMinPnt.Y() + theMaxPnt.Y()) * 0.5,
                                                       0.0);
@@ -431,6 +440,10 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const SelectMgr_Vec3& t
                                                          const SelectMgr_Vec3& theBoxMax,
                                                          Standard_Boolean*     theInside) const
 {
+  Message_PerfMeter aPerfMeter; 
+  Bnd_Box aBox (theBoxMin.x(), theBoxMin.y(), theBoxMin.z(),
+                theBoxMax.x(), theBoxMax.y(), theBoxMax.z());
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_vvb", aBox.ToString(), &aPerfMeter, NULL);
   return hasOverlap (theBoxMin, theBoxMax, theInside);
 }
 
@@ -443,6 +456,8 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const SelectMgr_Vec3& t
                                                          const SelectMgr_Vec3& theBoxMax,
                                                          SelectBasics_PickResult& thePickResult) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_vv", "", &aPerfMeter, NULL);
   if (!hasOverlap (theBoxMin, theBoxMax))
     return Standard_False;
 
@@ -463,6 +478,8 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const SelectMgr_Vec3& t
 Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt,
                                                          SelectBasics_PickResult& thePickResult) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_1p", "", &aPerfMeter, NULL);
   if (!hasOverlap (thePnt))
     return Standard_False;
 
@@ -482,6 +499,8 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt,
 // =======================================================================
 Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_1", "", &aPerfMeter, NULL);
   return hasOverlap (thePnt);
 }
 
@@ -493,6 +512,9 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt1,
                                                          const gp_Pnt& thePnt2,
                                                          SelectBasics_PickResult& thePickResult) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_2", "", &aPerfMeter, NULL);
+
   if (!hasOverlap (thePnt1, thePnt2))
     return Standard_False;
 
@@ -512,6 +534,8 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const TColgp_Array1OfPn
                                                          Select3D_TypeOfSensitivity theSensType,
                                                          SelectBasics_PickResult& thePickResult) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_n", "", &aPerfMeter, NULL);
   if (theSensType == Select3D_TOS_BOUNDARY)
   {
     Standard_Integer aMatchingSegmentsNb = -1;
@@ -562,6 +586,9 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt1,
                                                          Select3D_TypeOfSensitivity theSensType,
                                                          SelectBasics_PickResult& thePickResult) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::Overlaps_3", "", &aPerfMeter, NULL);
+
   if (theSensType == Select3D_TOS_BOUNDARY)
   {
     const gp_Pnt aPntsArrayBuf[4] = { thePnt1, thePnt2, thePnt3, thePnt1 };
@@ -651,6 +678,9 @@ Standard_Real SelectMgr_RectangularFrustum::DistToGeometryCenter (const gp_Pnt& 
 // =======================================================================
 gp_Pnt SelectMgr_RectangularFrustum::DetectedPoint (const Standard_Real theDepth) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::DetectedPoint", "", &aPerfMeter, NULL);
+
   return myNearPickedPnt.XYZ() + myViewRayDir.Normalized().XYZ() * theDepth / myScale;
 }
 
@@ -661,6 +691,9 @@ gp_Pnt SelectMgr_RectangularFrustum::DetectedPoint (const Standard_Real theDepth
 void SelectMgr_RectangularFrustum::computeClippingRange (const Graphic3d_SequenceOfHClipPlane& thePlanes,
                                                          SelectMgr_ViewClipRange& theRange) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("SelectMgr_RectangularFrustum::computeClippingRange", "", &aPerfMeter, NULL);
+
   Standard_Real aPlaneA, aPlaneB, aPlaneC, aPlaneD;
   for (Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt (thePlanes); aPlaneIt.More(); aPlaneIt.Next())
   {
@@ -746,6 +779,9 @@ void SelectMgr_RectangularFrustum::computeClippingRange (const Graphic3d_Sequenc
 Standard_Boolean SelectMgr_RectangularFrustum::IsClipped (const Graphic3d_SequenceOfHClipPlane& thePlanes,
                                                           const Standard_Real theDepth) const
 {
+  Message_PerfMeter aPerfMeter; 
+  MESSAGE_INFO ("IsClipped", "", &aPerfMeter, NULL);
+
   SelectMgr_ViewClipRange aRange;
   computeClippingRange (thePlanes, aRange);
   return aRange.IsClipped (theDepth);
@@ -796,4 +832,24 @@ void SelectMgr_RectangularFrustum::GetPlanes (NCollection_Vector<SelectMgr_Vec4>
     anEquation.w() = - (aPlaneNorm.XYZ().Dot (myVertices[aPlaneIdx % 2 == 0 ? aPlaneIdx : aPlaneIdx + 2].XYZ()));
     thePlaneEquations.Append (anEquation);
   }
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void SelectMgr_RectangularFrustum::Dump(Standard_OStream& OS)const 
+{
+  DUMP_VALUES (OS, "SelectMgr_RectangularFrustum", 2);
+  DUMP_VALUES (OS, "myNearPickedPnt", myNearPickedPnt.XYZ().ToString());
+  DUMP_VALUES (OS, "myFarPickedPnt", myFarPickedPnt.XYZ().ToString());
+  DUMP_VALUES (OS, "myViewRayDir", myViewRayDir.XYZ().ToString());
+  DUMP_VALUES (OS, "myMousePos", myMousePos.XY().ToString());
+  DUMP_VALUES (OS, "myScale", myScale);
+  DUMP_VALUES (OS, "myIsViewClipEnabled", myIsViewClipEnabled);
+
+  DUMP_VALUES (OS, "myViewClipRange", "");
+  myViewClipRange.Dump (OS);
+
+  SelectMgr_Frustum<4>::Dump (OS);
 }

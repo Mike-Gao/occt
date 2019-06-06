@@ -21,6 +21,7 @@
 #include <Standard_Handle.hxx>
 
 #include <Standard_ShortReal.hxx>
+#include <TCollection_AsciiString.hxx>
 #include <Quantity_NameOfColor.hxx>
 #include <Quantity_TypeOfColor.hxx>
 #include <Standard_Real.hxx>
@@ -239,6 +240,14 @@ Standard_Boolean operator == (const Quantity_Color& Other) const
   
   //! Internal test
   Standard_EXPORT static void Test();
+
+  //! Covers point into string in format: (X, Y, Z)
+  //! \return the string value
+  Standard_EXPORT TCollection_AsciiString ToString() const;
+
+  //! Converts text value into parameters if possible, the string format is: (X, Y, Z)
+  //! \return true if conversion is done
+  Standard_EXPORT Standard_Boolean FromString (const TCollection_AsciiString& theValue);
 
 private:
 
