@@ -501,17 +501,17 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
 AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_SelectionScheme theSelScheme)
 {
   // special case: single selection of detected owner - is it necessary ?
-  /*if (myWasLastMain && !myLastinMain.IsNull() && !myAutoHilight &&
-      (myLastinMain->IsSelected()
-      && !myLastinMain->IsForcedHilight()
+  /*if (myWasLastMain && !myLastPicked.IsNull() && !myAutoHilight &&
+      (myLastPicked->IsSelected()
+      && !myLastPicked->IsForcedHilight()
       && NbSelected() <= 1))
   {
-    mySelection->selectOwner(myLastinMain, aPrevSelected, SelectionScheme (AIS_SelectionType_Select));
+    mySelection->selectOwner(myLastPicked, aPrevSelected, SelectionScheme (AIS_SelectionType_Select));
     return getStatusOfPick (NbSelected());
   }*/
 
   AIS_NListOfEntityOwner aPickedOwners;
-  aPickedOwners.Append (myLastinMain);
+  aPickedOwners.Append (myLastPicked);
 
   return Select (aPickedOwners, theSelScheme);
 }
