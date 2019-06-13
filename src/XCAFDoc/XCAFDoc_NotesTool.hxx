@@ -105,6 +105,12 @@ public:
   //! \param [out] theNoteLabels - sequence of labels.
   Standard_EXPORT void GetNotes(TDF_LabelSequence& theNoteLabels) const;
 
+  //! Returns all labels corresponding to top notes from the notes hive.
+  //! A top note annotates any atem excepting other notes.
+  //! The label sequence isn't cleared beforehand.
+  //! \param [out] theNoteLabels - sequence of labels.
+  Standard_EXPORT void GetTopNotes(TDF_LabelSequence& theNoteLabels) const;
+
   //! Returns all labels from the annotated items hive.
   //! The label sequence isn't cleared beforehand.
   //! \param [out] theNoteLabels - sequence of labels.
@@ -120,6 +126,11 @@ public:
   //! \return true if the item is annotated, otherwise - false.
   Standard_EXPORT Standard_Boolean IsAnnotatedItem(const TDF_Label& theItemLabel) const;
 
+  //! Checks if the given note is annotated.
+  //! \param [in] theNote - note attribute.
+  //! \return true if the note is annotated, otherwise - false.
+  Standard_EXPORT Standard_Boolean IsAnnotatedItem(const Handle(XCAFDoc_Note)& theNote) const;
+
   //! @name Find annotated item functions
   //! @{
 
@@ -132,6 +143,11 @@ public:
   //! \param [in] theItemLabel - item label.
   //! \return annotated item label if it is found, otherwise - null label.
   Standard_EXPORT TDF_Label FindAnnotatedItem(const TDF_Label& theItemLabel) const;
+
+  //! Finds a label of the given note in the annotated items hive.
+  //! \param [in] theNote - note attribute.
+  //! \return annotated note label if it is found, otherwise - null label.
+  Standard_EXPORT TDF_Label FindAnnotatedItem(const Handle(XCAFDoc_Note)& theNote) const;
 
   //! Finds a label of the given assembly item's attribute in the annotated items hive.
   //! \param [in] theItemId - assembly item ID.
@@ -166,9 +182,16 @@ public:
   //! @name Note creation functions
   //! @{
 
+  //! Create a note.
+  //! Creates a new label under the notes hive and attaches \ref XCAFDoc_Note attribute.
+  //! \param [in] theUserName  - the user associated with the note.
+  //! \param [in] theTimeStamp - timestamp of the note.
+  //! \return a handle to the base note attribute.
+  Standard_EXPORT Handle(XCAFDoc_Note) Create(const TCollection_ExtendedString& theUserName,
+                                              const TCollection_ExtendedString& theTimeStamp);
+
   //! Create a new comment note.
-  //! Creates a new label under the notes hive and attaches \ref XCAFDoc_NoteComment 
-  //! attribute (derived ftom \ref XCAFDoc_Note).
+  //! Creates a new label under the notes hive and attaches \ref XCAFDoc_Note attribute.
   //! \param [in] theUserName  - the user associated with the note.
   //! \param [in] theTimeStamp - timestamp of the note.
   //! \param [in] theComment   - textual comment.
@@ -188,35 +211,13 @@ public:
                                                      const TCollection_ExtendedString& theTimeStamp,
                                                      const TCollection_ExtendedString& theComment);
 
-  //! Create a new note with data loaded from a binary file.
-  //! Creates a new label under the notes hive and attaches \ref XCAFDoc_NoteComment 
-  //! attribute (derived ftom \ref XCAFDoc_Note).
+  //! Create a new note for a binary data container.
+  //! Creates a new label under the notes hive and attaches \ref XCAFDoc_Note attribute.
   //! \param [in] theUserName  - the user associated with the note.
   //! \param [in] theTimeStamp - timestamp of the note.
-  //! \param [in] theTitle     - file title.
-  //! \param [in] theMIMEtype  - MIME type of the file.
-  //! \param [in] theFile      - input binary file.
   //! \return a handle to the base note attribute.
-  Standard_EXPORT Handle(XCAFDoc_Note) CreateBinData(const TCollection_ExtendedString& theUserName,
-                                                     const TCollection_ExtendedString& theTimeStamp,
-                                                     const TCollection_ExtendedString& theTitle,
-                                                     const TCollection_AsciiString&    theMIMEtype,
-                                                     OSD_File&                         theFile);
-
-  //! Create a new note with data loaded from a byte data array.
-  //! Creates a new label under the notes hive and attaches \ref XCAFDoc_NoteComment 
-  //! attribute (derived ftom \ref XCAFDoc_Note).
-  //! \param [in] theUserName  - the user associated with the note.
-  //! \param [in] theTimeStamp - timestamp of the note.
-  //! \param [in] theTitle     - data title.
-  //! \param [in] theMIMEtype  - MIME type of the file.
-  //! \param [in] theData      - byte data array.
-  //! \return a handle to the base note attribute.
-  Standard_EXPORT Handle(XCAFDoc_Note) CreateBinData(const TCollection_ExtendedString&    theUserName,
-                                                     const TCollection_ExtendedString&    theTimeStamp,
-                                                     const TCollection_ExtendedString&    theTitle,
-                                                     const TCollection_AsciiString&       theMIMEtype,
-                                                     const Handle(TColStd_HArray1OfByte)& theData);
+  Standard_EXPORT Handle(XCAFDoc_Note) CreateBinDataContainer(const TCollection_ExtendedString& theUserName,
+                                                              const TCollection_ExtendedString& theTimeStamp);
 
   //! @}
 
@@ -240,6 +241,15 @@ public:
   //! \return number of added labels.
   Standard_EXPORT Standard_Integer GetNotes(const TDF_Label&   theItemLabel,
                                             TDF_LabelSequence& theNoteLabels) const;
+
+  //! Gets all note labels of the note.
+  //! Notes linked to item's attributes aren't
+  //! taken into account. The label sequence isn't cleared beforehand.
+  //! \param [in] theNote        - note attribute.
+  //! \param [out] theNoteLabels - sequence of labels.
+  //! \return number of added labels.
+  Standard_EXPORT Standard_Integer GetNotes(const Handle(XCAFDoc_Note)& theNote,
+                                            TDF_LabelSequence&          theNoteLabels) const;
 
   //! Gets all note labels of the assembly item's attribute.
   //! Notes linked to the item itself or to item's subshapes
@@ -293,6 +303,13 @@ public:
   Standard_EXPORT Handle(XCAFDoc_AssemblyItemRef) AddNote(const TDF_Label& theNoteLabel,
                                                           const TDF_Label& theItemLabel);
 
+  //! Adds the given note to other note.
+  //! \param [in] theNoteLabel     - note label.
+  //! \param [in] theAnnotatedNote - other note attribute.
+  //! \return a handle to the assembly reference attribute.
+  Standard_EXPORT Handle(XCAFDoc_AssemblyItemRef) AddNote(const TDF_Label&            theNoteLabel,
+                                                          const Handle(XCAFDoc_Note)& theAnnotatedNote);
+
   //! Adds the given note to the assembly item's attribute.
   //! \param [in] theNoteLabel - note label.
   //! \param [in] theItemId    - assembly item ID.
@@ -335,7 +352,7 @@ public:
   //! @{
 
   //! Removes the given note from the assembly item.
-  //! \param [in] theNoteLabel   - note label.
+  //! \param [in] theNoteLabel   - label of the note to be removed.
   //! \param [in] theItemId      - assembly item ID.
   //! \param [in] theDelIfOrphan - deletes the note from the notes hive 
   //!                              if there are no more assembly items
@@ -346,7 +363,7 @@ public:
                                               Standard_Boolean              theDelIfOrphan = Standard_False);
 
   //! Removes the given note from the labeled item.
-  //! \param [in] theNoteLabel   - note label.
+  //! \param [in] theNoteLabel   - label of the note to be removed.
   //! \param [in] theItemLabel   - item label.
   //! \param [in] theDelIfOrphan - deletes the note from the notes hive 
   //!                              if there are no more labeled items
@@ -356,8 +373,19 @@ public:
                                               const TDF_Label& theItemLabel,
                                               Standard_Boolean theDelIfOrphan = Standard_False);
 
+  //! Removes the given note from other note.
+  //! \param [in] theNoteLabel    - label of the note to be removed.
+  //! \param [in] theNote         - note attribute.
+  //! \param [in] theDelIfOrphan  - deletes the note from the notes hive 
+  //!                               if there are no more labeled items
+  //!                               linked with the note.
+  //! \return true if the note is removed, otherwise - false.
+  Standard_EXPORT Standard_Boolean RemoveNote(const TDF_Label&            theNoteLabel,
+                                              const Handle(XCAFDoc_Note)& theNote,
+                                              Standard_Boolean            theDelIfOrphan = Standard_False);
+
   //! Removes the given note from the assembly item's subshape.
-  //! \param [in] theNoteLabel     - note label.
+  //! \param [in] theNoteLabel     - label of the note to be removed.
   //! \param [in] theItemId        - assembly item ID.
   //! \param [in] theSubshapeIndex - assembly item's subshape index.
   //! \param [in] theDelIfOrphan   - deletes the note from the notes hive 
@@ -370,7 +398,7 @@ public:
                                                       Standard_Boolean              theDelIfOrphan = Standard_False);
 
   //! Removes the given note from the labeled item's subshape.
-  //! \param [in] theNoteLabel     - note label.
+  //! \param [in] theNoteLabel     - label of the note to be removed.
   //! \param [in] theItemLabel     - item label.
   //! \param [in] theSubshapeIndex - labeled item's subshape index.
   //! \param [in] theDelIfOrphan   - deletes the note from the notes hive 
@@ -383,7 +411,7 @@ public:
                                                       Standard_Boolean theDelIfOrphan = Standard_False);
 
   //! Removes a note from the assembly item's attribute.
-  //! \param [in] theNoteLabel   - note label.
+  //! \param [in] theNoteLabel   - label of the note to be removed.
   //! \param [in] theItemId      - assembly item ID.
   //! \param [in] theGUID        - assembly item's attribute GUID.
   //! \param [in] theDelIfOrphan - deletes the note from the notes hive 
@@ -396,7 +424,7 @@ public:
                                                   Standard_Boolean              theDelIfOrphan = Standard_False);
 
   //! Removes a note from the labeled item's attribute.
-  //! \param [in] theNoteLabel   - note label.
+  //! \param [in] theNoteLabel   - label of the note to be removed.
   //! \param [in] theItemLabel   - item label.
   //! \param [in] theGUID        - labeled item's attribute GUID.
   //! \param [in] theDelIfOrphan - deletes the note from the notes hive 
@@ -425,6 +453,15 @@ public:
   //! \return true if the notes are removed, otherwise - false.
   Standard_EXPORT Standard_Boolean RemoveAllNotes(const TDF_Label& theItemLabel,
                                                   Standard_Boolean theDelIfOrphan = Standard_False);
+
+  //! Removes all notes from other note.
+  //! \param [in] theNote        - note attribute.
+  //! \param [in] theDelIfOrphan - deletes removed notes from the notes
+  //!                              hive if there are no more annotated items
+  //!                              linked with the notes.
+  //! \return true if the notes are removed, otherwise - false.
+  Standard_EXPORT Standard_Boolean RemoveAllNotes(const Handle(XCAFDoc_Note)& theNote,
+                                                  Standard_Boolean            theDelIfOrphan = Standard_False);
 
   //! Removes all notes from the assembly item's subshape.
   //! \param [in] theItemId        - assembly item ID.
