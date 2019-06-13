@@ -34,10 +34,9 @@
 #include <XmlMXCAFDoc_LocationDriver.hxx>
 #include <XmlMXCAFDoc_MaterialDriver.hxx>
 #include <XmlMXCAFDoc_VisMaterialDriver.hxx>
+#include <XmlMXCAFDoc_NoteDriver.hxx>
 #include <XmlMXCAFDoc_NotesToolDriver.hxx>
 #include <XmlMXCAFDoc_NoteBalloonDriver.hxx>
-#include <XmlMXCAFDoc_NoteCommentDriver.hxx>
-#include <XmlMXCAFDoc_NoteBinDataDriver.hxx>
 #include <XmlMXCAFDoc_MaterialToolDriver.hxx>
 #include <XmlMXCAFDoc_VisMaterialToolDriver.hxx>
 #include <XmlMXCAFDoc_ShapeToolDriver.hxx>
@@ -76,8 +75,7 @@ void XmlMXCAFDoc::AddDrivers (const Handle(XmlMDF_ADriverTable)& aDriverTable,
   aDriverTable -> AddDriver (new XmlMXCAFDoc_MaterialDriver   (anMsgDrv));
   aDriverTable -> AddDriver (new XmlMXCAFDoc_VisMaterialDriver(anMsgDrv));
   aDriverTable -> AddDriver (new XmlMXCAFDoc_NoteBalloonDriver(anMsgDrv));
-  aDriverTable -> AddDriver (new XmlMXCAFDoc_NoteCommentDriver(anMsgDrv));
-  aDriverTable -> AddDriver (new XmlMXCAFDoc_NoteBinDataDriver(anMsgDrv));
+  aDriverTable -> AddDriver (new XmlMXCAFDoc_NoteDriver       (anMsgDrv));
 
   aDriverTable -> AddDriver (new XmlMXCAFDoc_ColorToolDriver    (anMsgDrv));
   aDriverTable -> AddDriver (new XmlMXCAFDoc_DocumentToolDriver (anMsgDrv));
