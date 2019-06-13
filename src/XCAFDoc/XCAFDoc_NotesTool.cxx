@@ -20,12 +20,13 @@
 #include <TDF_LabelSequence.hxx>
 #include <TDF_Tool.hxx>
 #include <XCAFDoc.hxx>
-#include <XCAFDoc_GraphNode.hxx>
-#include <XCAFDoc_NotesTool.hxx>
-#include <XCAFDoc_NoteBalloon.hxx>
-#include <XCAFDoc_NoteComment.hxx>
-#include <XCAFDoc_NoteBinData.hxx>
 #include <XCAFDoc_AssemblyItemRef.hxx>
+#include <XCAFDoc_GraphNode.hxx>
+#include <XCAFDoc_Note.hxx>
+#include <XCAFDoc_NotesTool.hxx>
+#include <XCAFDoc_NoteComment.hxx>
+#include <XCAFDoc_NoteBalloon.hxx>
+#include <XCAFDoc_NoteBinData.hxx>
 
 namespace {
 
@@ -142,8 +143,52 @@ XCAFDoc_NotesTool::GetNotes(TDF_LabelSequence& theNoteLabels) const
   for (TDF_ChildIterator anIter(GetNotesLabel()); anIter.More(); anIter.Next())
   {
     const TDF_Label aLabel = anIter.Value();
-    if (!XCAFDoc_Note::Get(aLabel).IsNull())
+    if (XCAFDoc_Note::IsMine(aLabel))
       theNoteLabels.Append(aLabel);
+  }
+}
+
+// =======================================================================
+// function : GetNotes
+// purpose  :
+// =======================================================================
+void 
+XCAFDoc_NotesTool::GetTopNotes(TDF_LabelSequence& theNoteLabels) const
+{
+  for (TDF_ChildIterator anIter(GetNotesLabel()); anIter.More(); anIter.Next())
+  {
+    const TDF_Label aLabel = anIter.Value();
+    if (!XCAFDoc_Note::IsMine(aLabel))
+      continue;
+
+    Handle(XCAFDoc_GraphNode) aFather;
+    if (!aLabel.FindAttribute(XCAFDoc::NoteRefGUID(), aFather) || aFather.IsNull())
+    {
+      theNoteLabels.Append(aLabel);
+      continue;
+    }
+
+    Standard_Integer nbChildren = aFather->NbChildren();
+    if (nbChildren == 0)
+    {
+      theNoteLabels.Append(aLabel);
+      continue;
+    }
+
+    for (Standard_Integer iChild = 1; iChild <= nbChildren; ++iChild)
+    {
+      Handle(XCAFDoc_GraphNode) aChild = aFather->GetChild(iChild);
+      Handle(XCAFDoc_AssemblyItemRef) anItemRef = XCAFDoc_AssemblyItemRef::Get(aChild->Label());
+      if (!anItemRef.IsNull() && !anItemRef->HasExtraRef())
+      {
+        TDF_Label anAnnotatedLabel = anItemRef->GetItemLabel();
+        if (!anAnnotatedLabel.IsNull() && !XCAFDoc_Note::IsMine(anAnnotatedLabel))
+        {
+          theNoteLabels.Append(aLabel);
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -178,6 +223,16 @@ Standard_Boolean
 XCAFDoc_NotesTool::IsAnnotatedItem(const TDF_Label& theItemLabel) const
 {
   return IsAnnotatedItem(labeledItem(theItemLabel));
+}
+
+// =======================================================================
+// function : IsAnnotatedNote
+// purpose  :
+// =======================================================================
+Standard_Boolean 
+XCAFDoc_NotesTool::IsAnnotatedItem(const Handle(XCAFDoc_Note)& theNote) const
+{
+  return !theNote.IsNull() && IsAnnotatedItem(theNote->Label());
 }
 
 // =======================================================================
@@ -265,6 +320,30 @@ XCAFDoc_NotesTool::FindAnnotatedItemSubshape(const TDF_Label& theItemLabel,
 }
 
 // =======================================================================
+// function : FindAnnotatedNote
+// purpose  :
+// =======================================================================
+TDF_Label 
+XCAFDoc_NotesTool::FindAnnotatedItem(const Handle(XCAFDoc_Note)& theNote) const
+{
+  return !theNote.IsNull() ? FindAnnotatedItem(theNote->Label()) : TDF_Label();
+}
+
+// =======================================================================
+// function : Create
+// purpose  :
+// =======================================================================
+Handle(XCAFDoc_Note)
+XCAFDoc_NotesTool::Create(const TCollection_ExtendedString& theUserName,
+                          const TCollection_ExtendedString& theTimeStamp)
+{
+  TDF_Label aNoteLabel;
+  TDF_TagSource aTag;
+  aNoteLabel = aTag.NewChild(GetNotesLabel());
+  return XCAFDoc_Note::Set(aNoteLabel, theUserName, theTimeStamp);
+}
+
+// =======================================================================
 // function : CreateComment
 // purpose  :
 // =======================================================================
@@ -273,10 +352,20 @@ XCAFDoc_NotesTool::CreateComment(const TCollection_ExtendedString& theUserName,
                                  const TCollection_ExtendedString& theTimeStamp,
                                  const TCollection_ExtendedString& theComment)
 {
-  TDF_Label aNoteLabel;
+  TDF_Label aLabel;
   TDF_TagSource aTag;
-  aNoteLabel = aTag.NewChild(GetNotesLabel());
-  return XCAFDoc_NoteComment::Set(aNoteLabel, theUserName, theTimeStamp, theComment);
+  aLabel = aTag.NewChild(GetNotesLabel());
+  Handle(XCAFDoc_Note) aNote = XCAFDoc_Note::Set(aLabel, theUserName, theTimeStamp);
+  if (!aNote.IsNull())
+  {
+    Handle(XCAFDoc_NoteComment) aComment = XCAFDoc_NoteComment::Set(aLabel, theComment);
+    if (aComment.IsNull())
+    {
+      aLabel.ForgetAllAttributes();
+      return NULL;
+    }
+  }
+  return aNote;
 }
 
 // =======================================================================
@@ -299,33 +388,23 @@ XCAFDoc_NotesTool::CreateBalloon(const TCollection_ExtendedString& theUserName,
 // purpose  :
 // =======================================================================
 Handle(XCAFDoc_Note)
-XCAFDoc_NotesTool::CreateBinData(const TCollection_ExtendedString& theUserName,
-                                 const TCollection_ExtendedString& theTimeStamp,
-                                 const TCollection_ExtendedString& theTitle,
-                                 const TCollection_AsciiString&    theMIMEtype,
-                                 OSD_File&                         theFile)
+XCAFDoc_NotesTool::CreateBinDataContainer(const TCollection_ExtendedString& theUserName,
+                                          const TCollection_ExtendedString& theTimeStamp)
 {
-  TDF_Label aNoteLabel;
+  TDF_Label aLabel;
   TDF_TagSource aTag;
-  aNoteLabel = aTag.NewChild(GetNotesLabel());
-  return XCAFDoc_NoteBinData::Set(aNoteLabel, theUserName, theTimeStamp, theTitle, theMIMEtype, theFile);
-}
-
-// =======================================================================
-// function : CreateBinData
-// purpose  :
-// =======================================================================
-Handle(XCAFDoc_Note)
-XCAFDoc_NotesTool::CreateBinData(const TCollection_ExtendedString&    theUserName,
-                                 const TCollection_ExtendedString&    theTimeStamp,
-                                 const TCollection_ExtendedString&    theTitle,
-                                 const TCollection_AsciiString&       theMIMEtype,
-                                 const Handle(TColStd_HArray1OfByte)& theData)
-{
-  TDF_Label aNoteLabel;
-  TDF_TagSource aTag;
-  aNoteLabel = aTag.NewChild(GetNotesLabel());
-  return XCAFDoc_NoteBinData::Set(aNoteLabel, theUserName, theTimeStamp, theTitle, theMIMEtype, theData);
+  aLabel = aTag.NewChild(GetNotesLabel());
+  Handle(XCAFDoc_Note) aNote = XCAFDoc_Note::Set(aLabel, theUserName, theTimeStamp);
+  if (!aNote.IsNull())
+  {
+    Handle(XCAFDoc_NoteBinDataContainer) aBinDataCnt = XCAFDoc_NoteBinDataContainer::Set(aLabel);
+    if (aBinDataCnt.IsNull())
+    {
+      aLabel.ForgetAllAttributes();
+      return NULL;
+    }
+  }
+  return aNote;
 }
 
 // =======================================================================
@@ -352,6 +431,17 @@ XCAFDoc_NotesTool::GetNotes(const XCAFDoc_AssemblyItemId& theItemId,
   }
 
   return theNoteLabels.Length();
+}
+
+// =======================================================================
+// function : GetNotes
+// purpose  :
+// =======================================================================
+Standard_Integer
+XCAFDoc_NotesTool::GetNotes(const Handle(XCAFDoc_Note)& theNote,
+                            TDF_LabelSequence&          theNoteLabels) const
+{
+  return !theNote.IsNull() ? GetNotes(theNote->Label(), theNoteLabels) : 0;
 }
 
 // =======================================================================
@@ -491,6 +581,17 @@ XCAFDoc_NotesTool::AddNote(const TDF_Label& theNoteLabel,
                            const TDF_Label& theItemLabel)
 {
   return AddNote(theNoteLabel, labeledItem(theItemLabel));
+}
+
+// =======================================================================
+// function : AddNote
+// purpose  :
+// =======================================================================
+Handle(XCAFDoc_AssemblyItemRef)
+XCAFDoc_NotesTool::AddNote(const TDF_Label&            theNoteLabel,
+                           const Handle(XCAFDoc_Note)& theAnnotatedNote)
+{
+  return !theAnnotatedNote.IsNull() ? AddNote(theNoteLabel, theAnnotatedNote->Label()) : NULL;
 }
 
 // =======================================================================
@@ -674,6 +775,18 @@ XCAFDoc_NotesTool::RemoveNote(const TDF_Label& theNoteLabel,
 }
 
 // =======================================================================
+// function : RemoveNote
+// purpose  :
+// =======================================================================
+Standard_Boolean 
+XCAFDoc_NotesTool::RemoveNote(const TDF_Label&            theNoteLabel,
+                              const Handle(XCAFDoc_Note)& theNote,
+                              Standard_Boolean            theDelIfOrphan)
+{
+  return !theNote.IsNull() ? RemoveNote(theNoteLabel, theNote->Label(), theDelIfOrphan) : Standard_False;
+}
+
+// =======================================================================
 // function : RemoveSubshapeNote
 // purpose  :
 // =======================================================================
@@ -815,6 +928,17 @@ XCAFDoc_NotesTool::RemoveAllNotes(const TDF_Label& theItemLabel,
                                   Standard_Boolean theDelIfOrphan)
 {
   return RemoveAllNotes(labeledItem(theItemLabel), theDelIfOrphan);
+}
+
+// =======================================================================
+// function : RemoveAllNotes
+// purpose  :
+// =======================================================================
+Standard_Boolean 
+XCAFDoc_NotesTool::RemoveAllNotes(const Handle(XCAFDoc_Note)& theNote,
+                                  Standard_Boolean            theDelIfOrphan)
+{
+  return !theNote.IsNull() ? RemoveAllNotes(theNote->Label(), theDelIfOrphan) : Standard_False;
 }
 
 // =======================================================================
