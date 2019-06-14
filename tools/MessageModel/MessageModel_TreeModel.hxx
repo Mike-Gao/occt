@@ -22,8 +22,10 @@
 #include <Message_Report.hxx>
 #include <inspector/TreeModel_ModelBase.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QMap>
 #include <QObject>
+#include <Standard_WarningsRestore.hxx>
 
 class MessageModel_TreeModel;
 
@@ -38,6 +40,11 @@ public:
 
   //! Destructor
   virtual ~MessageModel_TreeModel() Standard_OVERRIDE {};
+
+  //! Returns true if parameter report was added into the model
+  //! \param theReport a report instance
+  //! \return boolen value
+  Standard_EXPORT Standard_Boolean HasReport (const Handle(Message_Report)& theReport);
 
   //! Add shape, append it to the model root item
   //! \param theReport a report instance

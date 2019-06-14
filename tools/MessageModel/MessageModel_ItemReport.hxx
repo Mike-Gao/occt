@@ -19,10 +19,14 @@
 #include <inspector/MessageModel_ItemBase.hxx>
 #include <Standard.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <Message_Alert.hxx>
 #include <Message_Report.hxx>
+#include <NCollection_DataMap.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QMap>
 #include <QVariant>
+#include <Standard_WarningsRestore.hxx>
 
 class MessageModel_ItemReport;
 typedef QExplicitlySharedDataPointer<MessageModel_ItemReport> MessageModel_ItemReportPtr;
@@ -47,6 +51,10 @@ public:
   //! Returns the current shape
   const Handle(Message_Report)& GetReport() const { return myReport; }
 
+  //! Returns alert of the report for the parameter row
+  Standard_Boolean GetChildAlerts (const int theRow, Message_ListOfAlert& theAlerts) const { return myChildAlerts.Find(theRow, theAlerts); }
+
+  //! Returns the report description or NULL
   const TCollection_AsciiString& GetDescription() const { return myDescription; }
 
   //! Inits the item, fills internal containers
@@ -71,6 +79,9 @@ public:
   //! \param theAlert a message alert
   //! \return double value
   Standard_EXPORT static double AmountElapsedTime (const Handle(Message_Report)& theReport);
+
+  //! Returns report of the item
+  static Handle(Message_Report) FindReport (const MessageModel_ItemBasePtr& thetItem);
 
 protected:
 
@@ -98,6 +109,8 @@ private:
   : MessageModel_ItemBase (theParent, theRow, theColumn) {}
 
 private:
+
+  NCollection_DataMap<Standard_Integer, Message_ListOfAlert> myChildAlerts; //!< container of child alerts
 
   Handle(Message_Report) myReport; //!< current report
   TCollection_AsciiString myDescription; //!< description

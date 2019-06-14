@@ -21,8 +21,11 @@
 #include <TCollection_AsciiString.hxx>
 
 #include <inspector/MessageModel_Actions.hxx>
-
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
+
+#include <AIS_InteractiveContext.hxx>
+#include <AIS_InteractiveObject.hxx>
+#include <TopoDS_Shape.hxx>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4127) // conditional expression is constant
@@ -145,12 +148,22 @@ protected slots:
   //! Import report into document
   void onImportReport();
 
+  //! Unite alerts in view model
+  void onUniteAlerts();
+
+  //! Sets report reversed 
+  void onSetReversedAlerts();
+
   //! Reads if possible report of a selected item and updates this report in tree view
   void onReloadReport();
 
 protected:
   //! Updates property panel content by item selected in tree view.
   void updatePropertyPanelBySelection();
+
+  //!< Updates presentation of preview for parameter shapes. Creates a compound of the shapes
+  //!< \param theShape container of shapes
+  void updatePreviewPresentation (const NCollection_List<Handle(Standard_Transient)>& thePresentations);
 
 private:
   QMainWindow* myMainWindow; //!< main control, parent for all MessageView controls
@@ -165,6 +178,10 @@ private:
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
   Handle(Message_ReportCallBack) myCallBack; //! < message call back to update content of the view
+
+  Handle(AIS_InteractiveContext) myContext; //! current context
+  Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
+  NCollection_List<Handle(Standard_Transient)> myPreviewPresentations;
 };
 
 #endif

@@ -19,11 +19,17 @@
 #include <Standard.hxx>
 
 #include <TCollection_AsciiString.hxx>
+#include <Message_ListOfAlert.hxx>
+#include <NCollection_DataMap.hxx>
+#include <NCollection_Vector.hxx>
 #include <Standard_Transient.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <inspector/TreeModel_ItemBase.hxx>
+
+#include <Standard_WarningsDisable.hxx>
 #include <QList>
-//#include <QColor>
+#include <Standard_WarningsRestore.hxx>
 
 class Message_Alert;
 class ViewControl_TableModelValues;
@@ -61,15 +67,14 @@ public:
   //! Fills container of table values
   //! \param theAlert a message alert
   //! \param theTableValue container of values
-  Standard_EXPORT static void GetPropertyTableValues (const Handle(Message_Alert)& theAlert,
+  Standard_EXPORT static void GetPropertyTableValues (const TreeModel_ItemBasePtr& theItem,
                                                       QList<ViewControl_TableModelValues*>& theTableValues);
 
-  //! Creates TopoDS_Compound with TopoDS_Edge/Vertex on alert data
-  //! \param theAlert a message alert
-  //! \parm theSelectedIndices a container of indices
-  //! \param theTableView source view
-  Standard_EXPORT TopoDS_Shape static BuildShape (const Handle(Message_Alert)& theAlert, QList<int> aSelectedIndices,
-                                                  ViewControl_Table* theTableView);
+  //! Returns alerts united by Message Key
+  //! \param theAlerts source message alert
+  //! \param theUnitedAlerts arranged source message alerts
+  Standard_EXPORT static void GetUnitedAlerts(const Message_ListOfAlert& theAlerts,
+    NCollection_DataMap<Standard_Integer, Message_ListOfAlert>& theUnitedAlerts);
 };
 
 #endif

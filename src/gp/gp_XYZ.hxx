@@ -22,6 +22,9 @@
 #include <Standard_Real.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Boolean.hxx>
+
+#include <TCollection_AsciiString.hxx>
+
 class Standard_ConstructionError;
 class Standard_OutOfRange;
 class gp_Mat;
@@ -323,6 +326,15 @@ public:
   //! XYZ1 + XYZ2
     void SetLinearForm (const gp_XYZ& XYZ1, const gp_XYZ& XYZ2);
 
+
+  //! Covers point into string in format: (X, Y, Z)
+  //! \return the string value
+  Standard_EXPORT TCollection_AsciiString ToString() const;
+
+
+  //! Converts text value into parameters if possible, the string format is: (X, Y, Z)
+  //! \return true if conversion is done
+  Standard_EXPORT Standard_Boolean FromString (const TCollection_AsciiString& theValue);
 
 
 

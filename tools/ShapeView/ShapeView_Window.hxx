@@ -33,7 +33,10 @@
 
 class View_Window;
 
+class ViewControl_PropertyView;
+
 class QAction;
+class QDockWidget;
 class QMainWindow;
 class QWidget;
 
@@ -108,11 +111,23 @@ protected slots:
   //! \param thePosition a clicked point
   void onTreeViewContextMenuRequested (const QPoint& thePosition);
 
+  //! Processes selection in tree view: make presentation or owner selected in the context if corresponding
+  //! check box is checked
+  //! \param theSelected a selected items
+  //! \param theDeselected a deselected items
+  void onTreeViewSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
+
   //! Updates visibility states by erase all in context
   void onEraseAllPerformed();
 
   //! Exports shape to BREP file and view result file
   void onBREPDirectory();
+
+  //! Perform shape fix for the selected shape. Result is a new shape in the tree.
+  void onShapeFixShape();
+
+  //! Set the shape item exploded
+  void onExplode();
 
   //! Removes all shapes in tree view
   void onClearView() { RemoveAllShapes(); }
@@ -134,6 +149,9 @@ protected slots:
   void onOpenFile(const QString& theFileName) { OpenFile (TCollection_AsciiString (theFileName.toUtf8().data())); }
 
 protected:
+
+  //! Updates property panel content by item selected in tree view.
+  void updatePropertyPanelBySelection();
 
   //! Views file name content in a text editor. It creates new Qt free control with content.
   //! \param theFileName a file name
@@ -159,6 +177,9 @@ protected:
 private:
 
   QMainWindow* myMainWindow; //!< main control, parent for all ShapeView controls
+
+  QDockWidget* myPropertyPanelWidget; //!< property pane dockable widget
+  ViewControl_PropertyView* myPropertyView; //!< property control to display model item values if exist
 
   View_Window* myViewWindow; //!< OCC 3d view to visualize presentations
   QTreeView* myTreeView; //!< tree view visualized shapes

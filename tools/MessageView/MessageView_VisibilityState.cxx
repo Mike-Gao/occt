@@ -17,8 +17,7 @@
 #include <inspector/MessageModel_ItemAlert.hxx>
 
 #include <Message_AlertExtended.hxx>
-#include <Message_AttributeVectorOfReal.hxx>
-#include <Message_AttributeVectorOfRealVec3.hxx>
+#include <Message_AttributeVectorOfValues.hxx>
 
 #include <TopoDS_AlertAttribute.hxx>
 
@@ -28,6 +27,15 @@
 // =======================================================================
 bool MessageView_VisibilityState::CanBeVisible (const QModelIndex& theIndex) const
 {
+  MessageModel_ItemAlertPtr anAlertItem = getAlertItem (theIndex);
+  if (anAlertItem)
+  {
+    NCollection_List<Handle(Standard_Transient)> aPresentations;
+    anAlertItem->GetPresentations (aPresentations);
+    if (!aPresentations.IsEmpty())
+      return true;
+  }
+
   return !getShape (theIndex).IsNull();// || hasTableValues (theIndex);
 }
 
@@ -125,7 +133,7 @@ bool MessageView_VisibilityState::hasTableValues (const QModelIndex& theIndex) c
   if (anAlert.IsNull())
     return false;
 
-  if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfReal)) || anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfRealVec3)))
+  if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
     return true;
 
   return false;

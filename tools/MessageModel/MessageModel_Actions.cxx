@@ -24,15 +24,26 @@
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
-#include <TCollection_AsciiString.hxx>
-#include <TopoDS_AlertWithShape.hxx>
+#include <Message_AlertExtended.hxx>
 
+#include <TCollection_AsciiString.hxx>
+#include <TopoDS_AlertAttribute.hxx>
+
+#include <Standard_WarningsDisable.hxx>
 #include <QAction>
 #include <QFileDialog>
 #include <QItemSelectionModel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QWidget>
+#include <Standard_WarningsRestore.hxx>
+
+#define DEBUG_ALERTS
+
+#ifdef DEBUG_ALERTS
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
 
 // =======================================================================
 // function : Constructor
@@ -46,8 +57,14 @@ MessageModel_Actions::MessageModel_Actions (QWidget* theParent,
                     ViewControl_Tools::CreateAction ("Deactivate", SLOT (OnDeactivateReport()), parent(), this));
   myActions.insert (MessageModel_ActionType_Activate,
                     ViewControl_Tools::CreateAction ("Activate", SLOT (OnActivateReport()), parent(), this));
+  myActions.insert (MessageModel_ActionType_Clear,
+                    ViewControl_Tools::CreateAction ("Clear", SLOT (OnClearReport()), parent(), this));
   myActions.insert (MessageModel_ActionType_ExportToShapeView,
                     ViewControl_Tools::CreateAction (tr ("Export to ShapeView"), SLOT (OnExportToShapeView()), parent(), this));
+#ifdef DEBUG_ALERTS
+  myActions.insert (MessageModel_ActionType_Test,
+                    ViewControl_Tools::CreateAction ("Test", SLOT (OnTestAlerts()), parent(), this));
+#endif
 }
 
 // =======================================================================
@@ -98,9 +115,15 @@ void MessageModel_Actions::AddMenuActions (const QModelIndexList& theSelectedInd
   {
     theMenu->addAction (myActions[MessageModel_ActionType_Deactivate]);
     theMenu->addAction (myActions[MessageModel_ActionType_Activate]);
+    theMenu->addAction (myActions[MessageModel_ActionType_Clear]);
+#ifdef DEBUG_ALERTS
+    theMenu->addAction (myActions[MessageModel_ActionType_Test]);
+#endif
   }
   else if (anAlertItem)
+  {
     theMenu->addAction (myActions[MessageModel_ActionType_ExportToShapeView]);
+  }
 
   theMenu->addSeparator();
 }
@@ -146,7 +169,7 @@ void MessageModel_Actions::OnDeactivateReport()
     return;
 
   aReport->SetActive (Standard_False);
-  ((MessageModel_TreeModel*)mySelectionModel)->EmitDataChanged (aReportIndex, aReportIndex);
+  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
 }
 
 // =======================================================================
@@ -161,7 +184,22 @@ void MessageModel_Actions::OnActivateReport()
     return;
 
   aReport->SetActive (Standard_True);
-  ((MessageModel_TreeModel*)mySelectionModel)->EmitDataChanged (aReportIndex, aReportIndex);
+  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
+}
+
+// =======================================================================
+// function : OnClearReport
+// purpose :
+// =======================================================================
+void MessageModel_Actions::OnClearReport()
+{
+  QModelIndex aReportIndex;
+  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
+  if (aReport.IsNull())
+    return;
+
+  aReport->Clear();
+  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
 }
 
 // =======================================================================
@@ -199,11 +237,18 @@ void MessageModel_Actions::OnExportToShapeView()
     if (anAlert.IsNull())
       continue;
 
-    Handle(TopoDS_AlertWithShape) aShapeAlert = Handle(TopoDS_AlertWithShape)::DownCast (anAlert);
-    if (aShapeAlert.IsNull() || aShapeAlert->GetShape().IsNull())
+    Handle(Message_AlertExtended) anExtAlert = Handle(Message_AlertExtended)::DownCast (anAlert);
+    if (anExtAlert.IsNull())
       continue;
 
-    const TopoDS_Shape aShape = aShapeAlert->GetShape();
+    Handle(Message_Attribute) anAttribute = anExtAlert->Attribute();
+    if (anAttribute.IsNull())
+      continue;
+
+    if (!anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+      continue;
+
+    const TopoDS_Shape aShape = Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape();
     if (aShape.IsNull())
       continue;
     aPluginParameters.Append (aShape.TShape());
@@ -218,4 +263,51 @@ void MessageModel_Actions::OnExportToShapeView()
   myParameters->SetParameters (aPluginName, aPluginParameters);
   QMessageBox::information (0, "Information", QString ("TShapes '%1' are sent to %2 tool.")
     .arg (anExportedPointers.join (", ")).arg (QString (aPluginName.ToCString())));
+}
+
+// =======================================================================
+// function : OnTestAlerts
+// purpose :
+// =======================================================================
+#include <OSD_Chronometer.hxx>
+#include <ctime>
+void MessageModel_Actions::OnTestAlerts()
+{
+#ifdef DEBUG_ALERTS
+  QModelIndex aReportIndex;
+  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
+  if (aReport.IsNull())
+    return;
+
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("MessageModel_Actions::OnTestAlerts()", "", &aPerfMeter, NULL);
+  unsigned int start_time =  clock();
+  //Standard_Real aSystemSeconds, aCurrentSeconds;
+  //OSD_Chronometer::GetThreadCPU (aCurrentSeconds, aSystemSeconds);
+
+  Standard_Integer aCounter = 50000;
+  Standard_Real aValue = 0., aValue2 = 0.1;
+  for (int j = 0; j < aCounter; j++)
+  {
+    for (int i = 0; i < aCounter; i++)
+    {
+      aValue = (aValue * 2. + 3.) * 0.5 - 0.3 * 0.5;
+
+      Standard_Real aValue3 = aValue + aValue2 * 0.2;
+      //MESSAGE_INFO ("Calculate", aValue, &aPerfMeter, NULL);
+    }
+  }
+
+  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitLayoutChanged();
+
+  //Standard_Real aSystemSeconds1, aCurrentSeconds1;
+  //OSD_Chronometer::GetThreadCPU (aCurrentSeconds1, aSystemSeconds1);
+
+  //std::cout << aValue << std::endl;
+  //std::cout << "user time = " << aCurrentSeconds1 - aCurrentSeconds
+  //          << ",  system time = " << aSystemSeconds1 - aSystemSeconds << std::endl;
+
+  unsigned int end_time = clock();
+  std::cout << "clock() = " << end_time - start_time << std::endl;
+#endif
 }

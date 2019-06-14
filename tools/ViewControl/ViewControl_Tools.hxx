@@ -16,15 +16,29 @@
 #ifndef ViewControl_Tools_H
 #define ViewControl_Tools_H
 
+#include <gp_Dir.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Trsf.hxx>
+#include <gp_XYZ.hxx>
+#include <Bnd_Box.hxx>
+#include <Bnd_OBB.hxx>
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
+#include <TColgp_HArray1OfPnt.hxx>
+#include <TCollection_AsciiString.hxx>
+#include <TopLoc_Location.hxx>
+#include <TopoDS_Shape.hxx> 
 
 #include <Standard_WarningsDisable.hxx>
 #include <QString>
+#include <QVariant>
 #include <Standard_WarningsRestore.hxx>
+
+class Geom_Transformation;
 
 class QAction;
 class QObject;
+class QTableView;
 class QWidget;
 
 //! \class ViewControl_Tools
@@ -32,6 +46,9 @@ class QWidget;
 class ViewControl_Tools
 {
 public:
+  //! Returns text of separation row in table
+  //! \return string value
+  static QString TableSeparator() { return "---------------------------"; }
 
   //! Creates an action with the given text connected to the slot
   //! \param theText an action text value
@@ -45,6 +62,104 @@ public:
   //! Change palette of the widget to have white foreground
   //! \param theControl a widget to be modified
   Standard_EXPORT static void SetWhiteBackground (QWidget* theControl);
+
+  //! Fills tree view by default sections parameters obtained in view's table model
+  //! \param theTableView table view instance
+  //! \param theOrientation header orientation
+  Standard_EXPORT static void SetDefaultHeaderSections (QTableView* theTableView, const Qt::Orientation theOrientation);
+
+  //! Returns default prefix added for each pointer info string
+  Standard_EXPORT static TCollection_AsciiString GetPointerPrefix() { return "0x"; }
+
+  //! Convert handle pointer to string value
+  //! \param thePointer a pointer
+  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString GetPointerInfo (const Handle(Standard_Transient)& thePointer,
+                                                                 const bool isShortInfo = true);
+
+  //! Convert pointer to string value
+  //! \param thePointer a pointer
+  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString GetPointerInfo (const void* thePointer,
+                                                                 const bool isShortInfo = true);
+
+  //! Convert real value to string value
+  //! \param theValue a short real value
+  //! \return the string value
+  Standard_EXPORT static QVariant ToVariant (const Standard_ShortReal theValue);
+
+  //! Convert real value to string value
+  //! \param theValue a real value
+  //! \return the string value
+  Standard_EXPORT static QVariant ToVariant (const Standard_Real theValue);
+
+  //! Convert real value to real value
+  //! \param theValue a string value
+  //! \return the real value
+  Standard_EXPORT static Standard_ShortReal ToShortRealValue (const QVariant& theValue);
+
+  //! Convert real value to string value
+  //! \param theValue a string value
+  //! \return the real value
+  Standard_EXPORT static Standard_Real ToRealValue (const QVariant& theValue);
+
+  //! Returns text of orientation
+  //! \param theLocation a location value
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const Handle(Geom_Transformation)& theValue);
+
+  //! Returns text of orientation
+  //! \param theLocation a location value
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_Trsf& theValue);
+
+  //! Returns text of point
+  //! \param theValue a 3D point
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_Pnt& thePoint);
+
+  //! Returns text of direction
+  //! \param theValue a direction
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_Dir& theDir);
+
+  //! Returns text of cartesian entity in 3D space
+  //! \param theValue an entity
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const gp_XYZ& theValue);
+
+  //! Returns text of bounding box in form: (xmin, ymin, zmin), (xmax, ymax, zmax)
+  //! \param theValue a bounding box
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const Bnd_Box& theValue);
+
+  //! Returns text of array of points
+  //! \param thePoints points
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const Handle(TColgp_HArray1OfPnt)& thePoints);
+
+  //! Returns text of location
+  //! \param theLocation object location
+  //! \return text value
+  Standard_EXPORT static TCollection_AsciiString ToString (const TopLoc_Location& theLocation);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_Box& theBoundingBox);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_OBB& theBoundingBox);
+
+  //! Creates box shape
+  //! \param thePntMin minimum point on the bounding box
+  //! \param thePntMax maximum point on the bounding box
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax);
 
 };
 

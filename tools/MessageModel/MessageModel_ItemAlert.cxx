@@ -18,18 +18,24 @@
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/MessageModel_Tools.hxx>
+#include <inspector/ViewControl_Tools.hxx>
+#include <inspector/ViewControl_TransientShape.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <Message_AlertExtended.hxx>
-#include <Message_AttributeVectorOfReal.hxx>
-#include <Message_AttributeVectorOfRealVec3.hxx>
+#include <Message_AttributeObject.hxx>
+#include <Message_AttributeVectorOfValues.hxx>
 #include <Message_CompositeAlerts.hxx>
 
+#include <Bnd_Box.hxx>
 #include <TCollection_AsciiString.hxx>
-#include <TopoDS_AlertWithShape.hxx>
+#include <TopoDS_AlertAttribute.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QColor>
 #include <QIcon>
+#include <Standard_WarningsRestore.hxx>
+
 
 // =======================================================================
 // function : initValue
@@ -59,18 +65,19 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
   }
 
   Handle(Message_Alert) anAlert = getAlert();
-  if (anAlert.IsNull())
-    return QVariant();
-
   // if the alert is composite, process the real alert
   if (theRole == Qt::DecorationRole && Column() == 0)
   {
-    if (anAlert->IsKind (STANDARD_TYPE (TopoDS_AlertWithShape)))
+    Handle(Message_AlertExtended) anExtAttribute = Handle(Message_AlertExtended)::DownCast (anAlert);
+    if (anExtAttribute.IsNull())
+      return QVariant();
+
+    Handle(Message_Attribute) anAttribute = anExtAttribute->Attribute();
+
+    if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
       return QIcon (":/icons/item_shape.png");
-    else if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfReal)))
-      return QIcon (":/icons/item_vectorOfReal.png");
-    else if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfRealVec3)))
-      return QIcon (":/icons/item_vectorOfRealVec3.png");
+    else if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
+      return QIcon (":/icons/item_vectorOfValues.png");
     else
       return QVariant();
   }
@@ -140,17 +147,26 @@ int MessageModel_ItemAlert::initRowCount() const
   if (aCompositeAlert.IsNull())
     return GetUnitedAlerts().Size();
 
-  int aRowCount = 0;
-  NCollection_Vector<Message_ListOfAlert> aUnitedAlerts;
+  MessageModel_ItemAlert* aCurrentItem = (MessageModel_ItemAlert*)this;
   for (int aGravityId = Message_Trace; aGravityId <= Message_Fail; aGravityId++)
   {
     const Message_ListOfAlert& anAlerts  = aCompositeAlert->GetAlerts ((Message_Gravity)aGravityId);
     if (isUniteAlerts())
-      GetUnitedAlerts (anAlerts, aUnitedAlerts);
+    {
+      MessageModel_Tools::GetUnitedAlerts (anAlerts, aCurrentItem->myChildAlerts);
+    }
     else
-      aRowCount += anAlerts.Size();
+    {
+      for (Message_ListOfAlert::Iterator anIt(anAlerts); anIt.More(); anIt.Next())
+      {
+        Message_ListOfAlert aCurAlerts;
+        aCurAlerts.Append (anIt.Value());
+        aCurrentItem->myChildAlerts.Bind(myChildAlerts.Size(), aCurAlerts);
+      }
+    }
   }
-  return isUniteAlerts() ? aUnitedAlerts.Size() : aRowCount;
+
+  return aCurrentItem->myChildAlerts.Size();
 }
 
 // =======================================================================
@@ -170,90 +186,51 @@ void MessageModel_ItemAlert::Init()
 {
   MessageModel_ItemReportPtr aReportItem = itemDynamicCast<MessageModel_ItemReport> (Parent());
   MessageModel_ItemAlertPtr anAlertItem;
-  Handle(Message_Report) aReport;
   Handle(Message_Alert) anAlert;
   if (aReportItem)
-    aReport = aReportItem->GetReport();
+  {
+    Message_ListOfAlert anAlerts;
+    if (aReportItem->GetChildAlerts (Row(), anAlerts))
+    {
+      if (anAlerts.Size() == 1)
+        myAlert = anAlerts.First();
+      else
+        myUnitedAlerts = anAlerts;
+    }
+  }
   else
   {
     anAlertItem = itemDynamicCast<MessageModel_ItemAlert> (Parent());
     if (anAlertItem)
-      anAlert = anAlertItem->GetAlert();
-  }
-  if (aReport.IsNull() && anAlert.IsNull() && !anAlertItem)
-    return;
-
-  if (anAlert.IsNull() && anAlertItem) // union folder item
-  {
-    int aCurrentSubId = 0;
-    for (Message_ListOfAlert::Iterator anAlertsIt (anAlertItem->GetUnitedAlerts()); anAlertsIt.More();
-         anAlertsIt.Next(), aCurrentSubId++)
     {
-      if (aCurrentSubId != Row())
-        continue;
-      myAlert = anAlertsIt.Value();
-      MessageModel_ItemBase::Init();
-      return;
-    }
-    return;
-  }
-
-  // iterates through all gravity types, skip types where report is empty, if report is not empty, increment
-  // current index until it equal to the current row index
-  Message_ListOfAlert anAlerts;
-  NCollection_Vector<Message_ListOfAlert> aUnitedAlerts;
-  int aRowId = Row();
-  int aPreviousAlertsCount = 0;
-  for (int aGravityId = Message_Trace; aGravityId <= Message_Fail; aGravityId++)
-  {
-    if (!aReport.IsNull())
-      anAlerts = aReport->GetAlerts ((Message_Gravity)aGravityId);
-    else if (!anAlert.IsNull())
-    {
-      Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(anAlert);
-      Handle(Message_CompositeAlerts) aCompositeAlert = !anExtendedAlert.IsNull() ? anExtendedAlert->GetCompositeAlerts()
-        : Handle(Message_CompositeAlerts)();
-      if (!aCompositeAlert.IsNull())
-        anAlerts = aCompositeAlert->GetAlerts ((Message_Gravity)aGravityId);
-    }
-
-    if (isReversed())
-      anAlerts.Reverse();
-
-    if (isUniteAlerts())
-    {
-      GetUnitedAlerts (anAlerts, aUnitedAlerts);
-      if (aRowId < aUnitedAlerts.Size())
+      Message_ListOfAlert anAlerts;
+      if (anAlertItem->GetChildAlerts (Row(), anAlerts))
       {
-        anAlerts = aUnitedAlerts.Value (aRowId);
-
         if (anAlerts.Size() == 1)
           myAlert = anAlerts.First();
         else
           myUnitedAlerts = anAlerts;
-
-        MessageModel_ItemBase::Init();
-        return;
       }
-    }
-    else
-    {
-      if (aRowId < aPreviousAlertsCount + anAlerts.Size())
-      {
-        aRowId = aRowId - aPreviousAlertsCount;
-        int aCurrentId = 0;
-        for (Message_ListOfAlert::Iterator anAlertsIt (anAlerts); anAlertsIt.More(); anAlertsIt.Next(), aCurrentId++)
-        {
-          if (aCurrentId != Row())
-            continue;
-          myAlert = anAlertsIt.Value();
-          MessageModel_ItemBase::Init();
-          return;
-        }
-      }
-      aPreviousAlertsCount += anAlerts.Size();
     }
   }
+
+  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(myAlert);
+  if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
+  {
+    Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+    if (!anAttribute.IsNull())
+    {
+      if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
+        myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
+      if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+        myPresentations.Append (new ViewControl_TransientShape (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape()));
+    }
+    TCollection_AsciiString aDescription = anExtendedAlert->Attribute()->GetDescription();
+    Bnd_Box aBox;
+    if (aBox.FromString (aDescription))
+      myPresentations.Append (new ViewControl_TransientShape (ViewControl_Tools::CreateShape (aBox)));
+  }
+  MessageModel_ItemBase::Init();
 }
 
 // =======================================================================
@@ -265,6 +242,8 @@ void MessageModel_ItemAlert::Reset()
   MessageModel_ItemBase::Reset();
   myAlert = Handle(Message_Alert)();
   myUnitedAlerts.Clear();
+  myChildAlerts.Clear();
+  myPresentations.Clear();
 }
 
 // =======================================================================
@@ -313,30 +292,4 @@ double MessageModel_ItemAlert::AmountElapsedTime(const Handle(Message_Alert)& th
     anAmountTime = anExtendedAlert->GetCumulativeTime();
 
   return anAmountTime;
-}
-
-// =======================================================================
-// function : GetUnitedAlerts
-// purpose :
-// =======================================================================
-void MessageModel_ItemAlert::GetUnitedAlerts(const Message_ListOfAlert& theAlerts,
-                       NCollection_Vector<Message_ListOfAlert>& theUnitedAlerts)
-{
-  //theUnitedAlerts.Clear();
-  TCollection_AsciiString anAlertMessageKey;
-  for (Message_ListOfAlert::Iterator anAlertsIt (theAlerts); anAlertsIt.More(); anAlertsIt.Next())
-  {
-    Handle(Message_Alert) anAlert = anAlertsIt.Value();
-    if (anAlertMessageKey.IsEqual (anAlert->GetMessageKey())) {
-      Message_ListOfAlert anAlerts = theUnitedAlerts.Last();
-      anAlerts.Append (anAlert);
-      theUnitedAlerts.SetValue(theUnitedAlerts.Size()-1, anAlerts);
-    }
-    else {
-      Message_ListOfAlert anAlerts;
-      anAlerts.Append (anAlert);
-      theUnitedAlerts.Append (anAlerts);
-      anAlertMessageKey = anAlert->GetMessageKey();
-    }
-  }
 }

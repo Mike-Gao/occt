@@ -18,6 +18,7 @@
 #define _Message_HeaderFile
 
 #include <Message_Gravity.hxx>
+#include <NCollection_Vector.hxx>
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
@@ -25,8 +26,9 @@
 
 #include <Standard_Integer.hxx>
 #include <Standard_Real.hxx>
+#include <TCollection_AsciiString.hxx>
+
 class Message_Messenger;
-class TCollection_AsciiString;
 class Message_Msg;
 class Message_MsgFile;
 class Message_Messenger;
@@ -83,7 +85,84 @@ public:
   Standard_EXPORT static Standard_Boolean GravityFromString (const Standard_CString theGravityString,
                                                              Message_Gravity& theGravity);
 
+  //! Returns separator symbol of Dump information
+  static Standard_Character DumpSeparator() { return '\\'; }
 
+  //! Returns separator symbol of values vector union
+  static TCollection_AsciiString VectorSeparator() { return " ,"; }
+
+  //! Convert handle pointer to string value
+  //! \param thePointer a pointer
+  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString TransientToString (const Handle(Standard_Transient)& thePointer,
+                                                                    const bool isShortInfo = true);
+
+  //! Convert pointer to string value
+  //! \param thePointer a pointer
+  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString PointerToString (const void* thePointer,
+                                                                  const bool isShortInfo = true);
+  //! Convert vector of real values to string, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString StrVectorToString
+    (const NCollection_Vector<TCollection_AsciiString>& theValues);
+
+  //! Convert string to vector of real values, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static Standard_Boolean StrVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<TCollection_AsciiString>& theValues);
+
+  //! Convert vector of real values to string, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString RealVectorToString
+    (const NCollection_Vector<Standard_Real>& theValues);
+
+  //! Convert string to vector of real values, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static Standard_Boolean RealVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<Standard_Real>& theValues);
+
+  //! Convert vector of real values to string, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString CoordVectorToString
+    (const NCollection_Vector<Standard_Real>& theValues);
+
+  //! Convert string to vector of real values, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static Standard_Boolean CoordVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<Standard_Real>& theValues);
+
+  //! Convert vector of real values to string, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static TCollection_AsciiString ColorVectorToString
+    (const NCollection_Vector<Standard_Real>& theValues);
+
+  //! Convert string to vector of real values, separator is vector separator
+  //! \param thePointer a container of real values
+  //! \return the string value
+  Standard_EXPORT static Standard_Boolean ColorVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<Standard_Real>& theValues);
+
+  //! Converts stream to vector of values and column count
+  //! \param theStream stream value
+  //! \param theColumnCount [out] number of columns
+  //! \param theValues [out] container of split values
+  static Standard_EXPORT void ConvertStream (const Standard_SStream& theStream,
+    Standard_Integer& theColumnCount,
+    NCollection_Vector<TCollection_AsciiString>& theValues);
 
 protected:
 

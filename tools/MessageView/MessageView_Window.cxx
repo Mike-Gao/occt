@@ -29,13 +29,15 @@
 
 #include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
-#include <inspector/ViewControl_TableProperty.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
+#include <inspector/ViewControl_TransientShape.hxx>
 
 #include <inspector/View_Tools.hxx>
+#include <inspector/View_Viewer.hxx>
+#include <inspector/View_Widget.hxx>
 
 #include <AIS_Shape.hxx>
-
+#include <Graphic3d_Camera.hxx>
 #include <OSD_Environment.hxx>
 
 #include <OSD_Directory.hxx>
@@ -99,6 +101,39 @@ const int MESSAGEVIEW_DEFAULT_TREE_VIEW_HEIGHT = 500;
 const int MESSAGEVIEW_DEFAULT_VIEW_WIDTH = 200;// 400;
 const int MESSAGEVIEW_DEFAULT_VIEW_HEIGHT = 300;// 1000;
 
+#include <Prs3d_PointAspect.hxx>
+#include <Prs3d_ShadingAspect.hxx>
+Handle(Prs3d_Drawer) GetPreviewAttributes (const Handle(AIS_InteractiveContext)& theContext)
+{
+  Handle(Prs3d_Drawer) myDrawer = new Prs3d_Drawer();
+  myDrawer->Link (theContext->DefaultDrawer());
+
+  Quantity_Color aColor(Quantity_NOC_TOMATO);//Quantity_NOC_GREENYELLOW));//Quantity_NOC_BLUE1));
+  Standard_ShortReal aTransparency = 0.8;
+
+  // point parameters
+  myDrawer->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_O_PLUS, aColor, 3.0));
+
+  // shading parameters
+  Graphic3d_MaterialAspect aShadingMaterial;
+  aShadingMaterial.SetReflectionModeOff (Graphic3d_TOR_SPECULAR);
+  aShadingMaterial.SetMaterialType (Graphic3d_MATERIAL_ASPECT);
+
+  myDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
+  myDrawer->ShadingAspect()->Aspect()->SetInteriorStyle (Aspect_IS_SOLID);
+  myDrawer->ShadingAspect()->SetColor (aColor);
+  myDrawer->ShadingAspect()->SetMaterial (aShadingMaterial);
+
+  myDrawer->ShadingAspect()->Aspect()->ChangeFrontMaterial().SetTransparency (aTransparency);
+  myDrawer->ShadingAspect()->Aspect()->ChangeBackMaterial() .SetTransparency (aTransparency);
+  myDrawer->SetTransparency (aTransparency);
+
+  // common parameters
+  myDrawer->SetZLayer (Graphic3d_ZLayerId_Topmost);
+
+  return myDrawer;
+}
+
 // =======================================================================
 // function : Constructor
 // purpose :
@@ -112,6 +147,7 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
   ((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (MESSAGEVIEW_DEFAULT_TREE_VIEW_WIDTH,
                                                                  MESSAGEVIEW_DEFAULT_TREE_VIEW_HEIGHT));
   MessageModel_TreeModel* aModel = new MessageModel_TreeModel (myTreeView);
+  //aModel->SetReversed (Standard_True);
   for (int i = 5; i <= 7; i++) // hide shape parameters columns
   {
     TreeModel_HeaderSection anItem = aModel->GetHeaderItem (i);
@@ -217,7 +253,6 @@ void MessageView_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIt
   QMap<QString, QString> anItems;
   TreeModel_Tools::SaveState (myTreeView, anItems);
   View_Tools::SaveState (myViewWindow, anItems);
-  ViewControl_PropertyView::SaveState (myPropertyView, anItems);
 
   for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
     theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
@@ -242,8 +277,6 @@ void MessageView_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap&
     else if (TreeModel_Tools::RestoreState (myTreeView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
       continue;
     else if (View_Tools::RestoreState (myViewWindow, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
-      continue;
-    else if (ViewControl_PropertyView::RestoreState (myPropertyView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
       continue;
   }
 }
@@ -274,6 +307,13 @@ void MessageView_Window::UpdateContent()
     myParameters->SetFileNames (aName, aNames);
     isUpdated = true;
   }
+  Handle(Message_Report) aDefaultReport = Message_Report::CurrentReport( Standard_False);
+  MessageModel_TreeModel* aViewModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  if (!aDefaultReport.IsNull() && !aViewModel->HasReport (aDefaultReport))
+  {
+    aDefaultReport->SetCallBack (myCallBack);
+    addReport (aDefaultReport);
+  }
   // reload report of selected item
   onReloadReport();
 
@@ -290,6 +330,7 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
   NCollection_List<Handle(Standard_Transient)> aParameters;
 
   Handle(Message_ReportCallBack) aReportCallBack;
+  Handle(Graphic3d_Camera) aViewCamera;
 
   for (NCollection_List<Handle(Standard_Transient)>::Iterator aParamsIt (theParameters);
        aParamsIt.More(); aParamsIt.Next())
@@ -301,23 +342,31 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
       aMessageReport->SetCallBack (myCallBack);
       addReport (aMessageReport);
     }
-    else
+    else if (!Handle(AIS_InteractiveContext)::DownCast (anObject).IsNull())
     {
       aParameters.Append (anObject);
       if (aContext.IsNull())
         aContext = Handle(AIS_InteractiveContext)::DownCast (anObject);
     }
+    else if (!Handle(Graphic3d_Camera)::DownCast (anObject).IsNull())
+    {
+      aViewCamera = Handle(Graphic3d_Camera)::DownCast (anObject);
+    }
   }
-  QAbstractItemModel* aModel = myTreeView->model();
-  if (!aModel)
-    return;
-  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (aModel);
+  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
   if (!aTreeModel)
     return;
+
   aTreeModel->EmitLayoutChanged();
 
   if (!aContext.IsNull())
+  {
+    myContext = aContext;
     myViewWindow->SetContext (View_ContextType_External, aContext);
+  }
+
+  if (!aViewCamera.IsNull())
+    myViewWindow->GetView()->GetViewer()->GetView()->Camera()->Copy (aViewCamera);
 
   theParameters = aParameters;
 }
@@ -381,6 +430,26 @@ void MessageView_Window::onTreeViewSelectionChanged (const QItemSelection&, cons
     return;
 
   updatePropertyPanelBySelection();
+
+  NCollection_List<Handle(Standard_Transient)> aPresentations;
+  MessageModel_ItemRootPtr aRootItem;
+  QModelIndexList aSelectedIndices = myTreeView->selectionModel()->selectedIndexes();
+  for (QModelIndexList::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
+  {
+    QModelIndex anIndex = *aSelIt;
+    if (anIndex.column() != 0)
+      continue;
+
+    TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+    if (!anItemBase)
+      continue;
+
+    MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
+    if (!anAlertItem)
+      continue;
+    anAlertItem->GetPresentations (aPresentations);
+  }
+  updatePreviewPresentation (aPresentations);
 }
 
 // =======================================================================
@@ -413,7 +482,16 @@ void MessageView_Window::onTreeViewContextMenuRequested (const QPoint& thePositi
       break;
   }
   if (aRootItem)
+  {
     aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Import Report"), SLOT (onImportReport()), myMainWindow, this));
+    // unite
+    MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+    aMenu->addAction (ViewControl_Tools::CreateAction (aTreeModel->IsUniteAlerts() ? tr ("SetUniteAlerts - OFF") : tr ("SetUniteAlerts - ON"),
+                      SLOT (onUniteAlerts()), myMainWindow, this));
+    // reversed
+    //aMenu->addAction (ViewControl_Tools::CreateAction (aTreeModel->IsReversed() ? tr ("SetReversed - OFF") : tr ("SetReversed - ON"),
+    //                  SLOT (onSetReversedAlerts()), myMainWindow, this));
+  }
   else if (aReportItem)
   {
     aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Export Report"), SLOT (onExportReport()), myMainWindow, this));
@@ -484,7 +562,7 @@ void MessageView_Window::onPropertyViewSelectionChanged()
     return;
   }
 
-  TopoDS_Shape aShapeOfSelection = MessageModel_Tools::BuildShape (anAlertItem->GetAlert(), aSelectedIndices[0], aFirstTable);
+  /*TopoDS_Shape aShapeOfSelection = MessageModel_Tools::BuildShape (anAlertItem->GetAlert(), aSelectedIndices[0], aFirstTable);
   if (aShapeOfSelection.IsNull())
     return;
 
@@ -504,7 +582,7 @@ void MessageView_Window::onPropertyViewSelectionChanged()
   {
     anAlertItem->SetCustomShape (aShapeOfSelection);
     aVisibilityState->SetVisible (anIndex, true);
-  }
+  }*/
 }
 
 // =======================================================================
@@ -560,6 +638,31 @@ void MessageView_Window::onImportReport()
 }
 
 // =======================================================================
+// function : onImportReport
+// purpose :
+// =======================================================================
+void MessageView_Window::onUniteAlerts()
+{
+  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  Standard_Boolean isUniteAlerts = aTreeModel->IsUniteAlerts();
+
+  aTreeModel->SetUniteAlerts (!isUniteAlerts);
+}
+
+// =======================================================================
+// function : onSetReversedAlerts
+// purpose :
+// =======================================================================
+void MessageView_Window::onSetReversedAlerts()
+{
+  MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  Standard_Boolean isReversed = aTreeModel->IsReversed();
+
+  aTreeModel->SetReversed (!isReversed);
+}
+
+
+// =======================================================================
 // function : onReloadReport
 // purpose :
 // =======================================================================
@@ -604,12 +707,81 @@ void MessageView_Window::updatePropertyPanelBySelection()
   if (!anItemBase)
     return;
 
-  MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
-  if (!anAlertItem)
-    return;
-
   QList<ViewControl_TableModelValues*> aTableValues;
-  MessageModel_Tools::GetPropertyTableValues (anAlertItem->GetAlert(), aTableValues);
+  MessageModel_Tools::GetPropertyTableValues (anItemBase, aTableValues);
 
   myPropertyView->Init (aTableValues);
+}
+
+// =======================================================================
+// function : updatePreviewPresentation
+// purpose :
+// =======================================================================
+void MessageView_Window::updatePreviewPresentation (const NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  if (myContext.IsNull())
+    return;
+
+  Handle(AIS_InteractiveContext) aContext = myContext;
+
+  if (!myPreviewPresentations.IsEmpty())
+  {
+    for (NCollection_List<Handle(Standard_Transient)>::Iterator aDisplayedIt (myPreviewPresentations); aDisplayedIt.More(); aDisplayedIt.Next())
+    {
+      Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (aDisplayedIt.Value());
+      if (!aPrs.IsNull())
+        aContext->Remove (aPrs, Standard_True);
+    }
+  }
+  myPreviewPresentations.Clear();
+
+  myPreviewPresentations = thePresentations;
+  if (myPreviewPresentations.IsEmpty())
+    return;
+
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+  for (NCollection_List<Handle(Standard_Transient)>::Iterator aDisplayedIt (myPreviewPresentations); aDisplayedIt.More(); aDisplayedIt.Next())
+  {
+    Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (aDisplayedIt.Value());
+    if (!aPrs.IsNull())
+    {
+      aContext->Display (aPrs, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+    }
+    else if (!Handle(ViewControl_TransientShape)::DownCast (aDisplayedIt.Value()).IsNull())
+    {
+      Handle(ViewControl_TransientShape) aShapeObject = Handle(ViewControl_TransientShape)::DownCast (aDisplayedIt.Value());
+      aBuilder.Add (aCompound, aShapeObject->GetShape());
+    }
+  }
+
+  if (aCompound.IsNull())
+  {
+    if (!aContext.IsNull())
+      aContext->Remove (myPreviewPresentation, Standard_True);
+    myPreviewPresentation = NULL;
+    return;
+
+  }
+  else
+  {
+    if (myPreviewPresentation.IsNull())
+    {
+      myPreviewPresentation = new AIS_Shape (aCompound);
+      myPreviewPresentation->SetAttributes (GetPreviewAttributes(myContext));
+      //myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
+
+      //myPreviewPresentation->SetTransformPersistence(thePersistent);
+      if (!aContext.IsNull())
+        aContext->Display (myPreviewPresentation, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+    }
+    else
+    {
+      Handle(AIS_Shape)::DownCast (myPreviewPresentation)->Set (aCompound);
+      //myPreviewPresentation->SetTransformPersistence(thePersistent);
+      if (!aContext.IsNull())
+        aContext->Redisplay (myPreviewPresentation, Standard_True);
+    }
+  }
 }

@@ -6,6 +6,10 @@ TreeModel_ContextMenu.hxx
 TreeModel_HeaderSection.hxx
 TreeModel_ItemBase.cxx
 TreeModel_ItemBase.hxx
+TreeModel_ItemProperties.cxx
+TreeModel_ItemProperties.hxx
+TreeModel_ItemPropertiesCreator.cxx
+TreeModel_ItemPropertiesCreator.hxx
 TreeModel_ItemRole.hxx
 TreeModel_ModelBase.cxx
 TreeModel_ModelBase.hxx

@@ -56,6 +56,11 @@ public:
   //! Empty constructor
   Standard_EXPORT Message_Report ();
   
+  //! returns the only one instance of Report
+  //! When theToCreate is true - automatically creates message report when not exist.
+  //! that has been created.
+  Standard_EXPORT static Handle(Message_Report) CurrentReport (const Standard_Boolean theToCreate = Standard_False);
+
   //! Add alert with specified gravity.
   //! This method is thread-safe, i.e. alerts can be added from parallel threads safely.
   Standard_EXPORT void AddAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert);

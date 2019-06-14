@@ -15,6 +15,9 @@
 
 #include <Quantity_Color.hxx>
 
+#include <Message_Alerts.hxx>
+#include <NCollection_Vector.hxx>
+
 #include <Quantity_ColorDefinitionError.hxx>
 #include <Quantity_ColorRGBA.hxx>
 #include <Standard_ErrorHandler.hxx>
@@ -3923,4 +3926,42 @@ void call_rgbhls (float r, float g, float b, float& h, float& l, float& s)
 	   h = (float ) 60.0 * ( plus + diff / delta );
 	   if (h < 0.0) h += 360.0;
 	}
+}
+
+//=======================================================================
+// function : ToString
+// purpose  :
+//=======================================================================
+TCollection_AsciiString Quantity_Color::ToString() const
+{
+  NCollection_Vector<Standard_Real> aValues;
+  aValues.Append (MyRed);
+  aValues.Append (MyGreen);
+  aValues.Append (MyBlue);
+
+  Standard_SStream OS;
+
+  TCollection_AsciiString aValue;
+  DUMP_VEC_COLOR(aValues, aValue)
+
+  return aValue;
+}
+
+//=======================================================================
+// function : FromString
+// purpose  :
+//=======================================================================
+Standard_Boolean Quantity_Color::FromString (const TCollection_AsciiString& theValue)
+{
+  NCollection_Vector<Standard_Real> aValues;
+  DUMP_VEC_COLOR_SPLIT (theValue, aValues)
+
+  if (aValues.Size() != 3)
+    return Standard_False;
+
+  MyRed = (Standard_ShortReal)aValues.Value (0);
+  MyGreen = (Standard_ShortReal)aValues.Value (1);
+  MyBlue = (Standard_ShortReal)aValues.Value (2);
+
+  return Standard_True;
 }

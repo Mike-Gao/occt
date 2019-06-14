@@ -20,6 +20,7 @@
 #include <Standard_Handle.hxx>
 #include <Standard_Real.hxx>
 #include <Standard_Boolean.hxx>
+#include <Standard_OStream.hxx>
 
 #include <Bnd_Box.hxx>
 #include <gp_Ax3.hxx>
@@ -287,6 +288,12 @@ protected:
       myAxes[2].SetCoord(0.0, 0.0, 1.0);
       myCenter = theP.XYZ();
     }
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT Standard_Boolean Init (const Standard_OStream& OS);
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
 private:
 

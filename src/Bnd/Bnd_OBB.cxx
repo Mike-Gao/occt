@@ -677,3 +677,19 @@ void Bnd_OBB::Add(const Bnd_OBB& theOther)
   ReBuild(TColgp_Array1OfPnt(aList[0], 0, 15));
 }
 
+// =======================================================================
+// function : Init
+// purpose  : 
+// =======================================================================
+Standard_Boolean Bnd_OBB::Init (const Standard_OStream&)
+{
+  return Standard_False;
+}
+
+// =======================================================================
+// function : Dump
+// purpose  : 
+// =======================================================================
+void Bnd_OBB::Dump (Standard_OStream&) const
+{
+}

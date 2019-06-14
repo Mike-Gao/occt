@@ -17,8 +17,7 @@
 
 #include <Message.hxx>
 #include <Message_AlertExtended.hxx>
-#include <Message_AttributeVectorOfReal.hxx>
-#include <Message_AttributeVectorOfRealVec3.hxx>
+#include <Message_AttributeVectorOfValues.hxx>
 #include <Message_CompositeAlerts.hxx>
 #include <Message_Report.hxx>
 
@@ -26,7 +25,7 @@
 #include <TDataStd_Comment.hxx>
 #include <TDataStd_Real.hxx>
 #include <TDataStd_Name.hxx>
-#include <TDataStd_RealArray.hxx>
+#include <TDataStd_ExtStringArray.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
@@ -250,36 +249,18 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
     TDataStd_Comment::Set (theAlertLabel, anAttribute->GetDescription());
 
   Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
-  if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfReal)->Name())
+  if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfValues)->Name())
   {
-    Handle(Message_AttributeVectorOfReal) aRealArrayAlert = Handle(Message_AttributeVectorOfReal)::DownCast (anAttribute);
+    Handle(Message_AttributeVectorOfValues) aValuesArrayAlert = Handle(Message_AttributeVectorOfValues)::DownCast (anAttribute);
     // store values
-    const NCollection_Vector<double>& anArrayValues = aRealArrayAlert->GetValues();
+    const NCollection_Vector<TCollection_AsciiString>& anArrayValues = aValuesArrayAlert->GetValues();
     // create real list attribute only if there are values in the attribute
     if (anArrayValues.IsEmpty())
       return;
     int anArraySize = anArrayValues.Length();
-    Handle(TDataStd_RealArray) aRealListAttribute = TDataStd_RealArray::Set (theAlertLabel, 0, anArraySize - 1);
+    Handle(TDataStd_ExtStringArray) aListAttribute = TDataStd_ExtStringArray::Set (theAlertLabel, 0, anArraySize - 1);
     for (int aValueId = 0; aValueId < anArraySize; aValueId++)
-      aRealListAttribute->SetValue (aValueId, anArrayValues.Value (aValueId));
-  }
-  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfRealVec3)->Name())
-  {
-    Handle(Message_AttributeVectorOfRealVec3) aRealArrayAlert = Handle(Message_AttributeVectorOfRealVec3)::DownCast (anAttribute);
-    // store values
-    const NCollection_Vector<NCollection_Vec3<double>>& anArrayValues = aRealArrayAlert->GetValues();
-    // create real list attribute only if there are values in the attribute
-    if (anArrayValues.IsEmpty())
-      return;
-    int anArraySize = anArrayValues.Length();
-    Handle(TDataStd_RealArray) aRealListAttribute = TDataStd_RealArray::Set (theAlertLabel, 0, 3 * anArraySize - 1);
-    for (int aValueId = 0; aValueId < anArraySize; aValueId++)
-    {
-      NCollection_Vec3<double> aValue = anArrayValues.Value (aValueId);
-      aRealListAttribute->SetValue (3 * aValueId, aValue.x());
-      aRealListAttribute->SetValue (3 * aValueId + 1, aValue.y());
-      aRealListAttribute->SetValue (3 * aValueId + 2, aValue.z());
-    }
+      aListAttribute->SetValue (aValueId, anArrayValues.Value (aValueId));
   }
 }
 
@@ -310,42 +291,24 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
   Handle(Message_Attribute) aMessageAttribute;
   if (aDynamicTypeName == STANDARD_TYPE (Message_Attribute)->Name())
     aMessageAttribute = new Message_Attribute();
-  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfReal)->Name())
+  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfValues)->Name())
   {
     // values
-    NCollection_Vector<double> anArrayValues;
-    if (!aParametersLabel.FindAttribute (TDataStd_RealArray::GetID(), anAttribute))
+    NCollection_Vector<TCollection_AsciiString> anArrayValues;
+    if (!aParametersLabel.FindAttribute (TDataStd_ExtStringArray::GetID(), anAttribute))
       return Handle(Message_Alert)();
 
-    Handle(TDataStd_RealArray) aValuesAttribute = Handle(TDataStd_RealArray)::DownCast (anAttribute);
+    Handle(TDataStd_ExtStringArray) aValuesAttribute = Handle(TDataStd_ExtStringArray)::DownCast (anAttribute);
     if (aValuesAttribute.IsNull())
       return Handle(Message_Alert)();
 
     for (int aValueId = aValuesAttribute->Lower(); aValueId <= aValuesAttribute->Upper(); aValueId++)
       anArrayValues.Append (aValuesAttribute->Value (aValueId));
 
-    aMessageAttribute = new Message_AttributeVectorOfReal (anArrayValues);
-  }
-  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfRealVec3)->Name())
-  {
-    // values
-    NCollection_Vector<NCollection_Vec3<double>> anArrayValues;
-    if (!aParametersLabel.FindAttribute(TDataStd_RealArray::GetID(), anAttribute))
-      return Handle(Message_Alert)();
-
-    Handle(TDataStd_RealArray) aValuesAttribute = Handle(TDataStd_RealArray)::DownCast (anAttribute);
-    if (aValuesAttribute.IsNull())
-      return Handle(Message_Alert)();
-
-    for (int aValueId = aValuesAttribute->Lower(); aValueId <= aValuesAttribute->Upper();
-         aValueId = aValueId + 3)
-    {
-      NCollection_Vec3<double> aValue (aValuesAttribute->Value (aValueId),
-                                       aValuesAttribute->Value (aValueId + 1),
-                                       aValuesAttribute->Value (aValueId + 2));
-      anArrayValues.Append (aValue);
-    }
-    aMessageAttribute = new Message_AttributeVectorOfRealVec3 (anArrayValues);
+    Standard_SStream aStream;
+    Handle(Message_AttributeVectorOfValues) anAlert = new Message_AttributeVectorOfValues (aStream);
+    anAlert->SetValues (anArrayValues);
+    aMessageAttribute = anAlert;
   }
 
   if (!aMessageAttribute.IsNull())

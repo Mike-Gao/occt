@@ -36,7 +36,7 @@ public:
 
   // Interface to be implemented in the child to process the message report event
   // \theAlert updated alert
-  virtual void Update(const Handle(Message_Alert)& theAlert) { (void)theAlert; myCommunicator->UpdateContent(); }
+  virtual void Update(const Handle(Message_Alert)& theAlert) { (void)theAlert; /*myCommunicator->UpdateContent();*/ }
 
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(MessageModel_ReportCallBack, Message_ReportCallBack)

@@ -27,7 +27,7 @@ public:
   TopoDS_AlertAttribute (const TopoDS_Shape& theShape,
                          const TCollection_AsciiString& theName = TCollection_AsciiString(),
                          const TCollection_AsciiString& theDescription = TCollection_AsciiString())
-    : Message_Attribute (theName, theDescription), myShape (theShape) {}
+  : Message_Attribute (theName, theDescription), myShape (theShape) {}
 
   //! Returns contained shape
   const TopoDS_Shape& GetShape() const { return myShape; }
@@ -39,5 +39,14 @@ private:
   TopoDS_Shape myShape;
 };
 
+#define MESSAGE_INFO_SHAPE(Shape, Name, Description, PerfMeter, ParentAlert) \
+  { \
+    if (!Message_Report::CurrentReport().IsNull() && \
+         Message_Report::CurrentReport()->IsActive (Message_Info)) \
+    { \
+      OCCT_Message_Alert = Message_AlertExtended::AddAlert (Message_Report::CurrentReport(), \
+        new TopoDS_AlertAttribute (Shape, Name, Description), PerfMeter, ParentAlert); \
+    } \
+  }
 
 #endif // _TopoDS_AlertAttribute_HeaderFile

@@ -420,6 +420,11 @@ void DFBrowser_Window::Init (const NCollection_List<Handle(Standard_Transient)>&
     }
     return;
   }
+  else
+  {
+    if (anApplication.IsNull() && CDF_Session::Exists())
+      anApplication = Handle(TDocStd_Application)::DownCast (CDF_Session::CurrentSession()->CurrentApplication());
+  }
 
   myModule = new DFBrowser_Module();
   myModule->CreateViewModel (myMainWindow);
@@ -659,7 +664,7 @@ void DFBrowser_Window::onExpand()
   for (int aSelectedId = 0, aSize = aSelectedIndices.size(); aSelectedId < aSize; aSelectedId++)
   {
     int aLevels = 2;
-    setExpanded (myTreeView, aSelectedIndices[aSelectedId], true, aLevels);
+    TreeModel_Tools::SetExpanded (myTreeView, aSelectedIndices[aSelectedId], true, aLevels);
   }
   QApplication::restoreOverrideCursor();
 }
@@ -677,7 +682,7 @@ void DFBrowser_Window::onExpandAll()
   for (int  aSelectedId = 0, aSize = aSelectedIndices.size(); aSelectedId < aSize; aSelectedId++)
   {
     int aLevels = -1;
-    setExpanded (myTreeView, aSelectedIndices[aSelectedId], true, aLevels);
+    TreeModel_Tools::SetExpanded (myTreeView, aSelectedIndices[aSelectedId], true, aLevels);
   }
   QApplication::restoreOverrideCursor();
 }
@@ -692,7 +697,7 @@ void DFBrowser_Window::onCollapseAll()
   QModelIndexList aSelectedIndices = aSelectionModel->selectedIndexes();
   for (int aSelectedId = 0, aSize = aSelectedIndices.size(); aSelectedId < aSize; aSelectedId++) {
     int aLevels = -1;
-    setExpanded (myTreeView, aSelectedIndices[aSelectedId], false, aLevels);
+    TreeModel_Tools::SetExpanded (myTreeView, aSelectedIndices[aSelectedId], false, aLevels);
   }
 }
 
@@ -986,28 +991,5 @@ void DFBrowser_Window::findPresentations (const QModelIndexList& theIndices, AIS
       continue;
 
     thePresentations.Append (aPresentation);
-  }
-}
-
-// =======================================================================
-// function : setExpanded
-// purpose :
-// =======================================================================
-void DFBrowser_Window::setExpanded (QTreeView* theTreeView, const QModelIndex& theIndex, const bool isExpanded,
-                                    int& theLevels)
-{
-  bool isToExpand = theLevels == -1 || theLevels > 0;
-  if (!isToExpand)
-    return;
-
-  theTreeView->setExpanded (theIndex, isExpanded);
-  if (theLevels != -1)
-    theLevels--;
-
-  QAbstractItemModel* aModel = theTreeView->model();
-  for (int aRowId = 0, aRows = aModel->rowCount (theIndex); aRowId < aRows; aRowId++)
-  {
-    int aLevels = theLevels;
-    setExpanded (theTreeView, aModel->index (aRowId, 0, theIndex), isExpanded, aLevels);
   }
 }

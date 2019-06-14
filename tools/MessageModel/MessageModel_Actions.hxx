@@ -16,21 +16,19 @@
 #ifndef MessageModel_Actions_H
 #define MessageModel_Actions_H
 
-#ifdef _MSC_VER
-  #pragma warning(disable : 4127 4718) // conditional expression is constant, recursive call has no side effects
-#endif
-
 #include <Standard.hxx>
 #include <Standard_Transient.hxx>
 
 #include <inspector/MessageModel_ActionType.hxx>
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QObject>
 #include <QMap>
 #include <QModelIndexList>
 #include <QPoint>
 #include <QString>
+#include <Standard_WarningsRestore.hxx>
 
 class Message_Report;
 class MessageModel_TreeModel;
@@ -78,8 +76,14 @@ public slots:
   //! Set selected report active
   void OnActivateReport();
 
+  //! Clears container of alerts of selected report
+  void OnClearReport();
+
   //! Exports the first selected shape into ShapeViewer plugin.
   void OnExportToShapeView();
+
+  //! Sending several alerts to check message-alert-tool mechanizm
+  void OnTestAlerts();
 
 protected:
   //! Returns report of selected tree view item if a report item is selected

@@ -15,6 +15,9 @@
 
 #include <SelectMgr_BaseFrustum.hxx>
 
+#include <Message.hxx>
+#include <Message_Alerts.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_BaseFrustum,Standard_Transient)
 
 //=======================================================================
@@ -250,4 +253,18 @@ Standard_Boolean SelectMgr_BaseFrustum::IsClipped (const Graphic3d_SequenceOfHCl
                                                    const Standard_Real /*theDepth*/) const
 {
   return Standard_True;
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void SelectMgr_BaseFrustum::Dump(Standard_OStream& OS)const 
+{
+  DUMP_VALUES (OS, "SelectMgr_BaseFrustum", 2);
+
+  DUMP_VALUES (OS, "myPixelTolerance", myPixelTolerance);
+  DUMP_VALUES (OS, "myIsOrthographic", myIsOrthographic);
+  DUMP_VALUES (OS, "myBuilder", Message::TransientToString (myBuilder));
+  DUMP_VALUES (OS, "myCamera", Message::TransientToString (myCamera));
 }

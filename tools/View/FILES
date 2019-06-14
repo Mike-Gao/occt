@@ -1,4 +1,6 @@
 View.qrc
+View_CameraPositionPrs.cxx
+View_CameraPositionPrs.hxx
 View_ContextType.hxx
 View_Displayer.cxx
 View_Displayer.hxx

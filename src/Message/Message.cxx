@@ -89,3 +89,264 @@ Standard_Boolean Message::GravityFromString (const Standard_CString theGravitySt
   }
   return Standard_False;
 }
+
+// =======================================================================
+// function : GetPointerInfo
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::TransientToString (const Handle(Standard_Transient)& thePointer, const bool isShortInfo)
+{
+  if (thePointer.IsNull())
+    return TCollection_AsciiString();
+
+  return PointerToString(thePointer.operator->(), isShortInfo);
+}
+
+// =======================================================================
+// function : GetPointerInfo
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::PointerToString (const void* thePointer, const bool isShortInfo)
+{
+  std::ostringstream aPtrStr;
+  aPtrStr << thePointer;
+  if (!isShortInfo)
+    return aPtrStr.str().c_str();
+
+  TCollection_AsciiString anInfoPtr (aPtrStr.str().c_str());
+  for (int aSymbolId = 1; aSymbolId < anInfoPtr.Length(); aSymbolId++)
+  {
+    if (anInfoPtr.Value(aSymbolId) != '0')
+    {
+      anInfoPtr = anInfoPtr.SubString(aSymbolId, anInfoPtr.Length());
+      anInfoPtr.Prepend("0x");
+      return anInfoPtr;
+    }
+  }
+  return aPtrStr.str().c_str();
+}
+
+// =======================================================================
+// function : StrVectorToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::StrVectorToString
+    (const NCollection_Vector<TCollection_AsciiString>& theValues)
+{
+  TCollection_AsciiString aValue;
+  for (NCollection_Vector<TCollection_AsciiString>::Iterator aValuesIt (theValues); aValuesIt.More(); aValuesIt.Next())
+  {
+    aValue += aValuesIt.Value();
+    if (aValuesIt.More())
+      aValue += VectorSeparator();
+  }
+  return aValue;
+}
+
+// =======================================================================
+// function : StrVectorFromString
+// purpose :
+// =======================================================================
+Standard_Boolean Message::StrVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<TCollection_AsciiString>& theValues)
+{
+  TCollection_AsciiString aCurrentString = theValue, aValueString;
+
+  while (!aCurrentString.IsEmpty())
+  {
+    Standard_Integer aPosition = aCurrentString.Search (", ");
+    aValueString = aCurrentString;
+    if (aPosition > 0)
+      aCurrentString = aValueString.Split (aPosition - 1);
+    theValues.Append (aValueString.RealValue());
+    if (aPosition > 0)
+      aCurrentString = aCurrentString.Split (2);
+  }
+  return Standard_True;
+}
+
+// =======================================================================
+// function : RealVectorToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::RealVectorToString
+    (const NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aValue = ("(");
+
+  for (NCollection_Vector<Standard_Real>::Iterator aValuesIt (theValues); aValuesIt.More(); aValuesIt.Next())
+  {
+    aValue += aValuesIt.Value();
+    if (aValuesIt.More())
+      aValue += VectorSeparator();
+  }
+  aValue += ")";
+
+  return aValue;
+}
+
+// =======================================================================
+// function : RealVectorFromString
+// purpose :
+// =======================================================================
+Standard_Boolean Message::RealVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aCurrentString = theValue, aValueString;
+
+  Standard_Integer aPosition = aCurrentString.Search ("(");
+  if (aPosition != 1)
+    return Standard_False;
+  aCurrentString = aCurrentString.Split (aPosition);
+
+  aPosition = aCurrentString.Search (")");
+  if (aPosition != 1)
+    return Standard_False;
+  aValueString = aCurrentString.Split (aPosition);
+
+
+  while (!aCurrentString.IsEmpty())
+  {
+    // x value
+    aPosition = aCurrentString.Search (", ");
+    aValueString = aCurrentString;
+    if (aPosition > 0)
+      aCurrentString = aValueString.Split (aPosition - 1);
+    theValues.Append (aValueString.RealValue());
+    if (aPosition > 0)
+      aCurrentString = aCurrentString.Split (2);
+  }
+  return Standard_True;
+}
+
+// =======================================================================
+// function : CoordVectorToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::CoordVectorToString
+    (const NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aValue = ("(");
+  aValue += RealVectorToString (theValues);
+  aValue += ")";
+
+  return aValue;
+}
+
+// =======================================================================
+// function : CoordVectorFromString
+// purpose :
+// =======================================================================
+Standard_Boolean Message::CoordVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aCurrentString = theValue, aValueString;
+
+  Standard_Integer aPosition = aCurrentString.Search ("(");
+  if (aPosition != 1)
+    return Standard_False;
+  aCurrentString = aCurrentString.Split (aPosition);
+
+  aPosition = aCurrentString.Search (")");
+  if (aPosition != 1)
+    return Standard_False;
+  aValueString = aCurrentString.Split (aPosition);
+
+  return RealVectorFromString (aCurrentString, theValues); 
+}
+
+// =======================================================================
+// function : ColorVectorToString
+// purpose :
+// =======================================================================
+TCollection_AsciiString Message::ColorVectorToString
+    (const NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aValue = ("[");
+  aValue += RealVectorToString (theValues);
+  aValue += "]";
+
+  return aValue;
+}
+
+// =======================================================================
+// function : ColorVectorFromString
+// purpose :
+// =======================================================================
+Standard_Boolean Message::ColorVectorFromString
+    (const TCollection_AsciiString& theValue,
+     NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aCurrentString = theValue, aValueString;
+
+  Standard_Integer aPosition = aCurrentString.Search ("[");
+  if (aPosition != 1)
+    return Standard_False;
+  aCurrentString = aCurrentString.Split (aPosition);
+
+  aPosition = aCurrentString.Search ("]");
+  if (aPosition != 1)
+    return Standard_False;
+  aValueString = aCurrentString.Split (aPosition);
+
+  return RealVectorFromString (aCurrentString, theValues); 
+}
+
+// =======================================================================
+// function : ConvertStream
+// purpose :
+// =======================================================================
+void Message::ConvertStream (const Standard_SStream& theStream,
+  Standard_Integer& theColumnCount,
+  NCollection_Vector<TCollection_AsciiString>& theValues)
+{
+  TCollection_AsciiString aStream (theStream.str().c_str());
+  Standard_Character aSeparator = Message::DumpSeparator();
+  Standard_Integer aColumnCount = 0;
+
+  TCollection_AsciiString aCurrentString = aStream;
+  Standard_Integer aPosition = aCurrentString.Search (aSeparator);
+  if (aPosition >= 1)
+  {
+    TCollection_AsciiString aTailString = aCurrentString.Split (aPosition);
+    Standard_Boolean aClassNameFound = Standard_False;
+    while (!aCurrentString.IsEmpty())
+    {
+      TCollection_AsciiString aValueString = aCurrentString;
+      aPosition = aValueString.Search (aSeparator);
+      if (aPosition < 0 )
+        break;
+      aCurrentString = aValueString.Split (aPosition - 1);
+
+      if (!aColumnCount)
+      {
+        if (!aClassNameFound)
+          aClassNameFound = Standard_True;
+        else
+        {
+          if (!aValueString.IsIntegerValue())
+            break; // not correct Dump, in correct the first value is number of property columns
+          aColumnCount = aValueString.IntegerValue();
+        }
+      }
+      else
+        theValues.Append (aValueString);
+
+      if (aTailString.IsEmpty())
+        break;
+      aCurrentString = aTailString;
+      aPosition = aCurrentString.Search (aSeparator);
+      if (aPosition < 0 )
+      {
+        aCurrentString = aTailString;
+        aTailString = TCollection_AsciiString();
+      }
+      else
+        aTailString = aCurrentString.Split (aPosition);
+    }
+  }
+  theColumnCount = aColumnCount;
+}
