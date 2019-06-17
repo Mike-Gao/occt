@@ -9,7 +9,7 @@ puts ""
 
 set Tol 1.0e-7
 
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 cone c 0 0 0 45 0
 trimv c1 c 5 10

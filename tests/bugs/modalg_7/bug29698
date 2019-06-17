@@ -15,7 +15,7 @@ restore [locate_data_file bug26952_B41.brep] b1
 restore [locate_data_file bug26952_Tank41_1.brep] b2
 
 # enable FPE signals
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 bclearobjects
 bcleartools
@@ -25,7 +25,7 @@ bfillds
 bbop result 0
 
 # disable FPE signals
-dsetsignal 0
+dsetsignal 1 -fpe 0
 
 checkprops result -s 424.666
 checknbshapes result -wire 2 -face 1

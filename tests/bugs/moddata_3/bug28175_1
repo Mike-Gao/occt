@@ -8,7 +8,7 @@ puts ""
 
 # Set signals on.
 pload MODELING
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 # Prepare input data.
 restore [locate_data_file bug28175_2.brep] c

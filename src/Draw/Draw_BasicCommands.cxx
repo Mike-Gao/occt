@@ -908,21 +908,71 @@ static int dperf (Draw_Interpretor& theDI, Standard_Integer theArgNb, const char
 
 static int dsetsignal (Draw_Interpretor& theDI, Standard_Integer theArgNb, const char** theArgVec)
 {
-  // arm FPE handler if argument is provided and its first symbol is not '0'
-  // or if environment variable CSF_FPE is set and its first symbol is not '0'
-  bool setFPE = false;
-  if (theArgNb > 1)
+  if (theArgNb < 2)
   {
-    setFPE = (theArgVec[1][0] == '1' || theArgVec[1][0] == 't');
+    theDI << "Catch signals: " << (OSD::ToCatchSignals() ? "1" : "0") << "\n"
+          << "Catch FPE:     " << (OSD::ToCatchFloatingSignals() ? "1" : "0") << "\n";
+    return 0;
   }
-  else
+
+  Standard_Integer toSetSig = -1, toSetFpe = -1;
+  for (Standard_Integer anArgIter = 1; anArgIter < theArgNb; ++anArgIter)
+  {
+    TCollection_AsciiString anArg (theArgVec[anArgIter]);
+    anArg.LowerCase();
+    if (anArg == "-fpe"
+     && toSetFpe == -1
+     && anArgIter + 1 < theArgNb)
+    {
+      TCollection_AsciiString anArgNext (theArgVec[++anArgIter]);
+      if (anArgNext == "1")
+      {
+        toSetFpe = 1;
+      }
+      else if (anArgNext == "0")
+      {
+        toSetFpe = 0;
+      }
+      else
+      {
+        std::cout << "Syntax error at '" << anArg << "'\n";
+        return 1;
+      }
+    }
+    else if (toSetSig == -1
+          && (anArg == "0" || anArg == "1"))
+    {
+      toSetSig = anArg == "1" ? 1 : 0;
+    }
+    else
+    {
+      std::cout << "Syntax error at '" << anArg << "'\n";
+      return 1;
+    }
+  }
+  if (toSetSig == -1)
+  {
+    std::cout << "Syntax error: wrong number of arguments\n";
+    return 1;
+  }
+
+  if (toSetSig == 1
+   && toSetFpe == -1)
   {
     OSD_Environment aEnv ("CSF_FPE");
     TCollection_AsciiString aEnvStr = aEnv.Value();
-    setFPE = (! aEnvStr.IsEmpty() && aEnvStr.Value(1) != '0');
+    toSetFpe = (!aEnvStr.IsEmpty() && aEnvStr.Value(1) != '0') ? 1 : 0;
   }
-  OSD::SetSignal (setFPE);
-  theDI << "Signal handlers are set, with FPE " << (setFPE ? "armed" : "disarmed"); 
+
+  OSD::SetSignal (toSetSig == 1, toSetFpe == 1);
+  if (toSetSig == 1)
+  {
+    theDI << "Signal handlers are set, with FPE " << (toSetFpe == 1 ? "armed" : "disarmed");
+  }
+  else
+  {
+    theDI << "Signal handlers are reset to defaults, with FPE " << (toSetFpe == 1 ? "armed" : "disarmed");
+  }
   return 0;
 }
 
@@ -1052,7 +1102,7 @@ void Draw::BasicCommands(Draw_Interpretor& theCommands)
 	  __FILE__, dmeminfo, g);
   theCommands.Add("dperf","dperf [reset] -- show performance counters, reset if argument is provided",
 		  __FILE__,dperf,g);
-  theCommands.Add("dsetsignal","dsetsignal [fpe=0] -- set OSD signal handler, with FPE option if argument is given",
+  theCommands.Add("dsetsignal","dsetsignal {0|1} [-fpe {0|1}] -- set OSD signal handler, with FPE option if argument is given",
 		  __FILE__,dsetsignal,g);
 
   theCommands.Add("dparallel",

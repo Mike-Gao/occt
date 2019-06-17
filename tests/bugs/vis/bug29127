@@ -11,7 +11,7 @@ box b 1 2 3
 vcaps -softMode 1
 
 # disable FPE signals -- these often occur in software OpenGL drivers
-dsetsignal 0
+dsetsignal 1 -fpe 0
 
 vclear
 vinit View1

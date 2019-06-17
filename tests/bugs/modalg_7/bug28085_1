@@ -4,7 +4,7 @@ puts "============"
 puts ""
 
 # enable FPE signals
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 restore [locate_data_file bug28085_object.brep] b1
 restore [locate_data_file bug28085_tool.brep] b2

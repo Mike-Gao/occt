@@ -8,7 +8,7 @@ puts ""
 
 set Tol 1.0e-7
 
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 restore [locate_data_file bug28054_FaceProj.brep] f1
 restore [locate_data_file bug28054_EdgeProj.brep] e1

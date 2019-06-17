@@ -15,9 +15,9 @@ pload QAcommands
 
 set BugNumber OCC6143
 
-dsetsignal 1
+dsetsignal 1 -fpe 1
 set IsDone [catch {set aResult [OCC6143]} result]
-dsetsignal
+dsetsignal 1 -fpe 0
 
 if { ${IsDone} != 0 } {
     puts "result = ${result}"

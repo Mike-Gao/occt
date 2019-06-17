@@ -50,7 +50,9 @@ public:
 
   DEFINE_STANDARD_ALLOC
 
-  
+  //! Return signal catching value previously set by SetSignal().
+  Standard_EXPORT static Standard_Boolean ToCatchSignals();
+
   //! Sets signal and exception handlers.
   //!
   //! ### Windows-specific notes
@@ -102,11 +104,30 @@ public:
   //! ::throw() will be called) is regulated by the
   //! OCC_CONVERT_SIGNALS macro used during compilation of Open CASCADE and
   //! user's code. Refer to Foundation Classes User's Guide for further details.
-  //!
-  Standard_EXPORT static void SetSignal (const Standard_Boolean theFloatingSignal = Standard_True);
+  Standard_EXPORT static void SetSignal (Standard_Boolean theToCatch,
+                                         Standard_Boolean theFloatingSignal);
+
+  //! Sets signal and exception handlers.
+  static void SetSignal (const Standard_Boolean theFloatingSignal = Standard_True)
+  {
+    SetSignal (Standard_True, theFloatingSignal);
+  }
+
+  //! Initializes thread-local signal handlers.
+  //! This method sets up extra handlers which are not inherited on creation of new thread.
+  //! This includes _set_se_translator() on Windows platform and SetFloatingSignals().
+  //! The main purpose of this method is initializing handlers for newly created threads
+  //! without overriding global handlers (set by application or by OSD::SetSignal()).
+  //! In most cases OSD::SetSignal() should be called instead.
+  Standard_EXPORT static void SetThreadLocalSignal (Standard_Boolean theToCatch,
+                                                    Standard_Boolean theFloatingSignal);
 
   //! Return floating signal catching value previously set by SetSignal().
   Standard_EXPORT static Standard_Boolean ToCatchFloatingSignals();
+
+  //! Enables/disables floating signal (FPE) catching for current thread.
+  //! This call does NOT actually register any exception handler - SetSignal() should be called beforehand for complete setup.
+  Standard_EXPORT static void SetFloatingSignals (Standard_Boolean theFloatingSignal);
 
   //! Commands the process to sleep for a number of seconds.
   Standard_EXPORT static void SecSleep (const Standard_Integer aDelay);

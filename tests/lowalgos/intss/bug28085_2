@@ -6,7 +6,7 @@ puts ""
 foreach a [directory c_*] {unset $a}
 
 # enable FPE signals
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 restore [locate_data_file bug28883_Prism.brep] b1
 restore [locate_data_file bug28883_LES_2d_shell.brep] b2

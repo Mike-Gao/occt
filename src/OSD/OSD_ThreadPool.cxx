@@ -310,7 +310,7 @@ void OSD_ThreadPool::performJob (Handle(Standard_Failure)& theFailure,
 // =======================================================================
 void OSD_ThreadPool::EnumeratedThread::performThread()
 {
-  OSD::SetSignal (false);
+  OSD::SetThreadLocalSignal (OSD::ToCatchSignals(), false);
   for (;;)
   {
     myWakeEvent.Wait();
@@ -323,7 +323,7 @@ void OSD_ThreadPool::EnumeratedThread::performThread()
     myFailure.Nullify();
     if (myJob != NULL)
     {
-      OSD::SetSignal (myToCatchFpe);
+      OSD::SetThreadLocalSignal (OSD::ToCatchSignals(), myToCatchFpe);
       OSD_ThreadPool::performJob (myFailure, myJob, myThreadIndex);
       myJob = NULL;
     }

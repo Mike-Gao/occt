@@ -6,7 +6,7 @@ puts ""
 # Exception in intersection algorithm if FPE is switched on
 ######################################################
 
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 restore [locate_data_file bug27842_shape1_fix.brep] b1 
 restore [locate_data_file bug27842_shape2_fix.brep] b2

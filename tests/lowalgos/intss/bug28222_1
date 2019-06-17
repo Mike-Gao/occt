@@ -6,7 +6,7 @@ puts ""
 #  Intersection of two cylinders fails
 #######################################################################
 
-dsetsignal 1
+dsetsignal 1 -fpe 1
 
 set GoodNbCurv 4
 

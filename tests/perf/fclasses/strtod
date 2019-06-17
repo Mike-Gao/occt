@@ -39,7 +39,7 @@ puts "1M random values, 18 significant digits, in range (-1e305, 1e305)"
 CheckAtof 1000000 16 -1e305 1e305
 
 # Disarm FPE signals - otherwise they will be raised if signaling NAN appears
-dsetsignal 0
+dsetsignal 1 -fpe 0
 
 puts "Special values + 1M values defined by random binary data, 10 digits"
 CheckAtof 1000000 10 0 0
