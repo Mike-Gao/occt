@@ -1945,7 +1945,9 @@ void AIS_InteractiveContext::EraseGlobal (const Handle(AIS_InteractiveObject)& t
 
   const Standard_Integer aDispMode = theIObj->HasHilightMode() ? theIObj->HilightMode() : 0;
   AIS_NListOfEntityOwner anOwners;
-  anOwners.Append(theIObj->GlobalSelOwner());
+  const Handle(SelectMgr_EntityOwner)& aGlobOwner = theIObj->GlobalSelOwner();
+  if (!aGlobOwner.IsNull())
+    anOwners.Append(aGlobOwner);
   unhighlightOwners (anOwners);
   myMainPM->SetVisibility (theIObj, aStatus->DisplayMode(), Standard_False);
 
