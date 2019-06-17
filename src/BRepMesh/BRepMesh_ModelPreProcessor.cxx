@@ -110,7 +110,7 @@ BRepMesh_ModelPreProcessor::~BRepMesh_ModelPreProcessor()
 // Function: Perform
 // Purpose : 
 //=======================================================================
-Standard_Boolean BRepMesh_ModelPreProcessor::Perform(
+Standard_Boolean BRepMesh_ModelPreProcessor::performInternal(
   const Handle(IMeshData_Model)& theModel,
   const IMeshTools_Parameters&   theParameters)
 {
