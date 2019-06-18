@@ -18,6 +18,7 @@
 
 #include <AIS_InteractiveContext.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
+#include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectText3d.hxx>
@@ -80,6 +81,37 @@ void AIS_InteractiveObject::SetContext (const Handle(AIS_InteractiveContext)& th
   if (!theCtx.IsNull())
   {
     myDrawer->Link (theCtx->DefaultDrawer());
+  }
+}
+
+//=======================================================================
+//function : SetCappingStyle
+//purpose  : 
+//=======================================================================
+void AIS_InteractiveObject::SetCappingStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle)
+{
+  myCappingStyle = theStyle;
+
+  // Modify existing presentations 
+  for (Standard_Integer aPrsIter = 1, n = myPresentations.Length(); aPrsIter <= n; ++aPrsIter)
+  {
+    const Handle(PrsMgr_Presentation)& aPrs3d = myPresentations (aPrsIter);
+    if (!aPrs3d.IsNull())
+    {
+      const Handle(Graphic3d_Structure)& aStruct = aPrs3d->Presentation();
+      if (!aStruct.IsNull())
+      {
+        const Graphic3d_SequenceOfGroup& aGroups = aStruct->Groups();
+        for (Graphic3d_SequenceOfGroup::Iterator aGroupIter (aGroups); aGroupIter.More(); aGroupIter.Next())
+        {
+          Handle(Graphic3d_Group)& aGrp = aGroupIter.ChangeValue();
+          if (aGrp.IsNull())
+            continue;
+
+          aGrp->SetGroupPrimitivesAspect (theStyle);
+        }
+      }
+    }
   }
 }
 

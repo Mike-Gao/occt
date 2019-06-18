@@ -21,6 +21,7 @@
 
 #include <NCollection_List.hxx>
 #include <OpenGl_Aspects.hxx>
+#include <OpenGl_CappingPlaneResource.hxx>
 #include <OpenGl_Element.hxx>
 
 class OpenGl_Group;
@@ -117,6 +118,17 @@ public:
   //! Is the group ray-tracable (contains ray-tracable elements)?
   Standard_Boolean IsRaytracable() const { return myIsRaytracable; }
 
+  //! Returns section style aspect.
+  virtual Handle(Graphic3d_AspectFillCapping) FillCappingAspect() const Standard_OVERRIDE
+  {
+    return myAspectFillCapping != NULL
+         ? myAspectFillCapping->Aspect()
+         : Handle(Graphic3d_AspectFillCapping)();
+  }
+
+  //! Returns OpenGL capping filling aspect.
+  const OpenGl_CappingPlaneResource* AspectFillCapping() const { return myAspectFillCapping; }
+
 protected:
 
   Standard_EXPORT virtual ~OpenGl_Group();
@@ -124,6 +136,7 @@ protected:
 protected:
 
   OpenGl_Aspects*     myAspects;
+  OpenGl_CappingPlaneResource* myAspectFillCapping;
   OpenGl_ElementNode* myFirst;
   OpenGl_ElementNode* myLast;
   Standard_Boolean    myIsRaytracable;

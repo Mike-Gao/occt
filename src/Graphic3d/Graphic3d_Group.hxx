@@ -37,6 +37,7 @@
 
 class Graphic3d_Structure;
 class Graphic3d_ArrayOfPrimitives;
+class Graphic3d_AspectFillCapping;
 
 //! This class allows the definition of groups
 //! of primitives inside of graphic objects (presentations).
@@ -103,6 +104,9 @@ public:
 
   //! Modifies the current context of the group to give another aspect for all the primitives created after this call in the group.
   virtual void SetPrimitivesAspect (const Handle(Graphic3d_Aspects)& theAspect) = 0;
+
+  //! Returns style of filling clipping sections on closed shell primitives.
+  virtual Handle(Graphic3d_AspectFillCapping) FillCappingAspect() const = 0;
 
   //! Update presentation aspects after their modification.
   virtual void SynchronizeAspects() = 0;

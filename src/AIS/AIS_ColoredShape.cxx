@@ -633,6 +633,9 @@ void AIS_ColoredShape::addShapesWithCustomProps (const Handle(Prs3d_Presentation
           {
             aShadedGroup = thePrs->NewGroup();
             aShadedGroup->SetClosed (isClosed);
+            if (isClosed
+            && !myCappingStyle.IsNull())
+              aShadedGroup->SetGroupPrimitivesAspect (myCappingStyle);
           }
           aShadedGroup->SetPrimitivesAspect (aDrawer->ShadingAspect()->Aspect());
           aShadedGroup->AddPrimitiveArray (aTriangles);
