@@ -226,13 +226,12 @@ void XCAFDoc_VisMaterial::FillMaterialAspect (Graphic3d_MaterialAspect& theAspec
     // convert common into metal-roughness
     if (!myPbrMat.IsDefined)
     {
-    #ifdef _Graphic3d_PBRMaterial_HeaderFile
       Graphic3d_PBRMaterial aPbr;
       aPbr.SetColor (myCommonMat.DiffuseColor);
       aPbr.SetMetallic (((Graphic3d_Vec3 )myCommonMat.SpecularColor).maxComp());
       aPbr.SetRoughness (roughnessFromCommon (myCommonMat));
       theAspect.SetPBRMaterial (aPbr);
-    #endif
+      theAspect.SetBSDF (Graphic3d_BSDF::CreateMetallicRoughness (aPbr));
     }
   }
 
@@ -248,14 +247,16 @@ void XCAFDoc_VisMaterial::FillMaterialAspect (Graphic3d_MaterialAspect& theAspec
       theAspect.SetShininess    (1.0f - myPbrMat.Roughness);
     }
 
-  #ifdef _Graphic3d_PBRMaterial_HeaderFile
     Graphic3d_PBRMaterial aPbr;
     aPbr.SetColor    (myPbrMat.BaseColor);
     aPbr.SetMetallic (myPbrMat.Metallic);
     aPbr.SetRoughness(myPbrMat.Roughness);
-    aPbr.SetEmission (myPbrMat.EmissiveFactor);
+    if (myPbrMat.EmissiveTexture.IsNull()) // TODO Temporal measure until emissive map will be implemented
+    {
+      aPbr.SetEmission(myPbrMat.EmissiveFactor);
+    }
     theAspect.SetPBRMaterial (aPbr);
-  #endif
+    theAspect.SetBSDF (Graphic3d_BSDF::CreateMetallicRoughness (aPbr));
   }
 }
 
