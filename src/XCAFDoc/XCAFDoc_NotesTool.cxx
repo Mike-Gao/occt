@@ -606,7 +606,7 @@ XCAFDoc_NotesTool::RemoveFromGroup(const TDF_Label& theGroupLabel,
     Standard_Integer nbChildren = aFather->NbChildren();
     for (Standard_Integer iChild = 1; iChild <= nbChildren; ++iChild)
     {
-      Handle(XCAFDoc_GraphNode) aChild = aFather->GetFather(iChild);
+      Handle(XCAFDoc_GraphNode) aChild = aFather->GetChild(iChild);
       if (!aChild.IsNull() && theNoteLabel.IsEqual(aChild->Label()))
       {
         aFather->UnSetChild(aChild);
