@@ -17,6 +17,7 @@
 #include <BOPAlgo_BOP.hxx>
 #include <BOPAlgo_PaveFiller.hxx>
 #include <BOPDS_DS.hxx>
+#include <BOPTools_AlgoTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAlgoAPI_Section.hxx>
@@ -175,6 +176,7 @@ static void RemoveEdges(const TopoDS_Compound&      theSourceComp,
 static Standard_Boolean FilterSectionEdges(const BOPDS_VectorOfCurve&       theBCurves,
                                            const TopoDS_Face&               theSecPlane,
                                            const BOPDS_PDS&                 theDS,
+                                           const Handle (IntTools_Context)& theContext,
                                            TopoDS_Compound&                 theResult);
 
 static Standard_Boolean GetUEdges(const Standard_Integer                     theIndex,
@@ -345,7 +347,7 @@ void BRepFill_TrimShellCorner::Perform()
           }
         }
         else {
-          if(!MakeFacesSec(ii, theDS, anIndex1, anIndex2, i)) {
+          if(!MakeFacesSec(ii, theDS, aPF.Context(), anIndex1, anIndex2, i)) {
             myHistMap.Clear();
             return;
           }
@@ -658,6 +660,7 @@ BRepFill_TrimShellCorner::MakeFacesNonSec(const Standard_Integer                
 Standard_Boolean
 BRepFill_TrimShellCorner::MakeFacesSec(const Standard_Integer                     theIndex,
                                        const BOPDS_PDS&                           theDS,
+                                       const Handle (IntTools_Context)&           theContext,
                                        const Standard_Integer                     theFaceIndex1, 
                                        const Standard_Integer                     theFaceIndex2, 
                                        const Standard_Integer                     theSSInterfIndex)
@@ -669,7 +672,7 @@ BRepFill_TrimShellCorner::MakeFacesSec(const Standard_Integer                   
   TopoDS_Compound aSecEdges;
   TopoDS_Face aSecPlane;
 
-  if(!FilterSectionEdges(aBCurves, aSecPlane, theDS, aSecEdges))
+  if(!FilterSectionEdges(aBCurves, aSecPlane, theDS, theContext, aSecEdges))
     return Standard_False;
 
   //Extract vertices on the intersection of correspondent U-edges
@@ -787,11 +790,18 @@ BRepFill_TrimShellCorner::MakeFacesSec(const Standard_Integer                   
       aBB.MakeWire(aW);
       TopTools_ListIteratorOfListOfShape aEIt(aListOfWireEdges);
 
-      for(; aEIt.More(); aEIt.Next()) {
-        if(!aBoundEdge.IsSame(aEIt.Value()))
-          aBB.Add(aW, aEIt.Value());
+      TopoDS_Edge aFBE = TopoDS::Edge (aBoundEdge.Oriented (TopAbs_FORWARD));
+      for (; aEIt.More(); aEIt.Next())
+      {
+        if (!aBoundEdge.IsSame(aEIt.Value()))
+        {
+          TopoDS_Edge aSplit = TopoDS::Edge (aEIt.Value());
+          if (BOPTools_AlgoTools::IsSplitToReverse (aSplit, aFBE, theContext))
+            aSplit.Reverse();
+          aBB.Add (aW, aSplit);
+        }
       }
-      aSubstitutor->Replace(aBoundEdge.Oriented(TopAbs_FORWARD), aW);
+      aSubstitutor->Replace (aFBE, aW);
     }
 
     aSubstitutor->Apply(aFace);
@@ -2154,6 +2164,7 @@ void RemoveEdges(const TopoDS_Compound&      theSourceComp,
 Standard_Boolean FilterSectionEdges(const BOPDS_VectorOfCurve&       theBCurves,
                                     const TopoDS_Face&               theSecPlane,
                                     const BOPDS_PDS&                 theDS,
+                                    const Handle (IntTools_Context)& theContext,
                                     TopoDS_Compound&                 theResult) {
 
   theResult.Nullify();
@@ -2181,10 +2192,7 @@ Standard_Boolean FilterSectionEdges(const BOPDS_VectorOfCurve&       theBCurves,
         Standard_Real f = 0., l = 0.;
         BRep_Tool::Range(anEdge, f, l);
         anIntersector.SetBeanParameters(f, l);
-        //
-        Handle(IntTools_Context) aContext = new IntTools_Context;
-        anIntersector.SetContext(aContext);
-        //
+        anIntersector.SetContext(theContext);
         anIntersector.Perform();
 
         if(anIntersector.IsDone()) {

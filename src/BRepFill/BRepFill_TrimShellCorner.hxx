@@ -35,7 +35,7 @@ class gp_Ax2;
 class TopoDS_Face;
 class TopoDS_Wire;
 class TopoDS_Shape;
-
+class IntTools_Context;
 
 //! Trims sets of faces in the corner to make proper parts of pipe
 class BRepFill_TrimShellCorner 
@@ -80,6 +80,7 @@ private:
 
   Standard_Boolean MakeFacesSec(const Standard_Integer                     theIndex,
                                 const BOPDS_PDS&                           theDS,
+                                const Handle (IntTools_Context)&           theContext,
                                 const Standard_Integer                     theFaceIndex1, 
                                 const Standard_Integer                     theFaceIndex2, 
                                 const Standard_Integer                     theSSInterfIndex);
