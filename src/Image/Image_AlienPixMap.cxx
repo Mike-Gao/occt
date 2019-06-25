@@ -13,6 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <windows.h>
+
 #if !defined(HAVE_FREEIMAGE) && defined(_WIN32)
   #define HAVE_WINCODEC
 #endif
@@ -350,12 +352,12 @@ bool Image_AlienPixMap::InitCopy (const Image_PixMap& theCopy)
      && TopDownInc()   == theCopy.TopDownInc())
     {
       // copy with one call
-      memcpy (ChangeData(), theCopy.Data(), std::min (SizeBytes(), theCopy.SizeBytes()));
+      memcpy (ChangeData(), theCopy.Data(), min (SizeBytes(), theCopy.SizeBytes()));
       return true;
     }
 
     // copy row-by-row
-    const Standard_Size aRowSizeBytes = std::min (SizeRowBytes(), theCopy.SizeRowBytes());
+    const Standard_Size aRowSizeBytes = min (SizeRowBytes(), theCopy.SizeRowBytes());
     for (Standard_Size aRow = 0; aRow < myData.SizeY; ++aRow)
     {
       memcpy (ChangeRow (aRow), theCopy.Row (aRow), aRowSizeBytes);
