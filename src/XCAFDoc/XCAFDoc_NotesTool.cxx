@@ -149,7 +149,7 @@ XCAFDoc_NotesTool::GetNotes(TDF_LabelSequence& theNoteLabels) const
 }
 
 // =======================================================================
-// function : GetNotes
+// function : GetTopNotes
 // purpose  :
 // =======================================================================
 void 
@@ -179,7 +179,7 @@ XCAFDoc_NotesTool::GetTopNotes(TDF_LabelSequence& theNoteLabels) const
     {
       Handle(XCAFDoc_GraphNode) aChild = aFather->GetChild(iChild);
       Handle(XCAFDoc_AssemblyItemRef) anItemRef = XCAFDoc_AssemblyItemRef::Get(aChild->Label());
-      if (!anItemRef.IsNull() && !anItemRef->HasExtraRef())
+      if (!anItemRef.IsNull())
       {
         TDF_Label anAnnotatedLabel = anItemRef->GetItemLabel();
         if (!anAnnotatedLabel.IsNull() && !XCAFDoc_Note::IsMine(anAnnotatedLabel))
