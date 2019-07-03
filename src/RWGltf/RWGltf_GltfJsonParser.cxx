@@ -308,6 +308,7 @@ void RWGltf_GltfJsonParser::gltfParseMaterials()
       }
       aMat->Id = aMatId.GetString();
       myMaterialsCommon.Bind (aMat->Id, aMat);
+      gltfBindMaterial (Handle(RWGltf_MaterialMetallicRoughness)(), aMat);
     }
   }
   else if (aMatList->IsArray())
@@ -342,8 +343,58 @@ void RWGltf_GltfJsonParser::gltfParseMaterials()
         aMatCommon->Id = TCollection_AsciiString ("mat_") + aMatIndex;
         myMaterialsCommon.Bind (TCollection_AsciiString (aMatIndex), aMatCommon);
       }
+
+      gltfBindMaterial (aMatPbr, aMatCommon);
     }
   }
+}
+
+// =======================================================================
+// function : gltfBindMaterial
+// purpose  :
+// =======================================================================
+void RWGltf_GltfJsonParser::gltfBindMaterial (const Handle(RWGltf_MaterialMetallicRoughness)& theMatPbr,
+                                              const Handle(RWGltf_MaterialCommon)& theMatCommon)
+{
+  if (theMatPbr.IsNull()
+   && theMatCommon.IsNull())
+  {
+    return;
+  }
+
+  Handle(XCAFDoc_VisMaterial) aMat = new XCAFDoc_VisMaterial();
+  if (!theMatCommon.IsNull())
+  {
+    XCAFDoc_VisMaterialCommon aMatXde;
+    aMatXde.IsDefined = true;
+    aMatXde.AmbientColor    = theMatCommon->AmbientColor;
+    aMatXde.DiffuseColor    = theMatCommon->DiffuseColor;
+    aMatXde.SpecularColor   = theMatCommon->SpecularColor;
+    aMatXde.EmissiveColor   = theMatCommon->EmissiveColor;
+    aMatXde.Shininess       = theMatCommon->Shininess;
+    aMatXde.Transparency    = theMatCommon->Transparency;
+    aMatXde.AmbientTexture  = theMatCommon->AmbientTexture;
+    aMatXde.DiffuseTexture  = theMatCommon->DiffuseTexture;
+    aMatXde.SpecularTexture = theMatCommon->SpecularTexture;
+    aMat->SetCommonMaterial (aMatXde);
+  }
+  if (!theMatPbr.IsNull())
+  {
+    XCAFDoc_VisMaterialMetallicRoughness aMatXde;
+    aMatXde.IsDefined = true;
+    aMatXde.MetallicRoughnessTexture = theMatPbr->MetallicRoughnessTexture;
+    aMatXde.BaseColorTexture = theMatPbr->BaseColorTexture;
+    aMatXde.EmissiveTexture  = theMatPbr->EmissiveTexture;
+    aMatXde.OcclusionTexture = theMatPbr->OcclusionTexture;
+    aMatXde.NormalTexture    = theMatPbr->NormalTexture;
+    aMatXde.BaseColor        = theMatPbr->BaseColor;
+    aMatXde.EmissiveFactor   = theMatPbr->EmissiveFactor;
+    aMatXde.Metallic         = theMatPbr->Metallic;
+    aMatXde.Roughness        = theMatPbr->Roughness;
+    aMat->SetMetalRougnessMaterial (aMatXde);
+  }
+
+  myMaterials.Bind (!theMatPbr.IsNull() ? theMatPbr->Id : theMatCommon->Id, aMat);
 }
 
 // =======================================================================
@@ -1116,7 +1167,12 @@ bool RWGltf_GltfJsonParser::gltfParseMesh (TopoDS_Shape& theMeshShape,
       {
         RWMesh_NodeAttributes aShapeAttribs;
         aShapeAttribs.RawName = aUserName;
-        aShapeAttribs.Style.SetColorSurf (aMeshData->BaseColor());
+        //aShapeAttribs.Style.SetColorSurf (aMeshData->BaseColor());
+
+        Handle(XCAFDoc_VisMaterial) aMat;
+        myMaterials.Find (!aMeshData->MaterialPbr().IsNull() ? aMeshData->MaterialPbr()->Id : aMeshData->MaterialCommon()->Id, aMat);
+        aShapeAttribs.Style.SetMaterial (aMat);
+
         myAttribMap->Bind (aFace, aShapeAttribs);
       }
       myFaceList.Append (aFace);
@@ -1586,7 +1642,10 @@ void RWGltf_GltfJsonParser::bindNamedShape (TopoDS_Shape& theShape,
       {
         if (aLateData->HasStyle())
         {
-          aShapeAttribs.Style.SetColorSurf (aLateData->BaseColor());
+          //aShapeAttribs.Style.SetColorSurf (aLateData->BaseColor());
+          Handle(XCAFDoc_VisMaterial) aMat;
+          myMaterials.Find (!aLateData->MaterialPbr().IsNull() ? aLateData->MaterialPbr()->Id : aLateData->MaterialCommon()->Id, aMat);
+          aShapeAttribs.Style.SetMaterial (aMat);
         }
         if (aShapeAttribs.Name.IsEmpty()
          && myUseMeshNameAsFallback)
