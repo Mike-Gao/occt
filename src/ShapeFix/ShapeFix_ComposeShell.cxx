@@ -118,7 +118,7 @@ void ShapeFix_ComposeShell::Init (const Handle(ShapeExtend_CompositeSurface) &Gr
 //  DTK-CKY 100531 : protection against very thin face
 //  Test "isclosed" should be filtered on the overall (non trimmed) surface, must be closed
   Handle(Geom_Surface) theSurface = BRep_Tool::Surface(Face,myLoc);
-  // agv 2019/07/03 - avoid false detection of 'Closed' on very thin faces
+  // avoid false detection of 'Closed' on very thin faces
   if (theSurface->IsKind(STANDARD_TYPE(Geom_ElementarySurface))) {
     myUClosed = myUClosed && theSurface->IsUClosed();
     myVClosed = myVClosed && theSurface->IsVClosed();
