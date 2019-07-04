@@ -41,28 +41,22 @@
 #include <math_Vector.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepTools_WireExplorer.hxx>
-#include <BRepTools.hxx>
-#include <BRepTopAdaptor_FClass2d.hxx>
-#include <BOPAlgo_BuilderFace.hxx>
 #include <BOPAlgo_BuilderFace.hxx>
 #include <Geom2d_Line.hxx>
-#include <BRepBuilderAPI_Copy.hxx>
-#include <math_GlobOptMin.hxx>
 #include <Geom_ConicalSurface.hxx>
 #include <Extrema_ExtPC.hxx>
 #include <BOPDS_DS.hxx>
-#include <BRepLib.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepLib_MakeFace.hxx>
 #include <ShapeFix_Shape.hxx>
 #include <BRepClass_FaceClassifier.hxx>
-#include <BRepGProp_Face.hxx>
 #include <BRep_ListIteratorOfListOfCurveRepresentation.hxx>
 #include <BRep_TEdge.hxx>
 #include <ShapeUpgrade_UnifySameDomain.hxx>
 
 #ifdef BRepFill_AdvancedEvolved_DEBUG
 #include <BinTools.hxx>
+#include <BRepTools.hxx>
 #endif
 
 
@@ -542,7 +536,7 @@ void BRepFill_AdvancedEvolved::GetLids()
 
   //Square of the default angular tolerance in
   //BOPAlgo_Tools::EdgesToWires(...) and BOPAlgo_Tools::WiresToFaces(...) methods
-  const Standard_Real aSqAnguarTol = 1.0e-16;
+  const Standard_Real aSqAnguarTol = 1.0e-11;
   const gp_Dir &aNormal = aSurf->Position().Direction();
 
   // Obtain free-edges from myPipeShell. All edges must be planar
@@ -610,8 +604,8 @@ void BRepFill_AdvancedEvolved::GetLids()
   aBB.MakeCompound(aCompW);
   aBB.MakeCompound(aCompF);
   aBB.MakeCompound(myTopBottom);
-  BOPAlgo_Tools::EdgesToWires(aFreeEdges, aCompW, Standard_True);
-  BOPAlgo_Tools::WiresToFaces(aCompW, aCompF);
+  BOPAlgo_Tools::EdgesToWires(aFreeEdges, aCompW, Standard_True, 3e-6);
+  BOPAlgo_Tools::WiresToFaces(aCompW, aCompF, 3e-6);
 
   {
     // Check orientation
