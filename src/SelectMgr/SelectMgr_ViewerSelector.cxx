@@ -628,7 +628,9 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
   Standard_Integer aWidth;
   Standard_Integer aHeight;
   mySelectingVolumeMgr.WindowSize (aWidth, aHeight);
+#ifdef REPORT_SELECTION_BUILD
   MESSAGE_INFO ("UpdateBVH", "", &aPerfMeter, aParentAlert);
+#endif
   mySelectableObjects.UpdateBVH (mySelectingVolumeMgr.Camera(),
                                  mySelectingVolumeMgr.ProjectionMatrix(),
                                  mySelectingVolumeMgr.WorldViewMatrix(),
@@ -766,8 +768,9 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
       }
     }
   }
-
+#ifdef REPORT_SELECTION_BUILD
   MESSAGE_INFO ("SortResult", "", &aPerfMeter, aParentAlert);
+#endif
   SortResult();
 #ifdef REPORT_SELECTION_BUILD
   Standard_SStream aStreamDone;
