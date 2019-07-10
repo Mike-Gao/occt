@@ -1,0 +1,19 @@
+puts "========="
+puts "0026074: BRepMesh_IncrementalMesh meshes a specific shape for a long time"
+puts "========="
+puts ""
+
+set ::env(CSF_MeshAlgo) 1
+
+restore [locate_data_file bug26074.brep] result
+tclean result
+
+incmesh result 0.01116 -a 15 -parallel
+checktrinfo result -tri
+
+vinit
+vsetdispmode 1
+vdefaults -autoTriang 0
+vdisplay result
+vfit
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png
