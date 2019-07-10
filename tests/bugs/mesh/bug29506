@@ -1,0 +1,19 @@
+puts "========="
+puts "0029506: DRAW command 'incmesh' hangs on the attached planar face with specified deflection."
+puts "========="
+puts ""
+
+set ::env(CSF_MeshAlgo) 1
+
+restore [locate_data_file bug29506.brep] result
+tclean result
+
+incmesh result 1e-6
+checktrinfo result -tri 44437 -nod 44437 -defl 9.9999999999999995e-07
+
+vinit
+vsetdispmode 1
+vdefaults -autoTriang 0
+vdisplay result
+vfit
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png
