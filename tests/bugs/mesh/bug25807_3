@@ -1,0 +1,19 @@
+puts "========="
+puts "0025807: Bad performance of meshing"
+puts "========="
+puts ""
+
+set ::env(CSF_MeshAlgo) 1
+
+restore [locate_data_file shape_894944_1.brep] result
+tclean result
+
+incmesh result 0.001
+checktrinfo result -tri 26774 -nod 62436 -defl 0.0010000000000000007
+
+vinit
+vsetdispmode 1
+vdefaults -autoTriang 0
+vdisplay result
+vfit
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png
