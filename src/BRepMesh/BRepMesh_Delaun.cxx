@@ -89,7 +89,8 @@ BRepMesh_Delaun::BRepMesh_Delaun (
   const Standard_Boolean                        isFillCircles)
 : myMeshData ( theOldMesh ),
   myCircles (new NCollection_IncAllocator(
-             IMeshData::MEMORY_BLOCK_SIZE_HUGE))
+             IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
+  mySupVert (3)
 {
   if (isFillCircles)
   {
@@ -103,7 +104,8 @@ BRepMesh_Delaun::BRepMesh_Delaun (
 //=======================================================================
 BRepMesh_Delaun::BRepMesh_Delaun(IMeshData::Array1OfVertexOfDelaun& theVertices)
 : myCircles (theVertices.Length(), new NCollection_IncAllocator(
-             IMeshData::MEMORY_BLOCK_SIZE_HUGE))
+             IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
+  mySupVert (3)
 {
   if ( theVertices.Length() > 2 )
   {
@@ -123,7 +125,8 @@ BRepMesh_Delaun::BRepMesh_Delaun(
   IMeshData::Array1OfVertexOfDelaun&            theVertices)
 : myMeshData( theOldMesh ),
   myCircles ( theVertices.Length(), new NCollection_IncAllocator(
-             IMeshData::MEMORY_BLOCK_SIZE_HUGE))
+             IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
+  mySupVert (3)
 {
   if ( theVertices.Length() > 2 )
   {
@@ -140,7 +143,8 @@ BRepMesh_Delaun::BRepMesh_Delaun(
   IMeshData::VectorOfInteger&                   theVertexIndices)
 : myMeshData( theOldMesh ),
   myCircles ( theVertexIndices.Length(), new NCollection_IncAllocator(
-             IMeshData::MEMORY_BLOCK_SIZE_HUGE))
+             IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
+  mySupVert (3)
 {
   perform(theVertexIndices);
 }
@@ -155,7 +159,8 @@ BRepMesh_Delaun::BRepMesh_Delaun (const Handle (BRepMesh_DataStructureOfDelaun)&
                                   const Standard_Integer                         theCellsCountV)
 : myMeshData (theOldMesh),
   myCircles (theVertexIndices.Length (), new NCollection_IncAllocator(
-             IMeshData::MEMORY_BLOCK_SIZE_HUGE))
+             IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
+  mySupVert (3)
 {
   perform (theVertexIndices, theCellsCountU, theCellsCountV);
 }
@@ -284,14 +289,14 @@ void BRepMesh_Delaun::superMesh(const Bnd_Box2d& theBox)
   Standard_Real aDeltaMax = Max( aDeltaX, aDeltaY );
   Standard_Real aDelta    = aDeltaX + aDeltaY;
 
-  mySupVert[0] = myMeshData->AddNode(
-    BRepMesh_Vertex( ( aMinX + aMaxX ) / 2, aMaxY + aDeltaMax, BRepMesh_Free ) );
+  mySupVert.Append (myMeshData->AddNode(
+    BRepMesh_Vertex( ( aMinX + aMaxX ) / 2, aMaxY + aDeltaMax, BRepMesh_Free ) ) );
 
-  mySupVert[1] = myMeshData->AddNode(
-    BRepMesh_Vertex( aMinX - aDelta, aMinY - aDeltaMin, BRepMesh_Free ) );
+  mySupVert.Append (myMeshData->AddNode(
+    BRepMesh_Vertex( aMinX - aDelta, aMinY - aDeltaMin, BRepMesh_Free ) ) );
 
-  mySupVert[2] = myMeshData->AddNode(
-    BRepMesh_Vertex( aMaxX + aDelta, aMinY - aDeltaMin, BRepMesh_Free ) );
+  mySupVert.Append (myMeshData->AddNode(
+    BRepMesh_Vertex( aMaxX + aDelta, aMinY - aDeltaMin, BRepMesh_Free ) ) );
 
   Standard_Integer e[3];
   Standard_Boolean o[3];
@@ -300,7 +305,7 @@ void BRepMesh_Delaun::superMesh(const Bnd_Box2d& theBox)
     Standard_Integer aFirstNode = aNodeId;
     Standard_Integer aLastNode  = (aNodeId + 1) % 3;
     Standard_Integer aLinkIndex = myMeshData->AddLink( BRepMesh_Edge(
-      mySupVert[aFirstNode], mySupVert[aLastNode], BRepMesh_Free ) );
+      mySupVert (aFirstNode), mySupVert (aLastNode), BRepMesh_Free ) );
 
     e[aNodeId] = Abs(aLinkIndex);
     o[aNodeId] = (aLinkIndex > 0);
@@ -367,28 +372,41 @@ void BRepMesh_Delaun::compute(IMeshData::VectorOfInteger& theVertexIndexes)
     createTrianglesOnNewVertices( theVertexIndexes );
   }
 
+  RemoveAuxElements ();
+}
+
+//=======================================================================
+//function : RemoveAuxElements
+//purpose  : 
+//=======================================================================
+void BRepMesh_Delaun::RemoveAuxElements ()
+{
+  Handle (NCollection_IncAllocator) aAllocator = new NCollection_IncAllocator (
+    IMeshData::MEMORY_BLOCK_SIZE_HUGE);
+
+  IMeshData::MapOfIntegerInteger aLoopEdges (10, aAllocator);
+
   // Destruction of triangles containing a top of the super triangle
-  BRepMesh_SelectorOfDataStructureOfDelaun aSelector( myMeshData );
-  for (Standard_Integer aSupVertId = 0; aSupVertId < 3; ++aSupVertId)
-    aSelector.NeighboursOfNode( mySupVert[aSupVertId] );
-  
-  aLoopEdges.Clear();
-  IMeshData::IteratorOfMapOfInteger aFreeTriangles( aSelector.Elements() );
-  for ( ; aFreeTriangles.More(); aFreeTriangles.Next() )
-    deleteTriangle( aFreeTriangles.Key(), aLoopEdges );
+  BRepMesh_SelectorOfDataStructureOfDelaun aSelector (myMeshData);
+  for (Standard_Integer aSupVertId = 0; aSupVertId < mySupVert.Size(); ++aSupVertId)
+    aSelector.NeighboursOfNode (mySupVert (aSupVertId));
+
+  IMeshData::IteratorOfMapOfInteger aFreeTriangles (aSelector.Elements ());
+  for (; aFreeTriangles.More (); aFreeTriangles.Next ())
+    deleteTriangle (aFreeTriangles.Key (), aLoopEdges);
 
   // All edges that remain free are removed from aLoopEdges;
   // only the boundary edges of the triangulation remain there
-  IMeshData::MapOfIntegerInteger::Iterator aFreeEdges( aLoopEdges );
-  for ( ; aFreeEdges.More(); aFreeEdges.Next() )
+  IMeshData::MapOfIntegerInteger::Iterator aFreeEdges (aLoopEdges);
+  for (; aFreeEdges.More (); aFreeEdges.Next ())
   {
-    if ( myMeshData->ElementsConnectedTo( aFreeEdges.Key() ).IsEmpty() )
-      myMeshData->RemoveLink( aFreeEdges.Key() );
+    if (myMeshData->ElementsConnectedTo (aFreeEdges.Key ()).IsEmpty ())
+      myMeshData->RemoveLink (aFreeEdges.Key ());
   }
 
   // The tops of the super triangle are destroyed
-  for (Standard_Integer aSupVertId = 0; aSupVertId < 3; ++aSupVertId)
-    myMeshData->RemoveNode( mySupVert[aSupVertId] );
+  for (Standard_Integer aSupVertId = 0; aSupVertId < mySupVert.Size (); ++aSupVertId)
+    myMeshData->RemoveNode (mySupVert (aSupVertId));
 }
 
 //=======================================================================
@@ -771,9 +789,7 @@ void BRepMesh_Delaun::cleanupMesh()
               myMeshData->ElementNodes (aCurTriangle, v);
               for (int aNodeIdx = 0; aNodeIdx < 3 && isCanNotBeRemoved; ++aNodeIdx)
               {
-                if (v[aNodeIdx] == mySupVert[0] ||
-                    v[aNodeIdx] == mySupVert[1] ||
-                    v[aNodeIdx] == mySupVert[2])
+                if (isSupVertex (v[aNodeIdx]))
                 {
                   isCanNotBeRemoved = Standard_False;
                 }

@@ -20,7 +20,9 @@
 #include <BRepMesh_FaceDiscret.hxx>
 #include <BRepMesh_ModelPreProcessor.hxx>
 #include <BRepMesh_ModelPostProcessor.hxx>
+
 #include <BRepMesh_MeshAlgoFactory.hxx>
+#include <BRepMesh_DelabellaMeshAlgoFactory.hxx>
 
 //=======================================================================
 // Function: Constructor
@@ -28,11 +30,33 @@
 //=======================================================================
 BRepMesh_Context::BRepMesh_Context ()
 {
+  enum MeshAlgo
+  {
+    MeshAlgo_Default   = 0x0,
+    MeshAlgo_Delabella = 0x1
+  };
+
+  char* anAlgoVar;
+  anAlgoVar = getenv ("CSF_MeshAlgo");
+  const Standard_Integer anAlgoId = (anAlgoVar ? atoi (anAlgoVar) : MeshAlgo_Default);
+
+  Handle (IMeshTools_MeshAlgoFactory) aAlgoFactory;
+  switch (anAlgoId)
+  {
+  case MeshAlgo_Delabella:
+    aAlgoFactory = new BRepMesh_DelabellaMeshAlgoFactory;
+    break;
+
+  default:
+    aAlgoFactory = new BRepMesh_MeshAlgoFactory;
+    break;
+  }
+
   SetModelBuilder (new BRepMesh_ModelBuilder);
   SetEdgeDiscret  (new BRepMesh_EdgeDiscret);
   SetModelHealer  (new BRepMesh_ModelHealer);
   SetPreProcessor (new BRepMesh_ModelPreProcessor);
-  SetFaceDiscret  (new BRepMesh_FaceDiscret(new BRepMesh_MeshAlgoFactory));
+  SetFaceDiscret  (new BRepMesh_FaceDiscret (aAlgoFactory));
   SetPostProcessor(new BRepMesh_ModelPostProcessor);
 }
 
