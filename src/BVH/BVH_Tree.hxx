@@ -211,7 +211,9 @@ public: //! @name methods for accessing serialized tree data
     DUMP_VALUES (OS, "BVH_TreeNode", 2);
     DUMP_VALUES (OS, "NodeIndex", theNodeIndex);
 
-    DUMP_VALUES (OS, "MinPoint - MaxPoint", BVH::ToBndBox (MinPoint (theNodeIndex), MaxPoint (theNodeIndex)).ToString());
+    OS << "Bnd_Box" << TCollection::DumpSeparator();
+    BVH::ToBndBox (MinPoint (theNodeIndex), MaxPoint (theNodeIndex)).Dump (OS, Standard_DumpMask_SingleValue);
+    OS << TCollection::DumpSeparator();
 
     DUMP_VALUES (OS, "BegPrimitive", BegPrimitive (theNodeIndex));
     DUMP_VALUES (OS, "EndPrimitive", EndPrimitive (theNodeIndex));

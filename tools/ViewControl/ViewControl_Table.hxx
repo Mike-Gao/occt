@@ -16,8 +16,13 @@
 #ifndef ViewControl_Table_H
 #define ViewControl_Table_H
 
+#include <NCollection_List.hxx>
+
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
+#include <Standard_Transient.hxx>
+
+#include <inspector/TreeModel_ItemBase.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QItemSelection>
@@ -68,7 +73,14 @@ public:
 
   //! Retuns model indices of the selected cells in table view
   //! \param theSelectedIndices [out] a container of indices: row to list of columns
-  Standard_EXPORT void GetSelectedIndices (QMap<int, QList<int>>& aSelectedIndices);
+  Standard_EXPORT void GetSelectedIndices (QMap<int, QList<int>>& aSelectedIndices) const;
+
+  //! Returns presentations by the property item of tree item for the selected cells
+  Standard_EXPORT void GetSelectedPresentations (const TreeModel_ItemBasePtr& theTreeItem,
+                                                 NCollection_List<Handle(Standard_Transient)>& theSelPresentations) const;
+
+  //! Returns pointers from selected cells
+  Standard_EXPORT void GetSelectedPointers (QStringList& thePointers) const;
 
   //! Returns text of separation row in table
   //! \return string value

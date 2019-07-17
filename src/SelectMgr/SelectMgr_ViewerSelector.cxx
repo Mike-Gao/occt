@@ -219,7 +219,8 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(Select3D_SensitiveEnti
 {
   #ifdef REPORT_SELECTION_BUILD
   Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO_OBJECT (theEntity, "checkOverlap", "", &aPerfMeter, NULL);
+  Standard_SStream aStream;
+  MESSAGE_INFO_OBJECT (theEntity, aStream, "checkOverlap", "", &aPerfMeter, NULL);
   Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
   #endif
 
@@ -397,7 +398,8 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 
   #ifdef REPORT_SELECTION_BUILD
   Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO_OBJECT (theObject, "traverseObject", "", &aPerfMeter, NULL);
+  Standard_SStream aStream;
+  MESSAGE_INFO_OBJECT (theObject, aStream, "traverseObject", "", &aPerfMeter, NULL);
   Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
   #endif
 
@@ -616,7 +618,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
 
   Standard_SStream aStream;
   Dump (aStream);
-  MESSAGE_INFO_VALUES (aStream, "Parameters", "", &aPerfMeter, aParentAlert);
+  MESSAGE_INFO_STREAM (aStream, "Parameters", "", &aPerfMeter, aParentAlert);
 #endif
 
   mystored.Clear();
@@ -770,7 +772,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
 #ifdef REPORT_SELECTION_BUILD
   Standard_SStream aStreamDone;
   Dump (aStreamDone);
-  MESSAGE_INFO_VALUES (aStreamDone, "Parameters", "", &aPerfMeter, aParentAlert);
+  MESSAGE_INFO_STREAM (aStreamDone, "Parameters", "", &aPerfMeter, aParentAlert);
 #endif
 }
 

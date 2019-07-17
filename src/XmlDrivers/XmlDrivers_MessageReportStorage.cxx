@@ -17,10 +17,11 @@
 
 #include <Message.hxx>
 #include <Message_AlertExtended.hxx>
-#include <Message_AttributeVectorOfValues.hxx>
+#include <Message_AttributeStream.hxx>
 #include <Message_CompositeAlerts.hxx>
 #include <Message_Report.hxx>
 
+#include <TCollection.hxx>
 #include <TDataStd_AsciiString.hxx>
 #include <TDataStd_Comment.hxx>
 #include <TDataStd_Real.hxx>
@@ -249,18 +250,22 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
     TDataStd_Comment::Set (theAlertLabel, anAttribute->GetDescription());
 
   Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
-  if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfValues)->Name())
+  if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
   {
-    Handle(Message_AttributeVectorOfValues) aValuesArrayAlert = Handle(Message_AttributeVectorOfValues)::DownCast (anAttribute);
+    Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
     // store values
-    const NCollection_Vector<TCollection_AsciiString>& anArrayValues = aValuesArrayAlert->GetValues();
-    // create real list attribute only if there are values in the attribute
-    if (anArrayValues.IsEmpty())
+    NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
+    TCollection::Split (aValuesArrayAlert->GetStream(), aValues);
+    if (aValues.IsEmpty())
       return;
-    int anArraySize = anArrayValues.Length();
+    int anArraySize = 2 * aValues.Size();
     Handle(TDataStd_ExtStringArray) aListAttribute = TDataStd_ExtStringArray::Set (theAlertLabel, 0, anArraySize - 1);
     for (int aValueId = 0; aValueId < anArraySize; aValueId++)
-      aListAttribute->SetValue (aValueId, anArrayValues.Value (aValueId));
+    {
+      TCollection_AsciiString aKey = aValues.FindKey (aValueId);
+      aListAttribute->SetValue (aValueId * 2, aKey);
+      aListAttribute->SetValue (aValueId * 2 + 1, aValues.FindFromKey (aKey));
+    }
   }
 }
 
@@ -291,7 +296,7 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
   Handle(Message_Attribute) aMessageAttribute;
   if (aDynamicTypeName == STANDARD_TYPE (Message_Attribute)->Name())
     aMessageAttribute = new Message_Attribute();
-  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeVectorOfValues)->Name())
+  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
   {
     // values
     NCollection_Vector<TCollection_AsciiString> anArrayValues;
@@ -302,12 +307,15 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
     if (aValuesAttribute.IsNull())
       return Handle(Message_Alert)();
 
-    for (int aValueId = aValuesAttribute->Lower(); aValueId <= aValuesAttribute->Upper(); aValueId++)
-      anArrayValues.Append (aValuesAttribute->Value (aValueId));
-
     Standard_SStream aStream;
-    Handle(Message_AttributeVectorOfValues) anAlert = new Message_AttributeVectorOfValues (aStream);
-    anAlert->SetValues (anArrayValues);
+    for (int aValueId = aValuesAttribute->Lower(); aValueId <= aValuesAttribute->Upper(); aValueId++)
+    {
+      TCollection_AsciiString aKey = aValuesAttribute->Value (aValueId++);
+      if (aValueId > aValuesAttribute->Upper())
+        break;
+      DUMP_VALUES (aStream, aKey, aValuesAttribute->Value (aValueId));
+    }
+    Handle(Message_AttributeStream) anAlert = new Message_AttributeStream (aStream);
     aMessageAttribute = anAlert;
   }
 

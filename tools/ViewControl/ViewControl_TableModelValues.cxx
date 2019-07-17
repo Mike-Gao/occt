@@ -28,7 +28,7 @@
 int ViewControl_TableModelValues::ColumnCount (const QModelIndex&) const
 {
   if (!GetProperties().IsNull())
-    return GetProperties()->GetTableColumnCount();
+    return GetProperties()->ColumnCount();
 
   return 0;
 }
@@ -42,7 +42,7 @@ int ViewControl_TableModelValues::ColumnCount (const QModelIndex&) const
 int ViewControl_TableModelValues::RowCount (const QModelIndex&) const
 {
   if (!GetProperties().IsNull())
-    return GetProperties()->GetTableRowCount();
+    return GetProperties()->RowCount();
 
   return 0;
 }
@@ -56,7 +56,7 @@ QVariant ViewControl_TableModelValues::Data (const int theRow, const int theColu
 {
   if (!GetProperties().IsNull())
   {
-    QVariant aValue = GetProperties()->GetTableData (theRow, theColumn, theRole);
+    QVariant aValue = GetProperties()->Data (theRow, theColumn, theRole);
     if (aValue.isValid())
       return aValue;
   }

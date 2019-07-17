@@ -71,7 +71,6 @@ QVariant VInspectorPaneAIS_Shape::GetTableData (const Handle(Standard_Transient)
 
     default: return QVariant();
   }
-  return QVariant();
 }
 
 // =======================================================================
@@ -79,7 +78,7 @@ QVariant VInspectorPaneAIS_Shape::GetTableData (const Handle(Standard_Transient)
 // purpose :
 // =======================================================================
 ViewControl_PaneItem* VInspectorPaneAIS_Shape::GetSelected (const Handle(Standard_Transient)& theObject,
-                                                            const int theRow, const int theColumn)
+                                                            const int /*theRow*/, const int /*theColumn*/)
 {
   Handle(AIS_Shape) aPrs = GetPresentation (theObject);
   if (aPrs.IsNull())

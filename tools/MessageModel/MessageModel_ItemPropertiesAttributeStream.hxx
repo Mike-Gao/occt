@@ -17,7 +17,10 @@
 #define MessageModel_ItemReportProperties_H
 
 #include <Standard.hxx>
-#include <Message_Report.hxx>
+#include <Message_AttributeStream.hxx>
+#include <NCollection_IndexedDataMap.hxx>
+#include <TCollection_AsciiString.hxx>
+
 
 #include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/TreeModel_ItemBase.hxx>
@@ -32,21 +35,27 @@
 
 class QItemDelegate;
 
-DEFINE_STANDARD_HANDLE (MessageModel_ItemReportProperties, TreeModel_ItemProperties)
+DEFINE_STANDARD_HANDLE (MessageModel_ItemPropertiesAttributeStream, TreeModel_ItemProperties)
 
-//! \class MessageModel_ItemReportProperties
+//! \class MessageModel_ItemPropertiesAttributeStream
 //! \brief This is an interace for ViewControl_TableModel to give real values of the model
 //! It should be filled or redefined.
-class MessageModel_ItemReportProperties : public TreeModel_ItemProperties
+class MessageModel_ItemPropertiesAttributeStream : public TreeModel_ItemProperties
 {
 public:
 
   //! Constructor
-  Standard_EXPORT MessageModel_ItemReportProperties (TreeModel_ItemBasePtr theItem)
+  Standard_EXPORT MessageModel_ItemPropertiesAttributeStream (TreeModel_ItemBasePtr theItem)
     : TreeModel_ItemProperties (theItem) {}
 
   //! Destructor
-  virtual ~MessageModel_ItemReportProperties() {}
+  virtual ~MessageModel_ItemPropertiesAttributeStream() {}
+
+  //! If me has internal values, it should be initialized here.
+  Standard_EXPORT virtual void Init();
+
+  //! If the item has internal values, there should be reseted here.
+  Standard_EXPORT virtual void Reset();
 
   //! Returns number of rows, depending on orientation: myColumnCount or size of values container
   //! \param theParent an index of the parent item
@@ -73,11 +82,19 @@ public:
   //! \param theValue a new cell value
   Standard_EXPORT virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
 
-  DEFINE_STANDARD_RTTIEXT (MessageModel_ItemReportProperties, TreeModel_ItemProperties)
+  DEFINE_STANDARD_RTTIEXT (MessageModel_ItemPropertiesAttributeStream, TreeModel_ItemProperties)
 
 protected:
-  //! Returns report
-  Handle(Message_Report) getItemReport() const;
+  //! Returns attribute with stream value
+  const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetValues() const
+  {
+    if (!IsInitialized())
+      const_cast<MessageModel_ItemPropertiesAttributeStream*>(this)->Init();
+    return myValues;
+  }
+
+protected:
+  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myValues;
 };
 
 #endif

@@ -32,7 +32,7 @@
 #include <TopoDS_Shape.hxx>
 
 #include <inspector/VInspector_CallBackMode.hxx>
-#include <inspector/VInspector_DisplayActionType.hxx>
+#include <inspector/View_DisplayActionType.hxx>
 #include <inspector/VInspector_SelectionType.hxx>
 
 #include <inspector/ViewControl_PaneCreator.hxx>
@@ -160,14 +160,14 @@ public:
   //! Returns the string name for a given type.
   //! @param theType action type
   //! @return string identifier from the display action type
-  Standard_EXPORT static Standard_CString DisplayActionTypeToString (VInspector_DisplayActionType theType);
+  Standard_EXPORT static Standard_CString DisplayActionTypeToString (View_DisplayActionType theType);
 
   //! Returns the enumeration type from the given string identifier (using case-insensitive comparison).
   //! @param theTypeString string identifier
   //! @return string identifier from the display action type
-  static VInspector_DisplayActionType DisplayActionTypeFromString (Standard_CString theTypeString)
+  static View_DisplayActionType DisplayActionTypeFromString (Standard_CString theTypeString)
   {
-    VInspector_DisplayActionType aType = VInspector_DisplayActionType_NoneId;
+    View_DisplayActionType aType = View_DisplayActionType_NoneId;
     DisplayActionTypeFromString (theTypeString, aType);
     return aType;
   }
@@ -177,28 +177,12 @@ public:
   //! @param theType detected action type
   //! @return TRUE if string identifier is known
   Standard_EXPORT static Standard_Boolean DisplayActionTypeFromString (const Standard_CString theTypeString,
-                                                                       VInspector_DisplayActionType& theType);
+                                                                       View_DisplayActionType& theType);
 
   //! Build string presentation of bounding box information in form: (xmin, ymin, zmin), (xmax, ymax, zmax)
   //! \param theBoundingBox bounding box
   //! \return string presentation
   Standard_EXPORT static QVariant ToVariant (const Select3D_BndBox3d& theBoundingBox);
-
-  //! Creates box shape
-  //! \param theBoundingBox box shape parameters
-  //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_Box& theBoundingBox);
-
-  //! Creates box shape
-  //! \param theBoundingBox box shape parameters
-  //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_OBB& theBoundingBox);
-
-  //! Creates box shape
-  //! \param thePntMin minimum point on the bounding box
-  //! \param thePntMax maximum point on the bounding box
-  //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax);
 
   //! Creates box shape
   //! \param theBoundingBox box shape parameters

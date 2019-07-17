@@ -273,17 +273,6 @@ public:
 
 
 
-  //! Covers point into string in format: (X, Y)
-  //! \return the string value
-  Standard_EXPORT TCollection_AsciiString ToString() const;
-
-
-  //! Converts text value into parameters if possible, the string format is: (X, Y)
-  //! \return true if conversion is done
-  Standard_EXPORT Standard_Boolean FromString (const TCollection_AsciiString& theValue);
-
-
-
 protected:
 
 

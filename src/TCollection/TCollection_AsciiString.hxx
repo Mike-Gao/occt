@@ -17,6 +17,7 @@
 #ifndef _TCollection_AsciiString_HeaderFile
 #define _TCollection_AsciiString_HeaderFile
 
+
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
@@ -624,7 +625,7 @@ friend Standard_EXPORT Standard_IStream& operator >> (Standard_IStream& astream,
   //! aString contains "abcdefg"
   //! aString.Split(3) gives <me> = "abc" and returns "defg"
   Standard_EXPORT TCollection_AsciiString Split (const Standard_Integer where);
-  
+
   //! Creation of a sub-string of the string <me>.
   //! The sub-string starts to the index Fromindex and ends
   //! to the index ToIndex.

@@ -12,8 +12,8 @@ Message_Attribute.cxx
 Message_Attribute.hxx
 Message_AttributeObject.cxx
 Message_AttributeObject.hxx
-Message_AttributeVectorOfValues.cxx
-Message_AttributeVectorOfValues.hxx
+Message_AttributeStream.cxx
+Message_AttributeStream.hxx
 Message_CompositeAlerts.cxx
 Message_CompositeAlerts.hxx
 Message_ExecStatus.hxx

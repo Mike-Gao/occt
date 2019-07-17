@@ -101,7 +101,7 @@ protected:
   //! \param theColumn the child column position
   //! \return the created item
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE
-  { return TreeModel_ItemBasePtr(); }
+  { (void)theRow, (void)theColumn; return TreeModel_ItemBasePtr(); }
 
   //! Returns owner of the current sensitive entity
   //! \return owner

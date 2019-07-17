@@ -13,7 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/VInspector_PreviewParameters.hxx>
+#include <inspector/View_PreviewParameters.hxx>
 
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_PointAspect.hxx>
@@ -23,7 +23,7 @@
 // function : Constructor
 // purpose :
 // =======================================================================
-VInspector_PreviewParameters::VInspector_PreviewParameters()
+View_PreviewParameters::View_PreviewParameters()
 {
   myDrawer = new Prs3d_Drawer();
 
@@ -55,7 +55,7 @@ VInspector_PreviewParameters::VInspector_PreviewParameters()
 // function : SaveState
 // purpose :
 // =======================================================================
-void VInspector_PreviewParameters::SaveState (VInspector_PreviewParameters* theParameters,
+void View_PreviewParameters::SaveState (View_PreviewParameters* theParameters,
                                               QMap<QString, QString>& theItems,
                                               const QString& thePrefix)
 {
@@ -90,7 +90,7 @@ void VInspector_PreviewParameters::SaveState (VInspector_PreviewParameters* theP
 // function : RestoreState
 // purpose :
 // =======================================================================
-bool  VInspector_PreviewParameters::RestoreState (VInspector_PreviewParameters* theParameters,
+bool  View_PreviewParameters::RestoreState (View_PreviewParameters* theParameters,
                                                   const QString& theKey, const QString& theValue,
                                                   const QString& thePrefix)
 {

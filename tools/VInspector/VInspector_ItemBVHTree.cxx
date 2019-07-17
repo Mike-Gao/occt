@@ -21,6 +21,8 @@
 #include <inspector/VInspector_Tools.hxx>
 #include <inspector/ViewControl_PropertiesStream.hxx>
 
+#include <inspector/Convert_Tools.hxx>
+
 #include <Bnd_Box.hxx>
 #include <BRep_Builder.hxx>
 #include <TopoDS_Compound.hxx>
@@ -185,10 +187,10 @@ TopoDS_Shape VInspector_ItemBVHTree::buildPresentationShape()
 
       TCollection_AsciiString aValue = aValues.Value (aValueId);
       Bnd_Box aBox;
-      if (!aBox.FromString (aValue))
+      if (!aBox.Init (Standard_SStream (aValue.ToCString())))
         continue;
 
-      TopoDS_Shape aShape = VInspector_Tools::CreateShape (aBox);
+      TopoDS_Shape aShape = Convert_Tools::CreateShape (aBox);
       aBuilder.Add (aCompound, aShape);
     }
   }

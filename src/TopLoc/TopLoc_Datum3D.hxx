@@ -53,6 +53,9 @@ public:
     const gp_Trsf& Transformation() const;
   
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
+
   //! Writes the contents of this Datum3D to the stream S.
   Standard_EXPORT void ShallowDump (Standard_OStream& S) const;
 

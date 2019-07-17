@@ -41,6 +41,13 @@ DEFINE_STANDARD_HANDLE (TreeModel_ItemProperties, Standard_Transient)
 //! Class to manipulate properties of tree item. The properties are organized in table structure
 class TreeModel_ItemProperties : public Standard_Transient
 {
+  //! enum defined the dimension type
+  enum TreeModel_DimType
+  {
+    TreeModel_DimType_Rows,   //! defines number of rows
+    TreeModel_DimType_Columns //! defines number of columns
+  };
+
 public:
   //! Constructor
   TreeModel_ItemProperties (const TreeModel_ItemBasePtr& theItem) : myItem (theItem) {}
@@ -48,11 +55,33 @@ public:
   //! Destructor
   ~TreeModel_ItemProperties() {}
 
+  //! Returns number of table rows. It uses cached value of GetTableRowCount(), Reset() to reinit it.
+  //! \return an integer value
+  int RowCount() const { return cachedDimValue (TreeModel_DimType_Rows); }
+
+  //! Returns number of table columns. It uses cached value of GetTableColumnCount(), Reset() to reinit it.
+  //! \return an integer value
+  int ColumnCount() const { return cachedDimValue (TreeModel_DimType_Columns); }
+
+  //! Returns content of the model index for the given role, it is obtained from internal container of values
+  //! It uses cached value of GetTableData(), Reset() to reinit it.
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \param theRole a view role
+  //! \return value intepreted depending on the given role
+  QVariant Data (const int theRow, const int theColumn, int theRole = Qt::DisplayRole) const
+    { return cachedValue (theRow, theColumn, theRole); }
+
+  //! Gets whether the item is already initialized.The initialized state is thrown down
+  //! by the reset method and get back after the method Init().
+  //!  \return if the item is initialized
+  bool IsInitialized() const { return m_bInitialized; }
+
   //! If me has internal values, it should be initialized here.
-  virtual void Init() {}
+  virtual void Init() { m_bInitialized = true; }
 
   //! If the item has internal values, there should be reseted here.
-  Standard_EXPORT virtual void Reset() {}
+  Standard_EXPORT virtual void Reset();
 
   //! Returns number of item children
   //! \return an integer value, ZERO by default
@@ -114,7 +143,6 @@ public:
   //! \return flags
   Standard_EXPORT virtual Qt::ItemFlags GetTableFlags (const int theRow, const int theColumn) const;
 
-
   DEFINE_STANDARD_RTTIEXT (TreeModel_ItemProperties, Standard_Transient)
 
 protected:
@@ -122,7 +150,25 @@ protected:
   TreeModel_ItemBasePtr getItem() const { return myItem; }
 
 private:
+  //! Returns the cached value for number of rows. Init the value if it is requested the first time.
+  //! \param theDimType dimension type
+  //! \return the value
+  Standard_EXPORT int cachedDimValue (const TreeModel_DimType theDimType) const;
+
+  //! Returns the cached value for the role. Init the value if it is requested the first time
+  //! By default, it calls initRowCount(TreeModel_ItemRole_RowCountRole) or initValue for the item role
+  //! \param theItemRole a value role
+  //! \return the value
+  Standard_EXPORT QVariant cachedValue (const int theRow, const int theColumn, int theRole) const;
+
+private:
   TreeModel_ItemBasePtr myItem; //! current item
+
+  QMap<TreeModel_DimType, QVariant> myCachedDimValues; //!< cached values, should be cleared by reset
+  QMap<QPair<int, int>, QMap<int, QVariant> > myCachedValues; //!< cached values, should be cleared by reset
+  QMap<QPair<int, int>, NCollection_List<Handle(Standard_Transient)> > myCachedPresentations; //!< cached values, should be cleared by reset
+
+  bool m_bInitialized; //!< the state whether the item content is already initialized
 };
 
 #endif

@@ -13,7 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/MessageModel_ItemReportProperties.hxx>
+#include <inspector/MessageModel_ItemPropertiesReport.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/ShapeView_ItemShape.hxx>
 #include <inspector/ShapeView_Tools.hxx>
@@ -27,14 +27,14 @@
 #include <QFont>
 #include <Standard_WarningsRestore.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(MessageModel_ItemReportProperties, TreeModel_ItemProperties)
+IMPLEMENT_STANDARD_RTTIEXT(MessageModel_ItemPropertiesReport, TreeModel_ItemProperties)
 
 // =======================================================================
 // function : RowCount
 // purpose :
 // =======================================================================
 
-int MessageModel_ItemReportProperties::GetTableRowCount() const
+int MessageModel_ItemPropertiesReport::GetTableRowCount() const
 {
   return 1;
 }
@@ -44,7 +44,7 @@ int MessageModel_ItemReportProperties::GetTableRowCount() const
 // purpose :
 // =======================================================================
 
-QVariant MessageModel_ItemReportProperties::GetTableData (const int theRow, const int theColumn, int theRole) const
+QVariant MessageModel_ItemPropertiesReport::GetTableData (const int theRow, const int theColumn, int theRole) const
 {
   if (theRole != Qt::DisplayRole)
     return QVariant();
@@ -63,7 +63,7 @@ QVariant MessageModel_ItemReportProperties::GetTableData (const int theRow, cons
 // function : GetTableEditType
 // purpose :
 // =======================================================================
-ViewControl_EditType MessageModel_ItemReportProperties::GetTableEditType (const int theRow, const int) const
+ViewControl_EditType MessageModel_ItemPropertiesReport::GetTableEditType (const int theRow, const int) const
 {
   switch (theRow)
   {
@@ -76,7 +76,7 @@ ViewControl_EditType MessageModel_ItemReportProperties::GetTableEditType (const 
 // function : SetTableData
 // purpose :
 // =======================================================================
-bool MessageModel_ItemReportProperties::SetTableData (const int theRow, const int theColumn, const QVariant& theValue)
+bool MessageModel_ItemPropertiesReport::SetTableData (const int theRow, const int theColumn, const QVariant& theValue)
 {
   Handle(Message_Report) aReport = getItemReport();
   switch (theRow)
@@ -92,7 +92,7 @@ bool MessageModel_ItemReportProperties::SetTableData (const int theRow, const in
 // purpose :
 // =======================================================================
 
-Handle(Message_Report) MessageModel_ItemReportProperties::getItemReport() const
+Handle(Message_Report) MessageModel_ItemPropertiesReport::getItemReport() const
 {
   MessageModel_ItemReportPtr aReportItem = itemDynamicCast<MessageModel_ItemReport>(getItem());
   if (!aReportItem)

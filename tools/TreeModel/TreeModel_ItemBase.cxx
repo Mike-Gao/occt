@@ -52,7 +52,7 @@ Handle(TreeModel_ItemProperties) TreeModel_ItemBase::GetProperties() const
 }
 
 // =======================================================================
-// function :  reset
+// function :  Reset
 // purpose :
 // =======================================================================
 void TreeModel_ItemBase::Reset()
@@ -76,7 +76,7 @@ void TreeModel_ItemBase::Reset()
 // =======================================================================
 void TreeModel_ItemBase::Reset (int theRole)
 {
-  if (!myCachedValues.contains (theRole))  
+  if (!myCachedValues.contains (theRole))
     return;
 
   myCachedValues.remove (theRole);

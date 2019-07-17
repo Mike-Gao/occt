@@ -20,7 +20,10 @@
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Trsf.hxx>
+#include <NCollection_List.hxx>
 #include <Standard_ConstructionError.hxx>
+#include <TCollection.hxx>
+#include <TCollection_AsciiString.hxx>
 
 // set the flag to one
 #define ClearVoidFlag() ( Flags &= ~VoidMask )
@@ -980,39 +983,61 @@ TCollection_AsciiString PointsSeparator()
   return " - ";
 }
 
+
+const TCollection_AsciiString Bnd_Box_ClassName = "Bnd_Box";
+
 //=======================================================================
-//function : ToString
+//function : Dump
 //purpose  : 
 //=======================================================================
 
-TCollection_AsciiString Bnd_Box::ToString() const
+void Bnd_Box::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
 {
-  return gp_XYZ (Xmin, Ymin, Zmin).ToString()
-        + PointsSeparator()
-        + gp_XYZ (Xmax, Ymax, Zmax).ToString();
+  DUMP_START_KEY (OS, Bnd_Box_ClassName);
+
+  DUMP_VALUES (OS, "Xmin", Xmin);
+  DUMP_VALUES (OS, "Ymin", Ymin);
+  DUMP_VALUES (OS, "Zmin", Zmin);
+  DUMP_VALUES (OS, "Xmax", Xmax);
+  DUMP_VALUES (OS, "Ymax", Ymax);
+  DUMP_VALUES (OS, "Zmax", Zmax);
+  DUMP_VALUES (OS, "Gap",  Gap);
+  DUMP_VALUES (OS, "Flags", Flags);
+
+  DUMP_STOP_KEY (OS, Bnd_Box_ClassName);
 }
 
 //=======================================================================
-//function : FromString
+//function : Init
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean Bnd_Box::FromString (const TCollection_AsciiString& theValue)
+Standard_Boolean Bnd_Box::Init (const Standard_OStream& OS)
 {
-  TCollection_AsciiString aCurrentString = theValue;
-  Standard_Integer aPosition = aCurrentString.Search (PointsSeparator());
-  if (aPosition < 0)
+  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
+  Standard_SStream aSStream (OS);
+  TCollection::Split (aSStream, aStreamValues);
+
+  TCollection_AsciiString anXYZValue;
+  if (aStreamValues.Size() == 1)
+  {
+    TCollection_AsciiString aValueStr = aStreamValues.FindFromIndex (1);
+    Standard_Integer aPosition = aValueStr.Search (Bnd_Box_ClassName + TCollection::ClassNameSeparator());
+    if (aPosition < 1)
+      return Standard_False;
+    anXYZValue = aValueStr.Split (aPosition);
+  }
+
+  NCollection_Vector<Standard_Real> aValues;
+  if (!TCollection::SplitReal (anXYZValue, TCollection::VectorSeparator(), aValues))
     return Standard_False;
 
-  TCollection_AsciiString aLeftString = aCurrentString;
-  TCollection_AsciiString aRightString = aLeftString.Split (aPosition - 1);
-  aCurrentString = aRightString;
-  aRightString = aCurrentString.Split (PointsSeparator().Length());
-
-  gp_XYZ aMinPoint, aMaxPoint;
-  if (!aMinPoint.FromString (aLeftString) || !aMaxPoint.FromString (aRightString))
+  if (aValues.Size() != 8)
     return Standard_False;
 
-  Update (aMinPoint.X(), aMinPoint.Y(), aMinPoint.Z(), aMaxPoint.X(), aMaxPoint.Y(), aMaxPoint.Z());
+  Update (aValues.Value (1), aValues.Value (2), aValues.Value (3), aValues.Value (4), aValues.Value (5), aValues.Value (6));
+  Gap = aValues.Value (7);
+  Flags = (Standard_Integer)aValues.Value (8);
+
   return Standard_True;
 }

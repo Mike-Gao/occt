@@ -13,8 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspector_PreviewParameters_H
-#define VInspector_PreviewParameters_H
+#ifndef View_PreviewParameters_H
+#define View_PreviewParameters_H
 
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
@@ -26,17 +26,17 @@
 #include <QString>
 #include <Standard_WarningsRestore.hxx>
 
-//! \class VInspector_PreviewParameters
+//! \class View_PreviewParameters
 //! Container of View tool bar actions
-class VInspector_PreviewParameters
+class View_PreviewParameters
 {
 public:
 
   //! Constructor
-  Standard_EXPORT VInspector_PreviewParameters ();
+  Standard_EXPORT View_PreviewParameters ();
 
   //! Destructor
-  virtual ~VInspector_PreviewParameters() {}
+  virtual ~View_PreviewParameters() {}
 
   //! Returns main control
   const Handle(Prs3d_Drawer)& GetDrawer() const { return myDrawer; }
@@ -47,7 +47,7 @@ public:
   //! \param theTreeView a view instance
   //! \param theItems [out] properties
   //! \param thePrefix peference item prefix
-  Standard_EXPORT static void SaveState (VInspector_PreviewParameters* theParameters,
+  Standard_EXPORT static void SaveState (View_PreviewParameters* theParameters,
                                          QMap<QString, QString>& theItems,
                                          const QString& thePrefix = QString());
   //! Restore state of three view by a container
@@ -56,7 +56,7 @@ public:
   //! \param theValue property value
   //! \param thePrefix peference item prefix
   //! \return boolean value whether the property is applyed to the tree view
-  Standard_EXPORT static bool RestoreState (VInspector_PreviewParameters* theParameters,
+  Standard_EXPORT static bool RestoreState (View_PreviewParameters* theParameters,
                                             const QString& theKey, const QString& theValue,
                                             const QString& thePrefix = QString());
 

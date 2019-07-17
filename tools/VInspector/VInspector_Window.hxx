@@ -23,7 +23,7 @@
 
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
 #include <inspector/VInspector_CallBack.hxx>
-#include <inspector/VInspector_DisplayActionType.hxx>
+#include <inspector/View_DisplayActionType.hxx>
 
 #include <inspector/ViewControl_PaneCreator.hxx>
 
@@ -33,13 +33,12 @@
 #include <QMainWindow>
 #include <Standard_WarningsRestore.hxx>
 
-class VInspector_PreviewParameters;
-
 class ViewControl_MessageDialog;
 class ViewControl_PropertyView;
 
 class VInspector_ToolBar;
 
+class View_DisplayPreview;
 class View_Window;
 
 class QAbstractItemModel;
@@ -101,6 +100,8 @@ public:
   //! \return container of presentations
   NCollection_List<Handle(AIS_InteractiveObject)> GetSelectedPresentations (QItemSelectionModel* theModel);
 
+  void GetSelectedShapes (NCollection_List<Handle(Standard_Transient)>& theSelPresentations);
+
   //! Returns selected shapes
   //! \param theModel selection model
   //! \return container of shapes
@@ -109,8 +110,7 @@ public:
   //! Returns selected shapes
   //! \param theModel selection model
   //! \return container of shapes
-  void GetSelectedPropertyPanelShapes (const QModelIndexList& theTreeViewIndices,
-                                       const QModelIndexList& thePropertyPanelIndices,
+  void GetSelectedPropertyPanelShapes (const TreeModel_ItemBasePtr& theTreeItem,
                                        NCollection_List<TopoDS_Shape>& theShapes);
 
   //! Returns the first not zero transform persistent of selected elements
@@ -214,7 +214,7 @@ private:
   //! Set selected in tree view presentations displayed or erased in the current context. Note that erased presentations
   //! still belongs to the current context until Remove is called.
   //! \param theType display action type
-  void displaySelectedPresentations (const VInspector_DisplayActionType theType);
+  void displaySelectedPresentations (const View_DisplayActionType theType);
 
   //! Set items of the pointers highlighted in tree view
   //! \param theType display action type
@@ -227,12 +227,6 @@ private:
   //! Creates an istance of 3D view to initialize context.
   //! \return a context of created view.
   Handle(AIS_InteractiveContext) createView();
-
-  //!< Updates presentation of preview for parameter shapes. Creates a compound of the shapes
-  //!< \param theShape container of shapes
-  //!< \param thePersistent transform persistent to be used in preview presentation
-  void updatePreviewPresentation (const NCollection_List<TopoDS_Shape>& theShapes,
-                                  const Handle(Graphic3d_TransformPers)& thePersistent);
 
 private:
 
@@ -254,8 +248,8 @@ private:
   View_Window* myViewWindow; //!< temporary view window, it is created if Open is called but context is still NULL
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
-  VInspector_PreviewParameters* myPreviewParameters; //!< drawer of preview presentation
-  Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
+
+  View_DisplayPreview* myDisplayPreview; //!< class for preview display
 
 #ifdef DEBUG_TWO_VIEWS
   Handle(View_CameraPositionPrs) myCameraPrs;

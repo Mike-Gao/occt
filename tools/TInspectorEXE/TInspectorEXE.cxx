@@ -131,7 +131,8 @@ int main (int argc, char** argv)
     aReport->SetActive (Standard_True);//Standard_False);
     aPlugins.insert("TKMessageView");
 
-    anActivatedPluginName = "TKVInspector";
+    //anActivatedPluginName = "TKVInspector";
+    anActivatedPluginName = "TKMessageView";
   }
   else
     anActivatedPluginName = *aPlugins.rbegin();

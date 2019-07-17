@@ -15,7 +15,6 @@
 
 #include <inspector/MessageModel_Tools.hxx>
 #include <inspector/MessageModel_ItemAlert.hxx>
-#include <inspector/MessageModel_TableModelValues.hxx>
 
 #include <inspector/ViewControl_Table.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
@@ -27,7 +26,7 @@
 #include <BRepTools.hxx>
 #include <Message_AlertExtended.hxx>
 #include <Message_AttributeObject.hxx>
-#include <Message_AttributeVectorOfValues.hxx>
+#include <Message_AttributeStream.hxx>
 
 #include <Precision.hxx>
 #include <TopoDS_AlertAttribute.hxx>
@@ -163,36 +162,36 @@ void MessageModel_Tools::GetPropertyTableValues (const TreeModel_ItemBasePtr& th
   if (anAttribute.IsNull())
     return;
 
-  if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
+  //if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeStream)))
+  //{
+    //int aSectionSize = 200;
+    //ViewControl_TableModelValues* aTableValues = new MessageModel_TableModelValues (anAttribute, aSectionSize);
+    //theTableValues.append (aTableValues);
+  //}
+  //else
+  //{
+  if (!anAttribute->GetDescription().IsEmpty())
   {
-    int aSectionSize = 200;
-    ViewControl_TableModelValues* aTableValues = new MessageModel_TableModelValues (anAttribute, aSectionSize);
+    ViewControl_TableModelValuesDefault* aTableValues = new ViewControl_TableModelValuesDefault();
+    QList<TreeModel_HeaderSection> aHeaderValues;
+    QVector<QVariant> aValues;
+    aHeaderValues << TreeModel_HeaderSection ("Description", -2);
+    aValues << anAttribute->GetDescription().ToCString();
+    aTableValues->SetHeaderValues (aHeaderValues, Qt::Horizontal);
+
+    QString aValueStr = anAttribute->GetDescription().ToCString();
+    QStringList aValueStrList = aValueStr.split ("\n");
+    int aNbRows = aValueStrList.size();
+
+    QFontMetrics aFontMetrics (qApp->font());
+    int aHeight = aFontMetrics.boundingRect(aValueStr).height();
+    aHeight = (aHeight + TreeModel_Tools::HeaderSectionMargin()) * aNbRows;
+    aTableValues->SetValues (aValues);
+    aTableValues->SetDefaultSectionSize(Qt::Vertical, aHeight);
+
     theTableValues.append (aTableValues);
   }
-  else
-  {
-    if (!anAttribute->GetDescription().IsEmpty())
-    {
-      ViewControl_TableModelValuesDefault* aTableValues = new ViewControl_TableModelValuesDefault();
-      QList<TreeModel_HeaderSection> aHeaderValues;
-      QVector<QVariant> aValues;
-      aHeaderValues << TreeModel_HeaderSection ("Description", -2);
-      aValues << anAttribute->GetDescription().ToCString();
-      aTableValues->SetHeaderValues (aHeaderValues, Qt::Horizontal);
-
-      QString aValueStr = anAttribute->GetDescription().ToCString();
-      QStringList aValueStrList = aValueStr.split ("\n");
-      int aNbRows = aValueStrList.size();
-
-      QFontMetrics aFontMetrics (qApp->font());
-      int aHeight = aFontMetrics.boundingRect(aValueStr).height();
-      aHeight = (aHeight + TreeModel_Tools::HeaderSectionMargin()) * aNbRows;
-      aTableValues->SetValues (aValues);
-      aTableValues->SetDefaultSectionSize(Qt::Vertical, aHeight);
-
-      theTableValues.append (aTableValues);
-    }
-  }
+  //}
 }
 
 // =======================================================================

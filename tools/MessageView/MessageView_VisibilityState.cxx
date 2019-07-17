@@ -17,7 +17,7 @@
 #include <inspector/MessageModel_ItemAlert.hxx>
 
 #include <Message_AlertExtended.hxx>
-#include <Message_AttributeVectorOfValues.hxx>
+#include <Message_AttributeStream.hxx>
 
 #include <TopoDS_AlertAttribute.hxx>
 
@@ -133,7 +133,7 @@ bool MessageView_VisibilityState::hasTableValues (const QModelIndex& theIndex) c
   if (anAlert.IsNull())
     return false;
 
-  if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
+  if (anAlert->IsKind (STANDARD_TYPE (Message_AttributeStream)))
     return true;
 
   return false;

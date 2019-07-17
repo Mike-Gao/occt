@@ -20,6 +20,7 @@
 #include <BVH_Types.hxx>
 #include <Message_Alerts.hxx>
 #include <Standard_ShortReal.hxx>
+#include <TCollection.hxx>
 
 #include <limits>
 
@@ -115,10 +116,9 @@ public:
     DUMP_VALUES (OS, "BVH_Box", 2);
     DUMP_VALUES (OS, "IsValid", IsValid());
 
-    DUMP_VALUES (OS, "Bnd_Box", BVH::ToBndBox (CornerMin(), CornerMax()).ToString());
-
-    //DUMP_VALUES (OS, "CornerMin", BVH::ToString (CornerMin()));
-    //DUMP_VALUES (OS, "CornerMin", BVH::ToString (CornerMax()));
+    OS << "Bnd_Box" << TCollection::DumpSeparator();
+    BVH::ToBndBox (CornerMin(), CornerMax()).Dump (OS, Standard_DumpMask_SingleValue);
+    OS << TCollection::DumpSeparator();
   }
 
 public:

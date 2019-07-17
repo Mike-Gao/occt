@@ -18,14 +18,16 @@
 #include <AIS_ColoredShape.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_Trihedron.hxx>
-#include <BRep_Builder.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
-#include <BRepBuilderAPI_MakeEdge.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
+//#include <BRep_Builder.hxx>
+//#include <BRepBuilderAPI_MakeVertex.hxx>
+//#include <BRepBuilderAPI_MakeEdge.hxx>
+//#include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom_Axis2Placement.hxx>
-#include <TopoDS_Compound.hxx>
+//#include <TopoDS_Compound.hxx>
 
 #include <TopExp_Explorer.hxx>
+
+#include <inspector/Convert_Tools.hxx>
 
 #include <inspector/TreeModel_ColumnType.hxx>
 #include <inspector/TreeModel_ContextMenu.hxx>
@@ -35,7 +37,7 @@
 #include <inspector/ViewControl_MessageDialog.hxx>
 #include <inspector/ViewControl_TableModel.hxx>
 #include <inspector/ViewControl_Tools.hxx>
-#include <inspector/ViewControl_TransientShape.hxx>
+#include <inspector/Convert_TransientShape.hxx>
 
 #include <inspector/VInspector_ToolBar.hxx>
 #include <inspector/VInspector_Tools.hxx>
@@ -46,7 +48,6 @@
 #include <inspector/VInspector_ItemSelectBasicsEntityOwner.hxx>
 #include <inspector/VInspector_ItemFolderObject.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
-#include <inspector/VInspector_PreviewParameters.hxx>
 #include <inspector/VInspector_PropertiesCreator.hxx>
 #include <inspector/VInspector_TableModelValues.hxx>
 #include <inspector/VInspector_ToolBar.hxx>
@@ -61,6 +62,8 @@
 #include <inspector/ViewControl_TreeView.hxx>
 
 #include <inspector/View_Displayer.hxx>
+#include <inspector/View_DisplayPreview.hxx >
+#include <inspector/View_PreviewParameters.hxx>
 #include <inspector/View_Widget.hxx>
 #include <inspector/View_Window.hxx>
 
@@ -108,7 +111,7 @@ const int VINSPECTOR_DEFAULT_VIEW_POSITION_Y = 60; // TINSPECTOR_DEFAULT_POSITIO
 VInspector_Window::VInspector_Window()
 : myParent (0), myExportToShapeViewDialog (0), myViewWindow (0)
 {
-  myPreviewParameters = new VInspector_PreviewParameters();
+  myDisplayPreview = new View_DisplayPreview();
 
   myMainWindow = new QMainWindow (0);
 
@@ -251,8 +254,9 @@ void VInspector_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIte
     theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
   }
 
+
   anItems.clear();
-  VInspector_PreviewParameters::SaveState (myPreviewParameters, anItems, "preview_parameters_");
+  View_PreviewParameters::SaveState (myDisplayPreview->GetPreviewParameters(), anItems, "preview_parameters_");
   for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
     theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
 
@@ -286,8 +290,8 @@ void VInspector_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap& 
     else if (TreeModel_Tools::RestoreState (myHistoryView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString(),
                                             "history_view_"))
       continue;
-    else if (VInspector_PreviewParameters::RestoreState (myPreviewParameters, anItemIt.Key().ToCString(), anItemIt.Value().ToCString(),
-                                            "preview_parameters_"))
+    else if (View_PreviewParameters::RestoreState (myDisplayPreview->GetPreviewParameters(), anItemIt.Key().ToCString(),
+      anItemIt.Value().ToCString(), "preview_parameters_"))
       continue;
   }
 }
@@ -386,6 +390,31 @@ NCollection_List<Handle(AIS_InteractiveObject)> VInspector_Window::GetSelectedPr
 // function : GetSelectedShapes
 // purpose :
 // =======================================================================
+
+void VInspector_Window::GetSelectedShapes (NCollection_List<Handle(Standard_Transient)>& theSelPresentations)
+{
+  QModelIndexList theIndices = myTreeView->selectionModel()->selectedIndexes();
+
+  QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (theIndices);
+  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
+  {
+    TreeModel_ItemBasePtr anItem = *anItemIt;
+    VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
+    if (!aVItem /*|| aVItem->Row() == 0*/)
+      continue;
+
+    TopoDS_Shape aShape = aVItem->GetPresentationShape();
+    if (aShape.IsNull())
+      continue;
+
+    theSelPresentations.Append (new Convert_TransientShape (aShape));
+  }
+}
+
+// =======================================================================
+// function : GetSelectedShapes
+// purpose :
+// =======================================================================
 NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QModelIndexList& theIndices)
 {
   NCollection_List<TopoDS_Shape> aSelectedShapes;
@@ -407,18 +436,20 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
 
   // obtain selection from the property panel
   {
-    QList<ViewControl_Table*> aPropertyTables;
-    myPropertyView->GetActiveTables (aPropertyTables);
-    if (!aPropertyTables.isEmpty())
-    {
-      ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
+    //QList<ViewControl_Table*> aPropertyTables;
+    //myPropertyView->GetActiveTables (aPropertyTables);
+    //if (!aPropertyTables.isEmpty())
+    //{
+    //  ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
 
-      Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
-      QModelIndexList aTreeViewSelected = myTreeView->selectionModel()->selectedIndexes();
-      GetSelectedPropertyPanelShapes(aTreeViewSelected,
-                                     aFirstTable->GetTableView()->selectionModel()->selectedIndexes(),
-                                     aSelectedShapes);
-    }
+    //  Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
+
+    QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
+    TreeModel_ItemBasePtr aTreeItem = TreeModel_ModelBase::GetItemByIndex (anIndex);
+
+    //QModelIndexList aTreeViewSelected = myTreeView->selectionModel()->selectedIndexes();
+    GetSelectedPropertyPanelShapes(aTreeItem, aSelectedShapes);
+    //}
   }
 
   return aSelectedShapes;
@@ -428,55 +459,75 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
 // function : GetSelectedPropertyPanelShapes
 // purpose :
 // =======================================================================
-void VInspector_Window::GetSelectedPropertyPanelShapes (const QModelIndexList& theTreeViewIndices,
-                                                        const QModelIndexList& thePropertyPanelIndices,
+void VInspector_Window::GetSelectedPropertyPanelShapes (const TreeModel_ItemBasePtr& theTreeItem,
                                                         NCollection_List<TopoDS_Shape>& theShapes)
 {
-  QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (theTreeViewIndices);
-  NCollection_List<Handle(Standard_Transient)> aPropertyPresentations;
-  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
+  QList<ViewControl_Table*> aPropertyTables;
+  myPropertyView->GetActiveTables (aPropertyTables);
+  if (aPropertyTables.isEmpty())
+    return;
+
+  ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
+  if (!aFirstTable)
+    return;
+
+  NCollection_List<Handle(Standard_Transient)> theSelPresentations;
+  aFirstTable->GetSelectedPresentations (theTreeItem, theSelPresentations);
+
+  for (NCollection_List<Handle(Standard_Transient)>::Iterator anIterator (theSelPresentations); anIterator.More(); anIterator.Next())
   {
-    TreeModel_ItemBasePtr anItem = *anItemIt;
-    if (!anItem || anItem->Column() != 0)
-      continue;
-
-    QList<ViewControl_TableModelValues*> aTableValues;
-    VInspector_Tools::GetPropertyTableValues (anItem, myPaneCreators, aTableValues);
-    if (aTableValues.isEmpty())
-      continue;
-
-    Handle(TreeModel_ItemProperties) anItemProperties = anItem->GetProperties();
-    for (int aTableIt = 0; aTableIt < aTableValues.size(); aTableIt++)
-    {
-      VInspector_TableModelValues* aTableVals = dynamic_cast<VInspector_TableModelValues*>(aTableValues[aTableIt]);
-      if (!aTableVals)
-        continue;
-
-      // default shape by NULL selection
-      aTableVals->GetPaneShapes (-1, -1, theShapes);
-
-      for (QModelIndexList::const_iterator anIndicesIt = thePropertyPanelIndices.begin(); anIndicesIt != thePropertyPanelIndices.end(); anIndicesIt++)
-      {
-        QModelIndex anIndex = *anIndicesIt;
-        aTableVals->GetPaneShapes (anIndex.row(), anIndex.column(), theShapes);
-
-        if (!anItemProperties.IsNull())
-        {
-          anItemProperties->GetPresentations (anIndex.row(), anIndex.column(), aPropertyPresentations);
-        }
-      }
-    }
+    Handle(Convert_TransientShape) aShapePrs = Handle(Convert_TransientShape)::DownCast (anIterator.Value());
+    if (!aShapePrs.IsNull())
+      theShapes.Append (aShapePrs->GetShape());
   }
 
-  if (!aPropertyPresentations.IsEmpty())
-  {
-    for (NCollection_List<Handle(Standard_Transient)>::Iterator aPrsIterator (aPropertyPresentations); aPrsIterator.More(); aPrsIterator.Next())
-    {
-      Handle(ViewControl_TransientShape) aShapePrs = Handle(ViewControl_TransientShape)::DownCast (aPrsIterator.Value());
-      if (!aShapePrs.IsNull())
-        theShapes.Append (aShapePrs->GetShape());
-    }
-  }
+  //QModelIndexList& thePropertyPanelIndices = aFirstTable->GetTableView()->selectionModel()->selectedIndexes(),
+
+  //QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (theTreeViewIndices);
+  //NCollection_List<Handle(Standard_Transient)> aPropertyPresentations;
+  //for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
+  //{
+  //  TreeModel_ItemBasePtr anItem = *anItemIt;
+  //  if (!anItem || anItem->Column() != 0)
+  //    continue;
+
+  //  QList<ViewControl_TableModelValues*> aTableValues;
+  //  VInspector_Tools::GetPropertyTableValues (anItem, myPaneCreators, aTableValues);
+  //  if (aTableValues.isEmpty())
+  //    continue;
+
+  //  Handle(TreeModel_ItemProperties) anItemProperties = anItem->GetProperties();
+  //  for (int aTableIt = 0; aTableIt < aTableValues.size(); aTableIt++)
+  //  {
+  //    VInspector_TableModelValues* aTableVals = dynamic_cast<VInspector_TableModelValues*>(aTableValues[aTableIt]);
+  //    if (!aTableVals)
+  //      continue;
+
+  //    // default shape by NULL selection
+  //    aTableVals->GetPaneShapes (-1, -1, theShapes);
+
+  //    for (QModelIndexList::const_iterator anIndicesIt = thePropertyPanelIndices.begin(); anIndicesIt != thePropertyPanelIndices.end(); anIndicesIt++)
+  //    {
+  //      QModelIndex anIndex = *anIndicesIt;
+  //      aTableVals->GetPaneShapes (anIndex.row(), anIndex.column(), theShapes);
+
+  //      if (!anItemProperties.IsNull())
+  //      {
+  //        anItemProperties->GetPresentations (anIndex.row(), anIndex.column(), aPropertyPresentations);
+  //      }
+  //    }
+  //  }
+  //}
+
+  //if (!aPropertyPresentations.IsEmpty())
+  //{
+  //  for (NCollection_List<Handle(Standard_Transient)>::Iterator aPrsIterator (aPropertyPresentations); aPrsIterator.More(); aPrsIterator.Next())
+  //  {
+  //    Handle(Convert_TransientShape) aShapePrs = Handle(Convert_TransientShape)::DownCast (aPrsIterator.Value());
+  //    if (!aShapePrs.IsNull())
+  //      theShapes.Append (aShapePrs->GetShape());
+  //  }
+  //}
 }
 
 // =======================================================================
@@ -581,7 +632,7 @@ void VInspector_Window::SetContext (const Handle(AIS_InteractiveContext)& theCon
   if (!myCallBack.IsNull())
     myCallBack->SetContext (theContext);
 
-  myPreviewParameters->GetDrawer()->Link (theContext->DefaultDrawer());
+  myDisplayPreview->SetContext (theContext);
 
   if (isFirst)
     onExportToMessageView();
@@ -657,8 +708,8 @@ void VInspector_Window::onTreeViewContextMenuRequested(const QPoint& thePosition
   }
 
   aMenu->addSeparator();
-  for (int aTypeId = (int)VInspector_DisplayActionType_DisplayId; aTypeId <= (int)VInspector_DisplayActionType_RemoveId; aTypeId++)
-    aMenu->addAction (ViewControl_Tools::CreateAction (VInspector_Tools::DisplayActionTypeToString ((VInspector_DisplayActionType) aTypeId),
+  for (int aTypeId = (int)View_DisplayActionType_DisplayId; aTypeId <= (int)View_DisplayActionType_RemoveId; aTypeId++)
+    aMenu->addAction (ViewControl_Tools::CreateAction (VInspector_Tools::DisplayActionTypeToString ((View_DisplayActionType) aTypeId),
                       SLOT (onDisplayActionTypeClicked()), GetMainWindow(), this));
   aMenu->addSeparator();
 
@@ -730,21 +781,34 @@ void VInspector_Window::onPropertyPanelShown (bool isToggled)
 // =======================================================================
 void VInspector_Window::onPropertyViewSelectionChanged()
 {
+  QModelIndex aTreeItemIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr aTreeItemSelected = TreeModel_ModelBase::GetItemByIndex (aTreeItemIndex);
+  if (!aTreeItemSelected)
+    return;
+
   QList<ViewControl_Table*> aPropertyTables;
   myPropertyView->GetActiveTables (aPropertyTables);
   if (aPropertyTables.isEmpty())
     return;
 
   ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
+  NCollection_List<Handle(Standard_Transient)> aSelPresentations;
+  aFirstTable->GetSelectedPresentations (aTreeItemSelected, aSelPresentations);
 
-  QMap<int, QList<int>> aSelectedIndices;
-  aFirstTable->GetSelectedIndices (aSelectedIndices);
+  //Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->GetProperties();
 
-  ViewControl_TableModel* aTableModel = dynamic_cast<ViewControl_TableModel*>(aFirstTable->GetTableView()->model());
-  ViewControl_TableModelValues* aTableValues = aTableModel->GetModelValues();
+
+  //QMap<int, QList<int>> aSelectedIndices;
+  //aFirstTable->GetSelectedIndices (aSelectedIndices);
+
+  //ViewControl_TableModel* aTableModel = dynamic_cast<ViewControl_TableModel*>(aFirstTable->GetTableView()->model());
+  //ViewControl_TableModelValues* aTableValues = aTableModel->GetModelValues();
 
   QStringList aPointers;
-  for (QMap<int, QList<int>>::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
+  aFirstTable->GetSelectedPointers (aPointers);
+
+  //NCollection_List<Handle(Standard_Transient)> aSelPresentations;
+  /*for (QMap<int, QList<int>>::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
   {
     int aRowId = aSelIt.key();
     QList<int> aColIds = aSelIt.value();
@@ -757,19 +821,23 @@ void VInspector_Window::onPropertyViewSelectionChanged()
       QString aData = aTableValues->Data (aRowId, aSelectedColId, Qt::DisplayRole).toString();
       if (aData.contains (ViewControl_Tools::GetPointerPrefix().ToCString()))
         aPointers.append (aData);
+
+      if (anItemProperties)
+        anItemProperties->GetPresentations (aRowId, aColId, aSelPresentations);
     }
-  }
+  }*/
   highlightTreeViewItems (aPointers);
 
-  Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
-  QModelIndexList aTreeViewSelected = myTreeView->selectionModel()->selectedIndexes();
-  NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (aTreeViewSelected);
+  //Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
+  //QModelIndexList aTreeViewSelected = myTreeView->selectionModel()->selectedIndexes();
+  //NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (aTreeViewSelected);
 
-  GetSelectedPropertyPanelShapes(aTreeViewSelected,
-                                 aFirstTable->GetTableView()->selectionModel()->selectedIndexes(),
-                                 aSelectedShapes);
+  //GetSelectedPropertyPanelShapes(aTreeViewSelected,
+  //                               aFirstTable->GetTableView()->selectionModel()->selectedIndexes(),
+  //                               aSelectedShapes);
+  //updatePreviewPresentation(aSelectedShapes, aSelectedPersistent);
 
-  updatePreviewPresentation(aSelectedShapes, aSelectedPersistent);
+  myDisplayPreview->UpdatePreview (View_DisplayActionType_DisplayId, aSelPresentations);
 }
 
 // =======================================================================
@@ -789,10 +857,24 @@ void VInspector_Window::onTreeViewSelectionChanged (const QItemSelection&,
   if (myPropertyPanelWidget->toggleViewAction()->isChecked())
     updatePropertyPanelBySelection();
 
-  Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
+  QModelIndex aTreeItemIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr aTreeItemSelected = TreeModel_ModelBase::GetItemByIndex (aTreeItemIndex);
+  if (!aTreeItemSelected)
+    return;
 
-  NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (myTreeView->selectionModel()->selectedIndexes());
-  updatePreviewPresentation(aSelectedShapes, aSelectedPersistent);
+  Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->GetProperties();
+  NCollection_List<Handle(Standard_Transient)> aSelPresentations;
+  if (anItemProperties)
+    anItemProperties->GetPresentations (-1, -1, aSelPresentations);
+  else
+    GetSelectedShapes (aSelPresentations);
+  myDisplayPreview->UpdatePreview (View_DisplayActionType_DisplayId, aSelPresentations);
+
+  //Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
+
+  //NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (myTreeView->selectionModel()->selectedIndexes());
+
+  //updatePreviewPresentation(aSelectedShapes, aSelectedPersistent);
 
   QApplication::restoreOverrideCursor();
 }
@@ -914,26 +996,7 @@ void VInspector_Window::onExportToShapeView()
 // =======================================================================
 void VInspector_Window::onDefaultPreview()
 {
-  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
-  if (!aViewModel)
-    return;
-
-  Handle(AIS_InteractiveContext) aContext = aViewModel->GetContext();
-  if (aContext.IsNull())
-    return;
-
-  BRep_Builder aBuilder;
-  TopoDS_Compound aCompound;
-  aBuilder.MakeCompound (aCompound);
-  aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (gp_Pnt(25., 10., 0.)));
-  aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt(20., 20., 0.), gp_Pnt(30., 20., 10.)));
-  //aBuilder.Add (aCompound, BRepBuilderAPI_MakeFace (gp_Pln (gp_Pnt (20., 30., 0.), gp_Dir (1., 0., 0.))).Face());
-  aBuilder.Add (aCompound, VInspector_Tools::CreateBoxShape (gp_Pnt(20., 40., 0.), gp_Pnt(30., 60., 10.)));
-
-  Handle(AIS_Shape) aDefaultPreview = new AIS_Shape (aCompound);
-  aDefaultPreview->SetAttributes (myPreviewParameters->GetDrawer());
-  if (!aContext.IsNull())
-    aContext->Display (aDefaultPreview, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+  myDisplayPreview->DisplayDefaultPreview();
 
   UpdateTreeModel();
 }
@@ -1085,7 +1148,7 @@ void VInspector_Window::updatePropertyPanelBySelection()
 // purpose :
 // =======================================================================
 
-void VInspector_Window::displaySelectedPresentations (const VInspector_DisplayActionType theType)
+void VInspector_Window::displaySelectedPresentations (const View_DisplayActionType theType)
 {
   VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
   if (!aViewModel)
@@ -1102,24 +1165,35 @@ void VInspector_Window::displaySelectedPresentations (const VInspector_DisplayAc
   NCollection_List<Handle(AIS_InteractiveObject)> aSelectedPresentations = GetSelectedPresentations (aSelectionModel);
   const QModelIndexList& aSelectedIndices = aSelectionModel->selectedIndexes();
 
-  bool aPreviewPresentationShown = !myPreviewPresentation.IsNull();
+  bool aPreviewPresentationShown = myDisplayPreview->HasPreview();
   // the order of objects returned by AIS_InteractiveContext is changed because the processed object is moved from
   // Erased to Displayed container or back
   aSelectionModel->clear();
 
   // redisplay preview presentation if exists
-  if (aPreviewPresentationShown && theType == VInspector_DisplayActionType_RedisplayId)
+  if (aPreviewPresentationShown && theType == View_DisplayActionType_RedisplayId)
   {
-    QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (aSelectedIndices);
-    for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
-    {
-      TreeModel_ItemBasePtr anItem = *anItemIt;
-      VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
-      if (aVItem)
-        aVItem->UpdatePresentationShape();
-    }
-    NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (aSelectedIndices);
-    updatePreviewPresentation(aSelectedShapes, GetSelectedTransformPers());
+    // REDISPLAY preview !
+
+    //QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (aSelectedIndices);
+    //NCollection_List<Handle(Standard_Transient)> aSelPresentations;
+
+    //for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
+    //{
+    //  TreeModel_ItemBasePtr anItem = *anItemIt;
+    //  VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
+    //  if (!aVItem)
+    //    continue;
+    //  aVItem->UpdatePresentationShape();
+
+    //  Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->GetProperties();
+    //  if (anItemProperties)
+    //    anItemProperties->GetPresentations (aRowId, aColId, aSelPresentations);
+    //}
+    //myDisplayPreview->UpdatePreview (theType, aSelPresentations);
+
+    //NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (aSelectedIndices);
+    //updatePreviewPresentation(aSelectedShapes, GetSelectedTransformPers());
   }
 
   if (aSelectedPresentations.Extent() == 0)
@@ -1130,16 +1204,16 @@ void VInspector_Window::displaySelectedPresentations (const VInspector_DisplayAc
     Handle(AIS_InteractiveObject) aPresentation = anIOIt.Value();
     switch (theType)
     {
-      case VInspector_DisplayActionType_DisplayId:
+      case View_DisplayActionType_DisplayId:
       {
         aContext->Display(aPresentation, false);
         aContext->Load(aPresentation, -1);
       }
       break;
 
-      case VInspector_DisplayActionType_RedisplayId: aContext->Redisplay (aPresentation, false); break;
-      case VInspector_DisplayActionType_EraseId: aContext->Erase (aPresentation, false); break;
-      case VInspector_DisplayActionType_RemoveId: aContext->Remove (aPresentation, false); break;
+      case View_DisplayActionType_RedisplayId: aContext->Redisplay (aPresentation, false); break;
+      case View_DisplayActionType_EraseId: aContext->Erase (aPresentation, false); break;
+      case View_DisplayActionType_RemoveId: aContext->Remove (aPresentation, false); break;
       default: break;
     }
   }
@@ -1238,44 +1312,44 @@ Handle(AIS_InteractiveContext) VInspector_Window::createView()
 // function : updatePreviewPresentation
 // purpose :
 // =======================================================================
-void VInspector_Window::updatePreviewPresentation (const NCollection_List<TopoDS_Shape>& theShapes,
-                                                   const Handle(Graphic3d_TransformPers)& thePersistent)
-{
-  Handle(AIS_InteractiveContext) aContext;
-  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
-  if (aViewModel)
-    aContext = aViewModel->GetContext();
-
-  if (theShapes.IsEmpty())
-  {
-    if (!aContext.IsNull())
-      aContext->Remove (myPreviewPresentation, Standard_True);
-    myPreviewPresentation = NULL;
-    return;
-  }
-
-  BRep_Builder aBuilder;
-  TopoDS_Compound aCompound;
-  aBuilder.MakeCompound (aCompound);
-  for (NCollection_List<TopoDS_Shape>::Iterator anIterator (theShapes); anIterator.More(); anIterator.Next())
-  {
-    aBuilder.Add (aCompound, anIterator.Value());
-  }
-
-  if (myPreviewPresentation.IsNull())
-  {
-    myPreviewPresentation = new AIS_Shape (aCompound);
-    myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
-
-    myPreviewPresentation->SetTransformPersistence(thePersistent);
-    if (!aContext.IsNull())
-      aContext->Display (myPreviewPresentation, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
-  }
-  else
-  {
-    Handle(AIS_Shape)::DownCast (myPreviewPresentation)->Set (aCompound);
-    myPreviewPresentation->SetTransformPersistence(thePersistent);
-    if (!aContext.IsNull())
-      aContext->Redisplay (myPreviewPresentation, Standard_True);
-  }
-}
+//void VInspector_Window::updatePreviewPresentation (const NCollection_List<TopoDS_Shape>& theShapes,
+//                                                   const Handle(Graphic3d_TransformPers)& thePersistent)
+//{
+//  Handle(AIS_InteractiveContext) aContext;
+//  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+//  if (aViewModel)
+//    aContext = aViewModel->GetContext();
+//
+//  if (theShapes.IsEmpty())
+//  {
+//    if (!aContext.IsNull())
+//      aContext->Remove (myPreviewPresentation, Standard_True);
+//    myPreviewPresentation = NULL;
+//    return;
+//  }
+//
+//  BRep_Builder aBuilder;
+//  TopoDS_Compound aCompound;
+//  aBuilder.MakeCompound (aCompound);
+//  for (NCollection_List<TopoDS_Shape>::Iterator anIterator (theShapes); anIterator.More(); anIterator.Next())
+//  {
+//    aBuilder.Add (aCompound, anIterator.Value());
+//  }
+//
+//  if (myPreviewPresentation.IsNull())
+//  {
+//    myPreviewPresentation = new AIS_Shape (aCompound);
+//    myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
+//
+//    myPreviewPresentation->SetTransformPersistence(thePersistent);
+//    if (!aContext.IsNull())
+//      aContext->Display (myPreviewPresentation, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+//  }
+//  else
+//  {
+//    Handle(AIS_Shape)::DownCast (myPreviewPresentation)->Set (aCompound);
+//    myPreviewPresentation->SetTransformPersistence(thePersistent);
+//    if (!aContext.IsNull())
+//      aContext->Redisplay (myPreviewPresentation, Standard_True);
+//  }
+//}

@@ -16,24 +16,23 @@
 #ifndef _TopoDS_AlertAttribute_HeaderFile
 #define _TopoDS_AlertAttribute_HeaderFile
 
-#include <Message_Attribute.hxx>
+#include <Message_AttributeStream.hxx>
 #include <TopoDS_Shape.hxx>
 
 //! Alert attributre object storing TopoDS shape in its field
-class TopoDS_AlertAttribute : public Message_Attribute 
+class TopoDS_AlertAttribute : public Message_AttributeStream 
 {
 public:
   //! Constructor with shape argument
-  TopoDS_AlertAttribute (const TopoDS_Shape& theShape,
-                         const TCollection_AsciiString& theName = TCollection_AsciiString(),
-                         const TCollection_AsciiString& theDescription = TCollection_AsciiString())
-  : Message_Attribute (theName, theDescription), myShape (theShape) {}
+  Standard_EXPORT TopoDS_AlertAttribute (const TopoDS_Shape& theShape,
+    const TCollection_AsciiString& theName = TCollection_AsciiString(),
+    const TCollection_AsciiString& theDescription = TCollection_AsciiString());
 
   //! Returns contained shape
   const TopoDS_Shape& GetShape() const { return myShape; }
   
   // OCCT RTTI
-  DEFINE_STANDARD_RTTIEXT(TopoDS_AlertAttribute, Message_Attribute)
+  DEFINE_STANDARD_RTTIEXT(TopoDS_AlertAttribute, Message_AttributeStream)
 
 private:
   TopoDS_Shape myShape;

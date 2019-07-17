@@ -17,6 +17,7 @@
 #include <TCollection.hxx>
 
 #include <Standard_OutOfRange.hxx>
+#include <TCollection_AsciiString.hxx>
 
 // The array of prime numbers used as consequtive steps for 
 // size of array of buckets in the map.
@@ -71,4 +72,289 @@ Standard_Integer TCollection::NextPrimeForMap(const Standard_Integer N)
     }
   }
   throw Standard_OutOfRange ("TCollection::NextPrimeForMap() - requested too big size");
+}
+
+// =======================================================================
+// function : GetPointerInfo
+// purpose :
+// =======================================================================
+
+TCollection_AsciiString TCollection::GetPointerInfo (const Handle(Standard_Transient)& thePointer, const bool isShortInfo)
+{
+  if (thePointer.IsNull())
+    return TCollection_AsciiString();
+
+  return GetPointerInfo(thePointer.operator->(), isShortInfo);
+}
+
+// =======================================================================
+// function : GetPointerInfo
+// purpose :
+// =======================================================================
+
+TCollection_AsciiString TCollection::GetPointerInfo (const void* thePointer, const bool isShortInfo)
+{
+  std::ostringstream aPtrStr;
+  aPtrStr << thePointer;
+  if (!isShortInfo)
+    return aPtrStr.str().c_str();
+
+  TCollection_AsciiString anInfoPtr (aPtrStr.str().c_str());
+  for (int aSymbolId = 1; aSymbolId < anInfoPtr.Length(); aSymbolId++)
+  {
+    if (anInfoPtr.Value(aSymbolId) != '0')
+    {
+      anInfoPtr = anInfoPtr.SubString(aSymbolId, anInfoPtr.Length());
+      anInfoPtr.Prepend(GetPointerPrefix());
+      return anInfoPtr;
+    }
+  }
+  return aPtrStr.str().c_str();
+}
+
+// ----------------------------------------------------------------------------
+// Join
+// ----------------------------------------------------------------------------
+
+TCollection_AsciiString TCollection::Join (const NCollection_List<TCollection_AsciiString>& theValues,
+                                           const TCollection_AsciiString& theSeparator)
+{
+  TCollection_AsciiString aValue;
+  for (NCollection_List<TCollection_AsciiString>::Iterator anIterator (theValues); anIterator.More(); anIterator.Next())
+  {
+    if (!aValue.IsEmpty())
+      aValue += theSeparator;
+
+    aValue += anIterator.Value();
+  }
+
+  return aValue;
+}
+
+// ----------------------------------------------------------------------------
+// Split
+// ----------------------------------------------------------------------------
+
+void TCollection::Split (const Standard_SStream& theStream,
+  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues)
+{
+  TCollection_AsciiString aStreamStr (theStream.str().c_str());
+
+  NCollection_List<TCollection_AsciiString> aValues;
+  Split (aStreamStr, DumpSeparator(), aValues);
+
+  for (NCollection_List<TCollection_AsciiString>::Iterator anIterator (aValues); anIterator.More(); anIterator.Next())
+  {
+    TCollection_AsciiString aKey = anIterator.Value();
+    anIterator.Next();
+    if (!anIterator.More())
+      break;
+    theValues.Add (aKey, anIterator.Value());
+  }
+}
+
+
+// ----------------------------------------------------------------------------
+// Split
+// ----------------------------------------------------------------------------
+
+void TCollection::Split (const TCollection_AsciiString& theValue,
+                         const TCollection_AsciiString& theSeparator,
+                         NCollection_List<TCollection_AsciiString>& theValues)
+{
+  TCollection_AsciiString aCurrentString = theValue;
+
+  TCollection_AsciiString aSplitValue, aTailValue, aKey;
+  while (!aCurrentString.IsEmpty())
+  {
+    TCollection_AsciiString aValueString = aCurrentString;
+    if (SplitDumped (aValueString, aSplitValue, aTailValue, aKey))
+    {
+      aValueString = aSplitValue;
+      aCurrentString = aTailValue;
+    }
+    else
+    {
+      Standard_Integer aPosition = aValueString.Search (theSeparator);
+      if (aPosition < 0 )
+        break;
+      aCurrentString = aValueString.Split (aPosition - 1);
+    }
+    theValues.Append (aValueString);
+    if (aCurrentString.IsEmpty())
+      break;
+
+    aCurrentString = aCurrentString.Split (theSeparator.Length());
+  }
+
+  if (theValues.Size() == 1)
+  {
+    TCollection_AsciiString aKey, aValue;
+    if (!SplitKey (theValues.First(), aValue, aKey))
+      return;
+
+    theValues.Clear();
+    Split (aValue, DumpSeparator(), theValues);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// SplitReal
+// ----------------------------------------------------------------------------
+
+Standard_Boolean TCollection::SplitReal (const TCollection_AsciiString& theValue,
+                                         const TCollection_AsciiString& theSeparator,
+                                         NCollection_Vector<Standard_Real>& theValues)
+{
+  TCollection_AsciiString aCurrentString = theValue;
+
+  while (!aCurrentString.IsEmpty())
+  {
+    TCollection_AsciiString aValueString = aCurrentString;
+    Standard_Integer aPosition = aValueString.Search (theSeparator);
+    if (aPosition < 0 )
+      break;
+
+    aCurrentString = aValueString.Split (aPosition);
+    if (!aValueString.IsRealValue())
+      return Standard_False;
+
+    theValues.Append (aValueString.RealValue());
+    aCurrentString = aCurrentString.Split (theSeparator.Length() + 1);
+  }
+
+  return !theValues.IsEmpty();
+}
+
+// ----------------------------------------------------------------------------
+// ToDumpString
+// ----------------------------------------------------------------------------
+
+TCollection_AsciiString TCollection::ToDumpString (const NCollection_List<TCollection_AsciiString>& theValues)
+{
+  return TCollection::Join (theValues, TCollection::VectorSeparator());
+}
+
+// ----------------------------------------------------------------------------
+// ToString
+// ----------------------------------------------------------------------------
+
+TCollection_AsciiString TCollection::ToDumpString (const Standard_SStream& theStream)
+{
+  return TCollection_AsciiString (theStream.str().c_str());
+}
+
+// ----------------------------------------------------------------------------
+// ConvertDumpToText
+// ----------------------------------------------------------------------------
+
+TCollection_AsciiString TCollection::ConvertDumpToText (const TCollection_AsciiString& theValue)
+{
+  TCollection_AsciiString aText = theValue;
+
+  //TCollection_AsciiString aCurrentString = theValue;
+  //while (!aCurrentString.IsEmpty())
+  //{
+  //  TCollection_AsciiString aValueString = aCurrentString;
+  //  Standard_Integer aPosition = aValueString.Search (theSeparator);
+  //  if (aPosition < 0 )
+  //    break;
+
+  //  aCurrentString = aValueString.Split (aPosition);
+  //  theValues.Append (aValueString);
+
+  //  aCurrentString = aCurrentString.Split (theSeparator.Length() + 1);
+  //}
+
+  //TCollection_AsciiString XMLBracketOpen() { return TCollection_AsciiString ("<"); }
+  //TCollection_AsciiString XMLBracketClose() { return TCollection_AsciiString (">"); }
+  //TCollection_AsciiString XMLFinishKey() { return TCollection_AsciiString ("\\"); }
+
+  return aText;
+}
+
+// ----------------------------------------------------------------------------
+// SplitDumped
+// ----------------------------------------------------------------------------
+
+Standard_Boolean TCollection::SplitDumped (const TCollection_AsciiString& theSourceValue,
+                                           TCollection_AsciiString& theSplitValue,
+                                           TCollection_AsciiString& theTailValue,
+                                           TCollection_AsciiString& theKey)
+{
+  Standard_Integer aBracketPosition = theSourceValue.Search (XMLBracketOpen());
+  // the first symbol is bracket
+  if (aBracketPosition != 1 || aBracketPosition >= theSourceValue.Length())
+    return Standard_False;
+
+  TCollection_AsciiString aValue = theSourceValue.SubString (aBracketPosition + 1, theSourceValue.Length());
+
+  aBracketPosition = aValue.Search (XMLBracketClose());
+  if (aBracketPosition <= 1 || aBracketPosition >= theSourceValue.Length())
+    return Standard_False;
+
+  theKey = aValue;
+
+  TCollection_AsciiString aTailValue = theKey.Split (aBracketPosition - 1);
+  aTailValue = aTailValue.SubString (2, aTailValue.Length()); // remove close bracket
+  TCollection_AsciiString aStopKey = StopKey (theKey);
+
+  aBracketPosition = theSourceValue.Search (aStopKey);
+
+  Standard_Integer aStopKeyLastPosition = aBracketPosition + aStopKey.Length() - 1;
+
+  //aBracketPosition = aTailValue.Search (aStopKey);
+  if (aBracketPosition <= 1 || aStopKeyLastPosition  > theSourceValue.Length())
+    return Standard_False;
+
+  theSplitValue = theSourceValue;
+  theTailValue = theSplitValue.Split (aStopKeyLastPosition);
+  //theSplitValue = aTailValue;
+  //aTailValue = theSplitValue.Split (aBracketPosition - 1);
+
+  //if (aTailValue.Length() < aStopKey.Length())
+  //  return Standard_False;
+
+  //if (aTailValue.Length() == aStopKey.Length())
+  //{
+  //  theTailValue = TCollection_AsciiString();
+  //  return Standard_True;
+  //}
+
+  //theTailValue = aTailValue.Split (aStopKey.Length());
+  return Standard_True;
+}
+
+// ----------------------------------------------------------------------------
+// SplitKey
+// ----------------------------------------------------------------------------
+
+Standard_Boolean TCollection::SplitKey (const TCollection_AsciiString& theSourceValue,
+                                        TCollection_AsciiString& theSplitValue,
+                                        TCollection_AsciiString& theKey)
+{
+  Standard_Integer aBracketPosition = theSourceValue.Search (XMLBracketOpen());
+  // the first symbol is bracket
+  if (aBracketPosition != 1 || aBracketPosition >= theSourceValue.Length())
+    return Standard_False;
+
+  TCollection_AsciiString aValue = theSourceValue.SubString (aBracketPosition + 1, theSourceValue.Length());
+
+  aBracketPosition = aValue.Search (XMLBracketClose());
+  if (aBracketPosition <= 1 || aBracketPosition >= theSourceValue.Length())
+    return Standard_False;
+
+  theKey = aValue;
+
+  TCollection_AsciiString aTailValue = theKey.Split (aBracketPosition - 1);
+  aTailValue = aTailValue.SubString (2, aTailValue.Length()); // remove close bracket
+  TCollection_AsciiString aStopKey = StopKey (theKey);
+
+  aBracketPosition = theSourceValue.Search (aStopKey);
+  if (aBracketPosition <= 1 || aBracketPosition  >= theSourceValue.Length())
+    return Standard_False;
+
+  theSplitValue = aTailValue;
+  aTailValue = theSplitValue.Split (aBracketPosition - 1);
+  return Standard_True;
 }

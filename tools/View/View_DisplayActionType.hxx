@@ -13,17 +13,17 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspector_DisplayActionType_H
-#define VInspector_DisplayActionType_H
+#ifndef View_DisplayActionType_H
+#define View_DisplayActionType_H
 
-//! \enum VInspector_DisplayActionType
-enum VInspector_DisplayActionType
+//! \enum View_DisplayActionType
+enum View_DisplayActionType
 {
-  VInspector_DisplayActionType_NoneId, //!< No action activated
-  VInspector_DisplayActionType_DisplayId, //!< Display action
-  VInspector_DisplayActionType_RedisplayId, //!< Redisplay action
-  VInspector_DisplayActionType_EraseId, //!< Erase action
-  VInspector_DisplayActionType_RemoveId //!< Remove action
+  View_DisplayActionType_NoneId, //!< No action activated
+  View_DisplayActionType_DisplayId, //!< Display action
+  View_DisplayActionType_RedisplayId, //!< Redisplay action
+  View_DisplayActionType_EraseId, //!< Erase action
+  View_DisplayActionType_RemoveId //!< Remove action
 };
 
 #endif

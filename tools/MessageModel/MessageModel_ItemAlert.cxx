@@ -15,16 +15,17 @@
 
 #include <inspector/MessageModel_ItemAlert.hxx>
 
+#include <inspector/MessageModel_ItemPropertiesAttributeStream.hxx>
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/MessageModel_Tools.hxx>
 #include <inspector/ViewControl_Tools.hxx>
-#include <inspector/ViewControl_TransientShape.hxx>
+#include <inspector/Convert_TransientShape.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <Message_AlertExtended.hxx>
 #include <Message_AttributeObject.hxx>
-#include <Message_AttributeVectorOfValues.hxx>
+#include <Message_AttributeStream.hxx>
 #include <Message_CompositeAlerts.hxx>
 
 #include <Bnd_Box.hxx>
@@ -76,7 +77,7 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
 
     if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
       return QIcon (":/icons/item_shape.png");
-    else if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeVectorOfValues)))
+    else if (!Handle(Message_AttributeStream)::DownCast (anAttribute).IsNull())
       return QIcon (":/icons/item_vectorOfValues.png");
     else
       return QVariant();
@@ -218,17 +219,23 @@ void MessageModel_ItemAlert::Init()
   if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
   {
     Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+
     if (!anAttribute.IsNull())
     {
-      if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
-        myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
-      if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
-        myPresentations.Append (new ViewControl_TransientShape (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape()));
+      if (!Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
+      {
+        TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+        SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
+      }
+      //if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
+      //  myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
+      //if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+      //  myPresentations.Append (new Convert_TransientShape (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape()));
     }
-    TCollection_AsciiString aDescription = anExtendedAlert->Attribute()->GetDescription();
-    Bnd_Box aBox;
-    if (aBox.FromString (aDescription))
-      myPresentations.Append (new ViewControl_TransientShape (ViewControl_Tools::CreateShape (aBox)));
+    //TCollection_AsciiString aDescription = anExtendedAlert->Attribute()->GetDescription();
+    //Bnd_Box aBox;
+    //if (aBox.Init (Standard_SStream (aDescription.ToCString())))
+    //  myPresentations.Append (new Convert_TransientShape (Convert_Tools::CreateShape (aBox)));
   }
   MessageModel_ItemBase::Init();
 }

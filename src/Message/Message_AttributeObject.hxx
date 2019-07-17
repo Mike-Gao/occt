@@ -16,15 +16,16 @@
 #ifndef _Message_AttributeObject_HeaderFile
 #define _Message_AttributeObject_HeaderFile
 
-#include <Message_Attribute.hxx>
+#include <Message_AttributeStream.hxx>
 #include <TCollection_AsciiString.hxx>
 
 //! Alert object storing Transient object in its field
-class Message_AttributeObject : public Message_Attribute
+class Message_AttributeObject : public Message_AttributeStream
 {
 public:
   //! Constructor with string argument
   Standard_EXPORT Message_AttributeObject (const Handle(Standard_Transient)& theObject,
+    const Standard_SStream& theStream,
     const TCollection_AsciiString& theName = TCollection_AsciiString(),
     const TCollection_AsciiString& theDescription = TCollection_AsciiString());
 
@@ -36,7 +37,7 @@ public:
   Handle(Standard_Transient) GetObject() const { return myObject; }
 
   // OCCT RTTI
-  DEFINE_STANDARD_RTTIEXT(Message_AttributeObject, Message_Attribute)
+  DEFINE_STANDARD_RTTIEXT(Message_AttributeObject, Message_AttributeStream)
 
 private:
   Handle(Standard_Transient) myObject;

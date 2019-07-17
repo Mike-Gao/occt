@@ -13,6 +13,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/ViewControl_TransientShape.hxx>
+#include <inspector/Convert_TransientShape.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(ViewControl_TransientShape, Standard_Transient)
+IMPLEMENT_STANDARD_RTTIEXT(Convert_TransientShape, Standard_Transient)

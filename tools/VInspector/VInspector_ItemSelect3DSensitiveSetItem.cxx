@@ -54,6 +54,8 @@
 //#include <inspector/ViewControl_Table.hxx>
 //#include <inspector/ViewControl_Tools.hxx>
 //
+
+#include <inspector/Convert_Tools.hxx>
 #include <Standard_WarningsDisable.hxx>
 //#include <QStringList>
 #include <QColor>

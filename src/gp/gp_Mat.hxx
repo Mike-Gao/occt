@@ -17,6 +17,7 @@
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
+#include <Standard_DumpMask.hxx>
 #include <Standard_Handle.hxx>
 
 #include <Standard_Real.hxx>
@@ -254,6 +255,9 @@ public:
 
   //! Transposes the matrix. A(j, i) -> A (i, j)
     Standard_NODISCARD gp_Mat Transposed() const;
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
 
 
 friend class gp_XYZ;

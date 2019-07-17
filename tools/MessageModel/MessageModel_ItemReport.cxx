@@ -16,7 +16,7 @@
 #include <inspector/MessageModel_ItemReport.hxx>
 
 #include <inspector/MessageModel_ItemAlert.hxx>
-#include <inspector/MessageModel_ItemReportProperties.hxx>
+#include <inspector/MessageModel_ItemPropertiesReport.hxx>
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_Tools.hxx>
 
@@ -128,7 +128,7 @@ void MessageModel_ItemReport::Init()
   myReport = aRootItem ? aRootItem->GetReport (Row(), myDescription) : Handle(Message_Report)();
 
   TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
-  SetProperties (new MessageModel_ItemReportProperties(anItem));
+  SetProperties (new MessageModel_ItemPropertiesReport (anItem));
 
   MessageModel_ItemBase::Init();
 }

@@ -18,6 +18,7 @@
 #include <inspector/ViewControl_TableModel.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
+#include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -106,7 +107,7 @@ void ViewControl_Table::Init (ViewControl_TableModelValues* theModelValues)
 // purpose :
 // =======================================================================
 
-void ViewControl_Table::GetSelectedIndices (QMap<int, QList<int>>& theSelectedIndices)
+void ViewControl_Table::GetSelectedIndices (QMap<int, QList<int>>& theSelectedIndices) const
 {
   QModelIndexList aSelected = myTableView->selectionModel()->selectedIndexes();
 
@@ -130,4 +131,65 @@ void ViewControl_Table::GetSelectedIndices (QMap<int, QList<int>>& theSelectedIn
 QString ViewControl_Table::SeparatorData()
 {
   return ViewControl_Tools::TableSeparator();
+}
+
+// =======================================================================
+// function : GetSelectedPresentations
+// purpose :
+// =======================================================================
+
+void ViewControl_Table::GetSelectedPresentations (const TreeModel_ItemBasePtr& theTreeItem,
+                                                  NCollection_List<Handle(Standard_Transient)>& theSelPresentations) const
+{
+  Handle(TreeModel_ItemProperties) anItemProperties = theTreeItem->GetProperties();
+  if (anItemProperties.IsNull())
+    return;
+
+  QMap<int, QList<int>> aSelectedIndices;
+  GetSelectedIndices (aSelectedIndices);
+
+  for (QMap<int, QList<int>>::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
+  {
+    int aRowId = aSelIt.key();
+    QList<int> aColIds = aSelIt.value();
+    for (int aColId = 0; aColId < aColIds.size(); aColId++)
+    {
+      int aSelectedColId = aColIds[aColId];
+      if (aSelectedColId != 1)
+        continue;
+
+      if (anItemProperties)
+        anItemProperties->GetPresentations (aRowId, aSelectedColId, theSelPresentations);
+    }
+  }
+}
+
+// =======================================================================
+// function : GetSelectedPointers
+// purpose :
+// =======================================================================
+
+void ViewControl_Table::GetSelectedPointers (QStringList& thePointers) const
+{
+  QMap<int, QList<int>> aSelectedIndices;
+  GetSelectedIndices (aSelectedIndices);
+
+  ViewControl_TableModel* aTableModel = dynamic_cast<ViewControl_TableModel*>(GetTableView()->model());
+  ViewControl_TableModelValues* aTableValues = aTableModel->GetModelValues();
+
+  for (QMap<int, QList<int>>::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
+  {
+    int aRowId = aSelIt.key();
+    QList<int> aColIds = aSelIt.value();
+    for (int aColId = 0; aColId < aColIds.size(); aColId++)
+    {
+      int aSelectedColId = aColIds[aColId];
+      if (aSelectedColId != 1)
+        continue;
+
+      QString aData = aTableValues->Data (aRowId, aSelectedColId, Qt::DisplayRole).toString();
+      if (aData.contains (ViewControl_Tools::GetPointerPrefix().ToCString()))
+        thePointers.append (aData);
+    }
+  }
 }

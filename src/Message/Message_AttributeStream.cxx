@@ -13,20 +13,35 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <Message_AttributeObject.hxx>
+#include <Message_AttributeStream.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeObject, Message_AttributeStream)
+#include <Message.hxx>
+#include <Message_Msg.hxx>
+#include <Message_PerfMeter.hxx>
+#include <Message_Report.hxx>
+
+IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeStream, Message_Attribute)
 
 //=======================================================================
-//function : Message_AttributeObject
+//function : SetValues
+//purpose  : 
+//=======================================================================
+Message_AttributeStream::Message_AttributeStream (const Standard_SStream& theStream,
+                                                  const TCollection_AsciiString& theName,
+                                                  const TCollection_AsciiString& theDescription)
+: Message_Attribute(theName, theDescription)
+{
+  SetStream (theStream);
+}
+
+//=======================================================================
+//function : SetStream
 //purpose  : 
 //=======================================================================
 
-Message_AttributeObject::Message_AttributeObject (const Handle(Standard_Transient)& theObject,
-                                                  const Standard_SStream& theStream,
-                                                  const TCollection_AsciiString& theName,
-                                                  const TCollection_AsciiString& theDescription)
-: Message_AttributeStream (theStream, theName, theDescription)
+void Message_AttributeStream::SetStream (const Standard_SStream& theStream)
 {
-  myObject = theObject;
+  TCollection_AsciiString aStreamStr (theStream.str().c_str());
+  myStream << aStreamStr;
 }
+

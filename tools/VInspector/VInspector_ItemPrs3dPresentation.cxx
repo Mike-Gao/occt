@@ -21,6 +21,8 @@
 #include <inspector/ViewControl_Table.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
+#include <inspector/Convert_Tools.hxx>
+
 #include <Graphic3d.hxx>
 
 // =======================================================================
@@ -223,7 +225,7 @@ bool VInspector_ItemPrs3dPresentation::SetTableData (const int theRow, const int
 TopoDS_Shape VInspector_ItemPrs3dPresentation::buildPresentationShape()
 {
   if (!myPresentation.IsNull())
-    myPresentationShape = VInspector_Tools::CreateShape (myPresentation->MinMaxValues());
+    myPresentationShape = Convert_Tools::CreateShape (myPresentation->MinMaxValues());
 
   return TopoDS_Shape();
 }

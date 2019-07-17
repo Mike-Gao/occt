@@ -22,8 +22,10 @@
 #include <Standard.hxx>
 #include <Standard_Boolean.hxx>
 #include <Standard_DefineAlloc.hxx>
+#include <Standard_DumpMask.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Handle.hxx>
+#include <Standard_OStream.hxx>
 #include <Standard_Real.hxx>
 
 class Standard_ConstructionError;
@@ -348,6 +350,9 @@ void operator *= (const gp_Trsf& T)
     theMat.SetValue (3, 2, static_cast<T> (0));
     theMat.SetValue (3, 3, static_cast<T> (1));
   }
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
 
 friend class gp_GTrsf;
 

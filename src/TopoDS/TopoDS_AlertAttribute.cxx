@@ -18,3 +18,20 @@
 #include <Message_Msg.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(TopoDS_AlertAttribute, Message_Attribute)
+
+//=======================================================================
+//function : TopoDS_AlertAttribute
+//purpose  : 
+//=======================================================================
+
+
+TopoDS_AlertAttribute::TopoDS_AlertAttribute (const TopoDS_Shape& theShape,
+  const TCollection_AsciiString& theName,
+  const TCollection_AsciiString& theDescription)
+: Message_AttributeStream (Standard_SStream(), theName, theDescription), myShape (theShape)
+{
+  Standard_SStream aStream;
+  theShape.Dump (aStream);
+
+  SetStream (aStream);
+}

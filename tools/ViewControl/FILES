@@ -26,6 +26,4 @@ ViewControl_TableModelValuesDefault.cxx
 ViewControl_TableModelValuesDefault.hxx
 ViewControl_Tools.cxx
 ViewControl_Tools.hxx
-ViewControl_TransientShape.cxx
-ViewControl_TransientShape.hxx
 ViewControl_TreeView.hxx

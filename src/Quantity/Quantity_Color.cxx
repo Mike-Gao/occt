@@ -22,6 +22,7 @@
 #include <Quantity_ColorRGBA.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_OutOfRange.hxx>
+#include <TCollection.hxx>
 #include <TCollection_AsciiString.hxx>
 
 #include <string.h>
@@ -3928,40 +3929,59 @@ void call_rgbhls (float r, float g, float b, float& h, float& l, float& s)
 	}
 }
 
+
+const TCollection_AsciiString Quantity_Color_ClassName = "Quantity_Color";
+
 //=======================================================================
-// function : ToString
-// purpose  :
+//function : Dump
+//purpose  : 
 //=======================================================================
-TCollection_AsciiString Quantity_Color::ToString() const
+
+void Quantity_Color::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
 {
-  NCollection_Vector<Standard_Real> aValues;
-  aValues.Append (MyRed);
-  aValues.Append (MyGreen);
-  aValues.Append (MyBlue);
+  DUMP_START_KEY (OS, Quantity_Color_ClassName);
 
-  Standard_SStream OS;
+  DUMP_VALUES (OS, "MyRed", MyRed);
+  DUMP_VALUES (OS, "MyGreen", MyGreen);
+  DUMP_VALUES (OS, "MyBlue", MyBlue);
 
-  TCollection_AsciiString aValue;
-  DUMP_VEC_COLOR(aValues, aValue)
-
-  return aValue;
+  DUMP_STOP_KEY (OS, Quantity_Color_ClassName);
 }
 
 //=======================================================================
-// function : FromString
-// purpose  :
+//function : Init
+//purpose  : 
 //=======================================================================
-Standard_Boolean Quantity_Color::FromString (const TCollection_AsciiString& theValue)
+
+Standard_Boolean Quantity_Color::Init (const Standard_OStream& OS)
 {
-  NCollection_Vector<Standard_Real> aValues;
-  DUMP_VEC_COLOR_SPLIT (theValue, aValues)
+  //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
+  //Standard_SStream aSStream (OS);
+  //TCollection::Split (aSStream, aStreamValues);
 
-  if (aValues.Size() != 3)
-    return Standard_False;
+  //TCollection_AsciiString anXYZValue;
+  //if (!aStreamValues.FindFromKey (Quantity_Color_ClassName, anXYZValue))
+  //  anXYZValue = anXYZValue;
+  //else if (aStreamValues.Size() == 1)
+  //{
+  //  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>::Iterator anIterator (aStreamValues);
+  //  TCollection_AsciiString aValueStr = anIterator.Value();
+  //  Standard_Integer aPosition = aValueStr.Search (Quantity_Color_ClassName + TCollection::ClassNameSeparator());
+  //  if (aPosition < 1)
+  //    return Standard_False;
+  //  anXYZValue = aValueStr.Split (aPosition);
+  //}
 
-  MyRed = (Standard_ShortReal)aValues.Value (0);
-  MyGreen = (Standard_ShortReal)aValues.Value (1);
-  MyBlue = (Standard_ShortReal)aValues.Value (2);
+  //NCollection_Vector<Standard_Real> aValues;
+  //if (!TCollection::SplitReal (anXYZValue, TCollection::VectorSeparator(), aValues))
+  //  return Standard_False;
+
+  //if (aValues.Size() != 3)
+  //  return Standard_False;
+
+  //MyRed = (Standard_ShortReal)aValues.Value (1);
+  //MyGreen = (Standard_ShortReal)aValues.Value (2);
+  //MyBlue = (Standard_ShortReal)aValues.Value (3);
 
   return Standard_True;
 }

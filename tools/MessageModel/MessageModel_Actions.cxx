@@ -63,7 +63,9 @@ MessageModel_Actions::MessageModel_Actions (QWidget* theParent,
                     ViewControl_Tools::CreateAction (tr ("Export to ShapeView"), SLOT (OnExportToShapeView()), parent(), this));
 #ifdef DEBUG_ALERTS
   myActions.insert (MessageModel_ActionType_Test,
-                    ViewControl_Tools::CreateAction ("Test", SLOT (OnTestAlerts()), parent(), this));
+                    ViewControl_Tools::CreateAction ("Test <clock>", SLOT (OnTestClock()), parent(), this));
+  myActions.insert (MessageModel_ActionType_Test,
+                    ViewControl_Tools::CreateAction ("Test <PropertyPanel>", SLOT (OnTestPropetyPanel()), parent(), this));
 #endif
 }
 
@@ -266,12 +268,12 @@ void MessageModel_Actions::OnExportToShapeView()
 }
 
 // =======================================================================
-// function : OnTestAlerts
+// function : OnTestClock
 // purpose :
 // =======================================================================
 #include <OSD_Chronometer.hxx>
 #include <ctime>
-void MessageModel_Actions::OnTestAlerts()
+void MessageModel_Actions::OnTestClock()
 {
 #ifdef DEBUG_ALERTS
   QModelIndex aReportIndex;
@@ -294,11 +296,14 @@ void MessageModel_Actions::OnTestAlerts()
       aValue = (aValue * 2. + 3.) * 0.5 - 0.3 * 0.5;
 
       Standard_Real aValue3 = aValue + aValue2 * 0.2;
+      (void)aValue3;
       //MESSAGE_INFO ("Calculate", aValue, &aPerfMeter, NULL);
     }
   }
 
-  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitLayoutChanged();
+  //((MessageModel_TreeModel*)mySelectionModel->model())->EmitLayoutChanged();
+
+  myTreeModel->UpdateTreeModel();
 
   //Standard_Real aSystemSeconds1, aCurrentSeconds1;
   //OSD_Chronometer::GetThreadCPU (aCurrentSeconds1, aSystemSeconds1);
@@ -309,5 +314,46 @@ void MessageModel_Actions::OnTestAlerts()
 
   unsigned int end_time = clock();
   std::cout << "clock() = " << end_time - start_time << std::endl;
+#endif
+}
+
+// =======================================================================
+// function : OnTestClock
+// purpose :
+// =======================================================================
+void MessageModel_Actions::OnTestPropetyPanel()
+{
+#ifdef DEBUG_ALERTS
+  QModelIndex aReportIndex;
+  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
+  if (aReport.IsNull())
+    return;
+
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO ("MessageModel_Actions::OnTestAlerts()", "", &aPerfMeter, NULL);
+
+  // gp_XYZ
+  {
+    gp_XYZ aCoords (1.3, 2.3, 3.4);
+    Standard_SStream aStream;
+    aCoords.Dump (aStream, Standard_DumpMask_SingleValue);
+    MESSAGE_INFO_STREAM(aStream, "gp_XYZ", "", &aPerfMeter, NULL);
+  }
+  // Bnd_Box
+  {
+    Bnd_Box aBox(20., 15., 10., 25., 20., 15.);
+    Standard_SStream aStream;
+    aBox.Dump (aStream, Standard_DumpMask_SingleValue);
+    MESSAGE_INFO_STREAM(aStream, "Bnd_Box", "", &aPerfMeter, NULL);
+  }
+  // Bnd_OBB
+  {
+    Bnd_OBB anOBB (gp_Pnt (-10., -15., -10.), gp_Dir (1., 0., 0.), gp_Dir (0., 1., 0.), gp_Dir (0., 0., 1.),
+                  5., 10., 5.);
+    Standard_SStream aStream;
+    anOBB.Dump (aStream, Standard_DumpMask_SingleValue);
+    MESSAGE_INFO_STREAM(aStream, "Bnd_OBB", "", &aPerfMeter, NULL);
+  }
+  myTreeModel->UpdateTreeModel();
 #endif
 }

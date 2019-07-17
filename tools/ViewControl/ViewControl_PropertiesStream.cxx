@@ -14,7 +14,6 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/ViewControl_PropertiesStream.hxx>
-#include <inspector/ViewControl_TransientShape.hxx>
 
 #include <BRepBuilderAPI_MakeVertex.hxx>
 
@@ -108,8 +107,8 @@ void ViewControl_PropertiesStream::GetPresentations (const int theRow,
   TCollection_AsciiString aStrValue = aValue.toString().toStdString().c_str();
 
   gp_XYZ aPoint;
-  if (!aPoint.FromString (aStrValue))
+  if (!aPoint.Init (Standard_SStream (aStrValue.ToCString())))
     return;
 
-  thePresentations.Append (new ViewControl_TransientShape (BRepBuilderAPI_MakeVertex (aPoint)));
+  //thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPoint)));
 }

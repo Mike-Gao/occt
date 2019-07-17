@@ -179,7 +179,6 @@ private:
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
   Handle(Message_ReportCallBack) myCallBack; //! < message call back to update content of the view
 
-  Handle(AIS_InteractiveContext) myContext; //! current context
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
   NCollection_List<Handle(Standard_Transient)> myPreviewPresentations;
 };

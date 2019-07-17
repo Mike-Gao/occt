@@ -17,6 +17,7 @@
 #include <Bnd_B3d.hxx>
 #include <NCollection_Array1.hxx>
 #include <Precision.hxx>
+#include <TCollection.hxx>
 #include <TColStd_Array1OfReal.hxx>
 
 class OBBTool
@@ -677,19 +678,79 @@ void Bnd_OBB::Add(const Bnd_OBB& theOther)
   ReBuild(TColgp_Array1OfPnt(aList[0], 0, 15));
 }
 
-// =======================================================================
-// function : Init
-// purpose  : 
-// =======================================================================
-Standard_Boolean Bnd_OBB::Init (const Standard_OStream&)
+const TCollection_AsciiString Bnd_OBB_ClassName = "Bnd_OBB";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Bnd_OBB::Dump (Standard_OStream& OS, const Standard_Integer /*theMask*/) const
 {
-  return Standard_False;
+  DUMP_START_KEY (OS, Bnd_OBB_ClassName);
+  {
+    Standard_SStream aTmpStream;
+    myCenter.Dump (aTmpStream);
+    DUMP_VALUES (OS, "Center", TCollection::ToDumpString (aTmpStream));
+  }
+  {
+    Standard_SStream aTmpStream;
+    myAxes[0].Dump (aTmpStream);
+    DUMP_VALUES (OS, "XAxis", TCollection::ToDumpString (aTmpStream));
+  }
+  {
+    Standard_SStream aTmpStream;
+    myAxes[1].Dump (aTmpStream);
+    DUMP_VALUES (OS, "YAxis", TCollection::ToDumpString (aTmpStream));
+  }
+  {
+    Standard_SStream aTmpStream;
+    myAxes[2].Dump (aTmpStream);
+    DUMP_VALUES (OS, "ZAxis", TCollection::ToDumpString (aTmpStream));
+  }
+
+  DUMP_VALUES (OS, "XHSize", XHSize());
+  DUMP_VALUES (OS, "YHSize", YHSize());
+  DUMP_VALUES (OS, "ZHSize", ZHSize());
+  DUMP_VALUES (OS, "IsAABox", myIsAABox);
+
+  DUMP_STOP_KEY (OS, Bnd_OBB_ClassName);
 }
 
-// =======================================================================
-// function : Dump
-// purpose  : 
-// =======================================================================
-void Bnd_OBB::Dump (Standard_OStream&) const
+//=======================================================================
+//function : Init
+//purpose  : 
+//=======================================================================
+
+Standard_Boolean Bnd_OBB::Init (const Standard_OStream& /*OS*/)
 {
+  //NCollection_DataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
+  //Standard_SStream aSStream (OS);
+  //TCollection::Split (aSStream, aStreamValues);
+
+  //TCollection_AsciiString anXYZValue;
+  //if (aStreamValues.Size() == 1)
+  //{
+  //  NCollection_DataMap<TCollection_AsciiString, TCollection_AsciiString>::Iterator anIterator (aStreamValues);
+  //  TCollection_AsciiString aValueStr = anIterator.Value();
+  //  Standard_Integer aPosition = aValueStr.Search (Bnd_Box_ClassName + TCollection::ClassNameSeparator());
+  //  if (aPosition < 1)
+  //    return Standard_False;
+  //  anXYZValue = aValueStr.Split (aPosition);
+  //}
+
+  //NCollection_Vector<Standard_Real> aValues;
+  //if (!TCollection::SplitReal (anXYZValue, TCollection::VectorSeparator(), aValues))
+  //  return Standard_False;
+
+  //if (aValues.Size() != 8)
+  //  return Standard_False;
+
+  //Update (aValues.Value (1), aValues.Value (2), aValues.Value (3), aValues.Value (4), aValues.Value (5), aValues.Value (6));
+  //Gap = aValues.Value (7);
+  //Flags = (Standard_Integer)aValues.Value (8);
+
+  //return Standard_True;
+
+  return Standard_False;
 }

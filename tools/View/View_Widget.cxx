@@ -78,9 +78,9 @@ View_Widget::View_Widget (QWidget* theParent,
   {
     myViewer->InitViewer (myViewer->CreateStandardViewer());
 
-    Handle(AIS_Trihedron) aTrihedron = new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY()));
-    aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
-    myViewer->GetContext()->Display (aTrihedron, Standard_True);
+    //Handle(AIS_Trihedron) aTrihedron = new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY()));
+    //aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
+    //myViewer->GetContext()->Display (aTrihedron, Standard_True);
   }
 
   setAttribute (Qt::WA_PaintOnScreen);

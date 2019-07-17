@@ -13,8 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef ViewControl_TransientShape_H
-#define ViewControl_TransientShape_H
+#ifndef Convert_TransientShape_H
+#define Convert_TransientShape_H
 
 #include <Standard.hxx>
 #include <Standard_Handle.hxx>
@@ -24,19 +24,19 @@
 
 #include <TopoDS_Shape.hxx>
 
-DEFINE_STANDARD_HANDLE (ViewControl_TransientShape, Standard_Transient)
+DEFINE_STANDARD_HANDLE (Convert_TransientShape, Standard_Transient)
 
-//! \class ViewControl_TransientShape
+//! \class Convert_TransientShape
 //! \brief An interface to create custom panes by transient object name.
-class ViewControl_TransientShape : public Standard_Transient
+class Convert_TransientShape : public Standard_Transient
 {
 public:
 
   //! Constructor
-  ViewControl_TransientShape (const TopoDS_Shape& theShape) { SetShape (theShape); }
+  Convert_TransientShape (const TopoDS_Shape& theShape) { SetShape (theShape); }
 
   //! Destructor
-  virtual ~ViewControl_TransientShape() {}
+  virtual ~Convert_TransientShape() {}
 
   //! Fills current shape
   void SetShape (const TopoDS_Shape& theShape) { myShape = theShape; }
@@ -44,7 +44,7 @@ public:
   //! Returns current shape
   const TopoDS_Shape GetShape() const { return myShape; }
 
-  DEFINE_STANDARD_RTTIEXT (ViewControl_TransientShape, Standard_Transient)
+  DEFINE_STANDARD_RTTIEXT (Convert_TransientShape, Standard_Transient)
 
 private:
   TopoDS_Shape myShape;

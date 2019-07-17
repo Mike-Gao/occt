@@ -48,6 +48,8 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Vertex.hxx>
 
+#include <inspector/Convert_Tools.hxx>
+
 #include <inspector/VInspector_ItemContext.hxx>
 #include <inspector/VInspector_ItemSelectBasicsEntityOwner.hxx>
 #include <inspector/VInspector_ItemSelectMgrSensitiveEntity.hxx>
@@ -205,7 +207,7 @@ void VInspector_ItemSelectBasicsSensitiveEntity::GetPresentations(NCollection_Li
   if (!myPresentation.IsNull())
     return;
 
-  Handle(Select3D_SensitiveEntity) aBaseEntity = Handle(Select3D_SensitiveEntity)::DownCast (GetSensitiveEntity());
+  Handle(Select3D_SensitiveEntity) aBaseEntity = GetSensitiveEntity();
   if (aBaseEntity.IsNull())
     return;
 
@@ -276,7 +278,6 @@ QVariant VInspector_ItemSelectBasicsSensitiveEntity::GetTableData (const int the
     case 10: return ViewControl_Table::SeparatorData();
     default: return getTableData (theRow, theColumn, theRole, anEntity->DynamicType()->Name());
   }
-  return QVariant();
 }
 
 // =======================================================================
@@ -308,7 +309,7 @@ QVariant VInspector_ItemSelectBasicsSensitiveEntity::getTableData (const int the
                                                                    const int,
                                                                    const TCollection_AsciiString& theEntityKind) const
 {
-  Handle(Select3D_SensitiveEntity) aBaseEntity = Handle(Select3D_SensitiveEntity)::DownCast (GetSensitiveEntity());
+  Handle(Select3D_SensitiveEntity) aBaseEntity = GetSensitiveEntity();
   if (aBaseEntity.IsNull())
     return QVariant();
 
@@ -428,7 +429,7 @@ QVariant VInspector_ItemSelectBasicsSensitiveEntity::getTableData (const int the
 TopoDS_Shape VInspector_ItemSelectBasicsSensitiveEntity::buildPresentationShape
   (const Handle(SelectBasics_SensitiveEntity)& theEntity)
 {
-  Handle(Select3D_SensitiveEntity) aBaseEntity = Handle(Select3D_SensitiveEntity)::DownCast (theEntity);
+  Handle(Select3D_SensitiveEntity) aBaseEntity = theEntity;
   if (aBaseEntity.IsNull())
     return TopoDS_Shape();
 
@@ -446,7 +447,7 @@ TopoDS_Shape VInspector_ItemSelectBasicsSensitiveEntity::buildPresentationShape
   if (aTypeName == STANDARD_TYPE (Select3D_SensitiveBox)->Name())
   {
     Handle(Select3D_SensitiveBox) anEntity = Handle(Select3D_SensitiveBox)::DownCast (aBaseEntity);
-    TopoDS_Shape aShape = VInspector_Tools::CreateShape(anEntity->Box());
+    TopoDS_Shape aShape = Convert_Tools::CreateShape(anEntity->Box());
     aBuilder.Add (aCompound, aShape);
   }
   else if (aTypeName == STANDARD_TYPE (Select3D_SensitiveFace)->Name())

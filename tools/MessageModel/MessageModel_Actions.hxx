@@ -82,8 +82,11 @@ public slots:
   //! Exports the first selected shape into ShapeViewer plugin.
   void OnExportToShapeView();
 
-  //! Sending several alerts to check message-alert-tool mechanizm
-  void OnTestAlerts();
+  //! Sending several alerts to check time of message-alert-tool mechanizm
+  void OnTestClock();
+
+  //! Sending several alerts to check property panel/presentations of message-alert-tool mechanizm
+  void OnTestPropetyPanel();
 
 protected:
   //! Returns report of selected tree view item if a report item is selected

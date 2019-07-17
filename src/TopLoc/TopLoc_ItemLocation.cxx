@@ -16,6 +16,7 @@
 
 
 #include <TopLoc_Datum3D.hxx>
+#include <TCollection.hxx>
 #include <TopLoc_ItemLocation.hxx>
 #include <TopLoc_Location.hxx>
 #include <TopLoc_SListOfItemLocation.hxx>
@@ -31,4 +32,31 @@ TopLoc_ItemLocation::TopLoc_ItemLocation
   myPower(P),
   myTrsf (D->Transformation().Powered (P))
 {
+}
+
+const TCollection_AsciiString TopLoc_ItemLocation_ClassName = "TopLoc_ItemLocation";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void TopLoc_ItemLocation::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+{
+  DUMP_START_KEY (OS, TopLoc_ItemLocation_ClassName);
+
+  DUMP_VALUES (OS, "Power", myPower);
+  {
+    Standard_SStream aTmpStream;
+    myTrsf.Dump (aTmpStream);
+    DUMP_VALUES (OS, "Trsf", TCollection::ToDumpString (aTmpStream));
+  }
+  {
+    Standard_SStream aTmpStream;
+    if (!myDatum.IsNull())
+      myDatum->Dump (aTmpStream);
+    DUMP_VALUES (OS, "Datum", TCollection::ToDumpString (aTmpStream));
+  }
+
+  DUMP_STOP_KEY (OS, TopLoc_ItemLocation_ClassName);
 }

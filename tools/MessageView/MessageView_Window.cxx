@@ -30,7 +30,7 @@
 #include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
-#include <inspector/ViewControl_TransientShape.hxx>
+#include <inspector/Convert_TransientShape.hxx>
 
 #include <inspector/View_Tools.hxx>
 #include <inspector/View_Viewer.hxx>
@@ -361,7 +361,6 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
 
   if (!aContext.IsNull())
   {
-    myContext = aContext;
     myViewWindow->SetContext (View_ContextType_External, aContext);
   }
 
@@ -719,17 +718,16 @@ void MessageView_Window::updatePropertyPanelBySelection()
 // =======================================================================
 void MessageView_Window::updatePreviewPresentation (const NCollection_List<Handle(Standard_Transient)>& thePresentations)
 {
-  if (myContext.IsNull())
+  Handle(AIS_InteractiveContext) aContext = myViewWindow->GetViewToolBar()->GetCurrentContext();
+  if (aContext.IsNull())
     return;
-
-  Handle(AIS_InteractiveContext) aContext = myContext;
 
   if (!myPreviewPresentations.IsEmpty())
   {
     for (NCollection_List<Handle(Standard_Transient)>::Iterator aDisplayedIt (myPreviewPresentations); aDisplayedIt.More(); aDisplayedIt.Next())
     {
       Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (aDisplayedIt.Value());
-      if (!aPrs.IsNull())
+      if (!aPrs.IsNull() && aPrs->GetContext() == aContext)
         aContext->Remove (aPrs, Standard_True);
     }
   }
@@ -747,18 +745,20 @@ void MessageView_Window::updatePreviewPresentation (const NCollection_List<Handl
     Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (aDisplayedIt.Value());
     if (!aPrs.IsNull())
     {
+      if (!aPrs->GetContext().IsNull())
+        continue; // not possible to display one object in several contexts
       aContext->Display (aPrs, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
     }
-    else if (!Handle(ViewControl_TransientShape)::DownCast (aDisplayedIt.Value()).IsNull())
+    else if (!Handle(Convert_TransientShape)::DownCast (aDisplayedIt.Value()).IsNull())
     {
-      Handle(ViewControl_TransientShape) aShapeObject = Handle(ViewControl_TransientShape)::DownCast (aDisplayedIt.Value());
+      Handle(Convert_TransientShape) aShapeObject = Handle(Convert_TransientShape)::DownCast (aDisplayedIt.Value());
       aBuilder.Add (aCompound, aShapeObject->GetShape());
     }
   }
 
   if (aCompound.IsNull())
   {
-    if (!aContext.IsNull())
+    if (!aContext.IsNull() && myPreviewPresentation->GetContext() == aContext)
       aContext->Remove (myPreviewPresentation, Standard_True);
     myPreviewPresentation = NULL;
     return;
@@ -769,7 +769,7 @@ void MessageView_Window::updatePreviewPresentation (const NCollection_List<Handl
     if (myPreviewPresentation.IsNull())
     {
       myPreviewPresentation = new AIS_Shape (aCompound);
-      myPreviewPresentation->SetAttributes (GetPreviewAttributes(myContext));
+      myPreviewPresentation->SetAttributes (GetPreviewAttributes(aContext));
       //myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
 
       //myPreviewPresentation->SetTransformPersistence(thePersistent);
@@ -780,7 +780,7 @@ void MessageView_Window::updatePreviewPresentation (const NCollection_List<Handl
     {
       Handle(AIS_Shape)::DownCast (myPreviewPresentation)->Set (aCompound);
       //myPreviewPresentation->SetTransformPersistence(thePersistent);
-      if (!aContext.IsNull())
+      if (!aContext.IsNull() && myPreviewPresentation->GetContext() == aContext)
         aContext->Redisplay (myPreviewPresentation, Standard_True);
     }
   }
