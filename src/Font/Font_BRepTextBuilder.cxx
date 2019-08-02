@@ -34,7 +34,7 @@ TopoDS_Shape Font_BRepTextBuilder::Perform (Font_BRepFont&            theFont,
   myBuilder.MakeCompound (aResult);
 
   Standard_Real aScaleUnits    = theFont.Scale();
-  for (Font_TextFormatter::Iterator aFormatterIt (theFormatter, Font_TextFormatter::IterationFilter_ExcludeInvisible);
+  for (Font_TextFormatter::Iterator aFormatterIt (*theFormatter, Font_TextFormatter::IterationFilter_ExcludeInvisible);
        aFormatterIt .More(); aFormatterIt .Next())
   {
     const NCollection_Vec2<Standard_ShortReal>& aCorner = theFormatter->BottomLeft (aFormatterIt.SymbolPosition());

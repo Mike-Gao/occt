@@ -702,7 +702,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     Handle(Font_TextFormatter) aFormatter = myFormatter;
     if (myFormatter.IsNull())
     {
-      aFormatter = new Font_TextFormatter();
+      aFormatter = theCtx->DefaultTextFormatter();
       aFormatter->SetupAlignment (myParams.HAlign, myParams.VAlign);
       aFormatter->Reset();
 

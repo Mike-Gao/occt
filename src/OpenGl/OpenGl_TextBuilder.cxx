@@ -59,7 +59,7 @@ void OpenGl_TextBuilder::createGlyphs (const Handle(Font_TextFormatter)&        
   theTCrdsPerTexture.Clear();
 
   OpenGl_Font::Tile aTile = {Font_Rect(), Font_Rect(), 0u};
-  for (Font_TextFormatter::Iterator aFormatterIt (theFormatter, Font_TextFormatter::IterationFilter_ExcludeInvisible);
+  for (Font_TextFormatter::Iterator aFormatterIt (*theFormatter, Font_TextFormatter::IterationFilter_ExcludeInvisible);
        aFormatterIt .More(); aFormatterIt .Next())
   {
     theFont.RenderGlyph (theCtx, aFormatterIt.Symbol(), aTile);

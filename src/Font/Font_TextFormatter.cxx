@@ -126,15 +126,14 @@ void Font_TextFormatter::Append (const NCollection_String& theString,
   int aSymbolsCounter = 0; // special counter to process tabulation symbols
 
   // first pass - render all symbols using associated font on single ZERO baseline
-  Handle(Font_TextFormatter) aFormatter (this);
   Standard_Utf32Char aCharThis;
-  for (Font_TextFormatter::Iterator aFormatterIt (aFormatter); aFormatterIt .More(); aFormatterIt .Next())
+  for (Font_TextFormatter::Iterator aFormatterIt (*this); aFormatterIt .More(); aFormatterIt .Next())
   {
     aCharThis = aFormatterIt.Symbol();
     const Standard_Utf32Char aCharNext = aFormatterIt.SymbolNext();
 
     Standard_ShortReal anAdvanceX = 0;
-    if (Font_TextFormatter::IsCommandSymbol (aCharThis))
+    if (IsCommandSymbol (aCharThis))
     {
       continue; // skip unsupported carriage control codes
     }
@@ -176,7 +175,7 @@ void Font_TextFormatter::newLine (const Standard_Integer theLastRect,
   Standard_Integer aFirstCornerId = myRectLineStart;
   Standard_Integer aLastCornerId = theLastRect;
 
-  if (aFirstCornerId >= getRectsNb())
+  if (aFirstCornerId >= myCorners.Length())
   {
     ++myLinesNb;
     myPenCurrLine -= myLineSpacing;
@@ -210,7 +209,7 @@ void Font_TextFormatter::newLine (const Standard_Integer theLastRect,
 // =======================================================================
 void Font_TextFormatter::Format()
 {
-  if (getRectsNb() == 0 || myIsFormatted)
+  if (myCorners.Length() == 0 || myIsFormatted)
   {
     return;
   }
@@ -243,8 +242,7 @@ void Font_TextFormatter::Format()
     }
   }
 
-  Handle(Font_TextFormatter) aFormatter (this);
-  for (Font_TextFormatter::Iterator aFormatterIt (aFormatter);
+  for (Font_TextFormatter::Iterator aFormatterIt (*this);
        aFormatterIt .More(); aFormatterIt .Next())
   {
     const Standard_Utf32Char aCharThis = aFormatterIt.Symbol();
@@ -275,7 +273,7 @@ void Font_TextFormatter::Format()
   myBndWidth = aMaxLineWidth;
 
   // move last line
-  newLine (getRectsNb() - 1, aMaxLineWidth);
+  newLine (myCorners.Length() - 1, aMaxLineWidth);
 
   // apply vertical alignment style
   if (myAlignY == Graphic3d_VTA_BOTTOM)
@@ -293,7 +291,7 @@ void Font_TextFormatter::Format()
 
   if (myAlignY != Graphic3d_VTA_TOP)
   {
-    moveY (myCorners, myBndTop, 0, getRectsNb() - 1);
+    moveY (myCorners, myBndTop, 0, myCorners.Length() - 1);
   }
 }
 
@@ -303,7 +301,7 @@ void Font_TextFormatter::Format()
 // =======================================================================
 Standard_Boolean Font_TextFormatter::BndBox (const Standard_Integer theIndex, Font_Rect& theBndBox) const
 {
-  if (theIndex < 0 || theIndex >= GetCorners().Size())
+  if (theIndex < 0 || theIndex >= Corners().Size())
     return Standard_False;
 
   const NCollection_Vec2<Standard_ShortReal>& aLeftCorner = BottomLeft (theIndex);
@@ -355,10 +353,10 @@ Standard_Boolean Font_TextFormatter::IsLFSymbol (const Standard_Integer theIndex
 }
 
 // =======================================================================
-// function : GetFirstPosition
+// function : FirstPosition
 // purpose  :
 // =======================================================================
-Standard_ShortReal Font_TextFormatter::GetFirstPosition() const
+Standard_ShortReal Font_TextFormatter::FirstPosition() const
 {
   switch (myAlignX)
   {
@@ -397,22 +395,6 @@ Standard_Integer Font_TextFormatter::LineIndex (const Standard_Integer theIndex)
     return 0;
 
   return (Standard_Integer)Abs((BottomLeft (theIndex).y() + myAscender) / myLineSpacing);
-}
-
-// =======================================================================
-// function : IsCommandSymbol
-// purpose  :
-// =======================================================================
-Standard_Boolean Font_TextFormatter::IsCommandSymbol (const Standard_Utf32Char& theSymbol)
-{
-  if (theSymbol == '\x0D' // CR  (carriage return)
-   || theSymbol == '\a'   // BEL (alarm)
-   || theSymbol == '\f'   // FF  (form feed) NP (new page)
-   || theSymbol == '\b'   // BS  (backspace)
-   || theSymbol == '\v')  // VT  (vertical tab)
-   return Standard_True;
-
-  return Standard_False;
 }
 
 // =======================================================================

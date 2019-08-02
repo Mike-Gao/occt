@@ -61,9 +61,9 @@ public:
   {
   public:
     //! Constructor with initialization.
-    Iterator (const Handle(Font_TextFormatter)& theFormatter,
+    Iterator (const Font_TextFormatter& theFormatter,
               IterationFilter theFilter = IterationFilter_None)
-    : myFormatter (theFormatter), myFilter (theFilter), myIter (theFormatter->myString.Iterator())
+    : myFilter (theFilter), myIter (theFormatter.myString.Iterator())
     {
       mySymbolPosition = readNextSymbol (-1, mySymbolChar);
       mySymbolNext = readNextSymbol (mySymbolPosition, mySymbolCharNext);
@@ -76,16 +76,16 @@ public:
     Standard_Boolean HasNext() const { return mySymbolNext >= 0; }
 
     //! Returns current symbol.
-    const Standard_Utf32Char& Symbol() const { return mySymbolChar; }
+    Standard_Utf32Char Symbol() const { return mySymbolChar; }
 
     //! Returns the next symbol if exists.
-    const Standard_Utf32Char& SymbolNext() const { return mySymbolCharNext; }
+    Standard_Utf32Char SymbolNext() const { return mySymbolCharNext; }
 
     //! Returns current symbol position.
-    const Standard_Integer& SymbolPosition() const { return mySymbolPosition; }
+    Standard_Integer SymbolPosition() const { return mySymbolPosition; }
 
     //! Returns the next symbol position.
-    const Standard_Integer& SymbolPositionNext() const { return mySymbolNext; }
+    Standard_Integer SymbolPositionNext() const { return mySymbolNext; }
 
     //! Moves to the next item.
     void Next()
@@ -122,7 +122,6 @@ public:
     }
 
   protected:
-    Handle(Font_TextFormatter) myFormatter; //!< source class for iterating
     IterationFilter myFilter; //!< possibility to filter not-necessary symbols
 
     NCollection_Utf8Iter myIter; //!< the next symbol iterator value over the text formatter string
@@ -170,20 +169,13 @@ public:
   Standard_EXPORT Standard_Boolean IsLFSymbol (const Standard_Integer theIndex) const;
 
   //! Returns position of the first symbol in a line using alignment
-  Standard_EXPORT Standard_ShortReal GetFirstPosition() const;
+  Standard_EXPORT Standard_ShortReal FirstPosition() const;
 
   //! Returns column index of the corner index in the current line
   Standard_EXPORT Standard_Integer LinePositionIndex (const Standard_Integer theIndex) const;
 
   //! Returns row index of the corner index among text lines
   Standard_EXPORT Standard_Integer LineIndex (const Standard_Integer theIndex) const;
-
-  //! Returns current rendering string.
-  //! Obsolete method, please use Iterator to get the string characters
-  //inline const NCollection_String& String() const
-  //{
-  //  return myString;
-  //}
 
   //! Returns tab size.
   inline Standard_Integer TabSize() const
@@ -242,12 +234,22 @@ public:
   }
 
   //!< Returns internal container of the top left corners of a formatted rectangles.
-  const NCollection_Vector < NCollection_Vec2<Standard_ShortReal> >& GetCorners() const { return myCorners; }
+  const NCollection_Vector < NCollection_Vec2<Standard_ShortReal> >& Corners() const { return myCorners; }
 
-  const NCollection_Vector<Standard_ShortReal>& GetNewLines() const { return myNewLines; }
+  const NCollection_Vector<Standard_ShortReal>& NewLines() const { return myNewLines; }
 
   //!< Returns true if the symbol is CR, BEL, FF, NP, BS or VT
-  Standard_EXPORT static Standard_Boolean IsCommandSymbol (const Standard_Utf32Char& theSymbol);
+  static inline Standard_Boolean IsCommandSymbol (const Standard_Utf32Char& theSymbol)
+  {
+    if (theSymbol == '\x0D' // CR  (carriage return)
+     || theSymbol == '\a'   // BEL (alarm)
+     || theSymbol == '\f'   // FF  (form feed) NP (new page)
+     || theSymbol == '\b'   // BS  (backspace)
+     || theSymbol == '\v')  // VT  (vertical tab)
+      return Standard_True;
+
+    return Standard_False;
+  }
 
   DEFINE_STANDARD_RTTIEXT (Font_TextFormatter, Standard_Transient)
 
@@ -256,9 +258,6 @@ protected: //! @name class auxiliary methods
   //! Move glyphs on the current line to correct position.
   Standard_EXPORT void newLine (const Standard_Integer theLastRect,
                                 const Standard_ShortReal theMaxLineWidth);
-
-  //!< Returns rectangle number
-  Standard_Integer getRectsNb() { return myCorners.Length(); }
 
 protected: //! @name configuration
 
