@@ -41,7 +41,7 @@ const TCollection_AsciiString TopLoc_ItemLocation_ClassName = "TopLoc_ItemLocati
 //purpose  : 
 //=======================================================================
 
-void TopLoc_ItemLocation::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void TopLoc_ItemLocation::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, TopLoc_ItemLocation_ClassName);
 

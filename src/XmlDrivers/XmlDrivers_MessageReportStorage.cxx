@@ -255,7 +255,8 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
     Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
     // store values
     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
-    TCollection::Split (aValuesArrayAlert->GetStream(), aValues);
+    TCollection_AsciiString aKey;
+    TCollection::Split (aValuesArrayAlert->GetStream(), aValues, aKey);
     if (aValues.IsEmpty())
       return;
     int anArraySize = 2 * aValues.Size();

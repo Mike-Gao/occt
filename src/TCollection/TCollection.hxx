@@ -25,6 +25,7 @@
 #include <TCollection_AsciiString.hxx>
 
 #include <NCollection_IndexedDataMap.hxx>
+#include <NCollection_IndexedMap.hxx>
 #include <NCollection_List.hxx>
 #include <NCollection_Vector.hxx>
 
@@ -113,13 +114,15 @@ public:
   //! \param theStream stream value
   //! \param theValues [out] container of split values
   Standard_EXPORT static void Split (const Standard_SStream& theStream,
-                                     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
+                                     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues,
+                                     TCollection_AsciiString& theKey);
 
+private:
   //! Unites list of string into one string using the separator
-  Standard_EXPORT static void Split (const TCollection_AsciiString& theValue,
+  Standard_EXPORT static void split (const TCollection_AsciiString& theValue,
                                      const TCollection_AsciiString& theSeparator,
                                      NCollection_List<TCollection_AsciiString>& theValues);
-
+public:
   //! Unites list of string into one string using the separator
   Standard_EXPORT static Standard_Boolean SplitReal (const TCollection_AsciiString& theValue,
                                                      const TCollection_AsciiString& theSeparator,
@@ -143,7 +146,7 @@ public:
   //! Splits a AsciiString into two sub-strings using Dump keys.
   //! Example:
   //! aString contains "<key>abc</key>defg"
-  //! aString.SplitDumped() gives <me> = "abc" and returns "defg"
+  //! aString.SplitDumped() gives theSplitValue = "abc", theTailValue = "defg", theKey = "key"
   Standard_EXPORT static Standard_Boolean SplitDumped (const TCollection_AsciiString& theSourceValue,
                                                        TCollection_AsciiString& theSplitValue,
                                                        TCollection_AsciiString& theTailValue,
@@ -153,7 +156,12 @@ public:
   //! theSplitValue = value, theKey = key.
   Standard_EXPORT static Standard_Boolean SplitKey (const TCollection_AsciiString& theSourceValue,
                                                     TCollection_AsciiString& theSplitValue,
+                                                    TCollection_AsciiString& theTailValue,
                                                     TCollection_AsciiString& theKey);
+
+  //! Returns true if the value has bracket key
+  static Standard_Boolean HasBracketKey (const TCollection_AsciiString& theSourceValue)
+  { return theSourceValue.Search (TCollection::XMLBracketOpen()) >= 0; }
 
 protected:
   static TCollection_AsciiString XMLBracketOpen() { return TCollection_AsciiString ("<"); }

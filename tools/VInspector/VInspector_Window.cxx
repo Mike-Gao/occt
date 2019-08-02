@@ -48,7 +48,7 @@
 #include <inspector/VInspector_ItemSelectBasicsEntityOwner.hxx>
 #include <inspector/VInspector_ItemFolderObject.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
-#include <inspector/VInspector_PropertiesCreator.hxx>
+//#include <inspector/VInspector_PropertiesCreator.hxx>
 #include <inspector/VInspector_TableModelValues.hxx>
 #include <inspector/VInspector_ToolBar.hxx>
 #include <inspector/VInspector_Tools.hxx>
@@ -134,7 +134,7 @@ VInspector_Window::VInspector_Window()
   //((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (VINSPECTOR_DEFAULT_TREE_VIEW_WIDTH,
   //                                                               VINSPECTOR_DEFAULT_TREE_VIEW_HEIGHT));
   VInspector_ViewModel* aTreeModel = new VInspector_ViewModel (myTreeView);
-  aTreeModel-> AddPropertiesCreator(new VInspector_PropertiesCreator());
+  //aTreeModel->AddPropertiesCreator(new VInspector_PropertiesCreator());
   myTreeView->setModel (aTreeModel);
   // hide Visibility column
   TreeModel_HeaderSection anItem = aTreeModel->GetHeaderItem ((int)TreeModel_ColumnType_Visibility);
@@ -156,7 +156,7 @@ VInspector_Window::VInspector_Window()
 
   // property view
   myPaneCreators.Append (new VInspectorPaneAIS_PaneCreator());
-  aTreeModel->AddPropertiesCreator (new VInspectorPaneAIS_PropertiesCreator());
+  //aTreeModel->AddPropertiesCreator (new VInspectorPaneAIS_PropertiesCreator());
 
   myPropertyView = new ViewControl_PropertyView (myMainWindow,
     QSize(VINSPECTOR_DEFAULT_PROPERTY_VIEW_WIDTH, VINSPECTOR_DEFAULT_PROPERTY_VIEW_HEIGHT));
@@ -862,12 +862,12 @@ void VInspector_Window::onTreeViewSelectionChanged (const QItemSelection&,
   if (!aTreeItemSelected)
     return;
 
-  Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->GetProperties();
   NCollection_List<Handle(Standard_Transient)> aSelPresentations;
+  Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->GetProperties();
   if (anItemProperties)
     anItemProperties->GetPresentations (-1, -1, aSelPresentations);
-  else
-    GetSelectedShapes (aSelPresentations);
+  //else
+  GetSelectedShapes (aSelPresentations);
   myDisplayPreview->UpdatePreview (View_DisplayActionType_DisplayId, aSelPresentations);
 
   //Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();

@@ -15,7 +15,6 @@
 
 #include <inspector/MessageModel_ItemAlert.hxx>
 
-#include <inspector/MessageModel_ItemPropertiesAttributeStream.hxx>
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/MessageModel_Tools.hxx>
@@ -171,6 +170,33 @@ int MessageModel_ItemAlert::initRowCount() const
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void MessageModel_ItemAlert::GetStream (Standard_OStream& OS) const
+{
+  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (getAlert());
+  if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
+  {
+    Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+    if (!anAttribute.IsNull())
+    {
+      if (!Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
+      {
+        //if (GetProperties().IsNull())
+        //{
+        //  TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+        //  SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
+        //}
+        Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
+        //Handle(MessageModel_ItemPropertiesAttributeStream) aProperties = Handle(MessageModel_ItemPropertiesAttributeStream)::DownCast (GetProperties());
+        OS << anAttributeStream->GetStream().str();
+      }
+    }
+  }
+}
+
+// =======================================================================
 // function : createChild
 // purpose :
 // =======================================================================
@@ -215,17 +241,22 @@ void MessageModel_ItemAlert::Init()
     }
   }
 
-  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(myAlert);
+  /*Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(myAlert);
   if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
   {
     Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
-
     if (!anAttribute.IsNull())
     {
       if (!Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
       {
-        TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
-        SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
+        if (GetProperties().IsNull())
+        {
+          TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+          SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
+        }
+        Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
+        Handle(MessageModel_ItemPropertiesAttributeStream) aProperties = Handle(MessageModel_ItemPropertiesAttributeStream)::DownCast (GetProperties());
+        aProperties->Init (anAttributeStream->GetStream());
       }
       //if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
       //  myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
@@ -236,7 +267,7 @@ void MessageModel_ItemAlert::Init()
     //Bnd_Box aBox;
     //if (aBox.Init (Standard_SStream (aDescription.ToCString())))
     //  myPresentations.Append (new Convert_TransientShape (Convert_Tools::CreateShape (aBox)));
-  }
+  }*/
   MessageModel_ItemBase::Init();
 }
 

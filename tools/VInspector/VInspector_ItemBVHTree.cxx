@@ -163,7 +163,8 @@ TreeModel_ItemBasePtr VInspector_ItemBVHTree::createChild (int theRow, int theCo
 // =======================================================================
 TopoDS_Shape VInspector_ItemBVHTree::buildPresentationShape()
 {
-  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = myTree;
+  return TopoDS_Shape();
+  /*opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = myTree;
   if (aBVHTree.IsNull())
     return TopoDS_Shape();
 
@@ -194,5 +195,5 @@ TopoDS_Shape VInspector_ItemBVHTree::buildPresentationShape()
       aBuilder.Add (aCompound, aShape);
     }
   }
-  return aCompound;
+  return aCompound;*/
 }

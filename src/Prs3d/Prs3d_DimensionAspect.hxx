@@ -115,6 +115,9 @@ public:
   //! Returns format.
   const TCollection_AsciiString& ValueStringFormat() const { return myValueStringFormat; }
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
+
 protected:
 
   Handle(Prs3d_LineAspect)  myLineAspect;

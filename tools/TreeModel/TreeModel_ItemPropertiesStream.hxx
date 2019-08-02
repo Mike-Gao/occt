@@ -35,24 +35,33 @@
 
 class QItemDelegate;
 
-DEFINE_STANDARD_HANDLE (MessageModel_ItemPropertiesAttributeStream, TreeModel_ItemProperties)
+DEFINE_STANDARD_HANDLE (TreeModel_ItemPropertiesStream, TreeModel_ItemProperties)
 
-//! \class MessageModel_ItemPropertiesAttributeStream
+//! \class TreeModel_ItemPropertiesStream
 //! \brief This is an interace for ViewControl_TableModel to give real values of the model
 //! It should be filled or redefined.
-class MessageModel_ItemPropertiesAttributeStream : public TreeModel_ItemProperties
+class TreeModel_ItemPropertiesStream : public TreeModel_ItemProperties
 {
 public:
 
   //! Constructor
-  Standard_EXPORT MessageModel_ItemPropertiesAttributeStream (TreeModel_ItemBasePtr theItem)
+  Standard_EXPORT TreeModel_ItemPropertiesStream (TreeModel_ItemBasePtr theItem)
     : TreeModel_ItemProperties (theItem) {}
 
   //! Destructor
-  virtual ~MessageModel_ItemPropertiesAttributeStream() {}
+  virtual ~TreeModel_ItemPropertiesStream() {}
+
+  //! Returns Key of the current stream
+  const TCollection_AsciiString& GetKey() const { return myKey; }
+
+  //! Returns Key of the current stream
+  Standard_EXPORT TCollection_AsciiString GetChildKey (const Standard_Integer theRow) const;
+
+  //! Returns sub stream inside the current stream
+  Standard_EXPORT void GetChildStream (const Standard_Integer theRow, Standard_OStream& OS) const;
 
   //! If me has internal values, it should be initialized here.
-  Standard_EXPORT virtual void Init();
+  Standard_EXPORT virtual void Init (const Standard_SStream& theStream);
 
   //! If the item has internal values, there should be reseted here.
   Standard_EXPORT virtual void Reset();
@@ -82,19 +91,43 @@ public:
   //! \param theValue a new cell value
   Standard_EXPORT virtual bool SetTableData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
 
-  DEFINE_STANDARD_RTTIEXT (MessageModel_ItemPropertiesAttributeStream, TreeModel_ItemProperties)
+  //! Returns presentation of the attribute to be visualized in the view
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \thePresentations [out] container of presentation handles to be visualized
+  Standard_EXPORT virtual void GetPresentations (const int theRow, const int theColumn,
+    NCollection_List<Handle(Standard_Transient)>& thePresentations) Standard_OVERRIDE;
+
+  //! Returns number of item children
+  //! \return an integer value, ZERO by default
+  Standard_EXPORT virtual int ChildItemCount() const Standard_OVERRIDE;
+
+  //! Creates a child item in the given position.
+  //! \param theRow the child row position
+  //! \param theColumn the child column position
+  //! \return the created item
+  Standard_EXPORT virtual TreeModel_ItemBasePtr CreateChildItem (int theRow, int theColumn) const;
+
+  DEFINE_STANDARD_RTTIEXT (TreeModel_ItemPropertiesStream, TreeModel_ItemProperties)
 
 protected:
   //! Returns attribute with stream value
+  const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetChildrenValues() const
+  {
+    return myChildren;
+  }
+
+  //! Returns attribute with stream value
   const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetValues() const
   {
-    if (!IsInitialized())
-      const_cast<MessageModel_ItemPropertiesAttributeStream*>(this)->Init();
     return myValues;
   }
 
 protected:
+  TCollection_AsciiString myKey;
+  Standard_SStream myStream;
   NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myValues;
+  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myChildren;
 };
 
 #endif

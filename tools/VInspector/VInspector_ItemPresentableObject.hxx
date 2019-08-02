@@ -64,6 +64,10 @@ public:
   //! \thePresentations [out] container of presentation handles to be visualized
   Standard_EXPORT virtual void GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations);
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& OS) const Standard_OVERRIDE;
+
   //! Returns number of table rows
   //! \return an integer value
   virtual int GetTableRowCount() const Standard_OVERRIDE;

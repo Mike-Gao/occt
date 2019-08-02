@@ -19,7 +19,6 @@
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
-#include <Standard_DumpMask.hxx>
 #include <Standard_Handle.hxx>
 
 #include <Standard_Integer.hxx>
@@ -52,7 +51,7 @@ public:
   Standard_EXPORT TopLoc_ItemLocation(const Handle(TopLoc_Datum3D)& D, const Standard_Integer P);
 
   //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
 
 friend class TopLoc_Location;

@@ -120,6 +120,19 @@ int VInspector_ItemPrs3dAspect::initRowCount() const
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemPrs3dAspect::GetStream (Standard_OStream& OS) const
+{
+  Handle(Prs3d_BasicAspect) anAspect = GetAspect();
+  if (anAspect.IsNull())
+    return;
+
+  anAspect->Dump (OS);
+}
+
+// =======================================================================
 // function : createChild
 // purpose :
 // =======================================================================

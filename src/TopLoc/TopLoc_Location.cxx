@@ -238,7 +238,7 @@ const TCollection_AsciiString TopLoc_Location_ClassName = "TopLoc_Location";
 //purpose  : 
 //=======================================================================
 
-void TopLoc_Location::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void TopLoc_Location::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, TopLoc_Location_ClassName);
 
@@ -252,7 +252,6 @@ void TopLoc_Location::Dump (Standard_OStream& OS, const Standard_Integer theMask
   TopLoc_SListOfItemLocation items = myItems;
   if (!items.IsEmpty())
   {
-    DUMP_VALUES (OS, "Items", "");
     while (items.More())
     {
       Standard_SStream aTmpStream;

@@ -198,8 +198,9 @@ int TreeModel_ModelBase::rowCount (const QModelIndex& theParent) const
         if (aProperties)
           break;
       }
+      // TODO: dump properties should be united with properties created by the creator
+      aParentItem->SetProperties (aProperties);
     }
-    aParentItem->SetProperties (aProperties);
   }
 
   return aParentItem ? aParentItem->rowCount() : 0;

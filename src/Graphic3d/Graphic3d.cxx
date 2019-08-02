@@ -19,7 +19,7 @@ namespace
 {
   static Standard_CString Graphic3d_Table_PrintZLayerId[6] =
   {
-    "INKNOWN", "DEFAULT", "TOP", "TOPMOST", "TOP_OSD", "BOT_OSD"
+    "UNKNOWN", "DEFAULT", "TOP", "TOPMOST", "TOP_OSD", "BOT_OSD"
   };
 
   static Standard_CString Graphic3d_Table_PrintHorizontalTextAlignment[3] =

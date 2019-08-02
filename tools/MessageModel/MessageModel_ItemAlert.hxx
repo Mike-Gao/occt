@@ -77,6 +77,10 @@ public:
   //! \return number of children.
   Standard_EXPORT virtual int initRowCount() const Standard_OVERRIDE;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& OS) const Standard_OVERRIDE;
+
   //! Sets some shape to present the item
   //! \param theShape shape instance
   void SetCustomShape (const TopoDS_Shape& theShape) { myCustomShape = theShape; }

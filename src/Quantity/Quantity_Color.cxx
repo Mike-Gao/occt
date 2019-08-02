@@ -3937,7 +3937,7 @@ const TCollection_AsciiString Quantity_Color_ClassName = "Quantity_Color";
 //purpose  : 
 //=======================================================================
 
-void Quantity_Color::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void Quantity_Color::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, Quantity_Color_ClassName);
 
@@ -3953,11 +3953,12 @@ void Quantity_Color::Dump (Standard_OStream& OS, const Standard_Integer theMask)
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean Quantity_Color::Init (const Standard_OStream& OS)
+Standard_Boolean Quantity_Color::Init (const Standard_OStream& /*OS*/)
 {
   //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
   //Standard_SStream aSStream (OS);
-  //TCollection::Split (aSStream, aStreamValues);
+  //TCollection_AsciiString aKey;
+  //TCollection::Split (aSStream, aStreamValues, aKey);
 
   //TCollection_AsciiString anXYZValue;
   //if (!aStreamValues.FindFromKey (Quantity_Color_ClassName, anXYZValue))

@@ -136,12 +136,23 @@ TCollection_AsciiString TCollection::Join (const NCollection_List<TCollection_As
 // ----------------------------------------------------------------------------
 
 void TCollection::Split (const Standard_SStream& theStream,
-  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues)
+  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues,
+  TCollection_AsciiString& theKey)
 {
   TCollection_AsciiString aStreamStr (theStream.str().c_str());
 
+  TCollection_AsciiString aSplitValue, aTailValue, aKey;
+  if (SplitKey (aStreamStr, aSplitValue, aTailValue, aKey))
+  {
+    if (aTailValue.IsEmpty())
+    {
+      theKey = aKey;
+      aStreamStr = aSplitValue;
+    }
+  }
+
   NCollection_List<TCollection_AsciiString> aValues;
-  Split (aStreamStr, DumpSeparator(), aValues);
+  split (aStreamStr, DumpSeparator(), aValues);
 
   for (NCollection_List<TCollection_AsciiString>::Iterator anIterator (aValues); anIterator.More(); anIterator.Next())
   {
@@ -155,10 +166,10 @@ void TCollection::Split (const Standard_SStream& theStream,
 
 
 // ----------------------------------------------------------------------------
-// Split
+// split
 // ----------------------------------------------------------------------------
 
-void TCollection::Split (const TCollection_AsciiString& theValue,
+void TCollection::split (const TCollection_AsciiString& theValue,
                          const TCollection_AsciiString& theSeparator,
                          NCollection_List<TCollection_AsciiString>& theValues)
 {
@@ -185,16 +196,6 @@ void TCollection::Split (const TCollection_AsciiString& theValue,
       break;
 
     aCurrentString = aCurrentString.Split (theSeparator.Length());
-  }
-
-  if (theValues.Size() == 1)
-  {
-    TCollection_AsciiString aKey, aValue;
-    if (!SplitKey (theValues.First(), aValue, aKey))
-      return;
-
-    theValues.Clear();
-    Split (aValue, DumpSeparator(), theValues);
   }
 }
 
@@ -331,6 +332,7 @@ Standard_Boolean TCollection::SplitDumped (const TCollection_AsciiString& theSou
 
 Standard_Boolean TCollection::SplitKey (const TCollection_AsciiString& theSourceValue,
                                         TCollection_AsciiString& theSplitValue,
+                                        TCollection_AsciiString& theTailValue,
                                         TCollection_AsciiString& theKey)
 {
   Standard_Integer aBracketPosition = theSourceValue.Search (XMLBracketOpen());
@@ -350,11 +352,16 @@ Standard_Boolean TCollection::SplitKey (const TCollection_AsciiString& theSource
   aTailValue = aTailValue.SubString (2, aTailValue.Length()); // remove close bracket
   TCollection_AsciiString aStopKey = StopKey (theKey);
 
-  aBracketPosition = theSourceValue.Search (aStopKey);
-  if (aBracketPosition <= 1 || aBracketPosition  >= theSourceValue.Length())
+  aBracketPosition = aTailValue.Search (aStopKey);
+  if (aBracketPosition <= 1 || aBracketPosition  >= aTailValue.Length())
     return Standard_False;
 
   theSplitValue = aTailValue;
   aTailValue = theSplitValue.Split (aBracketPosition - 1);
+
+  if (aTailValue.Length() == aStopKey.Length())
+    theTailValue = "";
+  else
+    theTailValue = aTailValue.SubString (aStopKey.Length(), aTailValue.Length());
   return Standard_True;
 }

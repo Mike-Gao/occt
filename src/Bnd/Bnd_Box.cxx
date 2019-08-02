@@ -991,7 +991,7 @@ const TCollection_AsciiString Bnd_Box_ClassName = "Bnd_Box";
 //purpose  : 
 //=======================================================================
 
-void Bnd_Box::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void Bnd_Box::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, Bnd_Box_ClassName);
 
@@ -1012,32 +1012,32 @@ void Bnd_Box::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean Bnd_Box::Init (const Standard_OStream& OS)
+Standard_Boolean Bnd_Box::Init (const Standard_SStream& OS)
 {
   NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
-  Standard_SStream aSStream (OS);
-  TCollection::Split (aSStream, aStreamValues);
+  TCollection_AsciiString aKey;
+  TCollection::Split (OS, aStreamValues, aKey);
 
-  TCollection_AsciiString anXYZValue;
-  if (aStreamValues.Size() == 1)
-  {
-    TCollection_AsciiString aValueStr = aStreamValues.FindFromIndex (1);
-    Standard_Integer aPosition = aValueStr.Search (Bnd_Box_ClassName + TCollection::ClassNameSeparator());
-    if (aPosition < 1)
-      return Standard_False;
-    anXYZValue = aValueStr.Split (aPosition);
-  }
-
-  NCollection_Vector<Standard_Real> aValues;
-  if (!TCollection::SplitReal (anXYZValue, TCollection::VectorSeparator(), aValues))
+  TCollection_AsciiString aXmin, anYmin, aZmin, aXmax, anYmax, aZmax, aGap, aFlags;
+  if (!aStreamValues.FindFromKey ("Xmin", aXmin) ||
+      !aStreamValues.FindFromKey ("Ymin", anYmin) ||
+      !aStreamValues.FindFromKey ("Zmin", aZmin) ||
+      !aStreamValues.FindFromKey ("Xmax", aXmax) ||
+      !aStreamValues.FindFromKey ("Ymax", anYmax) ||
+      !aStreamValues.FindFromKey ("Zmax", aZmax) ||
+      !aStreamValues.FindFromKey ("Gap", aGap) ||
+      !aStreamValues.FindFromKey ("Flags", aFlags))
     return Standard_False;
 
-  if (aValues.Size() != 8)
-    return Standard_False;
+  Xmin = aXmin.RealValue();
+  Ymin = anYmin.RealValue();
+  Zmin = aZmin.RealValue();
+  Xmax = aXmax.RealValue();
+  Ymax = anYmax.RealValue();
+  Zmax = aZmax.RealValue();
 
-  Update (aValues.Value (1), aValues.Value (2), aValues.Value (3), aValues.Value (4), aValues.Value (5), aValues.Value (6));
-  Gap = aValues.Value (7);
-  Flags = (Standard_Integer)aValues.Value (8);
+  Gap = aGap.RealValue();
+  Flags = aFlags.IntegerValue();
 
   return Standard_True;
 }

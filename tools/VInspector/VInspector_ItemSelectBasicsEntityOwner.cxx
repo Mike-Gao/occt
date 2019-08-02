@@ -156,6 +156,19 @@ void VInspector_ItemSelectBasicsEntityOwner::initItem() const
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemSelectBasicsEntityOwner::GetStream (Standard_OStream& OS) const
+{
+  Handle(SelectMgr_EntityOwner) anEntityOwner = Handle(SelectMgr_EntityOwner)::DownCast (getEntityOwner());
+  if (anEntityOwner.IsNull())
+    return;
+
+  anEntityOwner->Dump (OS);
+}
+
+// =======================================================================
 // function : GetTableRowCount
 // purpose :
 // =======================================================================

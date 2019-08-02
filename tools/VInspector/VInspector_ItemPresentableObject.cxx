@@ -268,6 +268,19 @@ void VInspector_ItemPresentableObject::GetPresentations (NCollection_List<Handle
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemPresentableObject::GetStream (Standard_OStream& OS) const
+{
+  Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
+  if (anIO.IsNull())
+    return;
+
+  anIO->Dump (OS);
+}
+
+// =======================================================================
 // function : GetTableRowCount
 // purpose :
 // =======================================================================

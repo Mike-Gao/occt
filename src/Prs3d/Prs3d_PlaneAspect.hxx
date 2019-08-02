@@ -96,6 +96,9 @@ public:
   //! Returns the distance between isoparameters used in the display of planes.
   Standard_Real IsoDistance() const { return myIsoDistance; }
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
+
 protected:
 
   Handle(Prs3d_LineAspect) myEdgesAspect;

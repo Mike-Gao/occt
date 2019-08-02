@@ -145,7 +145,7 @@ Handle(Prs3d_Presentation) VInspector_ItemPresentations::GetPresentation (const 
       continue;
     if (theRowId - aNextPresentationIndex == aCurrentIndex)
     {
-      theName = "";//QString ("Prs3d_Presentation (mode = %1)").arg (aPrsIter.ChangeValue().Mode()).toStdString().c_str();
+      theName = "Prs3d_Presentation";
       return aPrs3d;
     }
     aCurrentIndex++;

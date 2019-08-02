@@ -17,7 +17,6 @@
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
-#include <Standard_DumpMask.hxx>
 #include <Standard_Handle.hxx>
 #include <Standard_Real.hxx>
 #include <Standard_Boolean.hxx>
@@ -279,10 +278,18 @@ public:
   Standard_EXPORT void Add(const gp_Pnt& theP);
 
   //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT Standard_Boolean Init (const Standard_OStream& OS);
+  Standard_EXPORT Standard_Boolean Init (const Standard_SStream& OS);
 
   //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer = Standard_DumpMask_Whole) const;
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
+
+  //! Covers bounding box into string in format: (Xmin, Ymin, Zmin) - (Xmax, Ymax, Zmax)
+  //! \return the string value
+  Standard_EXPORT TCollection_AsciiString ToString() const { return ""; }
+
+  //! Converts text value into parameters if possible, the string format is: (Xmin, Ymin, Zmin) - (Xmax, Ymax, Zmax)
+  //! \return true if conversion is done
+  Standard_EXPORT Standard_Boolean FromString (const TCollection_AsciiString& theValue) { (void)theValue; return Standard_False; }
 
 protected:
 

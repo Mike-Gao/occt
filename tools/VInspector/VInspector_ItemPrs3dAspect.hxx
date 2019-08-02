@@ -103,6 +103,10 @@ protected:
   //! \return the value
   virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& OS) const Standard_OVERRIDE;
+
   //! Creates a child item in the given position.
   //! \param theRow the child row position
   //! \param theColumn the child column position

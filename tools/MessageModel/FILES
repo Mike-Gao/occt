@@ -6,8 +6,6 @@ MessageModel_ItemAlert.cxx
 MessageModel_ItemAlert.hxx
 MessageModel_ItemBase.cxx
 MessageModel_ItemBase.hxx
-MessageModel_ItemPropertiesAttributeStream.cxx
-MessageModel_ItemPropertiesAttributeStream.hxx
 MessageModel_ItemPropertiesReport.cxx
 MessageModel_ItemPropertiesReport.hxx
 MessageModel_ItemReport.cxx

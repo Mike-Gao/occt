@@ -281,7 +281,7 @@ public:
   void TShape (const Handle(TopoDS_TShape)& theTShape) { myTShape = theTShape; }
 
   //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
 private:
 

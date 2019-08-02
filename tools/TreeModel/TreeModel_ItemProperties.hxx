@@ -50,7 +50,7 @@ class TreeModel_ItemProperties : public Standard_Transient
 
 public:
   //! Constructor
-  TreeModel_ItemProperties (const TreeModel_ItemBasePtr& theItem) : myItem (theItem) {}
+  TreeModel_ItemProperties (const TreeModel_ItemBasePtr& theItem) : myItem (theItem), m_bInitialized (Standard_False) {}
 
   //! Destructor
   ~TreeModel_ItemProperties() {}

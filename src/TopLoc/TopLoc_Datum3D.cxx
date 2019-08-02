@@ -49,7 +49,7 @@ const TCollection_AsciiString TopLoc_Datum3D_ClassName = "TopLoc_Datum3D";
 //purpose  : 
 //=======================================================================
 
-void TopLoc_Datum3D::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void TopLoc_Datum3D::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, TopLoc_Datum3D_ClassName);
 

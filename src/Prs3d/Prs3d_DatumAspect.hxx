@@ -144,6 +144,9 @@ public:
   //! Returns type of arrow for a type of axis
   Standard_EXPORT Prs3d_DatumParts ArrowPartForAxis (Prs3d_DatumParts thePart) const;
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
+
 private:
   Prs3d_DatumAxes myAxes;
   Standard_Boolean myToDrawLabels;

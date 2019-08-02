@@ -42,7 +42,7 @@ const TCollection_AsciiString TopoDS_Shape_ClassName = "TopoDS_Shape";
 //purpose  : 
 //=======================================================================
 
-void TopoDS_Shape::Dump (Standard_OStream& OS, const Standard_Integer /*theMask*/) const
+void TopoDS_Shape::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, TopoDS_Shape_ClassName);
 

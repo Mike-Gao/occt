@@ -20,7 +20,6 @@
 #include <inspector/VInspector_ItemBase.hxx>
 
 #include <AIS_InteractiveObject.hxx>
-#include <NCollection_List.hxx>
 #include <TCollection_AsciiString.hxx>
 
 class Prs3d_Drawer;

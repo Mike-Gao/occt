@@ -858,7 +858,7 @@ const TCollection_AsciiString gp_Trsf_ClassName = "gp_Trsf";
 //purpose  : 
 //=======================================================================
 
-void gp_Trsf::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void gp_Trsf::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, gp_Trsf_ClassName);
 

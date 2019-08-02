@@ -18,7 +18,6 @@
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
-#include <Standard_DumpMask.hxx>
 #include <Standard_Handle.hxx>
 
 #include <Standard_ShortReal.hxx>
@@ -267,7 +266,7 @@ Standard_Boolean operator == (const Quantity_Color& Other) const
   Standard_EXPORT static void Test();
 
   //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
   //! Dumps the content of me on the stream <OS>.
   Standard_EXPORT Standard_Boolean Init (const Standard_OStream& OS);

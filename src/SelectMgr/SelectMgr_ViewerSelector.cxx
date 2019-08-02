@@ -35,7 +35,7 @@
 
 #include <algorithm>
 
-#define REPORT_SELECTION_BUILD
+//#define REPORT_SELECTION_BUILD
 #ifdef REPORT_SELECTION_BUILD
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
@@ -767,7 +767,9 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
     }
   }
 
+#ifdef REPORT_SELECTION_BUILD
   MESSAGE_INFO ("SortResult", "", &aPerfMeter, aParentAlert);
+#endif
   SortResult();
 #ifdef REPORT_SELECTION_BUILD
   Standard_SStream aStreamDone;

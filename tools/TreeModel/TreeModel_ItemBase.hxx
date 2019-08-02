@@ -85,7 +85,7 @@ public:
 
   //! Sets the item internal initialized state to the true. If the item has internal values,
   //! there should be initialized here.
-  virtual void Init() { m_bInitialized = true; }
+  Standard_EXPORT virtual void Init();
 
   //! Returns data object of the item.
   //! \return object
@@ -98,6 +98,10 @@ public:
   //! Resets the item cached value for the parameter role.
   //! \param theRole an item role
   Standard_EXPORT virtual void Reset(int theRole);
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  virtual void GetStream (Standard_OStream& OS) const { (void)OS; }
 
   //! Gets the parent of the item, or TreeModel_ItemBasePtr() if it has no parent.
   //! \return pointer to the item

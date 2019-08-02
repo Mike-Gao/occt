@@ -17,6 +17,8 @@
 #include <Prs3d_TextAspect.hxx>
 
 #include <Font_NameOfFont.hxx>
+#include <Graphic3d.hxx>
+#include <TCollection.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_TextAspect, Prs3d_BasicAspect)
 
@@ -47,3 +49,28 @@ Prs3d_TextAspect::Prs3d_TextAspect (const Handle(Graphic3d_AspectText3d)& theAsp
 {
   //
 }
+
+const TCollection_AsciiString Prs3d_TextAspect_ClassName = "Prs3d_TextAspect";
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Prs3d_TextAspect::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, Prs3d_TextAspect_ClassName);
+  {
+    Standard_SStream aTmpStream;
+    myTextAspect->Dump (aTmpStream);
+    DUMP_VALUES (OS, "TextAspect", TCollection::ToDumpString (aTmpStream));
+  }
+
+  DUMP_VALUES (OS, "Height", myHeight);
+
+  DUMP_VALUES (OS, "HorizontalJustification", Graphic3d::HorizontalTextAlignmentToString (myHorizontalJustification));
+  DUMP_VALUES (OS, "VerticalJustification", Graphic3d::VerticalTextAlignmentToString (myVerticalJustification));
+  DUMP_VALUES (OS, "Orientation", Graphic3d::TextPathToString (myOrientation));
+
+  DUMP_STOP_KEY (OS, Prs3d_TextAspect_ClassName);
+}
+

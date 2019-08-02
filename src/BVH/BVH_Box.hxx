@@ -117,7 +117,7 @@ public:
     DUMP_VALUES (OS, "IsValid", IsValid());
 
     OS << "Bnd_Box" << TCollection::DumpSeparator();
-    BVH::ToBndBox (CornerMin(), CornerMax()).Dump (OS, Standard_DumpMask_SingleValue);
+    BVH::ToBndBox (CornerMin(), CornerMax()).Dump (OS);
     OS << TCollection::DumpSeparator();
   }
 

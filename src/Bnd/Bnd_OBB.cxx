@@ -685,7 +685,7 @@ const TCollection_AsciiString Bnd_OBB_ClassName = "Bnd_OBB";
 //purpose  : 
 //=======================================================================
 
-void Bnd_OBB::Dump (Standard_OStream& OS, const Standard_Integer /*theMask*/) const
+void Bnd_OBB::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, Bnd_OBB_ClassName);
   {
@@ -722,11 +722,10 @@ void Bnd_OBB::Dump (Standard_OStream& OS, const Standard_Integer /*theMask*/) co
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean Bnd_OBB::Init (const Standard_OStream& /*OS*/)
+Standard_Boolean Bnd_OBB::Init (const Standard_SStream& /*OS*/)
 {
   //NCollection_DataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
-  //Standard_SStream aSStream (OS);
-  //TCollection::Split (aSStream, aStreamValues);
+  //TCollection::Split (OS, aStreamValues, aKey);
 
   //TCollection_AsciiString anXYZValue;
   //if (aStreamValues.Size() == 1)

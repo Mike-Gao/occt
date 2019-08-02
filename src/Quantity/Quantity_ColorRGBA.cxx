@@ -207,7 +207,7 @@ const TCollection_AsciiString Quantity_ColorRGBA_ClassName = "Quantity_ColorRGBA
 //purpose  : 
 //=======================================================================
 
-void Quantity_ColorRGBA::Dump (Standard_OStream& OS, const Standard_Integer /*theMask*/) const
+void Quantity_ColorRGBA::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, Quantity_ColorRGBA_ClassName);
 

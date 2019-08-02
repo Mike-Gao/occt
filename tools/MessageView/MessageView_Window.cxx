@@ -443,6 +443,10 @@ void MessageView_Window::onTreeViewSelectionChanged (const QItemSelection&, cons
     if (!anItemBase)
       continue;
 
+    Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->GetProperties();
+    if (anItemProperties)
+      anItemProperties->GetPresentations (-1, -1, aPresentations);
+
     MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
     if (!anAlertItem)
       continue;

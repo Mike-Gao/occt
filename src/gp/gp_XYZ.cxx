@@ -45,7 +45,7 @@ const TCollection_AsciiString gp_XYZ_ClassName = "gp_XYZ";
 //purpose  : 
 //=======================================================================
 
-void gp_XYZ::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void gp_XYZ::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, gp_XYZ_ClassName);
 
@@ -61,11 +61,12 @@ void gp_XYZ::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean gp_XYZ::Init (const Standard_OStream& OS)
+Standard_Boolean gp_XYZ::Init (const Standard_OStream& /*OS*/)
 {
   /*NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
   Standard_SStream aSStream (OS);
-  TCollection::Split (aSStream, aStreamValues);
+  TCollection_AsciiString aKey;
+  TCollection::Split (aSStream, aStreamValues, aKey);
 
   TCollection_AsciiString anXYZValue;
   if (aStreamValues.FindFromKey (gp_XYZ_ClassName, anXYZValue))

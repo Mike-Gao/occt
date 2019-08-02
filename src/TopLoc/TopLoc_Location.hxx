@@ -23,7 +23,6 @@
 
 #include <TopLoc_SListOfItemLocation.hxx>
 #include <Standard_Boolean.hxx>
-#include <Standard_DumpMask.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_OStream.hxx>
 
@@ -145,7 +144,7 @@ Standard_Boolean operator != (const TopLoc_Location& Other) const
 }
   
   //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS, const Standard_Integer theMask = Standard_DumpMask_Whole) const;
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
   //! Prints the contents of <me> on the stream <s>.
   Standard_EXPORT void ShallowDump (Standard_OStream& S) const;

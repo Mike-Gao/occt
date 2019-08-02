@@ -82,3 +82,22 @@ void SelectMgr_EntityOwner::HilightWithColor (const Handle(PrsMgr_PresentationMa
     mySelectable->HilightOwnerWithColor (thePM, theStyle, this);
   }
 }
+
+const TCollection_AsciiString SelectMgr_EntityOwner_ClassName = "SelectMgr_EntityOwner";
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void SelectMgr_EntityOwner::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, SelectMgr_EntityOwner_ClassName);
+
+
+  DUMP_VALUES (OS, "Selectable", TCollection::GetPointerInfo (mySelectable));
+  DUMP_VALUES (OS, "Priority", mypriority);
+  DUMP_VALUES (OS, "IsSelected", myIsSelected);
+  DUMP_VALUES (OS, "ComesFromDecomposition", myFromDecomposition);
+
+  DUMP_STOP_KEY (OS, SelectMgr_EntityOwner_ClassName);
+}

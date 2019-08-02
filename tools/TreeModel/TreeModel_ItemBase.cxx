@@ -15,6 +15,7 @@
 
 #include <inspector/TreeModel_ItemBase.hxx>
 #include <inspector/TreeModel_ItemProperties.hxx>
+#include <inspector/TreeModel_ItemPropertiesStream.hxx>
 #include <inspector/TreeModel_ItemRole.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -48,6 +49,24 @@ void TreeModel_ItemBase::SetProperties (const Handle(TreeModel_ItemProperties)& 
 // =======================================================================
 Handle(TreeModel_ItemProperties) TreeModel_ItemBase::GetProperties() const
 {
+  if (myProperties.IsNull() && Parent())
+  {
+    TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+    //TreeModel_ItemBase* anItem = (TreeModel_ItemBase*)this;
+    anItem->SetProperties (new TreeModel_ItemPropertiesStream (anItem));
+  }
+
+  if (!myProperties.IsNull() && !myProperties->IsInitialized())
+  {
+    Handle(TreeModel_ItemPropertiesStream) aPropertiesStream = Handle(TreeModel_ItemPropertiesStream)::DownCast (myProperties);
+    if (!aPropertiesStream.IsNull())
+    {
+      Standard_SStream aStream;
+      GetStream (aStream);
+      aPropertiesStream->Init (aStream);
+    }
+  }
+
   return myProperties;
 }
 
@@ -96,10 +115,16 @@ TreeModel_ItemBasePtr TreeModel_ItemBase::Child (int theRow, int theColumn, cons
   TreeModel_ItemBasePtr anItem;
   if (isToCreate) {
     int aRowCount = rowCount();
-    if (myProperties.IsNull() || theRow < aRowCount - myProperties->ChildItemCount())
-      anItem = createChild (theRow, theColumn);
-    else if (!myProperties.IsNull())
-      anItem = myProperties->CreateChildItem (theRow, theColumn);
+    Handle(TreeModel_ItemProperties) aProperties = GetProperties();
+    int aChildOffset = aProperties.IsNull() ? 0 : aProperties->ChildItemCount();
+    if (!aProperties.IsNull() && theRow < aChildOffset)
+      anItem = aProperties->CreateChildItem (theRow, theColumn);
+    else
+      anItem = createChild (theRow - aChildOffset, theColumn);
+    //if (aProperties.IsNull() || theRow < aRowCount - aProperties->ChildItemCount())
+    //  anItem = createChild (theRow, theColumn);
+    //else if (!aProperties.IsNull())
+    //  anItem = aProperties->CreateChildItem (theRow, theColumn);
 
     if (anItem)
       m_ChildItems[aPos] = anItem;
@@ -128,13 +153,31 @@ QVariant TreeModel_ItemBase::cachedValue (const int theItemRole) const
   QVariant aValueToCache;
   if (theItemRole == TreeModel_ItemRole_RowCountRole)
   {
-    aValueToCache = myProperties.IsNull() ? initRowCount() : (initRowCount() + myProperties->ChildItemCount());
+    int aRowCount = initRowCount();
+    Handle(TreeModel_ItemProperties) aProperties = GetProperties();
+    int aChildOffset = aProperties.IsNull() ? 0 : aProperties->ChildItemCount();
+    aValueToCache = aRowCount + aChildOffset;
   }
   else
     aValueToCache = initValue (theItemRole);
 
   const_cast<TreeModel_ItemBase*>(this)->myCachedValues.insert (theItemRole, aValueToCache);
   return myCachedValues.contains (theItemRole) ? myCachedValues[theItemRole] : QVariant();
+}
+
+// =======================================================================
+// function : Init
+// purpose :
+// =======================================================================
+void TreeModel_ItemBase::Init()
+{
+  //if (myProperties.IsNull() && Parent())
+  //{
+  //  TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+  //  SetProperties (new TreeModel_ItemPropertiesStream (anItem));
+  //}
+
+  m_bInitialized = true;
 }
 
 // =======================================================================

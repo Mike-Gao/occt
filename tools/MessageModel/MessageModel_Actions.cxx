@@ -336,14 +336,14 @@ void MessageModel_Actions::OnTestPropetyPanel()
   {
     gp_XYZ aCoords (1.3, 2.3, 3.4);
     Standard_SStream aStream;
-    aCoords.Dump (aStream, Standard_DumpMask_SingleValue);
+    aCoords.Dump (aStream);
     MESSAGE_INFO_STREAM(aStream, "gp_XYZ", "", &aPerfMeter, NULL);
   }
   // Bnd_Box
   {
     Bnd_Box aBox(20., 15., 10., 25., 20., 15.);
     Standard_SStream aStream;
-    aBox.Dump (aStream, Standard_DumpMask_SingleValue);
+    aBox.Dump (aStream);
     MESSAGE_INFO_STREAM(aStream, "Bnd_Box", "", &aPerfMeter, NULL);
   }
   // Bnd_OBB
@@ -351,7 +351,7 @@ void MessageModel_Actions::OnTestPropetyPanel()
     Bnd_OBB anOBB (gp_Pnt (-10., -15., -10.), gp_Dir (1., 0., 0.), gp_Dir (0., 1., 0.), gp_Dir (0., 0., 1.),
                   5., 10., 5.);
     Standard_SStream aStream;
-    anOBB.Dump (aStream, Standard_DumpMask_SingleValue);
+    anOBB.Dump (aStream);
     MESSAGE_INFO_STREAM(aStream, "Bnd_OBB", "", &aPerfMeter, NULL);
   }
   myTreeModel->UpdateTreeModel();

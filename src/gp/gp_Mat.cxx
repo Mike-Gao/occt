@@ -273,7 +273,7 @@ void gp_Mat::Power (const Standard_Integer N)
 
 const TCollection_AsciiString gp_Map_ClassName = "gp_Mat";
 
-void gp_Mat::Dump (Standard_OStream& OS, const Standard_Integer theMask) const
+void gp_Mat::Dump (Standard_OStream& OS) const
 {
   DUMP_START_KEY (OS, gp_Map_ClassName);
 
