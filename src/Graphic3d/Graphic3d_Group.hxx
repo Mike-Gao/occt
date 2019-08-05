@@ -39,6 +39,7 @@ class Font_TextFormatter;
 class Graphic3d_Structure;
 class Graphic3d_ArrayOfPrimitives;
 class Graphic3d_AspectFillCapping;
+class Graphic3d_TextParams;
 
 //! This class allows the definition of groups
 //! of primitives inside of graphic objects (presentations).
@@ -127,7 +128,15 @@ public:
   //! Coordinates (NPC) Space).
   //! AAngle  : Orientation of the text
   //! (with respect to the horizontal).
-  Standard_EXPORT virtual void Text (const Standard_CString AText, const Graphic3d_Vertex& APoint, const Standard_Real AHeight, const Standard_Real AAngle, const Graphic3d_TextPath ATp, const Graphic3d_HorizontalTextAlignment AHta, const Graphic3d_VerticalTextAlignment AVta, const Standard_Boolean EvalMinMax = Standard_True);
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
+  Standard_EXPORT virtual void Text (const Standard_CString AText,
+                                     const Graphic3d_Vertex& APoint,
+                                     const Standard_Real AHeight,
+                                     const Standard_Real AAngle,
+                                     const Graphic3d_TextPath ATp,
+                                     const Graphic3d_HorizontalTextAlignment AHta,
+                                     const Graphic3d_VerticalTextAlignment AVta,
+                                     const Standard_Boolean EvalMinMax = Standard_True);
 
   //! Creates the string <AText> at position <APoint>.
   //! The 3D point of attachment is projected. The text is
@@ -142,7 +151,11 @@ public:
   //! ATp     : TP_RIGHT
   //! AHta    : HTA_LEFT
   //! AVta    : VTA_BOTTOM
-  Standard_EXPORT void Text (const Standard_CString AText, const Graphic3d_Vertex& APoint, const Standard_Real AHeight, const Standard_Boolean EvalMinMax = Standard_True);
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
+  Standard_EXPORT void Text (const Standard_CString AText,
+                             const Graphic3d_Vertex& APoint,
+                             const Standard_Real AHeight,
+                             const Standard_Boolean EvalMinMax = Standard_True);
 
   //! Creates the string <AText> at position <APoint>.
   //! The 3D point of attachment is projected. The text is
@@ -154,7 +167,15 @@ public:
   //! Coordinates (NPC) Space).
   //! AAngle  : Orientation of the text
   //! (with respect to the horizontal).
-  Standard_EXPORT void Text (const TCollection_ExtendedString& AText, const Graphic3d_Vertex& APoint, const Standard_Real AHeight, const Standard_Real AAngle, const Graphic3d_TextPath ATp, const Graphic3d_HorizontalTextAlignment AHta, const Graphic3d_VerticalTextAlignment AVta, const Standard_Boolean EvalMinMax = Standard_True);
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
+  Standard_EXPORT void Text (const TCollection_ExtendedString& AText,
+                             const Graphic3d_Vertex& APoint,
+                             const Standard_Real AHeight,
+                             const Standard_Real AAngle,
+                             const Graphic3d_TextPath ATp,
+                             const Graphic3d_HorizontalTextAlignment AHta,
+                             const Graphic3d_VerticalTextAlignment AVta,
+                             const Standard_Boolean EvalMinMax = Standard_True);
 
   //! Creates the string <AText> at position <APoint>.
   //! The 3D point of attachment is projected. The text is
@@ -169,9 +190,14 @@ public:
   //! ATp     : TP_RIGHT
   //! AHta    : HTA_LEFT
   //! AVta    : VTA_BOTTOM
-  Standard_EXPORT void Text (const TCollection_ExtendedString& AText, const Graphic3d_Vertex& APoint, const Standard_Real AHeight, const Standard_Boolean EvalMinMax = Standard_True);
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
+  Standard_EXPORT void Text (const TCollection_ExtendedString& AText,
+                             const Graphic3d_Vertex& APoint,
+                             const Standard_Real AHeight,
+                             const Standard_Boolean EvalMinMax = Standard_True);
 
   //! Creates the string <theText> at orientation <theOrientation> in 3D space.
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
   Standard_EXPORT virtual void Text (const Standard_CString                  theTextUtf,
                                      const gp_Ax2&                           theOrientation,
                                      const Standard_Real                     theHeight,
@@ -183,6 +209,7 @@ public:
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True);
 
   //! Creates the string <theText> at orientation <theOrientation> in 3D space.
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
   Standard_EXPORT virtual void Text (const TCollection_ExtendedString&       theText,
                                      const gp_Ax2&                           theOrientation,
                                      const Standard_Real                     theHeight,
@@ -194,6 +221,7 @@ public:
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True);
 
   //! Add text element in 3D space.
+  Standard_DEPRECATED("Deprecated method Text() with obsolete arguments, use AddText() instead of it")
   Standard_EXPORT virtual void Text (const Handle(Font_TextFormatter)&       theTextFormatter,
                                      const gp_Ax2&                           theOrientation,
                                      const Standard_Real                     theHeight,
@@ -202,6 +230,9 @@ public:
                                      const Standard_Boolean                  theToEvalMinMax,
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True);
 
+  //! Adds a text for display
+  Standard_EXPORT virtual void AddText (const Handle(Graphic3d_TextParams)& theTextParams,
+                                        const Standard_Boolean theToEvalMinMax = Standard_True);
 
   //! Adds an array of primitives for display
   Standard_EXPORT virtual void AddPrimitiveArray (const Graphic3d_TypeOfPrimitiveArray theType, const Handle(Graphic3d_IndexBuffer)& theIndices, const Handle(Graphic3d_Buffer)& theAttribs, const Handle(Graphic3d_BoundBuffer)& theBounds, const Standard_Boolean theToEvalMinMax = Standard_True);

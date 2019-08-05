@@ -111,9 +111,9 @@ void OpenGl_FrameStatsPrs::Update (const Handle(OpenGl_Workspace)& theWorkspace)
   {
     aParams.VAlign = Graphic3d_VTA_BOTTOM;
   }
-  if (aParams.Height != myCountersText.FormatParams().Height
-   || aParams.HAlign != myCountersText.FormatParams().HAlign
-   || aParams.VAlign != myCountersText.FormatParams().VAlign)
+  if (aParams.Height != myCountersText.FormatParams()->Height()
+   || aParams.HAlign != myCountersText.FormatParams()->HAlignment()
+   || aParams.VAlign != myCountersText.FormatParams()->VAlignment())
   {
     myCountersText.Release (aCtx.operator->());
   }
@@ -125,7 +125,8 @@ void OpenGl_FrameStatsPrs::Update (const Handle(OpenGl_Workspace)& theWorkspace)
   }
 
   TCollection_AsciiString aText = aStats->FormatStats (aRendParams.CollectedStats);
-  myCountersText.Init (aCtx, aText.ToCString(), OpenGl_Vec3 (0.0f, 0.0f, 0.0f), aParams);
+  myCountersText.Init (aCtx, aText.ToCString(), OpenGl_Vec3 (0.0f, 0.0f, 0.0f),
+    Standard_False, aParams.Height, aParams.HAlign, aParams.VAlign);
 
   updateChart (theWorkspace);
 }
@@ -341,9 +342,18 @@ void OpenGl_FrameStatsPrs::updateChart (const Handle(OpenGl_Workspace)& theWorks
     const float aLabX = aParams.HAlign == Graphic3d_HTA_RIGHT
                       ? float(anOffset.x())
                       : float(anOffset.x() + aCharSize.x());
-    myChartLabels[0].Init (aCtx, aLabels[isTopDown ? 0 : 2].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y()),                    0.0f), aParams);
-    myChartLabels[1].Init (aCtx, aLabels[isTopDown ? 1 : 1].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y() / 2), 0.0f), aParams);
-    myChartLabels[2].Init (aCtx, aLabels[isTopDown ? 2 : 0].ToCString(), OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y()),     0.0f), aParams);
+    myChartLabels[0].Init (aCtx,
+                           aLabels[isTopDown ? 0 : 2].ToCString(),
+                           OpenGl_Vec3 (aLabX, float(anOffset.y()), 0.0f),
+                           Standard_False, aParams.Height, aParams.HAlign, aParams.VAlign);
+    myChartLabels[1].Init (aCtx,
+                           aLabels[isTopDown ? 1 : 1].ToCString(),
+                           OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y() / 2), 0.0f),
+                           Standard_False, aParams.Height, aParams.HAlign, aParams.VAlign);
+    myChartLabels[2].Init (aCtx,
+                           aLabels[isTopDown ? 2 : 0].ToCString(),
+                           OpenGl_Vec3 (aLabX, float(anOffset.y() - aBinSize.y()), 0.0f),
+                           Standard_False, aParams.Height, aParams.HAlign, aParams.VAlign);
   }
 }
 

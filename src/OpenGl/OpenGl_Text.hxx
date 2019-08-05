@@ -28,6 +28,7 @@
 #include <Graphic3d_Vertex.hxx>
 #include <Graphic3d_HorizontalTextAlignment.hxx>
 #include <Graphic3d_RenderingParams.hxx>
+#include <Graphic3d_TextParams.hxx>
 #include <Graphic3d_VerticalTextAlignment.hxx>
 
 #include <gp_Ax2.hxx>
@@ -41,15 +42,20 @@ class OpenGl_Text : public OpenGl_Element
 public:
 
   //! Main constructor
+  Standard_DEPRECATED("Deprecated method OpenGl_Text() with obsolete arguments")
   Standard_EXPORT OpenGl_Text (const Standard_Utf8Char* theText,
                                const OpenGl_Vec3&       thePoint,
                                const OpenGl_TextParam&  theParams);
 
   //! Creates new text in 3D space.
+  Standard_DEPRECATED("Deprecated method OpenGl_Text() with obsolete arguments")
   Standard_EXPORT OpenGl_Text (const Standard_Utf8Char* theText,
                                const gp_Ax2&            theOrientation,
                                const OpenGl_TextParam&  theParams,
                                const bool               theHasOwnAnchor = true);
+
+  //! Creates new text in 3D space.
+  Standard_EXPORT OpenGl_Text (const Handle(Graphic3d_TextParams)& theTextParams);
 
   //! Destructor
   Standard_EXPORT virtual ~OpenGl_Text();
@@ -60,15 +66,23 @@ public:
                              const OpenGl_Vec3&            thePoint);
 
   //! Setup new string and parameters
+  Standard_DEPRECATED("Deprecated method Init(), obsolete parameter OpenGl_TextParam, use Graphic3d_TextParams instead of it")
   Standard_EXPORT void Init (const Handle(OpenGl_Context)& theCtx,
                              const Standard_Utf8Char*      theText,
                              const OpenGl_Vec3&            thePoint,
                              const OpenGl_TextParam&       theParams);
 
-  //! Setup text formatter
-  Standard_EXPORT void SetTextFormatter (const Handle(Font_TextFormatter)& theFormatter) { myFormatter = theFormatter; }
+  //! Setup new string and parameters
+  Standard_EXPORT void Init (const Handle(OpenGl_Context)& theCtx,
+                             const NCollection_String      theText,
+                             const OpenGl_Vec3&            thePoint,
+                             const Standard_Boolean        theIs2d,
+                             const Standard_Real           theHeight,
+                             const Graphic3d_HorizontalTextAlignment theHta,
+                             const Graphic3d_VerticalTextAlignment theVta);
 
   //! Setup new position
+  Standard_DEPRECATED("Deprecated method SetPosition(), use Graphic3d_TextParams for it")
   Standard_EXPORT void SetPosition (const OpenGl_Vec3& thePoint);
 
   //! Setup new font size
@@ -79,10 +93,10 @@ public:
   Standard_EXPORT virtual void Release (OpenGl_Context* theContext);
 
   //! Return defined text.
-  const NCollection_String& Text() const { return myString; }
+  const NCollection_String& Text() const { return myParams->Text(); }
 
   //! Return text formatting parameters.
-  const OpenGl_TextParam& FormatParams() const { return myParams; }
+  const Handle(Graphic3d_TextParams)& FormatParams() const { return myParams; }
 
 public: //! @name methods for compatibility with layers
 
@@ -112,6 +126,7 @@ public: //! @name methods for compatibility with layers
                                           Standard_ShortReal&           theDescent);
 
   //! Setup new string and parameters
+  Standard_DEPRECATED("Deprecated method Init(), obsolete parameter OpenGl_TextParam, use Graphic3d_TextParams instead of it")
   Standard_EXPORT void Init (const Handle(OpenGl_Context)&     theCtx,
                              const TCollection_ExtendedString& theText,
                              const OpenGl_Vec2&                thePoint,
@@ -129,6 +144,8 @@ protected:
 
   //! Release cached VBO resources
   Standard_EXPORT void releaseVbos (OpenGl_Context* theCtx);
+
+  Standard_Boolean hasAnchorPoint() const { return myParams->HasOwnAnchorPoint() != Standard_False;}
 
 private:
 
@@ -175,15 +192,8 @@ protected:
 
 protected:
 
-  OpenGl_TextParam   myParams;
-  NCollection_String myString;
-  OpenGl_Vec3        myPoint;
-  bool               myIs2d;
-  gp_Ax2             myOrientation; //!< Text orientation in 3D space.
-  bool               myHasPlane;    //!< Check if text have orientation in 3D space.
-  bool               myHasAnchorPoint; //!< Shows if it has own attach point
-
-  Handle(Font_TextFormatter) myFormatter; //!< Text formatter, an alternative to text params
+  Handle(Graphic3d_TextParams) myParams;
+  bool myIs2d;
  
 public:
 

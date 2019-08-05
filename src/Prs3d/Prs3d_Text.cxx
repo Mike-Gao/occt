@@ -18,6 +18,7 @@
 
 #include <gp_Pnt.hxx>
 #include <Graphic3d_Group.hxx>
+#include <Graphic3d_TextParams.hxx>
 #include <Graphic3d_Vertex.hxx>
 #include <Prs3d_Presentation.hxx>
 #include <Prs3d_TextAspect.hxx>
@@ -37,13 +38,14 @@ void Prs3d_Text::Draw (const Handle(Graphic3d_Group)& theGroup,
   theAttachmentPoint.Coord(x,y,z);
 
   theGroup->SetPrimitivesAspect (theAspect->Aspect());
-  theGroup->Text (theText,
-                  Graphic3d_Vertex(x,y,z),
-                  theAspect->Height(),
-                  theAspect->Angle(),
-                  theAspect->Orientation(),
-                  theAspect->HorizontalJustification(),
-                  theAspect->VerticalJustification());
+
+  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (theAspect->Height());
+  const NCollection_String aText (theText.ToExtString());
+  aTextParams->Init (aText,
+                     Graphic3d_Vertex(x,y,z),
+                     theAspect->HorizontalJustification(),
+                     theAspect->VerticalJustification());
+  theGroup->AddText (aTextParams);
 }
 
 // =======================================================================
@@ -57,13 +59,13 @@ void Prs3d_Text::Draw (const Handle(Graphic3d_Group)&    theGroup,
                        const Standard_Boolean            theHasOwnAnchor)
 {
   theGroup->SetPrimitivesAspect (theAspect->Aspect());
-  theGroup->Text (theText,
-                  theOrientation,
-                  theAspect->Height(),
-                  theAspect->Angle(),
-                  theAspect->Orientation(),
-                  theAspect->HorizontalJustification(),
-                  theAspect->VerticalJustification(),
-                  Standard_True,
-                  theHasOwnAnchor);
+
+  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (theAspect->Height());
+  const NCollection_String aText (theText.ToExtString());
+  aTextParams->Init (aText,
+                     theOrientation,
+                     theHasOwnAnchor,
+                     theAspect->HorizontalJustification(),
+                     theAspect->VerticalJustification());
+  theGroup->AddText (aTextParams);
 }

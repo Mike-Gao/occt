@@ -19,6 +19,7 @@
 #include <gp_Dir.hxx>
 #include <gp_Pnt.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>
+#include <Graphic3d_TextParams.hxx>
 #include <Graphic3d_Group.hxx>
 #include <Prs3d_Arrow.hxx>
 #include <Prs3d_ArrowAspect.hxx>
@@ -53,7 +54,10 @@ void DsgPrs_XYZAxisPresentation::Add(
   if (*aText != '\0')
   {
     Graphic3d_Vertex a2(aPlast.X(),aPlast.Y(),aPlast.Z());
-    Prs3d_Root::CurrentGroup(aPresentation)->Text(aText,a2,1./81.);
+
+    Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (1./81.);
+    aTextParams->Init (aText, a2);
+    Prs3d_Root::CurrentGroup(aPresentation)->AddText (aTextParams);
   }
 }
 
@@ -84,6 +88,8 @@ void DsgPrs_XYZAxisPresentation::Add(const Handle(Prs3d_Presentation)& aPresenta
   if (*aText != '\0')
   {
     Graphic3d_Vertex a2(aPlast.X(),aPlast.Y(),aPlast.Z());
-    Prs3d_Root::CurrentGroup(aPresentation)->Text(aText,a2,1./81.);
+    Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (1./81.);
+    aTextParams->Init (aText, a2);
+    Prs3d_Root::CurrentGroup(aPresentation)->AddText(aTextParams);
   }
 }

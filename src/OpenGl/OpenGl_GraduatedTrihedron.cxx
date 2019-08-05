@@ -20,6 +20,7 @@
 #include <Graphic3d_ArrayOfPolylines.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
+#include <Graphic3d_TextParams.hxx>
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_TransformUtils.hxx>
 #include <gp_Ax3.hxx>
@@ -522,7 +523,7 @@ void OpenGl_GraduatedTrihedron::renderTickmarkLabels (const Handle(OpenGl_Worksp
 
     myAspectLabels.Aspect()->SetColor (anAxis.NameColor);
     theWorkspace->SetAspects (&myAspectLabels);
-    anAxis.Label.SetPosition (aMiddle);
+    anAxis.Label.FormatParams()->SetPosition (Graphic3d_Vertex(aMiddle.x(), aMiddle.y(), aMiddle.z()));
     anAxis.Label.Render (theWorkspace);
   }
 
@@ -715,11 +716,15 @@ void OpenGl_GraduatedTrihedron::SetMinMax (const OpenGl_Vec3& theMin, const Open
 OpenGl_GraduatedTrihedron::Axis::Axis (const Graphic3d_AxisAspect& theAspect,
                                        const OpenGl_Vec3&          theDirection)
 : Direction (theDirection),
-  Label     (NCollection_String ((Standard_Utf16Char* )theAspect.Name().ToExtString()).ToCString(), theDirection, THE_LABEL_PARAMS),
   Tickmark  (NULL),
   Line      (NULL),
   Arrow     (NULL)
 {
+  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (THE_LABEL_PARAMS.Height);
+  aTextParams->Init (NCollection_String ((Standard_Utf16Char* )theAspect.Name().ToExtString()),
+                     Graphic3d_Vertex (theDirection.x(), theDirection.y(), theDirection.z()),
+                     THE_LABEL_PARAMS.HAlign, THE_LABEL_PARAMS.VAlign);
+  Label = OpenGl_Text (aTextParams);
   NameColor = theAspect.NameColor();
   LineAspect.Aspect()->SetColor (theAspect.Color());
 }
