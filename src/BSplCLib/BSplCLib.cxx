@@ -39,6 +39,8 @@
 #include <Precision.hxx>
 #include <Standard_NotImplemented.hxx>
 
+#include <limits>
+
 typedef gp_Pnt Pnt;
 typedef gp_Vec Vec;
 typedef TColgp_Array1OfPnt Array1OfPnt;
@@ -50,6 +52,11 @@ typedef TColStd_Array1OfInteger Array1OfInteger;
 //purpose: Auxiliary class optimizing creation of matrix buffer for
 //         evaluation of bspline (using stack allocation for main matrix)
 //=======================================================================
+
+template<typename T> bool myisfinite(T arg)
+{
+  return arg == arg && arg != std::numeric_limits<T>::infinity() && arg != -std::numeric_limits<T>::infinity();
+}
 
 class BSplCLib_LocalMatrix : public math_Matrix 
 {
@@ -276,7 +283,7 @@ void BSplCLib::LocateParameter
   const Standard_Integer  KLower = Knots.Lower(),
                           KUpper = Knots.Upper();
 
-  const Standard_Real Eps = Epsilon(Min(Abs(Knots(KUpper)), Abs(U)));
+  const Standard_Real Eps = (::myisfinite(Knots(KUpper)) && Abs(Knots(KUpper)) < Abs(U)) ? Epsilon(Knots(KUpper)) : Epsilon(Abs(U));
 
   const Standard_Real *knots = &Knots(KLower);
   knots -= KLower;
