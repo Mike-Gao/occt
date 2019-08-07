@@ -156,6 +156,13 @@ void BRepTools_ReShape::replace (const TopoDS_Shape& ashape,
   TopoDS_Shape shape = ashape;
   TopoDS_Shape newshape = anewshape;
   if ( shape.IsNull() || shape == newshape ) return;
+  if (Apply (newshape) == shape) 
+  {
+#ifdef OCCT_DEBUG
+    cout << "Warning: BRepTools_ReShape::Replace: recording the shape will lead to a loop" << endl;
+#endif
+    return;
+  }
 
   if (shape.Orientation() == TopAbs_REVERSED)
   {
@@ -181,7 +188,9 @@ void BRepTools_ReShape::replace (const TopoDS_Shape& ashape,
 #ifdef OCCT_DEBUG
   if ( IsRecorded ( shape ) && ((myConsiderLocation && ! Value ( shape ).IsPartner ( newshape )) ||
                                  (!myConsiderLocation && ! Value ( shape ).IsSame ( newshape )))) 
+  {
     cout << "Warning: BRepTools_ReShape::Replace: shape already recorded" << endl;
+  }
 #endif
 
   myShapeToReplacement.Bind(shape, TReplacement(newshape, theKind));
