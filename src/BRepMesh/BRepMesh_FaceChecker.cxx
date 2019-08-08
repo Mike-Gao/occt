@@ -134,6 +134,48 @@ namespace
       return myBox.IsOut(theBox);
     }
 
+    bool CheckSelfIntersectArea (Standard_Integer idx1, Standard_Integer idx2, const gp_Pnt2d & intPnt)
+    {
+      gp_XY aPrevVec;
+      Standard_Real aSumS = 0.;
+      const gp_XY& aRefPnt = intPnt.Coord ();
+      Standard_Integer start = -1;
+      Standard_Integer end = -1;
+
+      // we should consider the shortest loop
+      if ((idx2 - idx1) < (mySegments->Size () - idx2 + idx1))
+      {
+        start = idx1;
+        end = idx2;
+      }
+      else
+      {
+        start = idx2;
+        end = idx1;
+      }
+
+      while (start < end)
+      {
+        const BRepMesh_FaceChecker::Segment& aSeg = mySegments->Value (start);
+        gp_XY aCurVec = aSeg.Point2->XY () - aRefPnt;
+
+        if (aCurVec.SquareModulus () > gp::Resolution () && aPrevVec.SquareModulus () > gp::Resolution ())
+        {
+          aSumS += aPrevVec ^ aCurVec;
+        }
+
+        aPrevVec = aCurVec;
+
+        ++start;
+        if (start > mySegments->Upper ())
+        {
+          start = mySegments->Lower ();
+        }
+      }
+
+      return (Abs (aSumS / 2.) < myMaxLoopSize);
+    }
+
     //! Accepts segment with the given index in case if it fits conditions.
     virtual Standard_Boolean Accept(const Standard_Integer& theSegmentIndex)
     {
@@ -143,9 +185,9 @@ namespace
       const BRepMesh_GeomTool::IntFlag aIntStatus = BRepMesh_GeomTool::IntSegSeg(
         mySegment->Point1->XY(), mySegment->Point2->XY(),
         aSegment.Point1->XY(), aSegment.Point2->XY(),
-        Standard_False, Standard_False, aIntPnt);
+        Standard_False, Standard_True, aIntPnt);
 
-      if (aIntStatus == BRepMesh_GeomTool::Cross)
+      if (aIntStatus == BRepMesh_GeomTool::Cross || aIntStatus == BRepMesh_GeomTool::PointOnSegment)
       {
         const Standard_Real aAngle = gp_Vec2d(mySegment->Point1->XY(), mySegment->Point2->XY()).Angle(
                                      gp_Vec2d(aSegment.Point1->XY(), aSegment.Point2->XY()));
@@ -155,29 +197,9 @@ namespace
           return Standard_False;
         }
 
-        if (mySelfSegmentIndex != -1)
+        if (mySelfSegmentIndex != -1 && CheckSelfIntersectArea (mySelfSegmentIndex, theSegmentIndex, aIntPnt))
         {
-          gp_XY aPrevVec;
-          Standard_Real aSumS = 0.;
-          const gp_XY& aRefPnt = aIntPnt.Coord();
-          for (Standard_Integer i = mySelfSegmentIndex; i < theSegmentIndex; ++i)
-          {
-            const BRepMesh_FaceChecker::Segment& aCurrSegment = mySegments->Value(i);
-            gp_XY aCurVec = aCurrSegment.Point2->XY() - aRefPnt;
-
-            if (aCurVec.SquareModulus() < gp::Resolution())
-              continue;
-
-            if (aPrevVec.SquareModulus() > gp::Resolution())
-              aSumS += aPrevVec ^ aCurVec;
-
-            aPrevVec = aCurVec;
-          }
-
-          if (Abs(aSumS / 2.) < myMaxLoopSize)
-          {
-            return Standard_False;
-          }
+          return Standard_False;
         }
 
         myIndices.Append(theSegmentIndex);
