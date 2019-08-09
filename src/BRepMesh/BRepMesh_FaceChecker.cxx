@@ -137,26 +137,26 @@ namespace
     bool CheckSelfIntersectArea (Standard_Integer idx1, Standard_Integer idx2, const gp_Pnt2d & intPnt)
     {
       gp_XY aPrevVec;
-      Standard_Real aSumS = 0.;
-      const gp_XY& aRefPnt = intPnt.Coord ();
-      Standard_Integer start = -1;
-      Standard_Integer end = -1;
+      Standard_Real    aSumS   = 0.;
+      const gp_XY&     aRefPnt = intPnt.Coord ();
+      Standard_Integer aStart  = -1;
+      Standard_Integer aEnd    = -1;
 
       // we should consider the shortest loop
       if ((idx2 - idx1) < (mySegments->Size () - idx2 + idx1))
       {
-        start = idx1;
-        end = idx2;
+        aStart = idx1;
+        aEnd   = idx2;
       }
       else
       {
-        start = idx2;
-        end = idx1;
+        aStart = idx2;
+        aEnd   = idx1;
       }
 
-      while (start < end)
+      while (aStart < aEnd)
       {
-        const BRepMesh_FaceChecker::Segment& aSeg = mySegments->Value (start);
+        const BRepMesh_FaceChecker::Segment& aSeg = mySegments->Value (aStart);
         gp_XY aCurVec = aSeg.Point2->XY () - aRefPnt;
 
         if (aCurVec.SquareModulus () > gp::Resolution () && aPrevVec.SquareModulus () > gp::Resolution ())
@@ -166,10 +166,10 @@ namespace
 
         aPrevVec = aCurVec;
 
-        ++start;
-        if (start > mySegments->Upper ())
+        ++aStart;
+        if (aStart > mySegments->Upper ())
         {
-          start = mySegments->Lower ();
+          aStart = mySegments->Lower ();
         }
       }
 
@@ -197,7 +197,8 @@ namespace
           return Standard_False;
         }
 
-        if (mySelfSegmentIndex != -1 && CheckSelfIntersectArea (mySelfSegmentIndex, theSegmentIndex, aIntPnt))
+        if (mySelfSegmentIndex != -1 &&
+            CheckSelfIntersectArea (mySelfSegmentIndex, theSegmentIndex, aIntPnt))
         {
           return Standard_False;
         }
