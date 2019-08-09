@@ -1,0 +1,19 @@
+puts "========="
+puts "0025589: BRepMesh_WireInterferenceChecker doesn't report all cases of self-intersecting wires"
+puts "========="
+puts ""
+
+restore [locate_data_file bug25589_face1507.brep] result
+
+tclean result
+incmesh result 0.005
+
+checktrinfo result -tri
+
+vinit
+vsetdispmode 1
+vdefaults -autoTriang 0
+vdisplay result
+vfit
+
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png
