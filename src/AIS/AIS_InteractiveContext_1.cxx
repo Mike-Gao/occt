@@ -475,7 +475,7 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_SelectionScheme theSe
   {
     Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(myLastinMain->Selectable());
     if (!anIO.IsNull() &&
-        IsDisplayed(anIO))
+        myObjects.IsBound(anIO))
     {
       aPickedOwners.Append (myLastinMain);
     }
