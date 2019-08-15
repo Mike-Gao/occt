@@ -82,7 +82,7 @@ public:
   //! Return value or specified counter in MiB.
   //! Notice that NOT all counters are available on various systems.
   //! Standard_Size(-1) means invalid (unavailable) value.
-  Standard_EXPORT Standard_Size ValueMiB (const OSD_MemInfo::Counter theCounter) const;
+  Standard_EXPORT Standard_Real ValueMiB (const OSD_MemInfo::Counter theCounter) const;
 
 public:
 

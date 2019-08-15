@@ -43,7 +43,11 @@
 // =======================================================================
 OSD_MemInfo::OSD_MemInfo()
 {
-  Update();
+  // reset values
+  for (Standard_Integer anIter = 0; anIter < MemCounter_NB; ++anIter)
+  {
+    myCounters[anIter] = Standard_Size(-1);
+  }
 }
 
 // =======================================================================
@@ -227,14 +231,14 @@ Standard_Size OSD_MemInfo::Value (const OSD_MemInfo::Counter theCounter) const
 // function : ValueMiB
 // purpose  :
 // =======================================================================
-Standard_Size OSD_MemInfo::ValueMiB (const OSD_MemInfo::Counter theCounter) const
+Standard_Real OSD_MemInfo::ValueMiB (const OSD_MemInfo::Counter theCounter) const
 {
   if (theCounter < 0 || theCounter >= MemCounter_NB)
   {
-    return Standard_Size(-1);
+    return Standard_Real(-1.);
   }
   return (myCounters[theCounter] == Standard_Size(-1))
-       ? Standard_Size(-1) : (myCounters[theCounter] / (1024 * 1024));
+       ? Standard_Real(-1.) : ((Standard_Real)myCounters[theCounter] / (1024 * 1024));
 }
 
 // =======================================================================
