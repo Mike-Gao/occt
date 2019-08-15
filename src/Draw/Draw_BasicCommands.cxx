@@ -763,7 +763,6 @@ static int dmeminfo (Draw_Interpretor& theDI,
                      const char**      theArgVec)
 {
   OSD_MemInfo aMemInfo;
-  aMemInfo.Update();
   if (theArgNb <= 1)
   {
     theDI << aMemInfo.ToString();
