@@ -18,7 +18,7 @@
 
 #include <gp_Pnt.hxx>
 #include <Graphic3d_Group.hxx>
-#include <Graphic3d_TextParams.hxx>
+#include <Graphic3d_Text.hxx>
 #include <Graphic3d_Vertex.hxx>
 #include <Prs3d_Presentation.hxx>
 #include <Prs3d_TextAspect.hxx>
@@ -39,12 +39,12 @@ void Prs3d_Text::Draw (const Handle(Graphic3d_Group)& theGroup,
 
   theGroup->SetPrimitivesAspect (theAspect->Aspect());
 
-  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (theAspect->Height());
+  Handle(Graphic3d_Text) aTextParams = new Graphic3d_Text (theAspect->Height());
   const NCollection_String aText (theText.ToExtString());
-  aTextParams->Init (aText,
-                     Graphic3d_Vertex(x,y,z),
-                     theAspect->HorizontalJustification(),
-                     theAspect->VerticalJustification());
+  aTextParams->SetText (aText);
+  aTextParams->SetPosition (gp_Pnt (x,y,z));
+  aTextParams->SetHAlignment (theAspect->HorizontalJustification());
+  aTextParams->SetVAlignment (theAspect->VerticalJustification());
   theGroup->AddText (aTextParams);
 }
 
@@ -60,12 +60,12 @@ void Prs3d_Text::Draw (const Handle(Graphic3d_Group)&    theGroup,
 {
   theGroup->SetPrimitivesAspect (theAspect->Aspect());
 
-  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (theAspect->Height());
+  Handle(Graphic3d_Text) aTextParams = new Graphic3d_Text (theAspect->Height());
   const NCollection_String aText (theText.ToExtString());
-  aTextParams->Init (aText,
-                     theOrientation,
-                     theHasOwnAnchor,
-                     theAspect->HorizontalJustification(),
-                     theAspect->VerticalJustification());
+  aTextParams->SetText (aText);
+  aTextParams->SetOrientation (theOrientation);
+  aTextParams->SetOwnAnchorPoint (theHasOwnAnchor);
+  aTextParams->SetHAlignment (theAspect->HorizontalJustification());
+  aTextParams->SetVAlignment (theAspect->VerticalJustification());
   theGroup->AddText (aTextParams);
 }

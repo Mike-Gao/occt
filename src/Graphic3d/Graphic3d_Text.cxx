@@ -1,6 +1,4 @@
-// Created on: 2011-09-20
-// Created by: Sergey ZERCHANINOV
-// Copyright (c) 2011-2014 OPEN CASCADE SAS
+// Copyright (c) 2013-2014 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -13,12 +11,19 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef _OpenGl_TextParam_Header
-#define _OpenGl_TextParam_Header
-
 #include <Graphic3d_Text.hxx>
 
-Standard_DEPRECATED("This type name is deprecated - Graphic3d_Text should be used instead")
-typedef Graphic3d_Text OpenGl_TextParam;
+IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_Text, Standard_Transient)
 
-#endif //_OpenGl_TextParam_Header
+// =======================================================================
+// function : Graphic3d_Text
+// purpose  :
+// =======================================================================
+Graphic3d_Text::Graphic3d_Text (const Standard_Real theHeight)
+: myHeight (theHeight),
+  myHasPlane (Standard_False),
+  myHasOwnAnchor (Standard_True),
+  myHAlign (Graphic3d_HTA_LEFT),
+  myVAlign (Graphic3d_VTA_BOTTOM)
+{
+}

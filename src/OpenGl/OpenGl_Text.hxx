@@ -21,14 +21,13 @@
 #include <OpenGl_Aspects.hxx>
 #include <NCollection_String.hxx>
 
-#include <OpenGl_TextParam.hxx>
 #include <OpenGl_TextBuilder.hxx>
 
 #include <TCollection_ExtendedString.hxx>
 #include <Graphic3d_Vertex.hxx>
 #include <Graphic3d_HorizontalTextAlignment.hxx>
 #include <Graphic3d_RenderingParams.hxx>
-#include <Graphic3d_TextParams.hxx>
+#include <Graphic3d_Text.hxx>
 #include <Graphic3d_VerticalTextAlignment.hxx>
 
 #include <gp_Ax2.hxx>
@@ -41,21 +40,8 @@ class OpenGl_Text : public OpenGl_Element
 
 public:
 
-  //! Main constructor
-  Standard_DEPRECATED("Deprecated method OpenGl_Text() with obsolete arguments")
-  Standard_EXPORT OpenGl_Text (const Standard_Utf8Char* theText,
-                               const OpenGl_Vec3&       thePoint,
-                               const OpenGl_TextParam&  theParams);
-
   //! Creates new text in 3D space.
-  Standard_DEPRECATED("Deprecated method OpenGl_Text() with obsolete arguments")
-  Standard_EXPORT OpenGl_Text (const Standard_Utf8Char* theText,
-                               const gp_Ax2&            theOrientation,
-                               const OpenGl_TextParam&  theParams,
-                               const bool               theHasOwnAnchor = true);
-
-  //! Creates new text in 3D space.
-  Standard_EXPORT OpenGl_Text (const Handle(Graphic3d_TextParams)& theTextParams);
+  Standard_EXPORT OpenGl_Text (const Handle(Graphic3d_Text)& theTextParams);
 
   //! Destructor
   Standard_EXPORT virtual ~OpenGl_Text();
@@ -66,13 +52,6 @@ public:
                              const OpenGl_Vec3&            thePoint);
 
   //! Setup new string and parameters
-  Standard_DEPRECATED("Deprecated method Init(), obsolete parameter OpenGl_TextParam, use Graphic3d_TextParams instead of it")
-  Standard_EXPORT void Init (const Handle(OpenGl_Context)& theCtx,
-                             const Standard_Utf8Char*      theText,
-                             const OpenGl_Vec3&            thePoint,
-                             const OpenGl_TextParam&       theParams);
-
-  //! Setup new string and parameters
   Standard_EXPORT void Init (const Handle(OpenGl_Context)& theCtx,
                              const NCollection_String      theText,
                              const OpenGl_Vec3&            thePoint,
@@ -80,10 +59,6 @@ public:
                              const Standard_Real           theHeight,
                              const Graphic3d_HorizontalTextAlignment theHta,
                              const Graphic3d_VerticalTextAlignment theVta);
-
-  //! Setup new position
-  Standard_DEPRECATED("Deprecated method SetPosition(), use Graphic3d_TextParams for it")
-  Standard_EXPORT void SetPosition (const OpenGl_Vec3& thePoint);
 
   //! Setup new font size
   Standard_EXPORT void SetFontSize (const Handle(OpenGl_Context)& theContext,
@@ -96,7 +71,7 @@ public:
   const NCollection_String& Text() const { return myParams->Text(); }
 
   //! Return text formatting parameters.
-  const Handle(Graphic3d_TextParams)& FormatParams() const { return myParams; }
+  const Handle(Graphic3d_Text)& FormatParams() const { return myParams; }
 
 public: //! @name methods for compatibility with layers
 
@@ -119,23 +94,60 @@ public: //! @name methods for compatibility with layers
   Standard_EXPORT static void StringSize (const Handle(OpenGl_Context)& theCtx,
                                           const NCollection_String&     theText,
                                           const OpenGl_Aspects&         theTextAspect,
-                                          const OpenGl_TextParam&       theParams,
+                                          const Standard_Real&          theHeight,
                                           const unsigned int            theResolution,
                                           Standard_ShortReal&           theWidth,
                                           Standard_ShortReal&           theAscent,
                                           Standard_ShortReal&           theDescent);
 
-  //! Setup new string and parameters
-  Standard_DEPRECATED("Deprecated method Init(), obsolete parameter OpenGl_TextParam, use Graphic3d_TextParams instead of it")
-  Standard_EXPORT void Init (const Handle(OpenGl_Context)&     theCtx,
-                             const TCollection_ExtendedString& theText,
-                             const OpenGl_Vec2&                thePoint,
-                             const OpenGl_TextParam&           theParams);
-
   //! Perform rendering
   Standard_EXPORT void Render (const Handle(OpenGl_Context)& theCtx,
                                const OpenGl_Aspects& theTextAspect,
                                unsigned int theResolution = Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION) const;
+
+//! @name obsolete methods
+public:
+  //! Main constructor
+  Standard_DEPRECATED("Deprecated method OpenGl_Text() with obsolete arguments")
+  Standard_EXPORT OpenGl_Text (const Standard_Utf8Char* theText,
+                               const OpenGl_Vec3&       thePoint,
+                               const Graphic3d_Text&    theParams);
+
+  //! Creates new text in 3D space.
+  Standard_DEPRECATED("Deprecated method OpenGl_Text() with obsolete arguments")
+  Standard_EXPORT OpenGl_Text (const Standard_Utf8Char* theText,
+                               const gp_Ax2&            theOrientation,
+                               const Graphic3d_Text&    theParams,
+                               const bool               theHasOwnAnchor = true);
+
+  //! Setup new string and parameters
+  Standard_DEPRECATED("Deprecated method Init(), obsolete parameter Graphic3d_Text, use Graphic3d_Text instead of it")
+  Standard_EXPORT void Init (const Handle(OpenGl_Context)& theCtx,
+                             const Standard_Utf8Char*      theText,
+                             const OpenGl_Vec3&            thePoint,
+                             const Graphic3d_Text&         theParams);
+
+  //! Setup new position
+  Standard_DEPRECATED("Deprecated method SetPosition(), use Graphic3d_Text for it")
+  Standard_EXPORT void SetPosition (const OpenGl_Vec3& thePoint);
+
+  //! Setup new string and parameters
+  Standard_DEPRECATED("Deprecated method Init(), obsolete parameter Graphic3d_Text, use Graphic3d_Text instead of it")
+  Standard_EXPORT void Init (const Handle(OpenGl_Context)&     theCtx,
+                             const TCollection_ExtendedString& theText,
+                             const OpenGl_Vec2&                thePoint,
+                             const Graphic3d_Text&             theParams);
+
+  //! Compute text width
+  Standard_DEPRECATED("Deprecated method StringSize() with obsolete Graphic3d_Text argument")
+  Standard_EXPORT static void StringSize (const Handle(OpenGl_Context)& theCtx,
+                                          const NCollection_String&     theText,
+                                          const OpenGl_Aspects&         theTextAspect,
+                                          const Graphic3d_Text&         theParams,
+                                          const unsigned int            theResolution,
+                                          Standard_ShortReal&           theWidth,
+                                          Standard_ShortReal&           theAscent,
+                                          Standard_ShortReal&           theDescent);
 
 protected:
 
@@ -192,7 +204,7 @@ protected:
 
 protected:
 
-  Handle(Graphic3d_TextParams) myParams;
+  Handle(Graphic3d_Text) myParams;
   bool myIs2d;
  
 public:

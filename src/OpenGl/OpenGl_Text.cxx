@@ -87,8 +87,9 @@ OpenGl_Text::OpenGl_Text()
   myScaleHeight (1.0f),
   myIs2d   (false)
 {
-  myParams = new Graphic3d_TextParams (10.);
-  myParams->Init ("", Graphic3d_Vertex (0.0f, 0.0f, 0.0f));
+  myParams = new Graphic3d_Text (10.);
+  myParams->SetText ("");
+  myParams->SetPosition (gp_Pnt (0.0f, 0.0f, 0.0f));
 }
 
 // =======================================================================
@@ -97,7 +98,7 @@ OpenGl_Text::OpenGl_Text()
 // =======================================================================
 OpenGl_Text::OpenGl_Text (const Standard_Utf8Char* theText,
                           const OpenGl_Vec3&       thePoint,
-                          const OpenGl_TextParam&  theParams)
+                          const Graphic3d_Text&    theParams)
 : myWinX (0.0f),
   myWinY (0.0f),
   myWinZ (0.0f),
@@ -105,8 +106,11 @@ OpenGl_Text::OpenGl_Text (const Standard_Utf8Char* theText,
   myExportHeight (1.0f),
   myIs2d   (false)
 {
-  myParams = new Graphic3d_TextParams (theParams.Height);
-  myParams->Init (theText, Graphic3d_Vertex (thePoint.x(), thePoint.y(), thePoint.z()), theParams.HAlign, theParams.VAlign);
+  myParams = new Graphic3d_Text (theParams.Height());
+  myParams->SetText (theText);
+  myParams->SetPosition (gp_Pnt (thePoint.x(), thePoint.y(), thePoint.z()));
+  myParams->SetHAlignment (theParams.HAlignment());
+  myParams->SetVAlignment (theParams.VAlignment());
   //
 }
 
@@ -116,7 +120,7 @@ OpenGl_Text::OpenGl_Text (const Standard_Utf8Char* theText,
 // =======================================================================
 OpenGl_Text::OpenGl_Text (const Standard_Utf8Char* theText,
                           const gp_Ax2&            theOrientation,
-                          const OpenGl_TextParam&  theParams,
+                          const Graphic3d_Text&    theParams,
                           const bool               theHasOwnAnchor)
 : myWinX         (0.0),
   myWinY         (0.0),
@@ -125,15 +129,19 @@ OpenGl_Text::OpenGl_Text (const Standard_Utf8Char* theText,
   myExportHeight (1.0),
   myIs2d         (false)
 {
-  myParams = new Graphic3d_TextParams (theParams.Height);
-  myParams->Init (theText, theOrientation, theHasOwnAnchor, theParams.HAlign, theParams.VAlign);
+  myParams = new Graphic3d_Text (theParams.Height());
+  myParams->SetText (theText);
+  myParams->SetOrientation (theOrientation);
+  myParams->SetOwnAnchorPoint (theHasOwnAnchor);
+  myParams->SetHAlignment (theParams.HAlignment());
+  myParams->SetVAlignment (theParams.VAlignment());
 }
 
 // =======================================================================
 // function : OpenGl_Text
 // purpose  :
 // =======================================================================
-OpenGl_Text::OpenGl_Text (const Handle(Graphic3d_TextParams)& theTextParams)
+OpenGl_Text::OpenGl_Text (const Handle(Graphic3d_Text)& theTextParams)
 : myWinX (0.0f),
   myWinY (0.0f),
   myWinZ (0.0f),
@@ -149,7 +157,7 @@ OpenGl_Text::OpenGl_Text (const Handle(Graphic3d_TextParams)& theTextParams)
 // =======================================================================
 void OpenGl_Text::SetPosition (const OpenGl_Vec3& thePoint)
 {
-  myParams->SetPosition (Graphic3d_Vertex (thePoint.x(), thePoint.y(), thePoint.z()));
+  myParams->SetPosition (gp_Pnt (thePoint.x(), thePoint.y(), thePoint.z()));
 }
 
 // =======================================================================
@@ -181,7 +189,8 @@ void OpenGl_Text::Init (const Handle(OpenGl_Context)& theCtx,
 
   NCollection_String aText;
   aText.FromUnicode (theText);
-  myParams->Init (aText, Graphic3d_Vertex (thePoint.x(), thePoint.y(), thePoint.z()));
+  myParams->SetText (aText);
+  myParams->SetPosition (gp_Pnt (thePoint.x(), thePoint.y(), thePoint.z()));
 }
 
 // =======================================================================
@@ -191,9 +200,9 @@ void OpenGl_Text::Init (const Handle(OpenGl_Context)& theCtx,
 void OpenGl_Text::Init (const Handle(OpenGl_Context)& theCtx,
                         const Standard_Utf8Char*      theText,
                         const OpenGl_Vec3&            thePoint,
-                        const OpenGl_TextParam&       theParams)
+                        const Graphic3d_Text&         theParams)
 {
-  Init (theCtx, theText, thePoint, Standard_False, theParams.Height, theParams.HAlign, theParams.VAlign);
+  Init (theCtx, theText, thePoint, Standard_False, theParams.Height(), theParams.HAlignment(), theParams.VAlignment());
 }
 
 // =======================================================================
@@ -203,14 +212,14 @@ void OpenGl_Text::Init (const Handle(OpenGl_Context)& theCtx,
 void OpenGl_Text::Init (const Handle(OpenGl_Context)&     theCtx,
                         const TCollection_ExtendedString& theText,
                         const OpenGl_Vec2&                thePoint,
-                        const OpenGl_TextParam&           theParams)
+                        const Graphic3d_Text&             theParams)
 {
   OpenGl_Vec3 aPoint;
   aPoint.SetValues (thePoint, 0.0f);
 
   NCollection_String aText;
   aText.FromUnicode (theText.ToExtString());
-  Init (theCtx, aText, aPoint, Standard_True, theParams.Height, theParams.HAlign, theParams.VAlign);
+  Init (theCtx, aText, aPoint, Standard_True, theParams.Height(), theParams.HAlignment(), theParams.VAlignment());
 }
 
 // =======================================================================
@@ -235,7 +244,10 @@ void OpenGl_Text::Init (const Handle(OpenGl_Context)& theCtx,
   }
   myIs2d   = theIs2d;
 
-  myParams->Init (theText, Graphic3d_Vertex (thePoint.x(), thePoint.y(), thePoint.z()), theHta, theVta);
+  myParams->SetText (theText);
+  myParams->SetPosition (gp_Pnt (thePoint.x(), thePoint.y(), thePoint.z()));
+  myParams->SetHAlignment (theHta);
+  myParams->SetVAlignment (theVta);
 }
 
 // =======================================================================
@@ -303,7 +315,7 @@ void OpenGl_Text::Release (OpenGl_Context* theCtx)
 void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
                               const NCollection_String&     theText,
                               const OpenGl_Aspects&         theTextAspect,
-                              const OpenGl_TextParam&       theParams,
+                              const Standard_Real&          theHeight,
                               const unsigned int            theResolution,
                               Standard_ShortReal&           theWidth,
                               Standard_ShortReal&           theAscent,
@@ -312,8 +324,8 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
   theWidth   = 0.0f;
   theAscent  = 0.0f;
   theDescent = 0.0f;
-  const TCollection_AsciiString aFontKey = FontKey (theTextAspect, theParams.Height, theResolution);
-  Handle(OpenGl_Font) aFont = FindFont (theCtx, theTextAspect, theParams.Height, theResolution, aFontKey);
+  const TCollection_AsciiString aFontKey = FontKey (theTextAspect, (Standard_Integer)theHeight, theResolution);
+  Handle(OpenGl_Font) aFont = FindFont (theCtx, theTextAspect, (Standard_Integer)theHeight, theResolution, aFontKey);
   if (aFont.IsNull() || !aFont->IsValid())
   {
     return;
@@ -360,6 +372,22 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
   Handle(OpenGl_Context) aCtx = theCtx;
   aFont.Nullify();
   aCtx->ReleaseResource (aFontKey, Standard_True);
+}
+
+// =======================================================================
+// function : StringSize
+// purpose  :
+// =======================================================================
+void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
+                              const NCollection_String&     theText,
+                              const OpenGl_Aspects&         theTextAspect,
+                              const Graphic3d_Text&         theParams,
+                              const unsigned int            theResolution,
+                              Standard_ShortReal&           theWidth,
+                              Standard_ShortReal&           theAscent,
+                              Standard_ShortReal&           theDescent)
+{
+  StringSize (theCtx, theText, theTextAspect, theParams.Height(), theResolution, theWidth, theAscent, theDescent);
 }
 
 // =======================================================================
@@ -443,7 +471,7 @@ void OpenGl_Text::setupMatrix (const Handle(OpenGl_Context)& theCtx,
 
   if (myIs2d)
   {
-    const Graphic3d_Vertex& aPoint = myParams->Position();
+    const gp_Pnt& aPoint = myParams->Position();
     Graphic3d_TransformUtils::Translate<GLdouble> (aModViewMat, aPoint.X() + theDVec.x(), aPoint.Y() + theDVec.y(), 0.f);
     Graphic3d_TransformUtils::Scale<GLdouble> (aModViewMat, 1.f, -1.f, 1.f);
     Graphic3d_TransformUtils::Rotate<GLdouble> (aModViewMat, theTextAspect.Aspect()->TextAngle(), 0.f, 0.f, 1.f);
@@ -477,7 +505,7 @@ void OpenGl_Text::setupMatrix (const Handle(OpenGl_Context)& theCtx,
       if (!hasAnchorPoint())
       {
         OpenGl_Mat4d aPosMat;
-        const Graphic3d_Vertex& aPoint = myParams->Position();
+        const gp_Pnt& aPoint = myParams->Position();
         aPosMat.SetColumn (3, OpenGl_Vec3d (aPoint.X(), aPoint.Y(), aPoint.Z()));
         aPosMat *= aModViewMat;
         aModViewMat.SetColumn (3, aPosMat.GetColumn (3));
@@ -695,7 +723,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
 
   // Note that using difference resolution in different Views in same Viewer
   // will lead to performance regression (for example, text will be recreated every time).
-  const TCollection_AsciiString aFontKey = FontKey (theTextAspect, myParams->Height(), theResolution);
+  const TCollection_AsciiString aFontKey = FontKey (theTextAspect, (Standard_Integer)myParams->Height(), theResolution);
   if (!myFont.IsNull()
    && !myFont->ResourceKey().IsEqual (aFontKey))
   {
@@ -705,7 +733,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
 
   if (myFont.IsNull())
   {
-    myFont = FindFont (theCtx, theTextAspect, myParams->Height(), theResolution, aFontKey);
+    myFont = FindFont (theCtx, theTextAspect, (Standard_Integer)myParams->Height(), theResolution, aFontKey);
   }
   if (!myFont->WasInitialized())
   {
@@ -755,7 +783,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   const GLdouble aPointSize = (GLdouble )myFont->FTFont()->PointSize();
   if (!myIs2d)
   {
-    const Graphic3d_Vertex& aPoint = myParams->Position();
+    const gp_Pnt& aPoint = myParams->Position();
     Graphic3d_TransformUtils::Project<Standard_Real> (aPoint.X(), aPoint.Y(), aPoint.Z(),
                                                       myModelMatrix, myProjMatrix, theCtx->Viewport(),
                                                       myWinX, myWinY, myWinZ);

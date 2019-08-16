@@ -20,7 +20,7 @@
 #include <Graphic3d_ArrayOfPolylines.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
-#include <Graphic3d_TextParams.hxx>
+#include <Graphic3d_Text.hxx>
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_TransformUtils.hxx>
 #include <gp_Ax3.hxx>
@@ -34,10 +34,9 @@
 
 namespace
 {
-  static const OpenGl_TextParam THE_LABEL_PARAMS =
-  {
-    16, Graphic3d_HTA_LEFT, Graphic3d_VTA_BOTTOM
-  };
+  static Standard_Real THE_LABEL_HEIGHT = 16;
+  static Graphic3d_HorizontalTextAlignment THE_LABEL_HALIGH = Graphic3d_HTA_LEFT;
+  static Graphic3d_VerticalTextAlignment THE_LABEL_VALIGH = Graphic3d_VTA_BOTTOM;
 }
 
 // =======================================================================
@@ -523,7 +522,7 @@ void OpenGl_GraduatedTrihedron::renderTickmarkLabels (const Handle(OpenGl_Worksp
 
     myAspectLabels.Aspect()->SetColor (anAxis.NameColor);
     theWorkspace->SetAspects (&myAspectLabels);
-    anAxis.Label.FormatParams()->SetPosition (Graphic3d_Vertex(aMiddle.x(), aMiddle.y(), aMiddle.z()));
+    anAxis.Label.FormatParams()->SetPosition (gp_Pnt (aMiddle.x(), aMiddle.y(), aMiddle.z()));
     anAxis.Label.Render (theWorkspace);
   }
 
@@ -720,10 +719,11 @@ OpenGl_GraduatedTrihedron::Axis::Axis (const Graphic3d_AxisAspect& theAspect,
   Line      (NULL),
   Arrow     (NULL)
 {
-  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (THE_LABEL_PARAMS.Height);
-  aTextParams->Init (NCollection_String ((Standard_Utf16Char* )theAspect.Name().ToExtString()),
-                     Graphic3d_Vertex (theDirection.x(), theDirection.y(), theDirection.z()),
-                     THE_LABEL_PARAMS.HAlign, THE_LABEL_PARAMS.VAlign);
+  Handle(Graphic3d_Text) aTextParams = new Graphic3d_Text (THE_LABEL_HEIGHT);
+  aTextParams->SetText (NCollection_String ((Standard_Utf16Char* )theAspect.Name().ToExtString()));
+  aTextParams->SetPosition (gp_Pnt (theDirection.x(), theDirection.y(), theDirection.z()));
+  aTextParams->SetHAlignment (THE_LABEL_HALIGH);
+  aTextParams->SetVAlignment (THE_LABEL_VALIGH);
   Label = OpenGl_Text (aTextParams);
   NameColor = theAspect.NameColor();
   LineAspect.Aspect()->SetColor (theAspect.Color());

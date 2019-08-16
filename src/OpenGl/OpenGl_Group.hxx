@@ -75,7 +75,7 @@ public:
                                                   const Standard_Boolean               theToEvalMinMax) Standard_OVERRIDE;
 
   //! Adds a text for display
-  Standard_EXPORT virtual void AddText (const Handle(Graphic3d_TextParams)& theTextParams,
+  Standard_EXPORT virtual void AddText (const Handle(Graphic3d_Text)& theTextParams,
                                         const Standard_Boolean theToEvalMinMax = Standard_True) Standard_OVERRIDE;
 
   //! Add flipping element

@@ -226,7 +226,7 @@ void OpenGl_Group::AddPrimitiveArray (const Graphic3d_TypeOfPrimitiveArray theTy
 // function : AddText
 // purpose  :
 // =======================================================================
-void OpenGl_Group::AddText (const Handle(Graphic3d_TextParams)& theTextParams,
+void OpenGl_Group::AddText (const Handle(Graphic3d_Text)& theTextParams,
                             const Standard_Boolean theToEvalMinMax)
 {
   if (IsDeleted())

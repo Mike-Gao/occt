@@ -39,7 +39,7 @@ class Font_TextFormatter;
 class Graphic3d_Structure;
 class Graphic3d_ArrayOfPrimitives;
 class Graphic3d_AspectFillCapping;
-class Graphic3d_TextParams;
+class Graphic3d_Text;
 
 //! This class allows the definition of groups
 //! of primitives inside of graphic objects (presentations).
@@ -116,6 +116,62 @@ public:
   //! Replace aspects specified in the replacement map.
   virtual void ReplaceAspects (const Graphic3d_MapOfAspectsToAspects& theMap) = 0;
 
+  //! Adds a text for display
+  Standard_EXPORT virtual void AddText (const Handle(Graphic3d_Text)& theTextParams,
+                                        const Standard_Boolean theToEvalMinMax = Standard_True);
+
+  //! Adds an array of primitives for display
+  Standard_EXPORT virtual void AddPrimitiveArray (const Graphic3d_TypeOfPrimitiveArray theType, const Handle(Graphic3d_IndexBuffer)& theIndices, const Handle(Graphic3d_Buffer)& theAttribs, const Handle(Graphic3d_BoundBuffer)& theBounds, const Standard_Boolean theToEvalMinMax = Standard_True);
+
+  //! Adds an array of primitives for display
+  Standard_EXPORT void AddPrimitiveArray (const Handle(Graphic3d_ArrayOfPrimitives)& thePrim, const Standard_Boolean theToEvalMinMax = Standard_True);
+
+  //! Creates a primitive array with single marker using AddPrimitiveArray().
+  Standard_EXPORT void Marker (const Graphic3d_Vertex& thePoint, const Standard_Boolean theToEvalMinMax = Standard_True);
+
+public:
+
+  //! sets the stencil test to theIsEnabled state;
+  Standard_EXPORT virtual void SetStencilTestOptions (const Standard_Boolean theIsEnabled) = 0;
+
+  //! sets the flipping to theIsEnabled state.
+  Standard_EXPORT virtual void SetFlippingOptions (const Standard_Boolean theIsEnabled, const gp_Ax2& theRefPlane) = 0;
+
+  //! Returns true if the group contains Polygons, Triangles or Quadrangles.
+  bool ContainsFacet() const { return myContainsFacet; }
+
+  //! Returns Standard_True if the group <me> is deleted.
+  //! <me> is deleted after the call Remove (me) or the
+  //! associated structure is deleted.
+  Standard_EXPORT Standard_Boolean IsDeleted() const;
+
+  //! Returns Standard_True if the group <me> is empty.
+  Standard_EXPORT Standard_Boolean IsEmpty() const;
+
+  //! Returns the coordinates of the boundary box of the group.
+  Standard_EXPORT void MinMaxValues (Standard_Real& theXMin, Standard_Real& theYMin, Standard_Real& theZMin,
+                                     Standard_Real& theXMax, Standard_Real& theYMax, Standard_Real& theZMax) const;
+
+  //! Sets the coordinates of the boundary box of the group.
+  Standard_EXPORT void SetMinMaxValues (const Standard_Real theXMin, const Standard_Real theYMin, const Standard_Real theZMin,
+                                        const Standard_Real theXMax, const Standard_Real theYMax, const Standard_Real theZMax);
+
+  //! Returns boundary box of the group <me> without transformation applied,
+  const Graphic3d_BndBox4f& BoundingBox() const { return myBounds; }
+
+  //! Returns non-const boundary box of the group <me> without transformation applied,
+  Graphic3d_BndBox4f& ChangeBoundingBox() { return myBounds; }
+
+  //! Returns the structure containing the group <me>.
+  Standard_EXPORT Handle(Graphic3d_Structure) Structure() const;
+
+  //! Changes property shown that primitive arrays within this group form closed volume (do no contain open shells).
+  void SetClosed (const bool theIsClosed) { myIsClosed = theIsClosed; }
+
+  //! Return true if primitive arrays within this graphic group form closed volume (do no contain open shells).
+  bool IsClosed() const { return myIsClosed; }
+
+//! @name obsolete methods
 public:
 
   //! Creates the string <AText> at position <APoint>.
@@ -229,61 +285,6 @@ public:
                                      const Graphic3d_TextPath                theTp,
                                      const Standard_Boolean                  theToEvalMinMax,
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True);
-
-  //! Adds a text for display
-  Standard_EXPORT virtual void AddText (const Handle(Graphic3d_TextParams)& theTextParams,
-                                        const Standard_Boolean theToEvalMinMax = Standard_True);
-
-  //! Adds an array of primitives for display
-  Standard_EXPORT virtual void AddPrimitiveArray (const Graphic3d_TypeOfPrimitiveArray theType, const Handle(Graphic3d_IndexBuffer)& theIndices, const Handle(Graphic3d_Buffer)& theAttribs, const Handle(Graphic3d_BoundBuffer)& theBounds, const Standard_Boolean theToEvalMinMax = Standard_True);
-
-  //! Adds an array of primitives for display
-  Standard_EXPORT void AddPrimitiveArray (const Handle(Graphic3d_ArrayOfPrimitives)& thePrim, const Standard_Boolean theToEvalMinMax = Standard_True);
-
-  //! Creates a primitive array with single marker using AddPrimitiveArray().
-  Standard_EXPORT void Marker (const Graphic3d_Vertex& thePoint, const Standard_Boolean theToEvalMinMax = Standard_True);
-
-public:
-
-  //! sets the stencil test to theIsEnabled state;
-  Standard_EXPORT virtual void SetStencilTestOptions (const Standard_Boolean theIsEnabled) = 0;
-
-  //! sets the flipping to theIsEnabled state.
-  Standard_EXPORT virtual void SetFlippingOptions (const Standard_Boolean theIsEnabled, const gp_Ax2& theRefPlane) = 0;
-
-  //! Returns true if the group contains Polygons, Triangles or Quadrangles.
-  bool ContainsFacet() const { return myContainsFacet; }
-
-  //! Returns Standard_True if the group <me> is deleted.
-  //! <me> is deleted after the call Remove (me) or the
-  //! associated structure is deleted.
-  Standard_EXPORT Standard_Boolean IsDeleted() const;
-
-  //! Returns Standard_True if the group <me> is empty.
-  Standard_EXPORT Standard_Boolean IsEmpty() const;
-
-  //! Returns the coordinates of the boundary box of the group.
-  Standard_EXPORT void MinMaxValues (Standard_Real& theXMin, Standard_Real& theYMin, Standard_Real& theZMin,
-                                     Standard_Real& theXMax, Standard_Real& theYMax, Standard_Real& theZMax) const;
-
-  //! Sets the coordinates of the boundary box of the group.
-  Standard_EXPORT void SetMinMaxValues (const Standard_Real theXMin, const Standard_Real theYMin, const Standard_Real theZMin,
-                                        const Standard_Real theXMax, const Standard_Real theYMax, const Standard_Real theZMax);
-
-  //! Returns boundary box of the group <me> without transformation applied,
-  const Graphic3d_BndBox4f& BoundingBox() const { return myBounds; }
-
-  //! Returns non-const boundary box of the group <me> without transformation applied,
-  Graphic3d_BndBox4f& ChangeBoundingBox() { return myBounds; }
-
-  //! Returns the structure containing the group <me>.
-  Standard_EXPORT Handle(Graphic3d_Structure) Structure() const;
-
-  //! Changes property shown that primitive arrays within this group form closed volume (do no contain open shells).
-  void SetClosed (const bool theIsClosed) { myIsClosed = theIsClosed; }
-
-  //! Return true if primitive arrays within this graphic group form closed volume (do no contain open shells).
-  bool IsClosed() const { return myIsClosed; }
 
 protected:
 

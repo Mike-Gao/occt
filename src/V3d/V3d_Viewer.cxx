@@ -22,7 +22,7 @@
 #include <Graphic3d_GraphicDriver.hxx>
 #include <Graphic3d_Group.hxx>
 #include <Graphic3d_Structure.hxx>
-#include <Graphic3d_TextParams.hxx>
+#include <Graphic3d_Text.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Type.hxx>
 #include <V3d.hxx>
@@ -537,22 +537,25 @@ void V3d_Viewer::DisplayPrivilegedPlane (const Standard_Boolean theOnOff, const 
   const gp_Pnt pX (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.XDirection().XYZ());
   aPrims->AddVertex (p0);
   aPrims->AddVertex (pX);
-  Handle(Graphic3d_TextParams) aTextParams = new Graphic3d_TextParams (1.0 / 81.0);
-  aTextParams->Init ("X", Graphic3d_Vertex (pX.X(), pX.Y(), pX.Z()));
+  Handle(Graphic3d_Text) aTextParams = new Graphic3d_Text (1.0 / 81.0);
+  aTextParams->SetText ("X");
+  aTextParams->SetPosition (gp_Pnt (pX.X(), pX.Y(), pX.Z()));
   aGroup->AddText (aTextParams);
 
   const gp_Pnt pY (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.YDirection().XYZ());
   aPrims->AddVertex (p0);
   aPrims->AddVertex (pY);
-  aTextParams = new Graphic3d_TextParams (1.0 / 81.0);
-  aTextParams->Init ("Y", Graphic3d_Vertex (pY.X(), pY.Y(), pY.Z()));
+  aTextParams = new Graphic3d_Text (1.0 / 81.0);
+  aTextParams->SetText ("Y");
+  aTextParams->SetPosition (gp_Pnt (pY.X(), pY.Y(), pY.Z()));
   aGroup->AddText (aTextParams);
 
   const gp_Pnt pZ (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.Direction().XYZ());
   aPrims->AddVertex (p0);
   aPrims->AddVertex (pZ);
-  aTextParams = new Graphic3d_TextParams (1.0 / 81.0);
-  aTextParams->Init ("Z", Graphic3d_Vertex (pZ.X(), pZ.Y(), pZ.Z()));
+  aTextParams = new Graphic3d_Text (1.0 / 81.0);
+  aTextParams->SetText ("Z");
+  aTextParams->SetPosition (gp_Pnt (pZ.X(), pZ.Y(), pZ.Z()));
   aGroup->AddText (aTextParams);
 
   aGroup->AddPrimitiveArray (aPrims);
