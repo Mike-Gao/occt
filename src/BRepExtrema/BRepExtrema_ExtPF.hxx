@@ -21,7 +21,6 @@
 #include <Extrema_SequenceOfPOnSurf.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <Extrema_ExtFlag.hxx>
-#include <Extrema_ExtAlgo.hxx>
 
 class TopoDS_Vertex;
 class TopoDS_Face;
@@ -38,12 +37,10 @@ class BRepExtrema_ExtPF
   {}
   //! It calculates all the distances. <br>
   Standard_EXPORT BRepExtrema_ExtPF(const TopoDS_Vertex& TheVertex,const TopoDS_Face& TheFace,
-                                    const Extrema_ExtFlag TheFlag = Extrema_ExtFlag_MINMAX,
-                                    const Extrema_ExtAlgo TheAlgo = Extrema_ExtAlgo_Grad);
+                                    const Extrema_ExtFlag TheFlag = Extrema_ExtFlag_MINMAX);
   
   Standard_EXPORT void Initialize(const TopoDS_Face& TheFace,
-                                  const Extrema_ExtFlag TheFlag = Extrema_ExtFlag_MINMAX,
-                                  const Extrema_ExtAlgo TheAlgo = Extrema_ExtAlgo_Grad);
+                                  const Extrema_ExtFlag TheFlag = Extrema_ExtFlag_MINMAX);
 
   //! An exception is raised if the fields have not been initialized. <br>
   //! Be careful: this method uses the Face only for classify not for the fields. <br>
@@ -77,11 +74,6 @@ class BRepExtrema_ExtPF
   void SetFlag(const Extrema_ExtFlag F)
   {
     myExtPS.SetFlag(F);
-  }
-
-  void SetAlgo(const Extrema_ExtAlgo A)
-  {
-    myExtPS.SetAlgo(A);
   }
 
  private:

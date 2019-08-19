@@ -31,7 +31,6 @@
 #include <TColStd_SequenceOfReal.hxx>
 #include <GeomAbs_SurfaceType.hxx>
 #include <Extrema_ExtFlag.hxx>
-#include <Extrema_ExtAlgo.hxx>
 #include <Standard_Integer.hxx>
 class Extrema_ExtPExtS;
 class Extrema_ExtPRevS;
@@ -63,7 +62,11 @@ public:
   //! TolU et TolV are used to determine the conditions
   //! to stop the iterations; at the iteration number n:
   //! (Un - Un-1) < TolU and (Vn - Vn-1) < TolV .
-  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P, const Adaptor3d_Surface& S, const Standard_Real TolU, const Standard_Real TolV, const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX, const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P,
+                                const Adaptor3d_Surface& S,
+                                const Standard_Real TolU,
+                                const Standard_Real TolV,
+                                const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX);
   
   //! It calculates all the distances.
   //! NbU and NbV are used to locate the close points
@@ -73,10 +76,24 @@ public:
   //! TolU et TolV are used to determine the conditions
   //! to stop the iterations; at the iteration number n:
   //! (Un - Un-1) < TolU and (Vn - Vn-1) < TolV .
-  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P, const Adaptor3d_Surface& S, const Standard_Real Uinf, const Standard_Real Usup, const Standard_Real Vinf, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV, const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX, const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P,
+                                const Adaptor3d_Surface& S,
+                                const Standard_Real Uinf,
+                                const Standard_Real Usup,
+                                const Standard_Real Vinf,
+                                const Standard_Real Vsup,
+                                const Standard_Real TolU,
+                                const Standard_Real TolV,
+                                const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX);
   
   //! Initializes the fields of the algorithm.
-  Standard_EXPORT void Initialize (const Adaptor3d_Surface& S, const Standard_Real Uinf, const Standard_Real Usup, const Standard_Real Vinf, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV);
+  Standard_EXPORT void Initialize (const Adaptor3d_Surface& S,
+                                   const Standard_Real Uinf,
+                                   const Standard_Real Usup,
+                                   const Standard_Real Vinf,
+                                   const Standard_Real Vsup,
+                                   const Standard_Real TolU,
+                                   const Standard_Real TolV);
   
   //! Computes the distances.
   //! An exception is raised if the fieds have not been
@@ -107,9 +124,6 @@ public:
   Standard_EXPORT void TrimmedSquareDistances (Standard_Real& dUfVf, Standard_Real& dUfVl, Standard_Real& dUlVf, Standard_Real& dUlVl, gp_Pnt& PUfVf, gp_Pnt& PUfVl, gp_Pnt& PUlVf, gp_Pnt& PUlVl) const;
   
   Standard_EXPORT void SetFlag (const Extrema_ExtFlag F);
-  
-  Standard_EXPORT void SetAlgo (const Extrema_ExtAlgo A);
-
 
 
 
@@ -130,7 +144,7 @@ private:
   Adaptor3d_SurfacePtr myS;
   Standard_Boolean myDone;
   Extrema_ExtPElS myExtPElS;
-  Extrema_GenExtPS myExtPS;
+  Handle(Extrema_GenExtPS) myExtPS;
   Extrema_SequenceOfPOnSurf myPoints;
   Standard_Real myuinf;
   Standard_Real myusup;

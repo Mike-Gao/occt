@@ -772,7 +772,7 @@ void BRepExtrema_DistanceSS::Perform(const TopoDS_Vertex& S1, const TopoDS_Face&
   const Standard_Real Dst=B1.Distance(B2);
   if ((Dst < myDstRef - myEps) || (fabs(Dst-myDstRef) < myEps))
   { 
-    BRepExtrema_ExtPF Ext(S1,S2,myFlag,myAlgo);
+    BRepExtrema_ExtPF Ext(S1,S2,myFlag);
     const Standard_Integer NbExtrema = Ext.IsDone()? Ext.NbExt() : 0;
     if ( NbExtrema > 0 )
     {
@@ -828,7 +828,7 @@ void BRepExtrema_DistanceSS::Perform(const TopoDS_Face& S1, const TopoDS_Vertex&
   const Standard_Real Dst=B1.Distance(B2);
   if ((Dst < myDstRef - myEps) || (fabs(Dst-myDstRef) < myEps))
   { 
-    BRepExtrema_ExtPF Ext(S2,S1,myFlag,myAlgo);
+    BRepExtrema_ExtPF Ext(S2,S1,myFlag);
     const Standard_Integer NbExtrema = Ext.IsDone()? Ext.NbExt() : 0;
     if ( NbExtrema > 0 )
     {

@@ -33,7 +33,6 @@ Extrema_EPCOfExtPC.hxx
 Extrema_EPCOfExtPC2d.hxx
 Extrema_EPCOfExtPC2d_0.cxx
 Extrema_EPCOfExtPC_0.cxx
-Extrema_ExtAlgo.hxx
 Extrema_ExtCC.cxx
 Extrema_ExtCC.hxx
 Extrema_ExtCC2d.cxx

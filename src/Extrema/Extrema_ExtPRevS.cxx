@@ -208,7 +208,9 @@ static Standard_Boolean IsExtremum (const Standard_Real U, const Standard_Real V
 //purpose  : 
 //=======================================================================
 
-Extrema_ExtPRevS::Extrema_ExtPRevS() 
+Extrema_ExtPRevS::Extrema_ExtPRevS(const Handle(Extrema_GenExtPS)& theExtPS)
+  :
+  myExtPS (theExtPS)
 {
   myvinf = myvsup = 0.0;
   mytolv = Precision::Confusion();
@@ -233,7 +235,10 @@ Extrema_ExtPRevS::Extrema_ExtPRevS (const gp_Pnt&                               
                                     const Standard_Real                           theVmin,
                                     const Standard_Real                           theVsup,
                                     const Standard_Real                           theTolU,
-                                    const Standard_Real                           theTolV)
+                                    const Standard_Real                           theTolV,
+                                    const Handle(Extrema_GenExtPS)&               theExtPS)
+  :
+  myExtPS (theExtPS)
 {
   Initialize (theS,
               theUmin,
@@ -253,7 +258,10 @@ Extrema_ExtPRevS::Extrema_ExtPRevS (const gp_Pnt&                               
 Extrema_ExtPRevS::Extrema_ExtPRevS (const gp_Pnt&                                 theP,
                                     const Handle(GeomAdaptor_HSurfaceOfRevolution)& theS,
                                     const Standard_Real                           theTolU,
-                                    const Standard_Real                           theTolV)
+                                    const Standard_Real                           theTolV,
+                                    const Handle(Extrema_GenExtPS)&               theExtPS)
+  :
+  myExtPS (theExtPS)
 {
   Initialize (theS,
               theS->FirstUParameter(),
@@ -305,15 +313,18 @@ void Extrema_ExtPRevS::Initialize (const Handle(GeomAdaptor_HSurfaceOfRevolution
       aNbv = 100;
     }
 
-    myExtPS.Initialize (theS->ChangeSurface(),
-                        aNbu,
-                        aNbv,
-                        theUmin,
-                        theUsup,
-                        theVmin,
-                        theVsup,
-                        theTolU,
-                        theTolV);
+    if (myExtPS.IsNull())
+      myExtPS = new Extrema_GenExtPS();
+
+    myExtPS->Initialize (theS->ChangeSurface(),
+                         aNbu,
+                         aNbv,
+                         theUmin,
+                         theUsup,
+                         theVmin,
+                         theVsup,
+                         theTolU,
+                         theTolV);
   }
 }
 //=======================================================================
@@ -326,11 +337,11 @@ void Extrema_ExtPRevS::Perform(const gp_Pnt& P)
   myDone = Standard_False;
   myNbExt = 0;
   
-  if (!myIsAnalyticallyComputable) {
-    
-    myExtPS.Perform(P);
-    myDone = myExtPS.IsDone();
-    myNbExt = myExtPS.NbExt();
+  if (!myIsAnalyticallyComputable)
+  {
+    myExtPS->Perform(P);
+    myDone = myExtPS->IsDone();
+    myNbExt = myExtPS->NbExt();
     return;
   }
   
@@ -555,7 +566,7 @@ Standard_Real Extrema_ExtPRevS::SquareDistance(const Standard_Integer N) const
   if (myIsAnalyticallyComputable)
     return mySqDist[N-1];
   else
-    return myExtPS.SquareDistance(N);
+    return myExtPS->SquareDistance(N);
 }
 //=======================================================================
 //function : Point
@@ -571,7 +582,7 @@ const Extrema_POnSurf& Extrema_ExtPRevS::Point(const Standard_Integer N) const
   if (myIsAnalyticallyComputable)
     return myPoint[N-1];
   else
-    return myExtPS.Point(N);
+    return myExtPS->Point(N);
 }
 
 
