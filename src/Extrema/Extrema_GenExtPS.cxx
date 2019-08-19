@@ -1,5 +1,4 @@
 // Created on: 1995-07-18
-// Created by: Modelistation
 // Copyright (c) 1995-1999 Matra Datavision
 // Copyright (c) 1999-2014 OPEN CASCADE SAS
 //
@@ -14,980 +13,1060 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//  Modified by skv - Thu Sep 30 15:21:07 2004 OCC593
+#include <Extrema_GenExtPS.hxx>
 
-#include <Adaptor3d_Curve.hxx>
 #include <Adaptor3d_HCurve.hxx>
 #include <Adaptor3d_HSurface.hxx>
 #include <Adaptor3d_Surface.hxx>
-#include <Bnd_Array1OfSphere.hxx>
-#include <Bnd_HArray1OfSphere.hxx>
-#include <Bnd_Sphere.hxx>
-#include <Extrema_ExtFlag.hxx>
-#include <Extrema_GenExtPS.hxx>
-#include <Extrema_HUBTreeOfSphere.hxx>
-#include <Extrema_POnSurf.hxx>
-#include <Extrema_POnSurfParams.hxx>
+#include <Bnd_Box.hxx>
+#include <Bnd_Tools.hxx>
+#include <BndLib_AddSurface.hxx>
+#include <BVH_LinearBuilder.hxx>
+#include <BVH_Tools.hxx>
+#include <GCPnts.hxx>
 #include <Geom_BezierCurve.hxx>
 #include <Geom_BezierSurface.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <Geom_BSplineSurface.hxx>
-#include <Geom_OffsetSurface.hxx>
-#include <Geom_RectangularTrimmedSurface.hxx>
-#include <GeomAbs_IsoType.hxx>
-#include <gp_Pnt.hxx>
 #include <math_FunctionSetRoot.hxx>
-#include <math_NewtonFunctionSetRoot.hxx>
-#include <math_Vector.hxx>
-#include <Precision.hxx>
 #include <Standard_OutOfRange.hxx>
-#include <Standard_TypeMismatch.hxx>
-#include <StdFail_NotDone.hxx>
-#include <TColgp_Array2OfPnt.hxx>
-#include <TColStd_Array2OfInteger.hxx>
-#include <TColStd_Array2OfReal.hxx>
+#include <TColStd_ListOfInteger.hxx>
+#include <algorithm>
 
-//IMPLEMENT_HARRAY1(Extrema_HArray1OfSphere)
-class Bnd_SphereUBTreeSelector : public Extrema_UBTreeOfSphere::Selector
+IMPLEMENT_STANDARD_RTTIEXT (Extrema_GenExtPS, Standard_Transient)
+
+// Static methods definition
+namespace
 {
- public:
-
-  Bnd_SphereUBTreeSelector (const Handle(Bnd_HArray1OfSphere)& theSphereArray,
-Bnd_Sphere& theSol)
-    : myXYZ(0,0,0),
-      mySphereArray(theSphereArray),
-      mySol(theSol)
+  //=======================================================================
+  //function : fillParams
+  //purpose  : 
+  //=======================================================================
+  static void fillParams (const TColStd_Array1OfReal& theKnots,
+                          const Standard_Integer theDegree,
+                          const Standard_Real theParMin,
+                          const Standard_Real theParMax,
+                          Standard_Integer theNbSamples,
+                          Handle (TColStd_HArray1OfReal)& theParams)
   {
+    NCollection_Vector<Standard_Real> aParams;
+    GCPnts::FillParams (theKnots, theDegree, theParMin, theParMax, aParams);
+    Standard_Integer nbPar = aParams.Length();
+
+    // In case of an insufficient number of points the grid will be built later 
+    if (nbPar < theNbSamples)
+      return;
+
+    theParams = new TColStd_HArray1OfReal (1, nbPar);
+    for (Standard_Integer i = 0; i < nbPar; i++)
+      theParams->SetValue (i + 1, aParams (i));
   }
 
-  void DefineCheckPoint( const gp_Pnt& theXYZ )
-  { myXYZ = theXYZ; }
-
-  Bnd_Sphere& Sphere() const
-  { return mySol; }
-
-  virtual Standard_Boolean Reject( const Bnd_Sphere &theBnd ) const = 0;
-  
-  virtual Standard_Boolean Accept(const Standard_Integer& theObj) = 0;
- protected:
-  gp_Pnt                              myXYZ;
-  const Handle(Bnd_HArray1OfSphere)&  mySphereArray;
-  Bnd_Sphere&                         mySol;
- private:
-  void operator= (const Bnd_SphereUBTreeSelector&);
-
-};
-
-class Bnd_SphereUBTreeSelectorMin : public Bnd_SphereUBTreeSelector
-{
-public:
-  Bnd_SphereUBTreeSelectorMin (const Handle(Bnd_HArray1OfSphere)& theSphereArray,
-		Bnd_Sphere& theSol)
-		: Bnd_SphereUBTreeSelector(theSphereArray, theSol),
-		  myMinDist(RealLast())
-  {}
-  
-  void SetMinDist( const Standard_Real theMinDist )
-  { myMinDist = theMinDist; }
-
-  Standard_Real MinDist() const
-  { return myMinDist; }
-
-  Standard_Boolean Reject( const Bnd_Sphere &theBnd ) const
-  { 
-    Bnd_SphereUBTreeSelectorMin* me =
-      const_cast<Bnd_SphereUBTreeSelectorMin*>(this);
-    // myMinDist is decreased each time a nearer object is found
-    return theBnd.IsOut( myXYZ.XYZ(), me->myMinDist );
+  //=======================================================================
+  //function : fillParams
+  //purpose  : 
+  //=======================================================================
+  static void fillParams (Standard_Real theParMin,
+                          Standard_Real theParMax,
+                          Handle (TColStd_HArray1OfReal)& theParams,
+                          Standard_Integer theNbSamples)
+  {
+    Standard_Real PasU = theParMax - theParMin;
+    Standard_Real U0 = PasU / theNbSamples / 100.;
+    PasU = (PasU - U0) / (theNbSamples - 1);
+    U0 = U0 / 2. + theParMin;
+    theParams = new TColStd_HArray1OfReal (1, theNbSamples);
+    Standard_Real U = U0;
+    for (int NoU = 1; NoU <= theNbSamples; NoU++, U += PasU)
+      theParams->SetValue (NoU, U);
   }
-
-  Standard_Boolean Accept(const Standard_Integer&);
-
-private:
-	Standard_Real	myMinDist;
-};
-
-Standard_Boolean Bnd_SphereUBTreeSelectorMin::Accept(const Standard_Integer& theInd)
-{
-  const Bnd_Sphere& aSph = mySphereArray->Value(theInd);
-  Standard_Real aCurDist;
-
-//    if ( (aCurDist = aSph.SquareDistance(myXYZ.XYZ())) < mySol.SquareDistance(myXYZ.XYZ()) )
-    if ( (aCurDist = aSph.Distance(myXYZ.XYZ())) < mySol.Distance(myXYZ.XYZ()) )
-    {
-      mySol = aSph;
-      if ( aCurDist < myMinDist ) 
-        myMinDist = aCurDist;
-
-      return Standard_True;
-    }
-
-  return Standard_False;
 }
 
-class Bnd_SphereUBTreeSelectorMax : public Bnd_SphereUBTreeSelector
-{
-public:
-  Bnd_SphereUBTreeSelectorMax (const Handle(Bnd_HArray1OfSphere)& theSphereArray,
-		Bnd_Sphere& theSol)
-		: Bnd_SphereUBTreeSelector(theSphereArray, theSol),
-		  myMaxDist(0)
-  {}
-
-  void SetMaxDist( const Standard_Real theMaxDist )
-  { myMaxDist = theMaxDist; }
-
-  Standard_Real MaxDist() const
-  { return myMaxDist; }
-
-  Standard_Boolean Reject( const Bnd_Sphere &theBnd ) const
-  { 
-    Bnd_SphereUBTreeSelectorMax* me =
-      const_cast<Bnd_SphereUBTreeSelectorMax*>(this);
-    // myMaxDist is decreased each time a nearer object is found
-    return theBnd.IsOut( myXYZ.XYZ(), me->myMaxDist );
-  }
-
-  Standard_Boolean Accept(const Standard_Integer&);
-
-private:
-	Standard_Real	myMaxDist;
-};
-
-Standard_Boolean Bnd_SphereUBTreeSelectorMax::Accept(const Standard_Integer& theInd)
-{
-  const Bnd_Sphere& aSph = mySphereArray->Value(theInd);
-  Standard_Real aCurDist;
-
-//    if ( (aCurDist = aSph.SquareDistance(myXYZ.XYZ())) > mySol.SquareDistance(myXYZ.XYZ()) )
-    if ( (aCurDist = aSph.Distance(myXYZ.XYZ())) > mySol.Distance(myXYZ.XYZ()) )
-    {
-      mySol = aSph;
-      if ( aCurDist > myMaxDist ) 
-        myMaxDist = aCurDist;
-
-      return Standard_True;
-    }
-
-  return Standard_False;
-}
-
-//=============================================================================
-
-/*-----------------------------------------------------------------------------
-Function:
-   Find all extremum distances between point P and surface
-  S using sampling (NbU,NbV).
-
-Method:
-   The algorithm bases on the hypothesis that sampling is precise enough, 
-  if there exist N extreme distances between the point and the surface,
-  so there also exist N extrema between the point and the grid.
-  So, the algorithm consists in starting from extrema of the grid to find the 
-  extrema of the surface.
-  The extrema are calculated by the algorithm math_FunctionSetRoot with the
-  following arguments:
-  - F: Extrema_FuncExtPS created from P and S,
-  - UV: math_Vector the components which of are parameters of the extremum on the 
-    grid,
-  - Tol: Min(TolU,TolV), (Prov.:math_FunctionSetRoot does not autorize a vector)
-  - UVinf: math_Vector the components which of are lower limits of u and v,
-  - UVsup: math_Vector the components which of are upper limits of u and v.
-
-Processing:
-  a- Creation of the table of distances (TbDist(0,NbU+1,0,NbV+1)):
-     The table is expanded at will; lines 0 and NbU+1 and
-     columns 0 and NbV+1 are initialized at RealFirst() or RealLast()
-     to simplify the tests carried out at stage b
-     (there is no need to test if the point is on border of the grid).
-  b- Calculation of extrema:
-     First the minimums and then the maximums are found. These 2 procedured 
-     pass in a similar way:
-  b.a- Initialization:
-      - 'borders' of table  TbDist (RealLast() in case of minimums
-        and  RealLast() in case of maximums),
-      - table TbSel(0,NbU+1,0,NbV+1) of selection of points for 
-        calculation of local extremum (0). When a point will selected,
-	it will not be selectable, as well as the ajacent points 
-	(8 at least). The corresponding addresses will be set to 1.
-  b.b- Calculation of minimums (or maximums):
-       All distances from table TbDist are parsed in a loop:
-      - search minimum (or maximum) in the grid,
-      - calculate extremum on the surface,
-      - update table TbSel.
------------------------------------------------------------------------------*/
-
+//=======================================================================
+//function : Extrema_GenExtPS
+//purpose  : 
+//=======================================================================
 Extrema_GenExtPS::Extrema_GenExtPS()
-: myumin(0.0),
-  myusup(0.0),
-  myvmin(0.0),
-  myvsup(0.0),
-  myusample(0),
-  myvsample(0),
-  mytolu(0.0),
-  mytolv(0.0),
-  myS(NULL)
+  :
+  myUMin (RealLast()),
+  myUMax (RealFirst()),
+  myVMin (RealLast()),
+  myVMax (RealFirst()),
+  myNbUSamples (0),
+  myNbVSamples (0),
+  myTolU (Precision::PConfusion()),
+  myTolV (Precision::PConfusion()),
+  myLocUMin (RealLast()),
+  myLocUMax (RealFirst()),
+  myLocVMin (RealLast()),
+  myLocVMax (RealFirst()),
+  myTarget (Extrema_ExtFlag_MINMAX),
+  mySqDistance (-1),
+  myIsDone (Standard_False)
 {
-  myDone = Standard_False;
-  myInit = Standard_False;
-  myFlag = Extrema_ExtFlag_MINMAX;
-  myAlgo = Extrema_ExtAlgo_Grad;
 }
 
-
-Extrema_GenExtPS::Extrema_GenExtPS (const gp_Pnt&          P,
-                                    const Adaptor3d_Surface& S,
-                                    const Standard_Integer NbU, 
-                                    const Standard_Integer NbV,
-                                    const Standard_Real    TolU, 
-                                    const Standard_Real    TolV,
-                                    const Extrema_ExtFlag F,
-                                    const Extrema_ExtAlgo A) 
-: myF (P,S),
-  myFlag(F),
-  myAlgo(A)
+//=======================================================================
+//function : Extrema_GenExtPS
+//purpose  : 
+//=======================================================================
+Extrema_GenExtPS::Extrema_GenExtPS (const gp_Pnt&            theP,
+                                    const Adaptor3d_Surface& theS,
+                                    const Standard_Integer   theNbU,
+                                    const Standard_Integer   theNbV,
+                                    const Standard_Real      theTolU,
+                                    const Standard_Real      theTolV,
+                                    const Extrema_ExtFlag    theTarget)
+  :
+  myNbUSamples (theNbU),
+  myNbVSamples (theNbV),
+  myTolU (theTolU),
+  myTolV (theTolV),
+  myTarget (theTarget),
+  mySqDistance (-1),
+  myIsDone (Standard_False)
 {
-  Initialize(S, NbU, NbV, TolU, TolV);
-  Perform(P);
+  Initialize (theS, theNbU, theNbV, theTolU, theTolV);
+  Perform (theP);
 }
 
-Extrema_GenExtPS::Extrema_GenExtPS (const gp_Pnt&          P,
-                                    const Adaptor3d_Surface& S,
-                                    const Standard_Integer NbU, 
-                                    const Standard_Integer NbV,
-                                    const Standard_Real    Umin,
-                                    const Standard_Real    Usup,
-                                    const Standard_Real    Vmin,
-                                    const Standard_Real    Vsup,
-                                    const Standard_Real    TolU, 
-                                    const Standard_Real    TolV,
-                                    const Extrema_ExtFlag F,
-                                    const Extrema_ExtAlgo A) 
-: myF (P,S),
-  myFlag(F),
-  myAlgo(A)
+//=======================================================================
+//function : Extrema_GenExtPS
+//purpose  : 
+//=======================================================================
+Extrema_GenExtPS::Extrema_GenExtPS (const gp_Pnt&            theP,
+                                    const Adaptor3d_Surface& theS,
+                                    const Standard_Integer   theNbU,
+                                    const Standard_Integer   theNbV,
+                                    const Standard_Real      theUMin,
+                                    const Standard_Real      theUMax,
+                                    const Standard_Real      theVMin,
+                                    const Standard_Real      theVMax,
+                                    const Standard_Real      theTolU,
+                                    const Standard_Real      theTolV,
+                                    const Extrema_ExtFlag    theTarget)
+  :
+  myUMin (theUMin),
+  myUMax (theUMax),
+  myVMin (theVMin),
+  myVMax (theVMax),
+  myNbUSamples (theNbU),
+  myNbVSamples (theNbV),
+  myTolU (theTolU),
+  myTolV (theTolV),
+  myTarget (theTarget),
+  mySqDistance (-1),
+  myIsDone (Standard_False)
 {
-  Initialize(S, NbU, NbV, Umin, Usup, Vmin, Vsup, TolU, TolV);
-  Perform(P);
+  Initialize (theS, theNbU, theNbV, theUMin, theUMax, theVMin, theVMax, theTolU, theTolV);
+  Perform (theP);
 }
 
-
-void Extrema_GenExtPS::Initialize(const Adaptor3d_Surface& S,
-                                  const Standard_Integer NbU, 
-                                  const Standard_Integer NbV,
-                                  const Standard_Real    TolU, 
-                                  const Standard_Real    TolV)
+//=======================================================================
+//function : Initialize
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::Initialize (const Adaptor3d_Surface& theS,
+                                   const Standard_Integer   theNbU,
+                                   const Standard_Integer   theNbV,
+                                   const Standard_Real      theTolU,
+                                   const Standard_Real      theTolV)
 {
-  myumin = S.FirstUParameter();
-  myusup = S.LastUParameter();
-  myvmin = S.FirstVParameter();
-  myvsup = S.LastVParameter();
-  Initialize(S,NbU,NbV,myumin,myusup,myvmin,myvsup,TolU,TolV);
+  Initialize (theS,
+              theNbU, theNbV,
+              theS.FirstUParameter(), theS.LastUParameter(),
+              theS.FirstVParameter(), theS.LastVParameter(),
+              theTolU, theTolV);
 }
 
-
-void Extrema_GenExtPS::Initialize(const Adaptor3d_Surface& S,
-                                  const Standard_Integer NbU, 
-                                  const Standard_Integer NbV,
-                                  const Standard_Real    Umin,
-                                  const Standard_Real    Usup,
-                                  const Standard_Real    Vmin,
-                                  const Standard_Real    Vsup,
-                                  const Standard_Real    TolU, 
-                                  const Standard_Real    TolV)
+//=======================================================================
+//function : Initialize
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::Initialize (const Adaptor3d_Surface& theS,
+                                   const Standard_Integer   theNbU,
+                                   const Standard_Integer   theNbV,
+                                   const Standard_Real      theUMin,
+                                   const Standard_Real      theUMax,
+                                   const Standard_Real      theVMin,
+                                   const Standard_Real      theVMax,
+                                   const Standard_Real      theTolU,
+                                   const Standard_Real      theTolV)
 {
-  myS = (Adaptor3d_SurfacePtr)&S;
-  myusample = NbU;
-  myvsample = NbV;
-  mytolu = TolU;
-  mytolv = TolV;
-  myumin = Umin;
-  myusup = Usup;
-  myvmin = Vmin;
-  myvsup = Vsup;
+  myS = (Adaptor3d_SurfacePtr)&theS;
+  myUMin = theUMin;
+  myUMax = theUMax;
+  myVMin = theVMin;
+  myVMax = theVMax;
+  myNbUSamples = theNbU;
+  myNbVSamples = theNbV;
+  myTolU = theTolU;
+  myTolV = theTolV;
 
-  if ((myusample < 2) ||
-      (myvsample < 2)) { throw Standard_OutOfRange(); }
+  myLocUMin = myUMin;
+  myLocUMax = myUMax;
+  myLocVMin = myVMin;
+  myLocVMax = myVMax;
 
-  myF.Initialize(S);
+  if (myNbUSamples < 2 || myNbVSamples < 2)
+  {
+    throw Standard_OutOfRange ("Extrema_GenExtPS::Initialize - number of samples is too small");
+  }
 
-  mySphereUBTree.Nullify();
+  myF.Initialize (theS);
+
+  myBVHBoxSet.Nullify();
   myUParams.Nullify();
   myVParams.Nullify();
-  myInit = Standard_False;
 }
 
-inline static void fillParams(const TColStd_Array1OfReal& theKnots,
-                              Standard_Integer theDegree,
-                              Standard_Real theParMin,
-                              Standard_Real theParMax,
-                              Handle(TColStd_HArray1OfReal)& theParams,
-                              Standard_Integer theSample)
+//=======================================================================
+//function : Perform
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
 {
-  NCollection_Vector<Standard_Real> aParams;
-  Standard_Integer i = 1;
-  Standard_Real aPrevPar = theParMin;
-  aParams.Append(aPrevPar);
-  //calculation the array of parametric points depending on the knots array variation and degree of given surface
-  for ( ; i <  theKnots.Length() && theKnots(i) < (theParMax - Precision::PConfusion()); i++ )
-  {
-    if (  theKnots(i+1) < theParMin + Precision::PConfusion())
-      continue;
+  Perform (thePoint, myUMin, myUMax, myVMin, myVMax);
+}
 
-    Standard_Real aStep = (theKnots(i+1) - theKnots(i))/Max(theDegree,2);
-    Standard_Integer k =1;
-    for( ; k <= theDegree ; k++)
+//=======================================================================
+//function : Perform
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
+                                const Standard_Real theUMin,
+                                const Standard_Real theUMax,
+                                const Standard_Real theVMin,
+                                const Standard_Real theVMax)
+{
+  myIsDone = Standard_False;
+  myPoint = thePoint;
+  myF.SetPoint (thePoint, myTarget);
+  mySolutions.clear();
+
+  myLocUMin = Max (theUMin, myUMin);
+  myLocUMax = Min (theUMax, myUMax);
+  myLocVMin = Max (theVMin, myVMin);
+  myLocVMax = Min (theVMax, myVMax);
+
+  if (myUParams.IsNull() || myVParams.IsNull())
+  {
+    // Prepare surface sampling
+    BuildGrid();
+  }
+
+  if (myBVHBoxSet.IsNull() || myBVHBoxSet->IsDirty())
+  {
+    BuildTree();
+  }
+
+  if (myTarget == Extrema_ExtFlag_MIN)
+    mySqDistance = RealLast();
+  else if (myTarget == Extrema_ExtFlag_MAX)
+    mySqDistance = -1;
+
+  // Fill Square distances with default values
+  for (int iU = 0; iU <= myNbUSamples + 1; ++iU)
+  {
+    for (int iV = 0; iV <= myNbVSamples + 1; ++iV)
     {
-      Standard_Real aPar = theKnots(i) + k * aStep;
-      if(aPar > theParMax - Precision::PConfusion())
-        break;
-      if(aPar > aPrevPar + Precision::PConfusion() )
+      myPoints->ChangeValue (iU, iV).SetSqrDistance (-1.);
+
+      if (iU <= myNbUSamples && iV <= myNbVSamples)
+        myFacePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
+
+      if (iU > 0 && iU <= myNbUSamples && iV > 0 && iV <= myNbVSamples)
       {
-        aParams.Append(aPar);
-        aPrevPar = aPar;
+        if (iU < myNbUSamples)
+          myUEdgePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
+        if (iV < myNbVSamples)
+          myVEdgePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
+      }
+    }
+  }
+
+  if (myTarget == Extrema_ExtFlag_MIN || myTarget == Extrema_ExtFlag_MINMAX)
+  {
+    // Fill boundary with RealLast square distance.
+    for (int iV = 0; iV <= myNbVSamples; ++iV)
+    {
+      myFacePntParams->ChangeValue (0, iV).SetSqrDistance (RealLast());
+      myFacePntParams->ChangeValue (myNbUSamples, iV).SetSqrDistance (RealLast());
+    }
+
+    for (int iU = 1; iU < myNbUSamples; ++iU)
+    {
+      myFacePntParams->ChangeValue (iU, 0).SetSqrDistance (RealLast());
+      myFacePntParams->ChangeValue (iU, myNbVSamples).SetSqrDistance (RealLast());
+    }
+  }
+
+  if (myTarget == Extrema_ExtFlag_MINMAX)
+  {
+    for (int iU = 1; iU <= myNbUSamples; ++iU)
+    {
+      for (int iV = 1; iV <= myNbVSamples; ++iV)
+      {
+        Extrema_POnSurfParams& aParam = myPoints->ChangeValue (iU, iV);
+        aParam.SetSqrDistance (aParam.Value().SquareDistance (thePoint));
       }
     }
 
-  }
-  aParams.Append(theParMax);
-  Standard_Integer nbPar = aParams.Length();
-  //in case of an insufficient number of points the grid will be built later 
-  if (nbPar < theSample)
-    return;
-  theParams = new TColStd_HArray1OfReal(1, nbPar );
-  for( i = 0; i < nbPar; i++)
-    theParams->SetValue(i+1,aParams(i));
-}
-
-void Extrema_GenExtPS::GetGridPoints( const Adaptor3d_Surface& theSurf)
-{
-  //creation parametric points for BSpline and Bezier surfaces
-  //with taking into account of Degree and NbKnots of BSpline or Bezier geometry
-  if(theSurf.GetType() == GeomAbs_OffsetSurface)
-    GetGridPoints(theSurf.BasisSurface()->Surface());
-  //parametric points for BSpline surfaces
-  else if( theSurf.GetType() == GeomAbs_BSplineSurface) 
-  {
-    Handle(Geom_BSplineSurface) aBspl = theSurf.BSpline();
-    if(!aBspl.IsNull())
+    // Perform standard solution search (no tree)
+    for (Standard_Integer iTarget = 0; iTarget < 2; ++iTarget)
     {
-      TColStd_Array1OfReal aUKnots(1, aBspl->NbUKnots());
-      aBspl->UKnots( aUKnots);
-      TColStd_Array1OfReal aVKnots(1, aBspl->NbVKnots());
-      aBspl->VKnots( aVKnots);
-      fillParams(aUKnots,aBspl->UDegree(),myumin, myusup, myUParams, myusample);
-      fillParams(aVKnots,aBspl->VDegree(),myvmin, myvsup, myVParams, myvsample);
-    }
-  }
-  //calculation parametric points for Bezier surfaces
-  else if(theSurf.GetType() == GeomAbs_BezierSurface)
-  {
-    Handle(Geom_BezierSurface) aBezier = theSurf.Bezier();
-    if(aBezier.IsNull())
-      return;
-
-    TColStd_Array1OfReal aUKnots(1,2);
-    TColStd_Array1OfReal aVKnots(1,2);
-    aBezier->Bounds(aUKnots(1), aUKnots(2), aVKnots(1), aVKnots(2));
-    fillParams(aUKnots, aBezier->UDegree(), myumin, myusup, myUParams, myusample);
-    fillParams(aVKnots, aBezier->VDegree(), myvmin, myvsup, myVParams, myvsample);
-
-  }
-  //creation points for surfaces based on BSpline or Bezier curves
-  else if(theSurf.GetType() == GeomAbs_SurfaceOfRevolution || 
-    theSurf.GetType() == GeomAbs_SurfaceOfExtrusion)
-  {
-    Handle(TColStd_HArray1OfReal) anArrKnots;
-    Standard_Integer aDegree = 0;
-    if(theSurf.BasisCurve()->Curve().GetType() == GeomAbs_BSplineCurve)
-    {
-      Handle(Geom_BSplineCurve) aBspl = theSurf.BasisCurve()->Curve().BSpline();
-      if(!aBspl.IsNull())
+      const Extrema_ExtFlag aTarget = static_cast<Extrema_ExtFlag> (iTarget);
+      for (Standard_Integer iU = 1; iU <= myNbUSamples; iU++)
       {
-        anArrKnots = new TColStd_HArray1OfReal(1,aBspl->NbKnots());
-        aBspl->Knots( anArrKnots->ChangeArray1() );
-        aDegree = aBspl->Degree();
-        
-      }
-
-    }
-    if(theSurf.BasisCurve()->Curve().GetType() == GeomAbs_BezierCurve)
-    {
-      Handle(Geom_BezierCurve) aBez = theSurf.BasisCurve()->Curve().Bezier();
-      if(!aBez.IsNull())
-      {
-        anArrKnots = new TColStd_HArray1OfReal(1,2);
-        anArrKnots->SetValue(1, aBez->FirstParameter());
-        anArrKnots->SetValue(2, aBez->LastParameter());
-        aDegree = aBez->Degree();
-        
+        for (Standard_Integer iV = 1; iV <= myNbVSamples; iV++)
+        {
+          FindSolution (iU, iV, aTarget);
+        }
       }
     }
-    if(anArrKnots.IsNull())
-      return;
-    if( theSurf.GetType() == GeomAbs_SurfaceOfRevolution )
-      fillParams( anArrKnots->Array1(), aDegree, myvmin, myvsup, myVParams, myvsample);
-    else
-      fillParams( anArrKnots->Array1(), aDegree, myumin, myusup, myUParams, myusample);
-  }
-  //update the number of points in sample
-  if(!myUParams.IsNull())
-    myusample = myUParams->Length();
-  if( !myVParams.IsNull())
-    myvsample = myVParams->Length();
-  
-}
-
-/*
- * This function computes the point on surface parameters on edge.
- * if it coincides with theParam0 or theParam1, it is returned.
- */
-const Extrema_POnSurfParams& Extrema_GenExtPS::ComputeEdgeParameters
-      (const Standard_Boolean       IsUEdge,
-       const Extrema_POnSurfParams &theParam0,
-       const Extrema_POnSurfParams &theParam1,
-       const gp_Pnt                &thePoint,
-       const Standard_Real          theDiffTol)
-{
-  const Standard_Real aSqrDist01 =
-    theParam0.Value().SquareDistance(theParam1.Value());
-
-  if (aSqrDist01 <= theDiffTol)
-  {
-    // The points are confused. Get the first point and change its type.
-    return theParam0;
+    // Copy solutions
+    for (Standard_Integer i = 1; i <= myF.NbExt(); ++i)
+    {
+      mySolutions.push_back (Extrema_GenExtPS_ExtPSResult (myF.Point (i), myF.SquareDistance (i)));
+    }
   }
   else
   {
-    const Standard_Real aDiffDist =
-      Abs(theParam0.GetSqrDistance() - theParam1.GetSqrDistance());
+    // Indicator for high-level BVH traverse
+    SetBVHSet (NULL);
+    Select (myBVHBoxSet->BVH());
 
-    if (aDiffDist >= aSqrDist01 - theDiffTol)
+    // Copy solutions
+    for (Standard_Integer i = 1; i <= myF.NbExt(); ++i)
     {
-      // The shortest distance is one of the nodes.
-      if (theParam0.GetSqrDistance() > theParam1.GetSqrDistance())
-      {
-        // The shortest distance is the point 1.
-        return theParam1;
-      }
-      else
-      {
-        // The shortest distance is the point 0.
-        return theParam0;
-      }
+      if (Abs (mySqDistance - myF.SquareDistance (i)) < Precision::SquareConfusion())
+        mySolutions.push_back (Extrema_GenExtPS_ExtPSResult (myF.Point (i), myF.SquareDistance (i)));
     }
-    else
+  }
+
+  // Sort solutions
+  std::sort (mySolutions.begin(), mySolutions.end());
+}
+
+//=======================================================================
+//function : BuildGrid
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::BuildGrid()
+{
+  GetGridPoints (*myS);
+
+  //build grid in other cases 
+  if (myUParams.IsNull())
+  {
+    fillParams (myUMin, myUMax, myUParams, myNbUSamples);
+  }
+
+  if (myVParams.IsNull())
+  {
+    fillParams (myVMin, myVMax, myVParams, myNbVSamples);
+  }
+
+  myPoints = new Extrema_HArray2OfPOnSurfParams (0, myNbUSamples + 1, 0, myNbVSamples + 1);
+  for (int iU = 1; iU <= myNbUSamples; iU++)
+  {
+    Standard_Real U = myUParams->Value (iU);
+    for (int iV = 1; iV <= myNbVSamples; iV++)
     {
-      // The shortest distance is inside the edge.
-      gp_XYZ aPoP(thePoint.XYZ().Subtracted(theParam0.Value().XYZ()));
-      gp_XYZ aPoP1(theParam1.Value().XYZ().Subtracted(theParam0.Value().XYZ()));
-      Standard_Real aRatio = aPoP.Dot(aPoP1)/aSqrDist01;
-      Standard_Real aU[2];
-      Standard_Real aV[2];
-
-      theParam0.Parameter(aU[0], aV[0]);
-      theParam1.Parameter(aU[1], aV[1]);
-
-      Standard_Real aUPar = aU[0];
-      Standard_Real aVPar = aV[0];
-
-      if (IsUEdge)
-      {
-        aUPar += aRatio*(aU[1] - aU[0]);
-      }
-      else
-      {
-        aVPar += aRatio*(aV[1] - aV[0]);
-      }
-
-      myGridParam.SetParameters(aUPar, aVPar, myS->Value(aUPar, aVPar));
-      Standard_Integer anIndices[2];
-
-      theParam0.GetIndices(anIndices[0], anIndices[1]);
-      myGridParam.SetElementType(IsUEdge ? Extrema_UIsoEdge : Extrema_VIsoEdge);
-      myGridParam.SetSqrDistance(thePoint.SquareDistance(myGridParam.Value()));
-      myGridParam.SetIndices(anIndices[0], anIndices[1]);
-      return myGridParam;
+      Standard_Real V = myVParams->Value (iV);
+      gp_Pnt aP = myS->Value (U, V);
+      Extrema_POnSurfParams aParam (U, V, aP);
+      aParam.SetElementType (Extrema_Node);
+      aParam.SetIndices (iU, iV);
+      myPoints->SetValue (iU, iV, aParam);
     }
+  }
+
+  myFacePntParams = new Extrema_HArray2OfPOnSurfParams (0, myNbUSamples, 0, myNbVSamples);
+
+  myUEdgePntParams = new Extrema_HArray2OfPOnSurfParams (1, myNbUSamples - 1, 1, myNbVSamples);
+  myVEdgePntParams = new Extrema_HArray2OfPOnSurfParams (1, myNbUSamples, 1, myNbVSamples - 1);
+}
+
+//=======================================================================
+//function : BuildTree
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::BuildTree()
+{
+  // The tree is not required for MINMAX mode
+  if (myTarget == Extrema_ExtFlag_MINMAX)
+    return;
+
+  // so fill the tree with elements with empty boxes
+  if (myBVHBoxSet.IsNull())
+  {
+    // Builder for low-level BVH sets
+    opencascade::handle<BVH_LinearBuilder<Standard_Real, 3> > aLBuilder = new BVH_LinearBuilder<Standard_Real, 3>();
+
+    myBVHBoxSet = new BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedGrid> (
+      new BVH_LinearBuilder<Standard_Real, 3> (BVH_Constants_LeafNodeSizeSingle));
+
+    // create hierarchy of BVH trees
+    const Standard_Integer aCoeff = static_cast<Standard_Integer>(Sqrt (Min (myNbUSamples, myNbVSamples)));
+    const Standard_Integer aNbUT = myNbUSamples / aCoeff;
+    const Standard_Integer aNbVT = myNbVSamples / aCoeff;
+    const Standard_Integer aNbU = myNbUSamples / aNbUT;
+    const Standard_Integer aNbV = myNbVSamples / aNbVT;
+    const Standard_Integer aSize = aNbU * aNbV;
+
+    myBVHBoxSet->SetSize (aNbUT * aNbVT);
+
+    Standard_Integer U1 = 1, V1 = 1, U2 = 1, V2 = 1;
+    for (Standard_Integer iUT = 1; iUT <= aNbUT; ++iUT)
+    {
+      U2 = (iUT == aNbUT) ? myNbUSamples : iUT * aNbU;
+      for (Standard_Integer iVT = 1; iVT <= aNbVT; ++iVT)
+      {
+        Handle (Extrema_GenExtPS_GridCellBoxSet) aGridSet = new Extrema_GenExtPS_GridCellBoxSet (aLBuilder);
+        aGridSet->SetSize (aSize);
+
+        V2 = (iVT == aNbVT) ? myNbVSamples : iVT * aNbV;
+        for (Standard_Integer iU = U1; iU <= U2; ++iU)
+        {
+          for (Standard_Integer iV = V1; iV <= V2; ++iV)
+          {
+            aGridSet->Add (Extrema_GenExtPS_GridCell (iU, iV), BVH_Box<Standard_Real, 3>());
+          }
+        }
+        myBVHBoxSet->Add (Extrema_GenExtPS_LocalizedGrid (U1, U2, V1, V2, aGridSet), BVH_Box<Standard_Real, 3>());
+        V1 = V2 + 1;
+      }
+      U1 = U2 + 1;
+      V1 = 1;
+    }
+  }
+
+  if (myBVHBoxSet->IsDirty())
+  {
+    // Fill the tree with the real boxes
+    const Standard_Integer aNbSets = myBVHBoxSet->Size();
+    for (Standard_Integer iSet = 0; iSet < aNbSets; ++iSet)
+    {
+      Extrema_GenExtPS_LocalizedGrid aGridSet = myBVHBoxSet->Element (iSet);
+
+      // Box of the set
+      Bnd_Box aSetBox;
+      const Standard_Integer aNbCells = aGridSet.CellBoxSet->Size();
+      for (Standard_Integer iCell = 0; iCell < aNbCells; ++iCell)
+      {
+        const Extrema_GenExtPS_GridCell& aCell = aGridSet.CellBoxSet->Element (iCell);
+        Standard_Integer iU = aCell.UIndex, iV = aCell.VIndex;
+
+        Standard_Integer aUCoeff = (iU < myNbUSamples) ? 1 : 0;
+        Standard_Integer aVCoeff = (iV < myNbVSamples) ? 1 : 0;
+
+        // Build box for the cell
+        Bnd_Box aGridBox;
+        for (int i = 0; i < 2; ++i)
+          for (int j = 0; j < 2; ++j)
+            aGridBox.Add (myPoints->Value (iU + i * aUCoeff, iV + j * aVCoeff).Value());
+        aGridBox.Enlarge (Precision::Confusion());
+
+        const Extrema_POnSurf& aPMin = myPoints->Value (iU, iV);
+        const Extrema_POnSurf& aPMax = myPoints->Value (iU + aUCoeff, iV + aVCoeff);
+
+        Standard_Real U1, V1, U2, V2;
+        aPMin.Parameter (U1, V1);
+        aPMax.Parameter (U2, V2);
+
+        // Enlarge box to make sure the whole cell is covered
+        if (U1 != U2 || V1 != V2)
+        {
+          gp_Pnt aPMid = myS->Value ((U1 + U2) * 0.5, (V1 + V2) * 0.5);
+
+          gp_Vec aDir (aPMin.Value(), aPMax.Value());
+          Standard_Real diag = aDir.SquareMagnitude();
+          if (diag > gp::Resolution())
+          {
+            aGridBox.Enlarge (gp_Lin (aPMin.Value(), aDir).Distance (aPMid));
+          }
+          else
+          {
+            aGridBox.Add (aPMid);
+          }
+        }
+        aGridSet.CellBoxSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aGridBox));
+
+        aSetBox.Add (aGridBox);
+      }
+      myBVHBoxSet->UpdateBox (iSet, Bnd_Tools::Bnd2BVH (aSetBox));
+    }
+
+    // Build only high level BVH tree
+    myBVHBoxSet->Build();
   }
 }
 
-void Extrema_GenExtPS::BuildGrid(const gp_Pnt &thePoint)
+//=======================================================================
+//function : GetGridPoints
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::GetGridPoints (const Adaptor3d_Surface& theSurf)
 {
-  Standard_Integer NoU, NoV;
+  // Creation parametric points for BSpline and Bezier surfaces
+  // taking into account of Degree and NbKnots of BSpline or Bezier geometry
+  if (theSurf.GetType() == GeomAbs_OffsetSurface)
+    GetGridPoints (theSurf.BasisSurface()->Surface());
 
-  //if grid was already built skip its creation
-  if (!myInit) {
-    //build parametric grid in case of a complex surface geometry (BSpline and Bezier surfaces)
-    GetGridPoints(*myS);
-    
-    //build grid in other cases 
-    if( myUParams.IsNull() )
+  // Parametric points for BSpline surfaces
+  else if (theSurf.GetType() == GeomAbs_BSplineSurface)
+  {
+    Handle (Geom_BSplineSurface) aBspl = theSurf.BSpline();
+    if (!aBspl.IsNull())
     {
-      Standard_Real PasU = myusup - myumin;
-      Standard_Real U0 = PasU / myusample / 100.;
-      PasU = (PasU - U0) / (myusample - 1);
-      U0 = U0/2. + myumin;
-      myUParams = new TColStd_HArray1OfReal(1,myusample );
-      Standard_Real U = U0;
-      for ( NoU = 1 ; NoU <= myusample; NoU++, U += PasU) 
-        myUParams->SetValue(NoU, U);
+      TColStd_Array1OfReal aUKnots (1, aBspl->NbUKnots());
+      aBspl->UKnots (aUKnots);
+      TColStd_Array1OfReal aVKnots (1, aBspl->NbVKnots());
+      aBspl->VKnots (aVKnots);
+      fillParams (aUKnots, aBspl->UDegree(), myUMin, myUMax, myNbUSamples, myUParams);
+      fillParams (aVKnots, aBspl->VDegree(), myVMin, myVMax, myNbVSamples, myVParams);
     }
-  
-    if( myVParams.IsNull())
+  }
+
+  // Calculation parametric points for Bezier surfaces
+  else if (theSurf.GetType() == GeomAbs_BezierSurface)
+  {
+    Handle (Geom_BezierSurface) aBezier = theSurf.Bezier();
+    if (!aBezier.IsNull())
     {
-      Standard_Real PasV = myvsup - myvmin;
-      Standard_Real V0 = PasV / myvsample / 100.;
-      PasV = (PasV - V0) / (myvsample - 1);
-      V0 = V0/2. + myvmin;
-      
-      myVParams = new TColStd_HArray1OfReal(1,myvsample );
-      Standard_Real V = V0;
-     
-      for ( NoV = 1, V = V0; NoV <= myvsample; NoV++, V += PasV)
-        myVParams->SetValue(NoV, V);
+      TColStd_Array1OfReal aUKnots (1, 2);
+      TColStd_Array1OfReal aVKnots (1, 2);
+      aBezier->Bounds (aUKnots (1), aUKnots (2), aVKnots (1), aVKnots (2));
+      fillParams (aUKnots, aBezier->UDegree(), myUMin, myUMax, myNbUSamples, myUParams);
+      fillParams (aVKnots, aBezier->VDegree(), myVMin, myVMax, myNbVSamples, myVParams);
     }
+  }
 
-    //If flag was changed and extrema not reinitialized Extrema would fail
-    myPoints = new Extrema_HArray2OfPOnSurfParams
-      (0, myusample + 1, 0, myvsample + 1);
-    // Calculation of distances
-  
-    for ( NoU = 1 ; NoU <= myusample; NoU++ ) {
-      for ( NoV = 1 ; NoV <= myvsample; NoV++) {
-        gp_Pnt aP1 = myS->Value(myUParams->Value(NoU), myVParams->Value(NoV));
-        Extrema_POnSurfParams aParam
-          (myUParams->Value(NoU), myVParams->Value(NoV), aP1);
+  // creation points for surfaces based on BSpline or Bezier curves
+  else if (theSurf.GetType() == GeomAbs_SurfaceOfRevolution ||
+           theSurf.GetType() == GeomAbs_SurfaceOfExtrusion)
+  {
+    Handle (TColStd_HArray1OfReal) anArrKnots;
+    Standard_Integer aDegree = 0;
+    if (theSurf.BasisCurve()->Curve().GetType() == GeomAbs_BSplineCurve)
+    {
+      Handle (Geom_BSplineCurve) aBspl = theSurf.BasisCurve()->Curve().BSpline();
+      if (!aBspl.IsNull())
+      {
+        anArrKnots = new TColStd_HArray1OfReal (1, aBspl->NbKnots());
+        aBspl->Knots (anArrKnots->ChangeArray1());
+        aDegree = aBspl->Degree();
+      }
+    }
+    if (theSurf.BasisCurve()->Curve().GetType() == GeomAbs_BezierCurve)
+    {
+      Handle (Geom_BezierCurve) aBez = theSurf.BasisCurve()->Curve().Bezier();
+      if (!aBez.IsNull())
+      {
+        anArrKnots = new TColStd_HArray1OfReal (1, 2);
+        anArrKnots->SetValue (1, aBez->FirstParameter());
+        anArrKnots->SetValue (2, aBez->LastParameter());
+        aDegree = aBez->Degree();
 
-        aParam.SetElementType(Extrema_Node);
-        aParam.SetIndices(NoU, NoV);
-        myPoints->SetValue(NoU, NoV, aParam);
+      }
+    }
+    if (anArrKnots.IsNull())
+      return;
+    if (theSurf.GetType() == GeomAbs_SurfaceOfRevolution)
+      fillParams (anArrKnots->Array1(), aDegree, myVMin, myVMax, myNbVSamples, myVParams);
+    else
+      fillParams (anArrKnots->Array1(), aDegree, myUMin, myUMax, myNbUSamples, myUParams);
+  }
+
+  // Update the number of points in sample
+  if (!myUParams.IsNull())
+    myNbUSamples = myUParams->Length();
+  if (!myVParams.IsNull())
+    myNbVSamples = myVParams->Length();
+}
+
+//=======================================================================
+//function : RejectNode
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::RejectNode (const BVH_Vec3d& theCMin,
+                                               const BVH_Vec3d& theCMax,
+                                               Standard_Real& theDistance) const
+{
+  if (myTarget == Extrema_ExtFlag_MINMAX)
+    return Standard_False;
+
+  theDistance = (myTarget == Extrema_ExtFlag_MIN) ?
+    BVH_Tools<Standard_Real, 3>::PointBoxSquareDistance (BVH_Vec3d (myPoint.X(), myPoint.Y(), myPoint.Z()), theCMin, theCMax) :
+    BVH_Tools<Standard_Real, 3>::PointBoxMaxSquareDistance (BVH_Vec3d (myPoint.X(), myPoint.Y(), myPoint.Z()), theCMin, theCMax);
+
+  return RejectMetric (theDistance);
+}
+
+//=======================================================================
+//function : RejectMetric
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::RejectMetric (const Standard_Real& theDistance) const
+{
+  switch (myTarget)
+  {
+  case Extrema_ExtFlag_MIN:
+    return theDistance > (mySqDistance + Precision::SquareConfusion());
+  case Extrema_ExtFlag_MAX:
+    return theDistance < (mySqDistance - Precision::SquareConfusion());
+  default:
+    return Standard_False;
+  }
+}
+
+//=======================================================================
+//function : IsMetricBetter
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::IsMetricBetter (const Standard_Real& theLeft,
+                                                   const Standard_Real& theRight) const
+{
+  switch (myTarget)
+  {
+  case Extrema_ExtFlag_MIN:
+    return theLeft <= theRight;
+  case Extrema_ExtFlag_MAX:
+    return theLeft >= theRight;
+  default:
+    return Standard_True;
+  }
+}
+
+//=======================================================================
+//function : Accept
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
+                                           const Standard_Real&)
+{
+  if (myBVHSet == NULL)
+  {
+    Extrema_GenExtPS_LocalizedGrid aGridSet = myBVHBoxSet->Element (theIndex);
+
+    Standard_Integer aUCoeff = (aGridSet.IdUMax < myNbUSamples) ? 1 : 0;
+    Standard_Integer aVCoeff = (aGridSet.IdVMax < myNbVSamples) ? 1 : 0;
+
+    const Extrema_POnSurf& aPMin = myPoints->Value (aGridSet.IdUMin, aGridSet.IdVMin);
+    const Extrema_POnSurf& aPMax = myPoints->Value (aGridSet.IdUMax + aUCoeff, aGridSet.IdVMax + aVCoeff);
+
+    Standard_Real aUMin, aUMax, aVMin, aVMax;
+    aPMin.Parameter (aUMin, aVMin);
+    aPMax.Parameter (aUMax, aVMax);
+
+    if ((aUMax < myLocUMin || aUMin > myLocUMax) &&
+        (aVMax < myLocVMin || aVMin > myLocVMax))
+      return 0;
+
+    Standard_Integer idUMin = Max (1, aGridSet.IdUMin - 1), idUMax = Min (myNbUSamples, aGridSet.IdUMax + 1);
+    Standard_Integer idVMin = Max (1, aGridSet.IdVMin - 1), idVMax = Min (myNbVSamples, aGridSet.IdVMax + 1);
+    for (Standard_Integer iU = idUMin; iU <= idUMax; ++iU)
+    {
+      for (Standard_Integer iV = idVMin; iV <= idVMax; ++iV)
+      {
+        Extrema_POnSurfParams& aParam = myPoints->ChangeValue (iU, iV);
+        aParam.SetSqrDistance (aParam.Value().SquareDistance (myPoint));
       }
     }
 
-    myFacePntParams = 
-      new Extrema_HArray2OfPOnSurfParams(0, myusample, 0, myvsample);
+    aGridSet.CellBoxSet->Build();
+    // Set low-level BVH set for inner selection
+    SetBVHSet (aGridSet.CellBoxSet.get());
+    Standard_Integer aNb = Select();
+    // Unset the inner set and continue with high level BVH traverse
+    SetBVHSet (NULL);
+    return aNb > 0;
+  }
+  else
+  {
+    Extrema_GenExtPS_GridCell aCell = myBVHSet->Element (theIndex);
+    return FindSolution (aCell.UIndex, aCell.VIndex, myTarget);
+  }
+}
 
-    myUEdgePntParams =
-      new Extrema_HArray2OfPOnSurfParams(1, myusample - 1, 1, myvsample);
-    myVEdgePntParams =
-      new Extrema_HArray2OfPOnSurfParams(1, myusample, 1, myvsample - 1);
+//=======================================================================
+//function : Accept
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
+                                                 const Standard_Integer theNV,
+                                                 const Extrema_ExtFlag theTarget)
+{
+  // Fill corner points with square distance to myPoint
+  const Extrema_POnSurfParams& aParam00 = myPoints->Value (theNU, theNV);
+  const Extrema_POnSurfParams& aParam11 = myPoints->Value (theNU + 1, theNV + 1);
 
-    // Fill boundary with negative square distance.
-    // It is used for computation of Maximum.
-    for (NoV = 0; NoV <= myvsample + 1; NoV++) {
-      myPoints->ChangeValue(0, NoV).SetSqrDistance(-1.);
-      myPoints->ChangeValue(myusample + 1, NoV).SetSqrDistance(-1.);
-    }
-
-    for (NoU = 1; NoU <= myusample; NoU++) {
-      myPoints->ChangeValue(NoU, 0).SetSqrDistance(-1.);
-      myPoints->ChangeValue(NoU, myvsample + 1).SetSqrDistance(-1.);
-    }
-    
-    myInit = Standard_True;
+  {
+    Standard_Real U1, U2, V1, V2;
+    aParam00.Parameter (U1, V1);
+    aParam11.Parameter (U2, V2);
+    if ((U2 < myLocUMin || U1 > myLocUMax) &&
+        (V2 < myLocVMin || V1 > myLocVMax))
+      return Standard_False;
   }
 
-  // Compute distances to mesh.
-  // Step 1. Compute distances to nodes.
-  for ( NoU = 1 ; NoU <= myusample; NoU++ ) {
-    for ( NoV = 1 ; NoV <= myvsample; NoV++) {
-      Extrema_POnSurfParams &aParam = myPoints->ChangeValue(NoU, NoV);
+  Standard_Boolean isFound = Standard_False;
+  if (theTarget == Extrema_ExtFlag_MIN && 
+      theNU != myNbUSamples && theNV != myNbVSamples)
+  {
+    // Find minimum
 
-      aParam.SetSqrDistance(thePoint.SquareDistance(aParam.Value()));
+    const Extrema_POnSurfParams& aParam = ComputeFaceParameters (theNU, theNV);
+
+    Standard_Boolean isMin = Standard_False;
+    Extrema_ElementType anElemType = aParam.GetElementType();
+
+    if (anElemType == Extrema_Face)
+    {
+      isMin = Standard_True;
+    }
+    else
+    {
+      // Check if it is a boundary edge or corner vertex.
+      Standard_Integer iU, iV;
+      aParam.GetIndices (iU, iV);
+
+      if (anElemType == Extrema_UIsoEdge)
+      {
+        isMin = (iV == 1 || iV == myNbVSamples);
+      }
+      else if (anElemType == Extrema_VIsoEdge)
+      {
+        isMin = (iU == 1 || iU == myNbUSamples);
+      }
+      else if (anElemType == Extrema_Node)
+      {
+        isMin = (iU == 1 || iU == myNbUSamples) &&
+          (iV == 1 || iV == myNbVSamples);
+      }
+
+      if (!isMin)
+      {
+        // This is a middle element.
+        if (anElemType == Extrema_UIsoEdge ||
+          (anElemType == Extrema_Node && (iU == 1 || iU == myNbUSamples)))
+        {
+          // Check the down face.
+          const Extrema_POnSurfParams &aDownParam = ComputeFaceParameters (theNU, theNV - 1);
+
+          if (aDownParam.GetElementType() == anElemType)
+          {
+            Standard_Integer iU2, iV2;
+            aDownParam.GetIndices (iU2, iV2);
+            isMin = (iU == iU2 && iV == iV2);
+          }
+        }
+        else if (anElemType == Extrema_VIsoEdge ||
+          (anElemType == Extrema_Node && (iV == 1 || iV == myNbVSamples)))
+        {
+          // Check the right face.
+          const Extrema_POnSurfParams &aRightParam = ComputeFaceParameters (theNU - 1, theNV);
+
+          if (aRightParam.GetElementType() == anElemType)
+          {
+            Standard_Integer iU2, iV2;
+            aRightParam.GetIndices (iU2, iV2);
+            isMin = (iU == iU2 && iV == iV2);
+          }
+        }
+        else if (iU == theNU && iV == theNV)
+        {
+          // Check the lower-left node. For this purpose it is necessary
+          // to check lower-left, lower and left faces.
+          isMin = Standard_True;
+
+          const Extrema_POnSurfParams *anOtherParam[3] = {
+            &ComputeFaceParameters (theNU,     theNV - 1), // Down
+            &ComputeFaceParameters (theNU - 1, theNV - 1), // Lower-left
+            &ComputeFaceParameters (theNU - 1, theNV) };   // Left
+
+          for (int i = 0; i < 3 && isMin; i++)
+          {
+            if (anOtherParam[i]->GetElementType() == Extrema_Node)
+            {
+              Standard_Integer iU2, iV2;
+              anOtherParam[i]->GetIndices (iU2, iV2);
+              isMin = (iU == iU2 && iV == iV2);
+            }
+            else
+            {
+              isMin = Standard_False;
+            }
+          }
+        }
+      }
+    }
+
+    if (isMin)
+    {
+      if (FindSolution (aParam))
+        isFound = Standard_True;
     }
   }
 
-  // For search of minimum compute distances to mesh.
-  if(myFlag == Extrema_ExtFlag_MIN || myFlag == Extrema_ExtFlag_MINMAX) 
+  if (theTarget == Extrema_ExtFlag_MAX)
+  {
+    // Find maximum
+    const Extrema_POnSurfParams &aParam1 = myPoints->Value (theNU - 1, theNV - 1);
+    const Extrema_POnSurfParams &aParam2 = myPoints->Value (theNU - 1, theNV);
+    const Extrema_POnSurfParams &aParam3 = myPoints->Value (theNU - 1, theNV + 1);
+    const Extrema_POnSurfParams &aParam4 = myPoints->Value (theNU, theNV - 1);
+    const Extrema_POnSurfParams &aParam5 = myPoints->Value (theNU, theNV + 1);
+    const Extrema_POnSurfParams &aParam6 = myPoints->Value (theNU + 1, theNV - 1);
+    const Extrema_POnSurfParams &aParam7 = myPoints->Value (theNU + 1, theNV);
+    const Extrema_POnSurfParams &aParam8 = myPoints->Value (theNU + 1, theNV + 1);
+
+    Standard_Real aDist = aParam00.GetSqrDistance();
+
+    if ((aParam1.GetSqrDistance() <= aDist) &&
+        (aParam2.GetSqrDistance() <= aDist) &&
+        (aParam3.GetSqrDistance() <= aDist) &&
+        (aParam4.GetSqrDistance() <= aDist) &&
+        (aParam5.GetSqrDistance() <= aDist) &&
+        (aParam6.GetSqrDistance() <= aDist) &&
+        (aParam7.GetSqrDistance() <= aDist) &&
+        (aParam8.GetSqrDistance() <= aDist))
+    {
+      // Find maximum.
+      if (FindSolution (aParam00))
+        isFound = Standard_True;
+    }
+  }
+
+  return isFound;
+}
+
+//=======================================================================
+//function : FindSolution
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &theParams)
+{
+  math_Vector Tol (1, 2);
+  Tol (1) = myTolU;
+  Tol (2) = myTolV;
+
+  math_Vector UV (1, 2);
+  theParams.Parameter (UV (1), UV (2));
+
+  math_Vector UVinf (1, 2), UVsup (1, 2);
+  UVinf (1) = myUMin;
+  UVinf (2) = myVMin;
+  UVsup (1) = myUMax;
+  UVsup (2) = myVMax;
+
+  Standard_Integer aNbFuncSol = myF.NbExt();
+
+  math_FunctionSetRoot S (myF, Tol);
+  S.Perform (myF, UV, UVinf, UVsup);
+
+  myIsDone = Standard_True;
+
+  Standard_Boolean isFound = Standard_False;
+  if (myTarget != Extrema_ExtFlag_MINMAX)
+  {
+    isFound = (mySqDistance != myF.BestSquareDistance());
+    mySqDistance = myF.BestSquareDistance();
+  }
+  else
+  {
+    isFound = myF.NbExt() > aNbFuncSol;
+  }
+  return isFound;
+}
+
+//=======================================================================
+//function : ComputeEdgeParameters
+//purpose  : This function computes the point on surface parameters on edge.
+//           if it coincides with theParam0 or theParam1, it is returned.
+//=======================================================================
+const Extrema_POnSurfParams& Extrema_GenExtPS::
+  ComputeEdgeParameters (const Standard_Boolean IsUEdge,
+                         const Extrema_POnSurfParams& theParam0,
+                         const Extrema_POnSurfParams& theParam1,
+                         const Standard_Real theDiffTol)
+{
+  const Handle (Extrema_HArray2OfPOnSurfParams)& anEdgeParamsArr = IsUEdge ? myUEdgePntParams : myVEdgePntParams;
+  Standard_Integer iU, iV;
+  theParam0.GetIndices (iU, iV);
+  Extrema_POnSurfParams& anEdgeParams = anEdgeParamsArr->ChangeValue (iU, iV);
+  if (anEdgeParams.GetSqrDistance() < 0.0)
+  {
+    const Standard_Real aSqrDist01 =
+      theParam0.Value().SquareDistance (theParam1.Value());
+
+    if (aSqrDist01 <= theDiffTol)
+    {
+      // The points are confused. Get the first point and change its type.
+      anEdgeParams = theParam0;
+    }
+    else
+    {
+      const Standard_Real aDiffDist =
+        Abs (theParam0.GetSqrDistance() - theParam1.GetSqrDistance());
+
+      if (aDiffDist >= aSqrDist01 - theDiffTol)
+      {
+        // The shortest distance is one of the nodes.
+        if (theParam0.GetSqrDistance() > theParam1.GetSqrDistance())
+        {
+          // The shortest distance is the point 1.
+          anEdgeParams = theParam1;
+        }
+        else
+        {
+          // The shortest distance is the point 0.
+          anEdgeParams = theParam0;
+        }
+      }
+      else
+      {
+        // The shortest distance is inside the edge.
+        gp_XYZ aPoP (myPoint.XYZ().Subtracted (theParam0.Value().XYZ()));
+        gp_XYZ aPoP1 (theParam1.Value().XYZ().Subtracted (theParam0.Value().XYZ()));
+        Standard_Real aRatio = aPoP.Dot (aPoP1) / aSqrDist01;
+        Standard_Real aU[2];
+        Standard_Real aV[2];
+
+        theParam0.Parameter (aU[0], aV[0]);
+        theParam1.Parameter (aU[1], aV[1]);
+
+        Standard_Real aUPar = aU[0];
+        Standard_Real aVPar = aV[0];
+
+        if (IsUEdge)
+        {
+          aUPar += aRatio*(aU[1] - aU[0]);
+        }
+        else
+        {
+          aVPar += aRatio*(aV[1] - aV[0]);
+        }
+
+        anEdgeParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
+        anEdgeParams.SetElementType (IsUEdge ? Extrema_UIsoEdge : Extrema_VIsoEdge);
+        anEdgeParams.SetSqrDistance (anEdgeParams.Value().SquareDistance (myPoint));
+        anEdgeParams.SetIndices (iU, iV);
+      }
+    }
+  }
+
+  return anEdgeParams;
+}
+
+//=======================================================================
+//function : ComputeFaceParameters
+//purpose  : This function computes the point on surface parameters on cell
+//=======================================================================
+const Extrema_POnSurfParams& Extrema_GenExtPS::
+  ComputeFaceParameters (const Standard_Integer theU,
+                         const Standard_Integer theV)
+{
+  Extrema_POnSurfParams& aFaceParams = myFacePntParams->ChangeValue (theU, theV);
+  if (aFaceParams.GetSqrDistance() < 0.0)
   {
     // This is the tolerance of difference of squared values.
     // No need to set it too small.
-    const Standard_Real aDiffTol = mytolu + mytolv;
+    const Standard_Real aDiffTol = myTolU + myTolV;
 
-    // Step 2. Compute distances to edges.
-    // Assume UEdge(i, j) = { Point(i, j); Point(i + 1, j    ) }
-    // Assume VEdge(i, j) = { Point(i, j); Point(i,     j + 1) }
-    for ( NoU = 1 ; NoU <= myusample; NoU++ ) 
+    const Extrema_POnSurfParams& aParam00 = myPoints->Value (theU, theV);
+    const Extrema_POnSurfParams& aParam01 = myPoints->Value (theU, theV + 1);
+    const Extrema_POnSurfParams& aParam10 = myPoints->Value (theU + 1, theV);
+    const Extrema_POnSurfParams& aParam11 = myPoints->Value (theU + 1, theV + 1);
+
+    const Extrema_POnSurfParams &aUE0 =
+      ComputeEdgeParameters (Standard_True, aParam00, aParam10, aDiffTol);
+    const Extrema_POnSurfParams &aUE1 =
+      ComputeEdgeParameters (Standard_True, aParam01, aParam11, aDiffTol);
+
+    const Extrema_POnSurfParams &aVE0 =
+      ComputeEdgeParameters (Standard_False, aParam00, aParam01, aDiffTol);
+    const Extrema_POnSurfParams &aVE1 =
+      ComputeEdgeParameters (Standard_False, aParam10, aParam11, aDiffTol);
+
+    Standard_Real aSqrDist01 = aUE0.Value().SquareDistance (aUE1.Value());
+    Standard_Real aDiffDist = Abs (aUE0.GetSqrDistance() - aUE1.GetSqrDistance());
+    Standard_Boolean isOut = Standard_False;
+
+    if (aDiffDist >= aSqrDist01 - aDiffTol)
     {
-      for ( NoV = 1 ; NoV <= myvsample; NoV++)
+      // The projection is outside the face.
+      isOut = Standard_True;
+    }
+    else
+    {
+      aSqrDist01 = aVE0.Value().SquareDistance (aVE1.Value());
+      aDiffDist = Abs (aVE0.GetSqrDistance() - aVE1.GetSqrDistance());
+
+      if (aDiffDist >= aSqrDist01 - aDiffTol)
       {
-        const Extrema_POnSurfParams &aParam0 = myPoints->Value(NoU, NoV);
-
-        if (NoU < myusample)
-        {
-          // Compute parameters to UEdge.
-          const Extrema_POnSurfParams &aParam1 = myPoints->Value(NoU + 1, NoV);
-          const Extrema_POnSurfParams &anEdgeParam = ComputeEdgeParameters(Standard_True, aParam0, aParam1, thePoint, aDiffTol);
-
-          myUEdgePntParams->SetValue(NoU, NoV, anEdgeParam);
-        }
-
-        if (NoV < myvsample)
-        {
-          // Compute parameters to VEdge.
-          const Extrema_POnSurfParams &aParam1 = myPoints->Value(NoU, NoV + 1);
-          const Extrema_POnSurfParams &anEdgeParam = ComputeEdgeParameters(Standard_False, aParam0, aParam1, thePoint, aDiffTol);
-
-          myVEdgePntParams->SetValue(NoU, NoV, anEdgeParam);
-        }
+        // The projection is outside the face.
+        isOut = Standard_True;
       }
     }
 
-    // Step 3. Compute distances to faces.
-    // Assume myFacePntParams(i, j) =
-    // { Point(i, j); Point(i + 1, j); Point(i + 1, j + 1); Point(i, j + 1) }
-    //   Or
-    // { UEdge(i, j); VEdge(i + 1, j); UEdge(i, j + 1); VEdge(i, j) }
-    Standard_Real aSqrDist01;
-    Standard_Real aDiffDist;
-    Standard_Boolean isOut;
+    if (isOut)
+    {
+      // Get the closest point on an edge.
+      const Extrema_POnSurfParams &aUEMin =
+        aUE0.GetSqrDistance() < aUE1.GetSqrDistance() ? aUE0 : aUE1;
+      const Extrema_POnSurfParams &aVEMin =
+        aVE0.GetSqrDistance() < aVE1.GetSqrDistance() ? aVE0 : aVE1;
+      const Extrema_POnSurfParams &aEMin =
+        aUEMin.GetSqrDistance() < aVEMin.GetSqrDistance() ? aUEMin : aVEMin;
 
-    for ( NoU = 1 ; NoU < myusample; NoU++ ) {
-      for ( NoV = 1 ; NoV < myvsample; NoV++) {
-        const Extrema_POnSurfParams &aUE0 = myUEdgePntParams->Value(NoU, NoV);
-        const Extrema_POnSurfParams &aUE1 = myUEdgePntParams->Value(NoU, NoV+1);
-        const Extrema_POnSurfParams &aVE0 = myVEdgePntParams->Value(NoU, NoV);
-        const Extrema_POnSurfParams &aVE1 = myVEdgePntParams->Value(NoU+1, NoV);
-
-        aSqrDist01 = aUE0.Value().SquareDistance(aUE1.Value());
-        aDiffDist = Abs(aUE0.GetSqrDistance() - aUE1.GetSqrDistance());
-        isOut = Standard_False;
-
-        if (aDiffDist >= aSqrDist01 - aDiffTol) {
-          // The projection is outside the face.
-          isOut = Standard_True;
-        } else {
-          aSqrDist01 = aVE0.Value().SquareDistance(aVE1.Value());
-          aDiffDist = Abs(aVE0.GetSqrDistance() - aVE1.GetSqrDistance());
-
-          if (aDiffDist >= aSqrDist01 - aDiffTol) {
-            // The projection is outside the face.
-            isOut = Standard_True;
-          }
-        }
-
-        if (isOut) {
-          // Get the closest point on an edge.
-          const Extrema_POnSurfParams &aUEMin =
-            aUE0.GetSqrDistance() < aUE1.GetSqrDistance() ? aUE0 : aUE1;
-          const Extrema_POnSurfParams &aVEMin =
-            aVE0.GetSqrDistance() < aVE1.GetSqrDistance() ? aVE0 : aVE1;
-          const Extrema_POnSurfParams &aEMin =
-            aUEMin.GetSqrDistance() < aVEMin.GetSqrDistance() ? aUEMin : aVEMin;
-
-          myFacePntParams->SetValue(NoU, NoV, aEMin);
-        } else {
-          // Find closest point inside the face.
-          Standard_Real aU[2];
-          Standard_Real aV[2];
-          Standard_Real aUPar;
-          Standard_Real aVPar;
-
-          // Compute U parameter.
-          aUE0.Parameter(aU[0], aV[0]);
-          aUE1.Parameter(aU[1], aV[1]);
-          aUPar = 0.5*(aU[0] + aU[1]);
-          // Compute V parameter.
-          aVE0.Parameter(aU[0], aV[0]);
-          aVE1.Parameter(aU[1], aV[1]);
-          aVPar = 0.5*(aV[0] + aV[1]);
-
-          Extrema_POnSurfParams aParam(aUPar, aVPar, myS->Value(aUPar, aVPar));
-
-          aParam.SetElementType(Extrema_Face);
-          aParam.SetSqrDistance(thePoint.SquareDistance(aParam.Value()));
-          aParam.SetIndices(NoU, NoV);
-          myFacePntParams->SetValue(NoU, NoV, aParam);
-        }
-      }
+      aFaceParams = aEMin;
     }
+    else
+    {
+      // Find closest point inside the face.
+      Standard_Real aU[2];
+      Standard_Real aV[2];
+      Standard_Real aUPar;
+      Standard_Real aVPar;
 
-    // Fill boundary with RealLast square distance.
-    for (NoV = 0; NoV <= myvsample; NoV++) {
-      myFacePntParams->ChangeValue(0, NoV).SetSqrDistance(RealLast());
-      myFacePntParams->ChangeValue(myusample, NoV).SetSqrDistance(RealLast());
-    }
+      // Compute U parameter.
+      aUE0.Parameter (aU[0], aV[0]);
+      aUE1.Parameter (aU[1], aV[1]);
+      aUPar = 0.5*(aU[0] + aU[1]);
+      // Compute V parameter.
+      aVE0.Parameter (aU[0], aV[0]);
+      aVE1.Parameter (aU[1], aV[1]);
+      aVPar = 0.5*(aV[0] + aV[1]);
 
-    for (NoU = 1; NoU < myusample; NoU++) {
-      myFacePntParams->ChangeValue(NoU, 0).SetSqrDistance(RealLast());
-      myFacePntParams->ChangeValue(NoU, myvsample).SetSqrDistance(RealLast());
+      aFaceParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
+      aFaceParams.SetElementType (Extrema_Face);
+      aFaceParams.SetSqrDistance (aFaceParams.Value().SquareDistance (myPoint));
+      aFaceParams.SetIndices (theU, theV);
     }
   }
+
+  return aFaceParams;
 }
 
-// Parametrization of the sample
-void Extrema_GenExtPS::BuildTree()
+//=======================================================================
+//function : NbExt
+//purpose  : 
+//=======================================================================
+Standard_Integer Extrema_GenExtPS::NbExt() const
 {
-  // if tree already exists, assume it is already correctly filled
-  if ( ! mySphereUBTree.IsNull() )
-    return;
-
-   if (myS->GetType() == GeomAbs_BSplineSurface) {
-     Handle(Geom_BSplineSurface) aBspl = myS->BSpline();
-     Standard_Integer aUValue = aBspl->UDegree() * aBspl->NbUKnots();
-     Standard_Integer aVValue = aBspl->VDegree() * aBspl->NbVKnots();
-     if (aUValue > myusample)
-       myusample = aUValue;
-     if (aVValue > myvsample)
-       myvsample = aVValue;
-   }
-
-  Standard_Real PasU = myusup - myumin;
-  Standard_Real PasV = myvsup - myvmin;
-  Standard_Real U0 = PasU / myusample / 100.;
-  Standard_Real V0 = PasV / myvsample / 100.;
-  gp_Pnt P1;
-  PasU = (PasU - U0) / (myusample - 1);
-  PasV = (PasV - V0) / (myvsample - 1);
-  U0 = U0/2. + myumin;
-  V0 = V0/2. + myvmin;
-
-  //build grid of parametric points 
-  myUParams = new TColStd_HArray1OfReal(1,myusample );
-  myVParams = new TColStd_HArray1OfReal(1,myvsample );
-  Standard_Integer NoU, NoV;
-  Standard_Real U = U0, V = V0;
-  for ( NoU = 1 ; NoU <= myusample; NoU++, U += PasU) 
-    myUParams->SetValue(NoU, U);
-  for ( NoV = 1, V = V0; NoV <= myvsample; NoV++, V += PasV)
-    myVParams->SetValue(NoV, V);
-
-  // Calculation of distances
-  mySphereUBTree = new Extrema_UBTreeOfSphere;
-  Extrema_UBTreeFillerOfSphere aFiller(*mySphereUBTree);
-  Standard_Integer i = 0;
-  
-  mySphereArray = new Bnd_HArray1OfSphere(0, myusample * myvsample);
- 
-  for ( NoU = 1; NoU <= myusample; NoU++ ) {
-    for ( NoV = 1; NoV <= myvsample; NoV++) {
-      P1 = myS->Value(myUParams->Value(NoU), myVParams->Value(NoV));
-      Bnd_Sphere aSph(P1.XYZ(), 0/*mytolu < mytolv ? mytolu : mytolv*/, NoU, NoV);
-      aFiller.Add(i, aSph);
-      mySphereArray->SetValue( i, aSph );
-      i++;
-    }
-  }
-  aFiller.Fill();
-}
-
-void Extrema_GenExtPS::FindSolution(const gp_Pnt& /*P*/, 
-                                    const Extrema_POnSurfParams &theParams)
-{
-  math_Vector Tol(1,2);
-  Tol(1) = mytolu;
-  Tol(2) = mytolv;
-
-  math_Vector UV(1, 2);
-  theParams.Parameter(UV(1), UV(2));
-
-  math_Vector UVinf(1,2), UVsup(1,2);
-  UVinf(1) = myumin;
-  UVinf(2) = myvmin;
-  UVsup(1) = myusup;
-  UVsup(2) = myvsup;
-
-  math_FunctionSetRoot S(myF, Tol);
-  S.Perform(myF, UV, UVinf, UVsup);
-
-  myDone = Standard_True;
-}
-
-void Extrema_GenExtPS::SetFlag(const Extrema_ExtFlag F)
-{
-  myFlag = F;
-}
-
-void Extrema_GenExtPS::SetAlgo(const Extrema_ExtAlgo A)
-{
-  if(myAlgo != A)
-     myInit = Standard_False;
-  myAlgo = A;
- 
-}
-
-void Extrema_GenExtPS::Perform(const gp_Pnt& P) 
-{  
-  myDone = Standard_False;
-  myF.SetPoint(P);
-  
-  if(myAlgo == Extrema_ExtAlgo_Grad)
+  if (!IsDone())
   {
-    BuildGrid(P);
-    Standard_Integer NoU,NoV;
-
-    if(myFlag == Extrema_ExtFlag_MIN || myFlag == Extrema_ExtFlag_MINMAX) 
-    {
-      Extrema_ElementType anElemType;
-      Standard_Integer iU;
-      Standard_Integer iV;
-      Standard_Integer iU2;
-      Standard_Integer iV2;
-      Standard_Boolean isMin;
-      Standard_Integer i;
-
-      for (NoU = 1; NoU < myusample; NoU++) {
-        for (NoV = 1; NoV < myvsample; NoV++) {
-          const Extrema_POnSurfParams &aParam =
-            myFacePntParams->Value(NoU, NoV);
-
-          isMin = Standard_False;
-          anElemType = aParam.GetElementType();
-
-          if (anElemType == Extrema_Face) {
-            isMin = Standard_True;
-          } else {
-            // Check if it is a boundary edge or corner vertex.
-            aParam.GetIndices(iU, iV);
-
-            if (anElemType == Extrema_UIsoEdge) {
-              isMin = (iV == 1 || iV == myvsample);
-            } else if (anElemType == Extrema_VIsoEdge) {
-              isMin = (iU == 1 || iU == myusample);
-            } else if (anElemType == Extrema_Node) {
-              isMin = (iU == 1 || iU == myusample) &&
-                      (iV == 1 || iV == myvsample);
-            }
-
-            if (!isMin) {
-              // This is a middle element.
-              if (anElemType == Extrema_UIsoEdge ||
-                (anElemType == Extrema_Node && (iU == 1 || iU == myusample))) {
-                // Check the down face.
-                const Extrema_POnSurfParams &aDownParam =
-                    myFacePntParams->Value(NoU, NoV - 1);
-
-                if (aDownParam.GetElementType() == anElemType) {
-                  aDownParam.GetIndices(iU2, iV2);
-                  isMin = (iU == iU2 && iV == iV2);
-                }
-              } else if (anElemType == Extrema_VIsoEdge ||
-                (anElemType == Extrema_Node && (iV == 1 || iV == myvsample))) {
-                // Check the right face.
-                const Extrema_POnSurfParams &aRightParam =
-                    myFacePntParams->Value(NoU - 1, NoV);
-
-                if (aRightParam.GetElementType() == anElemType) {
-                  aRightParam.GetIndices(iU2, iV2);
-                  isMin = (iU == iU2 && iV == iV2);
-                }
-              } else if (iU == NoU && iV == NoV) {
-                // Check the lower-left node. For this purpose it is necessary
-                // to check lower-left, lower and left faces.
-                isMin = Standard_True;
-
-                const Extrema_POnSurfParams *anOtherParam[3] =
-                { &myFacePntParams->Value(NoU, NoV - 1),     // Down
-                  &myFacePntParams->Value(NoU - 1, NoV - 1), // Lower-left
-                  &myFacePntParams->Value(NoU - 1, NoV) };   // Left
-
-                for (i = 0; i < 3 && isMin; i++) {
-                  if (anOtherParam[i]->GetElementType() == Extrema_Node) {
-                    anOtherParam[i]->GetIndices(iU2, iV2);
-                    isMin = (iU == iU2 && iV == iV2);
-                  } else {
-                    isMin = Standard_False;
-                  }
-                }
-              }
-            }
-          }
-
-          if (isMin) {
-            FindSolution(P, aParam);
-          }
-        }
-      }
-    }
-    
-    if(myFlag == Extrema_ExtFlag_MAX || myFlag == Extrema_ExtFlag_MINMAX)
-    {
-      Standard_Real Dist;
-
-      for (NoU = 1; NoU <= myusample; NoU++)
-      {
-        for (NoV = 1; NoV <= myvsample; NoV++)
-        {
-          const Extrema_POnSurfParams &aParamMain = myPoints->Value(NoU, NoV);
-          const Extrema_POnSurfParams &aParam1 = myPoints->Value(NoU - 1, NoV - 1);
-          const Extrema_POnSurfParams &aParam2 = myPoints->Value(NoU - 1, NoV);
-          const Extrema_POnSurfParams &aParam3 = myPoints->Value(NoU - 1, NoV + 1);
-          const Extrema_POnSurfParams &aParam4 = myPoints->Value(NoU, NoV - 1);
-          const Extrema_POnSurfParams &aParam5 = myPoints->Value(NoU, NoV + 1);
-          const Extrema_POnSurfParams &aParam6 = myPoints->Value(NoU + 1, NoV - 1);
-          const Extrema_POnSurfParams &aParam7 = myPoints->Value(NoU + 1, NoV);
-          const Extrema_POnSurfParams &aParam8 = myPoints->Value(NoU + 1, NoV + 1);
-
-          Dist = aParamMain.GetSqrDistance();
-
-          if ((aParam1.GetSqrDistance() <= Dist) &&
-              (aParam2.GetSqrDistance() <= Dist) &&
-              (aParam3.GetSqrDistance() <= Dist) &&
-              (aParam4.GetSqrDistance() <= Dist) &&
-              (aParam5.GetSqrDistance() <= Dist) &&
-              (aParam6.GetSqrDistance() <= Dist) &&
-              (aParam7.GetSqrDistance() <= Dist) &&
-              (aParam8.GetSqrDistance() <= Dist))
-          {
-            // Find maximum.
-            FindSolution(P, myPoints->Value(NoU, NoV));
-          }
-        }
-      }
-    }
+    throw StdFail_NotDone();
   }
-  else
-  {
-    BuildTree();
-    if(myFlag == Extrema_ExtFlag_MIN || myFlag == Extrema_ExtFlag_MINMAX)
-    {
-      Bnd_Sphere aSol = mySphereArray->Value(0);
-      Bnd_SphereUBTreeSelectorMin aSelector(mySphereArray, aSol);
-      //aSelector.SetMaxDist( RealLast() );
-      aSelector.DefineCheckPoint( P );
-      mySphereUBTree->Select( aSelector );
-      //TODO: check if no solution in binary tree
-      Bnd_Sphere& aSph = aSelector.Sphere();
-      Standard_Real aU = myUParams->Value(aSph.U());
-      Standard_Real aV = myVParams->Value(aSph.V());
-      Extrema_POnSurfParams aParams(aU, aV, myS->Value(aU, aV));
-
-      aParams.SetSqrDistance(P.SquareDistance(aParams.Value()));
-      aParams.SetIndices(aSph.U(), aSph.V());
-      FindSolution(P, aParams);
-    }
-    if(myFlag == Extrema_ExtFlag_MAX || myFlag == Extrema_ExtFlag_MINMAX)
-    {
-      Bnd_Sphere aSol = mySphereArray->Value(0);
-      Bnd_SphereUBTreeSelectorMax aSelector(mySphereArray, aSol);
-      //aSelector.SetMaxDist( RealLast() );
-      aSelector.DefineCheckPoint( P );
-      mySphereUBTree->Select( aSelector );
-      //TODO: check if no solution in binary tree
-      Bnd_Sphere& aSph = aSelector.Sphere();
-      Standard_Real aU = myUParams->Value(aSph.U());
-      Standard_Real aV = myVParams->Value(aSph.V());
-      Extrema_POnSurfParams aParams(aU, aV, myS->Value(aU, aV));
-      aParams.SetSqrDistance(P.SquareDistance(aParams.Value()));
-      aParams.SetIndices(aSph.U(), aSph.V());
-
-      FindSolution(P, aParams);
-    }
-  }
+  return static_cast<Standard_Integer> (mySolutions.size());
 }
-//=============================================================================
 
-Standard_Boolean Extrema_GenExtPS::IsDone () const { return myDone; }
-//=============================================================================
-
-Standard_Integer Extrema_GenExtPS::NbExt () const
-{
-  if (!IsDone()) { throw StdFail_NotDone(); }
-  return myF.NbExt();
-}
-//=============================================================================
-
+//=======================================================================
+//function : SquareDistance
+//purpose  : 
+//=======================================================================
 Standard_Real Extrema_GenExtPS::SquareDistance (const Standard_Integer N) const
 {
   if ((N < 1) || (N > NbExt()))
@@ -995,10 +1074,13 @@ Standard_Real Extrema_GenExtPS::SquareDistance (const Standard_Integer N) const
     throw Standard_OutOfRange();
   }
 
-  return myF.SquareDistance(N);
+  return mySolutions[N - 1].SqDistance;
 }
-//=============================================================================
 
+//=======================================================================
+//function : Point
+//purpose  : 
+//=======================================================================
 const Extrema_POnSurf& Extrema_GenExtPS::Point (const Standard_Integer N) const
 {
   if ((N < 1) || (N > NbExt()))
@@ -1006,6 +1088,5 @@ const Extrema_POnSurf& Extrema_GenExtPS::Point (const Standard_Integer N) const
     throw Standard_OutOfRange();
   }
 
-  return myF.Point(N);
+  return mySolutions[N - 1].UV;
 }
-//=============================================================================

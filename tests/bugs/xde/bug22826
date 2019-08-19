@@ -11,8 +11,6 @@ set BugNumber OCC22826
 restore [locate_data_file bug22610_f1.brep] a 
 mksurface s1 a
 
-proj s1 1500 1500 500 g
-renamevar ext_2 res
-proj s1 1500 1500 500 t
+proj s1 1500 1500 500
 
-checklength res -l -equal ext_1
+checklength ext_1 -l 6.8749734766305481

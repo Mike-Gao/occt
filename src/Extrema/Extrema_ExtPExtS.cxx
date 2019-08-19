@@ -144,7 +144,7 @@ void Extrema_ExtPExtS::MakePreciser (Standard_Real& U,
 }
 //=============================================================================
 
-Extrema_ExtPExtS::Extrema_ExtPExtS()
+Extrema_ExtPExtS::Extrema_ExtPExtS (const Handle (Extrema_GenExtPS)& theExtPS)
 : myuinf(0.0),
   myusup(0.0),
   mytolu(0.0),
@@ -153,7 +153,8 @@ Extrema_ExtPExtS::Extrema_ExtPExtS()
   mytolv(0.0),
   myIsAnalyticallyComputable(Standard_False),
   myDone(Standard_False),
-  myNbExt(0)
+  myNbExt(0),
+  myExtPS (theExtPS)
 {
   for (size_t anIdx = 0; anIdx < sizeof (mySqDist) / sizeof (mySqDist[0]); anIdx++)
   {
@@ -170,7 +171,8 @@ Extrema_ExtPExtS::Extrema_ExtPExtS (const gp_Pnt&                               
                                     const Standard_Real                                 theVmin,
                                     const Standard_Real                                 theVsup,
                                     const Standard_Real                                 theTolU,
-                                    const Standard_Real                                 theTolV)
+                                    const Standard_Real                                 theTolV,
+                                    const Handle(Extrema_GenExtPS)&                     theExtPS)
 : myuinf(theUmin),
   myusup(theUsup),
   mytolu(theTolU),
@@ -180,7 +182,8 @@ Extrema_ExtPExtS::Extrema_ExtPExtS (const gp_Pnt&                               
   myS   (theS),
   myIsAnalyticallyComputable(Standard_False),
   myDone(Standard_False),
-  myNbExt(0)
+  myNbExt(0),
+  myExtPS (theExtPS)
 {
   for (size_t anIdx = 0; anIdx < sizeof (mySqDist) / sizeof (mySqDist[0]); anIdx++)
   {
@@ -201,7 +204,8 @@ Extrema_ExtPExtS::Extrema_ExtPExtS (const gp_Pnt&                               
 Extrema_ExtPExtS::Extrema_ExtPExtS (const gp_Pnt&                                       theP,
                                     const Handle(GeomAdaptor_HSurfaceOfLinearExtrusion)&  theS,
                                     const Standard_Real                                 theTolU, 
-                                    const Standard_Real                                 theTolV)
+                                    const Standard_Real                                 theTolV,
+                                    const Handle(Extrema_GenExtPS)&                     theExtPS)
 : myuinf(theS->FirstUParameter()),
   myusup(theS->LastUParameter()),
   mytolu(theTolU),
@@ -211,7 +215,8 @@ Extrema_ExtPExtS::Extrema_ExtPExtS (const gp_Pnt&                               
   myS   (theS),
   myIsAnalyticallyComputable(Standard_False),
   myDone(Standard_False),
-  myNbExt(0)
+  myNbExt(0),
+  myExtPS (theExtPS)
 {
   for (size_t anIdx = 0; anIdx < sizeof (mySqDist) / sizeof (mySqDist[0]); anIdx++)
   {
@@ -265,15 +270,18 @@ void Extrema_ExtPExtS::Initialize (const Handle(GeomAdaptor_HSurfaceOfLinearExtr
   
   if (!myIsAnalyticallyComputable)
   {
-    myExtPS.Initialize (theS->ChangeSurface(),
-                        32,
-                        32,
-                        theUinf,
-                        theUsup,
-                        theVinf,
-                        theVsup,
-                        theTolU,
-                        theTolV);
+    if (myExtPS.IsNull())
+      myExtPS = new Extrema_GenExtPS();
+
+    myExtPS->Initialize (theS->ChangeSurface(),
+                         32,
+                         32,
+                         theUinf,
+                         theUsup,
+                         theVinf,
+                         theVsup,
+                         theTolU,
+                         theTolV);
   }
 }
 
@@ -292,11 +300,9 @@ void Extrema_ExtPExtS::Perform (const gp_Pnt& P)
   myNbExt = 0;
   
   if (!myIsAnalyticallyComputable) {
-    myExtPS.Perform(P);
-    myDone = myExtPS.IsDone();
-//  modified by NIZHNY-EAP Wed Nov 17 12:59:08 1999 ___BEGIN___
-    myNbExt = myExtPS.NbExt();
-//  modified by NIZHNY-EAP Wed Nov 17 12:59:09 1999 ___END___
+    myExtPS->Perform(P);
+    myDone = myExtPS->IsDone();
+    myNbExt = myExtPS->NbExt();
     return;
   }
   
@@ -455,10 +461,8 @@ Standard_Boolean Extrema_ExtPExtS::IsDone () const { return myDone; }
 Standard_Integer Extrema_ExtPExtS::NbExt () const
 {
   if (!IsDone()) { throw StdFail_NotDone(); }
-  if (myIsAnalyticallyComputable)
-    return myNbExt;
-  else
-    return myExtPS.NbExt();
+
+  return myNbExt;
 }
 //=============================================================================
 
@@ -474,7 +478,7 @@ Standard_Real Extrema_ExtPExtS::SquareDistance (const Standard_Integer N) const
     return mySqDist[N-1];
   // modified by NIZHNY-MKK  Thu Sep 18 14:48:42 2003.END
   else
-    return myExtPS.SquareDistance(N);
+    return myExtPS->SquareDistance(N);
 }
 //=============================================================================
 
@@ -491,7 +495,7 @@ const Extrema_POnSurf& Extrema_ExtPExtS::Point (const Standard_Integer N) const
   }
   // modified by NIZHNY-MKK  Thu Sep 18 14:47:43 2003.END
   else
-    return myExtPS.Point(N);
+    return myExtPS->Point(N);
 }
 //=============================================================================
 

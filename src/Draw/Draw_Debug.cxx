@@ -18,6 +18,10 @@
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
 
+#include <Bnd_OBB.hxx>
+#include <Bnd_Box.hxx>
+#include <Draw_Box.hxx>
+
 // This file defines global functions not declared in any public header,
 // intended for use from debugger prompt (Command Window in Visual Studio)
 
@@ -34,6 +38,50 @@ Standard_EXPORT const char* Draw_Eval (const char *theCommandStr)
     aCommands.Eval (theCommandStr);
     std::cout << aCommands.Result() << std::endl;
     return aCommands.Result();
+  }
+  catch (Standard_Failure const& anException)
+  {
+    return anException.GetMessageString();
+  }
+}
+
+//=======================================================================
+//function : DBRep_SetOBB
+//purpose  : Draw OBB
+//=======================================================================
+Standard_EXPORT const char* Draw_SetOBB(const char* theNameStr, void* theBox)
+{
+  if (theNameStr == 0 || theBox == 0)
+  {
+    return "Error: name or box is null";
+  }
+  try {
+    Bnd_OBB B = *(Bnd_OBB*)theBox;
+    Handle(Draw_Box) DB = new Draw_Box (B, Draw_orange);
+    Draw::Set (theNameStr, DB);
+    return theNameStr;
+  }
+  catch (Standard_Failure const& anException)
+  {
+    return anException.GetMessageString();
+  }
+}
+
+//=======================================================================
+//function : DBRep_SetBox
+//purpose  : Draw Box
+//=======================================================================
+Standard_EXPORT const char* Draw_SetBox(const char* theNameStr, void* theBox)
+{
+  if (theNameStr == 0 || theBox == 0)
+  {
+    return "Error: name or box is null";
+  }
+  try {
+    Bnd_Box B = *(Bnd_Box*)theBox;
+    Handle(Draw_Box) DB = new Draw_Box (B, Draw_orange);
+    Draw::Set (theNameStr, DB);
+    return theNameStr;
   }
   catch (Standard_Failure const& anException)
   {

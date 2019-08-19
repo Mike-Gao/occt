@@ -17,12 +17,16 @@
 #ifndef _Extrema_ExtFlag_HeaderFile
 #define _Extrema_ExtFlag_HeaderFile
 
-
+//! Enumeration describes the objective for extrema algorithms.
+//! Generally:
+//! - *Extrema_ExtFlag_MIN* - means that only minimal solutions are required
+//! - *Extrema_ExtFlag_MAX* - means that only maximal solutions are required
+//! - *Extrema_ExtFlag_MINMAX* - means that all solutions are required
 enum Extrema_ExtFlag
 {
-Extrema_ExtFlag_MIN,
-Extrema_ExtFlag_MAX,
-Extrema_ExtFlag_MINMAX
+  Extrema_ExtFlag_MIN,
+  Extrema_ExtFlag_MAX,
+  Extrema_ExtFlag_MINMAX
 };
 
 #endif // _Extrema_ExtFlag_HeaderFile

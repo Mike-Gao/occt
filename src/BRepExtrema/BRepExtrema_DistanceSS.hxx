@@ -16,7 +16,6 @@
 
 #include <BRepExtrema_SeqOfSolution.hxx>
 #include <Extrema_ExtFlag.hxx>
-#include <Extrema_ExtAlgo.hxx>
 #include <Precision.hxx>
 #include <Standard_DefineAlloc.hxx>
 
@@ -39,9 +38,8 @@ class BRepExtrema_DistanceSS
   BRepExtrema_DistanceSS(const TopoDS_Shape& S1, const TopoDS_Shape& S2,
                                          const Bnd_Box& B1, const Bnd_Box& B2,
                                          const Standard_Real DstRef,
-                                         const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX,
-                                         const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad)
-  : myDstRef(DstRef), myModif(Standard_False), myEps(Precision::Confusion()), myFlag(F), myAlgo(A)
+                                         const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX)
+  : myDstRef(DstRef), myModif(Standard_False), myEps(Precision::Confusion()), myFlag(F)
   {
     Perform(S1, S2, B1, B2);
   }
@@ -52,9 +50,8 @@ class BRepExtrema_DistanceSS
   BRepExtrema_DistanceSS(const TopoDS_Shape& S1, const TopoDS_Shape& S2,
                                          const Bnd_Box& B1, const Bnd_Box& B2,
                                          const Standard_Real DstRef, const Standard_Real aDeflection,
-                                         const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX,
-                                         const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad)
-  : myDstRef(DstRef), myModif(Standard_False), myEps(aDeflection), myFlag(F), myAlgo(A)
+                                         const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX)
+  : myDstRef(DstRef), myModif(Standard_False), myEps(aDeflection), myFlag(F)
   {
     Perform(S1, S2, B1, B2);
   }
@@ -82,11 +79,6 @@ class BRepExtrema_DistanceSS
   void SetFlag(const Extrema_ExtFlag F)
   {
     myFlag = F;
-  }
-  //! sets the flag controlling ...
-  void SetAlgo(const Extrema_ExtAlgo A)
-  {
-    myAlgo = A;
   }
 
  private:
@@ -130,7 +122,6 @@ class BRepExtrema_DistanceSS
   Standard_Boolean myModif;
   Standard_Real myEps;
   Extrema_ExtFlag myFlag;
-  Extrema_ExtAlgo myAlgo;
 };
 
 #endif

@@ -88,6 +88,24 @@ public: //! @name Point-Box Square distance
     return aDist;
   }
 
+  //! Computes Max square distance between point and bounding box
+  static T PointBoxMaxSquareDistance (const BVH_VecNt& thePoint,
+                                      const BVH_VecNt& theCMin,
+                                      const BVH_VecNt& theCMax)
+  {
+    T aDist = 0;
+    for (int i = 0; i < N; ++i)
+    {
+      T dmin = 0, dmax = 0;
+      if (thePoint[i] > theCMin[i]) { dmin = thePoint[i] - theCMin[i]; }
+      if (thePoint[i] < theCMax[i]) { dmax = theCMax[i] - thePoint[i]; }
+      T d = dmin > dmax ? dmin : dmax;
+      d *= d;
+      aDist += d;
+    }
+    return aDist;
+  }
+
 public: //! @name Point-Box projection
 
   //! Computes projection of point on bounding box
@@ -110,7 +128,6 @@ public: //! @name Point-Box projection
   {
     return thePoint.cwiseMax (theCMin).cwiseMin (theCMax);
   }
-
 public: //! @name Point-Triangle Square distance
 
   //! Computes square distance between point and triangle
