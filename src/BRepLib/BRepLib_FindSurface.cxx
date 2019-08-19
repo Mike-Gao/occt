@@ -23,6 +23,7 @@
 #include <BRepLib_MakeFace.hxx>
 #include <BRepTools_WireExplorer.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
+#include <GCPnts.hxx>
 #include <Geom2d_Curve.hxx>
 #include <Geom_BezierCurve.hxx>
 #include <Geom_BSplineCurve.hxx>
@@ -181,39 +182,6 @@ BRepLib_FindSurface::BRepLib_FindSurface(const TopoDS_Shape&    S,
 
 namespace
 {
-static void fillParams (const TColStd_Array1OfReal& theKnots,
-                        Standard_Integer theDegree,
-                        Standard_Real theParMin,
-                        Standard_Real theParMax,
-                        NCollection_Vector<Standard_Real>& theParams)
-{
-  Standard_Real aPrevPar = theParMin;
-  theParams.Append (aPrevPar);
-
-  Standard_Integer aNbP = Max (theDegree, 1);
-
-  for (Standard_Integer i = 1;
-       (i < theKnots.Length()) && (theKnots (i) < (theParMax - Precision::PConfusion())); ++i)
-  {
-    if (theKnots (i + 1) < theParMin + Precision::PConfusion())
-      continue;
-
-    Standard_Real aStep = (theKnots (i + 1) - theKnots (i)) / aNbP;
-    for (Standard_Integer k = 1; k <= aNbP ; ++k)
-    {
-      Standard_Real aPar = theKnots (i) + k * aStep;
-      if (aPar > theParMax - Precision::PConfusion())
-        break;
-
-      if (aPar > aPrevPar + Precision::PConfusion())
-      {
-        theParams.Append (aPar);
-        aPrevPar = aPar;
-      }
-    }
-  }
-  theParams.Append (theParMax);
-}
 
 static void fillPoints (const BRepAdaptor_Curve& theCurve,
                         const NCollection_Vector<Standard_Real> theParams,
@@ -361,13 +329,13 @@ void BRepLib_FindSurface::Init(const TopoDS_Shape&    S,
         aKnots.SetValue (1, GC->FirstParameter());
         aKnots.SetValue (2, GC->LastParameter());
 
-        fillParams (aKnots, GC->Degree(), dfUf, dfUl, aParams);
+        GCPnts::FillParams (aKnots, GC->Degree(), dfUf, dfUl, aParams);
         break;
       }
       case GeomAbs_BSplineCurve:
       {
         Handle(Geom_BSplineCurve) GC = c.BSpline();
-        fillParams (GC->Knots(), GC->Degree(), dfUf, dfUl, aParams);
+        GCPnts::FillParams (GC->Knots(), GC->Degree(), dfUf, dfUl, aParams);
         break;
       }
       case GeomAbs_Line:
@@ -394,7 +362,7 @@ void BRepLib_FindSurface::Init(const TopoDS_Shape&    S,
         aBounds.SetValue (1, dfUf);
         aBounds.SetValue (2, dfUl);
 
-        fillParams (aBounds, iNbPoints - 1, dfUf, dfUl, aParams);
+        GCPnts::FillParams (aBounds, iNbPoints - 1, dfUf, dfUl, aParams);
       }
     }
 

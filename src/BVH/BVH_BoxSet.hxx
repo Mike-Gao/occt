@@ -66,6 +66,18 @@ public: //! @name Adding elements in BVH
     BVH_Object<NumType, Dimension>::myIsDirty = Standard_True;
   }
 
+  //! Allows to update the box of the element while the tree is not yet built
+  virtual void UpdateBox (const Standard_Integer theId, const BVH_Box<NumType, Dimension>& theNewBox)
+  {
+    if (BVH_Object<NumType, Dimension>::myIsDirty)
+    {
+      if (theId >= 0 && theId < Size())
+      {
+        myBoxes[theId] = theNewBox;
+      }
+    }
+  }
+
 public: //! @name BVH construction
 
   //! BVH construction

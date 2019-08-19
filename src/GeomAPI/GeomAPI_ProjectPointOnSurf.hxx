@@ -25,7 +25,6 @@
 #include <Standard_Integer.hxx>
 #include <Extrema_ExtPS.hxx>
 #include <GeomAdaptor_Surface.hxx>
-#include <Extrema_ExtAlgo.hxx>
 #include <Extrema_ExtFlag.hxx>
 #include <Standard_Real.hxx>
 class Standard_OutOfRange;
@@ -51,45 +50,38 @@ public:
   
   //! Create the projection  of a point <P> on a surface
   //! <Surface>
-  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface);
   
   //! Create the projection  of a point <P> on a surface
   //! <Surface>
   //! Create the projection of a point <P>  on a surface
   //! <Surface>. The solution are computed in the domain
   //! [Umin,Usup] [Vmin,Vsup] of the surface.
-  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Tolerance, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Tolerance);
   
-  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real Tolerance, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real Tolerance);
   
   //! Init the projection  of a point <P> on a surface
   //! <Surface>
-  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT GeomAPI_ProjectPointOnSurf(const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup);
   
-  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Tolerance, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Tolerance);
   
   //! Init the projection of a point <P>  on a surface
   //! <Surface>. The solution are computed in the domain
   //! [Umin,Usup] [Vmin,Vsup] of the surface.
-  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface);
   
-  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real Tolerance, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real Tolerance);
   
   //! Init the projection for many points on a surface
   //! <Surface>. The solutions will be computed in the domain
   //! [Umin,Usup] [Vmin,Vsup] of the surface.
-  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT void Init (const gp_Pnt& P, const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup);
   
-  Standard_EXPORT void Init (const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real Tolerance, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT void Init (const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real Tolerance);
   
-  Standard_EXPORT void Init (const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Extrema_ExtAlgo Algo = Extrema_ExtAlgo_Grad);
-
-  //! Sets the Extrema search algorithm - Grad or Tree. <br>
-  //! By default the Extrema is initialized with Grad algorithm.
-  void SetExtremaAlgo(const Extrema_ExtAlgo theAlgo)
-  {
-    myExtPS.SetAlgo(theAlgo);
-  }
+  Standard_EXPORT void Init (const Handle(Geom_Surface)& Surface, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup);
 
   //! Sets the Extrema search flag - MIN or MAX or MINMAX.<br>
   //! By default the Extrema is set to search the MinMax solutions.

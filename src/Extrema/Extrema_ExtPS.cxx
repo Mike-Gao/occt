@@ -169,12 +169,8 @@ Extrema_ExtPS::Extrema_ExtPS (const gp_Pnt&            theP,
                               const Adaptor3d_Surface& theS,
                               const Standard_Real      theTolU,
                               const Standard_Real      theTolV,
-                              const Extrema_ExtFlag    theF,
-                              const Extrema_ExtAlgo    theA)
+                              const Extrema_ExtFlag    theTarget)
 {
-  myExtPS.SetFlag (theF);
-  myExtPS.SetAlgo (theA);
-
   Initialize (theS,
               theS.FirstUParameter(),
               theS.LastUParameter(),
@@ -182,6 +178,8 @@ Extrema_ExtPS::Extrema_ExtPS (const gp_Pnt&            theP,
               theS.LastVParameter(),
               theTolU,
               theTolV);
+
+  myExtPS->SetTarget (theTarget);
 
   Perform (theP);
 }
@@ -199,12 +197,8 @@ Extrema_ExtPS::Extrema_ExtPS (const gp_Pnt&            theP,
                               const Standard_Real      theVsup,
                               const Standard_Real      theTolU,
                               const Standard_Real      theTolV,
-                              const Extrema_ExtFlag    theF,
-                              const Extrema_ExtAlgo    theA)
+                              const Extrema_ExtFlag    theTarget)
 {
-  myExtPS.SetFlag (theF);
-  myExtPS.SetAlgo (theA);
-
   Initialize (theS,
               theUinf,
               theUsup,
@@ -212,6 +206,8 @@ Extrema_ExtPS::Extrema_ExtPS (const gp_Pnt&            theP,
               theVsup,
               theTolU,
               theTolV);
+
+  myExtPS->SetTarget (theTarget);
 
   Perform (theP);
 }
@@ -263,7 +259,10 @@ void Extrema_ExtPS::Initialize (const Adaptor3d_Surface& theS,
   if(bUIsoIsDeg) nbU = 300;
   if(bVIsoIsDeg) nbV = 300;
 
-  myExtPS.Initialize(*myS, nbU, nbV, myuinf, myusup, myvinf, myvsup, mytolu, mytolv);
+  if (myExtPS.IsNull())
+    myExtPS = new Extrema_GenExtPS();
+
+  myExtPS->Initialize(*myS, nbU, nbV, myuinf, myusup, myvinf, myvsup, mytolu, mytolv);
 
   myExtPExtS.Nullify();
   myExtPRevS.Nullify();
@@ -304,7 +303,7 @@ void Extrema_ExtPS::Perform(const gp_Pnt& thePoint)
         Handle(GeomAdaptor_HSurfaceOfLinearExtrusion) aS (new GeomAdaptor_HSurfaceOfLinearExtrusion (
           GeomAdaptor_SurfaceOfLinearExtrusion (myS->BasisCurve(), myS->Direction())));
 
-        myExtPExtS = new Extrema_ExtPExtS (thePoint, aS, myuinf, myusup, myvinf, myvsup, mytolu, mytolv);
+        myExtPExtS = new Extrema_ExtPExtS (thePoint, aS, myuinf, myusup, myvinf, myvsup, mytolu, mytolv, myExtPS);
       }
       else
       {
@@ -330,7 +329,7 @@ void Extrema_ExtPS::Perform(const gp_Pnt& thePoint)
         Handle(GeomAdaptor_HSurfaceOfRevolution) aS (new GeomAdaptor_HSurfaceOfRevolution (
           GeomAdaptor_SurfaceOfRevolution (myS->BasisCurve(), myS->AxeOfRevolution())));
 
-        myExtPRevS = new Extrema_ExtPRevS (thePoint, aS, myuinf, myusup, myvinf, myvsup, mytolu, mytolv);
+        myExtPRevS = new Extrema_ExtPRevS (thePoint, aS, myuinf, myusup, myvinf, myvsup, mytolu, mytolv, myExtPS);
       }
       else
       {
@@ -351,13 +350,13 @@ void Extrema_ExtPS::Perform(const gp_Pnt& thePoint)
 
     default:
     {
-      myExtPS.Perform (thePoint);
-      myDone = myExtPS.IsDone();
+      myExtPS->Perform (thePoint);
+      myDone = myExtPS->IsDone();
       if (myDone)
       {
-        for (Standard_Integer anIdx = 1; anIdx <= myExtPS.NbExt(); ++anIdx)
+        for (Standard_Integer anIdx = 1; anIdx <= myExtPS->NbExt(); ++anIdx)
         {
-          TreatSolution (myExtPS.Point (anIdx), myExtPS.SquareDistance (anIdx));
+          TreatSolution (myExtPS->Point (anIdx), myExtPS->SquareDistance (anIdx));
         }
       }
       return;
@@ -423,10 +422,8 @@ void Extrema_ExtPS::TrimmedSquareDistances(Standard_Real& dUfVf,
 
 void Extrema_ExtPS::SetFlag(const Extrema_ExtFlag F)
 {
-  myExtPS.SetFlag(F);
-}
+  if (myExtPS.IsNull())
+    myExtPS = new Extrema_GenExtPS();
 
-void Extrema_ExtPS::SetAlgo(const Extrema_ExtAlgo A)
-{
-  myExtPS.SetAlgo(A);
+  myExtPS->SetTarget(F);
 }

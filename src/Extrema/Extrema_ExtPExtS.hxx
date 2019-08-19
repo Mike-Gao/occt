@@ -50,15 +50,21 @@ class Extrema_ExtPExtS : public Standard_Transient
 public:
 
   
-  Standard_EXPORT Extrema_ExtPExtS();
+  //! theExtPS is used to compute the solutions in case
+  //! it cannot be found analytically.
+  Standard_EXPORT Extrema_ExtPExtS(const Handle(Extrema_GenExtPS)& theExtPS);
   
   //! It calculates all the distances between a point
   //! from gp and a Surface.
-  Standard_EXPORT Extrema_ExtPExtS(const gp_Pnt& P, const Handle(GeomAdaptor_HSurfaceOfLinearExtrusion)& S, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV);
+  //! theExtPS is used to compute the solutions in case
+  //! it cannot be found analytically.
+  Standard_EXPORT Extrema_ExtPExtS(const gp_Pnt& P, const Handle(GeomAdaptor_HSurfaceOfLinearExtrusion)& S, const Standard_Real Umin, const Standard_Real Usup, const Standard_Real Vmin, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV, const Handle(Extrema_GenExtPS)& theExtPS = NULL);
   
   //! It calculates all the distances between a point
   //! from gp and a Surface.
-  Standard_EXPORT Extrema_ExtPExtS(const gp_Pnt& P, const Handle(GeomAdaptor_HSurfaceOfLinearExtrusion)& S, const Standard_Real TolU, const Standard_Real TolV);
+  //! theExtPS is used to compute the solutions in case
+  //! it cannot be found analytically.
+  Standard_EXPORT Extrema_ExtPExtS(const gp_Pnt& P, const Handle(GeomAdaptor_HSurfaceOfLinearExtrusion)& S, const Standard_Real TolU, const Standard_Real TolV, const Handle(Extrema_GenExtPS)& theExtPS = NULL);
   
   //! Initializes the fields of the algorithm.
   Standard_EXPORT void Initialize (const Handle(GeomAdaptor_HSurfaceOfLinearExtrusion)& S, const Standard_Real Uinf, const Standard_Real Usup, const Standard_Real Vinf, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV);
@@ -103,13 +109,12 @@ private:
   Handle(GeomAdaptor_HSurfaceOfLinearExtrusion) myS;
   gp_Vec myDirection;
   gp_Ax2 myPosition;
-  Extrema_GenExtPS myExtPS;
   Standard_Boolean myIsAnalyticallyComputable;
   Standard_Boolean myDone;
   Standard_Integer myNbExt;
   Standard_Real mySqDist[4];
   Extrema_POnSurf myPoint[4];
-
+  Handle(Extrema_GenExtPS) myExtPS;
 
 };
 

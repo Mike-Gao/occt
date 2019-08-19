@@ -198,14 +198,13 @@ Standard_EXPORT Standard_Boolean FUN_tool_projPonC2D(const gp_Pnt& P,
 Standard_EXPORT Standard_Boolean FUN_tool_projPonS(const gp_Pnt& P,
                                                    const Handle(Geom_Surface)& S,
                                                    gp_Pnt2d& UV,Standard_Real& dist,
-                                                   const Extrema_ExtFlag anExtFlag,
-                                                   const Extrema_ExtAlgo anExtAlgo)
+                                                   const Extrema_ExtFlag anExtFlag)
 { 
   Standard_Real UMin, UMax, VMin, VMax;
   GeomAPI_ProjectPointOnSurf PonS;
   //
   S->Bounds(UMin, UMax, VMin, VMax);
-  PonS.Init(S, UMin, UMax, VMin, VMax, anExtAlgo);
+  PonS.Init(S, UMin, UMax, VMin, VMax);
   Extrema_ExtPS& anExtPS = const_cast<Extrema_ExtPS&>(PonS.Extrema());
   anExtPS.SetFlag(anExtFlag);
   //
@@ -279,11 +278,10 @@ Standard_EXPORT Standard_Boolean FUN_tool_projPonboundedF(const gp_Pnt& P,const 
 // ----------------------------------------------------------------------
 Standard_EXPORT Standard_Boolean FUN_tool_projPonF(const gp_Pnt& P,const TopoDS_Face& F,
                                                    gp_Pnt2d& UV,Standard_Real& dist,
-                                                   const Extrema_ExtFlag anExtFlag,
-                                                   const Extrema_ExtAlgo anExtAlgo)
+                                                   const Extrema_ExtFlag anExtFlag)
 {
   dist = 1.;
   Handle(Geom_Surface) S = BRep_Tool::Surface(F);
-  Standard_Boolean ok = FUN_tool_projPonS(P,S,UV,dist, anExtFlag, anExtAlgo);
+  Standard_Boolean ok = FUN_tool_projPonS(P,S,UV,dist, anExtFlag);
   return ok;
 }

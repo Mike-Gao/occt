@@ -88,9 +88,9 @@ static void showProjSolution(Draw_Interpretor& di,
 
 static Standard_Integer proj (Draw_Interpretor& di, Standard_Integer n, const char** a)
 {
-  if ( n < 5)
+  if ( n != 5 && n != 7)
   {
-    std::cout << " Use proj curve/surf x y z [{extrema algo: g(grad)/t(tree)}|{u v}]" << std::endl;
+    di.PrintHelp (a[0]);
     return 1;
   }
 
@@ -98,10 +98,6 @@ static Standard_Integer proj (Draw_Interpretor& di, Standard_Integer n, const ch
 
   Handle(Geom_Curve) GC = DrawTrSurf::GetCurve(a[1]);
   Handle(Geom_Surface) GS;
-  Extrema_ExtAlgo aProjAlgo = Extrema_ExtAlgo_Grad;
-
-  if (n == 6 && a[5][0] == 't')
-    aProjAlgo = Extrema_ExtAlgo_Tree;
 
   if (GC.IsNull())
   {
@@ -110,12 +106,12 @@ static Standard_Integer proj (Draw_Interpretor& di, Standard_Integer n, const ch
     if (GS.IsNull())
       return 1;
 
-    if (n <= 6)
+    if (n == 5)
     {
       Standard_Real U1, U2, V1, V2;
       GS->Bounds(U1,U2,V1,V2);
 
-      GeomAPI_ProjectPointOnSurf proj(P,GS,U1,U2,V1,V2,aProjAlgo);
+      GeomAPI_ProjectPointOnSurf proj(P,GS,U1,U2,V1,V2);
       if (!proj.IsDone())
       {
         di << "projection failed.";
@@ -752,7 +748,7 @@ void GeometryTest::APICommands(Draw_Interpretor& theCommands)
 
   done = Standard_True;
 
-  theCommands.Add("proj", "proj curve/surf x y z [{extrema algo: g(grad)/t(tree)}|{u v}]\n"
+  theCommands.Add("proj", "proj curve/surf x y z [{u v}]\n"
                   "\t\tOptional parameters are relevant to surf only.\n"
                   "\t\tIf initial {u v} are given then local extrema is called",__FILE__, proj);
 

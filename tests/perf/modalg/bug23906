@@ -12,6 +12,6 @@ point p 3.5527136788005e-015 100 100
 
 dchrono h restart
 
-projponf f p -min -t
+projponf f p -min
 
 dchrono h stop counter projponf

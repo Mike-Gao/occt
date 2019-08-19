@@ -1112,9 +1112,8 @@ void GeomInt_IntSS::BuildPCurves (Standard_Real f,
       const gp_Pnt aP3d1 = C->Value(f);
       const gp_Pnt aP3d2 = C->Value(l);
 
-      anExtr.SetAlgo(Extrema_ExtAlgo_Grad);
       anExtr.Initialize(anAS, umin, umax, vmin, vmax,
-                                Precision::Confusion(), Precision::Confusion());
+                        Precision::Confusion(), Precision::Confusion());
       anExtr.Perform(aP3d1);
 
       if(ParametersOfNearestPointOnSurface(anExtr, aU, aV))

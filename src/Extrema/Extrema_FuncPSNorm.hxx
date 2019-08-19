@@ -25,6 +25,7 @@
 #include <Standard_Real.hxx>
 #include <TColStd_SequenceOfReal.hxx>
 #include <Extrema_SequenceOfPOnSurf.hxx>
+#include <Extrema_ExtFlag.hxx>
 #include <Standard_Boolean.hxx>
 #include <math_FunctionSetWithDerivatives.hxx>
 #include <Standard_Integer.hxx>
@@ -71,8 +72,10 @@ public:
   //! sets the field mysurf of the function.
   Standard_EXPORT void Initialize (const Adaptor3d_Surface& S);
   
-  //! sets the field mysurf of the function.
-  Standard_EXPORT void SetPoint (const gp_Pnt& P);
+  //! Initializes the function with the point and
+  //! target (MIN, MAX or MINMAX). MINMAX is used as default target.
+  Standard_EXPORT void SetPoint (const gp_Pnt& P,
+                                 const Extrema_ExtFlag theTarget = Extrema_ExtFlag_MINMAX);
   
   Standard_EXPORT Standard_Integer NbVariables() const Standard_OVERRIDE;
   
@@ -99,6 +102,19 @@ public:
   //! Returns the Nth extremum.
   Standard_EXPORT const Extrema_POnSurf& Point (const Standard_Integer N) const;
 
+  //! Returns the target (MIN, MAX or MINMAX).
+  Extrema_ExtFlag Target() const
+  {
+    return myTarget;
+  }
+
+  //! Returns the best (min or max, depending on the mode) found
+  //! square distance. Does not make sense for MINMAX mode.
+  Standard_Real BestSquareDistance() const
+  {
+    return myBestSqDistance;
+  }
+
 private:
 
   gp_Pnt myP;
@@ -110,5 +126,7 @@ private:
   Extrema_SequenceOfPOnSurf myPoint;
   Standard_Boolean myPinit;
   Standard_Boolean mySinit;
+  Extrema_ExtFlag myTarget;
+  Standard_Real myBestSqDistance;
 };
 #endif // _Extrema_FunctPSNorm_HeaderFile

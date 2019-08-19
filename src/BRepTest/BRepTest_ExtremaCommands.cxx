@@ -77,7 +77,7 @@ static Standard_Integer distmini(Draw_Interpretor& di, Standard_Integer n, const
   if (n == 5)
     aDeflection = Draw::Atof(a[4]);
 
-  BRepExtrema_DistShapeShape dst(S1 ,S2, aDeflection);
+  BRepExtrema_DistShapeShape dst(S1 ,S2, aDeflection, Extrema_ExtFlag_MIN);
 
   if (dst.IsDone()) 
   { 
