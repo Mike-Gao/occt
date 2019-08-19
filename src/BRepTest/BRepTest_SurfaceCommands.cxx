@@ -619,9 +619,9 @@ static Standard_Integer getedgeregul
 //=======================================================================
 static Standard_Integer projponf(Draw_Interpretor& di, Standard_Integer n, const char** a)
 {
-  if (n < 3 || n > 5) {
+  if (n < 3 || n > 4) {
     di << "Project point on the face.\n";
-    di << "Usage: projponf face pnt [extrema flag: -min/-max/-minmax] [extrema algo: -g(grad)/-t(tree)]\n";
+    di << "Usage: projponf face pnt [extrema flag: -min/-max/-minmax]\n";
     return 1;
   }
   // get face
@@ -644,7 +644,6 @@ static Standard_Integer projponf(Draw_Interpretor& di, Standard_Integer n, const
   //
   // get projection options
   // default values;
-  Extrema_ExtAlgo anExtAlgo = Extrema_ExtAlgo_Grad;
   Extrema_ExtFlag anExtFlag = Extrema_ExtFlag_MINMAX;
   //
   for (Standard_Integer i = 3; i < n; ++i) {
@@ -656,12 +655,6 @@ static Standard_Integer projponf(Draw_Interpretor& di, Standard_Integer n, const
     }
     else if (!strcasecmp(a[i], "-minmax")) {
       anExtFlag = Extrema_ExtFlag_MINMAX;
-    }
-    else if (!strcasecmp(a[i], "-t")) {
-      anExtAlgo = Extrema_ExtAlgo_Tree;
-    }
-    else if (!strcasecmp(a[i], "-g")) {
-      anExtAlgo = Extrema_ExtAlgo_Grad;
     }
   }
   //
@@ -679,7 +672,6 @@ static Standard_Integer projponf(Draw_Interpretor& di, Standard_Integer n, const
   GeomAPI_ProjectPointOnSurf aProjPS;
   aProjPS.Init(aSurf, aUMin, aUMax, aVMin, aVMax);
   // set the options
-  aProjPS.SetExtremaAlgo(anExtAlgo);
   aProjPS.SetExtremaFlag(anExtFlag);
   // perform projection
   aProjPS.Perform(aP);
@@ -768,7 +760,7 @@ void  BRepTest::SurfaceCommands(Draw_Interpretor& theCommands)
   theCommands.Add ("getedgeregularity", "getedgeregularity edge face1 [face2]",  __FILE__,getedgeregul,g);
 
   theCommands.Add ("projponf",
-                   "projponf face pnt [extrema flag: -min/-max/-minmax] [extrema algo: -g(grad)/-t(tree)]\n"
+                   "projponf face pnt [extrema flag: -min/-max/-minmax]\n"
                    "\t\tProject point on the face.",
                    __FILE__, projponf, g);
 }

@@ -27,7 +27,6 @@
 #include <Extrema_ExtPC.hxx>
 #include <Extrema_ExtPC2d.hxx>
 #include <Extrema_ExtFlag.hxx>
-#include <Extrema_ExtAlgo.hxx>
 
 // ----------------------------------------------------------------------
 //  project point <P> on geometries (curve <C>,surface <S>)
@@ -42,8 +41,7 @@ Standard_EXPORT Standard_Boolean FUN_tool_projPonC2D(const gp_Pnt& P,const Stand
 Standard_EXPORT Standard_Boolean FUN_tool_projPonC2D(const gp_Pnt& P,const BRepAdaptor_Curve2d& BAC2D,const Standard_Real pmin,const Standard_Real pmax,Standard_Real& param,Standard_Real& dist);
 Standard_EXPORT Standard_Boolean FUN_tool_projPonC2D(const gp_Pnt& P,const BRepAdaptor_Curve2d& BAC2D,Standard_Real& param,Standard_Real& dist);
 Standard_EXPORT Standard_Boolean FUN_tool_projPonS(const gp_Pnt& P,const Handle(Geom_Surface)& S,gp_Pnt2d& UV,Standard_Real& dist,
-                                                   const Extrema_ExtFlag anExtFlag=Extrema_ExtFlag_MINMAX,
-                                                   const Extrema_ExtAlgo anExtAlgo=Extrema_ExtAlgo_Grad);
+                                                   const Extrema_ExtFlag anExtFlag=Extrema_ExtFlag_MINMAX);
 
 // ----------------------------------------------------------------------
 //  project point <P> on topologies (edge <E>,face <F>)
@@ -52,7 +50,6 @@ Standard_EXPORT Standard_Boolean FUN_tool_projPonE(const gp_Pnt& P,const Standar
 Standard_EXPORT Standard_Boolean FUN_tool_projPonE(const gp_Pnt& P,const TopoDS_Edge& E,Standard_Real& param,Standard_Real& dist);
 Standard_EXPORT Standard_Boolean FUN_tool_projPonboundedF(const gp_Pnt& P,const TopoDS_Face& F,gp_Pnt2d& UV,Standard_Real& dist);
 Standard_EXPORT Standard_Boolean FUN_tool_projPonF(const gp_Pnt& P,const TopoDS_Face& F,gp_Pnt2d& UV,Standard_Real& dist,
-                                                   const Extrema_ExtFlag anExtFlag=Extrema_ExtFlag_MINMAX,
-                                                   const Extrema_ExtAlgo anExtAlgo=Extrema_ExtAlgo_Grad);
+                                                   const Extrema_ExtFlag anExtFlag=Extrema_ExtFlag_MINMAX);
 
 #endif

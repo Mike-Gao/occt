@@ -18,7 +18,6 @@
 #include <BRepExtrema_SeqOfSolution.hxx>
 #include <BRepExtrema_SolutionElem.hxx>
 #include <BRepExtrema_SupportType.hxx>
-#include <Extrema_ExtAlgo.hxx>
 #include <Extrema_ExtFlag.hxx>
 #include <gp_Pnt.hxx>
 #include <TopoDS_Shape.hxx>
@@ -39,9 +38,9 @@ class BRepExtrema_DistShapeShape
   Standard_EXPORT BRepExtrema_DistShapeShape();
   //! computation of the minimum distance (value and pair of points) using default deflection <br>
   //! Default value is Precision::Confusion(). <br>
-  Standard_EXPORT BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape1,const TopoDS_Shape& Shape2,const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX,const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape1,const TopoDS_Shape& Shape2,const Extrema_ExtFlag F = Extrema_ExtFlag_MIN);
   //! create tool and load both shapes into it <br>
-  Standard_EXPORT BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape1,const TopoDS_Shape& Shape2,const Standard_Real theDeflection,const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX,const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape1,const TopoDS_Shape& Shape2,const Standard_Real theDeflection,const Extrema_ExtFlag F = Extrema_ExtFlag_MIN);
   
   void SetDeflection(const Standard_Real theDeflection)
   {
@@ -129,11 +128,6 @@ class BRepExtrema_DistShapeShape
     myFlag = F;
   }
 
-  void SetAlgo(const Extrema_ExtAlgo A)
-  {
-    myAlgo = A;
-  }
-
 private:
 
   //! computes the minimum distance between two maps of shapes (Face,Edge,Vertex) <br>
@@ -156,7 +150,6 @@ private:
   Standard_Boolean myIsInitS1;
   Standard_Boolean myIsInitS2;
   Extrema_ExtFlag myFlag;
-  Extrema_ExtAlgo myAlgo;
   Bnd_SeqOfBox myBV1;
   Bnd_SeqOfBox myBV2;
   Bnd_SeqOfBox myBE1;

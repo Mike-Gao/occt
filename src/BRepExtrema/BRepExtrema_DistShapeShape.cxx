@@ -154,7 +154,7 @@ void BRepExtrema_DistShapeShape::DistanceMapMap (const TopTools_IndexedMapOfShap
     const TopoDS_Shape& aShape1 = theMap1 (aPair.Index1);
     const TopoDS_Shape& aShape2 = theMap2 (aPair.Index2);
 
-    BRepExtrema_DistanceSS aDistTool (aShape1, aShape2, aBox1, aBox2, myDistRef, myEps);
+    BRepExtrema_DistanceSS aDistTool (aShape1, aShape2, aBox1, aBox2, myDistRef, myEps, myFlag);
     if (aDistTool.IsDone())
     {
       if (aDistTool.DistValue() < myDistRef - myEps)
@@ -199,8 +199,7 @@ BRepExtrema_DistShapeShape::BRepExtrema_DistShapeShape()
   myEps (Precision::Confusion()),
   myIsInitS1 (Standard_False),
   myIsInitS2 (Standard_False),
-  myFlag (Extrema_ExtFlag_MINMAX),
-  myAlgo (Extrema_ExtAlgo_Grad)
+  myFlag (Extrema_ExtFlag_MINMAX)
 {
   //
 }
@@ -211,16 +210,14 @@ BRepExtrema_DistShapeShape::BRepExtrema_DistShapeShape()
 //=======================================================================
 BRepExtrema_DistShapeShape::BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape1,
                                                        const TopoDS_Shape& Shape2,
-                                                       const Extrema_ExtFlag F,
-                                                       const Extrema_ExtAlgo A)
+                                                       const Extrema_ExtFlag F)
 : myDistRef (0.0),
   myIsDone (Standard_False),
   myInnerSol (Standard_False),
   myEps (Precision::Confusion()),
   myIsInitS1 (Standard_False),
   myIsInitS2 (Standard_False),
-  myFlag (F),
-  myAlgo (A)
+  myFlag (F)
 {
   LoadS1(Shape1);
   LoadS2(Shape2);
@@ -235,16 +232,14 @@ BRepExtrema_DistShapeShape::BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape
 BRepExtrema_DistShapeShape::BRepExtrema_DistShapeShape(const TopoDS_Shape& Shape1,
                                                        const TopoDS_Shape& Shape2,
                                                        const Standard_Real theDeflection,
-                                                       const Extrema_ExtFlag F,
-                                                       const Extrema_ExtAlgo A)
+                                                       const Extrema_ExtFlag F)
 : myDistRef (0.0),
   myIsDone (Standard_False),
   myInnerSol (Standard_False),
   myEps (theDeflection),
   myIsInitS1 (Standard_False),
   myIsInitS2 (Standard_False),
-  myFlag (F),
-  myAlgo (A)
+  myFlag (F)
 {
   LoadS1(Shape1);
   LoadS2(Shape2);

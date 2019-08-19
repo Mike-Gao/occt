@@ -32,9 +32,9 @@
 //=======================================================================
 
 BRepExtrema_ExtPF::BRepExtrema_ExtPF(const TopoDS_Vertex& TheVertex, const TopoDS_Face& TheFace,
-                                     const Extrema_ExtFlag TheFlag, const Extrema_ExtAlgo TheAlgo)
+                                     const Extrema_ExtFlag TheFlag)
 {
-  Initialize(TheFace,TheFlag,TheAlgo);
+  Initialize(TheFace,TheFlag);
   Perform(TheVertex,TheFace);
 }
 
@@ -44,7 +44,7 @@ BRepExtrema_ExtPF::BRepExtrema_ExtPF(const TopoDS_Vertex& TheVertex, const TopoD
 //=======================================================================
 
 void BRepExtrema_ExtPF::Initialize(const TopoDS_Face& TheFace,
-                                   const Extrema_ExtFlag TheFlag, const Extrema_ExtAlgo TheAlgo)
+                                   const Extrema_ExtFlag TheFlag)
 {
   // cette surface doit etre en champ. Extrema ne fait
   // pas de copie et prend seulement un pointeur dessus.
@@ -60,7 +60,6 @@ void BRepExtrema_ExtPF::Initialize(const TopoDS_Face& TheFace,
   Standard_Real U1, U2, V1, V2;
   BRepTools::UVBounds(TheFace, U1, U2, V1, V2);
   myExtPS.SetFlag(TheFlag);
-  myExtPS.SetAlgo(TheAlgo);
   myExtPS.Initialize(mySurf, U1, U2, V1, V2, aTolU, aTolV);
 }
 

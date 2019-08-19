@@ -31,7 +31,6 @@
 #include <TColStd_SequenceOfReal.hxx>
 #include <GeomAbs_SurfaceType.hxx>
 #include <Extrema_ExtFlag.hxx>
-#include <Extrema_ExtAlgo.hxx>
 #include <Standard_Integer.hxx>
 class Extrema_ExtPExtS;
 class Extrema_ExtPRevS;
@@ -63,7 +62,11 @@ public:
   //! TolU et TolV are used to determine the conditions
   //! to stop the iterations; at the iteration number n:
   //! (Un - Un-1) < TolU and (Vn - Vn-1) < TolV .
-  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P, const Adaptor3d_Surface& S, const Standard_Real TolU, const Standard_Real TolV, const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX, const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P,
+                                const Adaptor3d_Surface& S,
+                                const Standard_Real TolU,
+                                const Standard_Real TolV,
+                                const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX);
   
   //! It calculates all the distances.
   //! NbU and NbV are used to locate the close points
@@ -73,16 +76,39 @@ public:
   //! TolU et TolV are used to determine the conditions
   //! to stop the iterations; at the iteration number n:
   //! (Un - Un-1) < TolU and (Vn - Vn-1) < TolV .
-  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P, const Adaptor3d_Surface& S, const Standard_Real Uinf, const Standard_Real Usup, const Standard_Real Vinf, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV, const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX, const Extrema_ExtAlgo A = Extrema_ExtAlgo_Grad);
+  Standard_EXPORT Extrema_ExtPS(const gp_Pnt& P,
+                                const Adaptor3d_Surface& S,
+                                const Standard_Real Uinf,
+                                const Standard_Real Usup,
+                                const Standard_Real Vinf,
+                                const Standard_Real Vsup,
+                                const Standard_Real TolU,
+                                const Standard_Real TolV,
+                                const Extrema_ExtFlag F = Extrema_ExtFlag_MINMAX);
   
   //! Initializes the fields of the algorithm.
-  Standard_EXPORT void Initialize (const Adaptor3d_Surface& S, const Standard_Real Uinf, const Standard_Real Usup, const Standard_Real Vinf, const Standard_Real Vsup, const Standard_Real TolU, const Standard_Real TolV);
+  Standard_EXPORT void Initialize (const Adaptor3d_Surface& S,
+                                   const Standard_Real Uinf,
+                                   const Standard_Real Usup,
+                                   const Standard_Real Vinf,
+                                   const Standard_Real Vsup,
+                                   const Standard_Real TolU,
+                                   const Standard_Real TolV);
   
   //! Computes the distances.
   //! An exception is raised if the fieds have not been
   //! initialized.
   Standard_EXPORT void Perform (const gp_Pnt& P);
   
+  //! Performs localized extrema search.
+  //! The solution to be found in the given parametric space, which
+  //! is required to be inside the initialized parametric space.
+  Standard_EXPORT void Perform (const gp_Pnt& P,
+                                const Standard_Real theLocUMin,
+                                const Standard_Real theLocUMax,
+                                const Standard_Real theLocVMin,
+                                const Standard_Real theLocVMax);
+
   //! Returns True if the distances are found.
   Standard_EXPORT Standard_Boolean IsDone() const;
   
@@ -107,9 +133,6 @@ public:
   Standard_EXPORT void TrimmedSquareDistances (Standard_Real& dUfVf, Standard_Real& dUfVl, Standard_Real& dUlVf, Standard_Real& dUlVl, gp_Pnt& PUfVf, gp_Pnt& PUfVl, gp_Pnt& PUlVf, gp_Pnt& PUlVl) const;
   
   Standard_EXPORT void SetFlag (const Extrema_ExtFlag F);
-  
-  Standard_EXPORT void SetAlgo (const Extrema_ExtAlgo A);
-
 
 
 
@@ -130,7 +153,7 @@ private:
   Adaptor3d_SurfacePtr myS;
   Standard_Boolean myDone;
   Extrema_ExtPElS myExtPElS;
-  Extrema_GenExtPS myExtPS;
+  Handle(Extrema_GenExtPS) myExtPS;
   Extrema_SequenceOfPOnSurf myPoints;
   Standard_Real myuinf;
   Standard_Real myusup;
@@ -138,6 +161,10 @@ private:
   Standard_Real myvsup;
   Standard_Real mytolu;
   Standard_Real mytolv;
+  Standard_Real myLocUMin; //!< Localized parametric space boundary (required to be inside the main parametric space)
+  Standard_Real myLocUMax; //!< Localized parametric space boundary (required to be inside the main parametric space)
+  Standard_Real myLocVMin; //!< Localized parametric space boundary (required to be inside the main parametric space)
+  Standard_Real myLocVMax; //!< Localized parametric space boundary (required to be inside the main parametric space)
   Standard_Real d11;
   Standard_Real d12;
   Standard_Real d21;
