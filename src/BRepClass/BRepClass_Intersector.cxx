@@ -130,18 +130,15 @@ void  BRepClass_Intersector::Perform(const gp_Lin2d& L,
   gp_Pnt2d pdeb,pfin;
   C.D0(deb,pdeb);
   C.D0(fin,pfin);
-  Standard_Real toldeb = 1.e-5, tolfin = 1.e-5;
 
   IntRes2d_Domain DL;
-  //
-  if(P!=RealLast()) {
-    DL.SetValues(L.Location(),0.,Precision::PConfusion(),ElCLib::Value(P,L),P,Precision::PConfusion());
-  }
-  else { 
-    DL.SetValues(L.Location(),0.,Precision::PConfusion(),Standard_True);
-  }
+  if (P != RealLast())
+    DL.SetValues (L.Location(),         0., Precision::PConfusion(),
+                  ElCLib::Value (P, L), P,  Precision::PConfusion());
+  else
+    DL.SetValues (L.Location(), 0., Precision::PConfusion(), Standard_True);
 
-  IntRes2d_Domain DE(pdeb,deb,toldeb,pfin,fin,tolfin);
+  IntRes2d_Domain DE (pdeb, deb, Tol, pfin, fin, Tol);
   // temporary periodic domain
   if (C.Curve()->IsPeriodic()) {
     DE.SetEquivalentParameters(C.FirstParameter(),
