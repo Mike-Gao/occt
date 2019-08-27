@@ -41,6 +41,7 @@ AIS_TextLabel::AIS_TextLabel()
   myFont             ("Courier"),
   myFontAspect       (Font_FA_Regular),
   myHasOrientation3D (Standard_False),
+  myHasOwnAnchorPoint (Standard_True),
   myHasFlipping      (Standard_False)
 {
   myDrawer->SetTextAspect (new Prs3d_TextAspect());
@@ -308,7 +309,12 @@ void AIS_TextLabel::Compute (const Handle(PrsMgr_PresentationManager3d)& /*thePr
 
         gp_Ax2 anOrientation = myOrientation3D;
         anOrientation.SetLocation (aPosition);
-        Prs3d_Text::Draw (Prs3d_Root::CurrentGroup (thePrs), anAsp, myText, myOrientation3D, !myHasFlipping);
+
+        Standard_Boolean aHasOwnAnchor = HasOwnAnchorPoint();
+        if (myHasFlipping)
+          aHasOwnAnchor = Standard_False; // always not using own anchor if flipping
+
+        Prs3d_Text::Draw (Prs3d_Root::CurrentGroup (thePrs), anAsp, myText, myOrientation3D, aHasOwnAnchor);
         if (myHasFlipping && isInit)
         {
           Prs3d_Root::CurrentGroup (thePrs)->SetFlippingOptions (Standard_False, gp_Ax2());
