@@ -90,6 +90,12 @@ public:
 
   Standard_EXPORT Standard_Boolean HasFlipping() const;
 
+  //! Returns flag if text uses position as point of attach
+  Standard_Boolean HasOwnAnchorPoint() const { return myHasOwnAnchorPoint; }
+
+  //! Set flag if text uses position as point of attach
+  void SetOwnAnchorPoint (const Standard_Boolean theOwnAnchorPoint) { myHasOwnAnchorPoint = theOwnAnchorPoint; }
+
   //! Define the display type of the text.
   //!
   //! TODT_NORMAL     Default display. Text only.
@@ -121,6 +127,7 @@ protected:
   Font_FontAspect            myFontAspect;
   gp_Ax2                     myOrientation3D;
   Standard_Boolean           myHasOrientation3D;
+  Standard_Boolean           myHasOwnAnchorPoint;
   Standard_Boolean           myHasFlipping;
 
 public:
