@@ -93,6 +93,9 @@
   // GL_EXT_texture_format_BGRA8888
   #define GL_BGRA_EXT 0x80E1 // same as GL_BGRA on desktop
 
+  #define GL_SRGB8        0x8C41
+  #define GL_SRGB8_ALPHA8 0x8C43
+
   #define GL_R16      0x822A
   #define GL_R16F     0x822D
   #define GL_R32F     0x822E

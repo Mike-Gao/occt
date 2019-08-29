@@ -408,6 +408,7 @@ OpenGl_ShaderManager::OpenGl_ShaderManager (OpenGl_Context* theContext)
   myShadingModel (Graphic3d_TOSM_VERTEX),
   myUnlitPrograms (new OpenGl_SetOfPrograms()),
   myContext  (theContext),
+  mySRgbState (theContext->ToRenderSRGB()),
   myHasLocalOrigin (Standard_False),
   myLastView (NULL)
 {
@@ -560,6 +561,23 @@ void OpenGl_ShaderManager::switchLightPrograms()
     myLightPrograms = new OpenGl_SetOfShaderPrograms();
     myMapOfLightPrograms.Bind (aKey, myLightPrograms);
   }
+}
+
+// =======================================================================
+// function : UpdateSRgbState
+// purpose  :
+// =======================================================================
+void OpenGl_ShaderManager::UpdateSRgbState()
+{
+  if (mySRgbState == myContext->ToRenderSRGB())
+  {
+    return;
+  }
+
+  mySRgbState = myContext->ToRenderSRGB();
+
+  // special cases - GLSL programs dealing with sRGB/linearRGB internally
+  myStereoPrograms[Graphic3d_StereoMode_Anaglyph].Nullify();
 }
 
 // =======================================================================
@@ -744,6 +762,8 @@ void OpenGl_ShaderManager::pushLightSourceState (const Handle(OpenGl_ShaderProgr
       continue;
     }
 
+    // ignoring OpenGl_Context::ToRenderSRGB() for light colors,
+    // as non-absolute colors for lights are rare and require tuning anyway
     aLightType.Type        = aLight.Type();
     aLightType.IsHeadlight = aLight.IsHeadlight();
     aLightParams.Color     = aLight.PackedColor();
@@ -1227,7 +1247,7 @@ void OpenGl_ShaderManager::PushInteriorState (const Handle(OpenGl_ShaderProgram)
     }
     else
     {
-      theProgram->SetUniform (myContext, aLocWireframeColor, theAspect->EdgeColorRGBA());
+      theProgram->SetUniform (myContext, aLocWireframeColor, myContext->Vec4FromQuantityColor (theAspect->EdgeColorRGBA()));
     }
   }
   if (const OpenGl_ShaderUniformLocation aLocQuadModeState = theProgram->GetStateLocation (OpenGl_OCCT_QUAD_MODE_STATE))
@@ -2432,19 +2452,21 @@ Standard_Boolean OpenGl_ShaderManager::prepareStdProgramStereo (Handle(OpenGl_Sh
       aName = "anaglyph";
       aUniforms.Append (OpenGl_ShaderObject::ShaderVariable ("mat4 uMultL", Graphic3d_TOS_FRAGMENT));
       aUniforms.Append (OpenGl_ShaderObject::ShaderVariable ("mat4 uMultR", Graphic3d_TOS_FRAGMENT));
-      aSrcFrag =
-          EOL"const vec4 THE_POW_UP   =       vec4 (2.2, 2.2, 2.2, 1.0);"
-          EOL"const vec4 THE_POW_DOWN = 1.0 / vec4 (2.2, 2.2, 2.2, 1.0);"
-          EOL
-          EOL"void main()"
-          EOL"{"
-          EOL"  vec4 aColorL = occTexture2D (uLeftSampler,  TexCoord);"
-          EOL"  vec4 aColorR = occTexture2D (uRightSampler, TexCoord);"
-          EOL"  aColorL = pow (aColorL, THE_POW_UP);" // normalize
-          EOL"  aColorR = pow (aColorR, THE_POW_UP);"
-          EOL"  vec4 aColor = uMultR * aColorR + uMultL * aColorL;"
-          EOL"  occSetFragColor (pow (aColor, THE_POW_DOWN));"
-          EOL"}";
+      const TCollection_AsciiString aNormalize = mySRgbState
+                                               ? EOL"#define sRgb2linear(theColor) theColor"
+                                                 EOL"#define linear2sRgb(theColor) theColor"
+                                               : EOL"#define sRgb2linear(theColor) pow(theColor, vec4(2.2, 2.2, 2.2, 1.0))"
+                                                 EOL"#define linear2sRgb(theColor) pow(theColor, 1.0 / vec4(2.2, 2.2, 2.2, 1.0))";
+      aSrcFrag = aNormalize
+      + EOL"void main()"
+        EOL"{"
+        EOL"  vec4 aColorL = occTexture2D (uLeftSampler,  TexCoord);"
+        EOL"  vec4 aColorR = occTexture2D (uRightSampler, TexCoord);"
+        EOL"  aColorL = sRgb2linear (aColorL);"
+        EOL"  aColorR = sRgb2linear (aColorR);"
+        EOL"  vec4 aColor = uMultR * aColorR + uMultL * aColorL;"
+        EOL"  occSetFragColor (linear2sRgb (aColor));"
+        EOL"}";
       break;
     }
     case Graphic3d_StereoMode_RowInterlaced:

@@ -116,11 +116,16 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   hasHighp   (Standard_False),
   hasUintIndex(Standard_False),
   hasTexRGBA8(Standard_False),
-  hasFlatShading (OpenGl_FeatureNotAvailable),
 #else
   hasHighp   (Standard_True),
   hasUintIndex(Standard_True),
   hasTexRGBA8(Standard_True),
+#endif
+  hasTexSRGB (Standard_False),
+  hasFboSRGB (Standard_False),
+#if defined(GL_ES_VERSION_2_0)
+  hasFlatShading (OpenGl_FeatureNotAvailable),
+#else
   hasFlatShading (OpenGl_FeatureInCore),
 #endif
   hasGlslBitwiseOps  (OpenGl_FeatureNotAvailable),
@@ -462,6 +467,29 @@ void OpenGl_Context::SetDrawBuffers (const Standard_Integer theNb, const Standar
   }
 
   myFuncs->glDrawBuffers (theNb, (const GLenum*)theDrawBuffers);
+}
+
+// =======================================================================
+// function : SetFrameBufferSRGB
+// purpose  :
+// =======================================================================
+void OpenGl_Context::SetFrameBufferSRGB()
+{
+#if !defined(GL_ES_VERSION_2_0)
+  if (!hasFboSRGB)
+  {
+    return;
+  }
+
+  if (ToRenderSRGB())
+  {
+    core11fwd->glEnable (GL_FRAMEBUFFER_SRGB);
+  }
+  else
+  {
+    core11fwd->glDisable (GL_FRAMEBUFFER_SRGB);
+  }
+#endif
 }
 
 // =======================================================================
@@ -1349,6 +1377,8 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
 
   hasTexRGBA8 = IsGlGreaterEqual (3, 0)
              || CheckExtension ("GL_OES_rgb8_rgba8");
+  hasTexSRGB  = IsGlGreaterEqual (3, 0);
+  hasFboSRGB  = IsGlGreaterEqual (3, 0);
   // NPOT textures has limited support within OpenGL ES 2.0
   // which are relaxed by OpenGL ES 3.0 or some extensions
   //arbNPTW     = IsGlGreaterEqual (3, 0)
@@ -1506,6 +1536,8 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
   myTexClamp = IsGlGreaterEqual (1, 2) ? GL_CLAMP_TO_EDGE : GL_CLAMP;
 
   hasTexRGBA8 = Standard_True;
+  hasTexSRGB       = IsGlGreaterEqual (2, 0);
+  hasFboSRGB       = IsGlGreaterEqual (2, 1);
   arbDrawBuffers   = CheckExtension ("GL_ARB_draw_buffers");
   arbNPTW          = CheckExtension ("GL_ARB_texture_non_power_of_two");
   arbTexFloat      = IsGlGreaterEqual (3, 0)
@@ -3400,10 +3432,10 @@ void OpenGl_Context::SetShadingMaterial (const OpenGl_Aspects* theAspect,
                                        ? anAspect->BackInteriorColor()
                                        : aFrontIntColor;
 
-  myMatFront.Init (aMatFrontSrc, aFrontIntColor);
+  myMatFront.Init (*this, aMatFrontSrc, aFrontIntColor);
   if (toDistinguish)
   {
-    myMatBack.Init (aMatBackSrc, aBackIntColor);
+    myMatBack.Init (*this, aMatBackSrc, aBackIntColor);
   }
   else
   {
@@ -3507,7 +3539,10 @@ void OpenGl_Context::SetColor4fv (const OpenGl_Vec4& theColor)
 {
   if (!myActiveProgram.IsNull())
   {
-    myActiveProgram->SetUniform (this, myActiveProgram->GetStateLocation (OpenGl_OCCT_COLOR), theColor);
+    if (const OpenGl_ShaderUniformLocation& aLoc = myActiveProgram->GetStateLocation (OpenGl_OCCT_COLOR))
+    {
+      myActiveProgram->SetUniform (this, aLoc, Vec4FromQuantityColor (theColor));
+    }
   }
 #if !defined(GL_ES_VERSION_2_0)
   else if (core11 != NULL)

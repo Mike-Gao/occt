@@ -538,6 +538,43 @@ public:
   //! @return TRUE if atomic adaptive screen sampling in ray tracing mode is supported
   Standard_Boolean HasRayTracingAdaptiveSamplingAtomic() const { return myHasRayTracingAdaptiveSamplingAtomic; }
 
+  //! Returns TRUE if sRGB rendering is supported.
+  bool HasSRGB() const
+  {
+    return hasTexSRGB
+       &&  hasFboSRGB;
+  }
+
+  //! Returns TRUE if sRGB rendering is supported and permitted.
+  bool ToRenderSRGB() const
+  {
+    return HasSRGB()
+       && !caps->sRGBDisable
+       && !caps->ffpEnable;
+  }
+
+  //! Convert Quantity_ColorRGBA into vec4.
+  OpenGl_Vec4 Vec4FromQuantityColor (const OpenGl_Vec4& theColor) const
+  {
+    return ToRenderSRGB()
+         ? Vec4LinearFromQuantityColor(theColor)
+         : Vec4sRGBFromQuantityColor  (theColor);
+  }
+
+  //! Convert Quantity_ColorRGBA into vec4.
+  const OpenGl_Vec4& Vec4LinearFromQuantityColor (const OpenGl_Vec4& theColor) const
+  {
+    // interpret Quantity_Color as linear RGB, hence conversion is NOT required
+    return theColor;
+  }
+
+  //! Convert Quantity_ColorRGBA into vec4.
+  OpenGl_Vec4 Vec4sRGBFromQuantityColor (const OpenGl_Vec4& theColor) const
+  {
+    // interpret Quantity_Color as linear RGB, hence conversion is required
+    return Quantity_ColorRGBA::Convert_LinearRGB_To_sRGB (theColor);
+  }
+
   //! Returns true if VBO is supported and permitted.
   inline bool ToUseVbo() const
   {
@@ -687,6 +724,9 @@ public: //! @name methods to alter or retrieve current state
     SetReadBuffer (theBuffer);
     SetDrawBuffer (theBuffer);
   }
+
+  //! Enables/disables GL_FRAMEBUFFER_SRGB flag.
+  Standard_EXPORT void SetFrameBufferSRGB();
 
   //! Return cached flag indicating writing into color buffer is enabled or disabled (glColorMask).
   bool ColorMask() const { return myColorMask; }
@@ -893,6 +933,8 @@ public: //! @name extensions
   Standard_Boolean       hasHighp;           //!< highp in GLSL ES fragment shader is supported
   Standard_Boolean       hasUintIndex;       //!< GLuint for index buffer is supported (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_element_index_uint)
   Standard_Boolean       hasTexRGBA8;        //!< always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_rgb8_rgba8
+  Standard_Boolean       hasTexSRGB;         //!< sRGB texture    formats (desktop OpenGL 2.0, OpenGL ES 3.0 or GL_EXT_texture_sRGB)
+  Standard_Boolean       hasFboSRGB;         //!< sRGB FBO render targets (desktop OpenGL 2.1, OpenGL ES 3.0)
   OpenGl_FeatureFlag     hasFlatShading;     //!< Complex flag indicating support of Flat shading (Graphic3d_TOSM_FACET) (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_standard_derivatives)
   OpenGl_FeatureFlag     hasGlslBitwiseOps;  //!< GLSL supports bitwise operations; OpenGL 3.0 / OpenGL ES 3.0 (GLSL 130 / GLSL ES 300) or OpenGL 2.1 + GL_EXT_gpu_shader4
   OpenGl_FeatureFlag     hasDrawBuffers;     //!< Complex flag indicating support of multiple draw buffers (desktop OpenGL 2.0, OpenGL ES 3.0, GL_ARB_draw_buffers, GL_EXT_draw_buffers)
