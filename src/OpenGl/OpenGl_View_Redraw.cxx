@@ -180,9 +180,19 @@ void OpenGl_View::Redraw()
   ++myFrameCounter;
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
   Graphic3d_Camera::Projection aProjectType = myCamera->ProjectionType();
-  Handle(OpenGl_Context)       aCtx         = myWorkspace->GetGlContext();
+  const Handle(OpenGl_Context)& aCtx        = myWorkspace->GetGlContext();
   aCtx->FrameStats()->FrameStart (myWorkspace->View(), false);
   aCtx->SetLineFeather (myRenderParams.LineFeather);
+
+  const Standard_Integer anSRgbState = aCtx->ToRenderSRGB() ? 1 : 0;
+  if (mySRgbState != -1
+   && mySRgbState != anSRgbState)
+  {
+    releaseSrgbResources (aCtx);
+    initTextureEnv (aCtx);
+  }
+  mySRgbState = anSRgbState;
+  aCtx->ShaderManager()->UpdateSRgbState();
 
   // release pending GL resources
   aCtx->ReleaseDelayed();
@@ -799,7 +809,7 @@ void OpenGl_View::redraw (const Graphic3d_Camera::Projection theProjection,
   glClearDepthf (1.0f);
 #endif
 
-  const OpenGl_Vec4& aBgColor = myBgColor;
+  const OpenGl_Vec4 aBgColor = aCtx->Vec4FromQuantityColor (myBgColor);
   glClearColor (aBgColor.r(), aBgColor.g(), aBgColor.b(), 0.0f);
 
   glClear (toClear);

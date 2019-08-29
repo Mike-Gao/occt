@@ -95,8 +95,9 @@ NCollection_Vec3<float> Quantity_Color::valuesOf (const Quantity_NameOfColor the
   const NCollection_Vec3<float>& anRgb = THE_COLORS[theName].RgbValues;
   switch (theType)
   {
-    case Quantity_TOC_RGB: return anRgb;
-    case Quantity_TOC_HLS: return Convert_sRGB_To_HLS (anRgb);
+    case Quantity_TOC_RGB:  return anRgb;
+    case Quantity_TOC_sRGB: return Convert_LinearRGB_To_sRGB (anRgb);
+    case Quantity_TOC_HLS:  return Convert_LinearRGB_To_HLS (anRgb);
   }
   throw Standard_ProgramError("Internal error");
 }
@@ -190,10 +191,18 @@ Quantity_Color::Quantity_Color (const Standard_Real theR1, const Standard_Real t
       myRgb.SetValues (float(theR1), float(theR2), float(theR3));
       break;
     }
+    case Quantity_TOC_sRGB:
+    {
+      Quantity_ColorValidateRgbRange(theR1, theR2, theR3);
+      myRgb.SetValues (Convert_sRGB_To_LinearRGB (float(theR1)),
+                       Convert_sRGB_To_LinearRGB (float(theR2)),
+                       Convert_sRGB_To_LinearRGB (float(theR3)));
+      break;
+    }
     case Quantity_TOC_HLS:
     {
       Quantity_ColorValidateHlsRange(theR1, theR2, theR3);
-      myRgb = Convert_HLS_To_sRGB (NCollection_Vec3<float> (float(theR1), float(theR2), float(theR3)));
+      myRgb = Convert_HLS_To_LinearRGB (NCollection_Vec3<float> (float(theR1), float(theR2), float(theR3)));
       break;
     }
   }
@@ -215,11 +224,11 @@ Quantity_Color::Quantity_Color (const NCollection_Vec3<float>& theRgb)
 // =======================================================================
 void Quantity_Color::ChangeContrast (const Standard_Real theDelta)
 {
-  NCollection_Vec3<float> aHls = Convert_sRGB_To_HLS (myRgb);
+  NCollection_Vec3<float> aHls = Convert_LinearRGB_To_HLS (myRgb);
   aHls[2] += aHls[2] * Standard_ShortReal (theDelta) / 100.0f; // saturation
   if (!((aHls[2] > 1.0f) || (aHls[2] < 0.0f)))
   {
-    myRgb = Convert_HLS_To_sRGB (aHls);
+    myRgb = Convert_HLS_To_LinearRGB (aHls);
   }
 }
 
@@ -229,11 +238,11 @@ void Quantity_Color::ChangeContrast (const Standard_Real theDelta)
 // =======================================================================
 void Quantity_Color::ChangeIntensity (const Standard_Real theDelta)
 {
-  NCollection_Vec3<float> aHls = Convert_sRGB_To_HLS (myRgb);
+  NCollection_Vec3<float> aHls = Convert_LinearRGB_To_HLS (myRgb);
   aHls[1] += aHls[1] * Standard_ShortReal (theDelta) / 100.0f; // light
   if (!((aHls[1] > 1.0f) || (aHls[1] < 0.0f)))
   {
-    myRgb = Convert_HLS_To_sRGB (aHls);
+    myRgb = Convert_HLS_To_LinearRGB (aHls);
   }
 }
 
@@ -252,10 +261,18 @@ void Quantity_Color::SetValues (const Standard_Real theR1, const Standard_Real t
       myRgb.SetValues (float(theR1), float(theR2), float(theR3));
       break;
     }
+    case Quantity_TOC_sRGB:
+    {
+      Quantity_ColorValidateRgbRange(theR1, theR2, theR3);
+      myRgb.SetValues (Convert_sRGB_To_LinearRGB (float(theR1)),
+                       Convert_sRGB_To_LinearRGB (float(theR2)),
+                       Convert_sRGB_To_LinearRGB (float(theR3)));
+      break;
+    }
     case Quantity_TOC_HLS:
     {
       Quantity_ColorValidateHlsRange(theR1, theR2, theR3);
-      myRgb = Convert_HLS_To_sRGB (NCollection_Vec3<float> (float(theR1), float(theR2), float(theR3)));
+      myRgb = Convert_HLS_To_LinearRGB (NCollection_Vec3<float> (float(theR1), float(theR2), float(theR3)));
       break;
     }
   }
@@ -269,8 +286,8 @@ void Quantity_Color::Delta (const Quantity_Color& theColor,
                             Standard_Real& theDC,
                             Standard_Real& theDI) const
 {
-  const NCollection_Vec3<float> aHls1 = Convert_sRGB_To_HLS (myRgb);
-  const NCollection_Vec3<float> aHls2 = Convert_sRGB_To_HLS (theColor.myRgb);
+  const NCollection_Vec3<float> aHls1 = Convert_LinearRGB_To_HLS (myRgb);
+  const NCollection_Vec3<float> aHls2 = Convert_LinearRGB_To_HLS (theColor.myRgb);
   theDC = Standard_Real (aHls1[2] - aHls2[2]); // saturation
   theDI = Standard_Real (aHls1[1] - aHls2[1]); // light
 }
@@ -315,9 +332,16 @@ void Quantity_Color::Values (Standard_Real& theR1, Standard_Real& theR2, Standar
       theR3 = myRgb.b();
       break;
     }
+    case Quantity_TOC_sRGB:
+    {
+      theR1 = Convert_LinearRGB_To_sRGB (myRgb.r());
+      theR2 = Convert_LinearRGB_To_sRGB (myRgb.g());
+      theR3 = Convert_LinearRGB_To_sRGB (myRgb.b());
+      break;
+    }
     case Quantity_TOC_HLS:
     {
-      const NCollection_Vec3<float> aHls = Convert_sRGB_To_HLS (myRgb);
+      const NCollection_Vec3<float> aHls = Convert_LinearRGB_To_HLS (myRgb);
       theR1 = aHls[0];
       theR2 = aHls[1];
       theR3 = aHls[2];

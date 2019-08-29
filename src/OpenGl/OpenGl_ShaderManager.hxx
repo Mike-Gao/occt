@@ -50,6 +50,9 @@ public:
   //! Release all resources.
   Standard_EXPORT void clear();
 
+  //! Fetch sRGB state from caps and invalidates programs, if necessary.
+  Standard_EXPORT void UpdateSRgbState();
+
   //! Return local camera transformation.
   const gp_XYZ& LocalOrigin() const { return myLocalOrigin; }
 
@@ -775,6 +778,7 @@ protected:
   Handle(OpenGl_VertexBuffer)        myBoundBoxVertBuffer; //!< bounding box vertex buffer
 
   OpenGl_Context*                    myContext;            //!< OpenGL context
+  Standard_Boolean                   mySRgbState;          //!< track sRGB state
 
 protected:
 
