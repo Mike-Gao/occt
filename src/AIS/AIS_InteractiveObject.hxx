@@ -104,12 +104,6 @@ public:
   void ClearOwner() { myOwner.Nullify(); }
 
 public:
-  //! Set style of filling capping section created by clipping planes.
-  Standard_EXPORT virtual void SetCappingStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle);
-
-  //! Returns style for filling capping section created by clipping planes.
-  const Handle(Graphic3d_AspectFillCapping)& CappingStyle() const { return myCappingStyle; }
-
 
   //! Returns the context pointer to the interactive context.
   Standard_EXPORT Handle(AIS_InteractiveContext) GetContext() const;
@@ -136,7 +130,6 @@ protected:
 
   AIS_InteractiveContext*    myCTXPtr; //!< pointer to Interactive Context, where object is currently displayed; @sa SetContext()
   Handle(Standard_Transient) myOwner;  //!< application-specific owner object
-  Handle(Graphic3d_AspectFillCapping) myCappingStyle;
 
 };
 
