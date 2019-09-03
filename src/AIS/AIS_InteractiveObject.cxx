@@ -85,37 +85,6 @@ void AIS_InteractiveObject::SetContext (const Handle(AIS_InteractiveContext)& th
 }
 
 //=======================================================================
-//function : SetCappingStyle
-//purpose  : 
-//=======================================================================
-void AIS_InteractiveObject::SetCappingStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle)
-{
-  myCappingStyle = theStyle;
-
-  // Modify existing presentations 
-  for (Standard_Integer aPrsIter = 1, n = myPresentations.Length(); aPrsIter <= n; ++aPrsIter)
-  {
-    const Handle(PrsMgr_Presentation)& aPrs3d = myPresentations (aPrsIter);
-    if (!aPrs3d.IsNull())
-    {
-      const Handle(Graphic3d_Structure)& aStruct = aPrs3d;
-      if (!aStruct.IsNull())
-      {
-        const Graphic3d_SequenceOfGroup& aGroups = aStruct->Groups();
-        for (Graphic3d_SequenceOfGroup::Iterator aGroupIter (aGroups); aGroupIter.More(); aGroupIter.Next())
-        {
-          Handle(Graphic3d_Group)& aGrp = aGroupIter.ChangeValue();
-          if (aGrp.IsNull())
-            continue;
-
-          aGrp->SetGroupPrimitivesAspect (theStyle);
-        }
-      }
-    }
-  }
-}
-
-//=======================================================================
 //function : HasPresentation
 //purpose  :
 //=======================================================================
@@ -194,7 +163,6 @@ void AIS_InteractiveObject::Dump (Standard_OStream& OS) const
 
   DUMP_VALUES (OS, "InteractiveContext", TCollection::GetPointerInfo (myCTXPtr));
   DUMP_VALUES (OS, "Owner", TCollection::GetPointerInfo (myOwner));
-  DUMP_VALUES (OS, "CappingStyle", TCollection::GetPointerInfo (myCappingStyle));
 
   DUMP_STOP_KEY (OS, AIS_InteractiveObject_ClassName);
 
