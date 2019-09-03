@@ -470,7 +470,16 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_SelectionScheme theSe
   }*/
 
   AIS_NListOfEntityOwner aPickedOwners;
-  aPickedOwners.Append (myLastinMain);
+  if (!myLastinMain.IsNull() &&
+      myLastinMain->HasSelectable())
+  {
+    Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(myLastinMain->Selectable());
+    if (!anIO.IsNull() &&
+        myObjects.IsBound(anIO))
+    {
+      aPickedOwners.Append (myLastinMain);
+    }
+  }
 
   return Select (aPickedOwners, theSelScheme);
 }
