@@ -293,8 +293,11 @@ namespace
             const gp_Dir aPlaneUp   (aPlaneMat.GetValue (0, 2), aPlaneMat.GetValue (1, 2), aPlaneMat.GetValue (2, 2));
             const gp_Dir& aCameraUp  = aCamera->Up();
             const gp_Vec  aCameraPln = aPlaneSide.Dot (aCameraUp) * aPlaneSide + aPlaneUp.Dot (aCameraUp) * aPlaneUp;
-            const gp_Dir& aCameraDir   = aCamera->Direction();
-            aRotateAngle = static_cast<Standard_ShortReal> (aCameraPln.AngleWithRef (aPlaneUp, aCameraDir) / M_PI * 180.0);
+            if (aCameraPln.Magnitude() > Precision::Confusion())
+            {
+              const gp_Dir& aCameraDir   = aCamera->Direction();
+              aRotateAngle = static_cast<Standard_ShortReal> (aCameraPln.AngleWithRef (aPlaneUp, aCameraDir) / M_PI * 180.0);
+            }
           }
 
           aHatchAngle = aRotateAngle;
