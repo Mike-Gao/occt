@@ -27,7 +27,7 @@
 
 namespace
 {
-  static const OpenGl_CappingPlaneResource THE_DEFAULT_ASPECT = OpenGl_CappingPlaneResource (new Graphic3d_AspectFillCapping);
+  static const OpenGl_CappingPlaneResource* THE_DEFAULT_ASPECT = new OpenGl_CappingPlaneResource (new Graphic3d_AspectFillCapping);
   static const TCollection_AsciiString THE_QUAD_PARRAY = "OpenGl_CappingAlgo_Quad";
   static const TCollection_AsciiString THE_PLANE_STYLE = "OpenGl_CappingAlgo_CappingStyle_";
 
@@ -269,7 +269,7 @@ namespace
 
       if (anAspectCapping == NULL)
       {
-        anAspectCapping = &THE_DEFAULT_ASPECT;
+        anAspectCapping = THE_DEFAULT_ASPECT;
       }
 
       const OpenGl_Aspects*  anAspectFace     = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
