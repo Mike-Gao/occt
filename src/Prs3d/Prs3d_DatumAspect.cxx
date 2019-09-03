@@ -14,6 +14,9 @@
 
 #include <Prs3d_DatumAspect.hxx>
 
+#include <Prs3d.hxx>
+#include <TCollection.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_DatumAspect, Prs3d_BasicAspect)
 
 // =======================================================================
@@ -167,3 +170,40 @@ Prs3d_DatumParts Prs3d_DatumAspect::ArrowPartForAxis (Prs3d_DatumParts thePart) 
   }
   return Prs3d_DP_None;
 }
+
+const TCollection_AsciiString Prs3d_DatumAspect_ClassName = "Prs3d_DatumAspect";
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Prs3d_DatumAspect::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, Prs3d_DatumAspect_ClassName);
+
+  DUMP_VALUES (OS, "Axes", Prs3d::DatumAxesToString (myAxes));
+  DUMP_VALUES (OS, "ToDrawLabels", myToDrawLabels);
+  DUMP_VALUES (OS, "ToDrawArrows", myToDrawArrows);
+
+  //NCollection_DataMap<Prs3d_DatumAttribute, Standard_Real> myAttributes;
+  //NCollection_DataMap<Prs3d_DatumParts, Handle(Prs3d_ShadingAspect)> myShadedAspects;
+  //NCollection_DataMap<Prs3d_DatumParts, Handle(Prs3d_LineAspect)> myLineAspects;
+
+  {
+    Standard_SStream aTmpStream;
+    myTextAspect->Dump (aTmpStream);
+    DUMP_VALUES (OS, "TextAspect", TCollection::ToDumpString (aTmpStream));
+  }
+  {
+    Standard_SStream aTmpStream;
+    myPointAspect->Dump (aTmpStream);
+    DUMP_VALUES (OS, "PointAspect", TCollection::ToDumpString (aTmpStream));
+  }
+  {
+    Standard_SStream aTmpStream;
+    myArrowAspect->Dump (aTmpStream);
+    DUMP_VALUES (OS, "ArrowAspect", TCollection::ToDumpString (aTmpStream));
+  }
+  DUMP_STOP_KEY (OS, Prs3d_DatumAspect_ClassName);
+}
+

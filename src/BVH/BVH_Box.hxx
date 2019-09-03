@@ -18,7 +18,9 @@
 
 #include <BVH_Constants.hxx>
 #include <BVH_Types.hxx>
+#include <Message_Alerts.hxx>
 #include <Standard_ShortReal.hxx>
+#include <TCollection.hxx>
 
 #include <limits>
 
@@ -107,6 +109,17 @@ public:
 
   //! Returns center of bounding box along the given axis.
   T Center (const Standard_Integer theAxis) const;
+
+  //! Dumps the content of me on the stream <OS>.
+  void Dump (Standard_OStream& OS) const
+  {
+    DUMP_VALUES (OS, "BVH_Box", 2);
+    DUMP_VALUES (OS, "IsValid", IsValid());
+
+    OS << "Bnd_Box" << TCollection::DumpSeparator();
+    BVH::ToBndBox (CornerMin(), CornerMax()).Dump (OS);
+    OS << TCollection::DumpSeparator();
+  }
 
 public:
 

@@ -19,6 +19,7 @@
 #include <Standard_ConstructionError.hxx>
 #include <Standard_Stream.hxx>
 #include <Standard_Type.hxx>
+#include <TCollection.hxx>
 #include <TopLoc_Datum3D.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(TopLoc_Datum3D,Standard_Transient)
@@ -39,6 +40,24 @@ TopLoc_Datum3D::TopLoc_Datum3D ()
 TopLoc_Datum3D::TopLoc_Datum3D (const gp_Trsf& T) :
  myTrsf(T)
 {
+}
+
+const TCollection_AsciiString TopLoc_Datum3D_ClassName = "TopLoc_Datum3D";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void TopLoc_Datum3D::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, TopLoc_Datum3D_ClassName);
+
+  Standard_SStream aTmpStream;
+  myTrsf.Dump (aTmpStream);
+  DUMP_VALUES (OS, "Transformation", TCollection::ToDumpString (aTmpStream));
+
+  DUMP_START_KEY (OS, TopLoc_Datum3D_ClassName);
 }
 
 //=======================================================================

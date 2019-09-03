@@ -41,6 +41,15 @@ Standard_EXPORT ViewerTest_DoubleMapOfInteractiveAndName& GetMapOfAIS();
 static TInspector_Communicator* MyCommunicator;
 
 // =======================================================================
+// function : GetCommunicator
+// purpose  : defines plugin library name by the command argument
+// =======================================================================
+TInspector_Communicator* ToolsDraw::GetCommunicator()
+{
+  return MyCommunicator;
+}
+
+// =======================================================================
 // function : convertToPluginName
 // purpose  : defines plugin library name by the command argument
 // =======================================================================
@@ -53,6 +62,7 @@ Standard_Boolean convertToPluginName (const TCollection_AsciiString& theArgument
   if (anArgument == "dfbrowser")       { thePluginName = "TKDFBrowser"; return Standard_True; }
   else if (anArgument == "shapeview")  { thePluginName = "TKShapeView"; return Standard_True; }
   else if (anArgument == "vinspector") { thePluginName = "TKVInspector"; return Standard_True; }
+  else if (anArgument == "messageview") { thePluginName = "TKMessageView"; return Standard_True; }
 
   return Standard_False;
 }
@@ -296,6 +306,7 @@ static int tinspector (Draw_Interpretor& di, Standard_Integer theArgsNb, const c
       aPlugins.Append ("TKDFBrowser");
       aPlugins.Append ("TKShapeView");
       aPlugins.Append ("TKVInspector");
+      aPlugins.Append ("TKMessageView");
     }
     aPluginNameToActivate = !aPluginNameToActivate.IsEmpty() ? aPluginNameToActivate : aPlugins.First();
   }
@@ -382,7 +393,7 @@ void ToolsDraw::Commands(Draw_Interpretor& theCommands)
     "\n\t\t: Starts tool of inspection."
     "\n\t\t: Options:"
     "\n\t\t:  -plugins enters plugins that should be added in the inspector."
-    "\n\t\t:           Available names are: dfbrowser, vinspector and shapeview."
+    "\n\t\t:           Available names are: dfbrowser, vinspector, shapeview and messageview."
     "\n\t\t:           Plugins order will be the same as defined in arguments."
     "\n\t\t:           'all' adds all available plugins in the order:"
     "\n\t\t:                 DFBrowser, VInspector and ShapeView."

@@ -239,6 +239,12 @@ public:
   Standard_EXPORT void SetAxis (const Standard_Real X, const Standard_Real Y, const Standard_Real Z,
                                 const Standard_Real Vx, const Standard_Real Vy, const Standard_Real Vz);
 
+  //! Returns an axis from its origin and
+  //! its orientation .
+  //! This is the current axis for rotations and movements.
+  Standard_EXPORT void Axis (Standard_Real& X, Standard_Real& Y, Standard_Real& Z,
+                             Standard_Real& Vx, Standard_Real& Vy, Standard_Real& Vz);
+
   //! Defines the shading model for the visualization. Various models are available.
   Standard_EXPORT void SetShadingModel (const Graphic3d_TypeOfShadingModel theShadingModel);
 

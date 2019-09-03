@@ -121,6 +121,9 @@ public:
                                             Quantity_ColorRGBA& theColor,
                                             const bool          theAlphaComponentIsOff = false);
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
+
 private:
 
   static void myTestSize3() { Standard_STATIC_ASSERT (sizeof(float) * 3 == sizeof(Quantity_Color)); }

@@ -223,6 +223,19 @@ public:
     return mySelectingVolumes[myActiveSelectionType / 2];
   }
 
+  //! Returns active selecting volume that was built during last
+  //! run of OCCT selection mechanism
+  Handle(SelectMgr_BaseFrustum) GetVolume (const SelectionType& theType) const
+  {
+    switch (theType)
+    {
+      case Point:
+      case Box:      return mySelectingVolumes[Frustum];
+      case Polyline: return mySelectingVolumes[FrustumSet];
+      default:       return NULL;
+    }
+  }
+
   //! Stores plane equation coefficients (in the following form:
   //! Ax + By + Cz + D = 0) to the given vector
   virtual void GetPlanes (NCollection_Vector<SelectMgr_Vec4>& thePlaneEquations) const Standard_OVERRIDE

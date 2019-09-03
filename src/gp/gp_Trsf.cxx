@@ -34,6 +34,7 @@
 #include <gp_XYZ.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_OutOfRange.hxx>
+#include <TCollection.hxx>
 
 //=======================================================================
 //function : gp_Trsf
@@ -848,4 +849,31 @@ void gp_Trsf::Orthogonalize()
   aTM.SetRows(aV1, aV2, aV3);
 
   matrix = aTM;
+}
+
+const TCollection_AsciiString gp_Trsf_ClassName = "gp_Trsf";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void gp_Trsf::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, gp_Trsf_ClassName);
+
+  DUMP_VALUES (OS, "Form", gp::TrsfFormToString (Form()));
+  {
+    Standard_SStream aTmpStream;
+    loc.Dump (aTmpStream);
+    DUMP_VALUES (OS, "TranslationPart", TCollection::ToDumpString (aTmpStream));
+  }
+  DUMP_VALUES (OS, "ScaleFactor", ScaleFactor());
+  {
+    Standard_SStream aTmpStream;
+    matrix.Dump (aTmpStream);
+    DUMP_VALUES (OS, "HVectorialPart", TCollection::ToDumpString (aTmpStream));
+  }
+
+  DUMP_STOP_KEY (OS, gp_Trsf_ClassName);
 }

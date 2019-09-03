@@ -447,3 +447,22 @@ void Graphic3d_Group::AddText (const Handle(Graphic3d_Text)& theTextParams,
 
   Update();
 }
+
+const TCollection_AsciiString Graphic3d_Group_ClassName = "Graphic3d_Group";
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Graphic3d_Group::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, Graphic3d_Group_ClassName);
+
+  //Graphic3d_Structure* myStructure;     //!< pointer to the parent structure
+  //Graphic3d_BndBox4f   myBounds;        //!< bounding box
+
+  DUMP_VALUES (OS, "IsClosed", myIsClosed);
+  DUMP_VALUES (OS, "ContainsFacet", myContainsFacet);
+
+  DUMP_STOP_KEY (OS, Graphic3d_Group_ClassName);
+}

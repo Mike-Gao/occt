@@ -1,8 +1,15 @@
 View.qrc
+View_CameraPositionPrs.cxx
+View_CameraPositionPrs.hxx
 View_ContextType.hxx
+View_DisplayActionType.hxx
 View_Displayer.cxx
 View_Displayer.hxx
+View_DisplayPreview.cxx
+View_DisplayPreview.hxx
 View_PresentationType.hxx
+View_PreviewParameters.cxx
+View_PreviewParameters.hxx
 View_ToolActionType.hxx
 View_ToolBar.cxx
 View_ToolBar.hxx

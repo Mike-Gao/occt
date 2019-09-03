@@ -16,8 +16,12 @@
 #include <inspector/TreeModel_ModelBase.hxx>
 
 #include <inspector/TreeModel_ItemBase.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
+#include <inspector/TreeModel_ItemPropertiesCreator.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 #include <inspector/TreeModel_VisibilityState.hxx>
+
+#include <Standard_Transient.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QIcon>
@@ -31,6 +35,8 @@ TreeModel_ModelBase::TreeModel_ModelBase (QObject* theParent)
 : QAbstractItemModel (theParent), m_pRootItem (0), m_pUseVisibilityColumn (false),
   myVisibilityState (0)
 {
+  myVisibleIcon = QIcon (":/icons/item_visible.png");
+  myInvisibleIcon = QIcon (":/icons/item_invisible.png");
 }
 
 // =======================================================================
@@ -104,14 +110,18 @@ QVariant TreeModel_ModelBase::data (const QModelIndex& theIndex, int theRole) co
     if (!myVisibilityState || !myVisibilityState->CanBeVisible (theIndex))
       return QVariant();
 
-    QVariant aValue = QIcon (myVisibilityState->IsVisible (theIndex) ? ":/icons/item_visible.png"
-                                                                     : ":/icons/item_invisible.png");
+    QVariant aValue = myVisibilityState->IsVisible (theIndex) ? myVisibleIcon : myInvisibleIcon;
     anItem->SetCustomData (aValue, theRole);
     return aValue;
   }
 
   TreeModel_ItemBasePtr anItem = GetItemByIndex (theIndex);
-  return anItem->data (theIndex, theRole);
+  QVariant anItemData = anItem->data (theIndex, theRole);
+
+  if (anItemData.isNull() && theRole == Qt::BackgroundRole && myHighlightedIndices.contains (theIndex))
+    anItemData = TreeModel_Tools::LightHighlightColor();
+
+  return anItemData;
 }
 
 // =======================================================================
@@ -174,6 +184,25 @@ int TreeModel_ModelBase::rowCount (const QModelIndex& theParent) const
   else
     aParentItem = GetItemByIndex (theParent);
 
+  if (!aParentItem)
+    return 0;
+  if (!aParentItem->IsInitialized())
+  {
+    TreeModel_ItemProperties* aProperties = 0;
+    if (!myPropertiesCreators.IsEmpty())
+    {
+      for (NCollection_List<Handle(TreeModel_ItemPropertiesCreator)>::Iterator anIterator (myPropertiesCreators); anIterator.More(); anIterator.Next())
+      {
+        Handle(TreeModel_ItemPropertiesCreator) aCreator = anIterator.Value();
+        aProperties = aCreator->GetProperties (aParentItem);
+        if (aProperties)
+          break;
+      }
+      // TODO: dump properties should be united with properties created by the creator
+      aParentItem->SetProperties (aProperties);
+    }
+  }
+
   return aParentItem ? aParentItem->rowCount() : 0;
 }
 
@@ -207,21 +236,70 @@ void TreeModel_ModelBase::EmitDataChanged (const QModelIndex& theTopLeft, const 
 }
 
 // =======================================================================
+// function :  SetPropertiesCreator
+// purpose :
+// =======================================================================
+void TreeModel_ModelBase::AddPropertiesCreator (const Handle(TreeModel_ItemPropertiesCreator)& theCreator)
+{
+  if (myPropertiesCreators.Contains (theCreator))
+    return;
+  myPropertiesCreators.Append (theCreator);
+}
+
+// =======================================================================
+// function :  GetProperties
+// purpose :
+// =======================================================================
+const NCollection_List<Handle(TreeModel_ItemPropertiesCreator)>& TreeModel_ModelBase::GetPropertiesCreators() const
+{
+  return myPropertiesCreators;
+}
+
+// =======================================================================
+// function : GetSelected
+// purpose :
+// =======================================================================
+QModelIndexList TreeModel_ModelBase::GetSelected (const QModelIndexList& theIndices, const int theCellId,
+                                                  const Qt::Orientation theOrientation)
+{
+  QModelIndexList aSelected;
+  for (QModelIndexList::const_iterator anIndicesIt = theIndices.begin(); anIndicesIt != theIndices.end(); anIndicesIt++)
+  {
+    QModelIndex anIndex = *anIndicesIt;
+    if ((theOrientation == Qt::Horizontal && anIndex.column() == theCellId) ||
+        (theOrientation == Qt::Vertical && anIndex.row() == theCellId))
+      aSelected.append (anIndex);
+  }
+  return aSelected;
+}
+
+// =======================================================================
 // function : SingleSelected
 // purpose :
 // =======================================================================
 QModelIndex TreeModel_ModelBase::SingleSelected (const QModelIndexList& theIndices, const int theCellId,
                                                  const Qt::Orientation theOrientation)
 {
-  QModelIndexList aFirstColumnSelectedIndices;
+  QModelIndexList aSelected = GetSelected (theIndices, theCellId, theOrientation);
+  return aSelected.size() == 1 ? aSelected.first() : QModelIndex();
+}
+
+// =======================================================================
+// function :  GetSelectedItems
+// purpose :
+// =======================================================================
+QList<TreeModel_ItemBasePtr> TreeModel_ModelBase::GetSelectedItems (const QModelIndexList& theIndices)
+{
+  QList<TreeModel_ItemBasePtr> anItems;
+
   for (QModelIndexList::const_iterator anIndicesIt = theIndices.begin(); anIndicesIt != theIndices.end(); anIndicesIt++)
   {
-    QModelIndex anIndex = *anIndicesIt;
-    if ((theOrientation == Qt::Horizontal && anIndex.column() == theCellId) ||
-        (theOrientation == Qt::Vertical && anIndex.row() == theCellId))
-      aFirstColumnSelectedIndices.append (anIndex);
+    TreeModel_ItemBasePtr anItem = TreeModel_ModelBase::GetItemByIndex (*anIndicesIt);
+    if (!anItem || anItems.contains (anItem))
+      continue;
+    anItems.append (anItem);
   }
-  return aFirstColumnSelectedIndices.size() == 1 ? aFirstColumnSelectedIndices.first() : QModelIndex();
+  return anItems;
 }
 
 // =======================================================================

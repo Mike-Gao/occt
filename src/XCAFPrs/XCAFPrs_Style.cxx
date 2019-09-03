@@ -15,6 +15,8 @@
 
 #include <XCAFPrs_Style.hxx>
 
+#include <TCollection.hxx>
+
 //=======================================================================
 //function : XCAFPrs_Style
 //purpose  :
@@ -66,4 +68,32 @@ void XCAFPrs_Style::UnSetColorCurv()
 {
   myHasColorCurv = Standard_False;
   myColorCurv.SetValues (Quantity_NOC_YELLOW);
+}
+
+const TCollection_AsciiString XCAFPrs_Style_ClassName = "XCAFPrs_Style";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void XCAFPrs_Style::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, XCAFPrs_Style_ClassName);
+
+  DUMP_VALUES (OS, "HasColorSurf", myHasColorSurf);
+  {
+    Standard_SStream aTmpStream;
+    myColorSurf.Dump (aTmpStream);
+    DUMP_VALUES (OS, "ColorSurf", TCollection::ToDumpString (aTmpStream));
+  }
+  DUMP_VALUES (OS, "HasColorCurv", myHasColorCurv);
+  {
+    Standard_SStream aTmpStream;
+    myColorCurv.Dump (aTmpStream);
+    DUMP_VALUES (OS, "ColorCurv", TCollection::ToDumpString (aTmpStream));
+  }
+  DUMP_VALUES (OS, "IsVisible", myIsVisible);
+
+  DUMP_STOP_KEY (OS, XCAFPrs_Style_ClassName);
 }

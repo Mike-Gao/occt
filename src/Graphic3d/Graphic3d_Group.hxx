@@ -280,6 +280,9 @@ public:
                                      const Standard_Boolean                  theHasOwnAnchor = Standard_True);
 
 
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const;
+
 protected:
 
   //! Creates a group in the structure <AStructure>.

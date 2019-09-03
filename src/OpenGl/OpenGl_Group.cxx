@@ -353,3 +353,34 @@ void OpenGl_Group::Release (const Handle(OpenGl_Context)& theGlCtx)
 
   OpenGl_Element::Destroy (theGlCtx.get(), myAspects);
 }
+
+const TCollection_AsciiString OpenGl_Group_ClassName = "OpenGl_Group";
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void OpenGl_Group::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, OpenGl_Group_ClassName);
+
+  {
+    Standard_SStream aTmpStream;
+    Graphic3d_Group::Dump (aTmpStream);
+    DUMP_VALUES (OS, "Graphic3d_Group", TCollection::ToDumpString (aTmpStream));
+  }
+
+  if (myAspects)
+  {
+    Standard_SStream aTmpStream;
+    myAspects->Dump (aTmpStream);
+    DUMP_VALUES (OS, "Aspects", TCollection::ToDumpString (aTmpStream));
+  }
+  //OpenGl_CappingPlaneResource* myAspectFillCapping;
+  //OpenGl_ElementNode* myFirst;
+  //OpenGl_ElementNode* myLast;
+
+  DUMP_VALUES (OS, "myIsRaytracable", myIsRaytracable);
+
+  DUMP_STOP_KEY (OS, OpenGl_Group_ClassName);
+}

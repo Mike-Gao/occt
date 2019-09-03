@@ -12,6 +12,7 @@
 // commercial license or contractual agreement.
 
 #include <Graphic3d_Aspects.hxx>
+#include <TCollection.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_Aspects, Standard_Transient)
 
@@ -59,4 +60,70 @@ void Graphic3d_Aspects::SetTextureMap (const Handle(Graphic3d_TextureMap)& theTe
   }
 
   myTextureSet = new Graphic3d_TextureSet (theTexture);
+}
+
+const TCollection_AsciiString Graphic3d_Aspects_ClassName = "Graphic3d_Aspects";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Graphic3d_Aspects::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, Graphic3d_Aspects_ClassName);
+  
+  /*Handle(Graphic3d_ShaderProgram)  myProgram;
+  Handle(Graphic3d_TextureSet)     myTextureSet;
+  Handle(Graphic3d_MarkerImage)    myMarkerImage;
+  Handle(Graphic3d_HatchStyle)     myHatchStyle;
+  Handle(TCollection_HAsciiString) myTextFont;
+  Graphic3d_MaterialAspect         myFrontMaterial;
+  Graphic3d_MaterialAspect         myBackMaterial;
+  */
+
+  Standard_SStream aTmpStream;
+  myInteriorColor.Dump (aTmpStream);
+  DUMP_VALUES (OS, "InteriorColor", TCollection::ToDumpString (aTmpStream));
+
+  aTmpStream.str ("");
+  myBackInteriorColor.Dump (aTmpStream);
+  DUMP_VALUES (OS, "BackInteriorColor", TCollection::ToDumpString (aTmpStream));
+
+  aTmpStream.str ("");
+  myEdgeColor.Dump (aTmpStream);
+  DUMP_VALUES (OS, "EdgeColor", TCollection::ToDumpString (aTmpStream));
+
+  aTmpStream.str ("");
+  myPolygonOffset.Dump (aTmpStream);
+  DUMP_VALUES (OS, "PolygonOffset", TCollection::ToDumpString (aTmpStream));
+
+
+  /*Aspect_InteriorStyle         myInteriorStyle;
+  Graphic3d_TypeOfShadingModel myShadingModel;
+  Graphic3d_AlphaMode          myAlphaMode;
+  Standard_ShortReal           myAlphaCutoff;
+
+  Aspect_TypeOfLine            myLineType;
+  Standard_ShortReal           myLineWidth;
+
+  Aspect_TypeOfMarker          myMarkerType;
+  Standard_ShortReal           myMarkerScale;
+
+  Aspect_TypeOfStyleText   myTextStyle;
+  Aspect_TypeOfDisplayText myTextDisplayType;
+  Font_FontAspect          myTextFontAspect;
+  Standard_ShortReal       myTextAngle;
+  */
+
+  DUMP_VALUES (OS, "ToSkipFirstEdge", myToSkipFirstEdge);
+  DUMP_VALUES (OS, "ToDistinguishMaterials", myToDistinguishMaterials);
+  DUMP_VALUES (OS, "ToDrawEdges", myToDrawEdges);
+  DUMP_VALUES (OS, "ToDrawSilhouette", myToDrawSilhouette);
+  DUMP_VALUES (OS, "ToSuppressBackFaces", myToSuppressBackFaces);
+  DUMP_VALUES (OS, "ToMapTexture", myToMapTexture);
+  DUMP_VALUES (OS, "IsTextZoomable", myIsTextZoomable);
+
+
+  DUMP_STOP_KEY (OS, Graphic3d_Aspects_ClassName);
 }

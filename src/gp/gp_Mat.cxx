@@ -24,8 +24,11 @@
 #include <gp_Mat.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_XYZ.hxx>
+#include <NCollection_List.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_OutOfRange.hxx>
+#include <TCollection.hxx>
+#include <TCollection_AsciiString.hxx>
 
 #define M00 ((Standard_Real*)M)[0]
 #define M01 ((Standard_Real*)M)[1]
@@ -268,3 +271,23 @@ void gp_Mat::Power (const Standard_Integer N)
   }
 }
 
+const TCollection_AsciiString gp_Map_ClassName = "gp_Mat";
+
+void gp_Mat::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, gp_Map_ClassName);
+
+  DUMP_VALUES (OS, "Mat00", Mat00);
+  DUMP_VALUES (OS, "Mat01", Mat01);
+  DUMP_VALUES (OS, "Mat02", Mat02);
+
+  DUMP_VALUES (OS, "Mat10", Mat10);
+  DUMP_VALUES (OS, "Mat11", Mat11);
+  DUMP_VALUES (OS, "Mat12", Mat12);
+
+  DUMP_VALUES (OS, "Mat20", Mat20);
+  DUMP_VALUES (OS, "Mat21", Mat21);
+  DUMP_VALUES (OS, "Mat22", Mat22);
+
+  DUMP_STOP_KEY (OS, gp_Map_ClassName);
+}

@@ -40,9 +40,14 @@ public:
   //! Destructor
   virtual ~VInspector_ItemSelectMgrFilter() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myFilter; }
+
   //! Returns the current filter, init item if it was not initialized yet
   //! \return filter object
-  Standard_EXPORT Handle(SelectMgr_Filter) GetFilter() const;
+  Standard_EXPORT Handle(SelectMgr_Filter) GetFilter() const
+  { return Handle(SelectMgr_Filter)::DownCast (GetObject()); }
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;

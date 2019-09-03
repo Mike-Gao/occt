@@ -15,6 +15,7 @@
 #define _Graphic3d_PolygonOffset_HeaderFile
 
 #include <Aspect_PolygonOffsetMode.hxx>
+#include <Standard_OStream.hxx>
 
 //! Polygon offset parameters.
 struct Graphic3d_PolygonOffset
@@ -33,6 +34,10 @@ struct Graphic3d_PolygonOffset
         && Factor == theOther.Factor
         && Units == theOther.Units;
   }
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
+
 };
 
 #endif // _Graphic3d_PolygonOffset_HeaderFile

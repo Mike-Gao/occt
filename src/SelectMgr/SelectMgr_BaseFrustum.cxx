@@ -15,6 +15,9 @@
 
 #include <SelectMgr_BaseFrustum.hxx>
 
+#include <Message.hxx>
+#include <Message_Alerts.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_BaseFrustum,Standard_Transient)
 
 //=======================================================================
@@ -244,4 +247,18 @@ Standard_Real SelectMgr_BaseFrustum::DistToGeometryCenter (const gp_Pnt& /*theCO
 gp_Pnt SelectMgr_BaseFrustum::DetectedPoint (const Standard_Real /*theDepth*/) const
 {
   return gp_Pnt (RealLast(), RealLast(), RealLast());
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void SelectMgr_BaseFrustum::Dump(Standard_OStream& OS)const 
+{
+  DUMP_VALUES (OS, "SelectMgr_BaseFrustum", 2);
+
+  DUMP_VALUES (OS, "myPixelTolerance", myPixelTolerance);
+  DUMP_VALUES (OS, "myIsOrthographic", myIsOrthographic);
+  DUMP_VALUES (OS, "myBuilder", Message::TransientToString (myBuilder));
+  DUMP_VALUES (OS, "myCamera", Message::TransientToString (myCamera));
 }

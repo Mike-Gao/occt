@@ -18,6 +18,9 @@
 
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
+#include <Standard_Handle.hxx>
+#include <Standard_OStream.hxx>
+
 #include <inspector/TreeModel_ItemRole.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -32,6 +35,7 @@
 #include <Standard_WarningsRestore.hxx>
 
 class TreeModel_ItemBase;
+class TreeModel_ItemProperties;
 
 typedef QExplicitlySharedDataPointer<TreeModel_ItemBase> TreeModel_ItemBasePtr;
 
@@ -81,7 +85,11 @@ public:
 
   //! Sets the item internal initialized state to the true. If the item has internal values,
   //! there should be initialized here.
-  virtual void Init() { m_bInitialized = true; }
+  Standard_EXPORT virtual void Init();
+
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { return NULL; }
 
   //! Resets the item and the child items content. Sets the initialized state to false.
   //! If the item has internal values, there should be reseted here.
@@ -90,6 +98,10 @@ public:
   //! Resets the item cached value for the parameter role.
   //! \param theRole an item role
   Standard_EXPORT virtual void Reset(int theRole);
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  virtual void GetStream (Standard_OStream& OS) const { (void)OS; }
 
   //! Gets the parent of the item, or TreeModel_ItemBasePtr() if it has no parent.
   //! \return pointer to the item
@@ -127,12 +139,28 @@ public:
   //! \return the row count
   int rowCount() const { return cachedValue(TreeModel_ItemRole_RowCountRole).toInt(); }
 
+  //! Sets item table properties builder
+  Standard_EXPORT void SetProperties (const Handle(TreeModel_ItemProperties)& theProperties);
+
+  //! Returns item table properties builder
+  Standard_EXPORT Handle(TreeModel_ItemProperties) GetProperties() const;
+
+  //! Dumps the content of me on the stream <OS>.
+  virtual Standard_Boolean Dump (Standard_OStream& OS) const { (void)OS; return Standard_False; }
+
+  //! Returns number of item rows only
+  static Standard_EXPORT int RowCountWithoutProperties (const TreeModel_ItemBasePtr& theItem);
+
+
 protected:
 
   //! \param theParent the parent item
   //! \param theRow the item row positition in the parent item
   //! \param theColumn the item column positition in the parent item
   Standard_EXPORT TreeModel_ItemBase (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn);
+
+  //! Initialize the current item. It creates a backup of the specific item information
+  virtual void initItem() const {}
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position
@@ -156,7 +184,7 @@ protected:
   //! Return data value for the role. It should be reimplemented in child
   //! \param theItemRole a value role
   //! \return the value
-  virtual QVariant initValue (const int theItemRole) const = 0;
+  Standard_EXPORT virtual QVariant initValue (const int theItemRole) const;
 
 private:
 
@@ -168,6 +196,8 @@ private:
   int m_iRow;          //!< the item row position in the parent item
   int m_iColumn;       //!< the item column position in the parent item
   bool m_bInitialized; //!< the state whether the item content is already initialized
+
+  Handle(TreeModel_ItemProperties) myProperties; //!< item properties
 };
 
 //! Returns an explicitly shared pointer to the pointer held by other, using a

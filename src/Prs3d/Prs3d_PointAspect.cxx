@@ -14,6 +14,8 @@
 
 #include <Prs3d_PointAspect.hxx>
 
+#include <TCollection.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_PointAspect, Prs3d_BasicAspect)
 
 // =======================================================================
@@ -40,3 +42,22 @@ Prs3d_PointAspect::Prs3d_PointAspect (const Quantity_Color& theColor,
 {
   //
 }
+
+const TCollection_AsciiString Prs3d_PointAspect_ClassName = "Prs3d_PointAspect";
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Prs3d_PointAspect::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, Prs3d_PointAspect_ClassName);
+  {
+    Standard_SStream aTmpStream;
+    myAspect->Dump (aTmpStream);
+    DUMP_VALUES (OS, "Aspect", TCollection::ToDumpString (aTmpStream));
+  }
+
+  DUMP_STOP_KEY (OS, Prs3d_PointAspect_ClassName);
+}
+

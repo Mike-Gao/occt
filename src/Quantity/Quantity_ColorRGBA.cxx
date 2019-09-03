@@ -16,6 +16,7 @@
 #include <Quantity_ColorRGBA.hxx>
 
 #include <Graphic3d_Vec4.hxx>
+#include <TCollection.hxx>
 
 #include <algorithm>
 
@@ -197,4 +198,25 @@ bool Quantity_ColorRGBA::ColorFromHex (const char* const   theHexColorString,
   const ColorInteger THE_HEX_COLOR_COMPONENT_SHORT_BASE = 1 << 4;
   const ColorInteger aColorComponentBase = isShort ? THE_HEX_COLOR_COMPONENT_SHORT_BASE : THE_HEX_COLOR_COMPONENT_BASE;
   return convertIntegerToColorRGBA (aHexColorInteger, aColorComponentBase, hasAlphaComponent, theColor);
+}
+
+const TCollection_AsciiString Quantity_ColorRGBA_ClassName = "Quantity_ColorRGBA";
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Quantity_ColorRGBA::Dump (Standard_OStream& OS) const
+{
+  DUMP_START_KEY (OS, Quantity_ColorRGBA_ClassName);
+
+  DUMP_VALUES (OS, "Alpha", Alpha());
+  {
+    Standard_SStream aTmpStream;
+    myRgb.Dump (aTmpStream);
+    DUMP_VALUES (OS, "RGB", TCollection::ToDumpString (aTmpStream));
+  }
+
+  DUMP_STOP_KEY (OS, Quantity_ColorRGBA_ClassName);
 }

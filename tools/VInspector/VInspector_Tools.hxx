@@ -17,6 +17,12 @@
 #define VInspector_Tools_H
 
 #include <AIS_InteractiveContext.hxx>
+#include <Bnd_Box.hxx>
+#include <Bnd_OBB.hxx>
+#include <Graphic3d_Buffer.hxx>
+#include <Graphic3d_Mat4.hxx>
+#include <Graphic3d_Mat4d.hxx>
+#include <Select3D_BndBox3d.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <Standard.hxx>
 #include <TCollection_AsciiString.hxx>
@@ -26,12 +32,23 @@
 #include <TopoDS_Shape.hxx>
 
 #include <inspector/VInspector_CallBackMode.hxx>
+#include <inspector/View_DisplayActionType.hxx>
 #include <inspector/VInspector_SelectionType.hxx>
+
+#include <inspector/ViewControl_PaneCreator.hxx>
+
+#include <inspector/TreeModel_ItemBase.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QList>
 #include <QVariant>
 #include <Standard_WarningsRestore.hxx>
+
+class ViewControl_TableModelValues;
+
+class Graphic3d_IndexBuffer;
+class Graphic3d_Buffer;
+class Graphic3d_BoundBuffer;
 
 //! \class VInspector_Tools
 //! The class that gives auxiliary methods for Visualization elements manipulation
@@ -50,7 +67,7 @@ public:
   //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
   //! \return the string value 
   Standard_EXPORT static TCollection_AsciiString GetPointerInfo (const Handle(Standard_Transient)& thePointer,
-                                                                 const bool isShortInfo);
+                                                                 const bool isShortInfo = true);
 
   //! Returns number of selected owners for presentation
   //! \param theContext an interactive context
@@ -65,27 +82,27 @@ public:
   //! \param theOwner a selectable owner
   //! \return boolean value
   Standard_EXPORT static bool IsOwnerSelected (const Handle(AIS_InteractiveContext)& theContext,
-                                               const Handle(SelectMgr_EntityOwner)& theOwner);
+                                               const Handle(SelectBasics_EntityOwner)& theOwner);
 
   //! Returns all owners present in the context
   //! \param theContext an interactive context
   //! \return container of owners
-  Standard_EXPORT static NCollection_List<Handle(SelectMgr_EntityOwner)> ContextOwners (
+  Standard_EXPORT static NCollection_List<Handle(SelectBasics_EntityOwner)> ContextOwners (
                                                  const Handle(AIS_InteractiveContext)& theContext);
 
   //! Returns active owners in main selector of context
   //! \param theContext an interactive context
   //! \param theEmptySelectableOwners container of owners with NULL presentation or not displayed presentation
   //! \return container of owners
-  Standard_EXPORT static NCollection_List<Handle(SelectMgr_EntityOwner)> ActiveOwners (
+  Standard_EXPORT static NCollection_List<Handle(SelectBasics_EntityOwner)> ActiveOwners (
                             const Handle(AIS_InteractiveContext)& theContext,
-                            NCollection_List<Handle(SelectMgr_EntityOwner)>& theEmptySelectableOwners);
+                            NCollection_List<Handle(SelectBasics_EntityOwner)>& theEmptySelectableOwners);
 
   //! Unhighlight selected, set selected the owners
   //! \param theContext an interactive context
   //! \param theOwners a container of owners
   Standard_EXPORT static void AddOrRemoveSelectedShapes (const Handle(AIS_InteractiveContext)& theContext,
-                                         const NCollection_List<Handle(SelectMgr_EntityOwner)>& theOwners);
+                                         const NCollection_List<Handle(SelectBasics_EntityOwner)>& theOwners);
 
   //! Unhighlight selected, set selected presentations
   //! \param theContext an interactive context
@@ -128,15 +145,77 @@ public:
   //! \return text value
   Standard_EXPORT static TCollection_AsciiString OrientationToName (const TopAbs_Orientation& theOrientation);
 
-  //! Returns text of orientation
-  //! \param theLocation a location value
-  //! \return text value
-  Standard_EXPORT static TCollection_AsciiString LocationToName (const TopLoc_Location& theLocation);
-
   //! Read Shape using BREP reader
   //! \param theFileName a file name
   //! \return shape or NULL
   Standard_EXPORT static TopoDS_Shape ReadShape (const TCollection_AsciiString& theFileName);
+
+  //! Fills container of table values
+  //! \param theAlert a message alert
+  //! \param theTableValue container of values
+  Standard_EXPORT static void GetPropertyTableValues (const TreeModel_ItemBasePtr& theItem,
+                                                      const NCollection_List<Handle(ViewControl_PaneCreator)>& theCreators,
+                                                      QList<ViewControl_TableModelValues*>& theTableValues);
+
+  //! Returns the string name for a given type.
+  //! @param theType action type
+  //! @return string identifier from the display action type
+  Standard_EXPORT static Standard_CString DisplayActionTypeToString (View_DisplayActionType theType);
+
+  //! Returns the enumeration type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @return string identifier from the display action type
+  static View_DisplayActionType DisplayActionTypeFromString (Standard_CString theTypeString)
+  {
+    View_DisplayActionType aType = View_DisplayActionType_NoneId;
+    DisplayActionTypeFromString (theTypeString, aType);
+    return aType;
+  }
+
+  //! Determines the enumeration type from the given string identifier (using case-insensitive comparison).
+  //! @param theTypeString string identifier
+  //! @param theType detected action type
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean DisplayActionTypeFromString (const Standard_CString theTypeString,
+                                                                       View_DisplayActionType& theType);
+
+  //! Build string presentation of bounding box information in form: (xmin, ymin, zmin), (xmax, ymax, zmax)
+  //! \param theBoundingBox bounding box
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Select3D_BndBox3d& theBoundingBox);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static TopoDS_Shape CreateShape (const Select3D_BndBox3d& theBoundingBox);
+
+  //! Build string presentation of Graphic3D index buffer
+  //! \param theIndexBuffer index buffer
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Handle(Graphic3d_IndexBuffer)& theIndexBuffer);
+
+  //! Build string presentation of Graphic3D buffer
+  //! \param theBuffer index buffer
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Handle(Graphic3d_Buffer)& theBuffer);
+
+  //! Build string presentation of Graphic3D bound buffer
+  //! \param theBoundBuffer index buffer
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Handle(Graphic3d_BoundBuffer)& theBoundBuffer);
+
+  //! Convert matrix values into a text presentation
+  //! \param theMatrix a matrix of elements
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Graphic3d_Mat4d& theMatrix);
+
+  //! Convert matrix values into a text presentation
+  //! \param theMatrix a matrix of elements
+  //! \return string presentation
+  Standard_EXPORT static QVariant ToVariant (const Graphic3d_Mat4& theMatrix);
+
+  Standard_EXPORT static QString ToString (const Graphic3d_Attribute& theAttribute);
+
 };
 
 #endif

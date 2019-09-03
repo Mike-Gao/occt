@@ -109,6 +109,9 @@ public:
   //!   depth which is used to choose among objects of the same priority.
   void SetPickClosest (const Standard_Boolean theToPreferClosest) { preferclosest = theToPreferClosest; }
 
+  //! Return preference of selecting one object for OnePicked() method
+  Standard_Boolean IsPickClosest() const { return preferclosest; }
+
   //! Returns the number of detected owners.
   Standard_Integer NbPicked() const { return mystored.Extent(); }
 
@@ -201,6 +204,12 @@ public:
   //! Returns instance of selecting volume manager of the viewer selector
   SelectMgr_SelectingVolumeManager& GetManager() { return mySelectingVolumeMgr; }
 
+  //! Returns container of selectable objects
+  const SelectMgr_SelectableObjectSet& GetSelectableObjects() const { return mySelectableObjects; }
+
+  //! Returns container of sensitives
+  const SelectMgr_MapOfObjectSensitives&  GetObjectSensitives() const { return myMapOfObjectSensitives; }
+
   //! Marks all added sensitive entities of all objects as non-selectable
   Standard_EXPORT void ResetSelectionActivationStatus();
 
@@ -208,6 +217,9 @@ public:
   //! If theIsToAllow is false, only fully included sensitives will be detected, otherwise the algorithm will
   //! mark both included and overlapped entities as matched
   Standard_EXPORT void AllowOverlapDetection (const Standard_Boolean theIsToAllow);
+
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
 
 public:
 

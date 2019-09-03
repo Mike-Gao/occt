@@ -25,6 +25,7 @@
 #include <Standard_Boolean.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_OStream.hxx>
+
 class Standard_NoSuchObject;
 class Standard_ConstructionError;
 class gp_Trsf;
@@ -142,6 +143,9 @@ Standard_Boolean operator != (const TopLoc_Location& Other) const
   return IsDifferent(Other);
 }
   
+  //! Dumps the content of me on the stream <OS>.
+  Standard_EXPORT void Dump (Standard_OStream& OS) const;
+
   //! Prints the contents of <me> on the stream <s>.
   Standard_EXPORT void ShallowDump (Standard_OStream& S) const;
 

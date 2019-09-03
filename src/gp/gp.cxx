@@ -22,6 +22,17 @@
 #include <gp_Pnt.hxx>
 #include <gp_Pnt2d.hxx>
 
+#include <TCollection_AsciiString.hxx>
+
+namespace
+{
+  static Standard_CString gp_Table_PrintTrsfForm[9] =
+  {
+    "IDENTITY", "ROTATION", "TRANSLATION", "PNTMIRROR", "AX1MIRROR", "AX2MIRROR",
+    "SCALE", "COMPOUNDSTRSF", "OTHER2"
+  };
+}
+
 //=======================================================================
 //function : Origin
 //purpose  : 
@@ -186,3 +197,32 @@ const gp_Ax2d&  gp::OY2d()
   return gp_OY2d;
 }
 
+//=======================================================================
+//function : TypeOfTrsfFormToString
+//purpose  :
+//=======================================================================
+Standard_CString gp::TrsfFormToString (gp_TrsfForm theType)
+{
+  return gp_Table_PrintTrsfForm[theType];
+}
+
+//=======================================================================
+//function : TrsfFormFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean gp::TrsfFormFromString (Standard_CString theTypeString,
+                                         gp_TrsfForm& theType)
+{
+  TCollection_AsciiString aName (theTypeString);
+  aName.UpperCase();
+  for (Standard_Integer aTypeIter = gp_Identity; aTypeIter <= gp_Other; ++aTypeIter)
+  {
+    Standard_CString aTypeName = gp_Table_PrintTrsfForm[aTypeIter];
+    if (aName == aTypeName)
+    {
+      theType = gp_TrsfForm (aTypeIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
