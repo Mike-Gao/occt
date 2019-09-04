@@ -86,7 +86,27 @@ void AIS_InteractiveContext::highlightWithColor (const Handle(SelectMgr_EntityOw
 void AIS_InteractiveContext::highlightSelected (const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   AIS_NListOfEntityOwner anOwners;
-  anOwners.Append (theOwner);
+  const Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (theOwner->Selectable());
+  if (anObj.IsNull())
+  {
+    return;
+  }
+
+  if (!theOwner->IsAutoHilight())
+  {
+    SelectMgr_SequenceOfOwner aSeq;
+    for (AIS_NListOfEntityOwner::Iterator aSelIter (mySelection->Objects()); aSelIter.More(); aSelIter.Next())
+    {
+      if (aSelIter.Value()->IsSameSelectable (anObj))
+      {
+        anOwners.Append (aSelIter.Value());
+      }
+    }
+  }
+  else
+  {
+    anOwners.Append (theOwner);
+  }
   highlightOwners (anOwners, Standard_False/*check if it is really important*/);
 }
 
@@ -114,7 +134,21 @@ void AIS_InteractiveContext::highlightGlobal (const Handle(AIS_InteractiveObject
   }
 
   AIS_NListOfEntityOwner anOwners;
-  anOwners.Append (aGlobOwner);
+  if (!aGlobOwner->IsAutoHilight())
+  {
+    SelectMgr_SequenceOfOwner aSeq;
+    for (AIS_NListOfEntityOwner::Iterator aSelIter (mySelection->Objects()); aSelIter.More(); aSelIter.Next())
+    {
+      if (aSelIter.Value()->IsSameSelectable (theObj))
+      {
+        anOwners.Append (aSelIter.Value());
+      }
+    }
+  }
+  else
+  {
+    anOwners.Append (aGlobOwner);
+  }
   highlightOwners (anOwners, Standard_True);
 }
 
