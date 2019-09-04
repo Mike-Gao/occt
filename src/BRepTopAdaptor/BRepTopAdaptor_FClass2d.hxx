@@ -27,9 +27,11 @@
 #include <TopoDS_Face.hxx>
 #include <TopAbs_State.hxx>
 #include <Standard_Boolean.hxx>
+#include <BRepClass_FaceExplorer.hxx>
+#include <memory>
+
 class TopoDS_Face;
 class gp_Pnt2d;
-
 
 
 class BRepTopAdaptor_FClass2d 
@@ -43,7 +45,9 @@ public:
   
   Standard_EXPORT TopAbs_State PerformInfinitePoint() const;
   
-  Standard_EXPORT TopAbs_State Perform (const gp_Pnt2d& Puv, const Standard_Boolean RecadreOnPeriodic = Standard_True) const;
+  Standard_EXPORT TopAbs_State Perform (const gp_Pnt2d& Puv,
+                                        const Standard_Boolean RecadreOnPeriodic = Standard_True,
+                                        const Standard_Boolean theUseFTolForOnCheck = Standard_False) const;
   
   Standard_EXPORT void Destroy();
 ~BRepTopAdaptor_FClass2d()
@@ -62,7 +66,12 @@ const BRepTopAdaptor_FClass2d& operator= (const BRepTopAdaptor_FClass2d& Other) 
   //! (Caution: Internal use . see the code for more details)
   Standard_EXPORT TopAbs_State TestOnRestriction (const gp_Pnt2d& Puv, const Standard_Real Tol, const Standard_Boolean RecadreOnPeriodic = Standard_True) const;
 
+  //! Returns FaceExplorer for myFace
+  Standard_EXPORT BRepClass_FaceExplorer& FExplorer() const;
 
+  //! Classifies the point by geometrical classifier
+  Standard_EXPORT TopAbs_State ClassifyByInter (const gp_Pnt2d& thePnt,
+                                                const Standard_Real theTolUV) const;
 
 
 protected:
@@ -88,13 +97,16 @@ private:
   Standard_Real Vmin;
   Standard_Real Vmax;
 
+#ifdef _MSC_VER
+#if _MSC_VER < 1600
+  mutable std::auto_ptr<BRepClass_FaceExplorer> myFExplorer;
+#else
+  mutable std::unique_ptr<BRepClass_FaceExplorer> myFExplorer;
+#endif
+#else
+  mutable std::unique_ptr<BRepClass_FaceExplorer> myFExplorer;
+#endif
 
 };
-
-
-
-
-
-
 
 #endif // _BRepTopAdaptor_FClass2d_HeaderFile

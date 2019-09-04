@@ -27,6 +27,7 @@
 #include <Standard_Real.hxx>
 #include <Standard_Boolean.hxx>
 #include <TopAbs_Orientation.hxx>
+#include <BVH_BoxSet.hxx>
 class TopoDS_Face;
 class gp_Pnt2d;
 class gp_Lin2d;
@@ -94,7 +95,18 @@ public:
   //! Current edge in current wire and its orientation.
   Standard_EXPORT void CurrentEdge (BRepClass_Edge& E, TopAbs_Orientation& Or) const;
 
+  //! Returns the cached BVH_BoxSet.
+  //! @param toBuild controls if the set should be constructed if it is null
+  Standard_EXPORT const opencascade::handle<BVH_BoxSet<Standard_Real, 3, TopoDS_Shape>>&
+    BVHBoxSet (Standard_Boolean toBuild = Standard_True) const;
 
+  //! Checks the On status of a point evaluated from surface for the face using the
+  //! real tolerances of the sub-shapes of the face
+  Standard_EXPORT Standard_Boolean IsPointOnFace (const gp_Pnt2d& thePoint) const;
+
+  //! Checks the On status of a point for the face using the
+  //! real tolerances of the sub-shapes of the face
+  Standard_EXPORT Standard_Boolean IsPointOnFace (const gp_Pnt& thePoint) const;
 
 
 protected:
@@ -117,6 +129,8 @@ private:
   Standard_Real myUMax;
   Standard_Real myVMin;
   Standard_Real myVMax;
+
+  mutable opencascade::handle <BVH_BoxSet<Standard_Real, 3, TopoDS_Shape>> myBVHSet;
 };
 
 

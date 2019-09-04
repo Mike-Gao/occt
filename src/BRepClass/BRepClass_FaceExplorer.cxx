@@ -27,10 +27,133 @@
 #include <Precision.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS_Edge.hxx>
 
 static const Standard_Real Probing_Start = 0.123;
 static const Standard_Real Probing_End = 0.7;
 static const Standard_Real Probing_Step = 0.2111;
+
+//=======================================================================
+//function : BRepClass_FExp_DistanceTool
+//purpose  : Tool for checking the ON status of a point for the face
+//           using the real tolerances of sub-shapes of the latter.
+//=======================================================================
+#include <BVH_BoxSet.hxx>
+#include <BVH_Distance.hxx>
+#include <BVH_Tools.hxx>
+#include <BVH_LinearBuilder.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <BRepBndLib.hxx>
+#include <TopExp.hxx>
+#include <Bnd_Box.hxx>
+#include <Bnd_Tools.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <BndLib_Add3dCurve.hxx>
+
+class BRepClass_FExp_DistanceTool:
+  public BVH_Distance <Standard_Real, 3, NCollection_Vec3<Standard_Real>,
+                       BVH_BoxSet<Standard_Real, 3, TopoDS_Shape> >
+{
+public:
+
+  //! Empty constructor
+  BRepClass_FExp_DistanceTool()
+    : BVH_Distance <Standard_Real, 3, NCollection_Vec3<Standard_Real>, BVH_BoxSet<Standard_Real, 3, TopoDS_Shape>>()
+  {
+  }
+
+public: //! @name Setters
+
+  void SetPoint (const gp_Pnt& thePoint)
+  {
+    SetObject (NCollection_Vec3<Standard_Real> (thePoint.X(), thePoint.Y(), thePoint.Z()));
+  }
+
+public: //! @name Setters
+
+  const TopoDS_Shape& GetOnShape() const
+  {
+    return myOnShape;
+  }
+
+public: //! @name Clearing the results
+
+    //! Returns the flag controlling the tree descend
+  virtual void Clear() Standard_OVERRIDE
+  {
+    myDistance = 0.0;
+    myIsDone = Standard_False;
+    myOnShape.Nullify();
+  }
+
+public: //! @name Definition of the rules for tree descend
+
+  // Computes the distance from the point to bounding box 
+  virtual Standard_Boolean RejectNode (const BVH_Vec3d& theCMin,
+                                       const BVH_Vec3d& theCMax,
+                                       Standard_Real& theDistance) const Standard_OVERRIDE
+  {
+    theDistance = BVH_Tools<Standard_Real, 3>::PointBoxSquareDistance (myObject, theCMin, theCMax);
+    return RejectMetric (theDistance);
+  }
+
+  // Computes the distance from the point to triangle
+  virtual Standard_Boolean Accept (const Standard_Integer theIndex,
+                                   const Standard_Real&) Standard_OVERRIDE
+  {
+    if (myBVHSet->Box (theIndex).IsOut (myObject))
+      return Standard_False;
+
+    // Get the shape
+    const TopoDS_Shape& aS = myBVHSet->Element (theIndex);
+
+    if (aS.ShapeType() == TopAbs_VERTEX)
+    {
+      const TopoDS_Vertex& aV = TopoDS::Vertex (aS);
+      gp_XYZ aP = BRep_Tool::Pnt (aV).XYZ();
+      Standard_Real aTolV = BRep_Tool::Tolerance (aV);
+      Standard_Real aSqTol = aTolV * aTolV;
+
+      Standard_Real aSqDist = (aP - gp_XYZ (myObject.x(), myObject.y(), myObject.z())).SquareModulus();
+      if (aSqDist <= aSqTol)
+      {
+        myOnShape = aS;
+        return Standard_True;
+      }
+    }
+    else if (aS.ShapeType() == TopAbs_EDGE)
+    {
+      const TopoDS_Edge& aE = TopoDS::Edge (aS);
+      Standard_Real aFirst, aLast;
+      const Handle (Geom_Curve)& aC = BRep_Tool::Curve (aE, aFirst, aLast);
+      if (aC.IsNull())
+        return Standard_False;
+
+      GeomAPI_ProjectPointOnCurve aProjPC
+        (gp_Pnt (myObject.x(), myObject.y(), myObject.z()), aC, aFirst, aLast);
+      if (aProjPC.NbPoints() > 0)
+      {
+        if (aProjPC.LowerDistance() < BRep_Tool::Tolerance (aE))
+        {
+          myOnShape = aS;
+          return Standard_True;
+        }
+      }
+    }
+    return Standard_False;
+  }
+
+  //! Returns the flag controlling the tree descend
+  virtual Standard_Boolean Stop() const Standard_OVERRIDE
+  {
+    return !myOnShape.IsNull();
+  }
+
+private: //! @name Fields
+
+  TopoDS_Shape myOnShape;
+};
 
 //=======================================================================
 //function : BRepClass_FaceExplorer
@@ -296,3 +419,68 @@ void  BRepClass_FaceExplorer::CurrentEdge(BRepClass_Edge& E,
   Or = E.Edge().Orientation();
 }
 
+//=======================================================================
+//function : IsPointOnFace
+//purpose  : 
+//=======================================================================
+const opencascade::handle<BVH_BoxSet<Standard_Real, 3, TopoDS_Shape>>& 
+  BRepClass_FaceExplorer::BVHBoxSet (Standard_Boolean toBuild) const
+{
+  if (toBuild && myBVHSet.IsNull())
+  {
+    myBVHSet = new BVH_BoxSet<Standard_Real, 3, TopoDS_Shape> (new BVH_LinearBuilder<Standard_Real, 3>());
+
+    for (TopExp_Explorer anExpV (myFace, TopAbs_VERTEX); anExpV.More(); anExpV.Next())
+    {
+      const TopoDS_Vertex& aV = TopoDS::Vertex (anExpV.Current());
+      const TopAbs_Orientation aVOri = aV.Orientation();
+      if (aVOri == TopAbs_FORWARD || aVOri == TopAbs_REVERSED)
+      {
+        Bnd_Box aBox;
+        aBox.Add (BRep_Tool::Pnt (aV));
+        aBox.Enlarge (BRep_Tool::Tolerance (aV));
+        myBVHSet->Add (anExpV.Current(), Bnd_Tools::Bnd2BVH (aBox));
+      }
+    }
+
+    for (TopExp_Explorer anExpE (myFace, TopAbs_EDGE); anExpE.More(); anExpE.Next())
+    {
+      const TopoDS_Edge& aE = TopoDS::Edge (anExpE.Current());
+      const TopAbs_Orientation aEOri = aE.Orientation();
+      if (aEOri == TopAbs_FORWARD || aEOri == TopAbs_REVERSED)
+      {
+        BRepAdaptor_Curve aBAC (aE);
+        Bnd_Box aBox;
+        BndLib_Add3dCurve::Add (aBAC, aBAC.Tolerance(), aBox);
+        myBVHSet->Add (anExpE.Current(), Bnd_Tools::Bnd2BVH (aBox));
+      }
+    }
+    myBVHSet->Build();
+  }
+  return myBVHSet;
+}
+
+
+//=======================================================================
+//function : IsPointOnFace
+//purpose  : 
+//=======================================================================
+Standard_Boolean BRepClass_FaceExplorer::IsPointOnFace (const gp_Pnt2d& thePoint) const
+{
+  const Handle (Geom_Surface)& aSurface = BRep_Tool::Surface (myFace);
+  gp_Pnt aP3d = aSurface->Value (thePoint.X(), thePoint.Y());
+  return IsPointOnFace (aP3d);
+}
+
+//=======================================================================
+//function : IsPointOnFace
+//purpose  : 
+//=======================================================================
+Standard_Boolean BRepClass_FaceExplorer::IsPointOnFace (const gp_Pnt& thePoint) const
+{
+  BRepClass_FExp_DistanceTool aDistTool;
+  aDistTool.SetBVHSet (BVHBoxSet().get());
+  aDistTool.SetPoint (thePoint);
+  aDistTool.ComputeDistance();
+  return aDistTool.IsDone();
+}

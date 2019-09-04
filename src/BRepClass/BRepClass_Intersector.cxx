@@ -26,6 +26,7 @@
 #include <Geom2d_Line.hxx>
 #include <Geom2dInt_GInter.hxx>
 #include <Geom2dLProp_CLProps2d.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <gp_Dir2d.hxx>
 #include <gp_Lin2d.hxx>
 #include <IntRes2d_Domain.hxx>
@@ -33,6 +34,7 @@
 #include <IntRes2d_Transition.hxx>
 #include <Precision.hxx>
 #include <TopExp.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
 
 static 
@@ -54,82 +56,74 @@ BRepClass_Intersector::BRepClass_Intersector()
 //function : Perform
 //purpose  : 
 //=======================================================================
-void  BRepClass_Intersector::Perform(const gp_Lin2d& L, 
-                                     const Standard_Real P, 
-                                     const Standard_Real Tol, 
-                                     const BRepClass_Edge& E)
+void  BRepClass_Intersector::Perform (const gp_Lin2d& L, 
+                                      const Standard_Real P, 
+                                      const Standard_Real Tol, 
+                                      const BRepClass_Edge& E)
 {
-  Standard_Real deb = 0.0, fin = 0.0, aTolZ = Tol;
-  Handle(Geom2d_Curve) aC2D;
-  //
-  const TopoDS_Edge& EE = E.Edge();
-  const TopoDS_Face& F = E.Face();
+  const TopoDS_Edge& anEdge = E.Edge();
+  const TopoDS_Face& aFace  = E.Face();
 
-  //
-  aC2D=BRep_Tool::CurveOnSurface(EE, F, deb, fin);
-  if (aC2D.IsNull()) {
-    done = Standard_False; // !IsDone()
+  Standard_Real aFirst, aLast;
+  Handle (Geom2d_Curve) aC2D = BRep_Tool::CurveOnSurface (anEdge, aFace, aFirst, aLast);
+  if (aC2D.IsNull())
+  {
+    done = Standard_False;
     return;
   }
-  //
-  Geom2dAdaptor_Curve C(aC2D, deb, fin);
-  //
-  deb = C.FirstParameter();
-  fin = C.LastParameter();
-  //
-  // Case of "ON": direct check of belonging to edge
-  // taking into account the tolerance
-  Extrema_ExtPC2d anExtPC2d(L.Location(), C);
-  Standard_Real MinDist = RealLast(), aDist;
-  Standard_Integer MinInd = 0, i;
-  if (anExtPC2d.IsDone())
+
+  Geom2dAdaptor_Curve C (aC2D, aFirst, aLast);
   {
-    const Standard_Integer aNbPnts = anExtPC2d.NbExt();
-    for (i = 1; i <= aNbPnts; ++i)
+    Extrema_ExtPC2d anExtPC2d (L.Location(), C);
+    Standard_Real MinDist = RealLast(), aDist;
+    Standard_Integer MinInd = 0, i;
+    if (anExtPC2d.IsDone())
     {
-      aDist = anExtPC2d.SquareDistance(i);
-
-      if (aDist < MinDist)
+      const Standard_Integer aNbPnts = anExtPC2d.NbExt();
+      for (i = 1; i <= aNbPnts; ++i)
       {
-        MinDist = aDist;
-        MinInd = i;
+        aDist = anExtPC2d.SquareDistance(i);
+        if (aDist < MinDist)
+        {
+          MinDist = aDist;
+          MinInd = i;
+        }
+      }
+    }
+
+    if (MinInd)
+      MinDist = sqrt (MinDist);
+
+    if (MinDist <= Tol)
+    {
+      gp_Pnt2d aPnt = (anExtPC2d.Point (MinInd)).Value();
+      Standard_Real aPar = (anExtPC2d.Point (MinInd)).Parameter();
+
+      Standard_Real aTolZ = Tol;
+      RefineTolerance (aFace, C, aPar, aTolZ);
+
+      if (MinDist <= aTolZ)
+      {
+        IntRes2d_Position aPosOnCurve = IntRes2d_Middle;
+        if (Abs (aPar - aFirst) <= Tol)
+          aPosOnCurve = IntRes2d_Head;
+        else if (Abs (aPar - aLast) <= Tol)
+          aPosOnCurve = IntRes2d_End;
+
+        IntRes2d_IntersectionPoint pnt_inter (aPnt, 0., aPar,
+                                              IntRes2d_Transition (IntRes2d_Head), 
+                                              IntRes2d_Transition (aPosOnCurve),
+                                              Standard_False);
+        Append (pnt_inter);
+        done = Standard_True;
+        return;
       }
     }
   }
 
-  if (MinInd) {
-    MinDist = sqrt(MinDist);
-  }
-  if (MinDist <= aTolZ) {
-    gp_Pnt2d pnt_exact = (anExtPC2d.Point(MinInd)).Value();
-    Standard_Real par = (anExtPC2d.Point(MinInd)).Parameter();
-    //
-    RefineTolerance(F, C, par, aTolZ);
-    //
-    if (MinDist <= aTolZ) {
-      IntRes2d_Transition tr_on_lin(IntRes2d_Head);
-      IntRes2d_Position pos_on_curve = IntRes2d_Middle;
-      if (Abs(par - deb) <= Precision::Confusion()) {
-        pos_on_curve = IntRes2d_Head;
-      }
-      else if (Abs(par - fin) <= Precision::Confusion()) {
-        pos_on_curve = IntRes2d_End;
-      }
-      //
-      IntRes2d_Transition tr_on_curve(pos_on_curve);
-      IntRes2d_IntersectionPoint pnt_inter(pnt_exact, 0., par,
-        tr_on_lin, tr_on_curve, 
-        Standard_False);
-      //
-      Append(pnt_inter);
-      done = Standard_True;
-      return;
-    }
-  }
-  //  
-  gp_Pnt2d pdeb,pfin;
-  C.D0(deb,pdeb);
-  C.D0(fin,pfin);
+  // Intersection of the edge with the line
+  gp_Pnt2d aPFirst = C.Value (aFirst),
+           aPLast  = C.Value (aLast);
 
   IntRes2d_Domain DL;
   if (P != RealLast())
@@ -138,7 +132,7 @@ void  BRepClass_Intersector::Perform(const gp_Lin2d& L,
   else
     DL.SetValues (L.Location(), 0., Precision::PConfusion(), Standard_True);
 
-  IntRes2d_Domain DE (pdeb, deb, Tol, pfin, fin, Tol);
+  IntRes2d_Domain DE (aPFirst, aFirst, Tol, aPLast, aLast, Tol);
   // temporary periodic domain
   if (C.Curve()->IsPeriodic()) {
     DE.SetEquivalentParameters(C.FirstParameter(),

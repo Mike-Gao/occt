@@ -23,7 +23,8 @@
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Curve2d.hxx>
 #include <BRepAdaptor_HSurface.hxx>
-#include <BRepClass_FaceClassifier.hxx>
+#include <BRepClass_FaceExplorer.hxx>
+#include <BRepClass_FClassifier.hxx>
 #include <BRepTools_WireExplorer.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <CSLib_Class2d.hxx>
@@ -486,12 +487,20 @@ TopAbs_State BRepTopAdaptor_FClass2d::PerformInfinitePoint() const {
   return(Perform(P,Standard_False));
 }
 
-TopAbs_State BRepTopAdaptor_FClass2d::Perform(const gp_Pnt2d& _Puv,
-					      const Standard_Boolean RecadreOnPeriodic) const
+TopAbs_State BRepTopAdaptor_FClass2d::Perform (const gp_Pnt2d& _Puv,
+					                                     const Standard_Boolean RecadreOnPeriodic,
+                                               const Standard_Boolean theUseFTolForOnCheck) const
 { 
 #if LBRCOMPT 
   STAT.NbPerform++;
 #endif
+
+  if (theUseFTolForOnCheck)
+  {
+    if (FExplorer().IsPointOnFace (_Puv))
+      return TopAbs_ON;
+  }
+
   
   Standard_Integer dedans;
   Standard_Integer nbtabclass = TabClass.Length();
@@ -568,11 +577,8 @@ TopAbs_State BRepTopAdaptor_FClass2d::Perform(const gp_Pnt2d& _Puv,
 	  }
 	}
 	if(dedans==0) { 
-	  BRepClass_FaceClassifier aClassifier;
 	  Standard_Real m_Toluv = (Toluv > 4.0) ? 4.0 : Toluv;
-	  //aClassifier.Perform(Face,Puv,Toluv);
-	  aClassifier.Perform(Face,Puv,m_Toluv);
-	  aStatus = aClassifier.State();
+	  aStatus = ClassifyByInter (Puv, m_Toluv);
 	}
 	if(dedans == 1) { 
 	  aStatus = TopAbs_IN;
@@ -582,9 +588,7 @@ TopAbs_State BRepTopAdaptor_FClass2d::Perform(const gp_Pnt2d& _Puv,
 	}
       }
       else {  //-- TabOrien(1)=-1    False Wire
-	BRepClass_FaceClassifier aClassifier;
-	aClassifier.Perform(Face,Puv,Toluv);
-	aStatus = aClassifier.State();
+	aStatus = ClassifyByInter (Puv, Toluv);
       }
 
       if (!RecadreOnPeriodic || (!IsUPer && !IsVPer))
@@ -712,9 +716,7 @@ TopAbs_State BRepTopAdaptor_FClass2d::TestOnRestriction(const gp_Pnt2d& _Puv,
 	}
       }
       else {  //-- TabOrien(1)=-1    False Wire
-	BRepClass_FaceClassifier aClassifier;
-	aClassifier.Perform(Face,Puv,Tol);
-	aStatus = aClassifier.State();
+	aStatus = ClassifyByInter (Puv, Tol);
       }
       
       if (!RecadreOnPeriodic || (!IsUPer && !IsVPer))
@@ -749,6 +751,24 @@ TopAbs_State BRepTopAdaptor_FClass2d::TestOnRestriction(const gp_Pnt2d& _Puv,
     } //for (;;)
 }
 
+//=======================================================================
+//function : FExplorer
+//purpose  : 
+//=======================================================================
+BRepClass_FaceExplorer& BRepTopAdaptor_FClass2d::FExplorer() const
+{
+  if (myFExplorer.get() == NULL)
+    myFExplorer.reset (new BRepClass_FaceExplorer (Face));
+  return *myFExplorer;
+}
+
+TopAbs_State BRepTopAdaptor_FClass2d::ClassifyByInter (const gp_Pnt2d& thePnt,
+                                                       const Standard_Real theTolUV) const
+{
+  BRepClass_FClassifier aClassifier;
+  aClassifier.Perform (FExplorer(), thePnt, theTolUV);
+  return aClassifier.State();
+}
 
 void BRepTopAdaptor_FClass2d::Destroy() { 
 #if LBRCOMPT

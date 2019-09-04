@@ -53,6 +53,7 @@ public: //! @name Compute the distance
   //! Computes the distance between object and BVH tree
   NumType ComputeDistance()
   {
+    Clear();
     myIsDone = this->Select() > 0;
     return myDistance;
   }
@@ -64,6 +65,15 @@ public: //! @name Accessing the results
 
   //! Returns the computed distance
   NumType Distance() const { return myDistance; }
+
+public: //! @name Clearing the results
+
+  //! Clears the data
+  virtual void Clear()
+  {
+    myDistance = std::numeric_limits<NumType>::max();
+    myIsDone = Standard_False;
+  }
 
 public: //! @name Definition of the rules for tree descend
 

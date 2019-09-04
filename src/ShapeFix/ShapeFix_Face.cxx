@@ -1014,6 +1014,130 @@ Standard_Boolean ShapeFix_Face::FixOrientation()
   return FixOrientation(MapWires);
 }
 
+static TopAbs_State classifyWire (const TopoDS_Wire& theWire,
+                                  const Bnd_Box2d& aBox1,
+                                  const BRepTopAdaptor_FClass2d& theClassifier,
+                                  const TopAbs_State theInfPntState,
+                                  const TopTools_SequenceOfShape& theAllSubShapes,
+                                  const NCollection_Array1<Bnd_Box2d>& theWireBoxes,
+                                  const TopoDS_Face& theFace,
+                                  const Handle(ShapeAnalysis_Surface)& theSurf,
+                                  const Standard_Boolean theUClosed,
+                                  const Standard_Boolean theVClosed,
+                                  const Standard_Real theURange,
+                                  const Standard_Real theVRange,
+                                  TopTools_DataMapOfShapeInteger& theSI,
+                                  TopTools_ListOfShape& theIntWires,
+                                  const Standard_Boolean theUseToler)
+{
+  Standard_Boolean CheckShift = Standard_True;
+  TopAbs_State sta = TopAbs_OUT;
+  Standard_Integer aWireIt = 0;
+  const Standard_Integer nbAll = theAllSubShapes.Length();
+  for (Standard_Integer j = 1; j <= nbAll; j++)
+  {
+    aWireIt++;
+    //if(i==j) continue;
+    TopoDS_Shape aSh2 = theAllSubShapes.Value (j);
+    if (theWire == aSh2)
+      continue;
+    TopAbs_State stb = TopAbs_UNKNOWN;
+    if (aSh2.ShapeType () == TopAbs_VERTEX) {
+      aWireIt--;
+      gp_Pnt aP = BRep_Tool::Pnt (TopoDS::Vertex (aSh2));
+      gp_Pnt2d p2d = theSurf->ValueOfUV (aP, Precision::Confusion ());
+      stb = theClassifier.Perform (p2d, Standard_False, theUseToler);
+      if (stb == theInfPntState && (theUClosed || theVClosed)) {
+        gp_Pnt2d p2d1;
+        if (theUClosed) {
+          p2d1.SetCoord (p2d.X () + theURange, p2d.Y ());
+          stb = theClassifier.Perform (p2d1, Standard_False, theUseToler);
+        }
+        if (stb == theInfPntState && theVClosed) {
+          p2d1.SetCoord (p2d.X (), p2d.Y () + theVRange);
+          stb = theClassifier.Perform (p2d1, Standard_False, theUseToler);
+        }
+      }
+    }
+    else if (aSh2.ShapeType () == TopAbs_WIRE) {
+      CheckShift = Standard_True;
+      TopoDS_Wire bw = TopoDS::Wire (aSh2);
+      //Standard_Integer numin =0;
+      Bnd_Box2d aBox2 = theWireBoxes.Value (aWireIt);
+      if (aBox2.IsOut (aBox1))
+        continue;
+
+      TopoDS_Iterator ew (bw);
+      for (; ew.More (); ew.Next ()) {
+        TopoDS_Edge ed = TopoDS::Edge (ew.Value ());
+        Standard_Real cf, cl;
+        Handle (Geom2d_Curve) cw = BRep_Tool::CurveOnSurface (ed, theFace, cf, cl);
+        if (cw.IsNull ()) continue;
+        gp_Pnt2d unp = cw->Value ((cf + cl) / 2.);
+        TopAbs_State ste = theClassifier.Perform (unp, Standard_False, theUseToler);
+        std::cout << (ste == TopAbs_ON ? "ON" : (ste == TopAbs_IN ? "IN" : "OUT")) << std::endl;
+        if (ste == TopAbs_OUT || ste == TopAbs_IN) {
+          if (stb == TopAbs_UNKNOWN) {
+            stb = ste;
+          }
+          else {
+            if (!(stb == ste)) {
+              sta = TopAbs_UNKNOWN;
+              theSI.Bind (theWire, 0);
+              break;
+            }
+          }
+        }
+
+        Standard_Boolean found = Standard_False;
+        gp_Pnt2d unp1;
+        if (stb == theInfPntState && CheckShift) {
+          CheckShift = Standard_False;
+          if (theUClosed) {
+            unp1.SetCoord (unp.X () + theURange, unp.Y ());
+            found = (theInfPntState != theClassifier.Perform (unp1, Standard_False, theUseToler));
+            if (!found) {
+              unp1.SetX (unp.X () - theURange);
+              found = (theInfPntState != theClassifier.Perform (unp1, Standard_False, theUseToler));
+            }
+          }
+          if (theVClosed && !found) {
+            unp1.SetCoord (unp.X (), unp.Y () + theVRange);
+            found = (theInfPntState != theClassifier.Perform (unp1, Standard_False, theUseToler));
+            if (!found) {
+              unp1.SetY (unp.Y () - theVRange);
+              found = (theInfPntState != theClassifier.Perform (unp1, Standard_False, theUseToler));
+            }
+          }
+          // Additional check of diagonal steps for toroidal surfaces
+          if (!found && theUClosed && theVClosed)
+          {
+            for (Standard_Real dX = -1.0; dX <= 1.0 && !found; dX += 2.0)
+              for (Standard_Real dY = -1.0; dY <= 1.0 && !found; dY += 2.0)
+              {
+                unp1.SetCoord (unp.X () + theURange * dX, unp.Y () + theVRange * dY);
+                found = (theInfPntState != theClassifier.Perform (unp1, Standard_False, theUseToler));
+              }
+          }
+        }
+        if (found) {
+          if (stb == TopAbs_IN) stb = TopAbs_OUT;
+          else stb = TopAbs_IN;
+          Shift2dWire (bw, theFace, unp1.XY () - unp.XY (), theSurf);
+        }
+      }
+      if (ew.More())
+        break;
+    }
+    if (stb == theInfPntState) {
+      sta = TopAbs_IN;
+    }
+    else {
+      theIntWires.Append (aSh2);
+    }
+  }
+  return sta;
+}
 
 //=======================================================================
 //function : FixOrientation
@@ -1137,9 +1261,6 @@ Standard_Boolean ShapeFix_Face::FixOrientation(TopTools_DataMapOfShapeListOfShap
     TopTools_DataMapOfShapeListOfShape MW;
     TopTools_DataMapOfShapeInteger SI;
     TopTools_MapOfShape MapIntWires;
-    MW.Clear();
-    SI.Clear();
-    MapIntWires.Clear();
     Standard_Integer NbOuts=0;
     Standard_Integer i;
 
@@ -1192,120 +1313,148 @@ Standard_Boolean ShapeFix_Face::FixOrientation(TopTools_DataMapOfShapeListOfShap
       Bnd_Box2d aBox1 = aWireBoxes.Value(i);
       TopoDS_Shape dummy = myFace.EmptyCopied();
       TopoDS_Face af = TopoDS::Face ( dummy );
-//      B.MakeFace (af,mySurf->Surface(),::Precision::Confusion());
       af.Orientation ( TopAbs_FORWARD );
       B.Add (af,aw);
       // PTV OCC945 06.11.2002 files ie_exhaust-A.stp (entities 3782,  3787)
       // tolerance is too big. It is seems that to identify placement of 2d point
       // it is enough Precision::PConfusion(), cause wea re know that 2d point in TopAbs_ON
       // BRepTopAdaptor_FClass2d clas (af,toluv);
-      Standard_Boolean CheckShift = Standard_True;
       BRepTopAdaptor_FClass2d clas (af,::Precision::PConfusion());
-      TopAbs_State sta = TopAbs_OUT;
       TopAbs_State staout = clas.PerformInfinitePoint();
-      TopTools_ListOfShape IntWires;
-      Standard_Integer aWireIt = 0;
-      for ( Standard_Integer j = 1; j <= nbAll; j ++) {
-        aWireIt++;
-        //if(i==j) continue;
-        TopoDS_Shape aSh2 = allSubShapes.Value(j);
-        if(aw == aSh2)
-          continue;
-        TopAbs_State stb = TopAbs_UNKNOWN;
-        if(aSh2.ShapeType() == TopAbs_VERTEX) {
-          aWireIt--;
-          gp_Pnt aP = BRep_Tool::Pnt(TopoDS::Vertex(aSh2));
-          gp_Pnt2d p2d = mySurf->ValueOfUV(aP,Precision::Confusion());
-          stb = clas.Perform (p2d,Standard_False);
-          if(stb == staout && (uclosed || vclosed)) {
-            gp_Pnt2d p2d1;
-            if(uclosed) {
-              p2d1.SetCoord(p2d.X()+uRange, p2d.Y());
-              stb = clas.Perform (p2d1,Standard_False);
-              
-            }
-            if(stb == staout && vclosed) {
-              p2d1.SetCoord(p2d.X(), p2d.Y()+ vRange);
-              stb = clas.Perform (p2d1,Standard_False);
-            }
-          }
-        }
-        else if (aSh2.ShapeType() == TopAbs_WIRE) {
-          CheckShift = Standard_True;
-          TopoDS_Wire bw = TopoDS::Wire (aSh2);
-          //Standard_Integer numin =0;
-          Bnd_Box2d aBox2 = aWireBoxes.Value(aWireIt);
-          if (aBox2.IsOut(aBox1))
-            continue;
 
-          TopoDS_Iterator ew (bw);
-          for(;ew.More(); ew.Next()) {
-            TopoDS_Edge ed = TopoDS::Edge (ew.Value());
-            Standard_Real cf,cl;
-            Handle(Geom2d_Curve) cw = BRep_Tool::CurveOnSurface (ed,myFace,cf,cl);
-            if (cw.IsNull()) continue;
-            gp_Pnt2d unp = cw->Value ((cf+cl)/2.);
-            TopAbs_State ste = clas.Perform (unp,Standard_False);
-            if( ste==TopAbs_OUT || ste==TopAbs_IN ) {
-              if(stb==TopAbs_UNKNOWN) {
-                stb = ste;
-              }
-              else {
-                if(!(stb==ste)) {
-                  sta = TopAbs_UNKNOWN;
-                  SI.Bind(aw,0);
-                  j=nb;
-                  break;
-                }
-              }
-            }
-          
-            Standard_Boolean found = Standard_False;
-            gp_Pnt2d unp1;
-            if( stb == staout && CheckShift ) {
-              CheckShift = Standard_False;
-              if(uclosed) {
-                unp1.SetCoord(unp.X()+uRange, unp.Y());
-                found = (staout != clas.Perform (unp1,Standard_False));
-                if(!found) {
-                  unp1.SetX(unp.X()-uRange);
-                  found = (staout != clas.Perform (unp1,Standard_False));
-                }
-              }
-              if(vclosed&&!found) {
-                unp1.SetCoord(unp.X(), unp.Y()+vRange);
-                found = (staout != clas.Perform (unp1,Standard_False));
-                if(!found) {
-                  unp1.SetY(unp.Y()-vRange);
-                  found = (staout != clas.Perform (unp1,Standard_False));
-                }
-              }
-              // Additional check of diagonal steps for toroidal surfaces
-              if (!found && uclosed && vclosed)
-              {
-                for (Standard_Real dX = -1.0; dX <= 1.0 && !found; dX += 2.0)
-                  for (Standard_Real dY = -1.0; dY <= 1.0 && !found; dY += 2.0)
-                  {
-                    unp1.SetCoord(unp.X() + uRange * dX, unp.Y() + vRange * dY);
-                    found = (staout != clas.Perform(unp1, Standard_False));
-                  }
-              }
-            }
-            if(found) {
-              if(stb==TopAbs_IN) stb = TopAbs_OUT;
-              else stb = TopAbs_IN;
-              Shift2dWire(bw,myFace,unp1.XY()-unp.XY(), mySurf);
-            }
-          }
-        }
-        if(stb==staout) {
-          sta = TopAbs_IN;
-        }
-        else {
-          IntWires.Append(aSh2);
-          MapIntWires.Add(aSh2);
-        }
+      TopTools_ListOfShape IntWires;
+      TopTools_DataMapOfShapeInteger SILoc;
+      TopAbs_State sta = classifyWire (aw, aBox1, clas, staout,
+                                       allSubShapes, aWireBoxes,
+                                       myFace, mySurf,
+                                       uclosed, vclosed, uRange, vRange,
+                                       SILoc, IntWires, Standard_False);
+      if (sta == TopAbs_UNKNOWN)
+      {
+        IntWires.Clear();
+        SILoc.Clear();
+        sta = classifyWire (aw, aBox1, clas, staout,
+                            allSubShapes, aWireBoxes,
+                            myFace, mySurf,
+                            uclosed, vclosed, uRange, vRange,
+                            SILoc, IntWires, Standard_True);
       }
+      {
+        for (TopTools_ListOfShape::Iterator itIW (IntWires); itIW.More(); itIW.Next())
+          MapIntWires.Add (itIW.Value());
+
+        for (TopTools_DataMapOfShapeInteger::Iterator itSI (SILoc); itSI.More(); itSI.Next())
+          SI.Bind (itSI.Key(), itSI.Value());
+      }
+
+      //
+      //Standard_Boolean CheckShift = Standard_True;
+      //
+      //TopAbs_State staout = clas.PerformInfinitePoint();
+      //TopTools_ListOfShape IntWires;
+      //Standard_Integer aWireIt = 0;
+      //for ( Standard_Integer j = 1; j <= nbAll; j ++) {
+      //  aWireIt++;
+      //  //if(i==j) continue;
+      //  TopoDS_Shape aSh2 = allSubShapes.Value(j);
+      //  if(aw == aSh2)
+      //    continue;
+      //  TopAbs_State stb = TopAbs_UNKNOWN;
+      //  if(aSh2.ShapeType() == TopAbs_VERTEX) {
+      //    aWireIt--;
+      //    gp_Pnt aP = BRep_Tool::Pnt(TopoDS::Vertex(aSh2));
+      //    gp_Pnt2d p2d = mySurf->ValueOfUV(aP,Precision::Confusion());
+      //    stb = clas.Perform (p2d,Standard_False);
+      //    if(stb == staout && (uclosed || vclosed)) {
+      //      gp_Pnt2d p2d1;
+      //      if(uclosed) {
+      //        p2d1.SetCoord(p2d.X()+uRange, p2d.Y());
+      //        stb = clas.Perform (p2d1,Standard_False);
+      //        
+      //      }
+      //      if(stb == staout && vclosed) {
+      //        p2d1.SetCoord(p2d.X(), p2d.Y()+ vRange);
+      //        stb = clas.Perform (p2d1,Standard_False);
+      //      }
+      //    }
+      //  }
+      //  else if (aSh2.ShapeType() == TopAbs_WIRE) {
+      //    CheckShift = Standard_True;
+      //    TopoDS_Wire bw = TopoDS::Wire (aSh2);
+      //    //Standard_Integer numin =0;
+      //    Bnd_Box2d aBox2 = aWireBoxes.Value(aWireIt);
+      //    if (aBox2.IsOut(aBox1))
+      //      continue;
+      //
+      //    TopoDS_Iterator ew (bw);
+      //    for(;ew.More(); ew.Next()) {
+      //      TopoDS_Edge ed = TopoDS::Edge (ew.Value());
+      //      Standard_Real cf,cl;
+      //      Handle(Geom2d_Curve) cw = BRep_Tool::CurveOnSurface (ed,myFace,cf,cl);
+      //      if (cw.IsNull()) continue;
+      //      gp_Pnt2d unp = cw->Value ((cf+cl)/2.);
+      //      TopAbs_State ste = clas.Perform (unp,Standard_False);
+      //      std::cout << (ste == TopAbs_ON ? "ON" : (ste == TopAbs_IN ? "IN" : "OUT")) << std::endl;
+      //      if( ste==TopAbs_OUT || ste==TopAbs_IN ) {
+      //        if(stb==TopAbs_UNKNOWN) {
+      //          stb = ste;
+      //        }
+      //        else {
+      //          if(!(stb==ste)) {
+      //            sta = TopAbs_UNKNOWN;
+      //            SI.Bind(aw,0);
+      //            j=nb;
+      //            break;
+      //          }
+      //        }
+      //      }
+      //    
+      //      Standard_Boolean found = Standard_False;
+      //      gp_Pnt2d unp1;
+      //      if( stb == staout && CheckShift ) {
+      //        CheckShift = Standard_False;
+      //        if(uclosed) {
+      //          unp1.SetCoord(unp.X()+uRange, unp.Y());
+      //          found = (staout != clas.Perform (unp1,Standard_False));
+      //          if(!found) {
+      //            unp1.SetX(unp.X()-uRange);
+      //            found = (staout != clas.Perform (unp1,Standard_False));
+      //          }
+      //        }
+      //        if(vclosed&&!found) {
+      //          unp1.SetCoord(unp.X(), unp.Y()+vRange);
+      //          found = (staout != clas.Perform (unp1,Standard_False));
+      //          if(!found) {
+      //            unp1.SetY(unp.Y()-vRange);
+      //            found = (staout != clas.Perform (unp1,Standard_False));
+      //          }
+      //        }
+      //        // Additional check of diagonal steps for toroidal surfaces
+      //        if (!found && uclosed && vclosed)
+      //        {
+      //          for (Standard_Real dX = -1.0; dX <= 1.0 && !found; dX += 2.0)
+      //            for (Standard_Real dY = -1.0; dY <= 1.0 && !found; dY += 2.0)
+      //            {
+      //              unp1.SetCoord(unp.X() + uRange * dX, unp.Y() + vRange * dY);
+      //              found = (staout != clas.Perform(unp1, Standard_False));
+      //            }
+      //        }
+      //      }
+      //      if(found) {
+      //        if(stb==TopAbs_IN) stb = TopAbs_OUT;
+      //        else stb = TopAbs_IN;
+      //        Shift2dWire(bw,myFace,unp1.XY()-unp.XY(), mySurf);
+      //      }
+      //    }
+      //  }
+      //  if(stb==staout) {
+      //    sta = TopAbs_IN;
+      //  }
+      //  else {
+      //    IntWires.Append(aSh2);
+      //    MapIntWires.Add(aSh2);
+      //  }
+      //}
 
       if (sta == TopAbs_UNKNOWN) {    // ERREUR
         SendWarning ( aw, Message_Msg ( "FixAdvFace.FixOrientation.MSG11" ) );// Cannot orient wire
