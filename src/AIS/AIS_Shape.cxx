@@ -27,6 +27,7 @@
 #include <gp_Pnt.hxx>
 #include <Graphic3d_ArrayOfPolylines.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
+#include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectText3d.hxx>
@@ -180,10 +181,7 @@ void AIS_Shape::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPresentat
           try
           {
             OCC_CATCH_SIGNALS
-            StdPrs_ShadedShape::Add (aPrs, myshape, myDrawer,
-                                     myDrawer->ShadingAspect()->Aspect()->ToMapTexture()
-                                 && !myDrawer->ShadingAspect()->Aspect()->TextureMap().IsNull(),
-                                     myUVOrigin, myUVRepeat, myUVScale);
+           StdPrs_ShadedShape::Add (aPrs, myshape, myDrawer, myDrawer->FillCappingAspect());
           }
           catch (Standard_Failure const& anException)
           {

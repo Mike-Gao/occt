@@ -21,6 +21,7 @@
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <gp_Pnt2d.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
+#include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_ArrayOfTriangles.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>
@@ -633,6 +634,11 @@ void AIS_ColoredShape::addShapesWithCustomProps (const Handle(Prs3d_Presentation
           {
             aShadedGroup = thePrs->NewGroup();
             aShadedGroup->SetClosed (isClosed);
+            if (isClosed)
+            {
+              if (aDrawer->HasOwnFillCappingAspect())
+                aShadedGroup->SetGroupPrimitivesAspect (aDrawer->FillCappingAspect());
+            }
           }
           aShadedGroup->SetPrimitivesAspect (aDrawer->ShadingAspect()->Aspect());
           aShadedGroup->AddPrimitiveArray (aTriangles);
