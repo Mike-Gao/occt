@@ -1968,9 +1968,7 @@ void AIS_InteractiveContext::EraseGlobal (const Handle(AIS_InteractiveObject)& t
   }
 
   const Standard_Integer aDispMode = theIObj->HasHilightMode() ? theIObj->HilightMode() : 0;
-  AIS_NListOfEntityOwner anOwners;
-  anOwners.Append(theIObj->GlobalSelOwner());
-  unhighlightOwners (anOwners);
+  unhighlightOwners (theIObj);
   myMainPM->SetVisibility (theIObj, aStatus->DisplayMode(), Standard_False);
 
   if (!myLastPicked.IsNull()
