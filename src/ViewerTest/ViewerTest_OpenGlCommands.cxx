@@ -1335,6 +1335,664 @@ static Standard_Integer VListColors (Draw_Interpretor& theDI,
   return 0;
 }
 
+#include <Graphic3d_ArrayOfTriangles.hxx>
+#include <Graphic3d_Text.hxx>
+
+//! Create an array of triangles defining a rectangle.
+static void addRectangleToArray (const Handle(Graphic3d_ArrayOfTriangles)& theTris,
+                                 const Graphic3d_Vec2i& theLower,
+                                 const Graphic3d_Vec2i& theUpper)
+{
+  const int aFirst = theTris->VertexNumber() + 1;
+  theTris->AddVertex (gp_Pnt (theLower.x(), theLower.y(), 0.0), gp_Pnt2d (0.0, 1.0));
+  theTris->AddVertex (gp_Pnt (theLower.x(), theUpper.y(), 0.0), gp_Pnt2d (0.0, 0.0));
+  theTris->AddVertex (gp_Pnt (theUpper.x(), theUpper.y(), 0.0), gp_Pnt2d (1.0, 0.0));
+  theTris->AddVertex (gp_Pnt (theUpper.x(), theLower.y(), 0.0), gp_Pnt2d (1.0, 1.0));
+  theTris->AddEdges (aFirst + 0, aFirst + 1, aFirst + 2);
+  theTris->AddEdges (aFirst + 0, aFirst + 2, aFirst + 3);
+}
+
+//! Create an array of triangles defining a rectangle.
+static Handle(Graphic3d_ArrayOfTriangles) createRectangleArray (const Graphic3d_Vec2i& theLower,
+                                                                const Graphic3d_Vec2i& theUpper,
+                                                                Graphic3d_ArrayFlags theFlags)
+{
+  Handle(Graphic3d_ArrayOfTriangles) aRectTris = new Graphic3d_ArrayOfTriangles (4, 6, theFlags);
+  addRectangleToArray (aRectTris, theLower, theUpper);
+  return aRectTris;
+}
+
+//! Material widget action.
+enum AIS_MaterialEditorWidgetAction
+{
+  AIS_MaterialEditorWidgetAction_Reset,
+  AIS_MaterialEditorWidgetAction_Transparency,
+  AIS_MaterialEditorWidgetAction_CommonShininess,
+  AIS_MaterialEditorWidgetAction_CommonAmbient,
+  AIS_MaterialEditorWidgetAction_CommonDiffuse,
+  AIS_MaterialEditorWidgetAction_CommonSpecular,
+  AIS_MaterialEditorWidgetAction_CommonEmissive,
+  AIS_MaterialEditorWidgetAction_NB
+};
+
+//! Entity owner holding AIS_MaterialEditorWidget action.
+class AIS_MaterialEditorWidgetOwner : public SelectMgr_EntityOwner
+{
+  DEFINE_STANDARD_RTTI_INLINE(AIS_MaterialEditorWidgetOwner, SelectMgr_EntityOwner)
+public:
+
+  //! Main constructor.
+  //AIS_MaterialEditorWidgetOwner (const Handle(AIS_MaterialEditorWidget)& theSel)
+  AIS_MaterialEditorWidgetOwner (const Handle(AIS_InteractiveObject)& theSel,
+                                 const Handle(Graphic3d_Aspects)& theAspects,
+                                 AIS_MaterialEditorWidgetAction theAction,
+                                 Standard_Integer theComponent = 0)
+  : SelectMgr_EntityOwner (theSel, 5),
+    myAspects (theAspects),
+    myAction (theAction),
+    myComponent (theComponent) {}
+
+  //! Set last picking results.
+  void SetPickedPoint (const gp_Pnt& thePickedCenterPnt,
+                       const gp_Pnt& thePnt,
+                       const gp_XY& theUV)
+  {
+    myPickedCenterPnt = thePickedCenterPnt;
+    myPickedPnt = thePnt;
+    myPickedUV  = theUV;
+  }
+
+  //! Reset highlighting.
+  virtual void Unhilight (const Handle(PrsMgr_PresentationManager)& ,
+                          const Standard_Integer ) Standard_OVERRIDE {}
+
+  //! Handle highlighting.
+  virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& thePrsMgr,
+                                 const Handle(Prs3d_Drawer)& theStyle,
+                                 const Standard_Integer theMode) Standard_OVERRIDE;
+private:
+  Handle(Graphic3d_Aspects) myAspects;
+  AIS_MaterialEditorWidgetAction myAction;
+  Standard_Integer myComponent;
+  gp_Pnt myPickedCenterPnt;
+  gp_Pnt myPickedPnt;
+  gp_XY  myPickedUV;
+};
+
+//! Sensitive quad.
+class AIS_MaterialEditorWidgetSensitiveQuad : public Select3D_SensitiveEntity
+{
+  DEFINE_STANDARD_RTTI_INLINE(AIS_MaterialEditorWidgetSensitiveQuad, Select3D_SensitiveEntity)
+public:
+
+  //! Main constructor.
+  AIS_MaterialEditorWidgetSensitiveQuad (const Handle(SelectBasics_EntityOwner)& theOwnerId,
+                                         const Graphic3d_Vec2i& theLower,
+                                         const Graphic3d_Vec2i& theUpper)
+  : Select3D_SensitiveEntity (theOwnerId)
+  {
+    myPoints[0].SetCoord (theLower.x(), theLower.y(), 0.0);
+    myPoints[1].SetCoord (theLower.x(), theUpper.y(), 0.0);
+    myPoints[2].SetCoord (theUpper.x(), theUpper.y(), 0.0);
+    myPoints[3].SetCoord (theUpper.x(), theLower.y(), 0.0);
+  }
+
+  //! Checks whether the triangle overlaps current selecting volume
+  virtual Standard_Boolean Matches (SelectBasics_SelectingVolumeManager& theMgr,
+                                    SelectBasics_PickResult& thePickResult) Standard_OVERRIDE
+  {
+    if (!theMgr.IsOverlapAllowed())
+    {
+      return Standard_False;
+    }
+
+    if (!theMgr.Overlaps (myPoints[0], myPoints[1], myPoints[2], Select3D_TOS_INTERIOR, thePickResult)
+     && !theMgr.Overlaps (myPoints[0], myPoints[2], myPoints[3], Select3D_TOS_INTERIOR, thePickResult))
+    {
+      return Standard_False;
+    }
+    if (!thePickResult.HasPickedPoint())
+    {
+      return Standard_False;
+    }
+
+    if (AIS_MaterialEditorWidgetOwner* anOwner = dynamic_cast<AIS_MaterialEditorWidgetOwner* >(myOwnerId.get()))
+    {
+      gp_Vec aDirX (myPoints[0], gp_Pnt (myPoints[2].X(), myPoints[0].Y(), myPoints[0].Z()));
+      gp_Vec aDirY (myPoints[0], gp_Pnt (myPoints[0].X(), myPoints[2].Y(), myPoints[0].Z()));
+      aDirX.Normalize();
+      aDirY.Normalize();
+      const gp_Vec aDirP (myPoints[0], thePickResult.PickedPoint());
+      const gp_Pnt aSize = myPoints[2].XYZ() - myPoints[0].XYZ();
+      anOwner->SetPickedPoint (CenterOfGeometry(),
+                               thePickResult.PickedPoint(),
+                               gp_XY (Max (0.0, Min (1.0, aDirP.Dot (aDirX) / aSize.X())),
+                                      Max (0.0, Min (1.0, aDirP.Dot (aDirY) / aSize.Y()))));
+    }
+
+    //thePickResult.SetDistToGeomCenter (theMgr.DistToGeometryCenter (CenterOfGeometry()));
+    thePickResult.SetDistToGeomCenter (0.0);
+    return Standard_True;
+  }
+
+  //! Returns the copy of this
+  virtual Handle(Select3D_SensitiveEntity) GetConnected() Standard_OVERRIDE
+  {
+    Handle(Select3D_SensitiveEntity) aCopy = new AIS_MaterialEditorWidgetSensitiveQuad (*this);
+    return aCopy;
+  }
+
+  //! Returns bounding box of the triangle. If location transformation is set, it will be applied
+  virtual Select3D_BndBox3d BoundingBox() Standard_OVERRIDE
+  {
+    const SelectMgr_Vec3 aMinPnt (myPoints[0].X(), myPoints[0].Y(), myPoints[0].Z());
+    const SelectMgr_Vec3 aMaxPnt (myPoints[2].X(), myPoints[2].Y(), myPoints[2].Z());
+    return Select3D_BndBox3d (aMinPnt, aMaxPnt);
+  }
+
+  //! Returns the amount of points
+  virtual Standard_Integer NbSubElements() Standard_OVERRIDE { return 4; }
+
+  virtual gp_Pnt CenterOfGeometry() const Standard_OVERRIDE { return (myPoints[0].XYZ() + myPoints[2].XYZ()) * 0.5; }
+
+private:
+
+  //! Copy constructor.
+  AIS_MaterialEditorWidgetSensitiveQuad (const AIS_MaterialEditorWidgetSensitiveQuad& theCopy)
+  : Select3D_SensitiveEntity (theCopy.myOwnerId)
+  {
+    myPoints[0] = theCopy.myPoints[0];
+    myPoints[1] = theCopy.myPoints[1];
+    myPoints[2] = theCopy.myPoints[2];
+    myPoints[3] = theCopy.myPoints[3];
+  }
+
+private:
+
+  gp_Pnt myPoints[4];
+
+};
+
+//! Widget for configuring material properties.
+class AIS_MaterialEditorWidget : public AIS_InteractiveObject
+{
+  DEFINE_STANDARD_RTTI_INLINE(AIS_MaterialEditorWidget, AIS_InteractiveObject)
+public:
+
+  //! Empty constructor.
+  AIS_MaterialEditorWidget()
+  : myBackAspect (new Graphic3d_Aspects()),
+    mySlideBackAspect (new Graphic3d_Aspects()),
+    mySlideFillAspect (new Graphic3d_Aspects()),
+    myCaptionTextAspect (new Graphic3d_AspectText3d()),
+    mySlideTextAspect (new Graphic3d_AspectText3d()),
+    myWidth (200),
+    mySlideHeight (30)
+  {
+    myInfiniteState = true;
+    myIsMutable = true;
+    myDrawer->SetZLayer (Graphic3d_ZLayerId_TopOSD);
+    myTransformPersistence = new Graphic3d_TransformPers (Graphic3d_TMF_2d, Aspect_TOTP_RIGHT_LOWER);
+    myTransformPersistence->SetOffset2d (Graphic3d_Vec2i (myWidth, 200));
+    
+    myBackAspect->SetInteriorColor (Quantity_NOC_GRAY80);
+    myBackAspect->SetShadingModel (Graphic3d_TOSM_UNLIT);
+    //myBackAspect->ChangeFrontMaterial().SetTransparency (0.5f);
+    //myBackAspect->SetAlphaMode (Graphic3d_AlphaMode_Blend);
+
+    mySlideBackAspect->SetInteriorColor (Quantity_NOC_GRAY30);
+    mySlideBackAspect->SetShadingModel (Graphic3d_TOSM_UNLIT);
+
+    mySlideFillAspect->SetInteriorColor (Quantity_NOC_STEELBLUE4);
+    mySlideFillAspect->SetShadingModel (Graphic3d_TOSM_UNLIT);
+
+    myCaptionTextAspect->SetFont (Font_NOF_SANS_SERIF);
+    myCaptionTextAspect->SetTextDisplayType (Aspect_TODT_SHADOW);
+    myCaptionTextAspect->SetColor (Quantity_NOC_WHITE);
+    myCaptionTextAspect->SetColorSubTitle (Quantity_NOC_BLACK);
+    myCaptionTextAspect->SetTextFontAspect (Font_FontAspect_Bold);
+
+    *mySlideTextAspect = *myCaptionTextAspect;
+    mySlideTextAspect->SetTextFontAspect (Font_FontAspect_Regular);
+  }
+
+  //! Set new widget width.
+  Standard_Integer WidgetWidth() const { return myWidth; }
+
+  //! Set new widget width.
+  void SetWidgetWidth (Standard_Integer theWidth)
+  {
+    myWidth = theWidth;
+    SetToUpdate();
+  }
+
+  //! Return list of attached presentations.
+  const AIS_ListOfInteractive& ListOfAttachments() const { return myAttachedPrsList; }
+
+  //! Attach widget to specified presentation list.
+  void Attach (const AIS_ListOfInteractive& thePrsList)
+  {
+    myAttachedPrsList = thePrsList;
+    myEditAspects.Nullify();
+    SetToUpdate();
+    if (thePrsList.IsEmpty())
+    {
+      return;
+    }
+
+    if (thePrsList.First()->Attributes()->SetupOwnShadingAspect())
+    {
+      thePrsList.First()->SetToUpdate();
+    }
+    Handle(Prs3d_ShadingAspect) anAspect = thePrsList.First()->Attributes()->ShadingAspect(); 
+    myEditAspects = anAspect->Aspect();
+    for (AIS_ListOfInteractive::Iterator aPrsIter (thePrsList); aPrsIter.More(); aPrsIter.Next())
+    {
+      const Handle(AIS_InteractiveObject)& aPrs = aPrsIter.Value();
+      if (aPrs->Attributes()->ShadingAspect() != anAspect)
+      {
+        aPrs->Attributes()->SetShadingAspect (anAspect);
+        aPrs->SetToUpdate();
+      }
+      if (aPrs->HasInteractiveContext())
+      {
+        if (aPrs->ToBeUpdated())
+        {
+          aPrs->GetContext()->Display (aPrs, false);
+        }
+        else
+        {
+          aPrs->SynchronizeAspects();
+        }
+      }
+    }
+  }
+
+public:
+
+  //! Accept only display mode 0.
+  virtual Standard_Boolean AcceptDisplayMode (const Standard_Integer theMode) const Standard_OVERRIDE { return theMode == 0; }
+
+  //! Global selection has no meaning for this class.
+  virtual Handle(SelectMgr_EntityOwner) GlobalSelOwner() const Standard_OVERRIDE { return Handle(SelectMgr_EntityOwner)(); }
+
+  //! Compute presentation.
+  virtual void Compute (const Handle(PrsMgr_PresentationManager3d)& ,
+                        const Handle(Prs3d_Presentation)& thePrs,
+                        const Standard_Integer theMode) Standard_OVERRIDE
+  {
+    if (theMode != 0)
+    {
+      return;
+    }
+
+    thePrs->SetInfiniteState (true);
+    mySensQuads.Clear();
+    mySelOwners.Clear();
+
+    Handle(Graphic3d_Aspects) anEditAspects = myEditAspects;
+    if (anEditAspects.IsNull())
+    {
+      anEditAspects = new Graphic3d_Aspects();
+    }
+
+    Handle(Graphic3d_Group) aBackGroup = thePrs->NewGroup();
+    aBackGroup->SetGroupPrimitivesAspect (myBackAspect);
+
+    Handle(Graphic3d_Group) aSlideBackGroup = thePrs->NewGroup();
+    aSlideBackGroup->SetGroupPrimitivesAspect (mySlideBackAspect);
+
+    Handle(Graphic3d_Group) aSlideFillGroup = thePrs->NewGroup();
+    aSlideFillGroup->SetGroupPrimitivesAspect (mySlideFillAspect);
+
+    Handle(Graphic3d_Group) aCapGroup = thePrs->NewGroup();
+    aCapGroup->SetGroupPrimitivesAspect (myCaptionTextAspect);
+
+    Handle(Graphic3d_Group) aLabGroup  = thePrs->NewGroup();
+    aLabGroup->SetGroupPrimitivesAspect (mySlideTextAspect);
+
+    Graphic3d_Vec2i aLower  (0, 0);
+    Graphic3d_Vec2i anUpper (myWidth, 0);
+    {
+      //Handle(Graphic3d_ArrayOfTriangles) aTris = createRectangleArray (aLower, anUpper, Graphic3d_ArrayFlags_None);
+      //aBackGroup->AddPrimitiveArray (aTris);
+    }
+
+    Standard_Integer aTopIter = anUpper.y();
+    addCaption (aTopIter, NULL, aCapGroup, "Material");
+    addCaption (aTopIter, NULL, aLabGroup, anEditAspects->FrontMaterial().StringName());
+    addSlider (aTopIter, aSlideBackGroup, NULL, aLabGroup, "RESET",
+               AIS_MaterialEditorWidgetAction_Reset, 0, -Precision::Infinite());
+
+    addCaption (aTopIter, NULL, aCapGroup, "Transparency");
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "",
+               AIS_MaterialEditorWidgetAction_Transparency, 0, anEditAspects->FrontMaterial().Transparency());
+
+    addCaption (aTopIter, NULL, aCapGroup, "Shininess");
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "",
+               AIS_MaterialEditorWidgetAction_CommonShininess, 0,
+               anEditAspects->FrontMaterial().Shininess() * 128.0, Bnd_Range (0, 128));
+
+    const Graphic3d_Vec3 anAmbVec3 = anEditAspects->FrontMaterial().AmbientColor();
+    addCaption (aTopIter, NULL, aCapGroup, "Ambient");
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "%",
+               AIS_MaterialEditorWidgetAction_CommonAmbient, -1, anAmbVec3.maxComp() * 100.0, Bnd_Range (0, 100));
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "r",
+               AIS_MaterialEditorWidgetAction_CommonAmbient, 0, anAmbVec3.r());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "g",
+               AIS_MaterialEditorWidgetAction_CommonAmbient, 1, anAmbVec3.g());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "b",
+               AIS_MaterialEditorWidgetAction_CommonAmbient, 2, anAmbVec3.b());
+
+    const Graphic3d_Vec3 aDiffVec3 = anEditAspects->FrontMaterial().DiffuseColor();
+    addCaption (aTopIter, NULL, aCapGroup, "Diffuse");
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "%",
+               AIS_MaterialEditorWidgetAction_CommonDiffuse, -1, aDiffVec3.maxComp() * 100.0, Bnd_Range (0, 100));
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "r",
+               AIS_MaterialEditorWidgetAction_CommonDiffuse, 0, aDiffVec3.r());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "g",
+               AIS_MaterialEditorWidgetAction_CommonDiffuse, 1, aDiffVec3.g());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "b",
+               AIS_MaterialEditorWidgetAction_CommonDiffuse, 2, aDiffVec3.b());
+
+    const Graphic3d_Vec3 aSpecVec3 = anEditAspects->FrontMaterial().SpecularColor();
+    addCaption (aTopIter, NULL, aCapGroup, "Specular");
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "%",
+               AIS_MaterialEditorWidgetAction_CommonSpecular, -1, aSpecVec3.maxComp() * 100.0, Bnd_Range (0, 100));
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "r",
+               AIS_MaterialEditorWidgetAction_CommonSpecular, 0, aSpecVec3.r());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "g",
+               AIS_MaterialEditorWidgetAction_CommonSpecular, 1, aSpecVec3.g());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "b",
+               AIS_MaterialEditorWidgetAction_CommonSpecular, 2, aSpecVec3.b());
+
+    const Graphic3d_Vec3 anEmissVec3 = anEditAspects->FrontMaterial().EmissiveColor();
+    addCaption (aTopIter, NULL, aCapGroup, "Emissive");
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "%",
+               AIS_MaterialEditorWidgetAction_CommonEmissive, -1, anEmissVec3.maxComp() * 100.0, Bnd_Range (0, 100));
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "r",
+               AIS_MaterialEditorWidgetAction_CommonEmissive, 0, anEmissVec3.r());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "g",
+               AIS_MaterialEditorWidgetAction_CommonEmissive, 1, anEmissVec3.g());
+    addSlider (aTopIter, aSlideBackGroup, aSlideFillGroup, aLabGroup, "b",
+               AIS_MaterialEditorWidgetAction_CommonEmissive, 2, anEmissVec3.b());
+
+    myTransformPersistence->SetOffset2d (Graphic3d_Vec2i (myWidth, Abs (aTopIter)));
+  }
+
+  void addCaption (Standard_Integer& theTopIter,
+                   const Handle(Graphic3d_Group)& theBackGroup,
+                   const Handle(Graphic3d_Group)& theLabelsGroup,
+                   const TCollection_AsciiString& theText)
+  {
+    addSlider (theTopIter, theBackGroup, NULL, theLabelsGroup, theText,
+               AIS_MaterialEditorWidgetAction_Transparency, -1, -Precision::Infinite());
+  }
+
+  void addSlider (Standard_Integer& theTopIter,
+                  const Handle(Graphic3d_Group)& theSlideBackGroup,
+                  const Handle(Graphic3d_Group)& theSlideFillGroup,
+                  const Handle(Graphic3d_Group)& theLabelsGroup,
+                  const TCollection_AsciiString& theText,
+                  const AIS_MaterialEditorWidgetAction theAction,
+                  const Standard_Integer theActionComponent,
+                  const Standard_Real theValue,
+                  const Bnd_Range& theValueRange = Bnd_Range (0.0, 1.0))
+  {
+    const Standard_Integer aSlideGap = 8;
+    const Graphic3d_Vec2i aSlideUpper (myWidth - aSlideGap, theTopIter - aSlideGap);
+    const Graphic3d_Vec2i aSlideLower (aSlideGap, theTopIter - mySlideHeight + aSlideGap);
+    if (!theSlideBackGroup.IsNull())
+    {
+      Handle(Graphic3d_ArrayOfTriangles) aTris = createRectangleArray (aSlideLower, aSlideUpper, Graphic3d_ArrayFlags_None);
+      theSlideBackGroup->AddPrimitiveArray (aTris);
+
+      Handle(AIS_MaterialEditorWidgetOwner) aSensOwner =
+        new AIS_MaterialEditorWidgetOwner (this, myEditAspects, theAction, theActionComponent);
+      Handle(AIS_MaterialEditorWidgetSensitiveQuad) aSensQuad = new AIS_MaterialEditorWidgetSensitiveQuad (aSensOwner, aSlideLower, aSlideUpper);
+      mySelOwners.Append (aSensOwner);
+      mySensQuads.Append (aSensQuad);
+    }
+
+    TCollection_AsciiString aTextVal = theText;
+    if (!theSlideFillGroup.IsNull()
+     && !Precision::IsInfinite (theValue))
+    {
+      if (!aTextVal.IsEmpty())
+      {
+        aTextVal += ": ";
+      }
+      aTextVal += theValue;
+
+      Standard_Real aMin = 0.0, aMax = 1.0;
+      theValueRange.GetBounds (aMin, aMax);
+      Standard_Real aVal = Max (Min (theValue, aMax), aMin) / (aMax - aMin);
+      const Graphic3d_Vec2i aFillUpper (aSlideLower.x() + Standard_Integer(aVal * (myWidth - aSlideGap * 2)),
+                                        aSlideUpper.y());
+      Handle(Graphic3d_ArrayOfTriangles) aTrisFill = createRectangleArray (aSlideLower, aFillUpper, Graphic3d_ArrayFlags_None);
+      theSlideFillGroup->AddPrimitiveArray (aTrisFill);
+    }
+
+    if (!aTextVal.IsEmpty()
+     && !theLabelsGroup.IsNull())
+    {
+      Handle(Graphic3d_Text) aText = new Graphic3d_Text ((float )myDrawer->TextAspect()->Height());
+      aText->SetText (aTextVal);
+      aText->SetHorizontalAlignment (Graphic3d_HTA_CENTER);
+      aText->SetVerticalAlignment (Graphic3d_VTA_CENTER);
+      aText->SetPosition (gp_Pnt (myWidth / 2, theTopIter - mySlideHeight / 2, 0));
+      theLabelsGroup->AddText (aText);
+    }
+
+    theTopIter -= mySlideHeight;
+  }
+
+  //! Compute selection
+  virtual void ComputeSelection (const Handle(SelectMgr_Selection)& theSel,
+                                 const Standard_Integer theMode) Standard_OVERRIDE
+  {
+    if (theMode != 0)
+    {
+      return;
+    }
+
+    for (NCollection_Sequence<Handle(AIS_MaterialEditorWidgetSensitiveQuad)>::Iterator aSensIter (mySensQuads);
+         aSensIter.More(); aSensIter.Next())
+    { 
+      theSel->Add (aSensIter.Value());
+    }
+  }
+
+protected:
+
+  Handle(Graphic3d_Aspects)      myEditAspects;       //!< aspects to edit
+  AIS_ListOfInteractive          myAttachedPrsList;   //!< list of attached presentations
+
+  Handle(Graphic3d_Aspects)      myBackAspect;        //!< widget background aspect
+  Handle(Graphic3d_Aspects)      mySlideBackAspect;   //!< slider background aspect
+  Handle(Graphic3d_Aspects)      mySlideFillAspect;   //!< slider progress aspect
+  Handle(Graphic3d_AspectText3d) myCaptionTextAspect; //!< caption text aspect
+  Handle(Graphic3d_AspectText3d) mySlideTextAspect;   //!< slider  text aspect
+  Standard_Integer               myWidth;             //!< widget width
+  Standard_Integer               mySlideHeight;       //!< slider height
+
+  NCollection_Sequence<Handle(AIS_MaterialEditorWidgetSensitiveQuad)> mySensQuads;
+  NCollection_Sequence<Handle(AIS_MaterialEditorWidgetOwner)> mySelOwners;
+};
+
+void AIS_MaterialEditorWidgetOwner::HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& thePrsMgr,
+                                                      const Handle(Prs3d_Drawer)& ,
+                                                      const Standard_Integer )
+{
+  if (thePrsMgr->IsImmediateModeOn())
+  {
+    return;
+  }
+
+  Handle(AIS_MaterialEditorWidget) aWidget = Handle(AIS_MaterialEditorWidget)::DownCast (Selectable());
+  if (aWidget.IsNull())
+  {
+    throw Standard_ProgramError ("Internal Error within AIS_MaterialWidgetOwnerOwner::HilightWithColor()!");
+  }
+
+  float aClamped = (float )Max (Min (myPickedUV.X(), 1.0), 0.0);
+  switch (myAction)
+  {
+    case AIS_MaterialEditorWidgetAction_Reset:
+    {
+      myAspects->ChangeFrontMaterial() = myAspects->FrontMaterial().RequestedName();
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_Transparency:
+    {
+      myAspects->ChangeFrontMaterial().SetTransparency (aClamped);
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_CommonShininess:
+    {
+      myAspects->ChangeFrontMaterial().SetShininess (aClamped);
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_CommonAmbient:
+    {
+      Graphic3d_Vec3 aVec = myAspects->FrontMaterial().AmbientColor();
+      if (myComponent == -1)
+      {
+        aVec = (aVec / aVec.maxComp()) * aClamped;
+      }
+      else
+      {
+        aVec[myComponent] = aClamped;
+      }
+      myAspects->ChangeFrontMaterial().SetAmbientColor (Quantity_Color (aVec));
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_CommonDiffuse:
+    {
+      Graphic3d_Vec3 aVec = myAspects->FrontMaterial().DiffuseColor();
+      if (myComponent == -1)
+      {
+        aVec = (aVec / aVec.maxComp()) * aClamped;
+      }
+      else
+      {
+        aVec[myComponent] = aClamped;
+      }
+      myAspects->ChangeFrontMaterial().SetDiffuseColor (Quantity_Color (aVec));
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_CommonSpecular:
+    {
+      Graphic3d_Vec3 aVec = myAspects->FrontMaterial().SpecularColor();
+      if (myComponent == -1)
+      {
+        aVec = (aVec / aVec.maxComp()) * aClamped;
+      }
+      else
+      {
+        aVec[myComponent] = aClamped;
+      }
+      myAspects->ChangeFrontMaterial().SetSpecularColor (Quantity_Color (aVec));
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_CommonEmissive:
+    {
+      Graphic3d_Vec3 aVec = myAspects->FrontMaterial().EmissiveColor();
+      if (myComponent == -1)
+      {
+        aVec = (aVec / aVec.maxComp()) * aClamped;
+      }
+      else
+      {
+        aVec[myComponent] = aClamped;
+      }
+      myAspects->ChangeFrontMaterial().SetEmissiveColor (Quantity_Color (aVec));
+      break;
+    }
+    case AIS_MaterialEditorWidgetAction_NB:
+      return;
+  }
+
+  for (AIS_ListOfInteractive::Iterator aPrsIter (aWidget->ListOfAttachments()); aPrsIter.More(); aPrsIter.Next())
+  {
+    aPrsIter.Value()->SynchronizeAspects();
+  }
+  aWidget->GetContext()->Redisplay (aWidget, false);
+}
+
+//==============================================================================
+//function : VMaterialWidget
+//purpose  :
+//==============================================================================
+static Standard_Integer VMaterialWidget (Draw_Interpretor& ,
+                                         Standard_Integer  theArgNb,
+                                         const char**      theArgVec)
+{
+  const Handle(AIS_InteractiveContext)& aCtx = ViewerTest::GetAISContext();
+  if (aCtx.IsNull())
+  {
+    std::cout << "Error: no active view\n";
+    return 1;
+  }
+
+  TCollection_AsciiString aWidgetName;
+  Handle(AIS_MaterialEditorWidget) aWidget;
+  AIS_ListOfInteractive aPrsList;
+  Standard_Integer aWidth = -1;
+  for (Standard_Integer anArgIter = 1; anArgIter < theArgNb; ++anArgIter)
+  {
+    TCollection_AsciiString anArgCase (theArgVec[anArgIter]);
+    if (anArgCase == "-width"
+     && anArgIter + 1 < theArgNb)
+    {
+      aWidth = Draw::Atoi (theArgVec[++anArgIter]);
+    }
+    else if (aWidgetName.IsEmpty())
+    {
+      aWidgetName = theArgVec[anArgIter];
+      Handle(AIS_InteractiveObject) aPrs;
+      if (GetMapOfAIS().Find2 (aWidgetName, aPrs))
+      {
+        aWidget = Handle(AIS_MaterialEditorWidget)::DownCast (aPrs);
+      }
+      if (aWidget.IsNull())
+      {
+        aWidget = new AIS_MaterialEditorWidget();
+      }
+      else
+      {
+        aWidget->SetToUpdate();
+      }
+    }
+    else
+    {
+      Handle(AIS_InteractiveObject) aPrs;
+      if (GetMapOfAIS().Find2 (theArgVec[anArgIter], aPrs))
+      {
+        aPrsList.Append (aPrs);
+      }
+      else
+      {
+        std::cout << "Syntax error: object '" << theArgVec[anArgIter] << "' is not displayed\n";
+        return 1;
+      }
+    }
+  }
+  if (aWidget.IsNull())
+  {
+    std::cout << "Syntax error: wrong number of arguments\n";
+    return 1;
+  }
+  if (aWidth != -1)
+  {
+    aWidget->SetWidgetWidth (aWidth);
+  }
+  aWidget->Attach (aPrsList);
+
+  ViewerTest::Display (aWidgetName, aWidget);
+  return 0;
+}
+
 //=======================================================================
 //function : OpenGlCommands
 //purpose  :
@@ -1386,4 +2044,8 @@ void ViewerTest::OpenGlCommands(Draw_Interpretor& theCommands)
                   "\n\t\t: or dumped into specified file."
                   "\n\t\t: * can be used to refer to complete list of standard colors.",
                   __FILE__, VListColors, aGroup);
+  theCommands.Add("vmaterialwidget",
+                  "vmaterialwidget widgetName prsName1 [prsName2 [...]]"
+                  "\n\t\t: Create a widget for configuring material properties of specified presentations.",
+                  __FILE__, VMaterialWidget, aGroup);
 }
