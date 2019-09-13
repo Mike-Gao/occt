@@ -290,6 +290,11 @@ private: //! @name Private methods performing the job
                            const gp_Pnt& thePoint,
                            const Standard_Real theDiffTol);
 
+  //! Looks for the Min or Max Solution (depending on the given target).
+  Standard_EXPORT Standard_Boolean FindSolution (const Standard_Integer theIndex,
+                                                 const Standard_Real& theMetric,
+                                                 const Extrema_ExtFlag theTarget);
+
   //! structure to keep the results
   struct ExtPSResult
   {

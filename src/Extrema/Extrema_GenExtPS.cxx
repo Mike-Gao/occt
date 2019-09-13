@@ -330,7 +330,11 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
     const Standard_Integer aNbCells = myGridBoxSet->Size();
     for (Standard_Integer i = 0; i < aNbCells; ++i)
     {
-      Accept (i, 0.0);
+      FindSolution (i, 0.0, Extrema_ExtFlag_MIN);
+    }
+    for (Standard_Integer i = 0; i < aNbCells; ++i)
+    {
+      FindSolution (i, 0.0, Extrema_ExtFlag_MAX);
     }
 
     // Copy solutions
@@ -432,10 +436,8 @@ void Extrema_GenExtPS::BuildTree()
         for (int j = 0; j < 2; ++j)
           aBox.Add (myPoints->Value (iU + i * aUCoeff, iV + j * aVCoeff).Value());
 
-      //aBox.Add (myS->Value ((U1 + U2) * 0.5, V1));
-      //aBox.Add (myS->Value ((U1 + U2) * 0.5, V2));
-      //aBox.Add (myS->Value (U1, (V1 + V2) * 0.5));
-      //aBox.Add (myS->Value (U2, (V1 + V2) * 0.5));
+      aBox.Enlarge (Precision::Confusion());
+
       const Extrema_POnSurf& aPMin = myPoints->Value (iU, iV);
       const Extrema_POnSurf& aPMax = myPoints->Value (iU + aUCoeff, iV + aVCoeff);
 
@@ -443,14 +445,18 @@ void Extrema_GenExtPS::BuildTree()
       aPMin.Parameter (U1, V1);
       aPMax.Parameter (U2, V2);
 
-      gp_Pnt aPMid = myS->Value ((U1 + U2) * 0.5, (V1 + V2) * 0.5);
-      aBox.Add (aPMid);
-
       // Enlarge box to make sure the whole cell is covered
-      aBox.Enlarge (Sqrt (aBox.SquareExtent()));
+      if (U1 != U2 || V1 != V2)
+      {
+        gp_Pnt aPMid = myS->Value ((U1 + U2) * 0.5, (V1 + V2) * 0.5);
+        aBox.Add (aPMid);
 
-      //aBox.Enlarge (Precision::Confusion() + 
-      //              gp_Lin (aPMin.Value(), gp_Vec (aPMin.Value(), aPMax.Value())).Distance (aPMid));
+        gp_Vec aDir(aPMin.Value(), aPMax.Value());
+        if (aDir.SquareMagnitude() > gp::Resolution())
+        {
+          aBox.Enlarge (gp_Lin (aPMin.Value(), aDir).Distance (aPMid));
+        }
+      }
 
       myGridBoxSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aBox));
     }
@@ -599,7 +605,18 @@ Standard_Boolean Extrema_GenExtPS::IsMetricBetter (const Standard_Real& theLeft,
 //purpose  : 
 //=======================================================================
 Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
-                                           const Standard_Real&)
+                                           const Standard_Real& theMetric)
+{
+  return FindSolution (theIndex, theMetric, myTarget);
+}
+
+//=======================================================================
+//function : Accept
+//purpose  : 
+//=======================================================================
+Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theIndex,
+                                                 const Standard_Real&,
+                                                 const Extrema_ExtFlag theTarget)
 {
   const GridCell& aCell = myGridBoxSet->Element (theIndex);
 
@@ -618,7 +635,7 @@ Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
   fillSqDist (aParam11, aPoint);
 
   if (nU != myNbUSamples && nV != myNbVSamples &&
-     (myTarget == Extrema_ExtFlag_MIN || myTarget == Extrema_ExtFlag_MINMAX))
+     (theTarget == Extrema_ExtFlag_MIN || theTarget == Extrema_ExtFlag_MINMAX))
   {
     // Find minimum
 
@@ -714,7 +731,7 @@ Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
     }
   }
 
-  if (myTarget == Extrema_ExtFlag_MAX || myTarget == Extrema_ExtFlag_MINMAX)
+  if (theTarget == Extrema_ExtFlag_MAX || theTarget == Extrema_ExtFlag_MINMAX)
   {
     // Find maximum
     Extrema_POnSurfParams &aParam1 = myPoints->ChangeValue (nU - 1, nV - 1);
