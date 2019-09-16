@@ -26,6 +26,7 @@
 #include <TDF_Tool.hxx>
 #include <TDocStd_Document.hxx>
 #include <TopoDS_Shape.hxx>
+#include <ViewerTest.hxx>
 #include <XCAFDoc_ColorTool.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
@@ -34,43 +35,92 @@
 //=======================================================================
 // Section: Work with colors
 //=======================================================================
-static Standard_Integer setColor (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+static Standard_Integer setColor (Draw_Interpretor& , Standard_Integer argc, const char** argv)
 {
-  if (argc < 6) {
-    di<<"Use: "<<argv[0]<<" Doc {Label|Shape} R G B [alpha] [curve|surf]\n";
+  if (argc < 4)
+  {
+    std::cout << "Syntax error: wrong number of arguments\n";
     return 1;
   }
-  Handle(TDocStd_Document) Doc;   
-  DDocStd::GetDocument(argv[1], Doc);
-  if ( Doc.IsNull() ) { di << argv[1] << " is not a document\n"; return 1; }
-  
+
+  Handle(TDocStd_Document) aDoc;
+  DDocStd::GetDocument (argv[1], aDoc);
+  if (aDoc.IsNull())
+  {
+    std::cout << "Syntax error: " << argv[1] << " is not a document\n";
+    return 1;
+  }
+
   TDF_Label aLabel;
-  TDF_Tool::Label(Doc->GetData(), argv[2], aLabel);
-  Quantity_Color Col ( Draw::Atof(argv[3]), Draw::Atof(argv[4]), Draw::Atof(argv[5]), Quantity_TOC_RGB );
-
-  Quantity_ColorRGBA aColRGBA;
-  aColRGBA.SetRGB(Col);
-  if (argc > 6 && (argv[6][0] != 's' && argv[6][0] != 'c')) {
-    aColRGBA.SetAlpha((Standard_ShortReal)(Draw::Atof(argv[6])));
-  }
-  
-  Handle(XCAFDoc_ColorTool) myColors = XCAFDoc_DocumentTool::ColorTool(Doc->Main());
-  XCAFDoc_ColorType ctype = XCAFDoc_ColorGen;
-  if (argc > 6) {
-    if (argv[argc - 1][0] == 's')
-      ctype = XCAFDoc_ColorSurf;
-    else if (argv[argc - 1][0] == 'c')
-      ctype = XCAFDoc_ColorCurv;
-  }
-
-  if ( !aLabel.IsNull() ) {
-    myColors->SetColor(aLabel, aColRGBA, ctype);
-  }
-  else {
-    TopoDS_Shape aShape= DBRep::Get(argv[2]);
-    if ( !aShape.IsNull() ) {
-      myColors->SetColor(aShape, aColRGBA, ctype);
+  TopoDS_Shape aShape;
+  TDF_Tool::Label (aDoc->GetData(), argv[2], aLabel);
+  if (aLabel.IsNull())
+  {
+    aShape = DBRep::Get (argv[2]);
+    if (aShape.IsNull())
+    {
+      std::cout << "Syntax error: " << argv[2] << " is not a label nor shape\n";
+      return 1;
     }
+  }
+
+  Quantity_ColorRGBA aColor;
+  bool isColorDefined = false;
+  XCAFDoc_ColorType aColType = XCAFDoc_ColorGen;
+  for (Standard_Integer anArgIter = 3; anArgIter < argc; ++anArgIter)
+  {
+    TCollection_AsciiString anArgCase (argv[anArgIter]);
+    anArgCase.LowerCase();
+    if (anArgCase == "surf"
+     || anArgCase == "surface"
+     || anArgCase == "s")
+    {
+      aColType = XCAFDoc_ColorSurf;
+    }
+    else if (anArgCase == "curve"
+          || anArgCase == "c")
+    {
+      aColType = XCAFDoc_ColorCurv;
+    }
+    else if (anArgCase == "gen"
+          || anArgCase == "generic")
+    {
+      aColType = XCAFDoc_ColorGen;
+    }
+    else if (!isColorDefined)
+    {
+      isColorDefined = true;
+      Standard_Integer aNbParsed = ViewerTest::ParseColor (argc - anArgIter,
+                                                           argv + anArgIter,
+                                                           aColor);
+      if (aNbParsed == 0)
+      {
+        std::cout << "Syntax error at '" << argv[anArgIter] << "'\n";
+        return 1;
+      }
+      anArgIter += aNbParsed - 1;
+    }
+    else
+    {
+      std::cout << "Syntax error at '" << argv[anArgIter] << "'\n";
+      return 1;
+    }
+  }
+  if (!isColorDefined)
+  {
+    std::cout << "Syntax error: wrong number of arguments\n";
+    return 1;
+  }
+
+  Handle(XCAFDoc_ColorTool) aColorTool = XCAFDoc_DocumentTool::ColorTool (aDoc->Main());
+  if (!aLabel.IsNull())
+  {
+    aColorTool->SetColor (aLabel, aColor, aColType);
+  }
+  else if (!aColorTool->SetColor (aShape, aColor, aColType))
+  {
+    std::cout << "Syntax error: " << argv[2] << " is not a label nor shape\n";
+    return 1;
   }
   return 0;
 }

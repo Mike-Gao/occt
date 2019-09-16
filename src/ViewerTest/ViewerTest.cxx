@@ -2366,6 +2366,11 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
       aNames.Remove (aNames.Length());
       isOk = Standard_True;
     }
+    else if (Quantity_Color::ColorFromHex (aNames.Last().ToCString(), aChangeSet->Color))
+    {
+      aNames.Remove (aNames.Length());
+      isOk = Standard_True;
+    }
     else if (aNames.Length() >= 3)
     {
       const char* anArgVec[3] =
