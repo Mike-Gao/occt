@@ -50,11 +50,7 @@ public:
 
   //! Creates OCC components on the window
   //! \param theWindowHandle an id of the application window
-  Standard_EXPORT void InitViewer (const Handle(AIS_InteractiveContext)& theContext);
-
-  //! Creates OCC components on the window
-  //! \param theWindowHandle an id of the application window
-  Standard_EXPORT static Handle(AIS_InteractiveContext) CreateStandardViewer();
+  Standard_EXPORT void InitStandardViewer();
 
   //! Returns an OCC viewer
   const Handle(V3d_Viewer)& GetViewer() { return myViewer; }

@@ -1,4 +1,4 @@
-TModelingData TKShapeView TKMessageModel TKMessageView
+TModelingData TKShapeView
 TVisualization TKView TKVInspector
 TApplicationFramework TKTreeModel TKTInspectorAPI TKDFBrowser
 TTool TKTInspector TKToolsDraw TInspectorEXE

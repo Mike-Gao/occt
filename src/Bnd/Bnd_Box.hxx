@@ -24,10 +24,6 @@
 #include <Standard_Real.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Boolean.hxx>
-
-#include <TCollection_AsciiString.hxx>
-#include <gp_XYZ.hxx>
-
 class Standard_ConstructionError;
 class gp_Pnt;
 class gp_Dir;
@@ -72,14 +68,6 @@ public:
   //! Creates an empty Box.
   //! The constructed box is qualified Void. Its gap is null.
   Standard_EXPORT Bnd_Box();
-
-  //! Creates a bounding box, it contains:
-  //! -   interval [ aXmin,aXmax ] in the "X Direction",
-  //! -   interval [ aYmin,aYmax ] in the "Y Direction",
-  //! -   interval [ aZmin,aZmax ] in the "Z Direction";
-  //! The constructed box is qualified Void. Its gap is null.
-  Standard_EXPORT Bnd_Box (const Standard_Real aXmin, const Standard_Real aYmin, const Standard_Real aZmin,
-                           const Standard_Real aXmax, const Standard_Real aYmax, const Standard_Real aZmax);
 
   //! Sets this bounding box so that it  covers the whole of 3D space.
   //! It is infinitely  long in all directions.
@@ -307,20 +295,6 @@ public:
     return !IsVoid()
          && Xmax >= Xmin;
   }
-
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS) const;
-
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT Standard_Boolean Init (const Standard_SStream& OS);
-
-  //! Covers bounding box into string in format: (Xmin, Ymin, Zmin) - (Xmax, Ymax, Zmax)
-  //! \return the string value
-  Standard_EXPORT TCollection_AsciiString ToString() const { return ""; }
-
-  //! Converts text value into parameters if possible, the string format is: (Xmin, Ymin, Zmin) - (Xmax, Ymax, Zmax)
-  //! \return true if conversion is done
-  Standard_EXPORT Standard_Boolean FromString (const TCollection_AsciiString& theValue) { (void)theValue; return Standard_False; }
 
 protected:
 

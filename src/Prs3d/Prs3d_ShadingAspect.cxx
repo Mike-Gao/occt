@@ -18,7 +18,6 @@
 #include <Graphic3d_MaterialAspect.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Type.hxx>
-#include <TCollection.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_ShadingAspect, Prs3d_BasicAspect)
 
@@ -165,22 +164,3 @@ Standard_Real Prs3d_ShadingAspect::Transparency (const Aspect_TypeOfFacingModel 
   }
   return 0.0;
 }
-
-const TCollection_AsciiString Prs3d_ShadingAspect_ClassName = "Prs3d_ShadingAspect";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_ShadingAspect::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, Prs3d_ShadingAspect_ClassName);
-  {
-    Standard_SStream aTmpStream;
-    myAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "Aspect", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_STOP_KEY (OS, Prs3d_ShadingAspect_ClassName);
-}
-

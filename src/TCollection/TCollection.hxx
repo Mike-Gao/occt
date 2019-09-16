@@ -22,13 +22,7 @@
 #include <Standard_Handle.hxx>
 
 #include <Standard_Integer.hxx>
-#include <TCollection_AsciiString.hxx>
-
-#include <NCollection_IndexedDataMap.hxx>
-#include <NCollection_IndexedMap.hxx>
-#include <NCollection_List.hxx>
-#include <NCollection_Vector.hxx>
-
+class TCollection_AsciiString;
 class TCollection_ExtendedString;
 class TCollection_HAsciiString;
 class TCollection_HExtendedString;
@@ -72,23 +66,6 @@ public:
   DEFINE_STANDARD_ALLOC
 
   
-  //! Returns default prefix added for each pointer info string
-  Standard_EXPORT static TCollection_AsciiString GetPointerPrefix() { return "0x"; }
-
-  //! Convert handle pointer to string value
-  //! \param thePointer a pointer
-  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString GetPointerInfo (const Handle(Standard_Transient)& thePointer,
-                                                                 const bool isShortInfo = true);
-
-  //! Convert pointer to string value
-  //! \param thePointer a pointer
-  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString GetPointerInfo (const void* thePointer,
-                                                                 const bool isShortInfo = true);
-
   //! Returns a  prime number greater than  <I> suitable
   //! to dimension a Map.  When  <I> becomes great there
   //! is  a  limit on  the  result (today  the  limit is
@@ -97,76 +74,8 @@ public:
   //! there will be more collisions  in  the map.
   Standard_EXPORT static Standard_Integer NextPrimeForMap (const Standard_Integer I);
 
-  //! Returns separator symbol of Dump information
-  static Standard_Character DumpSeparator() { return '\\'; }
 
-  //! Returns separator symbol of values vector union
-  static Standard_CString VectorSeparator() { return " ,"; }
 
-  //! Returns separator symbol of class name prefix
-  static inline Standard_CString ClassNameSeparator() { return " ,"; }
-
-  //! Unites list of string into one string using the separator
-  Standard_EXPORT static TCollection_AsciiString Join (const NCollection_List<TCollection_AsciiString>& theValues,
-                                                       const TCollection_AsciiString& theSeparator);
-
-  //! Converts stream to map of values where the key is each odd, value is each even value
-  //! \param theStream stream value
-  //! \param theValues [out] container of split values
-  Standard_EXPORT static void Split (const Standard_SStream& theStream,
-                                     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues,
-                                     TCollection_AsciiString& theKey);
-
-private:
-  //! Unites list of string into one string using the separator
-  Standard_EXPORT static void split (const TCollection_AsciiString& theValue,
-                                     const TCollection_AsciiString& theSeparator,
-                                     NCollection_List<TCollection_AsciiString>& theValues);
-public:
-  //! Unites list of string into one string using the separator
-  Standard_EXPORT static Standard_Boolean SplitReal (const TCollection_AsciiString& theValue,
-                                                     const TCollection_AsciiString& theSeparator,
-                                                     NCollection_Vector<Standard_Real>& theValues);
-
-  //! Unites vector to string value using VectorSeparator.
-  Standard_EXPORT static TCollection_AsciiString ToDumpString (const NCollection_List<TCollection_AsciiString>& theValues);
-  //! Converts stream value to string value
-  Standard_EXPORT static TCollection_AsciiString ToDumpString (const Standard_SStream& theStream);
-
-  //! Converts stream value to string value
-  static TCollection_AsciiString StartKey (const TCollection_AsciiString& theValue)
-    { return XMLBracketOpen() + theValue + XMLBracketClose(); }
-
-  //! Converts stream value to string value
-  static TCollection_AsciiString StopKey (const TCollection_AsciiString& theValue)
-    { return XMLBracketOpen() + XMLFinishKey() + theValue + XMLBracketClose(); }
-
-  Standard_EXPORT static TCollection_AsciiString ConvertDumpToText (const TCollection_AsciiString& theValue);
-
-  //! Splits a AsciiString into two sub-strings using Dump keys.
-  //! Example:
-  //! aString contains "<key>abc</key>defg"
-  //! aString.SplitDumped() gives theSplitValue = "abc", theTailValue = "defg", theKey = "key"
-  Standard_EXPORT static Standard_Boolean SplitDumped (const TCollection_AsciiString& theSourceValue,
-                                                       TCollection_AsciiString& theSplitValue,
-                                                       TCollection_AsciiString& theTailValue,
-                                                       TCollection_AsciiString& theKey);
-
-  //! Splits value that contains a key in form: <key>value</key>. In this case the values are:
-  //! theSplitValue = value, theKey = key.
-  Standard_EXPORT static Standard_Boolean SplitKey (const TCollection_AsciiString& theSourceValue,
-                                                    TCollection_AsciiString& theSplitValue,
-                                                    TCollection_AsciiString& theTailValue,
-                                                    TCollection_AsciiString& theKey);
-
-  //! Returns true if the value has bracket key
-  static Standard_Boolean HasBracketKey (const TCollection_AsciiString& theSourceValue)
-  { return theSourceValue.Search (TCollection::XMLBracketOpen()) >= 0; }
-
-protected:
-  static TCollection_AsciiString XMLBracketOpen() { return TCollection_AsciiString ("<"); }
-  static TCollection_AsciiString XMLBracketClose() { return TCollection_AsciiString (">"); }
-  static TCollection_AsciiString XMLFinishKey() { return TCollection_AsciiString ("\\"); }
 
 protected:
 
@@ -215,13 +124,6 @@ friend class TCollection_IndexedDataMapNode;
 
 };
 
-#define DUMP_VALUES(OS, Value1, Value2) \
-{ \
-  OS << Value1 << TCollection::DumpSeparator() << Value2 << TCollection::DumpSeparator(); \
-}
-
-#define DUMP_START_KEY(OS, Value1) { OS << TCollection::StartKey (Value1); }
-#define DUMP_STOP_KEY(OS, Value1)  { OS << TCollection::StopKey (Value1); }
 
 
 

@@ -18,7 +18,6 @@
 
 #include <Standard_Real.hxx>
 #include <Standard_ConstructionError.hxx>
-#include <TCollection_AsciiString.hxx>
 
 #include <NCollection_List.hxx>
 
@@ -256,10 +255,6 @@ public:
   {
     return ((myFirst == theOther.myFirst) && (myLast == theOther.myLast));
   }
-
-  //! Covers point into string in format: [myFirst, myLast]
-  //! \return the string value
-  Standard_EXPORT TCollection_AsciiString ToString() const;
 
 private:
 

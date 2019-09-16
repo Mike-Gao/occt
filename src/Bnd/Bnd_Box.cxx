@@ -20,10 +20,7 @@
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Trsf.hxx>
-#include <NCollection_List.hxx>
 #include <Standard_ConstructionError.hxx>
-#include <TCollection.hxx>
-#include <TCollection_AsciiString.hxx>
 
 // set the flag to one
 #define ClearVoidFlag() ( Flags &= ~VoidMask )
@@ -44,19 +41,6 @@ Bnd_Box::Bnd_Box()
   Gap (0.0)
 {
   SetVoid();
-}
-
-//=======================================================================
-//function : Bnd_Box
-//purpose  : 
-//=======================================================================
-
-Bnd_Box::Bnd_Box (const Standard_Real theXmin, const Standard_Real theYmin, const Standard_Real theZmin,
-                  const Standard_Real theXmax, const Standard_Real theYmax, const Standard_Real theZmax)
-: Gap (0.0)
-{
-  SetVoid();
-  Update (theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
 }
 
 //=======================================================================
@@ -972,72 +956,4 @@ void Bnd_Box::Dump () const
   }
   std::cout << "\n Gap : " << Gap;
   std::cout << "\n";
-}
-
-//=======================================================================
-//function : PointsSeparator
-//purpose  : 
-//=======================================================================
-TCollection_AsciiString PointsSeparator()
-{
-  return " - ";
-}
-
-
-const TCollection_AsciiString Bnd_Box_ClassName = "Bnd_Box";
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-
-void Bnd_Box::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, Bnd_Box_ClassName);
-
-  DUMP_VALUES (OS, "Xmin", Xmin);
-  DUMP_VALUES (OS, "Ymin", Ymin);
-  DUMP_VALUES (OS, "Zmin", Zmin);
-  DUMP_VALUES (OS, "Xmax", Xmax);
-  DUMP_VALUES (OS, "Ymax", Ymax);
-  DUMP_VALUES (OS, "Zmax", Zmax);
-  DUMP_VALUES (OS, "Gap",  Gap);
-  DUMP_VALUES (OS, "Flags", Flags);
-
-  DUMP_STOP_KEY (OS, Bnd_Box_ClassName);
-}
-
-//=======================================================================
-//function : Init
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean Bnd_Box::Init (const Standard_SStream& OS)
-{
-  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aStreamValues;
-  TCollection_AsciiString aKey;
-  TCollection::Split (OS, aStreamValues, aKey);
-
-  TCollection_AsciiString aXmin, anYmin, aZmin, aXmax, anYmax, aZmax, aGap, aFlags;
-  if (!aStreamValues.FindFromKey ("Xmin", aXmin) ||
-      !aStreamValues.FindFromKey ("Ymin", anYmin) ||
-      !aStreamValues.FindFromKey ("Zmin", aZmin) ||
-      !aStreamValues.FindFromKey ("Xmax", aXmax) ||
-      !aStreamValues.FindFromKey ("Ymax", anYmax) ||
-      !aStreamValues.FindFromKey ("Zmax", aZmax) ||
-      !aStreamValues.FindFromKey ("Gap", aGap) ||
-      !aStreamValues.FindFromKey ("Flags", aFlags))
-    return Standard_False;
-
-  Xmin = aXmin.RealValue();
-  Ymin = anYmin.RealValue();
-  Zmin = aZmin.RealValue();
-  Xmax = aXmax.RealValue();
-  Ymax = anYmax.RealValue();
-  Zmax = aZmax.RealValue();
-
-  Gap = aGap.RealValue();
-  Flags = aFlags.IntegerValue();
-
-  return Standard_True;
 }

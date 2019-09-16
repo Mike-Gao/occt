@@ -144,26 +144,3 @@ void AIS_InteractiveObject::SetAspect(const Handle(Prs3d_BasicAspect)& theAspect
     aGroup->SetGroupPrimitivesAspect (aTextAspect->Aspect());
   }
 }
-
-const TCollection_AsciiString AIS_InteractiveObject_ClassName = "AIS_InteractiveObject";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void AIS_InteractiveObject::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, AIS_InteractiveObject_ClassName);
-
-  {
-    Standard_SStream aTmpStream;
-    SelectMgr_SelectableObject::Dump (aTmpStream);
-    DUMP_VALUES (OS, "SelectMgr_SelectableObject", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_VALUES (OS, "InteractiveContext", TCollection::GetPointerInfo (myCTXPtr));
-  DUMP_VALUES (OS, "Owner", TCollection::GetPointerInfo (myOwner));
-
-  DUMP_STOP_KEY (OS, AIS_InteractiveObject_ClassName);
-
-}

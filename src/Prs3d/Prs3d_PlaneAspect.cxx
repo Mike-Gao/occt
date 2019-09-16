@@ -14,8 +14,6 @@
 
 #include <Prs3d_PlaneAspect.hxx>
 
-#include <TCollection.hxx>
-
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_PlaneAspect, Prs3d_BasicAspect)
 
 // =======================================================================
@@ -39,43 +37,3 @@ Prs3d_PlaneAspect::Prs3d_PlaneAspect()
 {
   //
 }
-
-const TCollection_AsciiString Prs3d_PlaneAspect_ClassName = "Prs3d_PlaneAspect";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_PlaneAspect::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, Prs3d_PlaneAspect_ClassName);
-  {
-    Standard_SStream aTmpStream;
-    myEdgesAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "EdgesAspect", TCollection::ToDumpString (aTmpStream));
-  }
-  {
-    Standard_SStream aTmpStream;
-    myIsoAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "IsoAspect", TCollection::ToDumpString (aTmpStream));
-  }
-  {
-    Standard_SStream aTmpStream;
-    myArrowAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "ArrowAspect", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_VALUES (OS, "ArrowsLength", myArrowsLength);
-  DUMP_VALUES (OS, "ArrowsSize", myArrowsSize);
-  DUMP_VALUES (OS, "ArrowsAngle", myArrowsAngle);
-  DUMP_VALUES (OS, "PlaneXLength", myPlaneXLength);
-  DUMP_VALUES (OS, "PlaneYLength", myPlaneYLength);
-  DUMP_VALUES (OS, "IsoDistance", myIsoDistance);
-  DUMP_VALUES (OS, "DrawCenterArrow", myDrawCenterArrow);
-  DUMP_VALUES (OS, "DrawEdgesArrows", myDrawEdgesArrows);
-  DUMP_VALUES (OS, "DrawEdges", myDrawEdges);
-  DUMP_VALUES (OS, "DrawIso", myDrawIso);
-
-  DUMP_STOP_KEY (OS, Prs3d_PlaneAspect_ClassName);
-}
-

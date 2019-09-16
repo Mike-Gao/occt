@@ -175,12 +175,3 @@ void Bnd_Range::Split(const Standard_Real theVal,
     theList.Append(Bnd_Range(aValPrev, myLast));
   }
 }
-
-//=======================================================================
-//function : ToString
-//purpose  : 
-//=======================================================================
-TCollection_AsciiString Bnd_Range::ToString() const
-{
-  return TCollection_AsciiString ("[") + myFirst + ", " + myLast + "]";
-}

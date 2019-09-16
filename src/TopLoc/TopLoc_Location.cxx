@@ -20,7 +20,6 @@
 #include <gp_Trsf.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_NoSuchObject.hxx>
-#include <TCollection.hxx>
 #include <TopLoc_Datum3D.hxx>
 #include <TopLoc_ItemLocation.hxx>
 #include <TopLoc_Location.hxx>
@@ -229,39 +228,6 @@ Standard_Boolean TopLoc_Location::IsDifferent
   (const TopLoc_Location& Other) const
 {
   return !IsEqual(Other);
-}
-
-const TCollection_AsciiString TopLoc_Location_ClassName = "TopLoc_Location";
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-
-void TopLoc_Location::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, TopLoc_Location_ClassName);
-
-  DUMP_VALUES (OS, "IsIdentity", IsIdentity());
-  {
-    Standard_SStream aTmpStream;
-    Transformation().Dump (aTmpStream);
-    DUMP_VALUES (OS, "Transformation", TCollection::ToDumpString (aTmpStream));
-  }
-
-  /*TopLoc_SListOfItemLocation items = myItems;
-  if (!items.IsEmpty())
-  {
-    while (items.More())
-    {
-      Standard_SStream aTmpStream;
-      items.Value().Dump (aTmpStream);
-      DUMP_VALUES (OS, "Item", TCollection::ToDumpString (aTmpStream));
-
-      items.Next();
-    }
-  }*/
-  DUMP_STOP_KEY (OS, TopLoc_Location_ClassName);
 }
 
 //=======================================================================

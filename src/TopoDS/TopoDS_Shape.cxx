@@ -19,7 +19,6 @@
 #include <Standard_DomainError.hxx>
 #include <Standard_NullObject.hxx>
 #include <Standard_TypeMismatch.hxx>
-#include <TCollection.hxx>
 #include <TopLoc_Location.hxx>
 #include <TopoDS_TShape.hxx>
 
@@ -33,26 +32,4 @@ Standard_Integer TopoDS_Shape::HashCode (const Standard_Integer theUpperBound) c
   const Standard_Integer aHS = ::HashCode (myTShape.get(), theUpperBound);
   const Standard_Integer aHL = myLocation.HashCode (theUpperBound);
   return ::HashCode (aHS ^ aHL, theUpperBound);
-}
-
-const TCollection_AsciiString TopoDS_Shape_ClassName = "TopoDS_Shape";
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-
-void TopoDS_Shape::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, TopoDS_Shape_ClassName);
-
-  DUMP_VALUES (OS, "TShape", TCollection::GetPointerInfo (myTShape));
-  DUMP_VALUES (OS, "Orientation", TopAbs::ShapeOrientationToString (myOrient));
-  {
-    Standard_SStream aTmpStream;
-    myLocation.Dump (aTmpStream);
-    DUMP_VALUES (OS, "Location", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_STOP_KEY (OS, TopoDS_Shape_ClassName);
 }

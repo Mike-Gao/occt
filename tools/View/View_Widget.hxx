@@ -74,9 +74,7 @@ protected:
 public:
 
   //! Constructor
-  Standard_EXPORT View_Widget (QWidget* theParent,
-                               const Handle(AIS_InteractiveContext)& theContext,
-                               const bool isFitAllActive);
+  Standard_EXPORT View_Widget (QWidget* theParent, const bool isFitAllActive);
 
   //! Destructor
   virtual ~View_Widget() {}
@@ -126,21 +124,6 @@ signals:
 
   //! Sends a signal about selection change if the left mouse button is pressed and current action does not process it
   void selectionChanged();
-
-  //! Sends a signal about moving to the point in the view
-  //! \param theX X mouse position in pixels
-  //! \param theY Y mouse position in pixels
-  void  moveTo (const int theX, const int theY);
-
-  //! Sends a signal about up the left mouse button down
-  //! \param theX X mouse position in pixels
-  //! \param theY Y mouse position in pixels
-  void leftButtonDown (const int theX, const int theY);
-
-  //! Sends a signal about up the left mouse button up
-  //! \param theX X mouse position in pixels
-  //! \param theY Y mouse position in pixels
-  void leftButtonUp (const int theX, const int theY);
 
   //! Sends a signal about display mode change
   void displayModeClicked();

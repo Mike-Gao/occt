@@ -17,12 +17,8 @@
 #define ShapeView_ItemShape_H
 
 #include <inspector/ShapeView_ItemBase.hxx>
-
-#include <TopTools_IndexedMapOfShape.hxx>
-
 #include <Standard.hxx>
 #include <TCollection_AsciiString.hxx>
-#include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -49,13 +45,6 @@ public:
 
   //! Destructor
   virtual ~ShapeView_ItemShape() Standard_OVERRIDE {};
-
-  //! Sets explore type
-  //! \param theType type of item explode. If TopAbs_SHAPE, no expode, only iteration by shape
-  void SetExplodeType (const TopAbs_ShapeEnum theType) { myExplodeType  = theType; }
-
-  //! Returns expode type of the item
-  TopAbs_ShapeEnum GetExplodeType() const { return myExplodeType; }
 
   //! Returns the current shape
   const TopoDS_Shape& GetItemShape() const { initItem(); return myShape; }
@@ -116,22 +105,16 @@ protected:
   //! \return the string value
   static TCollection_AsciiString getPointerInfo (const Handle(Standard_Transient)& thePointer, const bool isShortInfo = true);
 
-  //! Creates container of item properties
-  Standard_EXPORT Handle(TreeModel_ItemProperties) createItemProperties() const;
-
 private:
 
   //! Constructor
-  ShapeView_ItemShape (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-    : ShapeView_ItemBase (theParent, theRow, theColumn), myExplodeType (TopAbs_SHAPE) {}
+  ShapeView_ItemShape(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  : ShapeView_ItemBase(theParent, theRow, theColumn) {}
 
 private:
-  TopAbs_ShapeEnum myExplodeType; //!< type of explore own shape and get children
 
   TopoDS_Shape myShape; //!< current shape
   QString myFileName; //!< BREP file name
-
-  TopTools_IndexedMapOfShape myChildShapes; //! cached container of child shapes
 };
 
 #endif

@@ -20,9 +20,8 @@
 #include <inspector/VInspector_ItemBase.hxx>
 
 #include <AIS_InteractiveObject.hxx>
+#include <NCollection_List.hxx>
 #include <TCollection_AsciiString.hxx>
-
-class Prs3d_Drawer;
 
 class QItemSelectionModel;
 
@@ -44,32 +43,11 @@ public:
   //! Destructor
   virtual ~VInspector_ItemFolderObject() Standard_OVERRIDE {};
 
-  //! Returns data object of the item.
-  //! \return object
-  virtual Handle(Standard_Transient) GetObject() const { return NULL; }
-
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
 
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
-
-  //! Returns drawer of the row if possible
-  //! \param theRow child row index
-  //! \param theName [out] drawer name
-  Standard_EXPORT Handle(Prs3d_Drawer) GetPrs3dDrawer (const int theRow,
-                                                       TCollection_AsciiString& theName) const;
-
-  enum ParentKind
-  {
-    ParentKind_ContextItem, //!< "Properties" item under an interactive context
-    ParentKind_PresentationItem, //!< "Properties" item under an interactive presentation
-    ParentKind_FolderItem //!< "Filters" item under an interactive context
-  };
-
-  //! Finds kind of the parent item
-  //! \return item kind
-  ParentKind GetParentItemKind() const;
 
 protected:
 
@@ -90,6 +68,11 @@ protected:
   //! \param theColumn the child column position
   //! \return the created item
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE;
+
+private:
+  //! Returns whether the parent item is context item
+  //! \returns bolean value
+  bool parentItemIsContext() const;
 
 private:
 

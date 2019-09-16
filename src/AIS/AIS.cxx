@@ -82,24 +82,6 @@
 
 const Standard_Real SquareTolerance = Precision::SquareConfusion();
 
-namespace
-{
-  static Standard_CString AIS_Table_PrintDisplayMode[2] =
-  {
-    "WIREFRAME", "SHADING"
-  };
-
-  static Standard_CString AIS_Table_PrintDisplayStatus[3] =
-  {
-    "DISPLAYED", "ERASED", "NONE"
-  };
-
-  static Standard_CString AIS_Table_PrintKindOfInteractive[6] =
-  {
-    "NONE", "DATUM", "SHAPE", "OBJECT", "RELATION", "DIMENSION"
-  };
-}
-
 //=======================================================================
 //function : Nearest
 //purpose  :
@@ -1550,94 +1532,4 @@ void AIS::ComputeProjVertexPresentation (const Handle( Prs3d_Presentation )& aPr
     BRepBuilderAPI_MakeEdge MakEd (ProjPoint, BRep_Tool::Pnt (aVertex));
     StdPrs_WFShape::Add (aPresentation, MakEd.Edge(), aDrawer);
   }
-}
-
-//=======================================================================
-//function : DisplayModeToString
-//purpose  :
-//=======================================================================
-Standard_CString AIS::DisplayModeToString (AIS_DisplayMode theType)
-{
-  return AIS_Table_PrintDisplayMode[theType];
-}
-
-//=======================================================================
-//function : DisplayModeFromString
-//purpose  :
-//=======================================================================
-Standard_Boolean AIS::DisplayModeFromString (Standard_CString theTypeString,
-                                             AIS_DisplayMode& theType)
-{
-  TCollection_AsciiString aName (theTypeString);
-  aName.UpperCase();
-  for (Standard_Integer aTypeIter = 0; aTypeIter <= AIS_Shaded; ++aTypeIter)
-  {
-    Standard_CString aTypeName = AIS_Table_PrintDisplayMode[aTypeIter];
-    if (aName == aTypeName)
-    {
-      theType = AIS_DisplayMode (aTypeIter);
-      return Standard_True;
-    }
-  }
-  return Standard_False;
-}
-
-//=======================================================================
-//function : DisplayStatusToString
-//purpose  :
-//=======================================================================
-Standard_CString AIS::DisplayStatusToString (AIS_DisplayStatus theType)
-{
-  return AIS_Table_PrintDisplayStatus[theType];
-}
-
-//=======================================================================
-//function : DisplayStatusFromString
-//purpose  :
-//=======================================================================
-Standard_Boolean AIS::DisplayStatusFromString (Standard_CString theTypeString,
-                                               AIS_DisplayStatus& theType)
-{
-  TCollection_AsciiString aName (theTypeString);
-  aName.UpperCase();
-  for (Standard_Integer aTypeIter = 0; aTypeIter <= AIS_DS_None; ++aTypeIter)
-  {
-    Standard_CString aTypeName = AIS_Table_PrintDisplayStatus[aTypeIter];
-    if (aName == aTypeName)
-    {
-      theType = AIS_DisplayStatus (aTypeIter);
-      return Standard_True;
-    }
-  }
-  return Standard_False;
-}
-
-//=======================================================================
-//function : KindOfInteractiveToString
-//purpose  :
-//=======================================================================
-Standard_CString AIS::KindOfInteractiveToString (AIS_KindOfInteractive theType)
-{
-  return AIS_Table_PrintKindOfInteractive[theType];
-}
-
-//=======================================================================
-//function : KindOfInteractiveFromString
-//purpose  :
-//=======================================================================
-Standard_Boolean AIS::KindOfInteractiveFromString (Standard_CString theTypeString,
-                                                   AIS_KindOfInteractive& theType)
-{
-  TCollection_AsciiString aName (theTypeString);
-  aName.UpperCase();
-  for (Standard_Integer aTypeIter = 0; aTypeIter <= AIS_KOI_Dimension; ++aTypeIter)
-  {
-    Standard_CString aTypeName = AIS_Table_PrintKindOfInteractive[aTypeIter];
-    if (aName == aTypeName)
-    {
-      theType = AIS_KindOfInteractive (aTypeIter);
-      return Standard_True;
-    }
-  }
-  return Standard_False;
 }

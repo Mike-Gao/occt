@@ -23,10 +23,8 @@
 #include <Prs3d_PointAspect.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
-
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
-#include <inspector/View_Tools.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -279,7 +277,18 @@ void View_Displayer::DisplayedPresentations (NCollection_Shared<AIS_ListOfIntera
 // =======================================================================
 Handle(V3d_View) View_Displayer::GetView() const
 {
-  return View_Tools::FindActiveView (GetContext());
+  Handle(V3d_View) aView;
+  if (GetContext().IsNull())
+    return aView;
+
+  const Handle(V3d_Viewer)& aViewer = GetContext()->CurrentViewer();
+  if (!aViewer.IsNull())
+  {
+    aViewer->InitActiveViews();
+    if (aViewer->MoreActiveViews())
+      aView = aViewer->ActiveView();
+  }
+  return aView;
 }
 
 // =======================================================================
@@ -313,7 +322,7 @@ Handle(Standard_Transient) View_Displayer::CreatePresentation (const TopoDS_Shap
 {
   Handle(AIS_Shape) aShape = new AIS_Shape (theShape);
 
-  //aShape->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_WHITE, 1.0));
+  aShape->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_WHITE, 1.0));
 
   return aShape;
 }
