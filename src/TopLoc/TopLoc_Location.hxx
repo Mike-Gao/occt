@@ -142,6 +142,9 @@ Standard_Boolean operator != (const TopLoc_Location& Other) const
   return IsDifferent(Other);
 }
   
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
+
   //! Prints the contents of <me> on the stream <s>.
   Standard_EXPORT void ShallowDump (Standard_OStream& S) const;
 

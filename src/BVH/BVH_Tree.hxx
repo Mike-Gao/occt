@@ -27,6 +27,11 @@ class BVH_TreeBaseTransient : public Standard_Transient
   DEFINE_STANDARD_RTTIEXT(BVH_TreeBaseTransient, Standard_Transient)
 protected:
   BVH_TreeBaseTransient() {}
+  //! Dumps the content of me into the stream
+  virtual void Dump (Standard_OStream& theOStream) const { (void)theOStream; }
+  //! Dumps the content of me into the stream
+  virtual void DumpNode (const int theNodeIndex, Standard_OStream& theOStream) const
+  { (void)theNodeIndex; (void)theOStream; }
 };
 
 //! Stores parameters of bounding volume hierarchy (BVH).
@@ -176,6 +181,34 @@ public: //! @name methods for accessing serialized tree data
   const typename BVH::ArrayType<T, N>::Type& MaxPointBuffer() const
   {
     return myMaxPointBuffer;
+  }
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void Dump (Standard_OStream& theOStream) const Standard_OVERRIDE
+  {
+    Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (BVH_TreeBase));
+    DUMP_FIELD_VALUES (theOStream, myDepth);
+    DUMP_FIELD_VALUES (theOStream, Length());
+
+    for (Standard_Integer aNodeIdx = 0; aNodeIdx < Length(); ++aNodeIdx)
+    {
+       DumpNode (aNodeIdx, theOStream);
+    }
+  }
+
+  //! Dumps the content of node into the stream
+  Standard_EXPORT virtual void DumpNode (const int theNodeIndex, Standard_OStream& theOStream) const Standard_OVERRIDE
+  {
+    Standard_Dump::Sentry aSentry (theOStream, "BVH_TreeNode");
+    DUMP_FIELD_VALUES (theOStream, theNodeIndex);
+
+    Bnd_Box aBndBox = BVH::ToBndBox (MinPoint (theNodeIndex), MaxPoint (theNodeIndex));
+    DUMP_FIELD_VALUES_SUBCLASS (theOStream, &aBndBox);
+
+    DUMP_FIELD_VALUES (theOStream, BegPrimitive (theNodeIndex));
+    DUMP_FIELD_VALUES (theOStream, EndPrimitive (theNodeIndex));
+    DUMP_FIELD_VALUES (theOStream, Level (theNodeIndex));
+    DUMP_FIELD_VALUES (theOStream, IsOuter (theNodeIndex));
   }
 
 public: //! @name protected fields

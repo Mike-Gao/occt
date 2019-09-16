@@ -15,6 +15,8 @@
 
 #include <XCAFPrs_Style.hxx>
 
+#include <Standard_Dump.hxx>
+
 //=======================================================================
 //function : XCAFPrs_Style
 //purpose  :
@@ -66,4 +68,20 @@ void XCAFPrs_Style::UnSetColorCurv()
 {
   myHasColorCurv = Standard_False;
   myColorCurv.SetValues (Quantity_NOC_YELLOW);
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void XCAFPrs_Style::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (XCAFPrs_Style));
+
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myColorSurf);
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myColorCurv);
+
+  DUMP_FIELD_VALUES (theOStream, myHasColorSurf);
+  DUMP_FIELD_VALUES (theOStream, myHasColorCurv);
+  DUMP_FIELD_VALUES (theOStream, myIsVisible);
 }

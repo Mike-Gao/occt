@@ -19,6 +19,7 @@
 #include <Standard_ConstructionError.hxx>
 #include <Standard_Stream.hxx>
 #include <Standard_Type.hxx>
+#include <Standard_Dump.hxx>
 #include <TopLoc_Datum3D.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(TopLoc_Datum3D,Standard_Transient)
@@ -39,6 +40,17 @@ TopLoc_Datum3D::TopLoc_Datum3D ()
 TopLoc_Datum3D::TopLoc_Datum3D (const gp_Trsf& T) :
  myTrsf(T)
 {
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void TopLoc_Datum3D::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (TopLoc_Datum3D));
+
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myTrsf);
 }
 
 //=======================================================================

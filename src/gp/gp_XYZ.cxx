@@ -15,8 +15,13 @@
 
 #include <gp_Mat.hxx>
 #include <gp_XYZ.hxx>
+#include <NCollection_List.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_OutOfRange.hxx>
+#include <Standard_Dump.hxx>
+#include <TCollection_AsciiString.hxx>
+
+#include <TCollection_AsciiString.hxx>
 
 Standard_Boolean gp_XYZ::IsEqual (const gp_XYZ& Other,
 				  const Standard_Real Tolerance) const {
@@ -33,3 +38,15 @@ Standard_Boolean gp_XYZ::IsEqual (const gp_XYZ& Other,
   return Standard_True;
 }
 
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void gp_XYZ::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (gp_XYZ));
+
+  DUMP_FIELD_VALUES (theOStream, x);
+  DUMP_FIELD_VALUES (theOStream, y);
+  DUMP_FIELD_VALUES (theOStream, z);
+}

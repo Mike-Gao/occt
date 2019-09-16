@@ -447,3 +447,18 @@ void Graphic3d_Group::AddText (const Handle(Graphic3d_Text)& theTextParams,
 
   Update();
 }
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Graphic3d_Group::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Graphic3d_Group));
+
+  //Graphic3d_Structure* myStructure;     //!< pointer to the parent structure
+  //Graphic3d_BndBox4f   myBounds;        //!< bounding box
+
+  DUMP_FIELD_VALUES (theOStream, myIsClosed);
+  DUMP_FIELD_VALUES (theOStream, myContainsFacet);
+}

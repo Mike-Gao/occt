@@ -209,6 +209,9 @@ public:
   //! mark both included and overlapped entities as matched
   Standard_EXPORT void AllowOverlapDetection (const Standard_Boolean theIsToAllow);
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
+
 public:
 
   //! Begins an iteration scanning for the owners detected at a position in the view.

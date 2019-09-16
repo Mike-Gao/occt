@@ -121,6 +121,9 @@ public:
     return theS1.IsEqual (theS2);
   }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
+
 protected:
 
   Quantity_ColorRGBA myColorSurf;

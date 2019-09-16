@@ -126,6 +126,9 @@ public:
   //! @sa TopoDS_Iterator for accessing sub-shapes
   Standard_Integer NbChildren() const { return myShapes.Size(); }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
+
 friend class TopoDS_Iterator;
 friend class TopoDS_Builder;
 

@@ -353,3 +353,21 @@ void OpenGl_Group::Release (const Handle(OpenGl_Context)& theGlCtx)
 
   OpenGl_Element::Destroy (theGlCtx.get(), myAspects);
 }
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void OpenGl_Group::Dump (Standard_OStream& theOStream) const
+{ 
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (OpenGl_Group));
+
+  DUMP_FIELD_VALUES_PARENT (theOStream, Graphic3d_Group);
+
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myAspects);
+  //OpenGl_CappingPlaneResource* myAspectFillCapping;
+  //OpenGl_ElementNode* myFirst;
+  //OpenGl_ElementNode* myLast;
+
+  DUMP_FIELD_VALUES (theOStream, myIsRaytracable);
+}

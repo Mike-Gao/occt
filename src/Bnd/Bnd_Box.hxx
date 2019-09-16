@@ -69,6 +69,13 @@ public:
   //! The constructed box is qualified Void. Its gap is null.
   Standard_EXPORT Bnd_Box();
 
+  //! Creates a bounding box, it contains:
+  //! -   interval [ aXmin,aXmax ] in the "X Direction",
+  //! -   interval [ aYmin,aYmax ] in the "Y Direction",
+  //! -   interval [ aZmin,aZmax ] in the "Z Direction";
+  //! The constructed box is qualified Void. Its gap is null.
+  Standard_EXPORT Bnd_Box (const Standard_Real aXmin, const Standard_Real aYmin, const Standard_Real aZmin,
+                           const Standard_Real aXmax, const Standard_Real aYmax, const Standard_Real aZmax);
   //! Sets this bounding box so that it  covers the whole of 3D space.
   //! It is infinitely  long in all directions.
   void SetWhole() { Flags = WholeMask; }
@@ -295,6 +302,9 @@ public:
     return !IsVoid()
          && Xmax >= Xmin;
   }
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
 
 protected:
 

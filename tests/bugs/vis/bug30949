@@ -1,0 +1,20 @@
+puts "============="
+puts "0030949: Foundation Classes - Dump improvement for OCCT classes"
+puts "============="
+
+pload VISUALIZATION
+vinit View
+
+set pred 0.329
+set pgreen 0.224
+set pblue 0.027
+
+set log [vaspects -defaults -dump]
+
+if {![regexp {Red = +([-0-9.+eE]+)\n         Green = +([-0-9.+eE]+)\n         Blue = +([-0-9.+eE]+)} $log full cred cgreen cblue]} {
+  puts "Error in Dump."
+}
+
+checkreal "Cred" $cred $pred 1.0e-7 0.0
+checkreal "Cgreen" $cgreen $pgreen 1.0e-7 0.0
+checkreal "Cblue" $cblue $pblue 1.0e-7 0.0

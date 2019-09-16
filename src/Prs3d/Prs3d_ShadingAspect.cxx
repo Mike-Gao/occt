@@ -18,6 +18,7 @@
 #include <Graphic3d_MaterialAspect.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Type.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_ShadingAspect, Prs3d_BasicAspect)
 
@@ -164,3 +165,15 @@ Standard_Real Prs3d_ShadingAspect::Transparency (const Aspect_TypeOfFacingModel 
   }
   return 0.0;
 }
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Prs3d_ShadingAspect::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Prs3d_ShadingAspect), this);
+
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myAspect);
+}
+

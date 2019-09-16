@@ -21,6 +21,7 @@
 #include <gp_Pnt.hxx>
 #include <gp_Trsf.hxx>
 #include <Standard_ConstructionError.hxx>
+#include <Standard_Dump.hxx>
 
 // set the flag to one
 #define ClearVoidFlag() ( Flags &= ~VoidMask )
@@ -42,6 +43,19 @@ Bnd_Box::Bnd_Box()
 {
   SetVoid();
 }
+
+//=======================================================================
+//function : Bnd_Box
+//purpose  : 
+//=======================================================================
+Bnd_Box::Bnd_Box (const Standard_Real theXmin, const Standard_Real theYmin, const Standard_Real theZmin,
+                  const Standard_Real theXmax, const Standard_Real theYmax, const Standard_Real theZmax)
+: Gap (0.0)
+{
+  SetVoid();
+  Update (theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
+}
+
 
 //=======================================================================
 //function : Set
@@ -956,4 +970,22 @@ void Bnd_Box::Dump () const
   }
   std::cout << "\n Gap : " << Gap;
   std::cout << "\n";
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void Bnd_Box::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Bnd_Box));
+
+  DUMP_FIELD_VALUES (theOStream, Xmin);
+  DUMP_FIELD_VALUES (theOStream, Ymin);
+  DUMP_FIELD_VALUES (theOStream, Zmin);
+  DUMP_FIELD_VALUES (theOStream, Xmax);
+  DUMP_FIELD_VALUES (theOStream, Ymax);
+  DUMP_FIELD_VALUES (theOStream, Zmax);
+  DUMP_FIELD_VALUES (theOStream, Gap);
+  DUMP_FIELD_VALUES (theOStream, Flags);
 }

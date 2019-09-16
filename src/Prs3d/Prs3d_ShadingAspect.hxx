@@ -62,6 +62,9 @@ public:
 
   void SetAspect (const Handle(Graphic3d_AspectFillArea3d)& theAspect) { myAspect = theAspect; }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void Dump (Standard_OStream& theOStream) const Standard_OVERRIDE;
+
 protected:
 
   Handle(Graphic3d_AspectFillArea3d) myAspect;

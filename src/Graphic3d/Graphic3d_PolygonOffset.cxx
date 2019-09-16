@@ -1,7 +1,4 @@
-// Created on: 1991-03-20
-// Created by: Remi Lequette
-// Copyright (c) 1991-1999 Matra Datavision
-// Copyright (c) 1999-2014 OPEN CASCADE SAS
+// Copyright (c) 2016 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -14,21 +11,19 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <TopoDS_TShape.hxx>
-#include <TopoDS_Shape.hxx>
+#include <Graphic3d_PolygonOffset.hxx>
 
 #include <Standard_Dump.hxx>
-
-IMPLEMENT_STANDARD_RTTIEXT(TopoDS_TShape,Standard_Transient)
 
 //=======================================================================
 //function : Dump
 //purpose  : 
 //=======================================================================
-void TopoDS_TShape::Dump (Standard_OStream& theOStream) const
+void Graphic3d_PolygonOffset::Dump (Standard_OStream& theOStream) const
 {
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (TopoDS_TShape), this);
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Graphic3d_PolygonOffset));
 
-  DUMP_FIELD_VALUES (theOStream, myFlags);
-  //TopoDS_ListOfShape myShapes;
+  DUMP_FIELD_VALUES (theOStream, Mode);
+  DUMP_FIELD_VALUES (theOStream, Factor);
+  DUMP_FIELD_VALUES (theOStream, Units);
 }

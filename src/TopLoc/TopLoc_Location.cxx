@@ -20,6 +20,7 @@
 #include <gp_Trsf.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_NoSuchObject.hxx>
+#include <Standard_Dump.hxx>
 #include <TopLoc_Datum3D.hxx>
 #include <TopLoc_ItemLocation.hxx>
 #include <TopLoc_Location.hxx>
@@ -228,6 +229,28 @@ Standard_Boolean TopLoc_Location::IsDifferent
   (const TopLoc_Location& Other) const
 {
   return !IsEqual(Other);
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void TopLoc_Location::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (TopLoc_Location));
+
+  DUMP_FIELD_VALUES (theOStream, IsIdentity());
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &Transformation());
+
+  /*TopLoc_SListOfItemLocation items = myItems;
+  if (!items.IsEmpty())
+  {
+    while (items.More())
+    {
+      DUMP_FIELD_VALUES_SUBCLASS (theOStream, &items.Value());
+      items.Next();
+    }
+  }*/
 }
 
 //=======================================================================

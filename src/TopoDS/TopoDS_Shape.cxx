@@ -19,6 +19,7 @@
 #include <Standard_DomainError.hxx>
 #include <Standard_NullObject.hxx>
 #include <Standard_TypeMismatch.hxx>
+#include <Standard_Dump.hxx>
 #include <TopLoc_Location.hxx>
 #include <TopoDS_TShape.hxx>
 
@@ -32,4 +33,17 @@ Standard_Integer TopoDS_Shape::HashCode (const Standard_Integer theUpperBound) c
   const Standard_Integer aHS = ::HashCode (myTShape.get(), theUpperBound);
   const Standard_Integer aHL = myLocation.HashCode (theUpperBound);
   return ::HashCode (aHS ^ aHL, theUpperBound);
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void TopoDS_Shape::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (TopoDS_Shape));
+
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myTShape);
+  DUMP_FIELD_VALUES (theOStream, myOrient);
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myLocation);
 }

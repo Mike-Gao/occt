@@ -837,3 +837,39 @@ void PrsMgr_PresentableObject::PolygonOffsets (Standard_Integer&   theMode,
     myDrawer->ShadingAspect()->Aspect()->PolygonOffsets (theMode, theFactor, theUnits);
   }
 }
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void PrsMgr_PresentableObject::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (PrsMgr_PresentableObject));
+
+  DUMP_FIELD_VALUES (theOStream, myParent);
+
+  DUMP_FIELD_VALUES (theOStream, myOwnWidth);
+  DUMP_FIELD_VALUES (theOStream, hasOwnColor);
+  DUMP_FIELD_VALUES (theOStream, hasOwnMaterial);
+
+  DUMP_FIELD_VALUES (theOStream, myInfiniteState);
+  DUMP_FIELD_VALUES (theOStream, myIsMutable);
+  DUMP_FIELD_VALUES (theOStream, myHasOwnPresentations);
+
+/*
+  PrsMgr_Presentations                   myPresentations;           //!< list of presentations
+  Handle(Graphic3d_SequenceOfHClipPlane) myClipPlanes;              //!< sequence of object-specific clipping planes
+  Handle(Prs3d_Drawer)                   myDrawer;                  //!< main presentation attributes
+  Handle(Prs3d_Drawer)                   myHilightDrawer;           //!< (optional) custom presentation attributes for highlighting selected object
+  Handle(Prs3d_Drawer)                   myDynHilightDrawer;        //!< (optional) custom presentation attributes for highlighting detected object
+  Handle(Graphic3d_TransformPers)        myTransformPersistence;    //!< transformation persistence
+  Handle(Geom_Transformation)            myLocalTransformation;     //!< local transformation relative to parent object
+  Handle(Geom_Transformation)            myTransformation;          //!< absolute transformation of this object (combined parents + local transformations)
+  Handle(Geom_Transformation)            myCombinedParentTransform; //!< transformation of parent object (combined for all parents)
+  PrsMgr_ListOfPresentableObjects        myChildren;                //!< list of children
+  gp_GTrsf                               myInvTransformation;       //!< inversion of absolute transformation (combined parents + local transformations)
+  PrsMgr_TypeOfPresentation3d            myTypeOfPresentation3d;    //!< presentation type
+
+  Aspect_TypeOfFacingModel               myCurrentFacingModel;      //!< current facing model
+*/
+}

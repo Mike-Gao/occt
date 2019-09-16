@@ -144,3 +144,11 @@ void AIS_InteractiveObject::SetAspect(const Handle(Prs3d_BasicAspect)& theAspect
     aGroup->SetGroupPrimitivesAspect (aTextAspect->Aspect());
   }
 }
+
+void AIS_InteractiveObject::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (AIS_InteractiveObject));
+  DUMP_FIELD_VALUES_PARENT (theOStream, SelectMgr_SelectableObject);
+  DUMP_FIELD_VALUES_POINTER (theOStream, myCTXPtr);
+  DUMP_FIELD_VALUES_POINTER (theOStream, myOwner);
+}

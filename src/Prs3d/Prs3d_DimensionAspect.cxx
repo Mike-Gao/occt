@@ -16,6 +16,7 @@
 
 #include <Aspect_TypeOfLine.hxx>
 #include <Graphic3d_AspectText3d.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_DimensionAspect, Prs3d_BasicAspect)
 
@@ -59,3 +60,27 @@ void Prs3d_DimensionAspect::SetCommonColor (const Quantity_Color& theColor)
   myTextAspect->SetColor (theColor);
   myArrowAspect->SetColor (theColor);
 }
+
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Prs3d_DimensionAspect::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Prs3d_DimensionAspect));
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myLineAspect);
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myTextAspect);
+  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myArrowAspect);
+
+  DUMP_FIELD_VALUES (theOStream, myValueStringFormat);
+  DUMP_FIELD_VALUES (theOStream, myExtensionSize);
+  DUMP_FIELD_VALUES (theOStream, myArrowTailSize);
+  DUMP_FIELD_VALUES (theOStream, myArrowOrientation);
+  DUMP_FIELD_VALUES (theOStream, myTextHPosition);
+  DUMP_FIELD_VALUES (theOStream, myTextVPosition);
+  DUMP_FIELD_VALUES (theOStream, myToDisplayUnits);
+  DUMP_FIELD_VALUES (theOStream, myIsText3d);
+  DUMP_FIELD_VALUES (theOStream, myIsTextShaded);
+  DUMP_FIELD_VALUES (theOStream, myIsArrows3d);
+}
+

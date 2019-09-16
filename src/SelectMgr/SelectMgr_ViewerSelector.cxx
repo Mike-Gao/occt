@@ -1046,3 +1046,27 @@ void SelectMgr_ViewerSelector::AllowOverlapDetection (const Standard_Boolean the
 {
   mySelectingVolumeMgr.AllowOverlapDetection (theIsToAllow);
 }
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+void SelectMgr_ViewerSelector::Dump(Standard_OStream& theOStream)const 
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (SelectMgr_ViewerSelector));
+
+  DUMP_FIELD_VALUES (theOStream, preferclosest);
+  DUMP_FIELD_VALUES (theOStream, myToUpdateTolerance);
+  DUMP_FIELD_VALUES (theOStream, mystored.Extent());
+  //DUMP_FIELD_VALUES (theOStream, mySelectingVolumeMgr);
+
+  Standard_Integer aNbOfSelected = 0;
+  for (SelectMgr_SelectableObjectSet::Iterator aSelectableIt (mySelectableObjects); aSelectableIt.More(); aSelectableIt.Next())
+  {
+    aNbOfSelected++;
+  }
+  DUMP_FIELD_VALUES (theOStream, aNbOfSelected);
+  DUMP_FIELD_VALUES (theOStream, myTolerances.Tolerance());
+  DUMP_FIELD_VALUES (theOStream, myTolerances.CustomTolerance());
+  DUMP_FIELD_VALUES (theOStream, myZLayerOrderMap.Size());
+}

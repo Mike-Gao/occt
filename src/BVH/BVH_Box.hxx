@@ -19,6 +19,7 @@
 #include <BVH_Constants.hxx>
 #include <BVH_Types.hxx>
 #include <Standard_ShortReal.hxx>
+#include <Standard_Dump.hxx>
 
 #include <limits>
 
@@ -107,6 +108,15 @@ public:
 
   //! Returns center of bounding box along the given axis.
   T Center (const Standard_Integer theAxis) const;
+
+  //! Dumps the content of me into the stream
+  void Dump (Standard_OStream& theOStream) const
+  {
+    Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (BVH_Box));
+    DUMP_FIELD_VALUES (theOStream, IsValid());
+    Bnd_Box aBndBox = BVH::ToBndBox (CornerMin(), CornerMax());
+    DUMP_FIELD_VALUES_SUBCLASS (theOStream, &aBndBox);
+  }
 
 public:
 

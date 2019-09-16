@@ -15,6 +15,7 @@
 
 
 #include <Bnd_Range.hxx>
+#include <Standard_Dump.hxx>
 
 //=======================================================================
 //function : Common
@@ -174,4 +175,15 @@ void Bnd_Range::Split(const Standard_Real theVal,
   {
     theList.Append(Bnd_Range(aValPrev, myLast));
   }
+}
+// =======================================================================
+// function : Dump
+// purpose  :
+// =======================================================================
+void Bnd_Range::Dump (Standard_OStream& theOStream) const
+{
+  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Bnd_Range));
+
+  DUMP_FIELD_VALUES (theOStream, myFirst);
+  DUMP_FIELD_VALUES (theOStream, myLast);
 }
