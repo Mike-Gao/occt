@@ -33,6 +33,7 @@
 #include <ChFiDS_ErrorStatus.hxx>
 #include <Standard_Transient.hxx>
 #include <GeomAbs_CurveType.hxx>
+#include <ChFiDS_TypeOfConcavity.hxx>
 class TopoDS_Edge;
 class ChFiDS_HElSpine;
 class gp_Lin;
@@ -188,7 +189,13 @@ public:
   
     ChFiDS_State Status (const Standard_Boolean IsFirst) const;
   
+  //! returns the type of concavity in the connection
+    ChFiDS_TypeOfConcavity GetTypeOfConcavity() const;
+  
     void SetStatus (const ChFiDS_State S, const Standard_Boolean IsFirst);
+  
+  //! sets the type of concavity in the connection
+    void SetTypeOfConcavity (const ChFiDS_TypeOfConcavity theType);
   
   //! returns   if the  set  of  edges starts (or   end) on
   //! Tangency point.
@@ -246,6 +253,7 @@ private:
 
   BRepAdaptor_Curve myCurve;
   Standard_Integer indexofcurve;
+  ChFiDS_TypeOfConcavity myTypeOfConcavity;
   ChFiDS_State firstState;
   ChFiDS_State lastState;
   TopTools_SequenceOfShape spine;
