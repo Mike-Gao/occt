@@ -82,17 +82,3 @@ void SelectMgr_EntityOwner::HilightWithColor (const Handle(PrsMgr_PresentationMa
     mySelectable->HilightOwnerWithColor (thePM, theStyle, this);
   }
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void SelectMgr_EntityOwner::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (SelectMgr_EntityOwner));
-
-  DUMP_FIELD_VALUES_POINTER (theOStream, mySelectable);
-  DUMP_FIELD_VALUES (theOStream, mypriority);
-  DUMP_FIELD_VALUES (theOStream, myIsSelected);
-  DUMP_FIELD_VALUES (theOStream, myFromDecomposition);
-}

@@ -114,19 +114,3 @@ void OpenGl_Aspects::Release (OpenGl_Context* theContext)
   myResSprite.Release (theContext);
   myResProgram.Release (theContext);
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void OpenGl_Aspects::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (OpenGl_Aspects));
-
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myAspect);
-  DUMP_FIELD_VALUES (theOStream, myShadingModel);
-
-  //mutable OpenGl_AspectsProgram    myResProgram;
-  //mutable OpenGl_AspectsTextureSet myResTextureSet;
-  //mutable OpenGl_AspectsSprite     myResSprite;
-}

@@ -89,9 +89,6 @@ public:
   //! Update presentation aspects parameters after their modification.
   virtual void SynchronizeAspects() Standard_OVERRIDE { SetAspect (myAspect); }
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
-
 protected:
 
   //! OpenGl resources

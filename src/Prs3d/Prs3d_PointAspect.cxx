@@ -14,8 +14,6 @@
 
 #include <Prs3d_PointAspect.hxx>
 
-#include <Standard_Dump.hxx>
-
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_PointAspect, Prs3d_BasicAspect)
 
 // =======================================================================
@@ -42,14 +40,3 @@ Prs3d_PointAspect::Prs3d_PointAspect (const Quantity_Color& theColor,
 {
   //
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_PointAspect::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Prs3d_PointAspect));
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myAspect);
-}
-

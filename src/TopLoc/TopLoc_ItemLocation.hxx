@@ -22,7 +22,6 @@
 #include <Standard_Handle.hxx>
 
 #include <Standard_Integer.hxx>
-#include <Standard_OStream.hxx>
 #include <gp_Trsf.hxx>
 class TopLoc_Datum3D;
 class TopLoc_Location;
@@ -49,9 +48,6 @@ public:
   //! Sets the elementary Datum to <D>
   //! Sets the exponent to <P>
   Standard_EXPORT TopLoc_ItemLocation(const Handle(TopLoc_Datum3D)& D, const Standard_Integer P);
-
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
 
 
 friend class TopLoc_Location;

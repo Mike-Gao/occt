@@ -14,8 +14,6 @@
 
 #include <Prs3d_PlaneAspect.hxx>
 
-#include <Standard_Dump.hxx>
-
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_PlaneAspect, Prs3d_BasicAspect)
 
 // =======================================================================
@@ -39,27 +37,3 @@ Prs3d_PlaneAspect::Prs3d_PlaneAspect()
 {
   //
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_PlaneAspect::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Prs3d_PlaneAspect));
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myEdgesAspect);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myIsoAspect);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myArrowAspect);
-
-  DUMP_FIELD_VALUES (theOStream, myArrowsLength);
-  DUMP_FIELD_VALUES (theOStream, myArrowsSize);
-  DUMP_FIELD_VALUES (theOStream, myArrowsAngle);
-  DUMP_FIELD_VALUES (theOStream, myPlaneXLength);
-  DUMP_FIELD_VALUES (theOStream, myPlaneYLength);
-  DUMP_FIELD_VALUES (theOStream, myIsoDistance);
-  DUMP_FIELD_VALUES (theOStream, myDrawCenterArrow);
-  DUMP_FIELD_VALUES (theOStream, myDrawEdgesArrows);
-  DUMP_FIELD_VALUES (theOStream, myDrawEdges);
-  DUMP_FIELD_VALUES (theOStream, myDrawIso);
-}
-

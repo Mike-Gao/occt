@@ -2288,7 +2288,7 @@ struct ViewerTest_AspectsChangeSet
 //function : VAspects
 //purpose  :
 //==============================================================================
-static Standard_Integer VAspects (Draw_Interpretor& theDI,
+static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
                                   Standard_Integer  theArgNb,
                                   const char**      theArgVec)
 {
@@ -2339,7 +2339,6 @@ static Standard_Integer VAspects (Draw_Interpretor& theDI,
 
   // parse syntax of legacy commands
   bool toParseAliasArgs = false;
-  Standard_Boolean toDump = false;
   if (aCmdName == "vsetwidth")
   {
     if (aNames.IsEmpty()
@@ -3283,10 +3282,6 @@ static Standard_Integer VAspects (Draw_Interpretor& theDI,
       aChangeSet->ToSetTypeOfEdge = -1;
       aChangeSet->TypeOfEdge = Aspect_TOL_SOLID;
     }
-    else if (anArg == "-dump")
-    {
-      toDump = Standard_True;
-    }
     else
     {
       std::cout << "Error: wrong syntax at " << anArg << "\n";
@@ -3346,13 +3341,6 @@ static Standard_Integer VAspects (Draw_Interpretor& theDI,
       {
         aCtx->Redisplay (aPrs, Standard_False);
       }
-    }
-    if (toDump)
-    {
-      Standard_SStream aStream;
-      aDrawer->Dump (aStream);
-
-      theDI << Standard_Dump::ConvertDumpToText (aStream);
     }
     return 0;
   }
@@ -3506,16 +3494,6 @@ static Standard_Integer VAspects (Draw_Interpretor& theDI,
       else
       {
         aPrs->SynchronizeAspects();
-      }
-
-      if (toDump)
-      {
-        Standard_SStream aStream;
-        aDrawer->Dump (aStream);
-
-        theDI << aName << ": \n";
-        theDI << Standard_Dump::ConvertDumpToText (aStream);
-        theDI << "\n";
       }
     }
   }
@@ -6639,7 +6617,6 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
       "\n\t\t:          [-setDrawEdges {0|1}] [-setEdgeType LineType] [-setEdgeColor R G B] [-setQuadEdges {0|1}]"
       "\n\t\t:          [-setDrawSilhouette {0|1}]"
       "\n\t\t:          [-setAlphaMode {opaque|mask|blend|blendauto} [alphaCutOff=0.5]]"
-      "\n\t\t:          [-dump]"
       "\n\t\t: Manage presentation properties of all, selected or named objects."
       "\n\t\t: When -subshapes is specified than following properties will be"
       "\n\t\t: assigned to specified sub-shapes."

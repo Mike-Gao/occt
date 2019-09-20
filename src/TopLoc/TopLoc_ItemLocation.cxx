@@ -16,7 +16,6 @@
 
 
 #include <TopLoc_Datum3D.hxx>
-#include <Standard_Dump.hxx>
 #include <TopLoc_ItemLocation.hxx>
 #include <TopLoc_Location.hxx>
 #include <TopLoc_SListOfItemLocation.hxx>
@@ -32,17 +31,4 @@ TopLoc_ItemLocation::TopLoc_ItemLocation
   myPower(P),
   myTrsf (D->Transformation().Powered (P))
 {
-}
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-void TopLoc_ItemLocation::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (TopLoc_ItemLocation));
-
-  DUMP_FIELD_VALUES (theOStream, myPower);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myTrsf);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myDatum);
 }

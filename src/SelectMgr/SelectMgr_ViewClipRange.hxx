@@ -18,8 +18,6 @@
 
 #include <Bnd_Range.hxx>
 #include <Standard_TypeDef.hxx>
-#include <Standard_OStream.hxx>
-#include <Standard_Dump.hxx>
 
 #include <vector>
 
@@ -118,9 +116,6 @@ public:
 
   //! Adds a clipping sub-range (for clipping chains).
   void AddClipSubRange (const Bnd_Range& theRange) { myClipRanges.push_back (theRange); }
-
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
 
 private:
 

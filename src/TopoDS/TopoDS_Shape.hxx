@@ -280,9 +280,6 @@ public:
 
   void TShape (const Handle(TopoDS_TShape)& theTShape) { myTShape = theTShape; }
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
-
 private:
 
   Handle(TopoDS_TShape) myTShape;

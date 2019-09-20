@@ -34,7 +34,6 @@
 #include <gp_XYZ.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_OutOfRange.hxx>
-#include <Standard_Dump.hxx>
 
 //=======================================================================
 //function : gp_Trsf
@@ -849,19 +848,4 @@ void gp_Trsf::Orthogonalize()
   aTM.SetRows(aV1, aV2, aV3);
 
   matrix = aTM;
-}
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-void gp_Trsf::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (gp_Trsf));
-
-  DUMP_FIELD_VALUES (theOStream, Form());
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &TranslationPart());
-  DUMP_FIELD_VALUES (theOStream, ScaleFactor());
-  DUMP_FIELD_VALUES (theOStream, ScaleFactor());
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &HVectorialPart());
 }

@@ -12,7 +12,6 @@
 // commercial license or contractual agreement.
 
 #include <Graphic3d_Aspects.hxx>
-#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_Aspects, Standard_Transient)
 
@@ -60,53 +59,4 @@ void Graphic3d_Aspects::SetTextureMap (const Handle(Graphic3d_TextureMap)& theTe
   }
 
   myTextureSet = new Graphic3d_TextureSet (theTexture);
-}
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-void Graphic3d_Aspects::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Graphic3d_Aspects));
-
-  /*Handle(Graphic3d_ShaderProgram)  myProgram;
-  Handle(Graphic3d_TextureSet)     myTextureSet;
-  Handle(Graphic3d_MarkerImage)    myMarkerImage;
-  Handle(Graphic3d_HatchStyle)     myHatchStyle;
-  Handle(TCollection_HAsciiString) myTextFont;
-  Graphic3d_MaterialAspect         myFrontMaterial;
-  Graphic3d_MaterialAspect         myBackMaterial;
-  */
-
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myInteriorColor);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myBackInteriorColor);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myEdgeColor);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myPolygonOffset);
-
-
-  /*Aspect_InteriorStyle         myInteriorStyle;
-  Graphic3d_TypeOfShadingModel myShadingModel;
-  Graphic3d_AlphaMode          myAlphaMode;
-  Standard_ShortReal           myAlphaCutoff;
-
-  Aspect_TypeOfLine            myLineType;
-  Standard_ShortReal           myLineWidth;
-
-  Aspect_TypeOfMarker          myMarkerType;
-  Standard_ShortReal           myMarkerScale;
-
-  Aspect_TypeOfStyleText   myTextStyle;
-  Aspect_TypeOfDisplayText myTextDisplayType;
-  Font_FontAspect          myTextFontAspect;
-  Standard_ShortReal       myTextAngle;
-  */
-
-  DUMP_FIELD_VALUES (theOStream, myToSkipFirstEdge);
-  DUMP_FIELD_VALUES (theOStream, myToDistinguishMaterials);
-  DUMP_FIELD_VALUES (theOStream, myToDrawEdges);
-  DUMP_FIELD_VALUES (theOStream, myToDrawSilhouette);
-  DUMP_FIELD_VALUES (theOStream, myToSuppressBackFaces);
-  DUMP_FIELD_VALUES (theOStream, myToMapTexture);
-  DUMP_FIELD_VALUES (theOStream, myIsTextZoomable);
 }

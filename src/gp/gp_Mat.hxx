@@ -255,9 +255,6 @@ public:
   //! Transposes the matrix. A(j, i) -> A (i, j)
     Standard_NODISCARD gp_Mat Transposed() const;
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
-
 
 friend class gp_XYZ;
 friend class gp_Trsf;

@@ -17,7 +17,6 @@
 #define _Prs3d_BasicAspect_HeaderFile
 
 #include <Standard.hxx>
-#include <Standard_OStream.hxx>
 #include <Standard_Type.hxx>
 #include <Standard_Transient.hxx>
 
@@ -26,10 +25,6 @@
 class Prs3d_BasicAspect : public Standard_Transient
 {
   DEFINE_STANDARD_RTTIEXT(Prs3d_BasicAspect, Standard_Transient)
-
-  //! Dumps the content of me into the stream
-  virtual void Dump (Standard_OStream& theOStream) const = 0;
-
 };
 
 DEFINE_STANDARD_HANDLE(Prs3d_BasicAspect, Standard_Transient)

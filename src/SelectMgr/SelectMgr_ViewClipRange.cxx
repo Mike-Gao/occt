@@ -102,18 +102,3 @@ void SelectMgr_ViewClipRange::AddClippingPlanes (const Graphic3d_SequenceOfHClip
     }
   }
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void SelectMgr_ViewClipRange::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (SelectMgr_ViewClipRange));
-
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myUnclipRange);
-  for (size_t aRangeIter = 0; aRangeIter < myClipRanges.size(); ++aRangeIter)
-  {
-    DUMP_FIELD_VALUES_SUBCLASS (theOStream, &myClipRanges[aRangeIter]);
-  }
-}

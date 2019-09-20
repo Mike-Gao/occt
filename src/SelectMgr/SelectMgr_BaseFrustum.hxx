@@ -28,8 +28,6 @@
 #include <TColgp_Array1OfPnt.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
 
-#include <Standard_OStream.hxx>
-
 //! This class is an interface for different types of selecting frustums,
 //! defining different selection types, like point, box or polyline
 //! selection. It contains signatures of functions for detection of
@@ -172,9 +170,6 @@ public:
     thePlaneEquations.Clear();
     return;
   }
-
-  //! Dumps the content of me into the stream
-  Standard_EXPORT virtual void Dump (Standard_OStream& theOStream) const;
 
   DEFINE_STANDARD_RTTIEXT(SelectMgr_BaseFrustum,Standard_Transient)
 

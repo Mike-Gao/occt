@@ -902,9 +902,6 @@ public:
   Standard_EXPORT bool SetShadingModel (Graphic3d_TypeOfShadingModel theModel,
                                         bool theToOverrideDefaults = false);
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
-
 protected:
 
   Handle(Prs3d_Drawer)          myLink;

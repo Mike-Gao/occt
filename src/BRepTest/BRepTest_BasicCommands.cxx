@@ -55,9 +55,6 @@
 #include <Draw_Marker3D.hxx>
 #include <Draw_MarkerShape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
-
-#include <Standard_Dump.hxx>
-
 #include <stdio.h>
 
 Standard_IMPORT Draw_Viewer dout;
@@ -501,7 +498,6 @@ static Standard_Integer BoundBox(Draw_Interpretor& theDI,
   Bnd_Box anAABB;
 
   Standard_Boolean doPrint = Standard_False;
-  Standard_Boolean doDump = Standard_False;
   Standard_Boolean useOldSyntax = Standard_False;
   Standard_Boolean isOBB = Standard_False;
   Standard_Boolean isTriangulationReq = Standard_True;
@@ -531,13 +527,10 @@ static Standard_Integer BoundBox(Draw_Interpretor& theDI,
       aResShapeName = theArgVal[++anArgIter];
       hasToDraw = Standard_False;
     }
-    else if (anArgCase == "-print")
+    else if (anArgCase == "-dump"
+          || anArgCase == "-print")
     {
       doPrint = Standard_True;
-    }
-    else if (anArgCase == "-dump")
-    {
-      doDump = Standard_True;
     }
     else if (anArgCase == "-save"
           && anArgIter + 6 < theNArg
@@ -608,7 +601,7 @@ static Standard_Integer BoundBox(Draw_Interpretor& theDI,
   }
 
   // enable printing (old syntax) if neither saving to shape nor to DRAW variables is requested
-  if (! doPrint && ! doDump && anOutVars[0].IsEmpty() && aResShapeName.IsEmpty())
+  if (! doPrint && anOutVars[0].IsEmpty() && aResShapeName.IsEmpty())
   {
     doPrint = Standard_True;
     useOldSyntax = Standard_True;
@@ -641,15 +634,6 @@ static Standard_Integer BoundBox(Draw_Interpretor& theDI,
       theDI << "Half X: " << anOBB.XHSize() << "\n"
             << "Half Y: " << anOBB.YHSize() << "\n"
             << "Half Z: " << anOBB.ZHSize() << "\n";
-    }
-
-    if (doDump)
-    {
-      Standard_SStream aStream;
-      anOBB.Dump (aStream);
-
-      theDI << "Oriented bounding box\n";
-      theDI << Standard_Dump::ConvertDumpToText (aStream);
     }
 
     if (hasToDraw
@@ -1491,7 +1475,7 @@ void  BRepTest::BasicCommands(Draw_Interpretor& theCommands)
   theCommands.Add ("bounding",
                    "bounding {shape | xmin ymin zmin xmax ymax zmax}"
          "\n\t\t:            [-obb] [-noTriangulation] [-optimal] [-extToler]"
-         "\n\t\t:            [-dump] [-print] [-shape name] [-nodraw] [-finitePart]"
+         "\n\t\t:            [-dump] [-shape name] [-nodraw] [-finitePart]"
          "\n\t\t:            [-save xmin ymin zmin xmax ymax zmax]"
          "\n\t\t:"
          "\n\t\t: Computes a bounding box. Two types of the source data are supported:"
@@ -1508,10 +1492,9 @@ void  BRepTest::BasicCommands(Draw_Interpretor& theCommands)
          "\n\t\t:  -extToler Include tolerance of the shape in the resulting box."
          "\n\t\t:"
          "\n\t\t: Output options:"
-         "\n\t\t:  -print   Prints the information about computed Bounding Box."
+         "\n\t\t:  -dump    Prints the information about computed Bounding Box."
          "\n\t\t:           It is enabled by default (with plain old syntax for AABB)"
          "\n\t\t:           if neither -shape nor -save is specified."
-         "\n\t\t:  -dump    Prints Dump information about Bounding Box."
          "\n\t\t:  -shape   Stores computed box as solid in DRAW variable with specified name."
          "\n\t\t:  -save    Stores min and max coordinates of AABB in specified variables."
          "\n\t\t:  -noDraw  Avoid drawing resulting Bounding Box in DRAW viewer."

@@ -17,18 +17,4 @@
 #include <TopoDS_TShape.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <Standard_Dump.hxx>
-
 IMPLEMENT_STANDARD_RTTIEXT(TopoDS_TShape,Standard_Transient)
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-void TopoDS_TShape::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (TopoDS_TShape), this);
-
-  DUMP_FIELD_VALUES (theOStream, myFlags);
-  //TopoDS_ListOfShape myShapes;
-}

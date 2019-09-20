@@ -14,8 +14,6 @@
 
 #include <Prs3d_DatumAspect.hxx>
 
-#include <Standard_Dump.hxx>
-
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_DatumAspect, Prs3d_BasicAspect)
 
 // =======================================================================
@@ -169,25 +167,3 @@ Prs3d_DatumParts Prs3d_DatumAspect::ArrowPartForAxis (Prs3d_DatumParts thePart) 
   }
   return Prs3d_DP_None;
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_DatumAspect::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Prs3d_DatumAspect));
-
-  DUMP_FIELD_VALUES (theOStream, myAxes);
-  DUMP_FIELD_VALUES (theOStream, myToDrawLabels);
-  DUMP_FIELD_VALUES (theOStream, myToDrawArrows);
-
-  //NCollection_DataMap<Prs3d_DatumAttribute, Standard_Real> myAttributes;
-  //NCollection_DataMap<Prs3d_DatumParts, Handle(Prs3d_ShadingAspect)> myShadedAspects;
-  //NCollection_DataMap<Prs3d_DatumParts, Handle(Prs3d_LineAspect)> myLineAspects;
-
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myTextAspect);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myPointAspect);
-  DUMP_FIELD_VALUES_SUBCLASS (theOStream, myArrowAspect);
-}
-

@@ -24,7 +24,6 @@
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Handle.hxx>
-#include <Standard_OStream.hxx>
 #include <Standard_Real.hxx>
 
 class Standard_ConstructionError;
@@ -349,9 +348,6 @@ void operator *= (const gp_Trsf& T)
     theMat.SetValue (3, 2, static_cast<T> (0));
     theMat.SetValue (3, 3, static_cast<T> (1));
   }
-
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
 
 friend class gp_GTrsf;
 

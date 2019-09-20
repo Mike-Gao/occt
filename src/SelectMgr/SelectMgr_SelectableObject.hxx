@@ -169,9 +169,6 @@ public:
   //! Returns common entity owner if the object is an assembly
   Standard_EXPORT virtual const Handle(SelectMgr_EntityOwner)& GetAssemblyOwner() const;
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT virtual void Dump (Standard_OStream& theOStream) const Standard_OVERRIDE;
-
 public:
 
   //! Begins the iteration scanning for sensitive primitives.

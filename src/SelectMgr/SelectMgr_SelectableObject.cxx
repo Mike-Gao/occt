@@ -548,24 +548,3 @@ const Handle(SelectMgr_EntityOwner)& SelectMgr_SelectableObject::GetAssemblyOwne
 {
   return THE_NULL_ENTITYOWNER;
 }
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void SelectMgr_SelectableObject::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (SelectMgr_SelectableObject));
-
-  DUMP_FIELD_VALUES_PARENT (theOStream, PrsMgr_PresentableObject);
-
-  DUMP_FIELD_VALUES (theOStream, myGlobalSelMode);
-  //DUMP_FIELD_VALUES (theOStream, "mycurrent", mycurrent);
-  DUMP_FIELD_VALUES (theOStream, myAutoHilight);
-
-/*
-  SelectMgr_SequenceOfSelection myselections;    //!< list of selections
-  Handle(Prs3d_Presentation)    mySelectionPrs;  //!< optional presentation for highlighting selected object
-  Handle(Prs3d_Presentation)    myHilightPrs;    //!< optional presentation for highlighting detected object
-*/
-}

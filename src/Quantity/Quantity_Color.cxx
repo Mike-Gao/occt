@@ -19,7 +19,6 @@
 #include <Quantity_ColorRGBA.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_OutOfRange.hxx>
-#include <Standard_Dump.hxx>
 #include <TCollection_AsciiString.hxx>
 
 #include <string.h>
@@ -3924,17 +3923,4 @@ void call_rgbhls (float r, float g, float b, float& h, float& l, float& s)
 	   h = (float ) 60.0 * ( plus + diff / delta );
 	   if (h < 0.0) h += 360.0;
 	}
-}
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-void Quantity_Color::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (Quantity_Color));
-
-  DUMP_FIELD_VALUES (theOStream, MyRed);
-  DUMP_FIELD_VALUES (theOStream, MyGreen);
-  DUMP_FIELD_VALUES (theOStream, MyBlue);
 }

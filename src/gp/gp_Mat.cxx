@@ -26,7 +26,6 @@
 #include <gp_XYZ.hxx>
 #include <Standard_ConstructionError.hxx>
 #include <Standard_OutOfRange.hxx>
-#include <Standard_Dump.hxx>
 
 #define M00 ((Standard_Real*)M)[0]
 #define M01 ((Standard_Real*)M)[1]
@@ -269,19 +268,3 @@ void gp_Mat::Power (const Standard_Integer N)
   }
 }
 
-void gp_Mat::Dump (Standard_OStream& theOStream) const
-{
-  Standard_Dump::Sentry aSentry (theOStream, CLASS_NAME (gp_Mat));
-
-  DUMP_FIELD_VALUES (theOStream, Mat00);
-  DUMP_FIELD_VALUES (theOStream, Mat01);
-  DUMP_FIELD_VALUES (theOStream, Mat02);
-
-  DUMP_FIELD_VALUES (theOStream, Mat10);
-  DUMP_FIELD_VALUES (theOStream, Mat11);
-  DUMP_FIELD_VALUES (theOStream, Mat12);
-
-  DUMP_FIELD_VALUES (theOStream, Mat20);
-  DUMP_FIELD_VALUES (theOStream, Mat21);
-  DUMP_FIELD_VALUES (theOStream, Mat22);
-}

@@ -256,9 +256,6 @@ public:
     return ((myFirst == theOther.myFirst) && (myLast == theOther.myLast));
   }
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT void Dump (Standard_OStream& theOStream) const;
-
 private:
 
   Standard_Real myFirst; //!< Start of range
