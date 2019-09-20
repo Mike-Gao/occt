@@ -46,15 +46,25 @@ namespace
   {
     const char*             StringName;
     NCollection_Vec3<float> RgbValues;
+    NCollection_Vec4<Standard_Byte> sRgbVec4ub;
     Quantity_NameOfColor    EnumName;
 
-    Quantity_StandardColor (Quantity_NameOfColor theName, const char* theStringName, const NCollection_Vec3<float>& theVec3)
-    : StringName (theStringName), RgbValues (theVec3), EnumName (theName) {}
+    Quantity_StandardColor (Quantity_NameOfColor theName,
+                            const char* theStringName,
+                            const uint32_t theSRgbHex,
+                            const NCollection_Vec3<float>& theVec3)
+    : StringName (theStringName),
+      RgbValues (theVec3),
+      sRgbVec4ub (Standard_Byte((theSRgbHex & 0xff0000) >> 16),
+                  Standard_Byte((theSRgbHex & 0x00ff00) >> 8),
+                  Standard_Byte((theSRgbHex & 0x0000ff)),
+                  255),
+      EnumName (theName) {}
   };
 }
 
 // Note that HTML/hex sRGB representation is ignored
-#define RawColor(theName, theHex, theR, theG, theB) Quantity_StandardColor(Quantity_NOC_##theName, #theName, NCollection_Vec3<float>(theR##f, theG##f, theB##f))
+#define RawColor(theName, theHex, theR, theG, theB) Quantity_StandardColor(Quantity_NOC_##theName, #theName, theHex, NCollection_Vec3<float>(theR##f, theG##f, theB##f))
 
 //! Name list of standard materials (defined within enumeration).
 static const Quantity_StandardColor THE_COLORS[] =
@@ -298,16 +308,19 @@ void Quantity_Color::Delta (const Quantity_Color& theColor,
 // =======================================================================
 Quantity_NameOfColor Quantity_Color::Name() const
 {
-  Standard_ShortReal aDist2 = 4.0f;
+  // it is better finding closest sRGB color (closest to human eye) instead of linear RGB color,
+  // as enumeration defines color names for human
+  const NCollection_Vec3<Standard_Integer> ansRgbVec (Convert_LinearRGB_To_sRGB (myRgb) * 255.0f + NCollection_Vec3<float> (0.5f));
+  Standard_Integer aDist2 = IntegerLast();
   Quantity_NameOfColor aResName = Quantity_NOC_BLACK;
   for (Standard_Integer aColIter = Quantity_NOC_BLACK; aColIter <= Quantity_NOC_WHITE; ++aColIter)
   {
-    const Standard_ShortReal aNewDist2 = (myRgb - THE_COLORS[aColIter].RgbValues).SquareModulus();
+    const Standard_Integer aNewDist2 = (ansRgbVec - NCollection_Vec3<Standard_Integer> (THE_COLORS[aColIter].sRgbVec4ub.rgb())).SquareModulus();
     if (aNewDist2 < aDist2)
     {
       aResName = Quantity_NameOfColor (aColIter);
       aDist2 = aNewDist2;
-      if (aNewDist2 == 0.0f)
+      if (aNewDist2 == 0)
       {
         break;
       }
