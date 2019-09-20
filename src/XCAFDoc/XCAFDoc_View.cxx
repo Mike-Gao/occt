@@ -282,23 +282,23 @@ Handle(XCAFView_Object) XCAFDoc_View::GetObject()  const
     TDF_Label aPointsLabel = Label().FindChild(ChildLab_GDTPoints);
 
     // Find out the number of stored GDT-points in Ocaf tree.
-    Standard_Integer aNbGDTPoints = 0;
+    Standard_Integer nbGDTPoints(0);
     Handle(TDataXtd_Point) aGDTPointAttr;
-    TDF_ChildIterator anItrPnts (aPointsLabel, Standard_False);
-    for (; anItrPnts.More(); anItrPnts.Next()) {
-      if (anItrPnts.Value().FindAttribute (TDataXtd_Point::GetID(), aGDTPointAttr))
-        aNbGDTPoints++;
+    TDF_ChildIterator itrpnts(aPointsLabel, Standard_False);
+    for (; itrpnts.More(); itrpnts.Next()) {
+      if (itrpnts.Value().FindAttribute(TDataXtd_Point::GetID(), aGDTPointAttr))
+        nbGDTPoints++;
     }
 
     // Allocate the GDT-points and fill them in from Ocaf tree.
-    if (aNbGDTPoints) {
-      anObj->CreateGDTPoints (aNbGDTPoints);
-      const Standard_Integer aNbChildren = aPointsLabel.NbChildren();
-      for (Standard_Integer aLabelIndex = 1, aPointIndex = 1; aLabelIndex <= aNbChildren; aLabelIndex++) {
+    if (nbGDTPoints) {
+      anObj->CreateGDTPoints(nbGDTPoints);
+      const Standard_Integer nbChildren = aPointsLabel.NbChildren();
+      for (Standard_Integer i = 1, j = 1; i <= nbChildren; i++) {
         gp_Pnt aPoint;
-        if (aPointsLabel.FindChild (aLabelIndex).FindAttribute (TDataXtd_Point::GetID(), aGDTPointAttr)) {
-          TDataXtd_Geometry::Point (aGDTPointAttr->Label(), aPoint);
-          anObj->SetGDTPoint (aPointIndex++, aPoint);
+        if (aPointsLabel.FindChild(i).FindAttribute(TDataXtd_Point::GetID(), aGDTPointAttr)) {
+          TDataXtd_Geometry::Point(aGDTPointAttr->Label(), aPoint);
+          anObj->SetGDTPoint(j++, aPoint);
         }
       }
     }
@@ -312,26 +312,50 @@ Handle(XCAFView_Object) XCAFDoc_View::GetObject()  const
   // Shapes transparency
   if (!Label().FindChild(ChildLab_EnabledShapes, Standard_False).IsNull()) {
     TDF_Label aShapesTranspLabel = Label().FindChild(ChildLab_EnabledShapes);
-    anObj->CreateEnabledShapes(aShapesTranspLabel.NbChildren());
-    for (Standard_Integer i = 1; i <= aShapesTranspLabel.NbChildren(); i++) {
+
+    // Find out the number of stored shape-transparencies in Ocaf tree.
+    Standard_Integer nbShapeTransparencies(0);
+    Handle(TDataStd_Integer) aTranspAttr;
+    TDF_ChildIterator itrtrans(aShapesTranspLabel, Standard_False);
+    for (; itrtrans.More(); itrtrans.Next()) {
+      if (itrtrans.Value().FindAttribute(TDataStd_Integer::GetID(), aTranspAttr))
+        nbShapeTransparencies++;
+    }
+
+    // Allocate the shape-transparencies and fill them in from Ocaf tree.
+    const Standard_Integer nbChildren = aShapesTranspLabel.NbChildren();
+    anObj->CreateEnabledShapes(nbChildren);
+    for (Standard_Integer i = 1, j = 1; i <= nbChildren; i++) {
       gp_Pnt aPoint;
-      Handle(TDataStd_Integer) aTranspAttr;
-      aShapesTranspLabel.FindChild(i).FindAttribute(TDataStd_Integer::GetID(), aTranspAttr);
-      Standard_Boolean aValue = (aTranspAttr->Get() == 1);
-      anObj->SetEnabledShape(i, aValue);
+      if (aShapesTranspLabel.FindChild(i).FindAttribute(TDataStd_Integer::GetID(), aTranspAttr)) {
+        Standard_Boolean aValue = (aTranspAttr->Get() == 1);
+        anObj->SetEnabledShape(j++, aValue);
+      }
     }
   }
 
   // Note Points
   if (!Label().FindChild(ChildLab_NotePoints, Standard_False).IsNull()) {
     TDF_Label aPointsLabel = Label().FindChild(ChildLab_NotePoints);
-    anObj->CreateNotePoints(aPointsLabel.NbChildren());
-    for (Standard_Integer i = 1; i <= aPointsLabel.NbChildren(); i++) {
+
+    // Find out the number of stored note-points in Ocaf tree.
+    Standard_Integer nbNotePoints(0);
+    Handle(TDataXtd_Point) aPointAttr;
+    TDF_ChildIterator itrpnts(aPointsLabel, Standard_False);
+    for (; itrpnts.More(); itrpnts.Next()) {
+      if (itrpnts.Value().FindAttribute(TDataXtd_Point::GetID(), aPointAttr))
+        nbNotePoints++;
+    }
+
+    // Allocate the note-points and fill them in from Ocaf tree.
+    const Standard_Integer nbChildren = aPointsLabel.NbChildren();
+    anObj->CreateNotePoints(nbChildren);
+    for (Standard_Integer i = 1, j = 1; i <= nbChildren; i++) {
       gp_Pnt aPoint;
-      Handle(TDataXtd_Point) aPointAttr;
-      aPointsLabel.FindChild(i).FindAttribute(TDataXtd_Point::GetID(), aPointAttr);
-      TDataXtd_Geometry::Point(aPointAttr->Label(), aPoint);
-      anObj->SetNotePoint(i, aPoint);
+      if (aPointsLabel.FindChild(i).FindAttribute(TDataXtd_Point::GetID(), aPointAttr)) {
+        TDataXtd_Geometry::Point(aPointAttr->Label(), aPoint);
+        anObj->SetNotePoint(j++, aPoint);
+      }
     }
   }
   return anObj;
