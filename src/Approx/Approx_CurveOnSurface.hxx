@@ -112,6 +112,9 @@ protected:
                                      const Standard_Boolean           theIsForward);
 
 private:
+  Approx_CurveOnSurface& operator= (const Approx_CurveOnSurface&);
+
+private:
 
   //! Input curve.
   const Handle(Adaptor2d_HCurve2d) myC2D;

@@ -623,7 +623,7 @@ Standard_Boolean Approx_CurveOnSurface::buildC3dOnIsoLine(const Handle(Adaptor2d
   }
 
   // Convert arbitrary curve type to the b-spline.
-  myCurve3d = GeomConvert::CurveToBSplineCurve(aC3d, Convert_ParameterisationType::Convert_QuasiAngular);
+  myCurve3d = GeomConvert::CurveToBSplineCurve(aC3d, Convert_QuasiAngular);
   if (!theIsForward)
     myCurve3d->Reverse();
 
