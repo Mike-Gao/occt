@@ -18,8 +18,8 @@ vfit
 vmoveto 150 200
 vstate -entities
 vselect 150 200
-if { [vreadpixel 150 200 rgb name] != "BLACK"     } { puts "Error: object is not clipped" }
-if { [vreadpixel 350 200 rgb name] != "GOLDENROD" } { puts "Error: object should NOT be selected" }
+if { [vreadpixel 150 200 rgb name] != "BLACK" } { puts "Error: object is not clipped" }
+if { [vreadpixel 350 200 rgb name] != "PERU"  } { puts "Error: object should NOT be selected" }
 vdump $imagedir/${casename}_1.png
 
 # depth range starts behinds the picking ray
@@ -27,7 +27,7 @@ vviewparams -scale 14.7435 -proj 0.193921 -0.891229 0.410007 -up -0.0205984 0.41
 vmoveto 150 200
 vstate -entities
 vselect 150 200
-if { [vreadpixel 150 200 rgb name] != "BLACK"          } { puts "Error: object is not clipped" }
-if { [vreadpixel 300 200 rgb name] != "DARKGOLDENROD3" } { puts "Error: object should NOT be selected" }
+if { [vreadpixel 150 200 rgb name] != "BLACK"      } { puts "Error: object is not clipped" }
+if { [vreadpixel 300 200 rgb name] != "GOLDENROD3" } { puts "Error: object should NOT be selected" }
 
 vdump $imagedir/${casename}_2.png

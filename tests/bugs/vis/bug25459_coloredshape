@@ -18,4 +18,4 @@ vaspects b -subshapes b_3 -setcolor RED
 vaspects b -setmaterial PLASTIC
 
 # validate results
-if { [vreadpixel 128 256 -rgb -name] != "BROWN"} { puts "Error: wrong Face color" }
+if { [vreadpixel 128 256 -rgb -name] != "RED4"} { puts "Error: wrong Face color" }

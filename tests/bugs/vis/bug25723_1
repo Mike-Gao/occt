@@ -41,6 +41,6 @@ vrotate -mouseStart ${x_mouse_start_coord} ${y_mouse_start_coord} -mouseMove ${x
 vselect 0 0
 
 # check color
-if {"[vreadpixel ${x_check_coord} ${y_check_coord} rgb name]" != "DARKGOLDENROD3"} { puts "Error : Rotation is not correct" }
+if {"[vreadpixel ${x_check_coord} ${y_check_coord} rgb name]" != "GOLDENROD3"} { puts "Error : Rotation is not correct" }
 
 vdump ${imagedir}/${test_image}.png

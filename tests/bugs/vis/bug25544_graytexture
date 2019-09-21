@@ -19,5 +19,5 @@ vtexture b 1 -modulate off
 set aColorDec [vreadpixel 290 180 rgb name]
 vdump $imagedir/${casename}_decal.png
 
-if {"$aColorMod" != "GOLD4"}  { puts "Error: wrong color with modulation ON" }
-if {"$aColorDec" != "GRAY91"} { puts "Error: wrong color with modulation OFF" }
+if {"$aColorMod" != "GOLDENROD4"} { puts "Error: wrong color with modulation ON" }
+if {"$aColorDec" != "GRAY91"}     { puts "Error: wrong color with modulation OFF" }
