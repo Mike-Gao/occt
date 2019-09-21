@@ -210,7 +210,7 @@ namespace
     const bool hasColorComponentGreaterThanOne = (anIntegerColor.maxComp() > 1);
     if (anIntegerColor.a() == THE_COLOR_COMPONENT_NOT_PARSED)
     {
-      anIntegerColor.a() = THE_MAX_INTEGER_COLOR_COMPONENT;
+      anIntegerColor.a() = hasColorComponentGreaterThanOne ? THE_MAX_INTEGER_COLOR_COMPONENT : 1;
     }
 
     Graphic3d_Vec4 aRealColor (anIntegerColor);
