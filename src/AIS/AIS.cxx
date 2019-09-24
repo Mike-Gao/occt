@@ -1052,6 +1052,8 @@ Standard_Boolean AIS::InitAngleBetweenCurvilinearFaces (const TopoDS_Face&      
   }
 
   aFirstLine = Handle(Geom_Line)::DownCast (aFirstSurf->UIso (aFirstU));
+  if (aFirstLine.IsNull())
+    return Standard_False;
 
   if (theSecondSurfType == AIS_KOS_Cylinder)
   {
