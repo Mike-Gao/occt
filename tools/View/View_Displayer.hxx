@@ -23,9 +23,12 @@
 #include <NCollection_Shared.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Quantity_Color.hxx>
+
 #include <inspector/View_PresentationType.hxx>
+#include <inspector/View_DisplayActionType.hxx>
 
 class V3d_View;
+class View_DisplayPreview;
 
 //! \class View_Displayer
 //! \brief It is responsible for communication with AIS Interactive Context to:
@@ -43,6 +46,9 @@ public:
 
   //! Destructor
   virtual ~View_Displayer() {}
+
+  //! Returns preview display instance
+  View_DisplayPreview* GetDisplayPreview() const { return myDisplayPreview; }
 
   //! Stores the current context where the presentations will be displayed/erased.
   //! Erases previuously displayd presentations if there were some displayed
@@ -114,6 +120,10 @@ public:
   Standard_EXPORT bool IsVisible (const TopoDS_Shape& theShape,
                                   const View_PresentationType theType = View_PresentationType_Main) const;
 
+  //!< Updates visibility of the presentations for the display type
+  Standard_EXPORT void UpdatePreview (const View_DisplayActionType theType,
+                                      const NCollection_List<Handle(Standard_Transient)>& thePresentations);
+
   //! Calls UpdateCurrentViewer of context
   Standard_EXPORT void UpdateViewer();
 
@@ -156,6 +166,8 @@ private:
   void fitAllView();
 
 private:
+
+  View_DisplayPreview* myDisplayPreview; //!< class for preview display
 
   Handle(AIS_InteractiveContext) myContext; //!< context, where the displayer works
   NCollection_DataMap<View_PresentationType, NCollection_Shared<AIS_ListOfInteractive>> myDisplayed; //!< visualized presentations

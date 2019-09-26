@@ -14,9 +14,10 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/TreeModel_ItemBase.hxx>
-
 #include <inspector/TreeModel_ItemRole.hxx>
+#include <inspector/TreeModel_ItemStream.hxx>
 
+#include <Standard_Dump.hxx>
 #include <Standard_WarningsDisable.hxx>
 #include <QStringList>
 #include <Standard_WarningsRestore.hxx>
@@ -34,7 +35,7 @@ TreeModel_ItemBase::TreeModel_ItemBase (TreeModel_ItemBasePtr theParent, const i
 }
 
 // =======================================================================
-// function :  reset
+// function :  Reset
 // purpose :
 // =======================================================================
 void TreeModel_ItemBase::Reset()
@@ -55,7 +56,7 @@ void TreeModel_ItemBase::Reset()
 // =======================================================================
 void TreeModel_ItemBase::Reset (int theRole)
 {
-  if (!myCachedValues.contains (theRole))  
+  if (!myCachedValues.contains (theRole))
     return;
 
   myCachedValues.remove (theRole);
@@ -74,7 +75,17 @@ TreeModel_ItemBasePtr TreeModel_ItemBase::Child (int theRow, int theColumn, cons
 
   TreeModel_ItemBasePtr anItem;
   if (isToCreate) {
-    anItem = createChild (theRow, theColumn);
+    NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
+    Standard_SStream aStream;
+    GetStream (aStream);
+    Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
+    NCollection_List<Standard_Integer> aHierarchicalValues = Standard_Dump::HierarchicalValueIndices (aValues);
+    int aChildOffset = aHierarchicalValues.Extent();
+    if (theRow < aChildOffset)
+      anItem = TreeModel_ItemStream::CreateItem (currentItem(), theRow, theColumn);
+    else
+      anItem = createChild (theRow - aChildOffset, theColumn);
+
     if (anItem)
       m_ChildItems[aPos] = anItem;
   }
@@ -99,8 +110,40 @@ QVariant TreeModel_ItemBase::cachedValue (const int theItemRole) const
   if (myCachedValues.contains (theItemRole))
     return myCachedValues[theItemRole];
 
-  const_cast<TreeModel_ItemBase*>(this)->myCachedValues.insert (theItemRole,
-    theItemRole == TreeModel_ItemRole_RowCountRole ? QVariant (initRowCount()) : initValue (theItemRole));
+  QVariant aValueToCache;
+  if (theItemRole == TreeModel_ItemRole_RowCountRole)
+    aValueToCache = initRowCount();
+  else
+    aValueToCache = initValue (theItemRole);
 
+  const_cast<TreeModel_ItemBase*>(this)->myCachedValues.insert (theItemRole, aValueToCache);
   return myCachedValues.contains (theItemRole) ? myCachedValues[theItemRole] : QVariant();
+}
+
+// =======================================================================
+// function : Init
+// purpose :
+// =======================================================================
+void TreeModel_ItemBase::Init()
+{
+  m_bInitialized = true;
+}
+
+// =======================================================================
+// function : initValue
+// purpose :
+// =======================================================================
+QVariant TreeModel_ItemBase::initValue (const int theItemRole) const
+{
+  if (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole)
+    return QVariant();
+
+  switch (Column())
+  {
+    case 1: { return rowCount(); }
+    //case 2: return ViewControl_Tools::GetPointerInfo (GetObject(), true).ToCString();
+    case 3: { return Row(); }
+  }
+
+  return QVariant();
 }

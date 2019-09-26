@@ -14,6 +14,8 @@
 #ifndef _Standard_Dump_HeaderFile
 #define _Standard_Dump_HeaderFile
 
+#include <NCollection_IndexedDataMap.hxx>
+#include <NCollection_List.hxx>
 #include <Standard_SStream.hxx>
 #include <TCollection_AsciiString.hxx>
 
@@ -175,6 +177,19 @@ private:
   Standard_OStream* myOStream; //!< modified stream
 };
 
+//! Kind of key in Json string
+enum Standard_JsonKey
+{
+  Standard_JsonKey_None, //!< no key
+  Standard_JsonKey_OpenChild, //!< "{"
+  Standard_JsonKey_CloseChild, //!< "}"
+  Standard_JsonKey_OpenContainer, //!< "["
+  Standard_JsonKey_CloseContainer, //!< "]"
+  Standard_JsonKey_Quote, //!< "\""
+  Standard_JsonKey_SeparatorKeyToValue, //!< ": "
+  Standard_JsonKey_SeparatorValueToValue //!< ", "
+};
+
 //! This interface has some tool methods for stream (in JSON format) processing.
 class Standard_Dump
 {
@@ -192,6 +207,34 @@ public:
   //! @param theIndent count of ' ' symbols to apply hierarchical indent of the text values
   //! @return text presentation
   Standard_EXPORT static TCollection_AsciiString FormatJson (const Standard_SStream& theStream, const Standard_Integer theIndent = 3);
+
+  //! Converts stream into map of values. Values are not empty if the stream contains at least two values.
+  //!
+  //! The one level stream example: <class_name>key_1\value_1\key_2\value_2</class_name>
+  //! In output: theStreamKey equals class_name, theValues contains key_1, value_1, key_2, and value_2.
+  //!
+  //! Two level stream example: <class_name>key_1\value_1\key_2\value_2\key_3<subclass_name>subclass_key_1\subclass_value1</subclass_name></class_name>
+  //! In output: theStreamKey equals class_name, theValues contains key_1, value_1, key_2, and value_2, key_3 and
+  //! <subclass_name>subclass_key_1\subclass_value1</subclass_name>.
+  //! The last value might be processed later using the same method.
+  //!
+  //! \param theStream stream value
+  //! \param theValues [out] container of split values
+  Standard_EXPORT static Standard_Boolean SplitJson (const TCollection_AsciiString& theStreamStr,
+                                                     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
+
+  //! Returns container of indices in values, that has hierarchical value
+  Standard_EXPORT static NCollection_List<Standard_Integer> HierarchicalValueIndices (
+    const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
+
+  //! Returns true if the value has bracket key
+  Standard_EXPORT static Standard_Boolean HasChildKey (const TCollection_AsciiString& theSourceValue);
+
+  //! Returns key value for enum type
+  Standard_EXPORT static const Standard_CString JsonKeyToString (const Standard_JsonKey theKey);
+
+  //! Returns length value for enum type
+  Standard_EXPORT static Standard_Integer JsonKeyLength (const Standard_JsonKey theKey);
 
   //! Determines whether the end of this stream matches the specified string.
   //! @param theStream source value
@@ -240,6 +283,34 @@ public:
   //! @param theField a source value 
   //! @param theName [out] an updated name 
   Standard_EXPORT static void DumpFieldToName (const char* theField, const char*& theName);
+
+private:
+  //! Extracts from the string value a pair (key, value), add it into output container, update index value
+  //! Example:
+  //! stream string starting the index position contains: ..."key": <value>...
+  //! a pair key, value will be added into theValues
+  //! at beginning theIndex is the position of the quota before <key>, after the index is the next position after the value
+  //! splitDumped(aString) gives theSplitValue = "abc", theTailValue = "defg", theKey = "key"
+  Standard_EXPORT static Standard_Boolean splitKeyToValue (const TCollection_AsciiString& theStreamStr,
+                                                           Standard_Integer theStartIndex,
+                                                           Standard_Integer& theNextIndex,
+                                                           NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
+
+
+  //! Returns key of json in the index position. Incement the index position to the next symbol in the row
+  Standard_EXPORT static Standard_Boolean jsonKey (const TCollection_AsciiString& theStreamStr,
+                                                   Standard_Integer theStartIndex,
+                                                   Standard_Integer& theNextIndex,
+                                                   Standard_JsonKey& theKey);
+
+  //! Find position in the source string of the symbol close after the start position.
+  //! Ignore combination <symbol open> ... <symbol close> between the close symbol.
+  //! Example, for case ... { ... { ... } ...} ... } it returns the position of the forth brace
+  Standard_EXPORT static Standard_Integer nextClosePosition (const TCollection_AsciiString& theSourceValue,
+                                                             const Standard_Integer theStartPosition,
+                                                             const Standard_JsonKey theCloseKey,
+                                                             const Standard_JsonKey theOpenKey);
+
 };
 
 #endif // _Standard_Dump_HeaderFile

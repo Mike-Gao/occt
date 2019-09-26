@@ -24,6 +24,9 @@
 #include <QString>
 #include <Standard_WarningsRestore.hxx>
 
+#include <V3d_View.hxx>
+#include <AIS_InteractiveContext.hxx>
+
 class View_Window;
 
 class QAction;
@@ -43,6 +46,11 @@ public:
   //! \return a new action
   Standard_EXPORT static QAction* CreateAction (const QString& theText, const char* theSlot,
                                                 QObject* theParent, QObject* theContext);
+
+
+  //! Gets current viewer from the context and returns active view of the viewer
+  //! \return view or NULL
+  Standard_EXPORT static Handle(V3d_View) FindActiveView (const Handle(AIS_InteractiveContext)& theContext);
 
   //! Save state of three view in a container in form: key, value. It saves:
   //! - visibiblity of columns,

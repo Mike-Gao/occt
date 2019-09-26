@@ -25,6 +25,7 @@
 #include <NCollection_Sequence.hxx>
 #include <NCollection_DataMap.hxx>
 
+class OpenGl_FrameBuffer;
 class OpenGl_Structure;
 class OpenGl_Workspace;
 struct OpenGl_GlobalLayerSettings;
@@ -35,10 +36,10 @@ class OpenGl_LayerList
 public:
 
   //! Constructor
-  OpenGl_LayerList (const Standard_Integer theNbPriorities);
+  Standard_EXPORT OpenGl_LayerList (const Standard_Integer theNbPriorities);
 
   //! Destructor
-  virtual ~OpenGl_LayerList();
+  virtual ~OpenGl_LayerList() {};
 
   //! Method returns the number of available priorities
   Standard_Integer NbPriorities() const { return myNbPriorities; }

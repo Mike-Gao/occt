@@ -43,14 +43,16 @@ const int DEFAULT_SPACING = 3;
 // function : Constructor
 // purpose :
 // =======================================================================
-View_Window::View_Window (QWidget* theParent, const bool isUseKeepView, const bool isFitAllActive)
+View_Window::View_Window (QWidget* theParent,
+                          const Handle(AIS_InteractiveContext)& theContext,
+                          const bool isUseKeepView, const bool isFitAllActive)
 : QWidget (theParent)
 {
   QGridLayout* aViewLayout = new QGridLayout (this);
   aViewLayout->setContentsMargins (0, 0, 0, 0);
   aViewLayout->setSpacing (DEFAULT_SPACING);
 
-  myView = new View_Widget (this, isFitAllActive);
+  myView = new View_Widget (this, theContext, isFitAllActive);
   myViewToolBar = new View_ToolBar (this, isUseKeepView);
   aViewLayout->addWidget (myViewToolBar->GetControl(), 0, 0, 1, 2);
   connect (myViewToolBar, SIGNAL (contextChanged()), this, SLOT (onViewSelectorActivated()));
