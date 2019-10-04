@@ -17,6 +17,8 @@
 #define _NCollection_Mat4_HeaderFile
 
 #include <NCollection_Vec4.hxx>
+#include <Standard_Dump.hxx>
+#include <Standard_OStream.hxx>
 
 //! Generic matrix of 4 x 4 elements.
 //! To be used in conjunction with NCollection_Vec4 entities.
@@ -459,6 +461,18 @@ public:
   static const NCollection_Mat4<Element_t>& Map (const Element_t* theData)
   {
     return *reinterpret_cast<const NCollection_Mat4<Element_t>*> (theData);
+  }
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_CLASS_BEGIN (theOStream, NCollection_Mat4);
+
+    OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "CornerMin", 16,
+      myMat[0], myMat[1],   myMat[2],  myMat[3],
+      myMat[4], myMat[5],   myMat[6],  myMat[7],
+      myMat[8], myMat[9],   myMat[10], myMat[11],
+      myMat[12], myMat[13], myMat[14], myMat[15])
   }
 
 private:

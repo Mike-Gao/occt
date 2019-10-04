@@ -1071,35 +1071,30 @@ void VInspector_Window::updatePropertyPanelBySelection()
     return;
 
   QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (aModel->selectedIndexes(), 0);
-  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
-  if (!anItemBase)
-    return;
-
-  TreeModel_ItemStreamPtr aStreamItem = itemDynamicCast<TreeModel_ItemStream> (anItemBase);
-  if (!aStreamItem)
-    return;
-
-  Handle(TreeModel_ItemProperties) anItemProperties = aStreamItem->Properties ();
+  TreeModel_ItemStreamPtr aStreamItem = itemDynamicCast<TreeModel_ItemStream> (TreeModel_ModelBase::GetItemByIndex (anIndex));
   QList<ViewControl_TableModelValues*> aTableValuesList;
-  if (!anItemProperties.IsNull())
+  if (aStreamItem)
   {
-    ViewControl_TableModelValues* aTableValues = new ViewControl_TableModelValues();
-    aTableValues->SetProperties (anItemProperties);
-    aTableValuesList.append (aTableValues);
+    Handle(TreeModel_ItemProperties) anItemProperties = aStreamItem->Properties ();
+    if (!anItemProperties.IsNull())
+    {
+      ViewControl_TableModelValues* aTableValues = new ViewControl_TableModelValues();
+      aTableValues->SetProperties (anItemProperties);
+      aTableValuesList.append (aTableValues);
+    }
+    /*QItemSelectionModel* aModel = myTreeView->selectionModel();
+    if (!aModel)
+      return;
+
+    QModelIndexList aSelected = TreeModel_ModelBase::GetSelected (aModel->selectedIndexes(), 0);
+    QList<ViewControl_TableModelValues*> aTableValues;
+
+    if (aSelected.size() == 1)
+    {
+      TreeModel_ItemBasePtr aSelectedItem = TreeModel_ModelBase::GetItemByIndex(aSelected.first());
+      VInspector_Tools::GetPropertyTableValues (aSelectedItem, myPaneCreators, aTableValues);
+    }*/
   }
-
-  /*QItemSelectionModel* aModel = myTreeView->selectionModel();
-  if (!aModel)
-    return;
-
-  QModelIndexList aSelected = TreeModel_ModelBase::GetSelected (aModel->selectedIndexes(), 0);
-  QList<ViewControl_TableModelValues*> aTableValues;
-
-  if (aSelected.size() == 1)
-  {
-    TreeModel_ItemBasePtr aSelectedItem = TreeModel_ModelBase::GetItemByIndex(aSelected.first());
-    VInspector_Tools::GetPropertyTableValues (aSelectedItem, myPaneCreators, aTableValues);
-  }*/
   myPropertyView->Init (aTableValuesList);
 }
 
