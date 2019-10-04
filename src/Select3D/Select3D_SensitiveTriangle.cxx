@@ -93,3 +93,19 @@ Select3D_BndBox3d Select3D_SensitiveTriangle::BoundingBox()
                                                  Max (myPoints[0].Z(), Max (myPoints[1].Z(), myPoints[2].Z())));
   return Select3D_BndBox3d (aMinPnt, aMaxPnt);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Select3D_SensitiveTriangle::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveTriangle);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCentroid);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[0]);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[1]);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[2]);
+}

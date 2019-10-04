@@ -18,6 +18,7 @@
 #include <Graphic3d_StructureManager.hxx>
 #include <Graphic3d_TransModeFlags.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_CStructure,Standard_Transient)
 
@@ -43,4 +44,29 @@ Graphic3d_CStructure::Graphic3d_CStructure (const Handle(Graphic3d_StructureMana
   myBndBoxClipCheck(Standard_True)
 {
   Id = myGraphicDriver->NewIdentification();
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_CStructure::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_CStructure);
+
+  for (Graphic3d_SequenceOfGroup::Iterator anIterator (myGroups); anIterator.More(); anIterator.Next())
+  {
+    Handle(Graphic3d_Group) aGroup = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aGroup.get());
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTrsf.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTrsfPers.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myClipPlanes.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHighlightStyle.get());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsCulled);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBndBoxClipCheck);
 }

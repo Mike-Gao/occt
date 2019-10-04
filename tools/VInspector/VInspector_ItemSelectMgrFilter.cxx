@@ -30,6 +30,10 @@
 // =======================================================================
 QVariant VInspector_ItemSelectMgrFilter::initValue (int theItemRole) const
 {
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
+
   if (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole)
   {
     Handle(SelectMgr_Filter) aFilter = GetFilter();
@@ -37,8 +41,6 @@ QVariant VInspector_ItemSelectMgrFilter::initValue (int theItemRole) const
     {
       case 0: return theItemRole == Qt::ToolTipRole ? QVariant ("")
                                                     : QVariant (aFilter->DynamicType()->Name());
-      case 1: return rowCount() > 0 ? QVariant (rowCount()) : QVariant();
-      case 2: return VInspector_Tools::GetPointerInfo (aFilter, true).ToCString();
       default: break;
     }
   }
@@ -127,12 +129,3 @@ void VInspector_ItemSelectMgrFilter::initItem() const
   const_cast<VInspector_ItemSelectMgrFilter*>(this)->Init();
 }
 
-// =======================================================================
-// function : GetInteractiveObject
-// purpose :
-// =======================================================================
-Handle(SelectMgr_Filter) VInspector_ItemSelectMgrFilter::GetFilter() const
-{
-  initItem();
-  return myFilter;
-}

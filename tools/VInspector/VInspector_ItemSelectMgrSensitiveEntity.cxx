@@ -14,10 +14,11 @@
 // commercial license or contractual agreement. 
 
 
-#include <inspector/VInspector_ItemSensitiveEntity.hxx>
+#include <inspector/VInspector_ItemSelectMgrSensitiveEntity.hxx>
+#include <inspector/VInspector_ItemSelectBasicsSensitiveEntity.hxx>
 
 #include <AIS_ListOfInteractive.hxx>
-#include <Select3D_SensitiveEntity.hxx>
+#include <SelectBasics_SensitiveEntity.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_Selection.hxx>
 #include <SelectMgr_SensitiveEntity.hxx>
@@ -25,9 +26,11 @@
 #include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Shape.hxx>
 #include <inspector/VInspector_ItemContext.hxx>
-#include <inspector/VInspector_ItemEntityOwner.hxx>
-#include <inspector/VInspector_ItemSelection.hxx>
+#include <inspector/VInspector_ItemSelectBasicsEntityOwner.hxx>
+#include <inspector/VInspector_ItemSelectMgrSelection.hxx>
 #include <inspector/VInspector_Tools.hxx>
+#include <inspector/ViewControl_Table.hxx>
+#include <inspector/ViewControl_Tools.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QStringList>
@@ -35,24 +38,28 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
-// function : GetSensitiveEntity
+// function : initValue
 // purpose :
 // =======================================================================
-Handle(SelectMgr_SensitiveEntity) VInspector_ItemSensitiveEntity::GetSensitiveEntity() const
+int VInspector_ItemSelectMgrSensitiveEntity::initRowCount() const
 {
-  initItem();
-  return myEntity;
+  if (GetSensitiveEntity()->BaseSensitive().IsNull())
+    return 0;
+
+  return 2;
 }
 
 // =======================================================================
 // function : initValue
 // purpose :
 // =======================================================================
-QVariant VInspector_ItemSensitiveEntity::initValue (int theItemRole) const
+QVariant VInspector_ItemSelectMgrSensitiveEntity::initValue (int theItemRole) const
 {
-  Handle(SelectMgr_SensitiveEntity) aBase = GetSensitiveEntity();
-  Handle(SelectMgr_EntityOwner) anOwner = aBase->BaseSensitive()->OwnerId();
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
 
+  Handle(SelectMgr_SensitiveEntity) anEntity = GetSensitiveEntity();
   switch (theItemRole)
   {
     case Qt::DisplayRole:
@@ -61,35 +68,7 @@ QVariant VInspector_ItemSensitiveEntity::initValue (int theItemRole) const
     {
       switch (Column())
       {
-        case 0: return myEntity->DynamicType()->Name();
-        case 2: return VInspector_Tools::GetPointerInfo (GetSensitiveEntity()->BaseSensitive()->OwnerId(), true).ToCString();
-        case 3:
-        {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
-
-          const TopoDS_Shape& aShape = BROwnr->Shape();
-          if (aShape.IsNull())
-            return QVariant();
-
-          return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
-        }
-        case 13: return
-#if OCC_VERSION_HEX <= 0x060901
-                       ("none");
-#else
-                       myEntity->IsActiveForSelection() ? QString ("true") : QString ("false");
-#endif
-        case 14: return QString::number (GetSensitiveEntity()->BaseSensitive()->SensitivityFactor());
-        case 15: return QString::number (GetSensitiveEntity()->BaseSensitive()->NbSubElements());
-        case 16:
-        {
-          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
-          if (BROwnr.IsNull())
-            return QVariant();
-          return anOwner->Priority();
-        }
+        case 0: return anEntity->DynamicType()->Name();
         default:
           break;
       }
@@ -107,7 +86,7 @@ QVariant VInspector_ItemSensitiveEntity::initValue (int theItemRole) const
             return QVariant ((theItemRole == Qt::BackgroundRole) ? QColor (Qt::darkBlue) : QColor (Qt::white));
         }
       }
-      VInspector_ItemSelectionPtr aParentItem = itemDynamicCast<VInspector_ItemSelection>(Parent());
+      VInspector_ItemSelectMgrSelectionPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrSelection>(Parent());
       if (aParentItem)
         return aParentItem->data(QModelIndex(), theItemRole);
       break;
@@ -122,20 +101,25 @@ QVariant VInspector_ItemSensitiveEntity::initValue (int theItemRole) const
 // function : createChild
 // purpose :
 // =======================================================================
-TreeModel_ItemBasePtr VInspector_ItemSensitiveEntity::createChild (int theRow, int theColumn)
+TreeModel_ItemBasePtr VInspector_ItemSelectMgrSensitiveEntity::createChild (int theRow, int theColumn)
 {
-  return VInspector_ItemEntityOwner::CreateItem (currentItem(), theRow, theColumn);
+  if (theRow == 0)
+    return VInspector_ItemSelectBasicsEntityOwner::CreateItem (currentItem(), theRow, theColumn);
+  else if (theRow == 1)
+    return VInspector_ItemSelectBasicsSensitiveEntity::CreateItem (currentItem(), theRow, theColumn);
+
+  return TreeModel_ItemBasePtr();
 }
 
 // =======================================================================
 // function : Init
 // purpose :
 // =======================================================================
-void VInspector_ItemSensitiveEntity::Init()
+void VInspector_ItemSelectMgrSensitiveEntity::Init()
 {
-  VInspector_ItemSelectionPtr aParentItem = itemDynamicCast<VInspector_ItemSelection>(Parent());
+  VInspector_ItemSelectMgrSelectionPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrSelection>(Parent());
 
-  Handle(SelectMgr_Selection) aSelection = aParentItem->getSelection();
+  Handle(SelectMgr_Selection) aSelection = aParentItem->GetSelection();
 
   int aRowId = Row();
   int aCurrentId = 0;
@@ -161,7 +145,7 @@ void VInspector_ItemSensitiveEntity::Init()
 // function : Reset
 // purpose :
 // =======================================================================
-void VInspector_ItemSensitiveEntity::Reset()
+void VInspector_ItemSelectMgrSensitiveEntity::Reset()
 {
   // an empty method to don't clear the main label, otherwise the model will be empty
   TreeModel_ItemBase::Reset();
@@ -172,23 +156,23 @@ void VInspector_ItemSensitiveEntity::Reset()
 // function : initItem
 // purpose :
 // =======================================================================
-void VInspector_ItemSensitiveEntity::initItem() const
+void VInspector_ItemSelectMgrSensitiveEntity::initItem() const
 {
   if (IsInitialized())
     return;
-  const_cast<VInspector_ItemSensitiveEntity*>(this)->Init();
+  const_cast<VInspector_ItemSelectMgrSensitiveEntity*>(this)->Init();
 }
 
 // =======================================================================
 // function : getEntityOwner
 // purpose :
 // =======================================================================
-Handle(SelectMgr_EntityOwner) VInspector_ItemSensitiveEntity::getEntityOwner() const
+Handle(SelectBasics_EntityOwner) VInspector_ItemSelectMgrSensitiveEntity::getEntityOwner() const
 {
   initItem();
 
-  Handle(SelectMgr_EntityOwner) anOwner;
-  const Handle(Select3D_SensitiveEntity)& aBase = myEntity->BaseSensitive();
+  Handle(SelectBasics_EntityOwner) anOwner;
+  const Handle(SelectBasics_SensitiveEntity)& aBase = myEntity->BaseSensitive();
   if (aBase.IsNull())
     return anOwner;
   return aBase->OwnerId();

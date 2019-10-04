@@ -1195,6 +1195,22 @@ void TCollection_AsciiString::Split(const Standard_Integer where,
 // ----------------------------------------------------------------------------
 // Split
 // ----------------------------------------------------------------------------
+void TCollection_AsciiString::Split (const TCollection_AsciiString& theSeparator,
+                                     NCollection_IndexedMap<TCollection_AsciiString>& theValues)
+{
+  Standard_Integer aStartPosition = 1, aSeparatorPosition = -1;
+
+  aSeparatorPosition = Location (theSeparator, aStartPosition, Length());
+  while (aSeparatorPosition)
+  {
+    theValues.Add (SubString (aStartPosition, aSeparatorPosition - 1));
+    aStartPosition = aSeparatorPosition + theSeparator.Length();
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Split
+// ----------------------------------------------------------------------------
 TCollection_AsciiString TCollection_AsciiString::Split
                                                 (const Standard_Integer where)
 {

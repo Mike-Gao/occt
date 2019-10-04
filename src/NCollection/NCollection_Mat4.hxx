@@ -461,6 +461,15 @@ public:
     return *reinterpret_cast<const NCollection_Mat4<Element_t>*> (theData);
   }
 
+  void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "NCollection_Mat4", 16,
+      GetValue (0, 0),  GetValue (0, 1), GetValue (0, 2),  GetValue (0, 3),
+      GetValue (1, 0),  GetValue (1, 1), GetValue (1, 2),  GetValue (1, 3),
+      GetValue (2, 0),  GetValue (2, 1), GetValue (2, 2),  GetValue (2, 3),
+      GetValue (3, 0),  GetValue (3, 1), GetValue (3, 2),  GetValue (3, 3))
+  }
+
 private:
 
   Element_t myMat[16];

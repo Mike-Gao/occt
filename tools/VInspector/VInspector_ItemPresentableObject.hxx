@@ -41,9 +41,14 @@ public:
   //! Destructor
   virtual ~VInspector_ItemPresentableObject() Standard_OVERRIDE {};
 
+  //! Returns data object of the item.
+  //! \return object
+  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myIO; }
+
   //! Returns the current interactive object, init item if it was not initialized yet
   //! \return interactive object
-  Standard_EXPORT Handle(AIS_InteractiveObject) GetInteractiveObject() const;
+  Standard_EXPORT Handle(AIS_InteractiveObject) GetInteractiveObject() const
+  { return Handle(AIS_InteractiveObject)::DownCast (GetObject()); }
 
   //! Returns pointer information for the current interactive object, init item if it was not initialized yet
   //! \return string value
@@ -55,11 +60,13 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
-  //! Returns presentations, which items are selected in tree view
-  //! \param theSelectionModel a selection model
-  //! \return container of presentations
-  Standard_EXPORT static NCollection_List<Handle(AIS_InteractiveObject)> GetSelectedPresentations
-    (QItemSelectionModel* theSelectionModel);
+  //! Returns presentation of the attribute to be visualized in the view
+  //! \thePresentations [out] container of presentation handles to be visualized
+  Standard_EXPORT virtual void GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations);
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
 
 protected:
 
@@ -81,7 +88,10 @@ protected:
   //! \return the created item
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE;
 
-private:
+protected:
+  //! Build presentation shape
+  //! \return generated shape of the item parameters
+  virtual TopoDS_Shape buildPresentationShape() Standard_OVERRIDE;
 
   //! Set interactive object into the current field
   //! \param theIO a presentation
