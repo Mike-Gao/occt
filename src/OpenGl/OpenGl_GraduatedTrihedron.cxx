@@ -838,3 +838,26 @@ void OpenGl_GraduatedTrihedron::Axis::Release (OpenGl_Context* theCtx)
   Line    .Release (theCtx);
   Arrow   .Release (theCtx);
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_GraduatedTrihedron::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_GraduatedTrihedron);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Element);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
+  //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myShadingModel);
+  //OpenGl_Vec3 myMin;
+  //OpenGl_Vec3 myMax;
+  //mutable Axis myAxes[3]; //!< Axes for trihedron
+  //mutable Graphic3d_GraduatedTrihedron myData;
+  //mutable OpenGl_Aspects   myGridLineAspect; //!< Color grid properties
+  //mutable OpenGl_Text    myLabelValues;
+  //mutable OpenGl_Aspects myAspectLabels;
+  //mutable OpenGl_Aspects myAspectValues;
+  //mutable Standard_Boolean myIsInitialized;
+}

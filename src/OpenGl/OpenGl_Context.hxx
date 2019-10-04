@@ -200,6 +200,13 @@ DEFINE_STANDARD_HANDLE(OpenGl_Context, Standard_Transient)
 //!
 //! Notice that some systems provide mechanisms to simultaneously incorporate with GL contexts with different capabilities.
 //! For this reason OpenGl_Context should be initialized and used for each GL context independently.
+//!
+//! Matrices of OpenGl transformations:
+//! model -> world -> view -> projection
+//! These matrices might be changed for local transformation, transform persistent using direct access to
+//! current matrix of ModelWorldState, WorldViewState and ProjectionState
+//! After, this matrices should be applyed using ApplyModelWorldMatrix, ApplyWorldViewMatrix,
+//! ApplyModelViewMatrix or ApplyProjectionMatrix.
 class OpenGl_Context : public Standard_Transient
 {
   DEFINE_STANDARD_RTTIEXT(OpenGl_Context, Standard_Transient)
@@ -589,16 +596,25 @@ public:
   //! Returns currently applied polygon offset parameters.
   const Graphic3d_PolygonOffset& PolygonOffset() const { return myPolygonOffset; }
 
-  //! Applies matrix stored in ModelWorldState to OpenGl.
+  //! Applies matrix into shader manager stored in ModelWorldState to OpenGl.
+  //! In "model -> world -> view -> projection" it performs:
+  //!     model -> world
   Standard_EXPORT void ApplyModelWorldMatrix();
 
   //! Applies matrix stored in WorldViewState to OpenGl.
+  //! In "model -> world -> view -> projection" it performs:
+  //!     model -> world -> view,
+  //! where model -> world is identical matrix
   Standard_EXPORT void ApplyWorldViewMatrix();
 
   //! Applies combination of matrices stored in ModelWorldState and WorldViewState to OpenGl.
+  //! In "model -> world -> view -> projection" it performs:
+  //!     model -> world -> view
   Standard_EXPORT void ApplyModelViewMatrix();
 
   //! Applies matrix stored in ProjectionState to OpenGl.
+  //! In "model -> world -> view -> projection" it performs:
+  //!                       view -> projection
   Standard_EXPORT void ApplyProjectionMatrix();
 
 public:

@@ -22,6 +22,7 @@
 #include <inspector/TreeModel_Tools.hxx>
 #include <inspector/TreeModel_ContextMenu.hxx>
 
+#include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
 
@@ -39,6 +40,7 @@
 
 #include <BRep_Builder.hxx>
 #include <BRepTools.hxx>
+#include <ShapeFix_Shape.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
@@ -95,17 +97,39 @@ ShapeView_Window::ShapeView_Window (QWidget* theParent)
           this, SLOT (onTreeViewContextMenuRequested (const QPoint&)));
   new TreeModel_ContextMenu (myTreeView);
   ShapeView_TreeModel* aModel = new ShapeView_TreeModel (myTreeView);
+  for (int i = 5; i <= 6; i++) // hide shape parameters columns
+  {
+    TreeModel_HeaderSection anItem = aModel->GetHeaderItem (i);
+    anItem.SetIsHidden (true);
+    aModel->SetHeaderItem (i, anItem);
+  }
+
+
   myTreeView->setModel (aModel);
   ShapeView_VisibilityState* aVisibilityState = new ShapeView_VisibilityState (aModel);
   aModel->SetVisibilityState (aVisibilityState);
   TreeModel_Tools::UseVisibilityColumn (myTreeView);
 
+  QItemSelectionModel* aSelModel = new QItemSelectionModel (myTreeView->model(), myTreeView);
+  myTreeView->setSelectionModel (aSelModel);
+  connect (aSelModel, SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)),
+           this, SLOT (onTreeViewSelectionChanged (const QItemSelection&, const QItemSelection&)));
+
   QModelIndex aParentIndex = myTreeView->model()->index (0, 0);
   myTreeView->setExpanded (aParentIndex, true);
   myMainWindow->setCentralWidget (myTreeView);
 
+  // property view
+  myPropertyView = new ViewControl_PropertyView (myMainWindow,
+    QSize(SHAPEVIEW_DEFAULT_VIEW_WIDTH, SHAPEVIEW_DEFAULT_VIEW_HEIGHT));
+  myPropertyPanelWidget = new QDockWidget (tr ("PropertyPanel"), myMainWindow);
+  myPropertyPanelWidget->setObjectName (myPropertyPanelWidget->windowTitle());
+  myPropertyPanelWidget->setTitleBarWidget (new QWidget(myMainWindow));
+  myPropertyPanelWidget->setWidget (myPropertyView->GetControl());
+  myMainWindow->addDockWidget (Qt::RightDockWidgetArea, myPropertyPanelWidget);
+
   // view
-  myViewWindow = new View_Window (myMainWindow, false);
+  myViewWindow = new View_Window (myMainWindow, NULL, false);
   connect (myViewWindow, SIGNAL(eraseAllPerformed()), this, SLOT(onEraseAllPerformed()));
   aVisibilityState->SetDisplayer (myViewWindow->GetDisplayer());
   aVisibilityState->SetPresentationType (View_PresentationType_Main);
@@ -116,6 +140,8 @@ ShapeView_Window::ShapeView_Window (QWidget* theParent)
   aViewDockWidget->setWidget (myViewWindow);
   aViewDockWidget->setTitleBarWidget (myViewWindow->GetViewToolBar()->GetControl());
   myMainWindow->addDockWidget (Qt::RightDockWidgetArea, aViewDockWidget);
+
+  myMainWindow->splitDockWidget(myPropertyPanelWidget, aViewDockWidget, Qt::Vertical);
 
   myMainWindow->resize (DEFAULT_SHAPE_VIEW_WIDTH, DEFAULT_SHAPE_VIEW_HEIGHT);
   myMainWindow->move (DEFAULT_SHAPE_VIEW_POSITION_X, DEFAULT_SHAPE_VIEW_POSITION_Y);
@@ -355,10 +381,52 @@ void ShapeView_Window::onTreeViewContextMenuRequested (const QPoint& thePosition
       aMenu->addAction (ViewControl_Tools::CreateAction ("BREP view", SLOT (onBREPView()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("Close All BREP views", SLOT (onCloseAllBREPViews()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("BREP directory", SLOT (onBREPDirectory()), myMainWindow, this));
+    aMenu->addAction (ViewControl_Tools::CreateAction ("ShapeFix_Shape", SLOT (onShapeFixShape()), myMainWindow, this));
+
+    ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
+    const TopoDS_Shape& aShape = aShapeItem->GetItemShape();
+    TopAbs_ShapeEnum anExplodeType = aShapeItem->GetExplodeType();
+    NCollection_List<TopAbs_ShapeEnum> anExplodeTypes;
+    ShapeView_Tools::IsPossibleToExplode (aShape, anExplodeTypes);
+    if (anExplodeTypes.Size() > 0)
+    {
+      QMenu* anExplodeMenu = aMenu->addMenu ("Explode");
+      for (NCollection_List<TopAbs_ShapeEnum>::Iterator anExpIterator (anExplodeTypes); anExpIterator.More();
+        anExpIterator.Next())
+      {
+        TopAbs_ShapeEnum aType = anExpIterator.Value();
+        QAction* anAction = ViewControl_Tools::CreateAction (TopAbs::ShapeTypeToString (aType), SLOT (onExplode()), myMainWindow, this);
+        anExplodeMenu->addAction (anAction);
+        if (anExplodeType == aType)
+        {
+          anAction->setCheckable (true);
+          anAction->setChecked (true);
+        }
+      }
+      QAction* anAction = ViewControl_Tools::CreateAction ("NONE", SLOT (onExplode()), myMainWindow, this);
+      anExplodeMenu->addSeparator();
+      anExplodeMenu->addAction (anAction);
+    }
   }
 
   QPoint aPoint = myTreeView->mapToGlobal (thePosition);
   aMenu->exec (aPoint);
+}
+
+// =======================================================================
+// function : 
+// onTreeViewSelectionChanged
+// purpose :
+// =======================================================================
+void ShapeView_Window::onTreeViewSelectionChanged (const QItemSelection&,
+                                                   const QItemSelection&)
+{
+  QApplication::setOverrideCursor (Qt::WaitCursor);
+
+  if (myPropertyPanelWidget->toggleViewAction()->isChecked())
+    updatePropertyPanelBySelection();
+
+  QApplication::restoreOverrideCursor();
 }
 
 // =======================================================================
@@ -390,6 +458,78 @@ void ShapeView_Window::onBREPDirectory()
 }
 
 // =======================================================================
+// function : onExplode
+// purpose :
+// =======================================================================
+void ShapeView_Window::onShapeFixShape()
+{
+  QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected(aModel->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex(anIndex);
+  if (!anItemBase)
+    return;
+
+  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
+  if (!aShapeItem)
+    return;
+
+  const TopoDS_Shape aShape = aShapeItem->GetItemShape();
+
+  Standard_Real LinTol = Precision::Confusion();
+
+  Handle(ShapeFix_Shape) Fixer = new ShapeFix_Shape (aShape);
+  Fixer->SetPrecision (LinTol);
+  Fixer->SetMaxTolerance (LinTol);
+  Fixer->Perform();
+
+  TopoDS_Shape aFixedShape = Fixer->Shape();
+  addShape (aFixedShape);
+}
+
+// =======================================================================
+// function : onExplode
+// purpose :
+// =======================================================================
+void ShapeView_Window::onExplode()
+{
+  QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected(aModel->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex(anIndex);
+  if (!anItemBase)
+    return;
+
+  ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
+  if (!aShapeItem)
+    return;
+
+  QAction* anAction = (QAction*)sender();
+  if (!anAction)
+    return;
+
+  QApplication::setOverrideCursor (Qt::WaitCursor);
+  TopAbs_ShapeEnum aShapeType;
+  if (anAction->text() == "NONE")
+    aShapeType = TopAbs_SHAPE;
+  else
+    aShapeType = TopAbs::ShapeTypeFromString(anAction->text().toStdString().c_str());
+
+  myViewWindow->GetDisplayer()->EraseAllPresentations();
+  aShapeItem->SetExplodeType(aShapeType);
+
+  //anItemBase->Parent()->Reset(); - TODO (update only modified sub-tree)
+  ShapeView_TreeModel* aTreeModel = dynamic_cast<ShapeView_TreeModel*> (myTreeView->model());
+  aTreeModel->Reset();
+  aTreeModel->EmitLayoutChanged();
+  QApplication::restoreOverrideCursor();
+}
+
+// =======================================================================
 // function : onLoadFile
 // purpose :
 // =======================================================================
@@ -399,8 +539,12 @@ void ShapeView_Window::onLoadFile()
 
   QString aFileName = ShapeView_OpenFileDialog::OpenFile(0, aDataDirName);
   aFileName = QDir().toNativeSeparators (aFileName);
-  if (!aFileName.isEmpty())
+  if (aFileName.isEmpty())
+    return;
+
+    QApplication::setOverrideCursor (Qt::WaitCursor);
     onOpenFile(aFileName);
+    QApplication::restoreOverrideCursor();
 }
 
 // =======================================================================
@@ -504,6 +648,28 @@ void ShapeView_Window::viewFile (const QString& theFileName)
     }
   }
   QApplication::restoreOverrideCursor();
+}
+
+
+// =======================================================================
+// function : updatePropertyPanelBySelection
+// purpose :
+// =======================================================================
+void ShapeView_Window::updatePropertyPanelBySelection()
+{
+  /*QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+
+  QModelIndexList aSelected = TreeModel_ModelBase::GetSelected (aModel->selectedIndexes(), 0);
+  QList<ViewControl_TableModelValues*> aTableValues;
+
+  if (aSelected.size() == 1)
+  {
+    TreeModel_ItemBasePtr aSelectedItem = TreeModel_ModelBase::GetItemByIndex(aSelected.first());
+    ShapeView_Tools::GetPropertyTableValues (aSelectedItem, aTableValues);
+  }
+  myPropertyView->Init (aTableValues);*/
 }
 
 // =======================================================================

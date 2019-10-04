@@ -51,3 +51,15 @@ Handle(Graphic3d_TransformPers) Graphic3d_TransformPers::FromDeprecatedParams (G
   }
   return aTrsfPers;
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Graphic3d_TransformPers::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+{
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMode)
+
+  OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "Params3d", 3, myParams.Params3d.PntX, myParams.Params3d.PntY, myParams.Params3d.PntZ)
+  OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "Params2d", 3, myParams.Params2d.OffsetX, myParams.Params2d.OffsetY, myParams.Params2d.Corner)
+}

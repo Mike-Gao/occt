@@ -310,3 +310,20 @@ gp_Pnt Select3D_SensitivePoly::CenterOfGeometry() const
 
   return myCOG;
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Select3D_SensitivePoly::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitivePoly);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
+
+  //Select3D_PointData              myPolyg;              //!< Points of the poly
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCOG);
+  //Handle(TColStd_HArray1OfInteger) mySegmentIndexes;     //!< Segment indexes for BVH tree build
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsComputed);
+}
