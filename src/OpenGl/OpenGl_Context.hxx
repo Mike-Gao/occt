@@ -867,6 +867,9 @@ public: //! @name methods to alter or retrieve current state
   //! Return Graphics Driver's vendor.
   const TCollection_AsciiString& Vendor() const { return myVendor; }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
+
 private:
 
   //! Wrapper to system function to retrieve GL function pointer by name.

@@ -18,6 +18,7 @@
 
 #include <OpenGl_Vec.hxx>
 #include <NCollection_Vector.hxx>
+#include <Standard_Dump.hxx>
 
 //! Software implementation for OpenGL matrix stack.
 template<class T>
@@ -85,8 +86,9 @@ public:
   }
 
   //! Dumps the content of me into the stream
-  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const
+  void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const
   {
+    (void)theDepth;
     OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "myCurrent", 16,
       myCurrent.GetValue (0, 0),  myCurrent.GetValue (0, 1), myCurrent.GetValue (0, 2),  myCurrent.GetValue (0, 3),
       myCurrent.GetValue (1, 0),  myCurrent.GetValue (1, 1), myCurrent.GetValue (1, 2),  myCurrent.GetValue (1, 3),
