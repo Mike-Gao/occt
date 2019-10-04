@@ -443,3 +443,24 @@ gp_GTrsf Select3D_SensitiveTriangulation::InvInitLocation() const
 {
   return myInvInitLocation;
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Select3D_SensitiveTriangulation::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveTriangulation);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTriangul.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInitLocation);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCDG3D);
+  //Handle(TColStd_HArray1OfInteger) myFreeEdges;
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPrimitivesNb);
+  //Handle(TColStd_HArray1OfInteger) myBVHPrimIndexes;     //!< Indexes of edges or triangles for BVH build
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
+  //gp_GTrsf                         myInvInitLocation;
+}

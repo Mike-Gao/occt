@@ -842,11 +842,40 @@ void PrsMgr_PresentableObject::PolygonOffsets (Standard_Integer&   theMode,
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void PrsMgr_PresentableObject::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+void PrsMgr_PresentableObject::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, PrsMgr_PresentableObject);
 
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myParent);
+
+  for (PrsMgr_Presentations::Iterator anIterator (myPresentations); anIterator.More(); anIterator.Next())
+  {
+    Handle(PrsMgr_Presentation) aPresentation = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aPresentation.get());
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myClipPlanes.get());
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDrawer.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHilightDrawer.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDynHilightDrawer.get());
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTransformPersistence.get());
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myLocalTransformation.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTransformation.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCombinedParentTransform.get());
+
+  for (PrsMgr_ListOfPresentableObjects::Iterator anIterator (myChildren); anIterator.More(); anIterator.Next())
+  {
+    Handle(PrsMgr_PresentableObject) aPresentableObject = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, aPresentableObject.get());
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInvTransformation);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeOfPresentation3d);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurrentFacingModel);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOwnWidth);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, hasOwnColor);
@@ -855,4 +884,6 @@ void PrsMgr_PresentableObject::DumpJson (Standard_OStream& theOStream, const Sta
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myInfiniteState);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsMutable);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPresentations);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToPropagateVisualState);
 }

@@ -18,7 +18,7 @@
 
 #include <AIS_InteractiveContext.hxx>
 #include <NCollection_List.hxx>
-#include <SelectMgr_EntityOwner.hxx>
+#include <SelectBasics_EntityOwner.hxx>
 #include <Standard.hxx>
 #include <inspector/TreeModel_ModelBase.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
@@ -59,8 +59,11 @@ public:
 
   //! Returns tree view indices for the given pointers of presentable object
   //! \param thePointers a list of presentation pointers
-  //! \return container of indices
-  Standard_EXPORT QModelIndexList FindPointers (const QStringList& thePointers);
+  //! \param theParent an index of the parent item
+  //! \param [out] container of indices
+  Standard_EXPORT void FindPointers (const QStringList& thePointers,
+                                     const QModelIndex& theParent,
+                                     QModelIndexList& theFoundIndices);
 
   //! Returns tree model index of the presentation item in the tree view.
   //! \param thePresentation a presentation
@@ -77,7 +80,7 @@ public:
   //! \param theSelectionModel a selection model
   //! \param theOwners an output list of owners
   Standard_EXPORT static void GetSelectedOwners (QItemSelectionModel* theSelectionModel,
-                                                 NCollection_List<Handle(SelectMgr_EntityOwner)>& theOwners);
+                                                 NCollection_List<Handle(SelectBasics_EntityOwner)>& theOwners);
 
   //! Updates tree model
   Standard_EXPORT void UpdateTreeModel();

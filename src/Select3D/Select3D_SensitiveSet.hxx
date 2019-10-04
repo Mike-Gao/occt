@@ -96,6 +96,9 @@ public:
   //! Returns a number of nodes in 1 BVH leaf
   Standard_Integer GetLeafNodeSize() const { return myContent.Builder()->LeafNodeSize(); }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
+
 protected:
 
   //! Checks whether one or more entities of the set overlap current selecting volume.

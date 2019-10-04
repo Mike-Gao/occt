@@ -995,3 +995,33 @@ Handle(Prs3d_PointAspect) AIS_Trihedron::getHighlightPointAspect()
 
   return myHighlightPointAspect;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void AIS_Trihedron::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, AIS_Trihedron);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, AIS_InteractiveObject);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnSize);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTextColor);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnArrowColor);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDatumAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTrihDispMode);
+
+  //Handle(Geom_Axis2Placement) myComponent;
+  //NCollection_DataMap<Prs3d_DatumParts, Standard_Integer> mySelectionPriority;
+  //NCollection_DataMap<Prs3d_DatumParts, TCollection_ExtendedString> myLabel;
+
+  //NCollection_DataMap<Prs3d_DatumParts, Handle(Graphic3d_Group)> myPartToGroup;
+  //NCollection_List<Prs3d_DatumParts> mySelectedParts;
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myHighlightAspect.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHighlightLineAspect.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHighlightPointAspect.get());
+
+  //NCollection_DataMap<Prs3d_DatumParts, Handle(Graphic3d_ArrayOfPrimitives)> myPrimitives;
+}
