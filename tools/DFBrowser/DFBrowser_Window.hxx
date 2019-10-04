@@ -206,13 +206,6 @@ protected:
   //! \return container of presentations or NULL
   void findPresentations (const QModelIndexList& theIndices, AIS_ListOfInteractive& thePresentations);
 
-  //! Recursive items expanding in tree view staring from the index
-  //! \param theTreeView an OCAF tree view
-  //! \param theParentIndex an index which children should be expanded
-  //! \param isExpanded a boolean state if the item should be expanded or collapsed
-  //! \param theLevels a number of levels to be expanded, or -1 for all levels
-  static void setExpanded (QTreeView* theTreeView, const QModelIndex& theParentIndex, const bool isExpanded, int& theLevels);
-
 private:
 
   DFBrowser_Module* myModule; //!< current module

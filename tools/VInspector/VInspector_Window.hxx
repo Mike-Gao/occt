@@ -18,11 +18,14 @@
 
 #include <AIS_InteractiveContext.hxx>
 #include <NCollection_List.hxx>
-#include <SelectMgr_EntityOwner.hxx>
+#include <SelectBasics_EntityOwner.hxx>
 #include <Standard.hxx>
 
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
 #include <inspector/VInspector_CallBack.hxx>
+#include <inspector/View_DisplayActionType.hxx>
+
+#include <inspector/ViewControl_PaneCreator.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QObject>
@@ -31,15 +34,19 @@
 #include <Standard_WarningsRestore.hxx>
 
 class ViewControl_MessageDialog;
+class ViewControl_PropertyView;
 
 class VInspector_ToolBar;
+
+class View_DisplayPreview;
 class View_Window;
 
 class QAbstractItemModel;
 class QAction;
-class QMainWindow;
+class QDockWidget;
 class QTreeView;
 class QWidget;
+
 
 //! \class VInspector_Window
 //! Window that unites all VInspector controls.
@@ -82,6 +89,27 @@ public:
   //! Returns main control
   QWidget* GetMainWindow() const { return myMainWindow; }
 
+  //! Returns presentations of selected items in tree model
+  //! \param theModel selection model
+  //! \return container of presentations
+  NCollection_List<Handle(AIS_InteractiveObject)> GetSelectedPresentations (QItemSelectionModel* theModel);
+
+  void GetSelectedShapes (NCollection_List<Handle(Standard_Transient)>& theSelPresentations);
+
+  //! Returns selected shapes
+  //! \param theModel selection model
+  //! \return container of shapes
+  NCollection_List<TopoDS_Shape> GetSelectedShapes (const QModelIndexList& theIndices);
+
+  //! Returns selected shapes
+  //! \param theModel selection model
+  //! \return container of shapes
+  void GetSelectedPropertyPanelShapes (const TreeModel_ItemBasePtr& theTreeItem,
+                                       NCollection_List<TopoDS_Shape>& theShapes);
+
+  //! Returns the first not zero transform persistent of selected elements
+  Handle(Graphic3d_TransformPers) GetSelectedTransformPers();
+
 private:
 
   //! Fills controls of the plugin by parameters:
@@ -103,6 +131,15 @@ private slots:
   //! \param theActionId an action identifier in tool bar
   void onToolBarActionClicked (const int theActionId);
 
+  //! Display content of selected tree view item if isToggled is true
+  //! \param isToggled true if the property dock widget is shown
+  void onPropertyPanelShown (bool isToggled);
+
+  //! Update presentation of the selected tree view item using information about selection in property view
+  //! \param theSelected container of selected table cells
+  //! \param theDeselected container of selected table cells
+  void onPropertyViewSelectionChanged();
+
   //! Synchronization selection between history and tree view. Selection by history view
   //! \param theSelected a selected items
   //! \param theDeselected a deselected items
@@ -113,16 +150,28 @@ private slots:
   //! check box is checked
   //! \param theSelected a selected items
   //! \param theDeselected a deselected items
-  void onSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
+  void onTreeViewSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
+
+  //! Exports the selected context into MessageView for have preview in the context.
+  void onExportToMessageView();
 
   //! Exports the first selected shape into ShapeViewer plugin.
   void onExportToShapeView();
 
-  //! Shows selected presentation if it is not shown yet
-  void onShow();
+  //! Displays default preview presentation
+  void onDefaultPreview();
 
-  //! Erase selected presentation if it is shown
-  void onHide();
+  //! Apply activated display action
+  void onDisplayActionTypeClicked();
+
+  //! Expand two next levels for all selected item
+  void onExpand();
+
+  //! Expand all levels for all selected items
+  void onExpandAll();
+
+  //! Collapse all levels for all selected items
+  void onCollapseAll();
 
 private:
 
@@ -133,10 +182,21 @@ private:
   //! Updates tree model
   void UpdateTreeModel();
 
+  //! Updates property panel content by item selected in tree view.
+  void updatePropertyPanelBySelection();
+
   //! Set selected in tree view presentations displayed or erased in the current context. Note that erased presentations
   //! still belongs to the current context until Remove is called.
-  //! \param theToDisplay if true, presentation is displayed otherwise erased
-  void displaySelectedPresentations (const bool theToDisplay);
+  //! \param theType display action type
+  void displaySelectedPresentations (const View_DisplayActionType theType);
+
+  //! Set items of the pointers highlighted in tree view
+  //! \param theType display action type
+  void highlightTreeViewItems (const QStringList& thePointers);
+
+  //! Set items of the pointers selected in tree view
+  //! \param theType display action type
+  void selectTreeViewItems (const QStringList& thePointers);
 
   //! Creates an istance of 3D view to initialize context.
   //! \return a context of created view.
@@ -148,14 +208,23 @@ private:
 
   QMainWindow* myMainWindow; //!< main control
   VInspector_ToolBar* myToolBar; //!< tool bar actions
+
+  QDockWidget* myPropertyPanelWidget; //!< property pane dockable widget
+  ViewControl_PropertyView* myPropertyView; //!< property control to display model item values if exist
+
   QTreeView* myTreeView; //!< tree view of AIS content
   QTreeView* myHistoryView; //!< history of AIS context calls
   Handle(VInspector_CallBack) myCallBack; //!< AIS context call back, if set
+
+  NCollection_List<Handle(ViewControl_PaneCreator)> myPaneCreators; //!< panes for AIS presentations
 
   ViewControl_MessageDialog* myExportToShapeViewDialog; //!< dialog about exporting TopoDS_Shape to ShapeView plugin
   View_Window* myViewWindow; //!< temporary view window, it is created if Open is called but context is still NULL
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
+
+  View_DisplayPreview* myDisplayPreview; //!< class for preview display
+
 };
 
 #endif

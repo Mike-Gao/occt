@@ -263,3 +263,22 @@ PrsMgr_Presentation::~PrsMgr_Presentation()
 {
   Erase();
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void PrsMgr_Presentation::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, PrsMgr_Presentation);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_Structure);
+
+  //Handle(PrsMgr_PresentationManager) myPresentationManager;
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myPresentableObject);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBeforeHighlightState);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMode);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMustBeUpdated);
+}

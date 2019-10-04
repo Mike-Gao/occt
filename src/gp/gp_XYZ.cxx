@@ -42,3 +42,35 @@ void gp_XYZ::DumpJson (Standard_OStream& theOStream, const Standard_Integer) con
 {
   OCCT_DUMP_VECTOR_CLASS (theOStream, gp_XYZ, 3, x, y, z)
 }
+
+//=======================================================================
+//function : InitJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean gp_XYZ::InitJson (Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  OCCT_INIT_VECTOR_CLASS (theSStream, gp_XYZ, theStreamPos, 3, &x, &y, &z)
+
+  //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
+  //if (!Standard_Dump::SplitJson (Standard_Dump::Text (theSStream), aValues) || aValues.Size() > 1)
+  //  return Standard_False;
+
+  //if (aValues.FindKey (1).IsEqual (OCCT_CLASS_NAME(gp_XYZ)))
+  //  return Standard_False;
+
+  //NCollection_IndexedMap<TCollection_AsciiString> aValuesList;
+
+  //TCollection_AsciiString aValue = aValues.FindFromIndex (1);
+  //aValue.Split (Standard_Dump::JsonKeyToString (Standard_JsonKey_SeparatorValueToValue), aValuesList);
+
+  //if (aValuesList.Size() != 3 ||
+  //   !aValuesList.FindKey(1).IsRealValue() || !aValuesList.FindKey(2).IsRealValue() || !aValuesList.FindKey(3).IsRealValue())
+  //  return Standard_False;
+
+  //x = aValuesList.FindKey(1).RealValue();
+  //y = aValuesList.FindKey(2).RealValue();
+  //z = aValuesList.FindKey(3).RealValue();
+
+  return Standard_True;
+}
+

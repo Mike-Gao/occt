@@ -837,3 +837,30 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   theCtx->WorldViewState.Pop();
   theCtx->ApplyModelViewMatrix();
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_Text::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Text);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Element);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
+  //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myShadingModel);
+  //Handle(Graphic3d_Text)                                  myText;     //!< text parameters
+  //mutable Handle(OpenGl_Font)                             myFont;
+  //mutable NCollection_Vector<GLuint>                      myTextures;   //!< textures' IDs
+  //mutable NCollection_Vector<Handle(OpenGl_VertexBuffer)> myVertsVbo;   //!< VBOs of vertices
+  //mutable NCollection_Vector<Handle(OpenGl_VertexBuffer)> myTCrdsVbo;   //!< VBOs of texture coordinates
+  //mutable Handle(OpenGl_VertexBuffer)                     myBndVertsVbo;//!< VBOs of vertices for bounding box
+  //mutable Font_Rect                                       myBndBox;
+  //mutable OpenGl_Mat4d myProjMatrix;
+  //mutable OpenGl_Mat4d myModelMatrix;
+  //mutable OpenGl_Mat4d myOrientationMatrix;
+  //mutable OpenGl_Vec3d myWinXYZ;
+  //mutable GLdouble myScaleHeight;
+  //Standard_Boolean myIs2d;
+}

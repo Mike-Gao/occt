@@ -15,19 +15,27 @@
 
 #include <inspector/VInspector_ItemPresentableObject.hxx>
 
+#include <AIS.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
+
 #include <inspector/VInspector_ItemContext.hxx>
-#include <inspector/VInspector_ItemEntityOwner.hxx>
-#include <inspector/VInspector_ItemSelection.hxx>
+#include <inspector/VInspector_ItemSelectBasicsEntityOwner.hxx>
+#include <inspector/VInspector_ItemFolderObject.hxx>
+#include <inspector/VInspector_ItemPresentations.hxx>
+#include <inspector/VInspector_ItemSelectMgrSelection.hxx>
 #include <inspector/VInspector_Tools.hxx>
 #include <inspector/VInspector_ViewModel.hxx>
+
+#include <inspector/ViewControl_ColorSelector.hxx>
+#include <inspector/ViewControl_Table.hxx>
+#include <inspector/ViewControl_Tools.hxx>
 
 #include <NCollection_List.hxx>
 #include <Prs3d.hxx>
 #include <Prs3d_Drawer.hxx>
-#include <SelectMgr_EntityOwner.hxx>
+#include <SelectBasics_EntityOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
 #include <Standard_Version.hxx>
 
@@ -42,15 +50,9 @@
 // =======================================================================
 QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
 {
-  if (Column() == 20 && theItemRole == Qt::BackgroundRole) {
-    Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
-    if (!anIO.IsNull() && anIO->HasColor())
-    {
-      Quantity_Color aColor;
-      anIO->Color(aColor);
-      return QColor ((int)(aColor.Red()*255.), (int)(aColor.Green()*255.), (int)(aColor.Blue()*255.));
-    }
-  }
+  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
+  if (aParentValue.isValid())
+    return aParentValue;
 
   if (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole)
   {
@@ -67,45 +69,11 @@ QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
           return theItemRole == Qt::ToolTipRole ? QVariant ("")
                                                 : QVariant (anIO->DynamicType()->Name());
       }
-      case 1:
-        return rowCount();
-      case 2:
-      {
-        if (!aNullIO)
-          return VInspector_Tools::GetPointerInfo (anIO, true).ToCString();
-        break;
-      }
-      case 3:
-      {
-        Handle(AIS_Shape) aShapeIO = Handle(AIS_Shape)::DownCast (anIO);
-        if (!aShapeIO.IsNull())
-        {
-          const TopoDS_Shape& aShape = aShapeIO->Shape();
-          if (!aShape.IsNull())
-            return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
-        }
-        break;
-      }
       case 4:
       {
         int aNbSelected = VInspector_Tools::SelectedOwners (GetContext(), anIO, false);
         return aNbSelected > 0 ? QString::number (aNbSelected) : "";
       }
-      case 5:
-      {
-        TColStd_ListOfInteger aModes;
-        Handle(AIS_InteractiveContext) aContext = GetContext();
-        aContext->ActivatedModes(anIO, aModes);
-        TCollection_AsciiString aModesInfo;
-        for (TColStd_ListIteratorOfListOfInteger itr (aModes); itr.More(); itr.Next())
-        {
-          if (!aModesInfo.IsEmpty())
-            aModesInfo += ", ";
-          aModesInfo += VInspector_Tools::GetShapeTypeInfo (AIS_Shape::SelectionType(itr.Value()));
-        }
-        return aModesInfo.ToCString();
-      }
-      break;
       case 6:
       {
         double aDeviationCoefficient = 0;
@@ -116,18 +84,6 @@ QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
           anAISShape->OwnDeviationCoefficient(aDeviationCoefficient, aPreviousCoefficient);
         }
         return QString::number(aDeviationCoefficient);
-      }
-      case 7:
-      {
-        double aShapeDeflection = 0;
-        Handle(AIS_Shape) aShapeIO = Handle(AIS_Shape)::DownCast (anIO);
-        if (!aShapeIO.IsNull())
-        {
-          const TopoDS_Shape& aShape = aShapeIO->Shape();
-          if (!aShape.IsNull())
-            aShapeDeflection = Prs3d::GetDeflection(aShape, anIO->Attributes());
-        }
-        return QString::number (aShapeDeflection);
       }
       case 8:
       {
@@ -141,21 +97,6 @@ QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
         Handle(AIS_Shape) aShapeIO = Handle(AIS_Shape)::DownCast (anIO);
         bool anIsAutoTriangulation = aNullIO ? false : anIO->Attributes()->IsAutoTriangulation();
         return anIsAutoTriangulation ? QString ("true") : QString ("false");
-      }
-      case 17:
-      case 18:
-      case 19:
-        {
-        Handle(AIS_Shape) aShapeIO = Handle(AIS_Shape)::DownCast (anIO);
-        if (aShapeIO.IsNull())
-          return QVariant();
-        const TopoDS_Shape& aShape = aShapeIO->Shape();
-        if (aShape.IsNull())
-          return QVariant();
-
-        return Column() == 17 ? VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString()
-              : Column() == 18 ? VInspector_Tools::OrientationToName (aShape.Orientation()).ToCString()
-              :           /*19*/ VInspector_Tools::LocationToName (aShape.Location()).ToCString();
       }
       default: break;
     }
@@ -192,6 +133,11 @@ QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
 // =======================================================================
 int VInspector_ItemPresentableObject::initRowCount() const
 {
+  if (Column() != 0)
+    return 0;
+
+  int aNbProperties = 2; // "Properties", "Presentations"
+
   Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
 #if OCC_VERSION_HEX < 0x070201
   int aRows = 0;
@@ -200,12 +146,12 @@ int VInspector_ItemPresentableObject::initRowCount() const
   // iteration through sensitive privitives
   for (anIO->Init(); anIO->More(); anIO->Next())
     aRows++;
-  return aRows;
+  int aNbSelected = aRows;
 #else
-  return !anIO.IsNull()
-        ? anIO->Selections().Size()
-        : 0;
+  int aNbSelected = !anIO.IsNull() ? anIO->Selections().Size() : 0;
 #endif
+
+  return aNbProperties + aNbSelected;
 }
 
 // =======================================================================
@@ -214,7 +160,12 @@ int VInspector_ItemPresentableObject::initRowCount() const
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemPresentableObject::createChild (int theRow, int theColumn)
 {
-  return VInspector_ItemSelection::CreateItem(currentItem(), theRow, theColumn);
+  if (theRow == 0)
+    return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
+  if (theRow == 1)
+    return VInspector_ItemPresentations::CreateItem (currentItem(), theRow, theColumn);
+  else
+    return VInspector_ItemSelectMgrSelection::CreateItem(currentItem(), theRow, theColumn);
 }
 
 // =======================================================================
@@ -246,6 +197,8 @@ void VInspector_ItemPresentableObject::Init()
   }
 
   setInteractiveObject (anIO);
+  myTransformPersistence = anIO->TransformPersistence();
+  UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }
 
@@ -259,6 +212,7 @@ void VInspector_ItemPresentableObject::Reset()
 
   SetContext (NULL);
   setInteractiveObject (NULL);
+  myTransformPersistence = NULL;
 }
 
 // =======================================================================
@@ -273,13 +227,20 @@ void VInspector_ItemPresentableObject::initItem() const
 }
 
 // =======================================================================
-// function : GetInteractiveObject
+// function : buildPresentationShape
 // purpose :
 // =======================================================================
-Handle(AIS_InteractiveObject) VInspector_ItemPresentableObject::GetInteractiveObject() const
+TopoDS_Shape VInspector_ItemPresentableObject::buildPresentationShape()
 {
-  initItem();
-  return myIO;
+  Handle(AIS_InteractiveObject) aPrs = myIO;
+  if (aPrs.IsNull())
+    return TopoDS_Shape();
+
+  Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast (aPrs);
+  if (!aShapePrs.IsNull())
+    return aShapePrs->Shape();
+
+  return TopoDS_Shape();
 }
 
 // =======================================================================
@@ -292,40 +253,27 @@ QString VInspector_ItemPresentableObject::PointerInfo() const
 }
 
 // =======================================================================
-// function : GetSelectedPresentations
+// function : GetPresentations
 // purpose :
 // =======================================================================
-NCollection_List<Handle(AIS_InteractiveObject)> VInspector_ItemPresentableObject::GetSelectedPresentations
-                                                                  (QItemSelectionModel* theSelectionModel)
+void VInspector_ItemPresentableObject::GetPresentations (NCollection_List<Handle(Standard_Transient)>& thePresentations)
 {
-  NCollection_List<Handle(AIS_InteractiveObject)> aResultList;
-  if (!theSelectionModel)
-    return aResultList;
-  
-  QList<TreeModel_ItemBasePtr> anItems;
-  
-  QModelIndexList anIndices = theSelectionModel->selectedIndexes();
-  for (QModelIndexList::const_iterator anIndicesIt = anIndices.begin(); anIndicesIt != anIndices.end(); anIndicesIt++)
-  {
-    TreeModel_ItemBasePtr anItem = TreeModel_ModelBase::GetItemByIndex (*anIndicesIt);
-    if (!anItem || anItems.contains (anItem))
-      continue;
-    anItems.append (anItem);
-  }
+  if (Column() != 0)
+    return;
 
-  QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
-  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); anItemIt++)
-  {
-    TreeModel_ItemBasePtr anItem = *anItemIt;
-    VInspector_ItemPresentableObjectPtr aPrsItem = itemDynamicCast<VInspector_ItemPresentableObject>(anItem);
-    if (!aPrsItem)
-      continue;
-    Handle(AIS_InteractiveObject) aPresentation = aPrsItem->GetInteractiveObject();
-    if (aSelectedIds.contains ((size_t)aPresentation.operator->()))
-      continue;
-    aSelectedIds.append ((size_t)aPresentation.operator->());
-    if (!aPresentation.IsNull())
-      aResultList.Append (aPresentation);
-  }
-  return aResultList;
+  thePresentations.Append (GetInteractiveObject());
 }
+
+// =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemPresentableObject::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
+  if (anIO.IsNull())
+    return;
+
+  anIO->DumpJson (theOStream);
+}
+

@@ -361,3 +361,27 @@ Standard_Real Select3D_SensitiveGroup::distanceToCOG (SelectBasics_SelectingVolu
 {
   return theMgr.DistToGeometryCenter (CenterOfGeometry());
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Select3D_SensitiveGroup::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveGroup);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
+
+  for (Select3D_IndexedMapOfEntity::Iterator anIterator (myEntities); anIterator.More(); anIterator.Next())
+  {
+    Handle(Select3D_SensitiveEntity) anEntity = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anEntity.get());
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMustMatchAll);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToCheckOverlapAll);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCenter);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
+
+  //NCollection_Vector<Standard_Integer> myBVHPrimIndexes;     //!< Vector of sub-entities indexes for BVH tree build
+}
