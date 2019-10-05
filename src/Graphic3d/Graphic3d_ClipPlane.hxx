@@ -170,7 +170,7 @@ public:
 public: // @name user-defined graphical attributes
 
   //! Return color for rendering capping surface.
-  Quantity_Color CappingColor() const { return myAspect->FrontMaterial().MaterialType() == Graphic3d_MATERIAL_ASPECT ? myAspect->FrontMaterial().Color() : myAspect->InteriorColor(); }
+  Quantity_Color CappingColor() const { return mySectionStyle->FrontMaterial().MaterialType() == Graphic3d_MATERIAL_ASPECT ? mySectionStyle->FrontMaterial().Color() : mySectionStyle->InteriorColor(); }
 
   //! Set color for rendering capping surface.
   Standard_EXPORT void SetCappingColor (const Quantity_Color& theColor);

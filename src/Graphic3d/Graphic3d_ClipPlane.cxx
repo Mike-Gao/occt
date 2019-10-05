@@ -133,8 +133,8 @@ Handle(Graphic3d_ClipPlane) Graphic3d_ClipPlane::Clone() const
 // =======================================================================
 void Graphic3d_ClipPlane::SetCappingColor (const Quantity_Color& theColor)
 {
-  myAspect->SetInteriorColor (theColor);
-  myAspect->ChangeFrontMaterial().SetColor (theColor);
+  mySectionStyle->SetInteriorColor (theColor);
+  mySectionStyle->ChangeFrontMaterial().SetColor (theColor);
   ++myAspectMod;
 }
 
@@ -144,7 +144,7 @@ void Graphic3d_ClipPlane::SetCappingColor (const Quantity_Color& theColor)
 void Graphic3d_ClipPlane::SetCappingSectionStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle)
 {
   mySectionStyle = theStyle;
-  if (myAspect->FrontMaterial().MaterialType() != Graphic3d_MATERIAL_ASPECT)
+  if (mySectionStyle->FrontMaterial().MaterialType() != Graphic3d_MATERIAL_ASPECT)
   {
   }
 }
@@ -281,9 +281,9 @@ void Graphic3d_ClipPlane::SetChainNextPlane (const Handle(Graphic3d_ClipPlane)& 
 // =======================================================================
 void Graphic3d_ClipPlane::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySectionStyle.get());
 
-  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myId);
+  //OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myId);
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPlane);
 

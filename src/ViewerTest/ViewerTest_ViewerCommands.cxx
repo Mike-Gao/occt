@@ -9896,7 +9896,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
         std::cout << "Syntax error: unknown material '" << aChangeArgs[1] << "'.\n";
         return 1;
       }
-      aClipPlane->SetCappingMaterial (aMatName);
+      //aClipPlane->SetCappingMaterial (aMatName);
     }
     else if (aChangeArg == "-overrideaspect"
           || aChangeArg == "overrideaspect")
