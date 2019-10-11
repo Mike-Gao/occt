@@ -1367,13 +1367,13 @@ static LRESULT WINAPI AdvViewerWindowProc(
 //purpose  :
 //==============================================================================
 
-const Handle(Standard_Transient)& ViewerTest::WClass()
+const Handle(WNT_WClass)& ViewerTest::WClass()
 {
-  static Handle(Standard_Transient) theWClass;
+  static Handle(WNT_WClass) theWClass;
 #if defined(_WIN32)
   if (theWClass.IsNull())
   {
-    theWClass = new WNT_WClass ("GW3D_Class", (Standard_Address )AdvViewerWindowProc,
+    theWClass = new WNT_WClass ("GW3D_Class", AdvViewerWindowProc,
                                 CS_VREDRAW | CS_HREDRAW, 0, 0,
                                 ::LoadCursor (NULL, IDC_ARROW));
   }
@@ -1909,8 +1909,7 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
 
   // Create window
 #if defined(_WIN32)
-  VT_GetWindow() = new WNT_Window (aTitle.ToCString(),
-                                    Handle(WNT_WClass)::DownCast (WClass()),
+  VT_GetWindow() = new WNT_Window (aTitle.ToCString(), WClass(),
                                     Draw_VirtualWindows ? WS_POPUP : WS_OVERLAPPEDWINDOW,
                                     aPxLeft, aPxTop,
                                     aPxWidth, aPxHeight,
