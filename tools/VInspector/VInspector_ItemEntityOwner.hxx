@@ -13,8 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspector_ItemSelectBasicsEntityOwner_H
-#define VInspector_ItemSelectBasicsEntityOwner_H
+#ifndef VInspector_ItemEntityOwner_H
+#define VInspector_ItemEntityOwner_H
 
 #include <AIS_InteractiveObject.hxx>
 #include <Standard.hxx>
@@ -22,22 +22,22 @@
 
 class QItemSelectionModel;
 
-class VInspector_ItemSelectBasicsEntityOwner;
-typedef QExplicitlySharedDataPointer<VInspector_ItemSelectBasicsEntityOwner> VInspector_ItemSelectBasicsEntityOwnerPtr;
+class VInspector_ItemEntityOwner;
+typedef QExplicitlySharedDataPointer<VInspector_ItemEntityOwner> VInspector_ItemEntityOwnerPtr;
 
 //! \class VInspector_ItemPresentableObject
 //! Item for selection entity owner. The parent is sensitive entity item, there are no children
-class VInspector_ItemSelectBasicsEntityOwner : public VInspector_ItemBase
+class VInspector_ItemEntityOwner : public VInspector_ItemBase
 {
 
 public:
 
   //! Creates an item wrapped by a shared pointer
-  static VInspector_ItemSelectBasicsEntityOwnerPtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  { return VInspector_ItemSelectBasicsEntityOwnerPtr (new VInspector_ItemSelectBasicsEntityOwner (theParent, theRow, theColumn)); }
+  static VInspector_ItemEntityOwnerPtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  { return VInspector_ItemEntityOwnerPtr (new VInspector_ItemEntityOwner (theParent, theRow, theColumn)); }
 
   //! Destructor
-  virtual ~VInspector_ItemSelectBasicsEntityOwner() Standard_OVERRIDE {};
+  virtual ~VInspector_ItemEntityOwner() Standard_OVERRIDE {};
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
@@ -45,16 +45,8 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
-  //! Returns data object of the item.
-  //! \return object
-  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myOwner; }
-
   //! Returns the current entity owner
-  Handle(SelectBasics_EntityOwner) EntityOwner() const { return myOwner; }
-
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
+  Handle(SelectMgr_EntityOwner) EntityOwner() const { return myOwner; }
 
 protected:
   //! \return number of children.
@@ -69,9 +61,6 @@ protected:
   virtual void initItem() const Standard_OVERRIDE;
 
 protected:
-  //! Build presentation shape
-  //! \return generated shape of the item parameters
-  virtual TopoDS_Shape buildPresentationShape();
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position
@@ -84,18 +73,17 @@ private:
 
   //! Constructor
   //! param theParent a parent item
-  VInspector_ItemSelectBasicsEntityOwner(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  VInspector_ItemEntityOwner(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
   : VInspector_ItemBase(theParent, theRow, theColumn) {}
 
 private:
 
   //! Returns the current entity owner. Initializes the item if it was not initialized yet
-  Handle(SelectBasics_EntityOwner) getEntityOwner() const
-  { return Handle(SelectBasics_EntityOwner)::DownCast (GetObject()); }
+  Handle(SelectMgr_EntityOwner) getEntityOwner() const;
 
 private:
 
-  Handle(SelectBasics_EntityOwner) myOwner; //!< the current entity owner
+  Handle(SelectMgr_EntityOwner) myOwner; //!< the current entity owner
 };
 
 #endif

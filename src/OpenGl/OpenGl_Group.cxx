@@ -365,9 +365,4 @@ void OpenGl_Group::DumpJson (Standard_OStream& theOStream, const Standard_Intege
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_Group);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspects);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsRaytracable);
-
-  for (OpenGl_ElementNode* aNodeIter = myFirst; aNodeIter != NULL; aNodeIter = aNodeIter->next)
-  {
-    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aNodeIter->elem);
-  }
 }

@@ -63,10 +63,6 @@ public:
   //! Update parameters of the drawable elements.
   virtual void SynchronizeAspects() {}
 
-  //! Dumps the content of me into the stream
-  virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const
-  { (void)theOStream; (void)theDepth; }
-
 protected:
 
   Standard_EXPORT virtual ~OpenGl_Element();

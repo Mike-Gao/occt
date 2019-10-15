@@ -38,10 +38,6 @@ public:
   //! Destructor
   virtual ~VInspector_ItemContext() Standard_OVERRIDE {};
 
-  //! Returns data object of the item.
-  //! \return object
-  virtual Handle(Standard_Transient) GetObject() const { initItem(); return myContext; }
-
   //! Returns number of displayed presentations
   //! \return rows count
   Standard_EXPORT virtual int initRowCount() const Standard_OVERRIDE;

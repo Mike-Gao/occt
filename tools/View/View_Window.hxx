@@ -40,9 +40,7 @@ class View_Window : public QWidget
 public:
 
   //! Constructor
-  Standard_EXPORT View_Window (QWidget* theParent,
-                               const Handle(AIS_InteractiveContext)& theContext = Handle(AIS_InteractiveContext)(),
-                               const bool isUseKeepView = true, const bool isFitAllActive = true);
+  Standard_EXPORT View_Window (QWidget* theParent, const bool isUseKeepView = true, const bool isFitAllActive = true);
 
   //! Destructor
   virtual ~View_Window() {}
@@ -98,7 +96,6 @@ private:
 
   View_Displayer* myDisplayer; //!< displayer
   View_Widget* myView; //!< view widget
-
   QToolBar* myActionsToolBar; //!< actions tool bar
   View_ToolBar* myViewToolBar; //!< window tool bar
 };

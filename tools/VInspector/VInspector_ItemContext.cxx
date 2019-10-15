@@ -15,7 +15,6 @@
 
 #include <inspector/VInspector_ItemContext.hxx>
 
-#include <AIS.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <inspector/VInspector_ItemFolderObject.hxx>
@@ -53,14 +52,13 @@ int VInspector_ItemContext::initRowCount() const
 #ifdef DEBUG_FREE_OWNERS
   int aRows = 0;
   // only local context is processed: TODO for global context
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
+  NCollection_List<Handle(SelectMgr_EntityOwner)> anActiveOwners;
   aContext->MainSelector()->ActiveOwners(anActiveOwners);
 
   Handle(SelectMgr_EntityOwner) anOwner;
-  for (NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt(anActiveOwners);
-       anOwnersIt.More(); anOwnersIt.Next())
+  for (NCollection_List<Handle(SelectMgr_EntityOwner)>::Iterator anOwnersIt(anActiveOwners); anOwnersIt.More(); anOwnersIt.Next())
   {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
+    anOwner = anOwnersIt.Value();
     if (anOwner.IsNull())
       continue;
     Handle(AIS_InteractiveObject) anAISObj = Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
@@ -68,12 +66,12 @@ int VInspector_ItemContext::initRowCount() const
       aRows++;
   }
   // owners in Global Context
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
+  NCollection_List<Handle(SelectMgr_EntityOwner)> anActiveOwners;
   aContext->MainSelector()->ActiveOwners(anActiveOwners);
   if (aRows > 0)
     aNbPresentations += aRows;
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anEmptySelectableOwners;
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anOwners =
+  NCollection_List<Handle(SelectMgr_EntityOwner)> anEmptySelectableOwners;
+  NCollection_List<Handle(SelectMgr_EntityOwner)> anOwners =
     VInspector_Tools::ActiveOwners (aContext, anEmptySelectableOwners);
   if (anEmptySelectableOwners.Size() > 0)
     aNbPresentations += 1;
@@ -87,10 +85,6 @@ int VInspector_ItemContext::initRowCount() const
 // =======================================================================
 QVariant VInspector_ItemContext::initValue (const int theItemRole) const
 {
-  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
-  if (aParentValue.isValid())
-    return aParentValue;
-
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
@@ -100,6 +94,7 @@ QVariant VInspector_ItemContext::initValue (const int theItemRole) const
   switch (Column())
   {
     case 0: return GetContext()->DynamicType()->Name();
+    case 1: return rowCount();
     case 4:
     {
       Handle(AIS_InteractiveObject) anEmptyIO;

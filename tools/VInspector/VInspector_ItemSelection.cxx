@@ -13,7 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/VInspector_ItemSelectMgrSelection.hxx>
+#include <inspector/VInspector_ItemSelection.hxx>
 
 #include <AIS_ListOfInteractive.hxx>
 #include <SelectMgr_EntityOwner.hxx>
@@ -22,7 +22,7 @@
 #include <Standard_Version.hxx>
 #include <inspector/VInspector_ItemContext.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
-#include <inspector/VInspector_ItemSelectMgrSensitiveEntity.hxx>
+#include <inspector/VInspector_ItemSensitiveEntity.hxx>
 #include <inspector/VInspector_Tools.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -32,12 +32,22 @@
 #include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
+// function : getSelection
+// purpose :
+// =======================================================================
+Handle(SelectMgr_Selection) VInspector_ItemSelection::getSelection() const
+{
+  initItem();
+  return mySelection;
+}
+
+// =======================================================================
 // function : initRowCount
 // purpose :
 // =======================================================================
-int VInspector_ItemSelectMgrSelection::initRowCount() const
+int VInspector_ItemSelection::initRowCount() const
 {
-  Handle(SelectMgr_Selection) aSelection = GetSelection();
+  Handle(SelectMgr_Selection) aSelection = getSelection();
 #if OCC_VERSION_HEX < 0x070201
   int aRows = 0;
   for (aSelection->Init(); aSelection->More(); aSelection->Next())
@@ -52,12 +62,8 @@ int VInspector_ItemSelectMgrSelection::initRowCount() const
 // function : initValue
 // purpose :
 // =======================================================================
-QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
+QVariant VInspector_ItemSelection::initValue (int theItemRole) const
 {
-  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
-  if (aParentValue.isValid())
-    return aParentValue;
-
   switch (theItemRole)
   {
     case Qt::DisplayRole:
@@ -66,7 +72,8 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
     {
       switch (Column())
       {
-        case 0: return GetSelection()->DynamicType()->Name();
+        case 0: return getSelection()->DynamicType()->Name();
+        case 1: return rowCount();
         case 3:
         {
           if (theItemRole == Qt::ToolTipRole)
@@ -74,7 +81,7 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
           else
           {
             VInspector_ItemPresentableObjectPtr aParentItem = itemDynamicCast<VInspector_ItemPresentableObject>(Parent());
-            return VInspector_Tools::SelectionModeToName(GetSelection()->Mode(), aParentItem->GetInteractiveObject()).ToCString();
+            return VInspector_Tools::SelectionModeToName(getSelection()->Mode(), aParentItem->GetInteractiveObject()).ToCString();
           }
         }
         case 4:
@@ -83,18 +90,18 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
             return "SelectMgr_StateOfSelection";
           else {
             int aNbSelected = 0;
-            SelectMgr_StateOfSelection aState = GetSelection()->GetSelectionState();
+            SelectMgr_StateOfSelection aState = getSelection()->GetSelectionState();
             if (aState == SelectMgr_SOS_Activated || aState == SelectMgr_SOS_Any)
             {
               Handle(AIS_InteractiveContext) aContext = GetContext();
 #if OCC_VERSION_HEX < 0x070201
               for (mySelection->Init(); mySelection->More(); mySelection->Next())
               {
-                const Handle(SelectBasics_EntityOwner)& anOwner = mySelection->Sensitive()->BaseSensitive()->OwnerId();
+                const Handle(SelectMgr_EntityOwner)& anOwner = mySelection->Sensitive()->BaseSensitive()->OwnerId();
 #else
               for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (mySelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
               {
-                const Handle(SelectBasics_EntityOwner)& anOwner = aSelEntIter.Value()->BaseSensitive()->OwnerId();
+                const Handle(SelectMgr_EntityOwner)& anOwner = aSelEntIter.Value()->BaseSensitive()->OwnerId();
 #endif
                 if (VInspector_Tools::IsOwnerSelected(aContext, anOwner))
                   aNbSelected++;
@@ -105,16 +112,16 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
         }
         case 9:
         {
-          SelectMgr_StateOfSelection aState = GetSelection()->GetSelectionState();
+          SelectMgr_StateOfSelection aState = getSelection()->GetSelectionState();
           return VInspector_Tools::ToName (VInspector_SelectionType_StateOfSelection, aState).ToCString();
         }
-        case 10: return QString::number (GetSelection()->Sensitivity());
+        case 10: return QString::number (getSelection()->Sensitivity());
         case 11:
           return VInspector_Tools::ToName (VInspector_SelectionType_TypeOfUpdate,
-                                           GetSelection()->UpdateStatus()).ToCString();
+                                           getSelection()->UpdateStatus()).ToCString();
         case 12:
           return VInspector_Tools::ToName (VInspector_SelectionType_TypeOfBVHUpdate,
-                                           GetSelection()->BVHUpdateStatus()).ToCString();
+                                           getSelection()->BVHUpdateStatus()).ToCString();
         default:
           break;
       }
@@ -122,7 +129,7 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
     }
     case Qt::ForegroundRole:
     {
-      SelectMgr_StateOfSelection aState = GetSelection()->GetSelectionState();
+      SelectMgr_StateOfSelection aState = getSelection()->GetSelectionState();
       return QVariant (aState == SelectMgr_SOS_Activated ? QColor (Qt::black) : QColor (Qt::darkGray));
     }
   }
@@ -133,23 +140,22 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
 // function : createChild
 // purpose :
 // =======================================================================
-TreeModel_ItemBasePtr VInspector_ItemSelectMgrSelection::createChild (int theRow, int theColumn)
+TreeModel_ItemBasePtr VInspector_ItemSelection::createChild (int theRow, int theColumn)
 {
-  return VInspector_ItemSelectMgrSensitiveEntity::CreateItem (currentItem(), theRow, theColumn);
+  return VInspector_ItemSensitiveEntity::CreateItem (currentItem(), theRow, theColumn);
 }
 
 // =======================================================================
 // function : Init
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectMgrSelection::Init()
+void VInspector_ItemSelection::Init()
 {
   VInspector_ItemPresentableObjectPtr aParentItem = itemDynamicCast<VInspector_ItemPresentableObject>(Parent());
 
   Handle(AIS_InteractiveObject) anIO = aParentItem->GetInteractiveObject();
 
   int aRowId = Row();
-  int aDeltaIndex = 2; // properties, presentation items
   int aCurrentId = 0;
 #if OCC_VERSION_HEX < 0x070201
   for (anIO->Init(); anIO->More(); anIO->Next(), aCurrentId++)
@@ -157,7 +163,7 @@ void VInspector_ItemSelectMgrSelection::Init()
   for (SelectMgr_SequenceOfSelection::Iterator aSelIter (anIO->Selections()); aSelIter.More(); aSelIter.Next(), aCurrentId++)
 #endif
   {
-    if (aCurrentId != aRowId - aDeltaIndex)
+    if (aCurrentId != aRowId)
       continue;
 #if OCC_VERSION_HEX < 0x070201
     mySelection = anIO->CurrentSelection();
@@ -173,7 +179,7 @@ void VInspector_ItemSelectMgrSelection::Init()
 // function : Reset
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectMgrSelection::Reset()
+void VInspector_ItemSelection::Reset()
 {
   // an empty method to don't clear the main label, otherwise the model will be empty
   TreeModel_ItemBase::Reset();
@@ -185,11 +191,10 @@ void VInspector_ItemSelectMgrSelection::Reset()
 // function : initItem
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectMgrSelection::initItem() const
+void VInspector_ItemSelection::initItem() const
 {
   if (IsInitialized())
     return;
-  const_cast<VInspector_ItemSelectMgrSelection*>(this)->Init();
+  const_cast<VInspector_ItemSelection*>(this)->Init();
   // an empty method to don't initialize the main label, as it was not cleared in Reset()
 }
-

@@ -28,7 +28,6 @@
 #include <gp_Trsf.hxx>
 #include <gp_Vec.hxx>
 #include <Standard_ConstructionError.hxx>
-#include <Standard_Dump.hxx>
 
 gp_Ax2::gp_Ax2 (const gp_Pnt& P, const gp_Dir& V) :
 axis(P,V)
@@ -114,11 +113,3 @@ gp_Ax2 gp_Ax2::Mirrored(const gp_Ax2& A2) const
   return Temp;
 }
 
-void gp_Ax2::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
-{
-  OCCT_DUMP_CLASS_BEGIN (theOStream, gp_Ax2);
-
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &axis);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &vydir);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &vxdir);
-}

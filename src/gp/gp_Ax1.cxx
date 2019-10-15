@@ -28,8 +28,6 @@
 #include <gp_Trsf.hxx>
 #include <gp_Vec.hxx>
 
-#include <Standard_Dump.hxx>
-
 Standard_Boolean gp_Ax1::IsCoaxial
 (const gp_Ax1& Other, 
  const Standard_Real AngularTolerance,
@@ -86,8 +84,3 @@ gp_Ax1 gp_Ax1::Mirrored (const gp_Ax2& A2) const
   return A1;
 }
 
-void gp_Ax1::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
-{
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &loc);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &vdir);
-}

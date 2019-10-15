@@ -283,9 +283,6 @@ public:
               const Standard_Integer theViewportWidth,
               const Standard_Integer theViewportHeight) const;
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
-
 private:
 
   //! 3D anchor point for zoom/rotate transformation persistence.

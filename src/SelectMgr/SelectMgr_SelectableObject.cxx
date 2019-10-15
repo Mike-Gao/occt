@@ -558,17 +558,6 @@ void SelectMgr_SelectableObject::DumpJson (Standard_OStream& theOStream, const S
   OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_SelectableObject);
 
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, PrsMgr_PresentableObject);
-
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySelectionPrs.get());
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHilightPrs.get());
-
-  for (SelectMgr_SequenceOfSelection::Iterator anIterator (myselections); anIterator.More(); anIterator.Next())
-  {
-    Handle(SelectMgr_Selection) aSelection = anIterator.Value();
-    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aSelection.get());
-  }
-
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myGlobalSelMode);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mycurrent);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAutoHilight);
 }

@@ -14,10 +14,6 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/View_Tools.hxx>
-
-#include <inspector/View_Displayer.hxx>
-#include <inspector/View_DisplayPreview.hxx>
-#include <inspector/View_PreviewParameters.hxx>
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
 #include <inspector/View_Window.hxx>
@@ -41,26 +37,6 @@ QAction* View_Tools::CreateAction (const QString& theText, const char* theSlot, 
 }
 
 // =======================================================================
-// function : GetView
-// purpose :
-// =======================================================================
-Handle(V3d_View) View_Tools::FindActiveView (const Handle(AIS_InteractiveContext)& theContext)
-{
-  if (theContext.IsNull())
-    return NULL;
-
-  const Handle(V3d_Viewer)& aViewer = theContext->CurrentViewer();
-  if (aViewer.IsNull())
-    return NULL;
-
-  aViewer->InitActiveViews();
-  if (!aViewer->MoreActiveViews())
-    return NULL;
-
-  return aViewer->ActiveView();
-}
-
-// =======================================================================
 // function : SaveState
 // purpose :
 // =======================================================================
@@ -69,16 +45,10 @@ void View_Tools::SaveState (View_Window* theView, QMap<QString, QString>& theIte
 {
   QStringList aCameraDirection;
   Standard_Real aVX, aVY, aVZ;
-  Handle(V3d_View) aView = theView->GetView()->GetViewer()->GetView();
-  if (aView.IsNull())
-    return;
-
-  aView->Proj (aVX, aVY, aVZ);
+  theView->GetView()->GetViewer()->GetView()->Proj (aVX, aVY, aVZ);
   aCameraDirection << QString::number (aVX) << QString::number (aVY) << QString::number (aVZ);
 
   theItems[thePrefix + "view_camera_direction"] = aCameraDirection.join (",");
-
-  View_PreviewParameters::SaveState (theView->GetDisplayer()->GetDisplayPreview()->GetPreviewParameters(), theItems, "preview_parameters_");
 }
 
 // =======================================================================
@@ -99,12 +69,8 @@ bool View_Tools::RestoreState (View_Window* theView, const QString& theKey, cons
 
       theView->GetView()->SetInitProj (aVX, aVY, aVZ);
     }
-    return true;
   }
-  else if (View_PreviewParameters::RestoreState (theView->GetDisplayer()->GetDisplayPreview()->GetPreviewParameters(),
-                                                 theKey, theValue, "preview_parameters_"))
-  {
-    return true;
-  }
-  return false;
+  else
+    return false;
+  return true;
 }

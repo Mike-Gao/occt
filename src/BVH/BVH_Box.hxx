@@ -114,24 +114,7 @@ public:
   {
     (void)theDepth;
     OCCT_DUMP_CLASS_BEGIN (theOStream, BVH_Box);
-    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsInited);
-
-    int n = Min (N, 3);
-    if (n == 1)
-    {
-      OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMinPoint[0]);
-      OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMinPoint[0]);
-    }
-    if (n == 2)
-    {
-      OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "MinPoint", n, myMinPoint[0], myMinPoint[1]);
-      OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "MaxPoint", n, myMaxPoint[0], myMaxPoint[1]);
-    }
-    if (n == 3)
-    {
-      OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "MinPoint", n, myMinPoint[0], myMinPoint[1], myMinPoint[2]);
-      OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "MaxPoint", n, myMaxPoint[0], myMaxPoint[1], myMaxPoint[2]);
-    }
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, IsValid());
   }
 
 public:

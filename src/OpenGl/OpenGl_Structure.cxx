@@ -639,21 +639,3 @@ Handle(Graphic3d_CStructure) OpenGl_Structure::ShadowLink (const Handle(Graphic3
 {
   return new OpenGl_StructureShadow (theManager, this);
 }
-
-//=======================================================================
-//function : DumpJson
-//purpose  : 
-//=======================================================================
-void OpenGl_Structure::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
-{
-  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Structure);
-
-  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_CStructure);
-
-  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myInstancedStructure);
-  //Graphic3d_Mat4             myRenderTrsf; //!< transformation, actually used for rendering (includes Local Origin shift)
-
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsRaytracable);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myModificationState);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsMirrored);
-}

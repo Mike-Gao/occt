@@ -21,8 +21,6 @@
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
 
-#include <NCollection_IndexedMap.hxx>
-
 #include <Standard_PCharacter.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_CString.hxx>
@@ -626,12 +624,6 @@ friend Standard_EXPORT Standard_IStream& operator >> (Standard_IStream& astream,
   //! aString contains "abcdefg"
   //! aString.Split(3) gives <me> = "abc" and returns "defg"
   Standard_EXPORT TCollection_AsciiString Split (const Standard_Integer where);
-  
-  //! Splits a AsciiString into list of sub-strings.
-  //! Example:
-  //! aString contains "value_1, value_2, ..., value_n"
-  //! aString.Split(", ") gives container of strings: "value_1", "value_2"
-  Standard_EXPORT void Split (const TCollection_AsciiString& theSeparator, NCollection_IndexedMap<TCollection_AsciiString>& theValues);
   
   //! Creation of a sub-string of the string <me>.
   //! The sub-string starts to the index Fromindex and ends

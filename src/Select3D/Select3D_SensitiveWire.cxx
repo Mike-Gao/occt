@@ -226,22 +226,3 @@ gp_Pnt Select3D_SensitiveWire::CenterOfGeometry() const
 {
   return myCenter;
 }
-
-// =======================================================================
-// function : DumpJson
-// purpose  :
-// =======================================================================
-void Select3D_SensitiveWire::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
-{
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveWire);
-  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
-
-  for (NCollection_Vector<Handle(Select3D_SensitiveEntity)>::Iterator anIterator (myEntities); anIterator.More(); anIterator.Next())
-  {
-    Handle(Select3D_SensitiveEntity) anEntity = anIterator.Value();
-    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anEntity.get());
-  }
-  //NCollection_Vector<Standard_Integer>                 myEntityIndexes;     //!< Indexes of entities for BVH build
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCenter);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
-}

@@ -100,9 +100,6 @@ public: //! @name methods for compatibility with layers
                                const OpenGl_Aspects& theTextAspect,
                                unsigned int theResolution = Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION) const;
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const Standard_OVERRIDE;
-
 //! @name obsolete methods
 public:
 

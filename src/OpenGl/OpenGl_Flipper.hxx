@@ -42,9 +42,6 @@ public:
   Standard_EXPORT virtual void Render (const Handle(OpenGl_Workspace)& theWorkspace) const;
   Standard_EXPORT virtual void Release (OpenGl_Context* theCtx);
 
-  //! Dumps the content of me into the stream
-  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const Standard_OVERRIDE;
-
 public:
 
   DEFINE_STANDARD_ALLOC
@@ -56,7 +53,6 @@ protected:
   OpenGl_Vec4      myReferenceY;
   OpenGl_Vec4      myReferenceZ;
   Standard_Boolean myIsEnabled;
-
 
 };
 

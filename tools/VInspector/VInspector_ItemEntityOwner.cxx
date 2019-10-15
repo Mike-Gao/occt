@@ -13,16 +13,13 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#include <inspector/VInspector_ItemSelectBasicsEntityOwner.hxx>
-#include <inspector/VInspector_ItemSelectMgrSensitiveEntity.hxx>
+#include <inspector/VInspector_ItemEntityOwner.hxx>
+#include <inspector/VInspector_ItemSensitiveEntity.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
 #include <inspector/VInspector_Tools.hxx>
-#include <inspector/ViewControl_Table.hxx>
-#include <inspector/ViewControl_Tools.hxx>
 
 #include <SelectMgr_SensitiveEntity.hxx>
-#include <SelectBasics_EntityOwner.hxx>
-#include <SelectBasics_SensitiveEntity.hxx>
+#include <Select3D_SensitiveEntity.hxx>
 #include <Standard_Version.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
@@ -35,25 +32,50 @@
 // function : initValue
 // purpose :
 // =======================================================================
-QVariant VInspector_ItemSelectBasicsEntityOwner::initValue(int theItemRole) const
+QVariant VInspector_ItemEntityOwner::initValue(int theItemRole) const
 {
-  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
-  if (aParentValue.isValid())
-    return aParentValue;
-
   switch (theItemRole)
   { 
     case Qt::DisplayRole:
     case Qt::EditRole:
     case Qt::ToolTipRole:
     {
-      Handle(SelectBasics_EntityOwner) anOwner = getEntityOwner();
+      Handle(SelectMgr_EntityOwner) anOwner = getEntityOwner();
       if (anOwner.IsNull())
         return QVariant();
 
       switch (Column())
       {
         case 0: return anOwner->DynamicType()->Name();
+        case 2: return VInspector_Tools::GetPointerInfo (anOwner, true).ToCString();
+        case 3:
+        {
+          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
+          if (BROwnr.IsNull())
+            return QVariant();
+
+          const TopoDS_Shape& aShape = BROwnr->Shape();
+          if (aShape.IsNull())
+            return QVariant();
+
+          return VInspector_Tools::GetShapeTypeInfo (aShape.ShapeType()).ToCString();
+        }
+        case 17:
+        case 18:
+        case 19:
+          {
+          Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast (anOwner);
+          if (BROwnr.IsNull())
+            return QVariant();
+
+          const TopoDS_Shape& aShape = BROwnr->Shape();
+          if (aShape.IsNull())
+            return QVariant();
+
+          return Column() == 17 ? VInspector_Tools::GetPointerInfo (aShape.TShape(), true).ToCString()
+               : Column() == 18 ? VInspector_Tools::OrientationToName (aShape.Orientation()).ToCString()
+               :           /*19*/ VInspector_Tools::LocationToName (aShape.Location()).ToCString();
+        }
         default: break;
       }
       break;
@@ -70,7 +92,7 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::initValue(int theItemRole) cons
             return (theItemRole == Qt::BackgroundRole) ? QColor (Qt::darkBlue) : QColor (Qt::white);
         }
       }
-      VInspector_ItemSelectMgrSensitiveEntityPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrSensitiveEntity>(Parent());
+      VInspector_ItemSensitiveEntityPtr aParentItem = itemDynamicCast<VInspector_ItemSensitiveEntity>(Parent());
       if (aParentItem)
         return aParentItem->data(QModelIndex(), theItemRole);
       break;
@@ -83,16 +105,15 @@ QVariant VInspector_ItemSelectBasicsEntityOwner::initValue(int theItemRole) cons
 // function : Init
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectBasicsEntityOwner::Init()
+void VInspector_ItemEntityOwner::Init()
 {
-  Handle(SelectBasics_EntityOwner) anOwner;
+  Handle(SelectMgr_EntityOwner) anOwner;
 
-  VInspector_ItemSelectMgrSensitiveEntityPtr aParentItem = itemDynamicCast<VInspector_ItemSelectMgrSensitiveEntity>(Parent());
+  VInspector_ItemSensitiveEntityPtr aParentItem = itemDynamicCast<VInspector_ItemSensitiveEntity>(Parent());
   if (aParentItem)
   {
     Handle(SelectMgr_SensitiveEntity) anEntity = aParentItem->GetSensitiveEntity();
-    if (!anEntity.IsNull() && !anEntity->BaseSensitive().IsNull())
-      anOwner = anEntity->BaseSensitive()->OwnerId();
+    anOwner = anEntity->BaseSensitive()->OwnerId();
   }
   else
   {
@@ -118,7 +139,7 @@ void VInspector_ItemSelectBasicsEntityOwner::Init()
         {
           Handle(SelectMgr_SensitiveEntity) anEntity = aSelEntIter.Value();
 #endif
-          const Handle(SelectBasics_SensitiveEntity)& aBase = anEntity->BaseSensitive();
+          const Handle(Select3D_SensitiveEntity)& aBase = anEntity->BaseSensitive();
           if (!aBase.IsNull())
           {
             if (aRowId == aCurrentIndex)
@@ -130,7 +151,6 @@ void VInspector_ItemSelectBasicsEntityOwner::Init()
     }
   }
   myOwner = anOwner;
-  UpdatePresentationShape();
   TreeModel_ItemBase::Init();
 }
 
@@ -138,7 +158,7 @@ void VInspector_ItemSelectBasicsEntityOwner::Init()
 // function : Reset
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectBasicsEntityOwner::Reset()
+void VInspector_ItemEntityOwner::Reset()
 {
   VInspector_ItemBase::Reset();
   SetContext (NULL);
@@ -148,35 +168,19 @@ void VInspector_ItemSelectBasicsEntityOwner::Reset()
 // function : initItem
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectBasicsEntityOwner::initItem() const
+void VInspector_ItemEntityOwner::initItem() const
 {
   if (IsInitialized())
     return;
-  const_cast<VInspector_ItemSelectBasicsEntityOwner*>(this)->Init();
+  const_cast<VInspector_ItemEntityOwner*>(this)->Init();
 }
 
 // =======================================================================
-// function : GetStream
+// function : getEntityOwner
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectBasicsEntityOwner::GetStream (Standard_OStream& theOStream) const
+Handle(SelectMgr_EntityOwner) VInspector_ItemEntityOwner::getEntityOwner() const
 {
-  Handle(SelectMgr_EntityOwner) anEntityOwner = getEntityOwner();
-  if (anEntityOwner.IsNull())
-    return;
-
-  anEntityOwner->DumpJson (theOStream);
-}
-
-// =======================================================================
-// function : buildPresentationShape
-// purpose :
-// =======================================================================
-TopoDS_Shape VInspector_ItemSelectBasicsEntityOwner::buildPresentationShape()
-{
-  Handle(StdSelect_BRepOwner) aBROwner = Handle(StdSelect_BRepOwner)::DownCast (myOwner);
-  if (aBROwner.IsNull())
-    return TopoDS_Shape();
-
-  return aBROwner->Shape();
+  initItem();
+  return myOwner;
 }

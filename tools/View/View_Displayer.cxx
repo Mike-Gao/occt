@@ -23,11 +23,8 @@
 #include <Prs3d_PointAspect.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
-
-#include <inspector/View_DisplayPreview.hxx>
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
-#include <inspector/View_Tools.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -36,7 +33,6 @@
 View_Displayer::View_Displayer()
 : myIsKeepPresentations (false), myFitAllActive (false), myDisplayMode (-1)
 {
-  myDisplayPreview = new View_DisplayPreview();
 }
 
 // =======================================================================
@@ -57,7 +53,6 @@ void View_Displayer::SetContext (const Handle(AIS_InteractiveContext)& theContex
          aPresentationsIt.More(); aPresentationsIt.Next())
       DisplayPresentation (aPresentationsIt.Value(), aType, false);
   }
-  myDisplayPreview->SetContext (theContext);
   UpdateViewer();
 }
 
@@ -246,18 +241,6 @@ bool View_Displayer::IsVisible (const TopoDS_Shape& theShape, const View_Present
 }
 
 // =======================================================================
-// function : UpdatePreview
-// purpose :
-// =======================================================================
-void View_Displayer::UpdatePreview (const View_DisplayActionType theType,
-                                    const NCollection_List<Handle(Standard_Transient)>& thePresentations)
-{
-  myDisplayPreview->UpdatePreview (theType, thePresentations);
-  if (!myIsKeepPresentations || myFitAllActive)
-    fitAllView();
-}
-
-// =======================================================================
 // function : UpdateViewer
 // purpose :
 // =======================================================================
@@ -294,7 +277,18 @@ void View_Displayer::DisplayedPresentations (NCollection_Shared<AIS_ListOfIntera
 // =======================================================================
 Handle(V3d_View) View_Displayer::GetView() const
 {
-  return View_Tools::FindActiveView (GetContext());
+  Handle(V3d_View) aView;
+  if (GetContext().IsNull())
+    return aView;
+
+  const Handle(V3d_Viewer)& aViewer = GetContext()->CurrentViewer();
+  if (!aViewer.IsNull())
+  {
+    aViewer->InitActiveViews();
+    if (aViewer->MoreActiveViews())
+      aView = aViewer->ActiveView();
+  }
+  return aView;
 }
 
 // =======================================================================
@@ -328,7 +322,7 @@ Handle(Standard_Transient) View_Displayer::CreatePresentation (const TopoDS_Shap
 {
   Handle(AIS_Shape) aShape = new AIS_Shape (theShape);
 
-  //aShape->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_WHITE, 1.0));
+  aShape->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_WHITE, 1.0));
 
   return aShape;
 }

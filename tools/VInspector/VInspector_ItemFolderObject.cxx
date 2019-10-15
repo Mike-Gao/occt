@@ -16,15 +16,7 @@
 #include <inspector/VInspector_ItemFolderObject.hxx>
 
 #include <inspector/VInspector_ItemContext.hxx>
-#include <inspector/VInspector_ItemGraphic3dTransformPers.hxx>
-#include <inspector/VInspector_ItemPresentableObject.hxx>
-#include <inspector/VInspector_ItemPrs3dDrawer.hxx>
 #include <inspector/VInspector_ItemSelectMgrFilter.hxx>
-#include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
-#include <inspector/VInspector_ItemV3dViewer.hxx>
-
-#include <AIS_InteractiveObject.hxx>
-#include <Prs3d.hxx>
 
 // =======================================================================
 // function : initValue
@@ -32,21 +24,13 @@
 // =======================================================================
 QVariant VInspector_ItemFolderObject::initValue (int theItemRole) const
 {
-  QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
-  if (aParentValue.isValid())
-    return aParentValue;
-
-  if (Column() != 0 || (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole))
-    return QVariant();
-
-  ParentKind aParentKind = GetParentItemKind();
-  switch (aParentKind)
+  if (Column() == 0 && (theItemRole == Qt::DisplayRole || theItemRole == Qt::ToolTipRole))
   {
-    case ParentKind_ContextItem: return "Properties";
-    case ParentKind_PresentationItem: return "Properties";
-    case ParentKind_FolderItem: return Row() == 0 ? "Filters" : QVariant();
-    default: return QVariant();
+    if (parentItemIsContext()) return "Properties";
+    else if (Row() == 0) return "Filters";
+    else return QVariant();
   }
+  return QVariant();
 }
 
 // =======================================================================
@@ -55,30 +39,7 @@ QVariant VInspector_ItemFolderObject::initValue (int theItemRole) const
 // =======================================================================
 int VInspector_ItemFolderObject::initRowCount() const
 {
-  ParentKind aParentKind = GetParentItemKind();
-  switch (aParentKind)
-  {
-    case ParentKind_ContextItem:
-    {
-      int aNbChildren = 3; // Filters, Viewer, MainSelector
-      aNbChildren++; // DefaultDrawer
-      for (int aTypeId = 0; aTypeId < Prs3d_TypeOfHighlight_NB; aTypeId++)
-      {
-        const Handle(Prs3d_Drawer)& aStyle = GetContext()->HighlightStyle ((Prs3d_TypeOfHighlight)aTypeId);
-        if (!aStyle.IsNull())
-          aNbChildren++;
-      }
-      return aNbChildren;
-    }
-    case ParentKind_PresentationItem:
-    {
-      return 4; // TransformPers, Attributes, HilightAttributes and DynamicHilightAttributes
-    }
-    case ParentKind_FolderItem:
-      return (GetContext().IsNull() ? 0 : GetContext()->Filters().Extent());
-    default:
-      return 0;
-  }
+  return parentItemIsContext() ? 1 : (GetContext().IsNull() ? 0 : GetContext()->Filters().Extent());
 }
 
 // =======================================================================
@@ -87,31 +48,10 @@ int VInspector_ItemFolderObject::initRowCount() const
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemFolderObject::createChild (int theRow, int theColumn)
 {
-  ParentKind aParentKind = GetParentItemKind();
-  switch (aParentKind)
-  {
-    case ParentKind_ContextItem:
-    {
-      if (theRow == 0)
-        return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
-      else if (theRow == 1)
-        return VInspector_ItemV3dViewer::CreateItem (currentItem(), theRow, theColumn);
-      else if (theRow == 2)
-        return VInspector_ItemSelectMgrViewerSelector::CreateItem (currentItem(), theRow, theColumn);
-      else
-        return VInspector_ItemPrs3dDrawer::CreateItem (currentItem(), theRow, theColumn);
-    }
-    case ParentKind_PresentationItem:
-    {
-      if (theRow == 0)
-        return VInspector_ItemGraphic3dTransformPers::CreateItem (currentItem(), theRow, theColumn);
-      else
-        return VInspector_ItemPrs3dDrawer::CreateItem (currentItem(), theRow, theColumn);
-    }
-    case ParentKind_FolderItem:
-      return VInspector_ItemSelectMgrFilter::CreateItem (currentItem(), theRow, theColumn);
-    default: return TreeModel_ItemBasePtr();
-  }
+  if (parentItemIsContext())
+    return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
+  else
+    return VInspector_ItemSelectMgrFilter::CreateItem (currentItem(), theRow, theColumn);
 }
 
 // =======================================================================
@@ -133,62 +73,6 @@ void VInspector_ItemFolderObject::Reset()
 }
 
 // =======================================================================
-// function : GetPrs3dDrawer
-// purpose :
-// =======================================================================
-Handle(Prs3d_Drawer) VInspector_ItemFolderObject::GetPrs3dDrawer (const int theRow,
-                                                                  TCollection_AsciiString& theName) const
-{
-  ParentKind aParentKind = GetParentItemKind();
-  switch (aParentKind)
-  {
-    case ParentKind_ContextItem:
-    {
-      if (theRow == 0 || theRow == 1 || theRow == 2) // "Filters", "Viewer", "Viewer Selector"
-        return 0;
-
-      if (theRow == 3)
-      {
-        theName = "DefaultDrawer";
-        return GetContext()->DefaultDrawer();
-      }
-
-      for (int aTypeId = 0, aCurId = 0; aTypeId < Prs3d_TypeOfHighlight_NB; aTypeId++)
-      {
-        Prs3d_TypeOfHighlight aType = (Prs3d_TypeOfHighlight)aTypeId;
-        const Handle(Prs3d_Drawer)& aDrawer = GetContext()->HighlightStyle (aType);
-        if (aDrawer.IsNull())
-          continue;
-        if (aCurId == theRow - 4)
-        {
-          theName = TCollection_AsciiString ("HighlightStyle: ") + aType;
-          return aDrawer;
-        }
-        aCurId++;
-      }
-    }
-    case ParentKind_PresentationItem:
-    {
-      VInspector_ItemPresentableObjectPtr aParentPrsItem = itemDynamicCast<VInspector_ItemPresentableObject>(Parent());
-      Handle(AIS_InteractiveObject) aPrs = aParentPrsItem->GetInteractiveObject();
-      switch (theRow)
-      {
-        case 0: return 0; // "TransformPers"
-        case 1: theName = "Attributes"; return aPrs->Attributes();
-        case 2: theName = "HilightAttributes"; return aPrs->HilightAttributes();
-        case 3: theName = "DynamicHilightAttributes"; return aPrs->DynamicHilightAttributes();
-        default: break;
-      }
-    }
-    case ParentKind_FolderItem:
-    default: break;
-  }
-
-  theName = "None";
-  return Handle(Prs3d_Drawer)();
-}
-
-// =======================================================================
 // function : initItem
 // purpose :
 // =======================================================================
@@ -200,18 +84,10 @@ void VInspector_ItemFolderObject::initItem() const
 }
 
 // =======================================================================
-// function : GetParentItemKind
+// function : parentItemIsContext
 // purpose :
 // =======================================================================
-VInspector_ItemFolderObject::ParentKind VInspector_ItemFolderObject::GetParentItemKind() const
+bool VInspector_ItemFolderObject::parentItemIsContext() const
 {
-  VInspector_ItemPresentableObjectPtr aParentPrsItem = itemDynamicCast<VInspector_ItemPresentableObject>(Parent());
-  if (aParentPrsItem)
-    return ParentKind_PresentationItem;
-
-  VInspector_ItemContextPtr aParentContextItem = itemDynamicCast<VInspector_ItemContext>(Parent());
-  if (aParentContextItem)
-    return ParentKind_ContextItem;
-
-  return ParentKind_FolderItem;
+  return itemDynamicCast<VInspector_ItemContext> (Parent());
 }

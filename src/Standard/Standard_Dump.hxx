@@ -14,8 +14,6 @@
 #ifndef _Standard_Dump_HeaderFile
 #define _Standard_Dump_HeaderFile
 
-#include <NCollection_IndexedDataMap.hxx>
-#include <NCollection_List.hxx>
 #include <Standard_SStream.hxx>
 #include <TCollection_AsciiString.hxx>
 
@@ -132,8 +130,10 @@ class Standard_DumpSentry;
 { \
   if (theDepth != 0) \
   { \
-    Standard_Dump::AddValuesSeparator (theOStream); \
-    theField::DumpJson (theOStream, theDepth - 1); \
+    Standard_SStream aFieldStream; \
+    theField::DumpJson (aFieldStream, theDepth - 1); \
+    const char* aName = Standard_Dump::DumpFieldToName (#theField); \
+    Standard_Dump::DumpKeyToClass (theOStream, aName, Standard_Dump::Text (aFieldStream)); \
   } \
 }
 
@@ -146,18 +146,6 @@ class Standard_DumpSentry;
   theOStream << "\"" << OCCT_CLASS_NAME(theName) << "\": ["; \
   Standard_Dump::DumpRealValues (theOStream, theCount, __VA_ARGS__);\
   theOStream << "]"; \
-}
-
-//! @def OCCT_DUMP_VECTOR_CLASS
-//! Append vector values into output value: "Name": [value_1, value_2, ...]
-//! This macro is intended to have only one row for dumped object in Json.
-//! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
-#define OCCT_INIT_VECTOR_CLASS(theOStream, theName, theStreamPos, theCount, ...) \
-{ \
-  if (!Standard_Dump::ProcessStreamName (theOStream, OCCT_CLASS_NAME(theName), theStreamPos)) \
-    return Standard_False; \
-  if (!Standard_Dump::InitRealValues (theOStream, theStreamPos, theCount, __VA_ARGS__)) \
-    return Standard_False; \
 }
 
 //! @brief Simple sentry class providing convenient interface to dump.
@@ -175,19 +163,6 @@ public:
 
 private:
   Standard_OStream* myOStream; //!< modified stream
-};
-
-//! Kind of key in Json string
-enum Standard_JsonKey
-{
-  Standard_JsonKey_None, //!< no key
-  Standard_JsonKey_OpenChild, //!< "{"
-  Standard_JsonKey_CloseChild, //!< "}"
-  Standard_JsonKey_OpenContainer, //!< "["
-  Standard_JsonKey_CloseContainer, //!< "]"
-  Standard_JsonKey_Quote, //!< "\""
-  Standard_JsonKey_SeparatorKeyToValue, //!< ": "
-  Standard_JsonKey_SeparatorValueToValue //!< ", "
 };
 
 //! This interface has some tool methods for stream (in JSON format) processing.
@@ -208,38 +183,7 @@ public:
   //! @return text presentation
   Standard_EXPORT static TCollection_AsciiString FormatJson (const Standard_SStream& theStream, const Standard_Integer theIndent = 3);
 
-  //! Converts stream into map of values. Values are not empty if the stream contains at least two values.
-  //!
-  //! The one level stream example: <class_name>key_1\value_1\key_2\value_2</class_name>
-  //! In output: theStreamKey equals class_name, theValues contains key_1, value_1, key_2, and value_2.
-  //!
-  //! Two level stream example: <class_name>key_1\value_1\key_2\value_2\key_3<subclass_name>subclass_key_1\subclass_value1</subclass_name></class_name>
-  //! In output: theStreamKey equals class_name, theValues contains key_1, value_1, key_2, and value_2, key_3 and
-  //! <subclass_name>subclass_key_1\subclass_value1</subclass_name>.
-  //! The last value might be processed later using the same method.
-  //!
-  //! \param theStream stream value
-  //! \param theValues [out] container of split values
-  Standard_EXPORT static Standard_Boolean SplitJson (const TCollection_AsciiString& theStreamStr,
-                                                     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
-
-  //! Unites container of values into Json output in form: key_1 : value_1, key_2: value_2, ... key_n: value_n
-  Standard_EXPORT static void JoinJson (Standard_OStream& theOStream,
-                                        const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
-
-  //! Returns container of indices in values, that has hierarchical value
-  Standard_EXPORT static NCollection_List<Standard_Integer> HierarchicalValueIndices (
-    const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
-
-  //! Returns true if the value has bracket key
-  Standard_EXPORT static Standard_Boolean HasChildKey (const TCollection_AsciiString& theSourceValue);
-
-  //! Returns key value for enum type
-  Standard_EXPORT static const Standard_CString JsonKeyToString (const Standard_JsonKey theKey);
-
-  //! Returns length value for enum type
-  Standard_EXPORT static Standard_Integer JsonKeyLength (const Standard_JsonKey theKey);
-
+  //! Add Json values separator if the stream last symbol is not an open brace.
   //! @param theStream source value
   static Standard_EXPORT void AddValuesSeparator (Standard_OStream& theOStream);
 
@@ -278,55 +222,11 @@ public:
   //! @param theCount numer of values
   Standard_EXPORT static void DumpRealValues (Standard_OStream& theOStream, int theCount, ...);
 
-  //! Check whether the parameter name is equal to the name in the stream at position
-  //! @param theSStream stream with values
-  //! @param theName stream key value
-  //! @param theStreamPos current position in the stream
-  Standard_EXPORT static Standard_Boolean ProcessStreamName (const Standard_SStream& theStream,
-                                                             const TCollection_AsciiString& theName,
-                                                             Standard_Integer& theStreamPos);
-
-  //! Unite values in one value using template: value_1, value_2, ..., value_n
-  //! @param theSStream stream with values
-  //! @param theStreamPos current position in the stream
-  //! @param theCount numer of values
-  Standard_EXPORT static Standard_Boolean InitRealValues (const Standard_SStream& theStream,
-                                                          Standard_Integer& theStreamPos,
-                                                          int theCount, ...);
-
   //! Convert field name into dump text value, removes "&" and "my" prefixes
   //! An example, for field myValue, theName is Value, for &myCLass, the name is Class
   //! @param theField a source value 
   //! @param theName [out] an updated name 
   Standard_EXPORT static const char* DumpFieldToName (const char* theField);
-
-private:
-  //! Extracts from the string value a pair (key, value), add it into output container, update index value
-  //! Example:
-  //! stream string starting the index position contains: ..."key": <value>...
-  //! a pair key, value will be added into theValues
-  //! at beginning theIndex is the position of the quota before <key>, after the index is the next position after the value
-  //! splitDumped(aString) gives theSplitValue = "abc", theTailValue = "defg", theKey = "key"
-  Standard_EXPORT static Standard_Boolean splitKeyToValue (const TCollection_AsciiString& theStreamStr,
-                                                           Standard_Integer theStartIndex,
-                                                           Standard_Integer& theNextIndex,
-                                                           NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
-
-
-  //! Returns key of json in the index position. Incement the index position to the next symbol in the row
-  Standard_EXPORT static Standard_Boolean jsonKey (const TCollection_AsciiString& theStreamStr,
-                                                   Standard_Integer theStartIndex,
-                                                   Standard_Integer& theNextIndex,
-                                                   Standard_JsonKey& theKey);
-
-  //! Find position in the source string of the symbol close after the start position.
-  //! Ignore combination <symbol open> ... <symbol close> between the close symbol.
-  //! Example, for case ... { ... { ... } ...} ... } it returns the position of the forth brace
-  Standard_EXPORT static Standard_Integer nextClosePosition (const TCollection_AsciiString& theSourceValue,
-                                                             const Standard_Integer theStartPosition,
-                                                             const Standard_JsonKey theCloseKey,
-                                                             const Standard_JsonKey theOpenKey);
-
 };
 
 #endif // _Standard_Dump_HeaderFile

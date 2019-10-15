@@ -30,15 +30,3 @@ Select3D_SensitiveEntity::Select3D_SensitiveEntity (const Handle(SelectMgr_Entit
 {
   //
 }
-
-//=======================================================================
-//function : DumpJson
-//purpose  :
-//=======================================================================
-void Select3D_SensitiveEntity::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
-{
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveEntity);
-
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myOwnerId.get());
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySFactor);
-}

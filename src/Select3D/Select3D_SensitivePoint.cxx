@@ -85,14 +85,3 @@ Standard_Integer Select3D_SensitivePoint::NbSubElements()
 {
   return 1;
 }
-
-//=======================================================================
-//function : DumpJson
-//purpose  :
-//=======================================================================
-void Select3D_SensitivePoint::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
-{
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitivePoint);
-
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoint);
-}

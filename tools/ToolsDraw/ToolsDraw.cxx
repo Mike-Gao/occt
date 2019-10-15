@@ -41,15 +41,6 @@ Standard_EXPORT ViewerTest_DoubleMapOfInteractiveAndName& GetMapOfAIS();
 static TInspector_Communicator* MyCommunicator;
 
 // =======================================================================
-// function : GetCommunicator
-// purpose  : defines plugin library name by the command argument
-// =======================================================================
-TInspector_Communicator* ToolsDraw::GetCommunicator()
-{
-  return MyCommunicator;
-}
-
-// =======================================================================
 // function : convertToPluginName
 // purpose  : defines plugin library name by the command argument
 // =======================================================================

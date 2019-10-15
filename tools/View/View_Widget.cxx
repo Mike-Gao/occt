@@ -63,25 +63,16 @@
 // function :  Constructor
 // purpose :
 // =======================================================================
-View_Widget::View_Widget (QWidget* theParent,
-                          const Handle(AIS_InteractiveContext)& theContext,
-                          const bool isFitAllActive)
+View_Widget::View_Widget (QWidget* theParent, const bool isFitAllActive)
 : QWidget (theParent), myCurrentMode (View_CurrentAction3d_Nothing), myFirst (true), myDefaultWidth (-1),
   myDefaultHeight (-1), myViewIsEnabled (true), myXmin (0), myYmin (0), myXmax (0), myYmax (0), myDragButtonDownX (0),
   myDragButtonDownY (0), myDragMultiButtonDownX (0), myDragMultiButtonDownY (0), myIsRectVisible (false), myRectBand (0),
   myHasInitProj (Standard_False), myInitVx (0), myInitVy (0), myInitVz (0)
 {
   myViewer = new View_Viewer (View_Viewer::DefaultColor());
-  if (!theContext.IsNull())
-    myViewer->InitViewer (theContext);
-  else
-  {
-    myViewer->InitViewer (myViewer->CreateStandardViewer());
+  myViewer->InitStandardViewer();
 
-    //Handle(AIS_Trihedron) aTrihedron = new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY()));
-    //aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
-    //myViewer->GetContext()->Display (aTrihedron, Standard_True);
-  }
+  myViewer->GetContext()->Display(new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY())), Standard_True);
 
   setAttribute (Qt::WA_PaintOnScreen);
   setAttribute (Qt::WA_NoSystemBackground);
@@ -429,7 +420,6 @@ void View_Widget::processLeftButtonDown (const int theFlags, const QPoint thePoi
     }
   }
   activateCursor (myCurrentMode);
-  emit leftButtonDown(thePoint.x(), thePoint.y());
 }
 
 // =======================================================================
@@ -523,10 +513,8 @@ void View_Widget::processLeftButtonUp (const int theFlags, const QPoint thePoint
   myDragMultiButtonDownX = 0;
   myDragMultiButtonDownY = 0;
 
-  myCurrentMode = View_CurrentAction3d_Nothing;
   activateCursor (myCurrentMode);
   emit selectionChanged();
-  emit leftButtonUp(thePoint.x(), thePoint.y());
 }
 
 // =======================================================================
@@ -620,7 +608,6 @@ void View_Widget::processMouseMove (const int theFlags, const QPoint thePoint)
      else
       processMoveEvent (thePoint.x(), thePoint.y());
   }
-  emit moveTo (thePoint.x(), thePoint.y());
 }
 
 // =======================================================================
