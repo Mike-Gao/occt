@@ -126,10 +126,10 @@ int main (int argc, char** argv)
     aPlugins.insert("TKShapeView");
     aPlugins.insert("TKVInspector");
 
-    Handle(Message_Report) aReport = Message_Report::CurrentReport (Standard_True);
-    aReport->SetLimit (100);//30);
-    aReport->SetActive (Standard_True);//Standard_False);
-    aPlugins.insert("TKMessageView");
+    //Handle(Message_Report) aReport = Message_Report::CurrentReport (Standard_True);
+    //aReport->SetLimit (100);//30);
+    //aReport->SetActive (Standard_True);//Standard_False);
+    //aPlugins.insert("TKMessageView");
 
     anActivatedPluginName = "TKVInspector";
     //anActivatedPluginName = "TKMessageView";

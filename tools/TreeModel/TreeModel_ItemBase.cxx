@@ -122,24 +122,18 @@ void TreeModel_ItemBase::Init()
 {
   m_bInitialized = true;
 
-  m_iStreamChildren = 0;
+  NCollection_List<Standard_Integer> aHierarchicalValues;
   if (Column() == 0)
   {
     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
-    NCollection_List<Standard_Integer> aHierarchicalValues;
     Standard_SStream aStream;
     GetStream (aStream);
     Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
     aHierarchicalValues = Standard_Dump::HierarchicalValueIndices (aValues);
 
-    m_iStreamChildren = aHierarchicalValues.Extent();
-    if (!m_iStreamChildren && aValues.Extent())
-    {
-      TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(currentItem());
-      if (!aStreamParent)
-        m_iStreamChildren = 1;
-    }
+    //if (aHierarchicalValues.Size() == 1)
   }
+  m_iStreamChildren = aHierarchicalValues.Extent();
 }
 
 // =======================================================================

@@ -38,7 +38,7 @@ void TreeModel_ItemStream::Init()
   if (!myProperties->Item())
     myProperties->SetItem (currentItem());
 
-  TCollection_AsciiString aKey, aKeyValue, aPropertiesValue;
+  TCollection_AsciiString aKey, aKeyValue;
   TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(Parent());
   if (!aStreamParent)
   {
@@ -50,13 +50,6 @@ void TreeModel_ItemStream::Init()
 
     aKey = aValues.FindKey (Row() + 1);
     aKeyValue = aValues.FindFromIndex (Row() + 1);
-
-    // one row value, like gp_XYZ, without additional { for type
-    aValues.Clear();
-    if (!Standard_Dump::SplitJson (aKeyValue, aValues))
-      aPropertiesValue = Standard_Dump::Text (aStream);
-    else
-      aPropertiesValue = aKeyValue;
   }
   else
   {
@@ -64,11 +57,10 @@ void TreeModel_ItemStream::Init()
 
     TCollection_AsciiString aValue;
     aStreamParent->GetChildStream (Row(), aKey, aKeyValue);
-    aPropertiesValue = aKeyValue;
   }
 
   myKey = aKey;
-  myProperties->Init (aPropertiesValue);
+  myProperties->Init (aKeyValue);
   myStreamValue = aKeyValue;
 
   NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
