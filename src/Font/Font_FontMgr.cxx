@@ -81,7 +81,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Font_FontMgr,Standard_Transient)
       NULL
     };
 
-  #if !defined(__ANDROID__) && !defined(__APPLE__)
+  #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     // X11 configuration file in plain text format (obsolete - doesn't exists in modern distributives)
     static Standard_CString myFontServiceConf[] = {"/etc/X11/fs/config",
                                                    "/usr/X11R6/lib/X11/fs/config",
@@ -473,7 +473,7 @@ void Font_FontMgr::InitFontDataBase()
 #else
 
   NCollection_Map<TCollection_AsciiString> aMapOfFontsDirs;
-#if !defined(__ANDROID__) && !defined(__APPLE__)
+#if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
   if (FcConfig* aFcCfg = FcInitLoadConfig())
   {
     if (FcStrList* aFcFontDir = FcConfigGetFontDirs (aFcCfg))
@@ -576,7 +576,7 @@ void Font_FontMgr::InitFontDataBase()
   for (NCollection_Map<TCollection_AsciiString>::Iterator anIter (aMapOfFontsDirs);
        anIter.More(); anIter.Next())
   {
-  #if !defined(__ANDROID__) && !defined(__APPLE__)
+  #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     OSD_File aReadFile (anIter.Value() + "/fonts.dir");
     if (!aReadFile.Exists())
     {
@@ -597,7 +597,7 @@ void Font_FontMgr::InitFontDataBase()
         }
       }
 
-  #if !defined(__ANDROID__) && !defined(__APPLE__)
+  #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
       continue;
     }
 
