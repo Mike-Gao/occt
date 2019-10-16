@@ -14,6 +14,7 @@
 
 #include <OSD.hxx>
 #include <OSD_Exception_CTRL_BREAK.hxx>
+#include <OSD_Function.hxx>
 #include <Standard_DivideByZero.hxx>
 #include <Standard_Overflow.hxx>
 #include <Standard_Assert.hxx>
@@ -273,7 +274,7 @@ static void SIGWntHandler (int signum, int sub_code)
   Standard_Mutex::Sentry aSentry (THE_SIGNAL_MUTEX); // lock the mutex to prevent simultaneous handling
   switch( signum ) {
     case SIGFPE :
-      if ( signal( signum , (void(*)(int))SIGWntHandler ) == SIG_ERR )
+      if (signal (signum, OSD_FunctionCast<void (*) (int)> (SIGWntHandler)) == SIG_ERR)
         std::cout << "signal error" << std::endl ;
       switch( sub_code ) {
         case _FPE_INVALID :
@@ -301,12 +302,12 @@ static void SIGWntHandler (int signum, int sub_code)
       }
       break ;
     case SIGSEGV :
-      if ( signal( signum, (void(*)(int))SIGWntHandler ) == SIG_ERR )
+      if (signal (signum, OSD_FunctionCast<void (*) (int)> (SIGWntHandler)) == SIG_ERR)
         std::cout << "signal error" << std::endl ;
       CallHandler( EXCEPTION_ACCESS_VIOLATION ,0,0) ;
       break ;
     case SIGILL :
-      if ( signal( signum, (void(*)(int))SIGWntHandler ) == SIG_ERR )
+      if (signal (signum, OSD_FunctionCast<void (*) (int)> (SIGWntHandler)) == SIG_ERR)
         std::cout << "signal error" << std::endl ;
       CallHandler( EXCEPTION_ILLEGAL_INSTRUCTION ,0,0) ;
       break ;
@@ -452,7 +453,7 @@ void OSD::SetSignal (OSD_SignalMode theSignalMode,
     SignalFuncType aPreviousFunc = SIG_DFL;
     if (theSignalMode == OSD_SignalMode_Set || theSignalMode == OSD_SignalMode_SetUnhandled)
     {
-      aPreviousFunc = signal(aSignalTypes[i], (SignalFuncType)SIGWntHandler);
+      aPreviousFunc = signal (aSignalTypes[i], OSD_FunctionCast<SignalFuncType> (SIGWntHandler));
     }
     if (theSignalMode == OSD_SignalMode_Unset ||
         (theSignalMode == OSD_SignalMode_SetUnhandled && aPreviousFunc != SIG_DFL && aPreviousFunc != SIG_ERR))

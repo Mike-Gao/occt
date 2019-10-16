@@ -278,7 +278,7 @@ void Draw_Appli(int argc, char** argv, const FDraw_InitAppli Draw_InitAppli)
     typedef BOOL (WINAPI *SetDllDirectoryW_t)(const wchar_t* thePathName);
     HMODULE aKern32Module = GetModuleHandleW (L"kernel32");
     SetDllDirectoryW_t aFunc = (aKern32Module != NULL)
-                             ? (SetDllDirectoryW_t )GetProcAddress (aKern32Module, "SetDllDirectoryW") : NULL;
+                             ? OSD_FunctionCast<SetDllDirectoryW_t> (GetProcAddress (aKern32Module, "SetDllDirectoryW")) : NULL;
     if (aFunc != NULL)
     {
       aFunc (aUserDllPath.ToWideString());
@@ -724,8 +724,7 @@ void Draw::Load(Draw_Interpretor& theDI, const TCollection_AsciiString& theKey,
 //   fp = (void (*)(Draw_Interpretor&, const TCollection_AsciiString&)) f;
 //   (*fp) (theDI, theKey);
 
-  void (*fp) (Draw_Interpretor&) = NULL;
-  fp = (void (*)(Draw_Interpretor&)) f;
+  void (*fp) (Draw_Interpretor&) = OSD_FunctionCast<void (*) (Draw_Interpretor&)> (f);
   (*fp) (theDI);
 
 }

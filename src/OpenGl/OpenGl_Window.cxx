@@ -25,6 +25,7 @@
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
+#include <OSD_Function.hxx>
 
 #include <memory>
 
@@ -338,15 +339,15 @@ OpenGl_Window::OpenGl_Window (const Handle(OpenGl_GraphicDriver)& theDriver,
       wglMakeCurrent (aDevCtxTmp, aRendCtxTmp);
 
       typedef const char* (WINAPI *wglGetExtensionsStringARB_t)(HDC theDeviceContext);
-      wglGetExtensionsStringARB_t aGetExtensions = (wglGetExtensionsStringARB_t  )wglGetProcAddress ("wglGetExtensionsStringARB");
+      wglGetExtensionsStringARB_t aGetExtensions = OSD_FunctionCast<wglGetExtensionsStringARB_t> (wglGetProcAddress ("wglGetExtensionsStringARB"));
       const char* aWglExts = (aGetExtensions != NULL) ? aGetExtensions (wglGetCurrentDC()) : NULL;
       if (OpenGl_Context::CheckExtension (aWglExts, "WGL_ARB_pixel_format"))
       {
-        aChoosePixProc = (wglChoosePixelFormatARB_t    )wglGetProcAddress ("wglChoosePixelFormatARB");
+        aChoosePixProc = OSD_FunctionCast<wglChoosePixelFormatARB_t> (wglGetProcAddress ("wglChoosePixelFormatARB"));
       }
       if (OpenGl_Context::CheckExtension (aWglExts, "WGL_ARB_create_context_profile"))
       {
-        aCreateCtxProc = (wglCreateContextAttribsARB_t )wglGetProcAddress ("wglCreateContextAttribsARB");
+        aCreateCtxProc = OSD_FunctionCast<wglCreateContextAttribsARB_t> (wglGetProcAddress ("wglCreateContextAttribsARB"));
       }
     }
 
@@ -525,7 +526,7 @@ OpenGl_Window::OpenGl_Window (const Handle(OpenGl_GraphicDriver)& theDriver,
     typedef GLXContext (*glXCreateContextAttribsARB_t)(Display* dpy, GLXFBConfig config,
                                                        GLXContext share_context, Bool direct,
                                                        const int* attrib_list);
-    glXCreateContextAttribsARB_t aCreateCtxProc = (glXCreateContextAttribsARB_t )glXGetProcAddress((const GLubyte* )"glXCreateContextAttribsARB");
+    glXCreateContextAttribsARB_t aCreateCtxProc = OSD_FunctionCast<glXCreateContextAttribsARB_t> (glXGetProcAddress((const GLubyte* )"glXCreateContextAttribsARB"));
     if (!theCaps->contextCompatible)
     {
       int aCoreCtxAttribs[] =

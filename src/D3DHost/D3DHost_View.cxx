@@ -19,6 +19,7 @@
 
 #include <D3DHost_GraphicDriver.hxx>
 #include <TCollection_ExtendedString.hxx>
+#include <OSD_Function.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(D3DHost_View,OpenGl_View)
 
@@ -143,7 +144,7 @@ bool D3DHost_View::d3dInitLib()
     {
       // retrieve D3D9Ex function dynamically (available only since Vista+)
       typedef HRESULT (WINAPI* Direct3DCreate9Ex_t)(UINT , IDirect3D9Ex** );
-      Direct3DCreate9Ex_t Direct3DCreate9ExProc = (Direct3DCreate9Ex_t )GetProcAddress (aLib, "Direct3DCreate9Ex");
+      Direct3DCreate9Ex_t Direct3DCreate9ExProc = OSD_FunctionCast<Direct3DCreate9Ex_t> (GetProcAddress (aLib, "Direct3DCreate9Ex"));
       if (Direct3DCreate9ExProc != NULL)
       {
         Direct3DCreate9ExProc(D3D_SDK_VERSION, &aD3dLibEx);
