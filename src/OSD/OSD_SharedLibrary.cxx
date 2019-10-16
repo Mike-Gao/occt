@@ -266,7 +266,7 @@ Standard_Boolean OSD_SharedLibrary :: DlOpen ( const OSD_LoadMode /*Mode*/ ) {
 
 OSD_Function OSD_SharedLibrary :: DlSymb ( const Standard_CString Name ) const {
 
- OSD_Function func = ( OSD_Function )GetProcAddress (  ( HMODULE )myHandle, Name  );
+ OSD_Function func = OSD_FunctionCast<OSD_Function> (GetProcAddress ((HMODULE)myHandle, Name));
 
  if ( func == NULL )
 

@@ -16,6 +16,8 @@
 
 #include <OSD_Parallel.hxx>
 
+#include <OSD_Function.hxx>
+
 #ifdef _WIN32
   #include <windows.h>
   #include <process.h>
@@ -42,7 +44,7 @@ namespace {
 
     HMODULE aKern32Module = GetModuleHandleW(L"kernel32");
     LPFN_ISWOW64PROCESS aFunIsWow64 = (aKern32Module == NULL) ? (LPFN_ISWOW64PROCESS )NULL
-      : (LPFN_ISWOW64PROCESS)GetProcAddress(aKern32Module, "IsWow64Process");
+      : OSD_FunctionCast<LPFN_ISWOW64PROCESS> (GetProcAddress(aKern32Module, "IsWow64Process"));
 
     return aFunIsWow64 != NULL &&
            aFunIsWow64(GetCurrentProcess(), &bIsWow64) &&
@@ -221,7 +223,7 @@ Standard_Integer OSD_Parallel::NbLogicalProcessors()
     typedef BOOL (WINAPI *LPFN_GSI)(LPSYSTEM_INFO );
 
     HMODULE aKern32 = GetModuleHandleW(L"kernel32");
-    LPFN_GSI aFuncSysInfo = (LPFN_GSI )GetProcAddress(aKern32, "GetNativeSystemInfo");
+    LPFN_GSI aFuncSysInfo = OSD_FunctionCast<LPFN_GSI> (GetProcAddress(aKern32, "GetNativeSystemInfo"));
 
     // So, they suggest 32-bit apps should call this instead of the other in WOW64
     if ( aFuncSysInfo != NULL )
