@@ -196,6 +196,14 @@ public: //! @name Geometry management API
   Standard_EXPORT Standard_Boolean SetPosition (const Graphic3d_Vec2i& thePosition,
                                                 const Handle(V3d_View)& theView);
 
+  //! Return box side label or empty string if undefined.
+  //! Default labels: FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM.
+  Standard_EXPORT TCollection_AsciiString BoxSideLabel (const BRepPrim_Direction theSide) const;
+
+  //! Set box side label.
+  Standard_EXPORT void SetBoxSideLabel (const BRepPrim_Direction theSide,
+                                        const TCollection_AsciiString& theLabel);
+
   //! @return size (width and height) of View cube sides.
   Standard_EXPORT Standard_Real Size() const;
 
@@ -675,6 +683,15 @@ protected: //! @name Auxilliary classes to fill presentation with proper primiti
                   const Handle(Graphic3d_Group)& theTextGroup,
                   const Handle(Prs3d_TextAspect)& theTextAspect);
 
+    //! Returns the cube direction
+    BRepPrim_Direction Direction() const { return myDirection; }
+
+    //! Returns the cube text drawn in the middle of face.
+    TCollection_ExtendedString Text() const { return myText; }
+
+    //! Sets the cube text drawn in the middle of face.
+    void SetText (const TCollection_ExtendedString& theText ) { myText = theText; }
+
   protected:
 
     BRepPrim_Direction myDirection; //!< Defines cube face.
@@ -948,6 +965,9 @@ protected: //! @name Map definitions
 
   typedef NCollection_IndexedDataMap<Handle(SelectMgr_EntityOwner), Handle(Part), TColStd_MapTransientHasher>
   MapOfOwnerPart;
+
+  //! Returns side for the direction
+  Standard_EXPORT Handle(Side) findSide (const BRepPrim_Direction theSide) const;
 
 private:
 

@@ -403,6 +403,29 @@ Standard_Boolean AIS_ViewCube::SetPosition (const Graphic3d_Vec2i& thePosition)
   return SetPosition (thePosition, myView);
 }
 
+
+//=======================================================================
+//function : BoxSideLabel
+//purpose  :
+//=======================================================================
+TCollection_AsciiString AIS_ViewCube::BoxSideLabel (const BRepPrim_Direction theSide) const
+{
+  Handle(Side) aSide = findSide (theSide);
+  return !aSide.IsNull() ? aSide->Text() : "";
+}
+
+//=======================================================================
+//function : SetBoxSideLabel
+//purpose  :
+//=======================================================================
+void AIS_ViewCube::SetBoxSideLabel (const BRepPrim_Direction theSide,
+                                    const TCollection_AsciiString& theLabel)
+{
+  Handle(Side) aSide = findSide (theSide);
+  if (!aSide.IsNull())
+    aSide->SetText (theLabel);
+}
+
 //=======================================================================
 //function : Size
 //purpose  :
@@ -2103,4 +2126,21 @@ void AIS_ViewCubeFlat::HilightSelected (const Handle(PrsMgr_PresentationManager3
                                         const SelectMgr_SequenceOfOwner& theSeq)
 {
   parent()->HilightSelected (thePM, theSeq);
+}
+
+//=======================================================================
+//function : findSide
+//purpose  :
+//=======================================================================
+Handle(AIS_ViewCube::Side) AIS_ViewCube::findSide (const BRepPrim_Direction theSide) const
+{
+  for (MapOfOwnerPart::Iterator aPartsIt (myParts); aPartsIt.More(); aPartsIt.Next())
+  {
+    Handle(Side) aSide = Handle(Side)::DownCast (aPartsIt.Value());
+    if (aSide.IsNull())
+      continue;
+    if (aSide->Direction() == theSide)
+      return aSide;
+  }
+  return Handle(Side)();
 }
