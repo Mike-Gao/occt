@@ -681,7 +681,9 @@ protected: //! @name Auxilliary classes to fill presentation with proper primiti
     void Display (const Handle(PrsMgr_PresentationManager)& thePrsMgr,
                   const Handle(Graphic3d_Group)& theGroup,
                   const Handle(Graphic3d_Group)& theTextGroup,
-                  const Handle(Prs3d_TextAspect)& theTextAspect);
+                  const Handle(Prs3d_TextAspect)& theTextAspect,
+                  const Handle(Prs3d_Presentation)& thePresentation,
+                  const Handle(Prs3d_Drawer)& theDrawer);
 
     //! Returns the cube direction
     BRepPrim_Direction Direction() const { return myDirection; }

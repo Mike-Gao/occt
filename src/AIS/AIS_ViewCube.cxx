@@ -980,7 +980,7 @@ void AIS_ViewCube::Compute (const Handle(PrsMgr_PresentationManager3d)& thePrsMg
   for (; anIt < SIDE_INDEX; anIt++)
   {
     Handle(Side) aPart = Handle(Side)::DownCast (myParts.ChangeFromIndex (anIt));
-    aPart->Display (thePrsMgr, aGroup, aTextGroup, myDrawer->TextAspect());
+    aPart->Display (thePrsMgr, aGroup, aTextGroup, myDrawer->TextAspect(), thePrs, myDrawer);
     aPart->SetTransformPersistence (TransformPersistence());
   }
 
@@ -1609,15 +1609,164 @@ void AIS_ViewCube::ToolRectangle::FillArray (Handle(Graphic3d_ArrayOfTriangles)&
     theTriangulation->ChangeTriangles().SetValue (2, Poly_Triangle (1, 3, 4));
 }
 
+#include <Font_BRepFont.hxx>
+#include <Font_BRepTextBuilder.hxx>
+#include <BRepBndLib.hxx>
+void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
+                      const Handle(Prs3d_TextAspect)& theTextAspect,
+                      const Handle(Prs3d_Presentation)& thePresentation,
+                      const Handle(Prs3d_Drawer)& theDrawer,
+                      const TCollection_ExtendedString& theText,
+                      gp_Ax2 theTextPosition)
+{
+  gp_Pnt theTextPos = theTextPosition.Location();
+  gp_Dir theTextDir = theTextPosition.XDirection();
+  gp_Dir aPlaneDir = theTextPosition.Direction();
+
+  // getting font parameters
+  Handle(Prs3d_TextAspect) aTextAspect = theTextAspect;
+  Handle(Prs3d_Drawer) myDrawer = theDrawer;
+
+  Quantity_Color  aColor      = aTextAspect->Aspect()->Color();
+  Font_FontAspect aFontAspect = aTextAspect->Aspect()->GetTextFontAspect();
+  Standard_Real   aFontHeight = aTextAspect->Height();
+
+  // creating TopoDS_Shape for text
+  Font_BRepFont aFont (aTextAspect->Aspect()->Font().ToCString(),
+                        aFontAspect, aFontHeight);
+  NCollection_Utf8String anUTFString (theText.ToExtString());
+
+  Font_BRepTextBuilder aBuilder;
+  TopoDS_Shape aTextShape = aBuilder.Perform (aFont, anUTFString);
+
+  // compute text width with kerning
+  Standard_Real aTextWidth  = 0.0;
+  Standard_Real aTextHeight = aFont.Ascender() + aFont.Descender();
+
+  for (NCollection_Utf8Iter anIter = anUTFString.Iterator(); *anIter != 0; )
+  {
+    Standard_Utf32Char aCurrChar = *anIter;
+    Standard_Utf32Char aNextChar = *(++anIter);
+    aTextWidth += aFont.AdvanceX (aCurrChar, aNextChar);
+  }
+
+  // formating text position in XOY plane
+  //Standard_Integer aHLabelPos = LabelPosition_HCenter;//theLabelPosition & LabelPosition_HMask;
+  //Standard_Integer aVLabelPos = LabelPosition_VCenter;//theLabelPosition & LabelPosition_VMask;
+
+  gp_Dir aTextDir (/*aHLabelPos == LabelPosition_Left ? -theTextDir :*/ theTextDir);
+
+  // compute label offsets
+  Standard_Real aMarginSize    = aFontHeight;// * THE_3D_TEXT_MARGIN;
+  Standard_Real aCenterHOffset = 0.0;
+  Standard_Real aCenterVOffset = 0.0;
+  //switch (aHLabelPos)
+  //{
+  //  case LabelPosition_HCenter : aCenterHOffset =  0.0; break;
+  //  case LabelPosition_Right   : aCenterHOffset =  aTextWidth / 2.0 + aMarginSize; break;
+  //  case LabelPosition_Left    : aCenterHOffset = -aTextWidth / 2.0 - aMarginSize; break;
+  //}
+  //switch (aVLabelPos)
+  //{
+  //  case LabelPosition_VCenter : aCenterVOffset =  0.0; break;
+  //  case LabelPosition_Above   : aCenterVOffset =  aTextHeight / 2.0 + aMarginSize; break;
+  //  case LabelPosition_Below   : aCenterVOffset = -aTextHeight / 2.0 - aMarginSize; break;
+  //}
+
+  // compute shape offset transformation
+  Standard_Real aShapeHOffset = aCenterHOffset - aTextWidth / 2.0;
+  Standard_Real aShapeVOffset = aCenterVOffset - aTextHeight / 2.0;
+
+  // center shape in its bounding box (suppress border spacing added by FT_Font)
+  Bnd_Box aShapeBnd;
+  BRepBndLib::AddClose (aTextShape, aShapeBnd);
+
+  Standard_Real aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
+  aShapeBnd.Get (aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+
+  Standard_Real aXalign = aTextWidth  * 0.5 - (aXmax + aXmin) * 0.5;
+  Standard_Real aYalign = aTextHeight * 0.5 - (aYmax + aYmin) * 0.5;
+  aShapeHOffset += aXalign;
+  aShapeVOffset += aYalign;
+
+  gp_Trsf anOffsetTrsf;
+  anOffsetTrsf.SetTranslation (gp::Origin(), gp_Pnt (aShapeHOffset, aShapeVOffset, 0.0));
+  aTextShape.Move (anOffsetTrsf);
+
+  // transform text to myWorkingPlane coordinate system
+  gp_Ax3 aTextCoordSystem (theTextPos, aPlaneDir/*GetPlane().Axis().Direction()*/, aTextDir);
+  gp_Trsf aTextPlaneTrsf;
+  aTextPlaneTrsf.SetTransformation (aTextCoordSystem, gp_Ax3 (gp::XOY()));
+  aTextShape.Move (aTextPlaneTrsf);
+
+  // set text flipping anchors
+  gp_Trsf aCenterOffsetTrsf;
+  gp_Pnt aCenterOffset (aCenterHOffset, aCenterVOffset, 0.0);
+  aCenterOffsetTrsf.SetTranslation (gp::Origin(), aCenterOffset);
+
+  gp_Pnt aCenterOfLabel (gp::Origin());
+  aCenterOfLabel.Transform (aCenterOffsetTrsf);
+  aCenterOfLabel.Transform (aTextPlaneTrsf);
+
+  gp_Ax2 aFlippingAxes (aCenterOfLabel, aPlaneDir/*GetPlane().Axis().Direction()*/, aTextDir);
+  //Prs3d_Root::CurrentGroup (thePresentation)->SetFlippingOptions (Standard_True, aFlippingAxes);
+
+  // draw text
+  //if (myDrawer->DimensionAspect()->IsTextShaded())
+  {
+    Handle(Prs3d_ShadingAspect) aCurShadingAspect = myDrawer->ShadingAspect();
+    Standard_Real aDeviation = myDrawer->DeviationCoefficient();//SetDeviationCoefficient
+
+    // Setting text shading and color parameters
+    myDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
+
+    Graphic3d_MaterialAspect aShadeMat (Graphic3d_NOM_DEFAULT);
+    aShadeMat.SetReflectionModeOff (Graphic3d_TOR_AMBIENT);
+    aShadeMat.SetReflectionModeOff (Graphic3d_TOR_DIFFUSE);
+    aShadeMat.SetReflectionModeOff (Graphic3d_TOR_SPECULAR);
+    myDrawer->ShadingAspect()->Aspect()->SetInteriorColor (aColor);
+    myDrawer->ShadingAspect()->Aspect()->SetBackInteriorColor (aColor);
+    myDrawer->ShadingAspect()->SetMaterial (aShadeMat);
+
+    //myDrawer->SetDeviationCoefficient (0.000001);
+
+    // drawing text
+    //BRepMesh_IncrementalMesh aMesh(aTextShape, 0.00001, Standard_False, 0.00001);
+
+    StdPrs_ShadedShape::Add (thePresentation, aTextShape, myDrawer);
+
+    // restore drawer shading parameters
+    myDrawer->SetShadingAspect (aCurShadingAspect);
+    myDrawer->SetDeviationCoefficient (aDeviation);
+  }
+  //else
+  //{
+    //// Setting color for text
+    //if (!myDrawer->HasOwnFreeBoundaryAspect())
+    //{
+    //  myDrawer->SetFreeBoundaryAspect (new Prs3d_LineAspect (aColor, Aspect_TOL_SOLID, 1.0));
+    //}
+
+    //myDrawer->FreeBoundaryAspect()->Aspect()->SetColor (aColor);
+
+    //// drawing text
+    //StdPrs_WFShape::Add (thePresentation, aTextShape, myDrawer);
+  //}
+  //Prs3d_Root::CurrentGroup (thePresentation)->SetFlippingOptions (Standard_False, gp_Ax2());
+}
+
 //=======================================================================
 //class    : Side
 //function : Init
 //purpose  :
 //=======================================================================
+#include <Prs3d_DimensionAspect.hxx>
 void AIS_ViewCube::Side::Display (const Handle(PrsMgr_PresentationManager)& thePrsMgr,
                                   const Handle(Graphic3d_Group)& theGroup,
                                   const Handle(Graphic3d_Group)& theTextGroup,
-                                  const Handle(Prs3d_TextAspect)& theTextAspect)
+                                  const Handle(Prs3d_TextAspect)& theTextAspect,
+                                  const Handle(Prs3d_Presentation)& thePresentation,
+                                  const Handle(Prs3d_Drawer)& theDrawer)
 {
   Reset();
 
@@ -1679,7 +1828,10 @@ void AIS_ViewCube::Side::Display (const Handle(PrsMgr_PresentationManager)& theP
   aTool.FillArray (anArray, aTri);
   theGroup->AddPrimitiveArray (anArray);
 
-  Prs3d_Text::Draw (theTextGroup, theTextAspect, myText, aTextPosition);
+  if (theDrawer->DimensionAspect()->IsText3d())
+    displayBRepText (theTextGroup, theTextAspect, thePresentation, theDrawer, myText, aTextPosition);
+  else
+    Prs3d_Text::Draw (theTextGroup, theTextAspect, myText, aTextPosition);
 
   if (myHighlightPresentation.IsNull())
   {
