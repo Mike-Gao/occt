@@ -49,6 +49,9 @@ namespace
     void operator()(const IMeshData::IEdgePtr& theDEdge) const
     {
       const IMeshData::IEdgeHandle aDEdge = theDEdge;
+
+      const Standard_Integer aPointsNb = aDEdge->GetCurve()->ParametersNb();
+
       aDEdge->Clear(Standard_True);
       aDEdge->SetDeflection(Max(aDEdge->GetDeflection() / 3., Precision::Confusion()));
 
@@ -56,7 +59,8 @@ namespace
       const IMeshData::IFaceHandle    aDFace = aPCurve->GetFace();
       Handle(IMeshTools_CurveTessellator) aTessellator =
         BRepMesh_EdgeDiscret::CreateEdgeTessellator(
-          aDEdge, aPCurve->GetOrientation(), aDFace, myParameters);
+          aDEdge, aPCurve->GetOrientation(), aDFace,
+          myParameters, aPointsNb + 1);
 
       BRepMesh_EdgeDiscret::Tessellate3d(aDEdge, aTessellator, Standard_False);
       BRepMesh_EdgeDiscret::Tessellate2d(aDEdge, Standard_False);
