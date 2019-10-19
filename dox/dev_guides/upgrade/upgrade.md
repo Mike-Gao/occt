@@ -1880,3 +1880,7 @@ This change affects following parts:
   It is responsibility of user specifying this flag correctly. The flag value is TRUE by default.
 * Method *Image_PixMap::PixelColor()* has been extended with a new Boolean flag for performing linearization of non-linear sRGB.
   This flag is FALSE by default; application should consider passing TRUE instead for further handling *Quantity_Color* properly as linear RGB values.
+
+@subsection upgrade_750_aspectwindow Aspect_Window interface change
+
+Unexpected const-ness of Aspect_Window::DoResize() method has been removed, so that application classes implementing this interface should be updated accordingly.
