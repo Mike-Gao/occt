@@ -27,8 +27,11 @@
 #include <Standard_Type.hxx>
 #include <TCollection_HAsciiString.hxx>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#ifdef HAVE_FREETYPE
+  #include <ft2build.h>
+  #include FT_FREETYPE_H
+#endif
+
 IMPLEMENT_STANDARD_RTTIEXT(Font_FontMgr,Standard_Transient)
 
 #if defined(_WIN32)
@@ -36,7 +39,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Font_FontMgr,Standard_Transient)
   #include <windows.h>
   #include <stdlib.h>
 
-  #ifdef _MSC_VER
+  #if defined(_MSC_VER) && defined(HAVE_FREETYPE)
     #pragma comment (lib, "freetype.lib")
   #endif
 
@@ -146,6 +149,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Font_FontMgr,Standard_Transient)
 static Handle(Font_SystemFont) checkFont (const Handle(Font_FTLibrary)& theFTLib,
                                           const Standard_CString        theFontPath)
 {
+#ifdef HAVE_FREETYPE
   FT_Face aFontFace;
   FT_Error aFaceError = FT_New_Face (theFTLib->Instance(), theFontPath, 0, &aFontFace);
   if (aFaceError != FT_Err_Ok)
@@ -178,8 +182,12 @@ static Handle(Font_SystemFont) checkFont (const Handle(Font_FTLibrary)& theFTLib
   }
 
   FT_Done_Face (aFontFace);
-
   return aResult;
+#else
+  (void )theFTLib;
+  (void )theFontPath;
+  return Handle(Font_SystemFont)();
+#endif
 }
 
 // =======================================================================

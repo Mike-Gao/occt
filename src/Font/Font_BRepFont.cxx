@@ -47,9 +47,11 @@
 #include <TopTools_DataMapOfShapeInteger.hxx>
 #include <TopTools_DataMapOfShapeSequenceOfShape.hxx>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_OUTLINE_H
+#ifdef HAVE_FREETYPE
+  #include <ft2build.h>
+  #include FT_FREETYPE_H
+  #include FT_OUTLINE_H
+#endif
 
 IMPLEMENT_STANDARD_RTTIEXT(Font_BRepFont,Font_FTFont)
 
@@ -66,6 +68,7 @@ namespace
     return theSize / Standard_Real(THE_FONT_SIZE) * 72.0 / Standard_Real(THE_RESOLUTION_DPI);
   }
 
+#ifdef HAVE_FREETYPE
   //! Auxiliary method to convert FT_Vector to gp_XY
   static gp_XY readFTVec (const FT_Vector& theVec,
                           const Standard_Real theScaleUnits,
@@ -113,7 +116,7 @@ namespace
     }
     return aRes;
   }
-
+#endif
 }
 
 // =======================================================================
@@ -284,6 +287,7 @@ bool Font_BRepFont::to3d (const Handle(Geom2d_Curve)& theCurve2d,
 Standard_Boolean Font_BRepFont::buildFaces (const NCollection_Sequence<TopoDS_Wire>& theWires,
                                             TopoDS_Shape& theRes)
 {
+#ifdef HAVE_FREETYPE
   // classify wires
   NCollection_DataMap<TopoDS_Shape, NCollection_Sequence<TopoDS_Wire>, TopTools_ShapeMapHasher> aMapOutInts;
   TopTools_DataMapOfShapeInteger aMapNbOuts;
@@ -395,8 +399,12 @@ Standard_Boolean Font_BRepFont::buildFaces (const NCollection_Sequence<TopoDS_Wi
     theRes = aFaceComp;
   }
   return Standard_True;
+#else
+  (void )theWires;
+  (void )theRes;
+  return Standard_False;
+#endif
 }
-
 
 // =======================================================================
 // function : renderGlyph
@@ -406,6 +414,7 @@ Standard_Boolean Font_BRepFont::renderGlyph (const Standard_Utf32Char theChar,
                                              TopoDS_Shape&            theShape)
 {
   theShape.Nullify();
+#ifdef HAVE_FREETYPE
   if (!loadGlyph (theChar)
    || myActiveFTFace->glyph->format != FT_GLYPH_FORMAT_OUTLINE)
   {
@@ -645,5 +654,8 @@ Standard_Boolean Font_BRepFont::renderGlyph (const Standard_Utf32Char theChar,
   }
 
   myCache.Bind (theChar, theShape);
+#else
+  (void )theChar;
+#endif
   return !theShape.IsNull();
 }
