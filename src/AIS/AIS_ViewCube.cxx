@@ -776,6 +776,8 @@ Standard_Real AIS_ViewCube::ArrowTransparency() const
 void AIS_ViewCube::SetInnerColor (const Quantity_Color& theColor)
 {
   myDrawer->ShadingAspect()->SetColor (theColor, Aspect_TOFM_BACK_SIDE);
+  myArrowAspect->SetColor (theColor, Aspect_TOFM_BACK_SIDE);
+
   SetToUpdate();
 }
 
@@ -1612,6 +1614,7 @@ void AIS_ViewCube::ToolRectangle::FillArray (Handle(Graphic3d_ArrayOfTriangles)&
 #include <Font_BRepFont.hxx>
 #include <Font_BRepTextBuilder.hxx>
 #include <BRepBndLib.hxx>
+#include <StdPrs_WFShape.hxx>
 void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
                       const Handle(Prs3d_TextAspect)& theTextAspect,
                       const Handle(Prs3d_Presentation)& thePresentation,
@@ -1712,10 +1715,9 @@ void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
   //Prs3d_Root::CurrentGroup (thePresentation)->SetFlippingOptions (Standard_True, aFlippingAxes);
 
   // draw text
-  //if (myDrawer->DimensionAspect()->IsTextShaded())
+  if (myDrawer->DimensionAspect()->IsTextShaded())
   {
     Handle(Prs3d_ShadingAspect) aCurShadingAspect = myDrawer->ShadingAspect();
-    Standard_Real aDeviation = myDrawer->DeviationCoefficient();//SetDeviationCoefficient
 
     // Setting text shading and color parameters
     myDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
@@ -1728,31 +1730,21 @@ void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
     myDrawer->ShadingAspect()->Aspect()->SetBackInteriorColor (aColor);
     myDrawer->ShadingAspect()->SetMaterial (aShadeMat);
 
-    //myDrawer->SetDeviationCoefficient (0.000001);
-
-    // drawing text
-    //BRepMesh_IncrementalMesh aMesh(aTextShape, 0.00001, Standard_False, 0.00001);
-
     StdPrs_ShadedShape::Add (thePresentation, aTextShape, myDrawer);
 
     // restore drawer shading parameters
     myDrawer->SetShadingAspect (aCurShadingAspect);
-    myDrawer->SetDeviationCoefficient (aDeviation);
   }
-  //else
-  //{
-    //// Setting color for text
-    //if (!myDrawer->HasOwnFreeBoundaryAspect())
-    //{
-    //  myDrawer->SetFreeBoundaryAspect (new Prs3d_LineAspect (aColor, Aspect_TOL_SOLID, 1.0));
-    //}
+  else
+  {
+    Handle(Prs3d_LineAspect) aCurLineAspect = myDrawer->FreeBoundaryAspect();
+    myDrawer->FreeBoundaryAspect()->Aspect()->SetColor (aColor);
 
-    //myDrawer->FreeBoundaryAspect()->Aspect()->SetColor (aColor);
+    // drawing text
+    StdPrs_WFShape::Add (thePresentation, aTextShape, myDrawer);
 
-    //// drawing text
-    //StdPrs_WFShape::Add (thePresentation, aTextShape, myDrawer);
-  //}
-  //Prs3d_Root::CurrentGroup (thePresentation)->SetFlippingOptions (Standard_False, gp_Ax2());
+    myDrawer->SetFreeBoundaryAspect (aCurLineAspect);
+  }
 }
 
 //=======================================================================

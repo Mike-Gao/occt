@@ -326,6 +326,9 @@ public: //! @name Style management API
   //! @return value of transparency for 2D part of object.
   Standard_EXPORT Standard_Real ArrowTransparency() const;
 
+  //! Returns style for 2D arrows presentations.
+  const Handle(Prs3d_ShadingAspect)& ArrowAspect() const { return myArrowAspect; }
+
   //! Set color of sides back material.
   //! @code Attributes()->ShadingAspect()->Aspect()->ChangeBackMaterial().SetColor() @endcode
   //! can be used instead
