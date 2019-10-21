@@ -698,6 +698,14 @@ protected: //! @name Auxilliary classes to fill presentation with proper primiti
     void SetText (const TCollection_ExtendedString& theText ) { myText = theText; }
 
   protected:
+    //! Fill presentation with text in BRep style
+    void displayBRepText (const Handle(Prs3d_TextAspect)& theTextAspect,
+                          const Handle(Prs3d_Presentation)& thePresentation,
+                          const Handle(Prs3d_Drawer)& theDrawer,
+                          const TCollection_ExtendedString& theText,
+                          gp_Ax2 theTextPosition);
+
+  protected:
 
     BRepPrim_Direction myDirection; //!< Defines cube face.
     TCollection_ExtendedString myText; //!< Text drawn in the middle of face.

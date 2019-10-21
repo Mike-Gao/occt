@@ -16,11 +16,14 @@
 #include <AIS_ViewCube.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_ManipulatorOwner.hxx>
+#include <BRepBndLib.hxx>
 #include <BRepLib_MakeVertex.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepPrim_Wedge.hxx>
 #include <BRepTools.hxx>
 #include <ElCLib.hxx>
+#include <Font_BRepFont.hxx>
+#include <Font_BRepTextBuilder.hxx>
 #include <gce_MakeDir.hxx>
 #include <GeomAPI_ExtremaCurveCurve.hxx>
 #include <GeomAPI_IntCS.hxx>
@@ -32,6 +35,7 @@
 #include <Prs3d.hxx>
 #include <Prs3d_Arrow.hxx>
 #include <Prs3d_ArrowAspect.hxx>
+#include <Prs3d_DimensionAspect.hxx>
 #include <Prs3d_Root.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <Prs3d_Text.hxx>
@@ -43,6 +47,7 @@
 #include <Select3D_SensitiveTriangulation.hxx>
 #include <Select3D_SensitivePrimitiveArray.hxx>
 #include <SelectMgr_SequenceOfOwner.hxx>
+#include <StdPrs_WFShape.hxx>
 #include <StdSelect_BRepOwner.hxx>
 #include <StdSelect_BRepSelectionTool.hxx>
 #include <TColgp_Array1OfPnt.hxx>
@@ -1611,19 +1616,14 @@ void AIS_ViewCube::ToolRectangle::FillArray (Handle(Graphic3d_ArrayOfTriangles)&
     theTriangulation->ChangeTriangles().SetValue (2, Poly_Triangle (1, 3, 4));
 }
 
-#include <Font_BRepFont.hxx>
-#include <Font_BRepTextBuilder.hxx>
-#include <BRepBndLib.hxx>
-#include <StdPrs_WFShape.hxx>
-void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
-                      const Handle(Prs3d_TextAspect)& theTextAspect,
-                      const Handle(Prs3d_Presentation)& thePresentation,
-                      const Handle(Prs3d_Drawer)& theDrawer,
-                      const TCollection_ExtendedString& theText,
-                      gp_Ax2 theTextPosition)
+void AIS_ViewCube::Side::displayBRepText (const Handle(Prs3d_TextAspect)& theTextAspect,
+                                          const Handle(Prs3d_Presentation)& thePresentation,
+                                          const Handle(Prs3d_Drawer)& theDrawer,
+                                          const TCollection_ExtendedString& theText,
+                                          gp_Ax2 theTextPosition)
 {
-  gp_Pnt theTextPos = theTextPosition.Location();
-  gp_Dir theTextDir = theTextPosition.XDirection();
+  gp_Pnt aTextPos = theTextPosition.Location();
+  gp_Dir aTextDir = theTextPosition.XDirection();
   gp_Dir aPlaneDir = theTextPosition.Direction();
 
   // getting font parameters
@@ -1653,28 +1653,9 @@ void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
     aTextWidth += aFont.AdvanceX (aCurrChar, aNextChar);
   }
 
-  // formating text position in XOY plane
-  //Standard_Integer aHLabelPos = LabelPosition_HCenter;//theLabelPosition & LabelPosition_HMask;
-  //Standard_Integer aVLabelPos = LabelPosition_VCenter;//theLabelPosition & LabelPosition_VMask;
-
-  gp_Dir aTextDir (/*aHLabelPos == LabelPosition_Left ? -theTextDir :*/ theTextDir);
-
   // compute label offsets
-  Standard_Real aMarginSize    = aFontHeight;// * THE_3D_TEXT_MARGIN;
   Standard_Real aCenterHOffset = 0.0;
   Standard_Real aCenterVOffset = 0.0;
-  //switch (aHLabelPos)
-  //{
-  //  case LabelPosition_HCenter : aCenterHOffset =  0.0; break;
-  //  case LabelPosition_Right   : aCenterHOffset =  aTextWidth / 2.0 + aMarginSize; break;
-  //  case LabelPosition_Left    : aCenterHOffset = -aTextWidth / 2.0 - aMarginSize; break;
-  //}
-  //switch (aVLabelPos)
-  //{
-  //  case LabelPosition_VCenter : aCenterVOffset =  0.0; break;
-  //  case LabelPosition_Above   : aCenterVOffset =  aTextHeight / 2.0 + aMarginSize; break;
-  //  case LabelPosition_Below   : aCenterVOffset = -aTextHeight / 2.0 - aMarginSize; break;
-  //}
 
   // compute shape offset transformation
   Standard_Real aShapeHOffset = aCenterHOffset - aTextWidth / 2.0;
@@ -1697,7 +1678,7 @@ void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
   aTextShape.Move (anOffsetTrsf);
 
   // transform text to myWorkingPlane coordinate system
-  gp_Ax3 aTextCoordSystem (theTextPos, aPlaneDir/*GetPlane().Axis().Direction()*/, aTextDir);
+  gp_Ax3 aTextCoordSystem (aTextPos, aPlaneDir, aTextDir);
   gp_Trsf aTextPlaneTrsf;
   aTextPlaneTrsf.SetTransformation (aTextCoordSystem, gp_Ax3 (gp::XOY()));
   aTextShape.Move (aTextPlaneTrsf);
@@ -1711,8 +1692,7 @@ void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
   aCenterOfLabel.Transform (aCenterOffsetTrsf);
   aCenterOfLabel.Transform (aTextPlaneTrsf);
 
-  gp_Ax2 aFlippingAxes (aCenterOfLabel, aPlaneDir/*GetPlane().Axis().Direction()*/, aTextDir);
-  //Prs3d_Root::CurrentGroup (thePresentation)->SetFlippingOptions (Standard_True, aFlippingAxes);
+  gp_Ax2 aFlippingAxes (aCenterOfLabel, aPlaneDir, aTextDir);
 
   // draw text
   if (myDrawer->DimensionAspect()->IsTextShaded())
@@ -1752,7 +1732,6 @@ void displayBRepText (const Handle(Graphic3d_Group)& theTextGroup,
 //function : Init
 //purpose  :
 //=======================================================================
-#include <Prs3d_DimensionAspect.hxx>
 void AIS_ViewCube::Side::Display (const Handle(PrsMgr_PresentationManager)& thePrsMgr,
                                   const Handle(Graphic3d_Group)& theGroup,
                                   const Handle(Graphic3d_Group)& theTextGroup,
@@ -1821,7 +1800,7 @@ void AIS_ViewCube::Side::Display (const Handle(PrsMgr_PresentationManager)& theP
   theGroup->AddPrimitiveArray (anArray);
 
   if (theDrawer->DimensionAspect()->IsText3d())
-    displayBRepText (theTextGroup, theTextAspect, thePresentation, theDrawer, myText, aTextPosition);
+    displayBRepText (theTextAspect, thePresentation, theDrawer, myText, aTextPosition);
   else
     Prs3d_Text::Draw (theTextGroup, theTextAspect, myText, aTextPosition);
 
