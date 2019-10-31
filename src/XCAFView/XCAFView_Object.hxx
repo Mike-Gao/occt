@@ -27,7 +27,7 @@
 #include <TCollection_HAsciiString.hxx>
 #include <XCAFView_ProjectionType.hxx>
 #include <TColStd_HArray1OfByte.hxx>
-#include <TColStd_HArray1OfBoolean.hxx>
+#include <TColStd_HArray1OfInteger.hxx>
 
 class XCAFView_Object;
 DEFINE_STANDARD_HANDLE(XCAFView_Object, Standard_Transient)
@@ -238,7 +238,17 @@ public:
   Standard_EXPORT void CreateEnabledShapes(const Standard_Integer theLenght)
   {
     if (theLenght > 0)
-      myEnabledShapes = new TColStd_HArray1OfBoolean(1, theLenght);
+	  myEnabledShapes = new TColStd_HArray1OfInteger(1, theLenght);
+  }
+
+  Standard_EXPORT void SetEnabledShapes(Handle(TColStd_HArray1OfInteger) theArray)
+  {
+    myEnabledShapes = theArray;
+  }
+
+  const Handle(TColStd_HArray1OfInteger)& GetEnabledShapes() const
+  {
+    return myEnabledShapes;
   }
 
   Standard_EXPORT Standard_Boolean HasEnabledShapes()
@@ -253,7 +263,7 @@ public:
     return myEnabledShapes->Length();
   }
 
-  Standard_EXPORT void SetEnabledShape(const Standard_Integer theIndex, const bool theVal)
+  Standard_EXPORT void SetEnabledShape(const Standard_Integer theIndex, const Standard_Boolean theVal)
   {
     if (myEnabledShapes.IsNull())
       return;
@@ -261,15 +271,16 @@ public:
       myEnabledShapes->SetValue(theIndex, theVal);
   }
 
-  Standard_EXPORT bool EnabledShape(const Standard_Integer theIndex)
+  Standard_EXPORT Standard_Boolean EnabledShape(const Standard_Integer theIndex)
   {
     if (myEnabledShapes.IsNull())
       return Standard_False;
     if (theIndex > 0 && theIndex <= myEnabledShapes->Length())
-      return myEnabledShapes->Value(theIndex);
+      return myEnabledShapes->Value(theIndex) == 1;
     else
       return Standard_False;
   }
+
   Standard_EXPORT void CreateNotePoints(const Standard_Integer theLenght)
   {
     if (theLenght > 0)
@@ -326,7 +337,7 @@ private:
   Standard_Boolean myViewVolumeSidesClipping;
   Handle(TColgp_HArray1OfPnt) myGDTPoints; // Point for each GDT to describe position of GDT frame in View.
   Handle(TColStd_HArray1OfByte) myImage;
-  Handle(TColStd_HArray1OfBoolean) myEnabledShapes;
+  Handle(TColStd_HArray1OfInteger) myEnabledShapes;
   Handle(TColgp_HArray1OfPnt) myNotePoints;
 };
 
