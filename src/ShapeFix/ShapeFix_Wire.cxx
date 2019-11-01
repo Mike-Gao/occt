@@ -1365,8 +1365,8 @@ Standard_Boolean ShapeFix_Wire::FixShifted()
 
   Handle(ShapeAnalysis_Surface) surf = myAnalyzer->Surface();
   //#78 rln 12.03.99 S4135: checking spatial closure with Precision
-  Standard_Boolean uclosed = surf->IsUClosed(Precision());
-  Standard_Boolean vclosed = surf->IsVClosed(Precision()) || surf->Surface()->IsKind (STANDARD_TYPE(Geom_SphericalSurface));
+  Standard_Boolean uclosed = surf->Surface()->IsUPeriodic();//Precision());
+  Standard_Boolean vclosed = surf->Surface()->IsVPeriodic();//Precision()) || surf->Surface()->IsKind (STANDARD_TYPE(Geom_SphericalSurface));
   //#67 rln 01.03.99 S4135: ims010.igs entity D11900 (2D contour is 2*PI higher than V range [-pi/2,p/2])
   
   // PTV 26.06.2002 begin
