@@ -151,6 +151,7 @@ Standard_Integer Select3D_SensitiveFace::NbSubElements()
 void Select3D_SensitiveFace::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveFace);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveEntity);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFacePoints.get());

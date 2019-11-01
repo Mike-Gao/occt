@@ -1443,4 +1443,102 @@ void Prs3d_Drawer::DumpJson (Standard_OStream& theOStream, const Standard_Intege
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Prs3d_Drawer);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShadingAspect.get());
+
+  //Handle(Prs3d_Drawer)          myLink;
+  /*
+  Standard_Boolean              myHasOwnNbPoints;
+  Standard_Real                 myMaximalParameterValue;
+  Standard_Boolean              myHasOwnMaximalParameterValue;
+  Standard_Real                 myChordialDeviation;
+  Standard_Boolean              myHasOwnChordialDeviation;
+  Aspect_TypeOfDeflection       myTypeOfDeflection;
+  Standard_Boolean              myHasOwnTypeOfDeflection;
+  Prs3d_TypeOfHLR               myTypeOfHLR;
+  Standard_Real                 myDeviationCoefficient;
+  Standard_Real                 myPreviousDeviationCoefficient;
+  Standard_Boolean              myHasOwnDeviationCoefficient;
+  Standard_Real                 myHLRDeviationCoefficient;
+  Standard_Boolean              myHasOwnHLRDeviationCoefficient;
+  Standard_Real                 myPreviousHLRDeviationCoefficient;
+  Standard_Real                 myDeviationAngle;
+  Standard_Boolean              myHasOwnDeviationAngle;
+  Standard_Real                 myPreviousDeviationAngle;
+  Standard_Real                 myHLRAngle;
+  Standard_Boolean              myHasOwnHLRDeviationAngle;
+  Standard_Real                 myPreviousHLRDeviationAngle;
+  Standard_Boolean              myIsoOnPlane;
+  Standard_Boolean              myHasOwnIsoOnPlane;
+  Standard_Boolean              myIsoOnTriangulation;
+  Standard_Boolean              myHasOwnIsoOnTriangulation;
+  Standard_Boolean              myIsAutoTriangulated;
+  Standard_Boolean              myHasOwnIsAutoTriangulated;*/
+
+  /*Handle(Prs3d_IsoAspect)       myUIsoAspect;
+  Standard_Boolean              myHasOwnUIsoAspect;
+  Handle(Prs3d_IsoAspect)       myVIsoAspect;
+  Standard_Boolean              myHasOwnVIsoAspect;
+  Handle(Prs3d_LineAspect)      myWireAspect;
+  Standard_Boolean              myHasOwnWireAspect;
+  Standard_Boolean              myWireDraw;
+  Standard_Boolean              myHasOwnWireDraw;
+  Handle(Prs3d_PointAspect)     myPointAspect;
+  Standard_Boolean              myHasOwnPointAspect;
+  Handle(Prs3d_LineAspect)      myLineAspect;
+  Standard_Boolean              myHasOwnLineAspect;
+  */
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTextAspect);
+  if (!myTextAspect.IsNull())
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTextAspect.get());
+
+  //Handle(Prs3d_ShadingAspect)   myShadingAspect;
+  //Standard_Boolean              myHasOwnShadingAspect;
+
+  /*Handle(Prs3d_PlaneAspect)     myPlaneAspect;
+  Standard_Boolean              myHasOwnPlaneAspect;
+  Handle(Prs3d_LineAspect)      mySeenLineAspect;
+  Standard_Boolean              myHasOwnSeenLineAspect;
+  Handle(Prs3d_ArrowAspect)     myArrowAspect;
+  Standard_Boolean              myHasOwnArrowAspect;
+  Standard_Boolean              myLineArrowDraw;
+  Standard_Boolean              myHasOwnLineArrowDraw;
+  Handle(Prs3d_LineAspect)      myHiddenLineAspect;
+  Standard_Boolean              myHasOwnHiddenLineAspect;
+  Standard_Boolean              myDrawHiddenLine;
+  Standard_Boolean              myHasOwnDrawHiddenLine;
+  Handle(Prs3d_LineAspect)      myVectorAspect;
+  Standard_Boolean              myHasOwnVectorAspect;
+  Prs3d_VertexDrawMode          myVertexDrawMode;
+  Handle(Prs3d_DatumAspect)     myDatumAspect;
+  Standard_Boolean              myHasOwnDatumAspect;
+  Handle(Prs3d_LineAspect)      mySectionAspect;
+  Standard_Boolean              myHasOwnSectionAspect;
+
+  Handle(Prs3d_LineAspect)      myFreeBoundaryAspect;
+  Standard_Boolean              myHasOwnFreeBoundaryAspect;
+  Standard_Boolean              myFreeBoundaryDraw;
+  Standard_Boolean              myHasOwnFreeBoundaryDraw;
+  Handle(Prs3d_LineAspect)      myUnFreeBoundaryAspect;
+  Standard_Boolean              myHasOwnUnFreeBoundaryAspect;
+  Standard_Boolean              myUnFreeBoundaryDraw;
+  Standard_Boolean              myHasOwnUnFreeBoundaryDraw;
+  Handle(Prs3d_LineAspect)      myFaceBoundaryAspect;
+  Standard_Integer              myFaceBoundaryUpperContinuity; //!< the most edge continuity class (GeomAbs_Shape) to be included to face boundaries presentation, or -1 if undefined
+  Standard_Boolean              myHasOwnFaceBoundaryAspect;
+  Standard_Boolean              myFaceBoundaryDraw;
+  Standard_Boolean              myHasOwnFaceBoundaryDraw;
+
+  Handle(Prs3d_DimensionAspect) myDimensionAspect;
+  Standard_Boolean              myHasOwnDimensionAspect;
+  Prs3d_DimensionUnits          myDimensionModelUnits;
+  Standard_Boolean              myHasOwnDimLengthModelUnits;
+  Standard_Boolean              myHasOwnDimAngleModelUnits;
+  Prs3d_DimensionUnits          myDimensionDisplayUnits;
+  Standard_Boolean              myHasOwnDimLengthDisplayUnits;
+  Standard_Boolean              myHasOwnDimAngleDisplayUnits;
+  */
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFillCappingAspect);
+  if (!myFillCappingAspect.IsNull())
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFillCappingAspect.get());
 }

@@ -369,7 +369,6 @@ Standard_Real Select3D_SensitiveGroup::distanceToCOG (SelectBasics_SelectingVolu
 void Select3D_SensitiveGroup::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveGroup);
-
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
 
   for (Select3D_IndexedMapOfEntity::Iterator anIterator (myEntities); anIterator.More(); anIterator.Next())

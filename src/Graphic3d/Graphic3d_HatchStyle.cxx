@@ -516,3 +516,15 @@ const Standard_Byte* Graphic3d_HatchStyle::Pattern() const
       ? (const Standard_Byte*)myPredefinedPatterns[myHatchType]
       : NULL);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_HatchStyle::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_HatchStyle);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myPattern.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHatchType);
+}

@@ -237,9 +237,10 @@ void Select3D_SensitiveSet::Clear()
 //function : DumpJson
 //purpose  :
 //=======================================================================
-void Select3D_SensitiveSet::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+void Select3D_SensitiveSet::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveSet);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveEntity);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDetectedIdx);
 }

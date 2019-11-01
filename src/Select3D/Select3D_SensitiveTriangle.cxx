@@ -101,6 +101,7 @@ Select3D_BndBox3d Select3D_SensitiveTriangle::BoundingBox()
 void Select3D_SensitiveTriangle::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveTriangle);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveEntity);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType);
 
