@@ -77,8 +77,9 @@ namespace IMeshData
   const size_t MEMORY_BLOCK_SIZE_HUGE = 512 * 1024;
 #endif
 
-  typedef IMeshData_Edge* IEdgePtr;
-  typedef IMeshData_Face* IFacePtr;
+  typedef IMeshData_Edge*   IEdgePtr;
+  typedef IMeshData_PCurve* IPCurvePtr;
+  typedef IMeshData_Face*   IFacePtr;
 
   typedef Handle(IMeshData_Edge)   IEdgeHandle;
   typedef Handle(IMeshData_Wire)   IWireHandle;

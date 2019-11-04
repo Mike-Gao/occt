@@ -13,17 +13,15 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <BRepMesh_FaceChecker.hxx>
+#include <BRepMesh_FaceIntersectionsSplitter.hxx>
 #include <IMeshData_Wire.hxx>
 #include <IMeshData_Edge.hxx>
-#include <OSD_Parallel.hxx>
-#include <BRepMesh_GeomTool.hxx>
 
 //=======================================================================
 //function : Constructor
 //purpose  : 
 //=======================================================================
-BRepMesh_FaceChecker::BRepMesh_FaceChecker(
+BRepMesh_FaceIntersectionsSplitter::BRepMesh_FaceIntersectionsSplitter(
   const IMeshData::IFaceHandle& theFace,
   const IMeshTools_Parameters&  theParameters)
   : BRepMesh_SegmentedFace (theFace, theParameters)
@@ -34,7 +32,7 @@ BRepMesh_FaceChecker::BRepMesh_FaceChecker(
 //function : Destructor
 //purpose  : 
 //=======================================================================
-BRepMesh_FaceChecker::~BRepMesh_FaceChecker()
+BRepMesh_FaceIntersectionsSplitter::~BRepMesh_FaceIntersectionsSplitter()
 {
 }
 
@@ -42,32 +40,35 @@ BRepMesh_FaceChecker::~BRepMesh_FaceChecker()
 //function : Perform
 //purpose  : 
 //=======================================================================
-Standard_Boolean BRepMesh_FaceChecker::Perform()
+Standard_Boolean BRepMesh_FaceIntersectionsSplitter::Perform()
 {
-  collectSegments();
+  for (Standard_Integer aWireIt = 0; aWireIt < myDFace->WiresNb(); ++aWireIt)
+  {
+    Standard_Boolean isSplit = Standard_True;
+    while (isSplit)
+    {
+      collectSegments();
 
-  myIntersectingEdges      = new IMeshData::MapOfIEdgePtr;
-  myWiresIntersectingEdges = new ArrayOfMapOfIEdgePtr(0, myDFace->WiresNb() - 1);
+      isSplit = perform(aWireIt);
 
-  OSD_Parallel::For(0, myDFace->WiresNb(), *this, !isParallel());
-  collectResult();
+      myWiresSegments  .Nullify();
+      myWiresBndBoxTree.Nullify();
+    }
+  }
 
-  myWiresBndBoxTree       .Nullify();
-  myWiresSegments         .Nullify();
-  myWiresIntersectingEdges.Nullify();
-  return myIntersectingEdges->IsEmpty();
+  return Standard_False;
 }
 
 //=======================================================================
 //function : perform
 //purpose  : 
 //=======================================================================
-void BRepMesh_FaceChecker::perform(const Standard_Integer theWireIndex) const
+Standard_Boolean BRepMesh_FaceIntersectionsSplitter::perform(
+  const Standard_Integer theWireIndex)
 {
-  const Handle(Segments)&           aSegments1     = myWiresSegments         ->Value      (theWireIndex);
-  Handle(IMeshData::MapOfIEdgePtr)& aIntersections = myWiresIntersectingEdges->ChangeValue(theWireIndex);
+  const Handle(Segments)& aSegments1 = myWiresSegments->Value (theWireIndex);
 
-  BRepMesh_SegmentedFace::BndBox2dTreeSelector aSelector (Standard_False);
+  BRepMesh_SegmentedFace::BndBox2dTreeSelector aSelector (Standard_True);
   for (Standard_Integer aWireIt = theWireIndex; aWireIt < myDFace->WiresNb(); ++aWireIt)
   {
     const Handle(IMeshData::BndBox2dTree)& aBndBoxTree2 = myWiresBndBoxTree->Value(aWireIt);
@@ -80,36 +81,20 @@ void BRepMesh_FaceChecker::perform(const Standard_Integer theWireIndex) const
       aSelector.Reset(&aSegment1, (aWireIt == theWireIndex) ? aSegmentIt : -1);
       if (aBndBoxTree2->Select(aSelector) != 0)
       {
-        if (aIntersections.IsNull())
-        {
-          aIntersections = new IMeshData::MapOfIEdgePtr;
-        }
-
-        aIntersections->Add(aSegment1.EdgePtr);
-
-        const IMeshData::VectorOfInteger& aSegments = aSelector.Indices();
+        const IMeshData::VectorOfInteger&                         aSegments  = aSelector.Indices();
+        const BRepMesh_SegmentedFace::VectorOfIntersectionParams& aIntParams = aSelector.IntParams();
         for (Standard_Integer aSelIt = 0; aSelIt < aSegments.Size(); ++aSelIt)
         {
           const BRepMesh_SegmentedFace::Segment& aSegment2 = aSegments2->Value(aSegments(aSelIt));
-          aIntersections->Add(aSegment2.EdgePtr);
+
+          //aIntersections->Add(aSegment1.EdgePtr);
+          //aIntersections->Add(aSegment2.EdgePtr);
         }
+
+        //return Standard_False;
       }
     }
   }
-}
 
-//=======================================================================
-//function : collectResult
-//purpose  : 
-//=======================================================================
-void BRepMesh_FaceChecker::collectResult()
-{
-  for (Standard_Integer aWireIt = 0; aWireIt < myDFace->WiresNb(); ++aWireIt)
-  {
-    const Handle(IMeshData::MapOfIEdgePtr)& aEdges = myWiresIntersectingEdges->Value(aWireIt);
-    if (!aEdges.IsNull())
-    {
-      myIntersectingEdges->Unite(*aEdges);
-    }
-  }
+  return Standard_False;
 }

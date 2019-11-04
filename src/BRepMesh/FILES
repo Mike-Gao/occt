@@ -41,6 +41,8 @@ BRepMesh_EdgeTessellationExtractor.cxx
 BRepMesh_EdgeTessellationExtractor.hxx
 BRepMesh_FaceChecker.cxx
 BRepMesh_FaceChecker.hxx
+BRepMesh_FaceIntersectionsSplitter.cxx
+BRepMesh_FaceIntersectionsSplitter.hxx
 BRepMesh_FaceDiscret.cxx
 BRepMesh_FaceDiscret.hxx
 BRepMesh_FactoryError.hxx
@@ -68,6 +70,8 @@ BRepMesh_OrientedEdge.hxx
 BRepMesh_PairOfIndex.hxx
 BRepMesh_PluginEntryType.hxx
 BRepMesh_PluginMacro.hxx
+BRepMesh_SegmentedFace.cxx
+BRepMesh_SegmentedFace.hxx
 BRepMesh_SelectorOfDataStructureOfDelaun.cxx
 BRepMesh_SelectorOfDataStructureOfDelaun.hxx
 BRepMesh_ShapeTool.cxx

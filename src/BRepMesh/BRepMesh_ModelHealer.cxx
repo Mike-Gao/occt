@@ -17,6 +17,7 @@
 #include <BRepMesh_Deflection.hxx>
 #include <BRepMesh_ShapeTool.hxx>
 #include <BRepMesh_FaceChecker.hxx>
+#include <BRepMesh_FaceIntersectionsSplitter.hxx>
 #include <BRepMesh_EdgeDiscret.hxx>
 #include <IMeshData_Face.hxx>
 #include <IMeshData_Wire.hxx>
@@ -150,7 +151,12 @@ Standard_Boolean BRepMesh_ModelHealer::performInternal(
     {
       const IMeshData::IFaceHandle aDFace = aFaceIt.Key();
       aDFace->SetStatus(IMeshData_SelfIntersectingWire);
-      aDFace->SetStatus(IMeshData_Failure);
+
+      BRepMesh_FaceIntersectionsSplitter aSplitter (aDFace, myParameters);
+      if (!aSplitter.Perform())
+      {
+        aDFace->SetStatus(IMeshData_Failure);
+      }
     }
   }
 

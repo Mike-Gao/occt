@@ -2434,8 +2434,9 @@ BRepMesh_GeomTool::IntFlag BRepMesh_Delaun::intSegSeg(
   p3 = GetVertex( theEdg2.FirstNode() ).Coord();
   p4 = GetVertex( theEdg2.LastNode()  ).Coord();
   
+  Standard_Real aIntParams[2];
   return BRepMesh_GeomTool::IntSegSeg(p1, p2, p3, p4,
-    isConsiderEndPointTouch, isConsiderPointOnEdge, theIntPnt);
+    isConsiderEndPointTouch, isConsiderPointOnEdge, theIntPnt, aIntParams);
 }
 
 //=============================================================================

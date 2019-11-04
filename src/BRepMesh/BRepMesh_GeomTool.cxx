@@ -333,7 +333,8 @@ BRepMesh_GeomTool::IntFlag BRepMesh_GeomTool::IntSegSeg(
   const gp_XY&           theEndPnt2,
   const Standard_Boolean isConsiderEndPointTouch,
   const Standard_Boolean isConsiderPointOnSegment,
-  gp_Pnt2d&              theIntPnt)
+  gp_Pnt2d&              theIntPnt,
+  Standard_Real        (&theParamOnSegment)[2])
 {
   Standard_Integer aPointHash[] = {
     classifyPoint(theStartPnt1, theEndPnt1, theStartPnt2),
@@ -393,9 +394,8 @@ BRepMesh_GeomTool::IntFlag BRepMesh_GeomTool::IntSegSeg(
   else if ( aPosHash == 2 )
     return BRepMesh_GeomTool::Glued;
 
-  Standard_Real aParam[2];
   IntFlag aIntFlag = IntLinLin(theStartPnt1, theEndPnt1, 
-    theStartPnt2, theEndPnt2, theIntPnt.ChangeCoord(), aParam);
+    theStartPnt2, theEndPnt2, theIntPnt.ChangeCoord(), theParamOnSegment);
 
   if (aIntFlag == BRepMesh_GeomTool::NoIntersection)
     return BRepMesh_GeomTool::NoIntersection;
@@ -416,7 +416,7 @@ BRepMesh_GeomTool::IntFlag BRepMesh_GeomTool::IntSegSeg(
   const Standard_Real aEndPrec = 1 - aPrec;
   for (Standard_Integer i = 0; i < 2; ++i)
   {
-    if(aParam[i] < aPrec || aParam[i] > aEndPrec )
+    if(theParamOnSegment[i] < aPrec || theParamOnSegment[i] > aEndPrec )
       return BRepMesh_GeomTool::NoIntersection;
   }
  

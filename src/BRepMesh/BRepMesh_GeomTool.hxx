@@ -194,7 +194,8 @@ public: //! @name static API
     const gp_XY&           theEndPnt2,
     const Standard_Boolean isConsiderEndPointTouch,
     const Standard_Boolean isConsiderPointOnSegment,
-    gp_Pnt2d&              theIntPnt);
+    gp_Pnt2d&              theIntPnt,
+    Standard_Real        (&theParamOnSegment)[2]);
 
   //! Compute deflection of the given segment.
   static Standard_Real SquareDeflectionOfSegment(

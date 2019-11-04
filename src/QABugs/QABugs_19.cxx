@@ -3152,7 +3152,7 @@ static Standard_Integer OCC25547(
 
   aIntFlag = BRepMesh_GeomTool::IntSegSeg(
     aRefPnts[0], aRefPnts[1], aRefPnts[2], aRefPnts[3], 
-    Standard_False, Standard_False, aIntPnt);
+    Standard_False, Standard_False, aIntPnt, aParams);
 
   aDiff = aIntPnt.Distance(gp::Origin2d());
   if (aIntFlag != BRepMesh_GeomTool::Cross || aDiff > Precision::PConfusion())
