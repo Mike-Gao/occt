@@ -191,7 +191,7 @@ pararg2(1,aNbSolMAX)
         Geom2dInt_TheIntConicCurveOfGInter Intp(Line,D1,C2,D2,Tol,Tol);
         if (Intp.IsDone()) {
           if (!Intp.IsEmpty()) {
-            for (Standard_Integer i = 1 ; i <= Intp.NbPoints() ; i++) {
+            for (Standard_Integer i = 1 ; i <= Intp.NbPoints() && NbrSol < cirsol.Length() ; i++) {
               NbrSol++;
               gp_Pnt2d Center(Intp.Point(i).Value());
               cirsol(NbrSol) = gp_Circ2d(gp_Ax2d(Center,dirx),Radius);
@@ -375,7 +375,7 @@ pararg2(1,aNbSolMAX)
         Intp.Perform(Circ,D1,C2,D2,Tol,Tol);
         if (Intp.IsDone()) {
           if (!Intp.IsEmpty()) {
-            for (Standard_Integer i = 1 ; i <= Intp.NbPoints() ; i++) {
+            for (Standard_Integer i = 1 ; i <= Intp.NbPoints() && NbrSol < cirsol.Length() ; i++) {
               NbrSol++;
               gp_Pnt2d Center(Intp.Point(i).Value());
               cirsol(NbrSol) = gp_Circ2d(gp_Ax2d(Center,dirx),Radius);
@@ -507,7 +507,7 @@ pararg2(1,aNbSolMAX)
       Intp.Perform(Circ,D1,Cu2,D2,Tol,Tol);
       if (Intp.IsDone()) {
         if (!Intp.IsEmpty()) {
-          for (Standard_Integer i = 1 ; i <= Intp.NbPoints() ; i++) {
+          for (Standard_Integer i = 1 ; i <= Intp.NbPoints() && NbrSol < cirsol.Length(); i++) {
             NbrSol++;
             gp_Pnt2d Center(Intp.Point(i).Value());
             cirsol(NbrSol) = gp_Circ2d(gp_Ax2d(Center,dirx),Radius);
@@ -853,7 +853,7 @@ pararg2(1,aNbSolMAX)
           if (!Intp.IsEmpty()) {
             const Standard_Real aSQApproxTol = Precision::Approximation() *
                                                 Precision::Approximation();
-            for (Standard_Integer i = 1 ; i <= Intp.NbPoints() ; i++)
+            for (Standard_Integer i = 1 ; i <= Intp.NbPoints() && NbrSol < cirsol.Length()  ; i++)
             {
               Standard_Real aU0 = Intp.Point(i).ParamOnFirst();
               Standard_Real aV0 = Intp.Point(i).ParamOnSecond();
