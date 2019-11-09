@@ -1336,7 +1336,7 @@ void BinTools_ShapeSet::ReadPolygon3D(Standard_IStream& IS)
   if (IS.fail() || strstr(aHeader,"Polygon3D") == NULL)
   {
 #ifdef OCCT_DEBUG
-    std::cout <<"Buffer: " << buffer << std::endl;
+    std::cout <<"Buffer: " << aHeader << std::endl;
 #endif
     throw Standard_Failure("BinTools_ShapeSet::ReadPolygon3D: Not a Polygon3D section");
   }
