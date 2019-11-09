@@ -22,6 +22,7 @@
 #include <gp_XYZ.hxx>
 #include <Bnd_Box.hxx>
 #include <Bnd_OBB.hxx>
+#include <NCollection_List.hxx>
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <TColgp_HArray1OfPnt.hxx>
@@ -29,6 +30,7 @@
 #include <TCollection_AsciiString.hxx>
 #include <TopLoc_Location.hxx>
 #include <TopoDS_Shape.hxx> 
+#include <Standard_SStream.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QString>
@@ -42,6 +44,14 @@ class Geom_Transformation;
 class Convert_Tools
 {
 public:
+  //! Creates shape presentations on the stream if possible. Tries to init some OCCT base for a new presentation
+  //! \param theStream source of presentation
+  //! \param thePresentations container to add new presentation/s
+  Standard_EXPORT static void ConvertStreamToPresentations (const Standard_SStream& theSStream,
+                                                            const Standard_Integer theStartPos,
+                                                            const Standard_Integer theLastPos,
+                                                            NCollection_List<Handle(Standard_Transient)>& thePresentations);
+
   //! Creates box shape
   //! \param theBoundingBox box shape parameters
   //! \return created shape

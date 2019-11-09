@@ -73,9 +73,6 @@ public:
   const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetChildren() const
     { initItem(); return myChildren; }
 
-  //! Returns the item properties
-  Handle(TreeModel_ItemProperties) Properties() const { return myProperties; }
-
   //! Returns stream value of the item to fulfill property panel.
   //! \return stream value or dummy
   virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
@@ -103,7 +100,6 @@ private:
   Standard_EXPORT TreeModel_ItemStream(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn);
 
 protected:
-  Handle(TreeModel_ItemProperties) myProperties; //!< the properties
   TCollection_AsciiString myKey; //!< the item key
   TCollection_AsciiString myStreamValue; //!< the stream value
   NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myChildren; //!< the children

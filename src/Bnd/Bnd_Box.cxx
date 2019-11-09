@@ -985,3 +985,12 @@ void Bnd_Box::DumpJson (Standard_OStream& theOStream, const Standard_Integer) co
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Gap);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Flags);
 }
+
+//=======================================================================
+//function : InitJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean Bnd_Box::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  return Standard_False;
+}

@@ -146,6 +146,16 @@ View_ContextType View_ToolBar::GetCurrentContextType() const
 }
 
 // =======================================================================
+// function : SetCurrentContext
+// purpose :
+// =======================================================================
+void View_ToolBar::SetCurrentContextType (View_ContextType theType)
+{
+  myViewSelector->setCurrentIndex ((int)theType);
+  emit contextChanged();
+}
+
+// =======================================================================
 // function : GetCurrentContext
 // purpose :
 // =======================================================================

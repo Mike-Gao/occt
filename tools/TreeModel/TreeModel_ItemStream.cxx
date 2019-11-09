@@ -93,7 +93,6 @@ void TreeModel_ItemStream::Reset()
   myKey = "";
   myStreamValue = "";
 
-  myProperties->Reset();
   myChildren.Clear();
 
   TreeModel_ItemBase::Reset();

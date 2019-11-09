@@ -573,3 +573,14 @@ void V3d_Viewer::DisplayPrivilegedPlane (const Standard_Boolean theOnOff, const 
 
   myPlaneStructure->Display();
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void V3d_Viewer::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, V3d_Viewer);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPrivilegedPlane);
+}

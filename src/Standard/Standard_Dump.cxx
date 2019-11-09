@@ -43,7 +43,7 @@ void Standard_Dump::AddValuesSeparator (Standard_OStream& theOStream)
   Standard_SStream aStream;
   aStream << theOStream.rdbuf();
   TCollection_AsciiString aStreamStr = Standard_Dump::Text (aStream);
-  if (!aStreamStr.EndsWith ("{"))
+  if (!aStreamStr.IsEmpty() && !aStreamStr.EndsWith ("{"))
     theOStream << ", ";
 }
 
@@ -104,9 +104,17 @@ Standard_Boolean Standard_Dump::ProcessStreamName (const Standard_SStream& theSt
   TCollection_AsciiString aText = Text (theStream);
   if (aText.IsEmpty())
     return Standard_False;
-  TCollection_AsciiString aSubText = aText.SubString (theStreamPos, aText.Length());
 
-  TCollection_AsciiString aKeyName = theName + JsonKeyToString (Standard_JsonKey_SeparatorKeyToValue);
+  TCollection_AsciiString aSubText = aText.SubString (theStreamPos, aText.Length());
+  if (aSubText.StartsWith (JsonKeyToString (Standard_JsonKey_SeparatorValueToValue)))
+  {
+    theStreamPos += JsonKeyLength (Standard_JsonKey_SeparatorValueToValue);
+    aSubText = aText.SubString (theStreamPos, aText.Length());
+  }
+  TCollection_AsciiString aKeyName = TCollection_AsciiString (JsonKeyToString (Standard_JsonKey_Quote))
+    + theName
+    + TCollection_AsciiString (JsonKeyToString (Standard_JsonKey_Quote))
+    + JsonKeyToString (Standard_JsonKey_SeparatorKeyToValue);
   Standard_Boolean aResult = aSubText.StartsWith (aKeyName);
   if (aResult)
     theStreamPos += aKeyName.Length();
@@ -122,14 +130,15 @@ Standard_Boolean Standard_Dump::InitRealValues (const Standard_SStream& theStrea
                                                 Standard_Integer& theStreamPos,
                                                 int theCount, ...)
 {
-  Standard_Integer aStreamPos = theStreamPos + JsonKeyLength (Standard_JsonKey_OpenContainer) + 1;
+  Standard_Integer aStreamPos = theStreamPos + JsonKeyLength (Standard_JsonKey_OpenContainer);
 
   TCollection_AsciiString aText = Text (theStream);
   TCollection_AsciiString aSubText = aText.SubString (aStreamPos, aText.Length());
-  Standard_Integer aClosePos = aSubText.Location (JsonKeyToString (Standard_JsonKey_CloseContainer), aStreamPos, aSubText.Length());
 
   va_list  vl;
   va_start(vl, theCount);
+  aStreamPos = 1;
+  Standard_Integer aClosePos = aSubText.Location (JsonKeyToString (Standard_JsonKey_CloseContainer), aStreamPos, aSubText.Length());
   for(int i = 0; i < theCount; ++i)
   {
     //if (i < theCount -1)
@@ -142,13 +151,15 @@ Standard_Boolean Standard_Dump::InitRealValues (const Standard_SStream& theStrea
     if (!aValueText.IsRealValue())
       return Standard_False;
 
-    va_arg(vl, Standard_Real) = aValueText.RealValue();
+    Standard_Real aVal = aValueText.RealValue();
+    *(va_arg(vl, Standard_Real*)) = aValueText.RealValue();
 
-    aStreamPos = aNextPos + 1;
+    aStreamPos = aNextPos + JsonKeyLength (Standard_JsonKey_SeparatorValueToValue);
     //theOStream << va_arg(vl, Standard_Real);
   }
   va_end(vl);
-
+  aClosePos = aText.Location (JsonKeyToString (Standard_JsonKey_CloseContainer), theStreamPos, aText.Length());
+  theStreamPos = aClosePos + JsonKeyLength (Standard_JsonKey_CloseContainer);
 
   return Standard_True;
 }
@@ -461,7 +472,7 @@ Standard_Boolean Standard_Dump::splitKeyToValue (const TCollection_AsciiString& 
       Standard_Integer aCloseIndex2 = nextClosePosition (theStreamStr, aStartIndex, Standard_JsonKey_None, Standard_JsonKey_SeparatorValueToValue) - 1;
       aCloseIndex = aCloseIndex1 < aCloseIndex2 ? aCloseIndex1 : aCloseIndex2;
 
-      aSplitValue = theStreamStr.SubString (aStartIndex, aCloseIndex);
+      aSplitValue = aStartIndex <= aCloseIndex ? theStreamStr.SubString (aStartIndex, aCloseIndex) : "";
       theNextIndex = aCloseIndex + 1;
     }
     break;

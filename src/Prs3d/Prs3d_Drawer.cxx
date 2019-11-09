@@ -1442,103 +1442,110 @@ bool Prs3d_Drawer::SetShadingModel (Graphic3d_TypeOfShadingModel theModel,
 void Prs3d_Drawer::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Prs3d_Drawer);
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myLink.get());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnNbPoints);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaximalParameterValue);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnMaximalParameterValue);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myChordialDeviation);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnChordialDeviation);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeOfDeflection);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTypeOfDeflection);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeOfHLR);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeviationCoefficient);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPreviousDeviationCoefficient);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDeviationCoefficient);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHLRDeviationCoefficient);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnHLRDeviationCoefficient);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPreviousHLRDeviationCoefficient);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeviationAngle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDeviationAngle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPreviousDeviationAngle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHLRAngle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnHLRDeviationAngle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPreviousHLRDeviationAngle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsoOnPlane);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnIsoOnPlane);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsoOnTriangulation);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnIsoOnTriangulation);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsAutoTriangulated);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnIsAutoTriangulated);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myUIsoAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnUIsoAspect);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myVIsoAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnVIsoAspect);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myWireAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnWireAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myWireDraw);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnWireDraw);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myPointAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPointAspect);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myLineAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnLineAspect);
+
+  //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTextAspect);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTextAspect.get());
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShadingAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnShadingAspect);
 
-  //Handle(Prs3d_Drawer)          myLink;
-  /*
-  Standard_Boolean              myHasOwnNbPoints;
-  Standard_Real                 myMaximalParameterValue;
-  Standard_Boolean              myHasOwnMaximalParameterValue;
-  Standard_Real                 myChordialDeviation;
-  Standard_Boolean              myHasOwnChordialDeviation;
-  Aspect_TypeOfDeflection       myTypeOfDeflection;
-  Standard_Boolean              myHasOwnTypeOfDeflection;
-  Prs3d_TypeOfHLR               myTypeOfHLR;
-  Standard_Real                 myDeviationCoefficient;
-  Standard_Real                 myPreviousDeviationCoefficient;
-  Standard_Boolean              myHasOwnDeviationCoefficient;
-  Standard_Real                 myHLRDeviationCoefficient;
-  Standard_Boolean              myHasOwnHLRDeviationCoefficient;
-  Standard_Real                 myPreviousHLRDeviationCoefficient;
-  Standard_Real                 myDeviationAngle;
-  Standard_Boolean              myHasOwnDeviationAngle;
-  Standard_Real                 myPreviousDeviationAngle;
-  Standard_Real                 myHLRAngle;
-  Standard_Boolean              myHasOwnHLRDeviationAngle;
-  Standard_Real                 myPreviousHLRDeviationAngle;
-  Standard_Boolean              myIsoOnPlane;
-  Standard_Boolean              myHasOwnIsoOnPlane;
-  Standard_Boolean              myIsoOnTriangulation;
-  Standard_Boolean              myHasOwnIsoOnTriangulation;
-  Standard_Boolean              myIsAutoTriangulated;
-  Standard_Boolean              myHasOwnIsAutoTriangulated;*/
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myPlaneAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPlaneAspect);
 
-  /*Handle(Prs3d_IsoAspect)       myUIsoAspect;
-  Standard_Boolean              myHasOwnUIsoAspect;
-  Handle(Prs3d_IsoAspect)       myVIsoAspect;
-  Standard_Boolean              myHasOwnVIsoAspect;
-  Handle(Prs3d_LineAspect)      myWireAspect;
-  Standard_Boolean              myHasOwnWireAspect;
-  Standard_Boolean              myWireDraw;
-  Standard_Boolean              myHasOwnWireDraw;
-  Handle(Prs3d_PointAspect)     myPointAspect;
-  Standard_Boolean              myHasOwnPointAspect;
-  Handle(Prs3d_LineAspect)      myLineAspect;
-  Standard_Boolean              myHasOwnLineAspect;
-  */
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySeenLineAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnSeenLineAspect);
 
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTextAspect);
-  if (!myTextAspect.IsNull())
-    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTextAspect.get());
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myArrowAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnArrowAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLineArrowDraw);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnLineArrowDraw);
 
-  //Handle(Prs3d_ShadingAspect)   myShadingAspect;
-  //Standard_Boolean              myHasOwnShadingAspect;
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHiddenLineAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnHiddenLineAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDrawHiddenLine);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDrawHiddenLine);
 
-  /*Handle(Prs3d_PlaneAspect)     myPlaneAspect;
-  Standard_Boolean              myHasOwnPlaneAspect;
-  Handle(Prs3d_LineAspect)      mySeenLineAspect;
-  Standard_Boolean              myHasOwnSeenLineAspect;
-  Handle(Prs3d_ArrowAspect)     myArrowAspect;
-  Standard_Boolean              myHasOwnArrowAspect;
-  Standard_Boolean              myLineArrowDraw;
-  Standard_Boolean              myHasOwnLineArrowDraw;
-  Handle(Prs3d_LineAspect)      myHiddenLineAspect;
-  Standard_Boolean              myHasOwnHiddenLineAspect;
-  Standard_Boolean              myDrawHiddenLine;
-  Standard_Boolean              myHasOwnDrawHiddenLine;
-  Handle(Prs3d_LineAspect)      myVectorAspect;
-  Standard_Boolean              myHasOwnVectorAspect;
-  Prs3d_VertexDrawMode          myVertexDrawMode;
-  Handle(Prs3d_DatumAspect)     myDatumAspect;
-  Standard_Boolean              myHasOwnDatumAspect;
-  Handle(Prs3d_LineAspect)      mySectionAspect;
-  Standard_Boolean              myHasOwnSectionAspect;
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myVectorAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnVectorAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVertexDrawMode);
 
-  Handle(Prs3d_LineAspect)      myFreeBoundaryAspect;
-  Standard_Boolean              myHasOwnFreeBoundaryAspect;
-  Standard_Boolean              myFreeBoundaryDraw;
-  Standard_Boolean              myHasOwnFreeBoundaryDraw;
-  Handle(Prs3d_LineAspect)      myUnFreeBoundaryAspect;
-  Standard_Boolean              myHasOwnUnFreeBoundaryAspect;
-  Standard_Boolean              myUnFreeBoundaryDraw;
-  Standard_Boolean              myHasOwnUnFreeBoundaryDraw;
-  Handle(Prs3d_LineAspect)      myFaceBoundaryAspect;
-  Standard_Integer              myFaceBoundaryUpperContinuity; //!< the most edge continuity class (GeomAbs_Shape) to be included to face boundaries presentation, or -1 if undefined
-  Standard_Boolean              myHasOwnFaceBoundaryAspect;
-  Standard_Boolean              myFaceBoundaryDraw;
-  Standard_Boolean              myHasOwnFaceBoundaryDraw;
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDatumAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDatumAspect);
 
-  Handle(Prs3d_DimensionAspect) myDimensionAspect;
-  Standard_Boolean              myHasOwnDimensionAspect;
-  Prs3d_DimensionUnits          myDimensionModelUnits;
-  Standard_Boolean              myHasOwnDimLengthModelUnits;
-  Standard_Boolean              myHasOwnDimAngleModelUnits;
-  Prs3d_DimensionUnits          myDimensionDisplayUnits;
-  Standard_Boolean              myHasOwnDimLengthDisplayUnits;
-  Standard_Boolean              myHasOwnDimAngleDisplayUnits;
-  */
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySectionAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnSectionAspect);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFreeBoundaryAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFreeBoundaryAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFreeBoundaryDraw);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFreeBoundaryDraw);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myUnFreeBoundaryAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnUnFreeBoundaryAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUnFreeBoundaryDraw);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnUnFreeBoundaryDraw);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFaceBoundaryAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceBoundaryUpperContinuity);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFaceBoundaryAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceBoundaryDraw);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFaceBoundaryDraw);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDimensionAspect.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimensionAspect);
+  //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDimensionModelUnits);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimLengthModelUnits);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimAngleModelUnits);
+  //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDimensionDisplayUnits);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimLengthDisplayUnits);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimAngleDisplayUnits);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFillCappingAspect);
-  if (!myFillCappingAspect.IsNull())
-    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFillCappingAspect.get());
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFillCappingAspect.get());
 }

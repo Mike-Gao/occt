@@ -32,7 +32,22 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 
 #include <Geom_Axis2Placement.hxx>
+#include <Prs3d_PointAspect.hxx>
 #include <TopoDS_Compound.hxx>
+
+void enableGlobalClipping (const Handle(AIS_InteractiveObject)& theObject, const bool theIsEnable)
+{
+  if (theIsEnable)
+  {
+    theObject->SetClipPlanes (Handle(Graphic3d_SequenceOfHClipPlane)());
+  }
+  else
+  {
+    Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = new Graphic3d_SequenceOfHClipPlane;
+    aPlanes->SetOverrideGlobal (Standard_True);
+    theObject->SetClipPlanes (aPlanes);
+  }
+}
 
 // =======================================================================
 // function : Constructor
@@ -55,7 +70,8 @@ void View_DisplayPreview::SetContext (const Handle(AIS_InteractiveContext)& theC
   // remove all preview presentations from the previous context, display it in the new 
 
   myContext = theContext;
-  myPreviewParameters->GetDrawer()->Link (theContext->DefaultDrawer());
+  if (!theContext.IsNull())
+    myPreviewParameters->GetDrawer()->Link (theContext->DefaultDrawer());
 }
 
 // =======================================================================
@@ -68,38 +84,62 @@ void View_DisplayPreview::UpdatePreview (const View_DisplayActionType,
   if (myContext.IsNull())
     return;
 
+  // clear previous previews
+  for (NCollection_List<Handle(AIS_InteractiveObject)>::Iterator anIterator (myPreviewReadyPresentations); anIterator.More(); anIterator.Next())
+  {
+    if (!anIterator.Value()->GetContext().IsNull())
+      anIterator.Value()->GetContext()->Remove (anIterator.Value(), Standard_True);
+  }
+  myPreviewReadyPresentations.Clear();
+
   if (thePresentations.IsEmpty())
   {
-    myContext->Remove (myPreviewPresentation, Standard_True);
+    if (!myPreviewPresentation.IsNull() && !myPreviewPresentation->GetContext().IsNull())
+      myPreviewPresentation->GetContext()->Remove (myPreviewPresentation, Standard_True);
     myPreviewPresentation = NULL;
+
     return;
   }
 
+  // display parameter previews
   BRep_Builder aBuilder;
   TopoDS_Compound aCompound;
   aBuilder.MakeCompound (aCompound);
   for (NCollection_List<Handle(Standard_Transient)>::Iterator anIterator (thePresentations); anIterator.More(); anIterator.Next())
   {
     Handle(Convert_TransientShape) aShapePtr = Handle(Convert_TransientShape)::DownCast (anIterator.Value());
-    if (aShapePtr.IsNull())
-      continue;
-
-    aBuilder.Add (aCompound, aShapePtr->GetShape());
+    if (!aShapePtr.IsNull())
+    {
+      aBuilder.Add (aCompound, aShapePtr->GetShape());
+    }
+    Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (anIterator.Value());
+    if (!aPrs.IsNull() && aPrs->GetContext().IsNull()/*is not displayed in another context*/)
+    {
+      myContext->Display (aPrs, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+      enableGlobalClipping(aPrs, false);
+      myPreviewReadyPresentations.Append (aPrs);
+    }
   }
 
   if (myPreviewPresentation.IsNull())
   {
     myPreviewPresentation = new AIS_Shape (aCompound);
+    Quantity_Color aColor(Quantity_NOC_TOMATO);
+    myPreviewPresentation->Attributes()->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_O_PLUS, aColor, 3.0));
     myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
 
     //myPreviewPresentation->SetTransformPersistence(thePersistent);
     myContext->Display (myPreviewPresentation, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+    enableGlobalClipping(myPreviewPresentation, false);
   }
   else
   {
     Handle(AIS_Shape)::DownCast (myPreviewPresentation)->Set (aCompound);
     //myPreviewPresentation->SetTransformPersistence(thePersistent);
-    myContext->Redisplay (myPreviewPresentation, Standard_True);
+    if (!myPreviewPresentation.IsNull() && !myPreviewPresentation->GetContext().IsNull())
+    {
+      myPreviewPresentation->GetContext()->Redisplay (myPreviewPresentation, Standard_True);
+    }
   }
 }
 

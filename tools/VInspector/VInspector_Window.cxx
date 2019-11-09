@@ -1237,7 +1237,8 @@ Handle(AIS_InteractiveContext) VInspector_Window::createView()
   Handle(AIS_InteractiveContext) aContext = View_Viewer::CreateStandardViewer();
 
   Handle(AIS_Trihedron) aTrihedron = new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY()));
-  aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
+  aTrihedron->SetSize (0.5);
+  //aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
   aContext->Display (aTrihedron, Standard_True);
 
   myViewWindow = new View_Window (0, aContext, false /*for opening several BREP files*/, true);

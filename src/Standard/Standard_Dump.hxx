@@ -33,7 +33,7 @@ class Standard_DumpSentry;
 //!     It creates "key": { result of dump of the field }
 //! - OCCT_DUMP_FIELD_VALUES_NUMERICAL. Use it for unlimited list of fields of C++ double type.
 //!     It creates massive of values [value_1, value_2, ...]
-//! - OCCT_DUMP_FIELD_VALUES_STRING. Use it for unlimited list of fields of TCollection_AsciiString types.
+//! - OCCT_DUMP_FIELD_VALUES_STRING. Use it for unlimited list of fields of TCollection_AsciiString types.F
 //!     It creates massive of values ["value_1", "value_2", ...]
 //! - OCCT_DUMP_BASE_CLASS. Use if Dump implementation of the class is virtual, to perform ClassName::Dump() of the parent class,
 //!     expected parameter is the parent class name.
@@ -90,14 +90,25 @@ class Standard_DumpSentry;
 //! Depth = -1 is the default value, dump here is unlimited.
 #define OCCT_DUMP_FIELD_VALUES_DUMPED(theOStream, theDepth, theField) \
 { \
-  if (theDepth != 0) \
+  if (theDepth != 0 && (theField) != NULL) \
   { \
     Standard_SStream aFieldStream; \
-    if ((theField) != NULL) \
-      (theField)->DumpJson (aFieldStream, theDepth - 1); \
+    (theField)->DumpJson (aFieldStream, theDepth - 1); \
     const char* aName = Standard_Dump::DumpFieldToName (#theField); \
     Standard_Dump::DumpKeyToClass (theOStream, aName, Standard_Dump::Text (aFieldStream)); \
   } \
+}
+
+//! @def OCCT_INIT_FIELD_VALUES_DUMPED
+//! Append into output value: "Name": { field dumped values }
+//! It computes Dump of the fields. The expected field is a pointer.
+//! Use this macro for fields of the dumped class which has own Dump implementation.
+//! The macros is recursive. Recursion is stopped when the depth value becomes equal to zero.
+//! Depth = -1 is the default value, dump here is unlimited.
+#define OCCT_INIT_FIELD_VALUES_DUMPED(theSStream, theStreamPos, theField) \
+{ \
+  if ((theField) == NULL || !(theField)->InitJson (theSStream, theStreamPos)) \
+    return Standard_False; \
 }
 
 //! @def OCCT_DUMP_FIELD_VALUES_NUMERICAL
@@ -143,21 +154,24 @@ class Standard_DumpSentry;
 //! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
 #define OCCT_DUMP_VECTOR_CLASS(theOStream, theName, theCount, ...) \
 { \
+  Standard_Dump::AddValuesSeparator (theOStream); \
   theOStream << "\"" << OCCT_CLASS_NAME(theName) << "\": ["; \
   Standard_Dump::DumpRealValues (theOStream, theCount, __VA_ARGS__);\
   theOStream << "]"; \
 }
 
-//! @def OCCT_DUMP_VECTOR_CLASS
+//! @def OCCT_INIT_VECTOR_CLASS
 //! Append vector values into output value: "Name": [value_1, value_2, ...]
 //! This macro is intended to have only one row for dumped object in Json.
 //! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
 #define OCCT_INIT_VECTOR_CLASS(theOStream, theName, theStreamPos, theCount, ...) \
 { \
-  if (!Standard_Dump::ProcessStreamName (theOStream, OCCT_CLASS_NAME(theName), theStreamPos)) \
+  Standard_Integer aStreamPos = theStreamPos; \
+  if (!Standard_Dump::ProcessStreamName (theOStream, OCCT_CLASS_NAME(theName), aStreamPos)) \
     return Standard_False; \
-  if (!Standard_Dump::InitRealValues (theOStream, theStreamPos, theCount, __VA_ARGS__)) \
+  if (!Standard_Dump::InitRealValues (theOStream, aStreamPos, theCount, __VA_ARGS__)) \
     return Standard_False; \
+  theStreamPos = aStreamPos; \
 }
 
 //! @brief Simple sentry class providing convenient interface to dump.

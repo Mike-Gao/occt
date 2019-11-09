@@ -14,6 +14,7 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/TreeModel_ItemProperties.hxx>
+#include <inspector/Convert_Tools.hxx>
 #include <inspector/Convert_TransientShape.hxx>
 
 #include <BRepBuilderAPI_MakeVertex.hxx>
@@ -88,6 +89,10 @@ void TreeModel_ItemProperties::GetPresentations (const int theRow, const int the
 
   if (theRow < 0) // full presentation
   {
+    Standard_SStream aStream;
+    Item()->GetStream (aStream);
+
+    Convert_Tools::ConvertStreamToPresentations (aStream, 1, -1, thePresentations);
     return;
   }
 

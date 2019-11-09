@@ -40,6 +40,7 @@
 
 class View_Window;
 
+class View_DisplayPreview;
 class ViewControl_PropertyView;
 class MessageModel_ReportCallBack;
 
@@ -172,6 +173,8 @@ private:
   QDockWidget* myPropertyPanelWidget; //!< property pane dockable widget
   ViewControl_PropertyView* myPropertyView; //!< property control to display model item values if exist
 
+  View_DisplayPreview* myDisplayPreview; //!< class for preview display
+
   View_Window* myViewWindow; //!< OCC 3d view to visualize presentations
   QTreeView* myTreeView; //!< tree view visualized shapes
   MessageModel_Actions* myTreeViewActions; //!< processing history view actions
@@ -180,7 +183,6 @@ private:
   Handle(Message_ReportCallBack) myCallBack; //! < message call back to update content of the view
 
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
-  NCollection_List<Handle(Standard_Transient)> myPreviewPresentations;
 };
 
 #endif

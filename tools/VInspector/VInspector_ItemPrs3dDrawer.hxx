@@ -63,6 +63,10 @@ public:
                                                             TCollection_AsciiString& theName,
                                                             Standard_Boolean& theOwnAspect) const;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
+
 protected:
 
   //! Initialize the current item. It is empty because Reset() is also empty.

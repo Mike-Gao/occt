@@ -14,7 +14,11 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/Convert_Tools.hxx>
+#include <inspector/Convert_TransientShape.hxx>
 
+#include <AIS_Plane.hxx>
+#include <Geom_Plane.hxx>
+#include <Prs3d_PlaneAspect.hxx>
 #include <TColgp_Array1OfPnt.hxx>
 #include <Standard_Dump.hxx>
 #include <BRep_Builder.hxx>
@@ -22,6 +26,62 @@
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
+
+//=======================================================================
+//function : CreateShape
+//purpose  :
+//=======================================================================
+void Convert_Tools::ConvertStreamToPresentations (const Standard_SStream& theSStream,
+                                                  const Standard_Integer theStartPos,
+                                                  const Standard_Integer /*theLastPos*/,
+                                                  NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  int aStartPos = theStartPos;
+  gp_XYZ aPoint;
+  if (aPoint.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPoint)));
+    return;
+  }
+
+  gp_Pnt aPnt;
+  if (aPnt.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPnt)));
+    return;
+  }
+
+  gp_Dir aDir;
+  if (aDir.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeEdge (gp::Origin(), aDir.XYZ())));
+    return;
+  }
+
+  gp_Ax3 aPln;
+  if (aPln.InitJson (theSStream, aStartPos))
+  {
+    Handle(Geom_Plane) aGeomPlane = new Geom_Plane (aPln);
+    Handle(AIS_Plane) aPlanePrs = new AIS_Plane (aGeomPlane);
+
+    // TODO - default fields to be defined in another place
+    aPlanePrs->Attributes()->SetPlaneAspect (new Prs3d_PlaneAspect());
+    Handle (Prs3d_PlaneAspect) aPlaneAspect = aPlanePrs->Attributes()->PlaneAspect();
+    aPlaneAspect->SetPlaneLength (100, 100);
+    aPlaneAspect->SetDisplayCenterArrow (Standard_True);
+    aPlaneAspect->SetDisplayEdgesArrows (Standard_True);
+    aPlaneAspect->SetArrowsSize (100);
+    aPlaneAspect->SetArrowsLength (100);
+    aPlaneAspect->SetDisplayCenterArrow (Standard_True);
+    aPlaneAspect->SetDisplayEdges (Standard_True);
+
+    aPlanePrs->SetColor (Quantity_NOC_WHITE);
+    aPlanePrs->SetTransparency (0);
+
+    thePresentations.Append (aPlanePrs);
+    return;
+  }
+}
 
 //=======================================================================
 //function : CreateShape

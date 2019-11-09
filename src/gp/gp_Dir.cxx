@@ -142,5 +142,11 @@ gp_Dir gp_Dir::Mirrored (const gp_Ax2& A2) const
 
 void gp_Dir::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &coord);
+  OCCT_DUMP_VECTOR_CLASS (theOStream, gp_Dir, 3, coord.X(), coord.Y(), coord.Z())
+}
+
+Standard_Boolean gp_Dir::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  OCCT_INIT_VECTOR_CLASS (theSStream, gp_Dir, theStreamPos, 3, &coord.ChangeCoord (1), &coord.ChangeCoord (2), &coord.ChangeCoord (3))
+  return Standard_True;
 }

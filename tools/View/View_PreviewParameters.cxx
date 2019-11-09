@@ -43,9 +43,9 @@ View_PreviewParameters::View_PreviewParameters()
   myDrawer->ShadingAspect()->SetColor (aColor);
   myDrawer->ShadingAspect()->SetMaterial (aShadingMaterial);
 
-  myDrawer->ShadingAspect()->Aspect()->ChangeFrontMaterial().SetTransparency (aTransparency);
-  myDrawer->ShadingAspect()->Aspect()->ChangeBackMaterial() .SetTransparency (aTransparency);
-  myDrawer->SetTransparency (aTransparency);
+  //myDrawer->ShadingAspect()->Aspect()->ChangeFrontMaterial().SetTransparency (aTransparency);
+  //myDrawer->ShadingAspect()->Aspect()->ChangeBackMaterial() .SetTransparency (aTransparency);
+  //myDrawer->SetTransparency (aTransparency);
 
   // common parameters
   myDrawer->SetZLayer (Graphic3d_ZLayerId_Topmost);

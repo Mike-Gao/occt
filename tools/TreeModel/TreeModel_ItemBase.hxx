@@ -36,6 +36,7 @@
 #include <Standard_WarningsRestore.hxx>
 
 class TreeModel_ItemBase;
+class TreeModel_ItemProperties;
 
 typedef QExplicitlySharedDataPointer<TreeModel_ItemBase> TreeModel_ItemBasePtr;
 
@@ -145,6 +146,9 @@ public:
   //! Dumps the content of me into the stream
   virtual Standard_Boolean Dump (Standard_OStream& theOStream) const { (void)theOStream; return Standard_False; }
 
+  //! Returns the item properties
+  Handle(TreeModel_ItemProperties) Properties() const { return myProperties; }
+
 protected:
 
   //! \param theParent the parent item
@@ -178,6 +182,9 @@ protected:
   //! \param theItemRole a value role
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const;
+
+protected:
+  Handle(TreeModel_ItemProperties) myProperties; //!< the properties
 
 private:
 

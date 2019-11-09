@@ -60,6 +60,10 @@ public:
   //! \returns type of active item of context selector
   Standard_EXPORT View_ContextType GetCurrentContextType() const;
 
+  //! Sets current context type
+  //! \param theType a context type
+  Standard_EXPORT void SetCurrentContextType (View_ContextType theType);
+
   //! \returns an active context of context selector
   Standard_EXPORT Handle(AIS_InteractiveContext) GetCurrentContext() const;
 

@@ -347,6 +347,20 @@ void MessageModel_Actions::OnTestPropertyPanel()
     aCoords.DumpJson (aStream);
     MESSAGE_INFO_STREAM(aStream, "gp_XYZ", "", &aPerfMeter, NULL);
   }
+  // gp_Dir
+  {
+    gp_Dir aDir (0.3, 0.3, 0.4);
+    Standard_SStream aStream;
+    aDir.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Dir", "", &aPerfMeter, NULL);
+  }
+  // gp_Ax3
+  {
+    gp_Ax3 aPln (gp_Pnt (10., 20., 15.), gp_Dir (0., 0., 1.), gp_Dir (1., 0., 0.));
+    Standard_SStream aStream;
+    aPln.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Ax3", "", &aPerfMeter, NULL);
+  }
   // Bnd_Box
   {
     Bnd_Box aBox (gp_Pnt (20., 15., 10.), gp_Pnt (25., 20., 15.));
