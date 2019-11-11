@@ -17,6 +17,7 @@
 #ifndef _SelectMgr_SelectionManager_HeaderFile
 #define _SelectMgr_SelectionManager_HeaderFile
 
+#include <SelectMgr_MapOfSensitivityFactor.hxx>
 #include <SelectMgr_ViewerSelector.hxx>
 #include <SelectMgr_TypeOfUpdate.hxx>
 
@@ -99,6 +100,18 @@ public:
                                                 const Standard_Integer theMode,
                                                 const Standard_Integer theNewSens);
 
+  //!< Sets default sensitive factor, used for types where other is not defined
+  Standard_Integer DefaultSensitivityFactor() const { return myDefaultSensitivityFactor; }
+
+  //!< Returns default sensitive factor
+  void SetDefaultSensitivityFactor (const Standard_Integer theValue) { myDefaultSensitivityFactor = theValue; }
+
+  //!< Sets sensitive factor values for some type
+  Standard_EXPORT void SetDefaultSensitivityFactor (const TCollection_AsciiString& theType, const Standard_Integer theValue);
+
+  //!< Returns container of default sensitive factor values
+  const SelectMgr_MapOfSensitivityFactor& DefaultSensitivityFactors() const { return mySensitivityFactors; }
+
   //! Re-adds selectable object in BVHs in all viewer selectors.
   Standard_EXPORT void UpdateSelection (const Handle(SelectMgr_SelectableObject)& theObj);
 
@@ -121,6 +134,8 @@ private:
 
   Handle(SelectMgr_ViewerSelector)                    mySelector;
   NCollection_Map<Handle(SelectMgr_SelectableObject)> myGlobal;
+  SelectMgr_MapOfSensitivityFactor mySensitivityFactors; //!< container of sensitive factor values
+  Standard_Integer myDefaultSensitivityFactor;
 
 };
 

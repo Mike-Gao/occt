@@ -81,6 +81,10 @@ void SelectMgr_Selection::Add (const Handle(Select3D_SensitiveEntity)& theSensit
   }
   else
   {
+    Standard_Integer aSensitivityFactor;
+    if (mySensitivityFactors.Find (anEntity->DynamicType()->Name(), aSensitivityFactor))
+      anEntity->BaseSensitive()->SetSensitivityFactor (aSensitivityFactor);
+
     mySensFactor = Max (mySensFactor, anEntity->BaseSensitive()->SensitivityFactor());
   }
 }	
@@ -114,6 +118,27 @@ void SelectMgr_Selection::SetSensitivity (const Standard_Integer theNewSens)
   {
     Handle(SelectMgr_SensitiveEntity)& anEntity = anEntityIter.ChangeValue();
     anEntity->BaseSensitive()->SetSensitivityFactor (theNewSens);
+  }
+}
+
+// =======================================================================
+// function : SensitivityFactor
+// purpose  :
+// =======================================================================
+Standard_Boolean SelectMgr_Selection::SensitivityFactor (const TCollection_AsciiString& theType, Standard_Integer& theValue)
+{
+  return mySensitivityFactors.Find (theType, theValue);
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void SelectMgr_Selection::SetSensitivityFactor (const TCollection_AsciiString& theType, const Standard_Integer theValue)
+{
+  if (!mySensitivityFactors.IsBound (theType))
+  {
+    mySensitivityFactors.Bind (theType, theValue);
   }
 }
 

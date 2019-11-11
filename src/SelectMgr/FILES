@@ -17,6 +17,7 @@ SelectMgr_IndexedDataMapOfOwnerCriterion.hxx
 SelectMgr_IndexedMapOfOwner.hxx
 SelectMgr_ListIteratorOfListOfFilter.hxx
 SelectMgr_ListOfFilter.hxx
+SelectMgr_MapOfSensitivityFactor.hxx
 SelectMgr_OrFilter.cxx
 SelectMgr_OrFilter.hxx
 SelectMgr_PickingStrategy.hxx

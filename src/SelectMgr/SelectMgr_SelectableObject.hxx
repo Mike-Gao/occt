@@ -211,6 +211,7 @@ protected:
 protected:
 
   SelectMgr_SequenceOfSelection myselections;    //!< list of selections
+  NCollection_Map<Standard_Integer, Standard_Integer> mySensitivityFactors; //!< container of sensitive factor values
   Handle(Prs3d_Presentation)    mySelectionPrs;  //!< optional presentation for highlighting selected object
   Handle(Prs3d_Presentation)    myHilightPrs;    //!< optional presentation for highlighting detected object
   Standard_Integer              myGlobalSelMode; //!< global selection mode

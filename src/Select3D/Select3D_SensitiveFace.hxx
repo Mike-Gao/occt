@@ -73,6 +73,9 @@ public:
   //! Returns the amount of sub-entities (points or planar convex polygons)
   Standard_EXPORT virtual Standard_Integer NbSubElements() Standard_OVERRIDE;
 
+  //! Returns default sensitivity factor of the type
+  static Standard_Integer Sensitivity() { return 2; }
+
   //! Dumps the content of me into the stream
   Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 

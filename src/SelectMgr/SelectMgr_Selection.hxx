@@ -18,6 +18,7 @@
 #define _SelectMgr_Selection_HeaderFile
 
 #include <NCollection_Vector.hxx>
+#include <SelectMgr_MapOfSensitivityFactor.hxx>
 #include <SelectMgr_SensitiveEntity.hxx>
 #include <SelectMgr_StateOfSelection.hxx>
 #include <SelectMgr_TypeOfBVHUpdate.hxx>
@@ -139,12 +140,26 @@ public:
   //! proper updates use SelectMgr_SelectionManager::SetSelectionSensitivity method.
   Standard_EXPORT void SetSensitivity (const Standard_Integer theNewSens);
 
+  //!< Returns container of default sensitive factor values
+  const SelectMgr_MapOfSensitivityFactor& SensitivityFactors() const { return mySensitivityFactors; }
+
+  //!< Sets sensitive factor value for some type
+  Standard_EXPORT Standard_Boolean SensitivityFactor (const TCollection_AsciiString& theType, Standard_Integer& theValue);
+
+  //!< Sets sensitive factor value for some type
+  Standard_EXPORT void SetSensitivityFactor (const TCollection_AsciiString& theType, const Standard_Integer theValue);
+
+  //!< Returns container of default sensitive factor values
+  void SetSensitivityFactors (const SelectMgr_MapOfSensitivityFactor& theValues) { mySensitivityFactors = theValues; }
+
   //! Dumps the content of me into the stream
   Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
 
 private:
 
   NCollection_Vector<Handle(SelectMgr_SensitiveEntity)> myEntities;
+
+  SelectMgr_MapOfSensitivityFactor                      mySensitivityFactors;
   Standard_Integer                                      myEntityIter;
   Standard_Integer                                      myMode;
   SelectMgr_TypeOfUpdate                                myUpdateStatus;

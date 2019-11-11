@@ -108,7 +108,7 @@ Select3D_SensitiveCircle::Select3D_SensitiveCircle(const Handle(SelectMgr_Entity
 
   if (mySensType == Select3D_TOS_BOUNDARY)
   {
-    SetSensitivityFactor (6);
+    SetSensitivityFactor (Sensitivity());
   }
 }
 
@@ -166,7 +166,7 @@ Select3D_SensitiveCircle::Select3D_SensitiveCircle (const Handle(SelectMgr_Entit
 
   if (mySensType == Select3D_TOS_BOUNDARY)
   {
-    SetSensitivityFactor (6);
+    SetSensitivityFactor (Sensitivity());
   }
 }
 
@@ -190,7 +190,7 @@ Select3D_SensitiveCircle::Select3D_SensitiveCircle(const Handle(SelectMgr_Entity
 
   if (mySensType == Select3D_TOS_BOUNDARY)
   {
-    SetSensitivityFactor (6);
+    SetSensitivityFactor (Sensitivity());
   }
 }
 
@@ -215,7 +215,7 @@ Select3D_SensitiveCircle::Select3D_SensitiveCircle(const Handle(SelectMgr_Entity
 
   if (mySensType == Select3D_TOS_BOUNDARY)
   {
-    SetSensitivityFactor (6);
+    SetSensitivityFactor (Sensitivity());
   }
 }
 

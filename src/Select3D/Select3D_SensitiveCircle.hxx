@@ -89,6 +89,9 @@ public:
   //! Builds BVH tree for a circle's edge segments if needed
   Standard_EXPORT virtual void BVH() Standard_OVERRIDE;
 
+  //! Returns default sensitivity factor of the type
+  static Standard_Integer Sensitivity() { return 6; }
+
 protected:
 
   //! Calculates distance from the 3d projection of used-picked screen point

@@ -26,7 +26,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Select3D_SensitiveEntity, Standard_Transient)
 //=======================================================================
 Select3D_SensitiveEntity::Select3D_SensitiveEntity (const Handle(SelectMgr_EntityOwner)& theOwnerId)
 : myOwnerId (theOwnerId),
-  mySFactor (2)
+  mySFactor (Sensitivity())
 {
   //
 }

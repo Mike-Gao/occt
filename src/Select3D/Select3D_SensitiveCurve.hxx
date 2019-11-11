@@ -53,6 +53,9 @@ public:
   //! Returns the copy of this
   Standard_EXPORT virtual Handle(Select3D_SensitiveEntity) GetConnected() Standard_OVERRIDE;
 
+  //! Returns default sensitivity factor of the type
+  static Standard_Integer Sensitivity() { return 3; }
+
 private:
 
   void loadPoints (const Handle(Geom_Curve)& aCurve,

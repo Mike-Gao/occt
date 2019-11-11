@@ -27,7 +27,7 @@ IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_SelectionManager,Standard_Transient)
 // Purpose :
 //==================================================
 SelectMgr_SelectionManager::SelectMgr_SelectionManager (const Handle(SelectMgr_ViewerSelector)& theSelector)
-: mySelector (theSelector)
+: mySelector (theSelector), myDefaultSensitivityFactor (2)
 {
   //
 }
@@ -556,6 +556,15 @@ void SelectMgr_SelectionManager::SetSelectionSensitivity (const Handle(SelectMgr
     mySelector->myTolerances.Add (theNewSens);
     mySelector->myToUpdateTolerance = Standard_True;
   }
+}
+
+//=======================================================================
+//function : SetDefaultSelectionSensitivity
+//purpose  :
+//=======================================================================
+void SelectMgr_SelectionManager::SetDefaultSensitivityFactor (const TCollection_AsciiString& theType, const Standard_Integer theValue)
+{
+  mySensitivityFactors.Bind (theType, theValue);
 }
 
 //=======================================================================
