@@ -125,6 +125,9 @@ public:
   //! Is the structure ray-tracable (contains ray-tracable elements)?
   Standard_Boolean IsRaytracable() const;
 
+  //! Returns true if the structure is clipped with set planes
+  Standard_EXPORT virtual Standard_Boolean IsClipped (const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlane) const;
+
   //! Update render transformation matrix.
   Standard_EXPORT virtual void updateLayerTransformation() Standard_OVERRIDE;
 

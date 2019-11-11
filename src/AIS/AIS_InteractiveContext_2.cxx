@@ -454,3 +454,17 @@ Standard_Boolean AIS_InteractiveContext::EndImmediateDraw()
   myMainPM->EndImmediateDraw (myMainVwr);
   return Standard_True;
 }
+
+//=======================================================================
+//function : InvalidateBoundingBox
+//purpose  :
+//=======================================================================
+
+void AIS_InteractiveContext::InvalidateBoundingBox()
+{
+  const Handle(V3d_Viewer)& aCurViewer = CurrentViewer();
+  for (V3d_ListOfViewIterator anActiveViewIter (aCurViewer->ActiveViewIterator()); anActiveViewIter.More(); anActiveViewIter.Next())
+  {
+    anActiveViewIter.Value()->View()->InvalidateAllLayerBoundingBox();
+  }
+}

@@ -369,6 +369,18 @@ void Graphic3d_CView::InvalidateZLayerBoundingBox (const Graphic3d_ZLayerId theL
     }
   }
 }
+// =======================================================================
+// function : InvalidateAllLayerBoundingBox
+// purpose  :
+// =======================================================================
+void Graphic3d_CView::InvalidateAllLayerBoundingBox()
+{
+  for (NCollection_List<Handle(Graphic3d_Layer)>::Iterator aLayerIter (Layers()); aLayerIter.More(); aLayerIter.Next())
+  {
+    const Handle(Graphic3d_Layer)& aLayer = aLayerIter.Value();
+    aLayer->InvalidateBoundingBox();
+  }
+}
 
 // =======================================================================
 // function : ContainsFacet
@@ -436,7 +448,8 @@ Bnd_Box Graphic3d_CView::MinMaxValues (const Standard_Boolean theToIncludeAuxili
     Bnd_Box aBox = aLayer->BoundingBox (Identification(),
                                         aCamera,
                                         aWinSize.x(), aWinSize.y(),
-                                        theToIncludeAuxiliary);
+                                        theToIncludeAuxiliary,
+                                        ClipPlanes());
     aResult.Add (aBox);
   }
   return aResult;
