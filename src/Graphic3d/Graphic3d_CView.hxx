@@ -298,6 +298,9 @@ public:
   //! Returns the bounding box of all structures displayed in the Z layer.
   Standard_EXPORT virtual void InvalidateZLayerBoundingBox (const Graphic3d_ZLayerId theLayerId);
 
+  //! Returns the bounding box of all structures displayed in the Z layer.
+  Standard_EXPORT virtual void InvalidateAllLayerBoundingBox();
+
   //! Remove Z layer from the specified view. All structures
   //! displayed at the moment in layer will be displayed in default layer
   //! ( the bottom-level z layer ). To unset layer ID from associated

@@ -235,6 +235,94 @@ Standard_Boolean OpenGl_Structure::IsRaytracable() const
 }
 
 // =======================================================================
+// function : IsClipped
+// purpose  :
+// =======================================================================
+Standard_Boolean OpenGl_Structure::IsClipped (const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlane) const
+{
+  // True if structure is fully clipped
+  bool isClipped = false;
+  bool hasDisabled = false;
+
+  //const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
+  //if (aCtx->Clipping().IsClippingOrCappingOn())
+  {
+    const Graphic3d_BndBox3d& aBBox = BoundingBox();
+    if (!theClipPlane.IsNull()
+      && theClipPlane->ToOverrideGlobal())
+    {
+      //aCtx->ChangeClipping().DisableGlobal();
+      //hasDisabled = aCtx->Clipping().HasDisabled();
+    }
+    else if (!myTrsfPers.IsNull())
+    {
+      if (myTrsfPers->IsZoomOrRotate())
+      {
+        // Zoom/rotate persistence object lives in two worlds at the same time.
+        // Global clipping planes can not be trivially applied without being converted
+        // into local space of transformation persistence object.
+        // As more simple alternative - just clip entire object by its anchor point defined in the world space.
+        const gp_Pnt anAnchor = myTrsfPers->AnchorPoint();
+        for (Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt (theClipPlane); aPlaneIt.More(); aPlaneIt.Next()/*, ++aPlaneId*/)
+        {
+          const Handle(Graphic3d_ClipPlane)& aPlane = aPlaneIt.Value();
+        //for (OpenGl_ClippingIterator aPlaneIt (aCtx->Clipping()); aPlaneIt.More() && aPlaneIt.IsGlobal(); aPlaneIt.Next())
+        ///for (OpenGl_ClippingIterator aPlaneIt (myClipPlanes); aPlaneIt.More() && aPlaneIt.IsGlobal(); aPlaneIt.Next())
+        //{
+        //  const Handle(Graphic3d_ClipPlane)& aPlane = aPlaneIt.Value();
+          if (!aPlane->IsOn())
+          {
+            continue;
+          }
+
+          // check for clipping
+          const Graphic3d_Vec4d aCheckPnt (anAnchor.X(), anAnchor.Y(), anAnchor.Z(), 1.0);
+          if (aPlane->ProbePoint (aCheckPnt) == Graphic3d_ClipState_Out)
+          {
+            isClipped = true;
+            break;
+          }
+        }
+      }
+
+      //aCtx->ChangeClipping().DisableGlobal();
+      //hasDisabled = aCtx->Clipping().HasDisabled();
+    }
+
+    // Set of clipping planes that do not intersect the structure,
+    // and thus can be disabled to improve rendering performance
+    if (aBBox.IsValid()
+     && myTrsfPers.IsNull())
+    {
+      //for (OpenGl_ClippingIterator aPlaneIt (aCtx->Clipping()); aPlaneIt.More(); aPlaneIt.Next())
+      //{
+      //  const Handle(Graphic3d_ClipPlane)& aPlane = aPlaneIt.Value();
+      for (Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt (theClipPlane); aPlaneIt.More(); aPlaneIt.Next()/*, ++aPlaneId*/)
+      {
+        const Handle(Graphic3d_ClipPlane)& aPlane = aPlaneIt.Value();
+        if (!aPlane->IsOn())//aPlaneIt.IsDisabled())
+        {
+          continue;
+        }
+
+        const Graphic3d_ClipState aBoxState = aPlane->ProbeBox (aBBox);
+        if (aBoxState == Graphic3d_ClipState_In)
+        {
+          //aCtx->ChangeClipping().SetEnabled (aPlaneIt, false);
+          //hasDisabled = true;
+        }
+        else if (aBoxState == Graphic3d_ClipState_Out && myBndBoxClipCheck)
+        {
+          isClipped = true;
+          break;
+        }
+      }
+    }
+  }
+  return isClipped; 
+}
+
+// =======================================================================
 // function : UpdateRaytracableState
 // purpose  :
 // =======================================================================
