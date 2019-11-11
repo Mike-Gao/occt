@@ -808,6 +808,17 @@ void OpenGl_View::changePriority (const Handle(Graphic3d_CStructure)& theStructu
 }
 
 //=======================================================================
+//function : SetClipPlanes
+//purpose  :
+//=======================================================================
+void OpenGl_View::SetClipPlanes (const Handle(Graphic3d_SequenceOfHClipPlane)& thePlanes)
+{
+  myClipPlanes = thePlanes;
+
+  InvalidateAllLayerBoundingBox();
+}
+
+//=======================================================================
 //function : DiagnosticInformation
 //purpose  :
 //=======================================================================

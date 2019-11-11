@@ -133,6 +133,9 @@ public:
   //! highlight flag is set to true
   const Handle(Graphic3d_PresentationAttributes)& HighlightStyle() const { return myHighlightStyle; }
 
+  //! Returns true if the structure is clipped with set planes
+  virtual Standard_Boolean IsClipped (const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlane) const  = 0;
+
 public:
 
   //! Returns FALSE if the structure hits the current view volume, otherwise returns TRUE.

@@ -701,6 +701,9 @@ public: //! @name immediate mode rendering
   //! Redraws immediate structures in all views of the viewer given taking into account its visibility.
   void RedrawImmediate (const Handle(V3d_Viewer)& theViewer) { myMainPM->RedrawImmediate (theViewer); }
 
+  //! Change state to reset V3d_View bounding boxes. It should be used after a clipping plane was changed
+  Standard_EXPORT void InvalidateBoundingBox();
+
 public: //! @name management of active Selection Modes
 
   //! Activates or deactivates the selection mode for specified object.

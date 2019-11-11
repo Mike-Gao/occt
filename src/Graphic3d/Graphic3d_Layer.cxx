@@ -179,7 +179,8 @@ Bnd_Box Graphic3d_Layer::BoundingBox (Standard_Integer theViewId,
                                       const Handle(Graphic3d_Camera)& theCamera,
                                       Standard_Integer theWindowWidth,
                                       Standard_Integer theWindowHeight,
-                                      Standard_Boolean theToIncludeAuxiliary) const
+                                      Standard_Boolean theToIncludeAuxiliary,
+                                      const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlanes) const
 {
   updateBVH();
 
@@ -198,6 +199,11 @@ Bnd_Box Graphic3d_Layer::BoundingBox (Standard_Integer theViewId,
       {
         const Graphic3d_CStructure* aStructure = aStructIter.Value();
         if (!aStructure->IsVisible (theViewId))
+        {
+          continue;
+        }
+
+        if (aStructure->IsClipped (theClipPlanes) || aStructure->IsClipped (aStructure->ClipPlanes()))
         {
           continue;
         }

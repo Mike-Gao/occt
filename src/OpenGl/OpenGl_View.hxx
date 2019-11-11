@@ -259,7 +259,7 @@ public:
   virtual const Handle(Graphic3d_SequenceOfHClipPlane)& ClipPlanes() const Standard_OVERRIDE { return myClipPlanes; }
 
   //! Sets list of clip planes for the view.
-  virtual void SetClipPlanes (const Handle(Graphic3d_SequenceOfHClipPlane)& thePlanes) Standard_OVERRIDE { myClipPlanes = thePlanes; }
+  Standard_EXPORT virtual void SetClipPlanes (const Handle(Graphic3d_SequenceOfHClipPlane)& thePlanes) Standard_OVERRIDE;
 
   //! Fill in the dictionary with diagnostic info.
   //! Should be called within rendering thread.

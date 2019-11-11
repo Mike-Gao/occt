@@ -24,6 +24,8 @@
 #include <NCollection_IndexedMap.hxx>
 #include <NCollection_Sequence.hxx>
 
+class Graphic3d_SequenceOfHClipPlane;
+
 //! Defines index map of structures.
 typedef NCollection_IndexedMap<const Graphic3d_CStructure*> Graphic3d_IndexedMapOfStructure;
 
@@ -110,7 +112,8 @@ public:
                                        const Handle(Graphic3d_Camera)& theCamera,
                                        Standard_Integer theWindowWidth,
                                        Standard_Integer theWindowHeight,
-                                       Standard_Boolean theToIncludeAuxiliary) const;
+                                       Standard_Boolean theToIncludeAuxiliary,
+                                       const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlanes = Handle(Graphic3d_SequenceOfHClipPlane)()) const;
 
   //! Returns zoom-scale factor.
   Standard_EXPORT Standard_Real considerZoomPersistenceObjects (Standard_Integer theViewId,
