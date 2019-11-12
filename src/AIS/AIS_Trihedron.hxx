@@ -184,6 +184,15 @@ public:
     return myLabel.Find (thePart);
   }
 
+  //! Returns highlight aspect , create if it is the first call
+  Standard_EXPORT Handle(Prs3d_ShadingAspect) getHighlightAspect();
+
+  //! Returns highlight line aspect , create if it is the first call
+  Standard_EXPORT Handle(Prs3d_LineAspect) getHighlightLineAspect();
+
+  //! Returns highlight point aspect , create if it is the first call
+  Standard_EXPORT Handle(Prs3d_PointAspect) getHighlightPointAspect();
+
 public:
 
   //! Disables auto highlighting to use HilightSelected() and HilightOwnerWithColor() overridden methods.
@@ -249,13 +258,6 @@ protected:
                                          const gp_Dir& theXDir,
                                          const gp_Dir& theYDir,
                                          const gp_Dir& theZDir);
-
-  //! Returns highlight line aspect , create if it is the first call
-  Handle(Prs3d_ShadingAspect) getHighlightAspect();
-  //! Returns highlight line aspect , create if it is the first call
-  Handle(Prs3d_LineAspect) getHighlightLineAspect();
-  //! Returns highlight line aspect , create if it is the first call
-  Handle(Prs3d_PointAspect) getHighlightPointAspect();
 
 protected:
   Standard_Boolean myHasOwnSize;
