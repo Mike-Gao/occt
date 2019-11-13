@@ -126,7 +126,7 @@ public:
   Standard_Boolean IsRaytracable() const;
 
   //! Returns true if the structure is clipped with set planes
-  Standard_EXPORT virtual Standard_Boolean IsClipped (const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlane) const;
+  Standard_EXPORT virtual Standard_Boolean IsClipped (const Handle(Graphic3d_SequenceOfHClipPlane)& theClipPlane) const Standard_OVERRIDE;
 
   //! Update render transformation matrix.
   Standard_EXPORT virtual void updateLayerTransformation() Standard_OVERRIDE;

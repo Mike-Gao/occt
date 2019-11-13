@@ -242,7 +242,7 @@ Standard_Boolean OpenGl_Structure::IsClipped (const Handle(Graphic3d_SequenceOfH
 {
   // True if structure is fully clipped
   bool isClipped = false;
-  bool hasDisabled = false;
+  //bool hasDisabled = false;
 
   //const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
   //if (aCtx->Clipping().IsClippingOrCappingOn())
