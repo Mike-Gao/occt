@@ -3438,7 +3438,10 @@ static Standard_Integer DDataStd_GetNDInteger (Draw_Interpretor& di,
       std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
       return 1;
     } else {
-      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetInteger(arg[3])<<std::endl;
+      TCollection_AsciiString aString =
+        (((TCollection_AsciiString("Key = ") + arg[3]) +
+        " Value = ") + anAtt->GetInteger(arg[3])) + "\n";
+      di << aString;
       if(nb == 5) 
         Draw::Set(arg[4], anAtt->GetInteger(arg[3]));
       return 0; 
@@ -3546,7 +3549,10 @@ static Standard_Integer DDataStd_GetNDReal (Draw_Interpretor& di,
       std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
       return 1;
     } else {
-      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetReal(arg[3])<<std::endl;
+      TCollection_AsciiString aString =
+        (((TCollection_AsciiString("Key = ") + arg[3]) +
+        " Value = ") + anAtt->GetReal(arg[3])) + "\n";
+      di << aString;
       if(nb == 5) 
         Draw::Set(arg[4], anAtt->GetReal(arg[3]));
       return 0; 
@@ -3656,7 +3662,10 @@ static Standard_Integer DDataStd_GetNDString (Draw_Interpretor& di,
       return 1;
     } else {
       TCollection_AsciiString aValue (anAtt->GetString(arg[3]), '?');
-      std::cout << "Key = "  << arg[3]  << " Value = " << aValue.ToCString() << std::endl;
+      TCollection_AsciiString aString =
+        (((TCollection_AsciiString("Key = ") + arg[3]) +
+        " Value = ") + aValue.ToCString()) + "\n";
+      di << aString;
       if(nb == 5) 
         Draw::Set(arg[4], aValue.ToCString());
       return 0; 
