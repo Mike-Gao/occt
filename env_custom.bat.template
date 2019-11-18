@@ -1,0 +1,20 @@
+set aNbJobs=%NUMBER_OF_PROCESSORS%
+set "aFreeType=%~dp0..\3rdparty\freetype-2.7.1-wasm"
+set "aRapidJson=%~dp0..\3rdparty\rapidjson-1.1.0"
+set "EMSDK_ROOT=%~dp0..\occ-web3d\fips\fips-sdks\emsdk"
+set "PATH=C:\Program Files\CMake\bin;%PATH%"
+set "aBuildRoot=work"
+
+set "toCMake=1"
+set "toClean=0"
+set "toMake=1"
+set "toInstall=1"
+set "toPack=0"
+
+set BUILD_AppFramework=OFF
+set BUILD_DataExchange=OFF
+set BUILD_Draw=OFF
+set BUILD_FndClasses=ON
+set BUILD_ModAlg=OFF
+set BUILD_ModData=OFF
+set BUILD_Viz=OFF

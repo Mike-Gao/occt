@@ -59,3 +59,4 @@ Release
 /stamp*
 /build*
 /install
+env_custom.bat
