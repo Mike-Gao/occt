@@ -224,7 +224,7 @@ void OpenGl_Workspace::ResetAppliedAspect()
   ApplyAspectMarker();
   ApplyAspectText();
 
-  myGlContext->SetTypeOfLine (myDefaultAspectLine.Aspect()->Type());
+  myGlContext->SetLineStipple(myDefaultAspectLine.Aspect()->LinePattern());
   myGlContext->SetLineWidth  (myDefaultAspectLine.Aspect()->Width());
 }
 
