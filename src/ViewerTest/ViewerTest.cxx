@@ -1122,6 +1122,10 @@ static Standard_Integer VDump (Draw_Interpretor& theDI,
       {
         aParams.BufferType = Graphic3d_BT_RGB;
       }
+      else if (aBufArg == "red")
+      {
+        aParams.BufferType = Graphic3d_BT_Red;
+      }
       else if (aBufArg == "depth")
       {
         aParams.BufferType = Graphic3d_BT_Depth;
@@ -1187,6 +1191,11 @@ static Standard_Integer VDump (Draw_Interpretor& theDI,
           || anArg ==  "rgb")
     {
       aParams.BufferType = Graphic3d_BT_RGB;
+    }
+    else if (anArg == "-red"
+          || anArg ==  "red")
+    {
+      aParams.BufferType = Graphic3d_BT_Red;
     }
     else if (anArg == "-depth"
           || anArg ==  "depth")
@@ -1268,6 +1277,7 @@ static Standard_Integer VDump (Draw_Interpretor& theDI,
     case Graphic3d_BT_RGBA:                aFormat = Image_Format_RGBA;  break;
     case Graphic3d_BT_Depth:               aFormat = Image_Format_GrayF; break;
     case Graphic3d_BT_RGB_RayTraceHdrLeft: aFormat = Image_Format_RGBF;  break;
+    case Graphic3d_BT_Red:                 aFormat = Image_Format_Gray;  break;
   }
 
   switch (aStereoPair)
