@@ -1,0 +1,14 @@
+puts "========"
+puts "0030953: Data Exchange - implement export of mesh data into glTF 2.0 format"
+puts "========"
+
+catch { Close D1 }
+ReadGltf D1 [locate_data_file bug30691_DamagedHelmet.gltf]
+
+set aTmpGltf "${imagedir}/${casename}_tmp.gltf"
+WriteGltf D1 "$aTmpGltf"
+
+ReadGltf D "$aTmpGltf"
+XGetOneShape s D
+checknbshapes s -face 1 -compound 0
+checktrinfo s -tri 15452 -nod 14556
