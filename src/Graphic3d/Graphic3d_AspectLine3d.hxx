@@ -61,7 +61,51 @@ public:
   Aspect_TypeOfLine Type() const { return myType; }
 
   //! Modifies the type of line.
-  void SetType (const Aspect_TypeOfLine theType) { myType = theType; }
+  void SetType (const Aspect_TypeOfLine theType)
+  {
+    myType = theType;
+    myLinePattern = DefaultLinePatternForType (theType);
+  }
+
+  //! Return custom stipple line pattern; 0xFFFF by default.
+  uint16_t LinePattern() const { return myLinePattern; }
+
+  //! Modifies the stipple line pattern, and changes line type to Aspect_TOL_USERDEFINED for non-standard pattern.
+  void SetLinePattern (uint16_t thePattern)
+  {
+    myType = DefaultLineTypeForPattern (thePattern);
+    myLinePattern = thePattern;
+  }
+
+  //! Return stipple line pattern for line type.
+  static uint16_t DefaultLinePatternForType (Aspect_TypeOfLine theType)
+  {
+    switch (theType)
+    {
+      case Aspect_TOL_DASH:        return 0xFFC0;
+      case Aspect_TOL_DOT:         return 0xCCCC;
+      case Aspect_TOL_DOTDASH:     return 0xFF18;
+      case Aspect_TOL_EMPTY:       return 0x0000;
+      case Aspect_TOL_SOLID:       return 0xFFFF;
+      case Aspect_TOL_USERDEFINED: return 0xFF24;
+    }
+    return 0xFFFF;
+  }
+
+  //! Return line type for stipple line pattern.
+  static Aspect_TypeOfLine DefaultLineTypeForPattern (uint16_t thePattern)
+  {
+    switch (thePattern)
+    {
+      case 0x0000: return Aspect_TOL_EMPTY;
+      case 0xFFC0: return Aspect_TOL_DASH;
+      case 0xCCCC: return Aspect_TOL_DOT;
+      case 0xFF18: return Aspect_TOL_DOTDASH;
+      case 0xFFFF: return Aspect_TOL_SOLID;
+      case 0xFF24: return Aspect_TOL_USERDEFINED;
+    }
+    return Aspect_TOL_USERDEFINED;
+  }
 
   //! Return line width.
   Standard_ShortReal Width() const { return myWidth; }
@@ -97,6 +141,7 @@ public:
 
     return myProgram == theOther.myProgram
         && myType    == theOther.myType
+		&& myLinePattern == theOther.myLinePattern
         && myColor   == theOther.myColor
         && myWidth   == theOther.myWidth;
   }
@@ -120,6 +165,7 @@ protected:
   Quantity_ColorRGBA myColor;
   Aspect_TypeOfLine  myType;
   Standard_ShortReal myWidth;
+  uint16_t           myLinePattern;
 
 };
 

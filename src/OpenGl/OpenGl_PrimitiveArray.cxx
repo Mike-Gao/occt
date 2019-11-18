@@ -474,7 +474,7 @@ void OpenGl_PrimitiveArray::drawEdges (const OpenGl_Vec4&              theEdgeCo
   myVboAttribs->BindPositionAttribute (aGlContext);
 
   aGlContext->SetColor4fv   (theEdgeColour);
-  aGlContext->SetTypeOfLine (anAspect->Aspect()->Type());
+  aGlContext->SetLineStipple(anAspect->Aspect()->LinePattern());
   aGlContext->SetLineWidth  (anAspect->Aspect()->Width());
 
   if (!myVboIndices.IsNull())
@@ -833,7 +833,7 @@ void OpenGl_PrimitiveArray::Render (const Handle(OpenGl_Workspace)& theWorkspace
     if (myDrawMode == GL_LINES
      || myDrawMode == GL_LINE_STRIP)
     {
-      aCtx->SetTypeOfLine (anAspectLine->Aspect()->Type());
+      aCtx->SetLineStipple(anAspectLine->Aspect()->LinePattern());
       aCtx->SetLineWidth  (anAspectLine->Aspect()->Width());
     }
 

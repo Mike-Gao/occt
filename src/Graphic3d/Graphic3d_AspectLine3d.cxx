@@ -24,7 +24,8 @@ IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_AspectLine3d, Standard_Transient)
 Graphic3d_AspectLine3d::Graphic3d_AspectLine3d()
 : myColor (Quantity_NOC_YELLOW),
   myType  (Aspect_TOL_SOLID),
-  myWidth (1.0f)
+  myWidth (1.0f),
+  myLinePattern (0xFFFF)
 {
   //
 }
@@ -38,7 +39,8 @@ Graphic3d_AspectLine3d::Graphic3d_AspectLine3d (const Quantity_Color&   theColor
                                                 const Standard_Real     theWidth)
 : myColor (theColor),
   myType  (theType),
-  myWidth ((float )theWidth)
+  myWidth ((float )theWidth),
+  myLinePattern (DefaultLinePatternForType (theType))
 {
   if (myWidth <= 0.0f)
   {
