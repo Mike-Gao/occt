@@ -188,39 +188,74 @@ void ViewerTest::GetSelectedShapes (TopTools_ListOfShape& theSelectedShapes)
 //function : ParseLineType
 //purpose  :
 //=======================================================================
-Standard_Boolean ViewerTest::ParseLineType (Standard_CString   theArg,
-                                            Aspect_TypeOfLine& theType)
+Standard_Boolean ViewerTest::ParseLineType (Standard_CString theArg,
+                                            Aspect_TypeOfLine& theType,
+                                            uint16_t& thePattern)
 {
   TCollection_AsciiString aTypeStr (theArg);
   aTypeStr.LowerCase();
-  if (aTypeStr == "empty")
+  if (aTypeStr == "empty"
+   || aTypeStr == "-1")
   {
     theType = Aspect_TOL_EMPTY;
+    thePattern = Graphic3d_AspectLine3d::DefaultLinePatternForType (theType);
   }
-  else if (aTypeStr == "solid")
+  else if (aTypeStr == "solid"
+        || aTypeStr == "0")
   {
     theType = Aspect_TOL_SOLID;
+    thePattern = Graphic3d_AspectLine3d::DefaultLinePatternForType (theType);
   }
-  else if (aTypeStr == "dot")
+  else if (aTypeStr == "dot"
+        || aTypeStr == "2")
   {
     theType = Aspect_TOL_DOT;
+    thePattern = Graphic3d_AspectLine3d::DefaultLinePatternForType (theType);
   }
-  else if (aTypeStr == "dash")
+  else if (aTypeStr == "dash"
+        || aTypeStr == "1")
   {
     theType = Aspect_TOL_DASH;
+    thePattern = Graphic3d_AspectLine3d::DefaultLinePatternForType (theType);
   }
-  else if (aTypeStr == "dotdash")
+  else if (aTypeStr == "dotdash"
+        || aTypeStr == "3")
   {
     theType = Aspect_TOL_DOTDASH;
+    thePattern = Graphic3d_AspectLine3d::DefaultLinePatternForType (theType);
   }
   else
   {
-    const int aTypeInt = Draw::Atoi (theArg);
-    if (aTypeInt < -1 || aTypeInt >= Aspect_TOL_USERDEFINED)
+    if (aTypeStr.StartsWith ("0x"))
+    {
+      aTypeStr = aTypeStr.SubString (3, aTypeStr.Length());
+    }
+
+    if (aTypeStr.Length() != 4
+    || !std::isxdigit (static_cast<unsigned char> (aTypeStr.Value (1)))
+    || !std::isxdigit (static_cast<unsigned char> (aTypeStr.Value (2)))
+    || !std::isxdigit (static_cast<unsigned char> (aTypeStr.Value (3)))
+    || !std::isxdigit (static_cast<unsigned char> (aTypeStr.Value (4))))
     {
       return Standard_False;
     }
-    theType = (Aspect_TypeOfLine )aTypeInt;
+
+    std::stringstream aStream;
+    aStream << std::setbase (16) << aTypeStr.ToCString();
+    if (aStream.fail())
+    {
+      return Standard_False;
+    }
+
+    Standard_Integer aNumber = -1;
+    aStream >> aNumber;
+    if (aStream.fail())
+    {
+      return Standard_False;
+    }
+
+    thePattern = (uint16_t )aNumber;
+    theType = Graphic3d_AspectLine3d::DefaultLineTypeForPattern (thePattern);
   }
   return Standard_True;
 }
@@ -1628,7 +1663,7 @@ struct ViewerTest_AspectsChangeSet
   Standard_Real            LineWidth;
 
   Standard_Integer         ToSetTypeOfLine;
-  Aspect_TypeOfLine        TypeOfLine;
+  uint16_t                 StippleLinePattern;
 
   Standard_Integer         ToSetTypeOfMarker;
   Aspect_TypeOfMarker      TypeOfMarker;
@@ -1674,7 +1709,7 @@ struct ViewerTest_AspectsChangeSet
     ToSetLineWidth    (0),
     LineWidth         (1.0),
     ToSetTypeOfLine   (0),
-    TypeOfLine        (Aspect_TOL_SOLID),
+    StippleLinePattern(0xFFFF),
     ToSetTypeOfMarker (0),
     TypeOfMarker      (Aspect_TOM_PLUS),
     ToSetMarkerSize   (0),
@@ -2080,7 +2115,9 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
         std::cout << "Error: wrong syntax at " << anArg << "\n";
         return 1;
       }
-      if (!ViewerTest::ParseLineType (theArgVec[anArgIter], aChangeSet->TypeOfLine))
+
+      Aspect_TypeOfLine aLineType = Aspect_TOL_EMPTY;
+      if (!ViewerTest::ParseLineType (theArgVec[anArgIter], aLineType, aChangeSet->StippleLinePattern))
       {
         std::cout << "Error: wrong syntax at " << anArg << "\n";
         return 1;
@@ -2302,7 +2339,7 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
       aChangeSet->ToSetLineWidth = -1;
       aChangeSet->LineWidth = 1.0;
       aChangeSet->ToSetTypeOfLine = -1;
-      aChangeSet->TypeOfLine = Aspect_TOL_SOLID;
+      aChangeSet->StippleLinePattern = 0xFFFF;
       aChangeSet->ToSetTypeOfMarker = -1;
       aChangeSet->TypeOfMarker = Aspect_TOM_PLUS;
       aChangeSet->ToSetMarkerSize = -1;
@@ -2455,11 +2492,11 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
     }
     if (aChangeSet->ToSetTypeOfLine != 0)
     {
-      aDrawer->LineAspect()->SetTypeOfLine           (aChangeSet->TypeOfLine);
-      aDrawer->WireAspect()->SetTypeOfLine           (aChangeSet->TypeOfLine);
-      aDrawer->FreeBoundaryAspect()->SetTypeOfLine   (aChangeSet->TypeOfLine);
-      aDrawer->UnFreeBoundaryAspect()->SetTypeOfLine (aChangeSet->TypeOfLine);
-      aDrawer->SeenLineAspect()->SetTypeOfLine       (aChangeSet->TypeOfLine);
+      aDrawer->LineAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+      aDrawer->WireAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+      aDrawer->FreeBoundaryAspect()->Aspect()->SetLinePattern   (aChangeSet->StippleLinePattern);
+      aDrawer->UnFreeBoundaryAspect()->Aspect()->SetLinePattern (aChangeSet->StippleLinePattern);
+      aDrawer->SeenLineAspect()->Aspect()->SetLinePattern       (aChangeSet->StippleLinePattern);
     }
     if (aChangeSet->ToSetTypeOfMarker != 0)
     {
@@ -2633,11 +2670,11 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
         }
         if (aChangeSet->ToSetTypeOfLine != 0)
         {
-          aDrawer->LineAspect()->SetTypeOfLine           (aChangeSet->TypeOfLine);
-          aDrawer->WireAspect()->SetTypeOfLine           (aChangeSet->TypeOfLine);
-          aDrawer->FreeBoundaryAspect()->SetTypeOfLine   (aChangeSet->TypeOfLine);
-          aDrawer->UnFreeBoundaryAspect()->SetTypeOfLine (aChangeSet->TypeOfLine);
-          aDrawer->SeenLineAspect()->SetTypeOfLine       (aChangeSet->TypeOfLine);
+          aDrawer->LineAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+          aDrawer->WireAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+          aDrawer->FreeBoundaryAspect()->Aspect()->SetLinePattern   (aChangeSet->StippleLinePattern);
+          aDrawer->UnFreeBoundaryAspect()->Aspect()->SetLinePattern (aChangeSet->StippleLinePattern);
+          aDrawer->SeenLineAspect()->Aspect()->SetLinePattern       (aChangeSet->StippleLinePattern);
           toRedisplay = Standard_True;
         }
         if (aChangeSet->ToSetTypeOfMarker != 0)
@@ -6217,7 +6254,7 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
       "\n\t\t:          [-setMaterial MatName] [-unsetMaterial]"
       "\n\t\t:          [-setTransparency Transp] [-unsetTransparency]"
       "\n\t\t:          [-setWidth LineWidth] [-unsetWidth]"
-      "\n\t\t:          [-setLineType {solid|dash|dot|dotDash}] [-unsetLineType]"
+      "\n\t\t:          [-setLineType {solid|dash|dot|dotDash|0xHexPattern}] [-unsetLineType]"
       "\n\t\t:          [-setMarkerType {.|+|x|O|xcircle|pointcircle|ring1|ring2|ring3|ball|ImagePath}]"
       "\n\t\t:          [-unsetMarkerType]"
       "\n\t\t:          [-setMarkerSize Scale] [-unsetMarkerSize]"

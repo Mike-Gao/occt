@@ -3264,46 +3264,25 @@ void OpenGl_Context::SetColor4fv (const OpenGl_Vec4& theColor)
 void OpenGl_Context::SetTypeOfLine (const Aspect_TypeOfLine  theType,
                                     const Standard_ShortReal theFactor)
 {
-  Standard_Integer aPattern = 0xFFFF;
-  switch (theType)
-  {
-    case Aspect_TOL_DASH:
-    {
-      aPattern = 0xFFC0;
-      break;
-    }
-    case Aspect_TOL_DOT:
-    {
-      aPattern = 0xCCCC;
-      break;
-    }
-    case Aspect_TOL_DOTDASH:
-    {
-      aPattern = 0xFF18;
-      break;
-    }
-    case Aspect_TOL_EMPTY:
-    case Aspect_TOL_SOLID:
-    {
-      aPattern = 0xFFFF;
-      break;
-    }
-    case Aspect_TOL_USERDEFINED:
-    {
-      aPattern = 0xFF24;
-      break;
-    }
-  }
+  SetLineStipple (theFactor, Graphic3d_AspectLine3d::DefaultLinePatternForType (theType));
+}
 
+// =======================================================================
+// function : SetLineStipple
+// purpose  :
+// =======================================================================
+void OpenGl_Context::SetLineStipple (const Standard_ShortReal theFactor,
+                                     const uint16_t thePattern)
+{
   if (!myActiveProgram.IsNull())
   {
-    myActiveProgram->SetUniform (this, "uPattern", aPattern);
+    myActiveProgram->SetUniform (this, "uPattern", (Standard_Integer )thePattern);
     myActiveProgram->SetUniform (this, "uFactor",  theFactor);
     return;
   }
 
 #if !defined(GL_ES_VERSION_2_0)
-  if (aPattern != 0xFFFF)
+  if (thePattern != 0xFFFF)
   {
   #ifdef HAVE_GL2PS
     if (IsFeedback())
@@ -3317,7 +3296,7 @@ void OpenGl_Context::SetTypeOfLine (const Aspect_TypeOfLine  theType,
       core11fwd->glEnable (GL_LINE_STIPPLE);
 
       core11->glLineStipple (static_cast<GLint>    (theFactor),
-                             static_cast<GLushort> (aPattern));
+                             static_cast<GLushort> (thePattern));
     }
   }
   else
