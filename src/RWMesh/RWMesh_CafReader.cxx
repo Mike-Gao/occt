@@ -326,7 +326,7 @@ void RWMesh_CafReader::generateNames (const TCollection_AsciiString& theFile,
   }
 
   // replace empty names
-  Handle(TDataStd_Name) aNodeName;
+  Handle(TDataStd_Name) aRefNodeName, anInstNodeName;
   Standard_Integer aRootIndex = aRootLabels.Lower();
   TDF_LabelSequence aNewRootLabels;
   for (TDF_LabelSequence::Iterator aRootIter (aRootLabels); aRootIter.More(); ++aRootIndex, aRootIter.Next())
@@ -340,17 +340,25 @@ void RWMesh_CafReader::generateNames (const TCollection_AsciiString& theFile,
       aNewRootLabels.Append (aRootIter.Value());
     }
 
+    aRefNodeName.Nullify();
     const TDF_Label aLabel = aRootIter.Value();
     TDF_Label aRefLab = aLabel;
     XCAFDoc_ShapeTool::GetReferredShape (aLabel, aRefLab);
-    if (!aRefLab.FindAttribute (TDataStd_Name::GetID(), aNodeName))
+    if (!aRefLab.FindAttribute (TDataStd_Name::GetID(), aRefNodeName))
     {
       TDataStd_Name::Set (aRefLab, aRootName);
     }
     if (aLabel != aRefLab
-    && !aLabel.FindAttribute (TDataStd_Name::GetID(), aNodeName))
+    && !aLabel.FindAttribute (TDataStd_Name::GetID(), anInstNodeName))
     {
-      TDataStd_Name::Set (aLabel, aRootName);
+      if (!aRefNodeName.IsNull())
+      {
+        TDataStd_Name::Set (aLabel, aRefNodeName->Get());
+      }
+      else
+      {
+        TDataStd_Name::Set (aLabel, aRootName);
+      }
     }
   }
 
@@ -359,8 +367,9 @@ void RWMesh_CafReader::generateNames (const TCollection_AsciiString& theFile,
     for (XCAFPrs_DocumentExplorer aDocIter (myXdeDoc, aNewRootLabels, XCAFPrs_DocumentExplorerFlags_NoStyle);
          aDocIter.More(); aDocIter.Next())
     {
+      aRefNodeName.Nullify();
       if (aDocIter.CurrentDepth() == 0
-       || aDocIter.Current().RefLabel.FindAttribute (TDataStd_Name::GetID(), aNodeName))
+       || aDocIter.Current().RefLabel.FindAttribute (TDataStd_Name::GetID(), aRefNodeName))
       {
         continue;
       }
