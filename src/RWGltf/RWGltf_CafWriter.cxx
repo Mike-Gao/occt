@@ -145,7 +145,7 @@ void RWGltf_CafWriter::saveNodes (RWGltf_GltfFace& theGltfFace,
 {
   theGltfFace.NodePos.Id            = theAccessorNb++;
   theGltfFace.NodePos.Count         = theFaceIter.NbNodes();
-  theGltfFace.NodePos.ByteOffset    = theBinFile.tellp() - myBuffViewPos.ByteOffset;
+  theGltfFace.NodePos.ByteOffset    = (int64_t )theBinFile.tellp() - myBuffViewPos.ByteOffset;
   theGltfFace.NodePos.Type          = RWGltf_GltfAccessorLayout_Vec3;
   theGltfFace.NodePos.ComponentType = RWGltf_GltfAccessorCompType_Float32;
 
@@ -175,7 +175,7 @@ void RWGltf_CafWriter::saveNormals (RWGltf_GltfFace& theGltfFace,
 
   theGltfFace.NodeNorm.Id            = theAccessorNb++;
   theGltfFace.NodeNorm.Count         = theFaceIter.NbNodes();
-  theGltfFace.NodeNorm.ByteOffset    = theBinFile.tellp() - myBuffViewNorm.ByteOffset;
+  theGltfFace.NodeNorm.ByteOffset    = (int64_t )theBinFile.tellp() - myBuffViewNorm.ByteOffset;
   theGltfFace.NodeNorm.Type          = RWGltf_GltfAccessorLayout_Vec3;
   theGltfFace.NodeNorm.ComponentType = RWGltf_GltfAccessorCompType_Float32;
 
@@ -221,7 +221,7 @@ void RWGltf_CafWriter::saveTextCoords (RWGltf_GltfFace& theGltfFace,
 
   theGltfFace.NodeUV.Id            = theAccessorNb++;
   theGltfFace.NodeUV.Count         = theFaceIter.NbNodes();
-  theGltfFace.NodeUV.ByteOffset    = theBinFile.tellp() - myBuffViewTextCoord.ByteOffset;
+  theGltfFace.NodeUV.ByteOffset    = (int64_t )theBinFile.tellp() - myBuffViewTextCoord.ByteOffset;
   theGltfFace.NodeUV.Type          = RWGltf_GltfAccessorLayout_Vec2;
   theGltfFace.NodeUV.ComponentType = RWGltf_GltfAccessorCompType_Float32;
   const Standard_Integer aNodeUpper = theFaceIter.NodeUpper();
@@ -244,7 +244,7 @@ void RWGltf_CafWriter::saveIndices (RWGltf_GltfFace& theGltfFace,
 {
   theGltfFace.Indices.Id            = theAccessorNb++;
   theGltfFace.Indices.Count         = theFaceIter.NbTriangles() * 3;
-  theGltfFace.Indices.ByteOffset    = theBinFile.tellp() - myBuffViewInd.ByteOffset;
+  theGltfFace.Indices.ByteOffset    = (int64_t )theBinFile.tellp() - myBuffViewInd.ByteOffset;
   theGltfFace.Indices.Type          = RWGltf_GltfAccessorLayout_Scalar;
   theGltfFace.Indices.ComponentType = theGltfFace.NodePos.Count > std::numeric_limits<uint16_t>::max()
                                     ? RWGltf_GltfAccessorCompType_UInt32
@@ -392,7 +392,7 @@ bool RWGltf_CafWriter::writeBinData (const Handle(TDocStd_Document)& theDocument
       myBinDataMap.Bind (aFaceIter.Face(), aGltfFace);
     }
   }
-  myBuffViewPos.ByteLength = aBinFile.tellp() - myBuffViewPos.ByteOffset;
+  myBuffViewPos.ByteLength = (int64_t )aBinFile.tellp() - myBuffViewPos.ByteOffset;
   if (!aPSentryBin.More())
   {
     return false;
@@ -432,7 +432,7 @@ bool RWGltf_CafWriter::writeBinData (const Handle(TDocStd_Document)& theDocument
       }
     }
   }
-  myBuffViewNorm.ByteLength = aBinFile.tellp() - myBuffViewNorm.ByteOffset;
+  myBuffViewNorm.ByteLength = (int64_t )aBinFile.tellp() - myBuffViewNorm.ByteOffset;
   if (!aPSentryBin.More())
   {
     return false;
@@ -473,7 +473,7 @@ bool RWGltf_CafWriter::writeBinData (const Handle(TDocStd_Document)& theDocument
       }
     }
   }
-  myBuffViewTextCoord.ByteLength = aBinFile.tellp() - myBuffViewTextCoord.ByteOffset;
+  myBuffViewTextCoord.ByteLength = (int64_t )aBinFile.tellp() - myBuffViewTextCoord.ByteOffset;
   if (!aPSentryBin.More())
   {
     return false;
@@ -514,7 +514,7 @@ bool RWGltf_CafWriter::writeBinData (const Handle(TDocStd_Document)& theDocument
       }
     }
   }
-  myBuffViewInd.ByteLength = aBinFile.tellp() - myBuffViewInd.ByteOffset;
+  myBuffViewInd.ByteLength = (int64_t )aBinFile.tellp() - myBuffViewInd.ByteOffset;
 
   int aBuffViewId = 0;
   if (myBuffViewPos.ByteLength > 0)
