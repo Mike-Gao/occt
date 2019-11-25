@@ -2543,7 +2543,6 @@ void IntPatch_PrmPrmIntersection::Perform (const Handle(Adaptor3d_HSurface)& Sur
                                 } 
                               }
                             }
-                            }
 
                             Standard_Integer pI = ciVpar;
 
