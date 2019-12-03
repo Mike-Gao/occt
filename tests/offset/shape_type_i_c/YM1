@@ -1,0 +1,29 @@
+puts "TODO OCC31212 All: Error : The area of result shape is"
+puts "TODO OCC31212 All: Error : The volume of result shape is"
+puts "TODO OCC31212 All: Error :  is WRONG because number of"
+
+puts "========"
+puts "0031212: Modeling Algorithms - Incomplete result of the Offset operation due to presence of internal edges in the input shape"
+puts "========"
+puts ""
+
+restore [locate_data_file bug31212_input.brep] s
+offsetparameter 1e-7 c i
+offsetload s 0
+foreach f [explode s f] {
+  mksurface surf $f;
+  set found [regexp {Axis :([-0-9.+eE]*), ([-0-9.+eE]*), ([-0-9.+eE]*)} [dump surf] full x y z];
+  if {$found && abs($z - 1) < 1.e-7} {
+    offsetonface $f 2
+  } else {
+    offsetonface $f 5
+  }
+}
+offsetperform result
+
+checkprops result -s 886929 -v 1.24711e+07
+
+unifysamedom result_unif result
+checknbshapes result_unif -face 251 -shell 1 -solid 1
+
+checkview -display result_unif -2d -path ${imagedir}/${test_image}.png
