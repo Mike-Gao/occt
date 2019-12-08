@@ -180,7 +180,7 @@ public:
   //! Creates box shape
   //! \param theBoundingBox box shape parameters
   //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateShape (const Select3D_BndBox3d& theBoundingBox);
+  Standard_EXPORT static Standard_Boolean CreateShape (const Select3D_BndBox3d& theBoundingBox, TopoDS_Shape& theShape);
 
   //! Build string presentation of Graphic3D index buffer
   //! \param theIndexBuffer index buffer

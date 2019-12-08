@@ -207,26 +207,55 @@ int MessageModel_ItemAlert::initRowCount() const
 // =======================================================================
 void MessageModel_ItemAlert::GetStream (Standard_OStream& OS) const
 {
-  //return;
   Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (getAlert());
-  if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
-  {
-    Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
-    if (!anAttribute.IsNull())
-    {
-      if (!Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
-      {
-        //if (GetProperties().IsNull())
-        //{
-        //  TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
-        //  SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
-        //}
-        Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
-        //Handle(MessageModel_ItemPropertiesAttributeStream) aProperties = Handle(MessageModel_ItemPropertiesAttributeStream)::DownCast (GetProperties());
-        OS << anAttributeStream->GetStream().str();
-      }
-    }
-  }
+  if (anExtendedAlert.IsNull() || anExtendedAlert->Attribute().IsNull())
+    return;
+
+  Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+  if (anAttribute.IsNull())
+    return;
+
+  if (Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
+    return;
+
+  Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
+  OS << anAttributeStream->GetStream().str();
+}
+
+// =======================================================================
+// function : SetStream
+// purpose :
+// =======================================================================
+bool MessageModel_ItemAlert::SetStream (const Standard_SStream& theSStream, Standard_Integer& theStartPos,
+                                        Standard_Integer& theLastPos) const
+{
+  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (getAlert());
+  if (anExtendedAlert.IsNull() || anExtendedAlert->Attribute().IsNull())
+    return false;
+
+  Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+  if (anAttribute.IsNull())
+    return false;
+
+  if (Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
+    return false;
+
+  Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
+  TCollection_AsciiString aStreamValue = Standard_Dump::Text (anAttributeStream->GetStream());
+
+  TCollection_AsciiString aNewValue = Standard_Dump::Text (theSStream);
+
+  Standard_SStream aStream;
+  aStream << aStreamValue.SubString (1, theStartPos - 1);
+  aStream << aNewValue;
+  if (theLastPos + 1 <= aStreamValue.Length())
+    aStream << aStreamValue.SubString (theLastPos + 1, aStreamValue.Length());
+
+  //TCollection_AsciiString aStreamValue_debug = Standard_Dump::Text (aStream);
+
+  anAttributeStream->SetStream (aStream);
+
+  return true;
 }
 
 // =======================================================================
@@ -268,33 +297,33 @@ void MessageModel_ItemAlert::Init()
     }
   }
 
-  /*Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(myAlert);
+  Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast(myAlert);
   if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
   {
     Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
     if (!anAttribute.IsNull())
     {
-      if (!Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
-      {
-        if (GetProperties().IsNull())
-        {
-          TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
-          SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
-        }
-        Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
-        Handle(MessageModel_ItemPropertiesAttributeStream) aProperties = Handle(MessageModel_ItemPropertiesAttributeStream)::DownCast (GetProperties());
-        aProperties->Init (anAttributeStream->GetStream());
-      }
-      //if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
-      //  myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
-      //if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
-      //  myPresentations.Append (new Convert_TransientShape (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape()));
+      //if (!Handle(Message_AttributeStream)::DownCast(anAttribute).IsNull())
+      //{
+      //  if (GetProperties().IsNull())
+      //  {
+      //    TreeModel_ItemBasePtr anItem = Parent()->Child (Row(), Column(), false);
+      //    SetProperties (new MessageModel_ItemPropertiesAttributeStream (anItem));
+      //  }
+      //  Handle(Message_AttributeStream) anAttributeStream = Handle(Message_AttributeStream)::DownCast (anExtendedAlert->Attribute());
+      //  Handle(MessageModel_ItemPropertiesAttributeStream) aProperties = Handle(MessageModel_ItemPropertiesAttributeStream)::DownCast (GetProperties());
+      //  aProperties->Init (anAttributeStream->GetStream());
+      //}
+      ////if (anAttribute->IsKind (STANDARD_TYPE (Message_AttributeObject)))
+      ////  myPresentations.Append (Handle(Message_AttributeObject)::DownCast (anAttribute)->GetObject());
+      if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
+        myPresentations.Append (new Convert_TransientShape (Handle(TopoDS_AlertAttribute)::DownCast (anAttribute)->GetShape()));
     }
     //TCollection_AsciiString aDescription = anExtendedAlert->Attribute()->GetDescription();
     //Bnd_Box aBox;
     //if (aBox.Init (Standard_SStream (aDescription.ToCString())))
     //  myPresentations.Append (new Convert_TransientShape (Convert_Tools::CreateShape (aBox)));
-  }*/
+  }
   MessageModel_ItemBase::Init();
 }
 

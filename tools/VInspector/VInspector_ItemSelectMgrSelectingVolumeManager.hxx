@@ -57,6 +57,10 @@ public:
   //! Returns frustum Frustum for row = 0, FrustumSet for row = 1   
   Handle(SelectMgr_BaseFrustum) GetFrustum (const int theRow) const;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
+
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;

@@ -70,6 +70,14 @@ void Graphic3d_Aspects::DumpJson (Standard_OStream& theOStream, const Standard_I
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_Aspects);
 
+  /*Handle(Graphic3d_ShaderProgram)  myProgram;
+  Handle(Graphic3d_TextureSet)     myTextureSet;
+  Handle(Graphic3d_MarkerImage)    myMarkerImage;
+  Handle(Graphic3d_HatchStyle)     myHatchStyle;
+  Handle(TCollection_HAsciiString) myTextFont;
+  Graphic3d_MaterialAspect         myFrontMaterial;
+  Graphic3d_MaterialAspect         myBackMaterial;*/
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInteriorColor);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBackInteriorColor);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEdgeColor);
@@ -82,4 +90,23 @@ void Graphic3d_Aspects::DumpJson (Standard_OStream& theOStream, const Standard_I
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToSuppressBackFaces);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToMapTexture);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsTextZoomable);
+
+  /*Aspect_InteriorStyle       myInteriorStyle;
+  Graphic3d_TypeOfShadingModel myShadingModel;
+  Graphic3d_AlphaMode          myAlphaMode;
+  Standard_ShortReal           myAlphaCutoff;
+
+  Aspect_TypeOfLine            myLineType;
+  Standard_ShortReal           myLineWidth;
+
+  Aspect_TypeOfMarker          myMarkerType;
+  Standard_ShortReal           myMarkerScale;*/
+
+  if (!myTextFont.IsNull())
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myTextFont->String());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTextStyle);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTextDisplayType);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTextFontAspect);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTextAngle);
 }

@@ -41,6 +41,8 @@ Message_AttributeStream::Message_AttributeStream (const Standard_SStream& theStr
 
 void Message_AttributeStream::SetStream (const Standard_SStream& theStream)
 {
+  myStream.str ("");
+
   TCollection_AsciiString aStreamStr (theStream.str().c_str());
   myStream << aStreamStr;
 }

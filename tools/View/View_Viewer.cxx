@@ -19,7 +19,7 @@
 #include <Standard_ExtString.hxx>
 #include <Standard_Version.hxx>
 
-//#define USE_CLIPPLANE
+#define USE_CLIPPLANE
 
 #ifdef USE_CLIPPLANE
 #include <Graphic3d_ClipPlane.hxx>

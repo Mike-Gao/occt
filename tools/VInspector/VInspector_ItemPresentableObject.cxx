@@ -185,19 +185,27 @@ void VInspector_ItemPresentableObject::Init()
     AIS_ListOfInteractive aListOfIO;
     GetContext()->DisplayedObjects (aListOfIO); // the presentation is in displayed objects of Context
     GetContext()->ErasedObjects (aListOfIO); // the presentation is in erased objects of Context
+
+    std::vector<Handle(AIS_InteractiveObject)> aListOfIOSorted;
+    for (AIS_ListIteratorOfListOfInteractive anIOIt (aListOfIO); anIOIt.More(); anIOIt.Next())
+    {
+      aListOfIOSorted.push_back (anIOIt.Value());
+    }
+    std::sort (aListOfIOSorted.begin(), aListOfIOSorted.end());
+
     int aDeltaIndex = 1; // properties item
     int aCurrentIndex = 0;
-    for (AIS_ListIteratorOfListOfInteractive anIOIt (aListOfIO); anIOIt.More(); anIOIt.Next(), aCurrentIndex++)
+    for (std::vector<Handle(AIS_InteractiveObject)>::const_iterator anIOIt = aListOfIOSorted.begin(); anIOIt != aListOfIOSorted.end(); anIOIt++, aCurrentIndex++)
     {
       if (aCurrentIndex != aRowId - aDeltaIndex)
         continue;
-      anIO = anIOIt.Value();
+      anIO = *anIOIt;
       break;
     }
   }
 
   setInteractiveObject (anIO);
-  myTransformPersistence = anIO->TransformPersistence();
+  myTransformPersistence = !anIO.IsNull() ? anIO->TransformPersistence() : NULL;
   UpdatePresentationShape();
   TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
 }

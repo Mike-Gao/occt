@@ -204,10 +204,22 @@ bool Quantity_ColorRGBA::ColorFromHex (const char* const   theHexColorString,
 //function : DumpJson
 //purpose  : 
 //=======================================================================
-void Quantity_ColorRGBA::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+void Quantity_ColorRGBA::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Quantity_ColorRGBA);
+  OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "RGBA", 4, myRgb.Red(), myRgb.Green(), myRgb.Blue(), myAlpha)
+}
 
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myRgb);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAlpha);
+//=======================================================================
+//function : InitJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean Quantity_ColorRGBA::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  Standard_Integer aPos = theStreamPos;
+
+  Standard_Real aRed, aGreen, aBlue, anAlpha;
+  OCCT_INIT_VECTOR_CLASS (theSStream, RGBA, aPos, 4, &aRed, &aGreen, &aBlue, &anAlpha)
+
+  SetValues ((Standard_ShortReal)aRed, (Standard_ShortReal)aGreen, (Standard_ShortReal)aBlue, (Standard_ShortReal)anAlpha);
+  return Standard_True;
 }

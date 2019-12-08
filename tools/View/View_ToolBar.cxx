@@ -146,6 +146,16 @@ View_ContextType View_ToolBar::GetCurrentContextType() const
 }
 
 // =======================================================================
+// function : SetCurrentContext
+// purpose :
+// =======================================================================
+void View_ToolBar::SetCurrentContextType (View_ContextType theType)
+{
+  myViewSelector->setCurrentIndex ((int)theType);
+  emit contextChanged();
+}
+
+// =======================================================================
 // function : GetCurrentContext
 // purpose :
 // =======================================================================
@@ -163,6 +173,74 @@ bool View_ToolBar::IsActionChecked (const int theActionId) const
 {
   View_ToolActionType anActionId = (View_ToolActionType)theActionId;
   return myActionsMap.contains (anActionId) ? myActionsMap[anActionId]->isChecked() : false;
+}
+
+// =======================================================================
+// function : SaveState
+// purpose :
+// =======================================================================
+void View_ToolBar::SaveState (View_ToolBar* theParameters,
+                              QMap<QString, QString>& theItems,
+                              const QString& thePrefix)
+{
+  //Handle(Prs3d_Drawer) aDrawer = theParameters->GetDrawer();
+
+  //Quantity_Color aColor = aDrawer->Color();
+  //Standard_ShortReal aTransparency = aDrawer->Transparency();
+
+  //// point parameters
+  //{
+  //  Standard_Boolean anOwnPointAspect = aDrawer->HasOwnPointAspect();
+  //  Standard_SStream OS;
+  //  if (anOwnPointAspect)
+  //    myDrawer->PointAspect()->Dump (OS);
+  //  TCollection_AsciiString aStream (OS.str().c_str());
+  //  theItems[thePrefix + "has_point_aspect"] = anOwnPointAspect;
+  //  theItems[thePrefix + "point_aspect"] = aStream.ToCString();
+  //}
+  //// shading parameters
+  //{
+  //  Standard_Boolean anOwnShadingAspect = aDrawer->HasOwnShadingAspect();
+  //  Standard_SStream OS;
+  //  if (anOwnShadingAspect)
+  //    myDrawer->ShadingAspect()->Dump (OS);
+  //  TCollection_AsciiString aStream (OS.str().c_str());
+  //  theItems[thePrefix + "has_shading_aspect"] = anOwnShadingAspect;
+  //  theItems[thePrefix + "shading_aspect"] = aStream.ToCString();
+  //}
+}
+
+// =======================================================================
+// function : RestoreState
+// purpose :
+// =======================================================================
+bool  View_ToolBar::RestoreState (View_ToolBar* theParameters,
+                                  const QString& theKey, const QString& theValue,
+                                  const QString& thePrefix)
+{
+  //if (theKey == thePrefix + "has_point_aspect") // point parameters
+  //{
+  //  myDrawer->SetOwnPointAspect (theValue.toBool());
+  //}
+  //else if (theKey == thePrefix + "point_aspect") // point parameters
+  //{
+  //  Standard_SStream aStream;
+  //  aStream << theValue.ToString().ToStdString();
+  //  myDrawer->PointAspect()->Init (aStream);
+  //}
+  //else if (theKey == thePrefix + "has_shading_aspect") // shading parameters
+  //{
+  //  myDrawer->SetOwnShadingAspect (theValue.toBool());
+  //}
+  //else if (theKey == thePrefix + "shading_aspect") // shading parameters
+  //{
+  //  Standard_SStream aStream;
+  //  aStream << theValue.ToString().ToStdString();
+  //  myDrawer->ShadingAspect()->Init (aStream);
+  //}
+  //else
+  //  return false;
+  return true;
 }
 
 // =======================================================================

@@ -149,6 +149,12 @@ public:
   //! Returns listener of the reports events
   const Handle(Message_ReportCallBack)& GetCallBack() const { return myCallBack; }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
+
+  //! Inits the content of me into the stream
+  Standard_EXPORT Standard_Boolean InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos);
+
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 

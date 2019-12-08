@@ -38,6 +38,9 @@
 int VInspector_ItemSelectMgrSelection::initRowCount() const
 {
   Handle(SelectMgr_Selection) aSelection = GetSelection();
+
+  if (aSelection.IsNull())
+    return 0;
 #if OCC_VERSION_HEX < 0x070201
   int aRows = 0;
   for (aSelection->Init(); aSelection->More(); aSelection->Next())
@@ -57,6 +60,9 @@ QVariant VInspector_ItemSelectMgrSelection::initValue (int theItemRole) const
   QVariant aParentValue = VInspector_ItemBase::initValue (theItemRole);
   if (aParentValue.isValid())
     return aParentValue;
+
+  if (GetSelection().IsNull())
+    return QVariant();
 
   switch (theItemRole)
   {

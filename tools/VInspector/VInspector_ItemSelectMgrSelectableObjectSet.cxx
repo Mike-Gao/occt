@@ -141,6 +141,19 @@ opencascade::handle<BVH_Tree<Standard_Real, 3> > VInspector_ItemSelectMgrSelecta
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemSelectMgrSelectableObjectSet::GetStream (Standard_OStream& theOStream) const
+{
+  SelectMgr_SelectableObjectSet aSet;
+  if (!GetSelectableObjectSet (aSet))
+    return;
+
+  aSet.DumpJson (theOStream);
+}
+
+// =======================================================================
 // function : createChild
 // purpose :
 // =======================================================================

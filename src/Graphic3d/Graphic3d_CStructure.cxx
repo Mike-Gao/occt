@@ -60,6 +60,24 @@ void Graphic3d_CStructure::DumpJson (Standard_OStream& theOStream, const Standar
     OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aGroup.get());
   }
 
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Id);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myZLayer);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Priority);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, PreviousPriority);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, ContainsFacet);
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &ViewAffinity);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, IsInfinite);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, stick);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, highlight);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, visible);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, HLRValidation);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, IsForHighlight);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, IsMutable);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Is2dText);
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTrsf.get());

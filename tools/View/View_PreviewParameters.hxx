@@ -41,7 +41,7 @@ public:
   //! Returns main control
   const Handle(Prs3d_Drawer)& GetDrawer() const { return myDrawer; }
 
-    //! Save state of three view in a container in form: key, value. It saves:
+  //! Save state of three view in a container in form: key, value. It saves:
   //! - visibiblity of columns,
   //! - columns width
   //! \param theTreeView a view instance

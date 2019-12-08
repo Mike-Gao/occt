@@ -17,6 +17,7 @@
 #define TreeModel_ItemProperties_H
 
 #include <Standard.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Handle.hxx>
 #include <Standard_Macro.hxx>
 #include <Standard_Type.hxx>
@@ -65,7 +66,7 @@ public:
   TreeModel_ItemBasePtr Item() const { return myItem; }
 
   //! Fill internal containers by stream values
-  void Init (const TCollection_AsciiString& theStreamValue);
+  Standard_EXPORT void Init (/*const Standard_SStream& theStream*/);
 
   //! If the item has internal values, there should be reseted here.
   Standard_EXPORT virtual void Reset();
@@ -86,6 +87,20 @@ public:
   //! \return value interpreted depending on the given role
   QVariant Data (const int theRow, const int theColumn, int theRole = Qt::DisplayRole) const;
 
+  //! Returns type of edit control for the model index. By default, it is an empty control
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \return edit type
+  ViewControl_EditType GetEditType (const int theRow, const int theColumn) const;
+
+  //! Sets content of the model index for the given role, it is applyed to internal container of values
+  //! \param theRow a model index row
+  //! \param theColumn a model index column
+  //! \param theRole a view role
+  //! \return true if the value is changed
+  Standard_EXPORT virtual bool SetData (const int theRow, const int theColumn, const QVariant& theValue,
+                                        int theRole = Qt::DisplayRole);
+
   //! Returns presentation of the attribute to be visualized in the view
   //! \param theRow a model index row
   //! \param theColumn a model index column
@@ -99,12 +114,40 @@ public:
   //! \return flags
   Standard_EXPORT virtual Qt::ItemFlags GetTableFlags (const int theRow, const int theColumn) const;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT void GetChildStream (const int theRowId,
+                                       TCollection_AsciiString& theKey,
+                                       Standard_DumpValue& theValue) const;
+
+  //! Returns data object of the item.
+  //! \return object key
+  const TCollection_AsciiString& GetKey() const { return myKey; }
+
+  //! Returns stream value of the item.
+  //! \return value
+  const TCollection_AsciiString& StreamValue() const { return myStreamValue.myValue; }
+
+  //! Returns children stream values
+  const NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& Values() const { initItem(); return myValues; }
+
+  //! Returns children stream values
+  const NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& Children() const { initItem(); return myChildren; }
+
   DEFINE_STANDARD_RTTIEXT (TreeModel_ItemProperties, Standard_Transient)
+
+protected:
+  //! Initialize the current item. It creates a backup of the specific item information
+  void initItem() const;
 
 private:
   TreeModel_ItemBasePtr myItem; //!< current item
 
-  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myValues; //!< the values
+  TCollection_AsciiString myKey; //!< the item key
+  Standard_DumpValue myStreamValue; //!< the stream value
+  NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> myChildren; //!< the children
+
+  NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> myValues; //!< the values
 };
 
 #endif

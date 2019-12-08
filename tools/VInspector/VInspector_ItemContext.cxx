@@ -40,7 +40,7 @@ int VInspector_ItemContext::initRowCount() const
   int aNbProperties = 1; // item to visualize Filters/Drawer information of context
 
   int aNbPresentations = 0;
-  Handle(AIS_InteractiveContext) aContext = GetContext();
+  Handle(AIS_InteractiveContext) aContext = Handle(AIS_InteractiveContext)::DownCast (GetObject());
   if (aContext.IsNull())
     return 0;
 
@@ -94,23 +94,57 @@ QVariant VInspector_ItemContext::initValue (const int theItemRole) const
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
-  if (GetContext().IsNull())
+  Handle(AIS_InteractiveContext) aContext = Handle(AIS_InteractiveContext)::DownCast (GetObject());
+  if (aContext.IsNull())
     return Column() == 0 ? "Empty context" : "";
 
   switch (Column())
   {
-    case 0: return GetContext()->DynamicType()->Name();
+    case 0: return aContext->DynamicType()->Name();
     case 4:
     {
       Handle(AIS_InteractiveObject) anEmptyIO;
-      int aSelectedCount = VInspector_Tools::SelectedOwners (GetContext(), anEmptyIO, false);
+      int aSelectedCount = VInspector_Tools::SelectedOwners (aContext, anEmptyIO, false);
       return aSelectedCount > 0 ? QString::number (aSelectedCount) : "";
     }
-    case 6: return GetContext()->DeviationCoefficient();
+    case 6: return aContext->DeviationCoefficient();
     default:
       break;
   }
   return QVariant();
+}
+
+// =======================================================================
+// function : Init
+// purpose :
+// =======================================================================
+void VInspector_ItemContext::Init()
+{
+  Handle(AIS_InteractiveContext) aContext = GetContext();
+  if (aContext.IsNull())
+    return;
+
+  TreeModel_ItemBase::Init();
+}
+
+// =======================================================================
+// function : Reset
+// purpose :
+// =======================================================================
+void VInspector_ItemContext::Reset()
+{
+  VInspector_ItemBase::Reset();
+}
+
+// =======================================================================
+// function : initItem
+// purpose :
+// =======================================================================
+void VInspector_ItemContext::initItem() const
+{
+  if (IsInitialized())
+    return;
+  const_cast<VInspector_ItemContext*>(this)->Init();
 }
 
 // =======================================================================
@@ -124,3 +158,17 @@ TreeModel_ItemBasePtr VInspector_ItemContext::createChild (int theRow, int theCo
   else
     return VInspector_ItemPresentableObject::CreateItem (currentItem(), theRow, theColumn);
 }
+
+// =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemContext::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(AIS_InteractiveContext) aContext = GetContext();
+  if (aContext.IsNull())
+    return;
+
+  aContext->DumpJson (theOStream);
+}
+

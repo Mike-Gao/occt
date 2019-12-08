@@ -162,5 +162,8 @@ TopoDS_Shape VInspector_ItemSelect3DSensitiveSetItem::buildPresentationShape()
     return TopoDS_Shape();
 
   Select3D_BndBox3d aBndBox = aSensitiveSet->Box (Row());
-  return VInspector_Tools::CreateShape (aBndBox);
+  TopoDS_Shape aShape;
+  VInspector_Tools::CreateShape (aBndBox, aShape);
+
+  return aShape;
 }

@@ -78,6 +78,15 @@ public:
   //! Returns report of the item
   static Handle(Message_Report) FindReport (const MessageModel_ItemBasePtr& thetItem);
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual bool SetStream (const Standard_SStream& theSStream, Standard_Integer& theStartPos,
+                                          Standard_Integer& theLastPos) const Standard_OVERRIDE;
+
 protected:
 
   //! Initialize the current item. It is empty because Reset() is also empty.

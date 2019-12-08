@@ -120,6 +120,19 @@ Standard_Boolean VInspector_ItemSelectMgrSelectingVolumeManager::GetViewerSelect
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemSelectMgrSelectingVolumeManager::GetStream (Standard_OStream& theOStream) const
+{
+  SelectMgr_SelectingVolumeManager aVolumeManager;
+  if (!GetViewerSelector (aVolumeManager))
+    return;
+
+  aVolumeManager.DumpJson (theOStream);
+}
+
+// =======================================================================
 // function : createChild
 // purpose :
 // =======================================================================

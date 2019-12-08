@@ -108,3 +108,27 @@ void Graphic3d_AspectFillCapping::SetHatchRotationPeristent (const Standard_Bool
   setFlag (theToSet, Flags_HatchRotationPersistent);
   myHatchingState++;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_AspectFillCapping::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_AspectFillCapping);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_Aspects);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myMaterial);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myMaterial);
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myTexture);
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myShader);
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myStippleHatch);
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myTextureHatch);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myHatchMaterial);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFlags);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHatchingState);
+}

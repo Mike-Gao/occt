@@ -49,7 +49,7 @@ public:
   //! Fills the view content with values. Number of visible tables is size of container,
   //! Each element of container is values of the corresponded table
   //! \param theTableValues values
-  Standard_EXPORT void Init (const QList<ViewControl_TableModelValues*>& theTableValues);
+  Standard_EXPORT void Init (ViewControl_TableModelValues* theTableValues);
 
   //! Fills the view content with the parameter custom widget.
   //! \param theWidget control
@@ -61,27 +61,43 @@ public:
   //! \return the text edit control
   QWidget* GetControl() const { return myMainWidget; }
 
-  //! Returns container of active tables
-  //! \param theTables [out] modified container
-  Standard_EXPORT void GetActiveTables (QList<ViewControl_Table*>& theTables);
+  //! Returns container an active table or NULL
+  Standard_EXPORT ViewControl_Table* GetTable();
 
   //! Clears selection in active tables
   Standard_EXPORT void ClearActiveTablesSelection();
 
+  //! Save state of three view in a container in form: key, value. It saves:
+  //! - visibiblity of columns,
+  //! - columns width
+  //! \param theTreeView a view instance
+  //! \param theItems [out] properties
+  //! \param thePrefix peference item prefix
+  Standard_EXPORT static void SaveState (ViewControl_PropertyView* theParameters,
+                                         QMap<QString, QString>& theItems,
+                                         const QString& thePrefix = QString());
+  //! Restore state of three view by a container
+  //! \param theTreeView a view instance
+  //! \param theKey property key
+  //! \param theValue property value
+  //! \param thePrefix peference item prefix
+  //! \return boolean value whether the property is applyed to the tree view
+  Standard_EXPORT static bool RestoreState (ViewControl_PropertyView* theParameters,
+                                            const QString& theKey, const QString& theValue,
+                                            const QString& thePrefix = QString());
+
 signals:
+  //! Signal about selection change in property view table
   void propertyViewSelectionChanged();
+
+  //! Signal about data change in property view table
+  void propertyViewDataChanged();
 
 protected slots:
   //! Emits signal about selection is changed
   //! \param theSelected container of selected table cells
   //! \param theDeselected container of selected table cells
   void onTableSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
-
-protected:
-  //! Returns table instance or create if it was not created ealier
-  //! \param theTableId an index in internal container of tables
-  //! \param isToCreate if true, the table is created if not exists
-  ViewControl_Table* findTable (const int theTableId, const bool isToCreate = true);
 
 private:
   bool myOwnSelectionChangeBlocked; //! blocking emit of selection changed signal
@@ -93,7 +109,7 @@ private:
 
   QWidget* myTableWidget; //!< widget of tables in vertical layout
   QVBoxLayout* myTableWidgetLayout; //! main view layout where tables or custom widgets are presented
-  QList<ViewControl_Table*> myTables; //!< table view, shown only first tables filled in Init method
+  ViewControl_Table* myTable; //!< table view, shown only first tables filled in Init method
   QWidget* myCustomWidget; //!< custom view widget
 };
 #endif

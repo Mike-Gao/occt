@@ -268,6 +268,8 @@ void Graphic3d_ClipPlane::SetChainNextPlane (const Handle(Graphic3d_ClipPlane)& 
 // =======================================================================
 void Graphic3d_ClipPlane::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_ClipPlane);
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySectionStyle.get());
 
   OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myEntityUID);

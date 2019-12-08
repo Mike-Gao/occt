@@ -42,14 +42,16 @@ VInspector_ItemBVHTree::VInspector_ItemBVHTree (TreeModel_ItemBasePtr theParent,
 // =======================================================================
 int VInspector_ItemBVHTree::initRowCount() const
 {
-  if (Column() != 0)
-    return  0;
+  return 0;//
 
-  opencascade::handle<BVH_Tree<Standard_Real, 3> > aTree =  GetTree();
-  if (aTree.IsNull())
-    return 0;
+  //if (Column() != 0)
+  //  return  0;
 
-  return aTree->Length();
+  //opencascade::handle<BVH_Tree<Standard_Real, 3> > aTree =  GetTree();
+  //if (aTree.IsNull())
+  //  return 0;
+
+  //return aTree->Length();
 }
 
 // =======================================================================
@@ -134,17 +136,16 @@ void VInspector_ItemBVHTree::initItem() const
 }
 
 // =======================================================================
-// function : Dump
+// function : GetStream
 // purpose :
 // =======================================================================
-Standard_Boolean VInspector_ItemBVHTree::Dump (Standard_OStream& theOStream) const
+void VInspector_ItemBVHTree::GetStream (Standard_OStream& theOStream) const
 {
   opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = GetTree();
   if (aBVHTree.IsNull())
-    return Standard_False;
+    return;
 
   aBVHTree->DumpJson (theOStream);
-  return Standard_True;
 }
 
 // =======================================================================

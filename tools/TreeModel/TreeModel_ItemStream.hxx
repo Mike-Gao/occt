@@ -60,21 +60,18 @@ public:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT void GetChildStream (const int theRowId,
-                                       TCollection_AsciiString& theKey,
-                                       TCollection_AsciiString& theValue) const;
+  ////! Returns stream value of the item to fulfill property panel.
+  ////! \return stream value or dummy
+  //Standard_EXPORT void GetChildStream (const int theRowId,
+  //                                     TCollection_AsciiString& theKey,
+  //                                     TCollection_AsciiString& theValue) const;
 
-  //! Returns data object of the item.
-  //! \return object
-  const TCollection_AsciiString& GetKey() const { initItem(); return myKey; }
+  ////! Returns data object of the item.
+  ////! \return object
+  //const TCollection_AsciiString& GetKey() const { initItem(); return myKey; }
 
-  const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetChildren() const
-    { initItem(); return myChildren; }
-
-  //! Returns the item properties
-  Handle(TreeModel_ItemProperties) Properties() const { return myProperties; }
+  //const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetChildren() const
+  //  { initItem(); return myChildren; }
 
   //! Returns stream value of the item to fulfill property panel.
   //! \return stream value or dummy
@@ -103,10 +100,9 @@ private:
   Standard_EXPORT TreeModel_ItemStream(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn);
 
 protected:
-  Handle(TreeModel_ItemProperties) myProperties; //!< the properties
-  TCollection_AsciiString myKey; //!< the item key
-  TCollection_AsciiString myStreamValue; //!< the stream value
-  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myChildren; //!< the children
+  //TCollection_AsciiString myKey; //!< the item key
+  //TCollection_AsciiString myStreamValue; //!< the stream value
+  //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> myChildren; //!< the children
 };
 
 #endif

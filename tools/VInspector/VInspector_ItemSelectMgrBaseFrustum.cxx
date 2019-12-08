@@ -104,18 +104,17 @@ void VInspector_ItemSelectMgrBaseFrustum::initItem() const
 }
 
 // =======================================================================
-// function : Dump
+// function : GetStream
 // purpose :
 // =======================================================================
-Standard_Boolean VInspector_ItemSelectMgrBaseFrustum::Dump (Standard_OStream& theOStream) const
+void VInspector_ItemSelectMgrBaseFrustum::GetStream (Standard_OStream& theOStream) const
 {
   Handle(SelectMgr_BaseFrustum) aFrustum = GetFrustum();
 
   if (aFrustum.IsNull())
-    return Standard_False;
+    return;
 
   aFrustum->DumpJson (theOStream);
-  return Standard_True;
 }
 
 // =======================================================================

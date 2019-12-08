@@ -22,6 +22,8 @@
 #include <gp_XYZ.hxx>
 #include <Bnd_Box.hxx>
 #include <Bnd_OBB.hxx>
+#include <NCollection_List.hxx>
+#include <Quantity_Color.hxx>
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <TColgp_HArray1OfPnt.hxx>
@@ -29,12 +31,14 @@
 #include <TCollection_AsciiString.hxx>
 #include <TopLoc_Location.hxx>
 #include <TopoDS_Shape.hxx> 
+#include <Standard_SStream.hxx>
 
 #include <Standard_WarningsDisable.hxx>
 #include <QString>
 #include <QVariant>
 #include <Standard_WarningsRestore.hxx>
 
+class Geom_Plane;
 class Geom_Transformation;
 
 //! \class Convert_Tools
@@ -42,21 +46,48 @@ class Geom_Transformation;
 class Convert_Tools
 {
 public:
-  //! Creates box shape
-  //! \param theBoundingBox box shape parameters
-  //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_Box& theBoundingBox);
+  //! Creates shape presentations on the stream if possible. Tries to init some OCCT base for a new presentation
+  //! \param theStream source of presentation
+  //! \param thePresentations container to collect new presentation/s
+  Standard_EXPORT static void ConvertStreamToPresentations (const Standard_SStream& theSStream,
+                                                            const Standard_Integer theStartPos,
+                                                            const Standard_Integer theLastPos,
+                                                            NCollection_List<Handle(Standard_Transient)>& thePresentations);
+
+  //! Converts stream to color if possible. It processes Quantity_Color, Quantity_ColorRGBA
+  //! \param theStream source of presentation
+  //! \param theColor [out] converted color
+  //! \returns true if done
+  Standard_EXPORT static Standard_Boolean ConvertStreamToColor (const Standard_SStream& theSStream,
+                                                                Quantity_Color& theColor);
 
   //! Creates box shape
   //! \param theBoundingBox box shape parameters
   //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateShape (const Bnd_OBB& theBoundingBox);
+  Standard_EXPORT static Standard_Boolean CreateShape (const Bnd_Box& theBoundingBox, TopoDS_Shape& theShape);
+
+  //! Creates box shape
+  //! \param theBoundingBox box shape parameters
+  //! \return created shape
+  Standard_EXPORT static Standard_Boolean CreateShape (const Bnd_OBB& theBoundingBox, TopoDS_Shape& theShape);
 
   //! Creates box shape
   //! \param thePntMin minimum point on the bounding box
   //! \param thePntMax maximum point on the bounding box
   //! \return created shape
-  Standard_EXPORT static TopoDS_Shape CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax);
+  Standard_EXPORT static Standard_Boolean CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax, TopoDS_Shape& theShape);
+
+  //! Creates presentation AIS_Plane
+  //! \param thePlane source plane
+  //! \param thePresentations container to collect new presentation/s
+  Standard_EXPORT static void CreatePresentation (const Handle(Geom_Plane)& thePlane,
+    NCollection_List<Handle(Standard_Transient)>& thePresentations);
+
+  //! Creates two presentations base on gp_Trsf: box in initial place and transformed box
+  //! \param thePlane source plane
+  //! \param thePresentations container to collect new presentation/s
+  Standard_EXPORT static void CreatePresentation (const gp_Trsf& theTrsf,
+    NCollection_List<Handle(Standard_Transient)>& thePresentations);
 
 };
 

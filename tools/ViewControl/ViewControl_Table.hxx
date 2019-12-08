@@ -86,6 +86,9 @@ public:
   //! \return string value
   Standard_EXPORT static QString SeparatorData();
 
+protected slots:
+  void onHeaderResized (int theSectionId, int, int);
+
 private:
   bool myIsActive; //!< true if the table is used in property view and visible
 

@@ -1011,3 +1011,12 @@ void Bnd_OBB::DumpJson (Standard_OStream& theOStream, const Standard_Integer the
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHDims[2]);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsAABox);
 }
+
+//=======================================================================
+//function : InitJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean Bnd_OBB::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  return Standard_False;
+}

@@ -95,8 +95,9 @@ protected:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
-  //! Dumps the content of me into the stream
-  virtual Standard_Boolean Dump (Standard_OStream& theOStream) const;
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
 
 protected:
 
