@@ -64,11 +64,6 @@ void VInspector_ItemHistoryRoot::AddElement (const VInspector_CallBackMode& theM
 const VInspector_ItemHistoryTypeInfo& VInspector_ItemHistoryRoot::GetTypeInfo (const int theChildRowIndex)
 {
   int anInfoMapIndex = theChildRowIndex + myFirstIndex;
-
-  bool aReversed = true;
-  if (aReversed)
-    anInfoMapIndex = (myInfoMap.size() - myFirstIndex) - 1 - anInfoMapIndex;
-
   return myInfoMap[anInfoMapIndex];
 }
 
@@ -78,17 +73,13 @@ const VInspector_ItemHistoryTypeInfo& VInspector_ItemHistoryRoot::GetTypeInfo (c
 // =======================================================================
 QVariant VInspector_ItemHistoryRoot::initValue (const int theRole) const
 {
-  QVariant aParentValue = VInspector_ItemBase::initValue (theRole);
-  if (aParentValue.isValid())
-    return aParentValue;
-
   if (theRole != Qt::DisplayRole && theRole != Qt::EditRole && theRole != Qt::ToolTipRole)
     return QVariant();
  
   switch (Column())
   {
     case 0: return "History";
-    case 2: return theRole == Qt::ToolTipRole ? QVariant ("Count of children") : QVariant (rowCount());
+    case 1: return theRole == Qt::ToolTipRole ? QVariant ("Count of children") : QVariant (rowCount());
     default:
       break;
   }

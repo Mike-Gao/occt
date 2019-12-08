@@ -160,6 +160,15 @@ OpenGl_LayerList::OpenGl_LayerList (const Standard_Integer theNbPriorities)
 }
 
 //=======================================================================
+//function : ~OpenGl_LayerList
+//purpose  : Destructor
+//=======================================================================
+
+OpenGl_LayerList::~OpenGl_LayerList()
+{
+}
+
+//=======================================================================
 //function : SetFrustumCullingBVHBuilder
 //purpose  :
 //=======================================================================

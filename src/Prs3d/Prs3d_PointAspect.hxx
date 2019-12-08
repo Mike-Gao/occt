@@ -61,9 +61,6 @@ public:
   //! Returns marker's texture.
   const Handle(Graphic3d_MarkerImage)& GetTexture() const { return myAspect->GetMarkerImage(); }
 
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
-
 protected:
 
   Handle(Graphic3d_AspectMarker3d) myAspect;

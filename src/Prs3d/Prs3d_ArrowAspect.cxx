@@ -15,7 +15,6 @@
 #include <Prs3d_ArrowAspect.hxx>
 
 #include <Prs3d_InvalidAngle.hxx>
-#include <TCollection.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_ArrowAspect, Prs3d_BasicAspect)
 
@@ -65,25 +64,4 @@ void Prs3d_ArrowAspect::SetAngle (const Standard_Real theAngle)
   Prs3d_InvalidAngle_Raise_if (theAngle <= 0.0
                             || theAngle >= M_PI / 2.0, "Prs3d_ArrowAspect::SetAngle() - angle out of range");
   myAngle = theAngle;
-}
-
-const TCollection_AsciiString Prs3d_ArrowAspect_ClassName = "Prs3d_ArrowAspect";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_ArrowAspect::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, Prs3d_ArrowAspect_ClassName);
-  {
-    Standard_SStream aTmpStream;
-    myArrowAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "ArrowAspect", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_VALUES (OS, "Angle", myAngle);
-  DUMP_VALUES (OS, "Length", myLength);
-
-  DUMP_STOP_KEY (OS, Prs3d_ArrowAspect_ClassName);
 }

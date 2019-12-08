@@ -15,14 +15,10 @@
 
 #include <Quantity_Color.hxx>
 
-#include <Message_Alerts.hxx>
-#include <NCollection_Vector.hxx>
-
 #include <Quantity_ColorDefinitionError.hxx>
 #include <Quantity_ColorRGBA.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_OutOfRange.hxx>
-#include <TCollection.hxx>
 #include <TCollection_AsciiString.hxx>
 
 #include <string.h>
@@ -3927,33 +3923,4 @@ void call_rgbhls (float r, float g, float b, float& h, float& l, float& s)
 	   h = (float ) 60.0 * ( plus + diff / delta );
 	   if (h < 0.0) h += 360.0;
 	}
-}
-
-
-const TCollection_AsciiString Quantity_Color_ClassName = "Quantity_Color";
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-
-void Quantity_Color::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, Quantity_Color_ClassName);
-
-  DUMP_VALUES (OS, "MyRed", MyRed);
-  DUMP_VALUES (OS, "MyGreen", MyGreen);
-  DUMP_VALUES (OS, "MyBlue", MyBlue);
-
-  DUMP_STOP_KEY (OS, Quantity_Color_ClassName);
-}
-
-//=======================================================================
-//function : Init
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean Quantity_Color::Init (const Standard_OStream& /*OS*/)
-{
-  return Standard_False;
 }

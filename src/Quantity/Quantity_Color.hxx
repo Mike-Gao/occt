@@ -21,7 +21,6 @@
 #include <Standard_Handle.hxx>
 
 #include <Standard_ShortReal.hxx>
-#include <TCollection_AsciiString.hxx>
 #include <Quantity_NameOfColor.hxx>
 #include <Quantity_TypeOfColor.hxx>
 #include <Standard_Real.hxx>
@@ -264,12 +263,6 @@ Standard_Boolean operator == (const Quantity_Color& Other) const
   
   //! Internal test
   Standard_EXPORT static void Test();
-
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS) const;
-
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT Standard_Boolean Init (const Standard_OStream& OS);
 
 private:
 

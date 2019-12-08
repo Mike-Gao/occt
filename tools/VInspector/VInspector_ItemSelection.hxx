@@ -13,36 +13,33 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspector_ItemSelectMgrFilter_H
-#define VInspector_ItemSelectMgrFilter_H
+#ifndef VInspector_ItemSelection_H
+#define VInspector_ItemSelection_H
 
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 
-#include <SelectMgr_Filter.hxx>
+#include <SelectMgr_Selection.hxx>
 
-class QItemSelectionModel;
+class VInspector_ItemSelection;
+typedef QExplicitlySharedDataPointer<VInspector_ItemSelection> VInspector_ItemSelectionPtr;
 
-class VInspector_ItemSelectMgrFilter;
-typedef QExplicitlySharedDataPointer<VInspector_ItemSelectMgrFilter> VInspector_ItemSelectMgrFilterPtr;
-
-//! \class VInspector_ItemSelectMgrFilter
-//! Item presents information about SelectMgr_Filter.
-//! Parent is item folder, children are sub filter if the filter is a composition filter.
-class VInspector_ItemSelectMgrFilter : public VInspector_ItemBase
+//! \class VInspector_ItemSelection
+//! Item about SelectMgr_Selection.
+//! Parent is presentable object item, children are sensitive entity items 
+class VInspector_ItemSelection : public VInspector_ItemBase
 {
-
 public:
 
   //! Creates an item wrapped by a shared pointer
-  static VInspector_ItemSelectMgrFilterPtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  { return VInspector_ItemSelectMgrFilterPtr (new VInspector_ItemSelectMgrFilter (theParent, theRow, theColumn)); }
-  //! Destructor
-  virtual ~VInspector_ItemSelectMgrFilter() Standard_OVERRIDE {};
+  static VInspector_ItemSelectionPtr CreateItem(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  { return VInspector_ItemSelectionPtr (new VInspector_ItemSelection (theParent, theRow, theColumn)); }
 
-  //! Returns the current filter, init item if it was not initialized yet
-  //! \return filter object
-  Standard_EXPORT Handle(SelectMgr_Filter) GetFilter() const;
+  //! Destructor
+  virtual ~VInspector_ItemSelection() {};
+
+  //! \return current selection value
+  Standard_EXPORT Handle(SelectMgr_Selection) getSelection() const;
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
@@ -52,17 +49,19 @@ public:
 
 protected:
 
-  //! Initialize the current item. It is empty because Reset() is also empty.
+  //! Initializes the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
 
-  //! Returns number of item selected
-  //! \return rows count
+  //! Initializes number of children
+  //! \return integer value
   virtual int initRowCount() const Standard_OVERRIDE;
 
   //! Returns item information for the given role. Fills internal container if it was not filled yet
   //! \param theItemRole a value role
   //! \return the value
   virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
+
+protected:
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position
@@ -72,20 +71,14 @@ protected:
 
 private:
 
-  //! Set filter into the current item
-  //! \param theFilter a filter
-  void setFilter (Handle(SelectMgr_Filter) theFilter) { myFilter = theFilter; }
+  //! Constructor
+  //! param theParent a parent item
+  VInspector_ItemSelection(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  : VInspector_ItemBase(theParent, theRow, theColumn) {}
 
 private:
 
-  //! Constructor
-  //! param theParent a parent item
-  VInspector_ItemSelectMgrFilter (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  : VInspector_ItemBase (theParent, theRow, theColumn) {}
-
-protected:
-
-  Handle(SelectMgr_Filter) myFilter; //!< the current filter
+  Handle(SelectMgr_Selection) mySelection; //!< the current selection
 };
 
 #endif
