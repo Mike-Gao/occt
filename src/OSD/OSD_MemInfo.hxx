@@ -74,9 +74,6 @@ public:
   //! Update counters
   Standard_EXPORT void Update();
 
-  //! Update counter of specified counter
-  Standard_EXPORT void Update (const OSD_MemInfo::Counter theCounter);
-
   //! Return the string representation for all available counter.
   Standard_EXPORT TCollection_AsciiString ToString() const;
 

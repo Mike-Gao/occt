@@ -22,9 +22,6 @@
 #include <Standard_Real.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Boolean.hxx>
-
-#include <Standard_OStream.hxx>
-
 class Standard_ConstructionError;
 class Standard_OutOfRange;
 class gp_Mat;
@@ -326,12 +323,6 @@ public:
   //! XYZ1 + XYZ2
     void SetLinearForm (const gp_XYZ& XYZ1, const gp_XYZ& XYZ2);
 
-
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT void Dump (Standard_OStream& OS) const;
-
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT Standard_Boolean Init (const Standard_OStream& OS);
 
 
 

@@ -38,9 +38,25 @@ ShapeView_TreeModel::ShapeView_TreeModel (QObject* theParent)
   // column 1 is reserved for visiblity state
   SetHeaderItem (2, TreeModel_HeaderSection ("Size", COLUMN_SIZE_WIDTH));
   SetHeaderItem (3, TreeModel_HeaderSection ("Pointer", COLUMN_POINTER_WIDTH));
-  SetHeaderItem (4, TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
-  SetHeaderItem (5, TreeModel_HeaderSection ("Orientation", COLUMN_ORIENTATION_WIDTH));
-  SetHeaderItem (6, TreeModel_HeaderSection ("Location", COLUMN_LOCATION_WIDTH));
+  SetHeaderItem (4, TreeModel_HeaderSection ("Orientation", COLUMN_ORIENTATION_WIDTH));
+  SetHeaderItem (5, TreeModel_HeaderSection ("Location", COLUMN_LOCATION_WIDTH));
+
+  SetHeaderItem (6, TreeModel_HeaderSection ("Checked", -1, true));
+  SetHeaderItem (7, TreeModel_HeaderSection ("Closed", -1, true));
+  SetHeaderItem (8, TreeModel_HeaderSection ("Infinite", -1, true));
+  SetHeaderItem (9, TreeModel_HeaderSection ("Locked", -1, true));
+  SetHeaderItem (10, TreeModel_HeaderSection ("Modified", -1, true));
+  SetHeaderItem (11, TreeModel_HeaderSection ("Orientable", -1, true));
+
+  SetHeaderItem (12, TreeModel_HeaderSection ("VERTEX: (X, Y, Z)", -1, true));
+
+  SetHeaderItem (13, TreeModel_HeaderSection ("EDGE: Length", -1, true));
+  SetHeaderItem (14, TreeModel_HeaderSection ("DynamicType", -1, true));
+  SetHeaderItem (15, TreeModel_HeaderSection ("First", -1, true));
+  SetHeaderItem (16, TreeModel_HeaderSection ("Last", -1, true));
+  SetHeaderItem (17, TreeModel_HeaderSection ("Continuity", -1, true));
+  SetHeaderItem (18, TreeModel_HeaderSection ("IsClosed", -1, true));
+  SetHeaderItem (19, TreeModel_HeaderSection ("IsPeriodic", -1, true));
 }
 
 // =======================================================================

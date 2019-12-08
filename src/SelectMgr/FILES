@@ -1,5 +1,3 @@
-SelectMgr.cxx
-SelectMgr.hxx
 SelectMgr_AndFilter.cxx
 SelectMgr_AndFilter.hxx
 SelectMgr_BaseFrustum.cxx

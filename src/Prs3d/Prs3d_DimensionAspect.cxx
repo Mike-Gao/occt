@@ -16,8 +16,6 @@
 
 #include <Aspect_TypeOfLine.hxx>
 #include <Graphic3d_AspectText3d.hxx>
-#include <Prs3d.hxx>
-#include <TCollection.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_DimensionAspect, Prs3d_BasicAspect)
 
@@ -61,43 +59,3 @@ void Prs3d_DimensionAspect::SetCommonColor (const Quantity_Color& theColor)
   myTextAspect->SetColor (theColor);
   myArrowAspect->SetColor (theColor);
 }
-
-const TCollection_AsciiString Prs3d_DimensionAspect_ClassName = "Prs3d_DimensionAspect";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void Prs3d_DimensionAspect::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, Prs3d_DimensionAspect_ClassName);
-  {
-    Standard_SStream aTmpStream;
-    myLineAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "LineAspect", TCollection::ToDumpString (aTmpStream));
-  }
-  {
-    Standard_SStream aTmpStream;
-    myTextAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "TextAspect", TCollection::ToDumpString (aTmpStream));
-  }
-  {
-    Standard_SStream aTmpStream;
-    myArrowAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "ArrowAspect", TCollection::ToDumpString (aTmpStream));
-  }
-  DUMP_VALUES (OS, "ValueStringFormat", myValueStringFormat);
-  DUMP_VALUES (OS, "ExtensionSize", myExtensionSize);
-  DUMP_VALUES (OS, "ArrowTailSize", myArrowTailSize);
-  DUMP_VALUES (OS, "ArrowOrientation", Prs3d::DimensionArrowOrientationToString (myArrowOrientation));
-  DUMP_VALUES (OS, "TextHPosition", Prs3d::DimensionTextHorizontalPositionToString (myTextHPosition));
-  DUMP_VALUES (OS, "TextVPosition", Prs3d::DimensionTextVerticalPositionToString (myTextVPosition));
-
-  DUMP_VALUES (OS, "ToDisplayUnits", myToDisplayUnits);
-  DUMP_VALUES (OS, "IsText3d", myIsText3d);
-  DUMP_VALUES (OS, "IsTextShaded", myIsTextShaded);
-  DUMP_VALUES (OS, "IsArrows3d", myIsArrows3d);
-
-  DUMP_STOP_KEY (OS, Prs3d_DimensionAspect_ClassName);
-}
-

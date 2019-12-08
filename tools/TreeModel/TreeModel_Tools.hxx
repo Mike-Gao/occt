@@ -22,7 +22,6 @@
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QByteArray>
-#include <QColor>
 #include <QMap>
 #include <QString>
 #include <QStyle>
@@ -91,24 +90,6 @@ public:
   //! \param theWidth width value, if -1, default value is used
   //! \param theTail symbols added to the end of the cut string
   Standard_EXPORT static QString CutString (const QString& theText, const int theWidth = -1, const QString& theTail = "...");
-
-  //! Returns light highlight color
-  //! \returns Qt color
-  Standard_EXPORT static QColor LightHighlightColor();
-
-  //! Makes the view expanded fron the root till the index
-  Standard_EXPORT static void SetExpandedTo (QTreeView* theTreeView, const QModelIndex& theIndex);
-
-  //! Recursive items expanding in tree view staring from the index
-  //! \param theTreeView an OCAF tree view
-  //! \param theParentIndex an index which children should be expanded
-  //! \param isExpanded a boolean state if the item should be expanded or collapsed
-  //! \param theLevels a number of levels to be expanded, or -1 for all levels
-  Standard_EXPORT static void SetExpanded (QTreeView* theTreeView,
-                                           const QModelIndex& theIndex,
-                                           const bool isExpanded,
-                                           int& theLevels);
-
 };
 
 #endif

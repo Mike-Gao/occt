@@ -548,32 +548,3 @@ const Handle(SelectMgr_EntityOwner)& SelectMgr_SelectableObject::GetAssemblyOwne
 {
   return THE_NULL_ENTITYOWNER;
 }
-
-const TCollection_AsciiString SelectMgr_SelectableObject_ClassName = "SelectMgr_SelectableObject";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void SelectMgr_SelectableObject::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, SelectMgr_SelectableObject_ClassName);
-
-  {
-    Standard_SStream aTmpStream;
-    PrsMgr_PresentableObject::Dump (aTmpStream);
-    DUMP_VALUES (OS, "PrsMgr_PresentableObject", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_VALUES (OS, "GlobalSelectionMode", myGlobalSelMode);
-  //DUMP_VALUES (OS, "mycurrent", mycurrent);
-  DUMP_VALUES (OS, "IsAutoHilight", myAutoHilight);
-
-/*
-  SelectMgr_SequenceOfSelection myselections;    //!< list of selections
-  Handle(Prs3d_Presentation)    mySelectionPrs;  //!< optional presentation for highlighting selected object
-  Handle(Prs3d_Presentation)    myHilightPrs;    //!< optional presentation for highlighting detected object
-*/
-
-  DUMP_STOP_KEY (OS, SelectMgr_SelectableObject_ClassName);
-}

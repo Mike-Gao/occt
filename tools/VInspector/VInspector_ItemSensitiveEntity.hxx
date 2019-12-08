@@ -13,36 +13,36 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef VInspector_ItemSelectMgrFilter_H
-#define VInspector_ItemSelectMgrFilter_H
+#ifndef VInspector_ItemSensitiveEntity_H
+#define VInspector_ItemSensitiveEntity_H
 
+#include <SelectMgr_SensitiveEntity.hxx>
+#include <Select3D_SensitiveEntity.hxx>
 #include <Standard.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 
-#include <SelectMgr_Filter.hxx>
+class SelectMgr_EntityOwner;
+class VInspector_ItemSensitiveEntity;
 
-class QItemSelectionModel;
+typedef QExplicitlySharedDataPointer<VInspector_ItemSensitiveEntity> VInspector_ItemSensitiveEntityPtr;
 
-class VInspector_ItemSelectMgrFilter;
-typedef QExplicitlySharedDataPointer<VInspector_ItemSelectMgrFilter> VInspector_ItemSelectMgrFilterPtr;
-
-//! \class VInspector_ItemSelectMgrFilter
-//! Item presents information about SelectMgr_Filter.
-//! Parent is item folder, children are sub filter if the filter is a composition filter.
-class VInspector_ItemSelectMgrFilter : public VInspector_ItemBase
+//! \class VInspector_ItemSensitiveEntity
+//! The item shows information about SelectMgr_EntityOwner.
+//! The parent is item selection, children are item entity owners
+class VInspector_ItemSensitiveEntity : public VInspector_ItemBase
 {
 
 public:
 
   //! Creates an item wrapped by a shared pointer
-  static VInspector_ItemSelectMgrFilterPtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  { return VInspector_ItemSelectMgrFilterPtr (new VInspector_ItemSelectMgrFilter (theParent, theRow, theColumn)); }
-  //! Destructor
-  virtual ~VInspector_ItemSelectMgrFilter() Standard_OVERRIDE {};
+  static VInspector_ItemSensitiveEntityPtr CreateItem (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  { return VInspector_ItemSensitiveEntityPtr (new VInspector_ItemSensitiveEntity (theParent, theRow, theColumn)); }
 
-  //! Returns the current filter, init item if it was not initialized yet
-  //! \return filter object
-  Standard_EXPORT Handle(SelectMgr_Filter) GetFilter() const;
+  //! Destructor
+  virtual ~VInspector_ItemSensitiveEntity() Standard_OVERRIDE {};
+
+  //! \return the current sensitive entity
+  Standard_EXPORT Handle(SelectMgr_SensitiveEntity) GetSensitiveEntity() const;
 
   //! Inits the item, fills internal containers
   Standard_EXPORT virtual void Init() Standard_OVERRIDE;
@@ -55,14 +55,15 @@ protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
 
-  //! Returns number of item selected
-  //! \return rows count
-  virtual int initRowCount() const Standard_OVERRIDE;
+  //! \return number of children.
+  virtual int initRowCount() const Standard_OVERRIDE { return !GetSensitiveEntity()->BaseSensitive().IsNull() ? 1 : 0; }
 
   //! Returns item information for the given role. Fills internal container if it was not filled yet
   //! \param theItemRole a value role
   //! \return the value
   virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
+
+protected:
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position
@@ -70,22 +71,20 @@ protected:
   //! \return the created item
   virtual TreeModel_ItemBasePtr createChild (int theRow, int theColumn) Standard_OVERRIDE;
 
-private:
-
-  //! Set filter into the current item
-  //! \param theFilter a filter
-  void setFilter (Handle(SelectMgr_Filter) theFilter) { myFilter = theFilter; }
+  //! Returns owner of the current sensitive entity
+  //! \return owner
+  Handle(SelectMgr_EntityOwner) getEntityOwner() const;
 
 private:
 
   //! Constructor
   //! param theParent a parent item
-  VInspector_ItemSelectMgrFilter (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
-  : VInspector_ItemBase (theParent, theRow, theColumn) {}
+  VInspector_ItemSensitiveEntity(TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
+  : VInspector_ItemBase(theParent, theRow, theColumn) {}
 
-protected:
+private:
 
-  Handle(SelectMgr_Filter) myFilter; //!< the current filter
+  Handle(SelectMgr_SensitiveEntity) myEntity; //!< the current entity owner
 };
 
 #endif

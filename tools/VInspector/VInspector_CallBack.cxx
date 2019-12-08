@@ -38,18 +38,7 @@ IMPLEMENT_STANDARD_RTTIEXT(VInspector_CallBack, VInspectorAPI_CallBack)
 // =======================================================================
 void VInspector_CallBack::Activate (Handle(AIS_InteractiveObject) thePrs, const Standard_Integer theMode)
 {
-  if (!myHistoryModel)
-    return;
-
-  QList<QVariant> anInfo;
-  if (!thePrs.IsNull())
-    anInfo = VInspector_Tools::GetInfo (thePrs);
-  else
-  {
-    anInfo.append ("Activate");
-    anInfo.append ("");
-    anInfo.append ("");
-  }
+  QList<QVariant> anInfo = VInspector_Tools::GetInfo (thePrs);
   anInfo[0] = QString ("%1: %2").arg (anInfo[0].toString()).arg (theMode);
   myHistoryModel->AddElement (VInspector_CallBackMode_Activate, anInfo);
 }
@@ -60,8 +49,6 @@ void VInspector_CallBack::Activate (Handle(AIS_InteractiveObject) thePrs, const 
 // =======================================================================
 void VInspector_CallBack::AddOrRemoveSelected (const TopoDS_Shape& theShape)
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues;
   aValues.append (""); // Name
   aValues.append (""); // Pointer
@@ -76,8 +63,6 @@ void VInspector_CallBack::AddOrRemoveSelected (const TopoDS_Shape& theShape)
 // =======================================================================
 void VInspector_CallBack::AddOrRemoveSelected (Handle(AIS_InteractiveObject) thePrs)
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues = VInspector_Tools::GetInfo (thePrs);
   aValues.append (VInspector_Tools::GetSelectedInfoPointers (myContext)); // SelectionInfo
   myHistoryModel->AddElement (VInspector_CallBackMode_AddOrRemoveSelected, aValues);
@@ -89,8 +74,6 @@ void VInspector_CallBack::AddOrRemoveSelected (Handle(AIS_InteractiveObject) the
 // =======================================================================
 void VInspector_CallBack::AddOrRemoveSelected (Handle(SelectMgr_EntityOwner) theOwner)
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues;
   aValues.append (""); // Name
   aValues.append (VInspector_Tools::GetPointerInfo (theOwner, true).ToCString()); // Pointer
@@ -106,8 +89,6 @@ void VInspector_CallBack::AddOrRemoveSelected (Handle(SelectMgr_EntityOwner) the
 // =======================================================================
 void VInspector_CallBack::ClearSelected()
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues;
   myHistoryModel->AddElement (VInspector_CallBackMode_ClearSelected, aValues);
 }
@@ -118,8 +99,6 @@ void VInspector_CallBack::ClearSelected()
 // =======================================================================
 void VInspector_CallBack::MoveTo (const Standard_Integer/* theXPix*/, const Standard_Integer/* theYPix*/)
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues;
   aValues = VInspector_Tools::GetHighlightInfo (myContext);
   myHistoryModel->AddElement (VInspector_CallBackMode_MoveTo, aValues);
@@ -131,8 +110,6 @@ void VInspector_CallBack::MoveTo (const Standard_Integer/* theXPix*/, const Stan
 // =======================================================================
 void VInspector_CallBack::Select()
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues;
   aValues = VInspector_Tools::GetSelectedInfo (myContext);
   myHistoryModel->AddElement (VInspector_CallBackMode_Select, aValues);
@@ -144,8 +121,6 @@ void VInspector_CallBack::Select()
 // =======================================================================
 void VInspector_CallBack::ShiftSelect()
 {
-  if (!myHistoryModel)
-    return;
   QList<QVariant> aValues;
   aValues = VInspector_Tools::GetSelectedInfo (myContext);
   myHistoryModel->AddElement (VInspector_CallBackMode_ShiftSelect, aValues);

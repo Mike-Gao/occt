@@ -15,7 +15,6 @@
 #include <OpenGl_Context.hxx>
 #include <OpenGl_Workspace.hxx>
 
-#include <Graphic3d.hxx>
 #include <Graphic3d_TypeOfReflection.hxx>
 #include <Graphic3d_MaterialAspect.hxx>
 
@@ -114,29 +113,4 @@ void OpenGl_Aspects::Release (OpenGl_Context* theContext)
   myResTextureSet.Release (theContext);
   myResSprite.Release (theContext);
   myResProgram.Release (theContext);
-}
-
-const TCollection_AsciiString OpenGl_Aspects_ClassName = "OpenGl_Aspects";
-
-// =======================================================================
-// function : Dump
-// purpose  :
-// =======================================================================
-void OpenGl_Aspects::Dump (Standard_OStream& OS) const
-{
-  DUMP_START_KEY (OS, OpenGl_Aspects_ClassName);
-
-  {
-    Standard_SStream aTmpStream;
-    myAspect->Dump (aTmpStream);
-    DUMP_VALUES (OS, "Aspect", TCollection::ToDumpString (aTmpStream));
-  }
-
-  DUMP_VALUES (OS, "myShadingModel", Graphic3d::TypeOfShadingModelToString (myShadingModel));
-
-  //mutable OpenGl_AspectsProgram    myResProgram;
-  //mutable OpenGl_AspectsTextureSet myResTextureSet;
-  //mutable OpenGl_AspectsSprite     myResSprite;
-
-  DUMP_STOP_KEY (OS, OpenGl_Aspects_ClassName);
 }

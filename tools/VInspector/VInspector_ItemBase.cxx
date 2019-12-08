@@ -17,37 +17,6 @@
 #include <inspector/VInspector_ItemBase.hxx>
 #include <inspector/VInspector_ItemContext.hxx>
 
-#include <inspector/ViewControl_Tools.hxx>
-
-// =======================================================================
-// function : Reset
-// purpose :
-// =======================================================================
-void VInspector_ItemBase::Reset()
-{
-  myPresentationShape = TopoDS_Shape();
-  TreeModel_ItemBase::Reset();
-}
-
-// =======================================================================
-// function : initValue
-// purpose :
-// =======================================================================
-QVariant VInspector_ItemBase::initValue (const int theItemRole) const
-{
-  if (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole)
-    return QVariant();
-
-  switch (Column())
-  {
-    case 1: { return rowCount(); }
-    case 2: return ViewControl_Tools::GetPointerInfo (GetObject(), true).ToCString();
-    case 3: { return Row(); }
-  }
-
-  return QVariant();
-}
-
 // =======================================================================
 // function : GetContext
 // purpose :
@@ -79,17 +48,4 @@ Handle(AIS_InteractiveContext) VInspector_ItemBase::GetContext() const
     const_cast<VInspector_ItemBase*>(this)->SetContext (aContext);
 
   return myContext;
-}
-
-// =======================================================================
-// function : GetContext
-// purpose :
-// =======================================================================
-TopoDS_Shape VInspector_ItemBase::GetPresentationShape() const
-{
-  if (Column() != TreeModel_ColumnType_Name)
-    return TopoDS_Shape();
-  
-  initItem();
-  return myPresentationShape;
 }

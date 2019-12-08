@@ -17,8 +17,6 @@
 #ifndef _gp_HeaderFile
 #define _gp_HeaderFile
 
-#include <gp_TrsfForm.hxx>
-
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
@@ -153,27 +151,6 @@ public:
   Standard_EXPORT static const gp_Ax2d& OY2d();
 
 
-  //! Returns the string name for a given type.
-  //! @param theType an enumeration type
-  //! @return string identifier from the enumeration list
-  Standard_EXPORT static Standard_CString TrsfFormToString (gp_TrsfForm theType);
-
-  //! Returns the orientation type from the given string identifier (using case-insensitive comparison).
-  //! @param theTypeString string identifier
-  //! @return enumeration type or gp_Identity if string identifier is invalid
-  static gp_TrsfForm TrsfFormFromString (Standard_CString theTypeString)
-  {
-    gp_TrsfForm aType = gp_Identity;
-    TrsfFormFromString (theTypeString, aType);
-    return aType;
-  }
-
-  //! Determines the type from the given string identifier (using case-insensitive comparison).
-  //! @param theTypeString string identifier
-  //! @param theType detected type
-  //! @return TRUE if string identifier is known
-  Standard_EXPORT static Standard_Boolean TrsfFormFromString (const Standard_CString theTypeString,
-                                                              gp_TrsfForm& theType);
 
 
 protected:

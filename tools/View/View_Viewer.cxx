@@ -19,13 +19,6 @@
 #include <Standard_ExtString.hxx>
 #include <Standard_Version.hxx>
 
-//#define USE_CLIPPLANE
-
-#ifdef USE_CLIPPLANE
-#include <Graphic3d_ClipPlane.hxx>
-#include <gp_Pln.hxx>
-#endif
-
 // =======================================================================
 // function : CreateView
 // purpose :
@@ -33,15 +26,7 @@
 void View_Viewer::CreateView()
 {
   if (myView.IsNull())
-  {
     myView = myContext->CurrentViewer()->CreateView();
-
-#ifdef USE_CLIPPLANE
-    gp_Pln aPln (gp_Pnt (50, 0, 0), gp_Dir (-1., 0., 0.));
-    Handle(Graphic3d_ClipPlane) aClipPlane = new Graphic3d_ClipPlane(aPln);
-    myView->AddClipPlane (aClipPlane);
-#endif
-  }
 }
 
 // =======================================================================
@@ -56,38 +41,26 @@ void View_Viewer::SetWindow(const Handle(Aspect_Window)& theWindow)
 }
 
 // =======================================================================
-// function : InitViewer
+// function : InitStandardViewer
 // purpose :
 // =======================================================================
-void View_Viewer::InitViewer (const Handle(AIS_InteractiveContext)& theContext)
-{
-  myContext = theContext;
-  myViewer = myContext->CurrentViewer();
-}
-
-// =======================================================================
-// function : CreateStandardViewer
-// purpose :
-// =======================================================================
-Handle(AIS_InteractiveContext) View_Viewer::CreateStandardViewer()
+void View_Viewer::InitStandardViewer()
 {
   Handle(Aspect_DisplayConnection) aDisplayConnection = new Aspect_DisplayConnection();
   static Handle(OpenGl_GraphicDriver) aGraphicDriver = new OpenGl_GraphicDriver (aDisplayConnection);
 
 #if OCC_VERSION_HEX > 0x060901
-  Handle(V3d_Viewer) aViewer = new V3d_Viewer (aGraphicDriver);
+  myViewer = new V3d_Viewer (aGraphicDriver);
 #else
   TCollection_AsciiString a3DName ("Visu3D");
-  Handle(V3d_Viewer) aViewer = new V3d_Viewer (aGraphicDriver, a3DName.ToExtString(), "", 1000.0, V3d_XposYnegZpos,
-    Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT, Standard_True, Standard_False);
+  myViewer = new V3d_Viewer (aGraphicDriver, a3DName.ToExtString(), "", 1000.0, V3d_XposYnegZpos, Quantity_NOC_GRAY30,
+                             V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT, Standard_True, Standard_False);
 #endif
 
-  aViewer->SetDefaultLights();
-  aViewer->SetLightOn();
-  aViewer->SetDefaultBackgroundColor (Quantity_NOC_GRAY30);
+  myViewer->SetDefaultLights();
+  myViewer->SetLightOn();
+  myViewer->SetDefaultBackgroundColor (Quantity_NOC_GRAY30);
 
-  Handle(AIS_InteractiveContext) aContext = new AIS_InteractiveContext (aViewer);
-  aContext->UpdateCurrentViewer();
-
-  return aContext;
+  myContext = new AIS_InteractiveContext (myViewer);
+  myContext->UpdateCurrentViewer();
 }

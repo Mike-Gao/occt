@@ -19,12 +19,10 @@
 #include <BVH_Tree.hxx>
 #include <gp_GTrsf.hxx>
 #include <gp_Pnt.hxx>
-#include <Message_Alerts.hxx>
 #include <OSD_Environment.hxx>
 #include <Precision.hxx>
 #include <Select3D_SensitiveEntity.hxx>
 #include <SelectBasics_PickResult.hxx>
-#include <SelectMgr.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_SortCriterion.hxx>
 #include <SelectMgr_SensitiveEntitySet.hxx>
@@ -34,12 +32,6 @@
 #include <TColStd_ListOfInteger.hxx>
 
 #include <algorithm>
-
-//#define REPORT_SELECTION_BUILD
-#ifdef REPORT_SELECTION_BUILD
-#include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
-#endif
 
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_ViewerSelector, Standard_Transient)
 
@@ -217,37 +209,15 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(Select3D_SensitiveEnti
                                              const gp_GTrsf& theInversedTrsf,
                                              SelectMgr_SelectingVolumeManager& theMgr)
 {
-  #ifdef REPORT_SELECTION_BUILD
-  Message_PerfMeter aPerfMeter;
-  Standard_SStream aStream;
-  MESSAGE_INFO_OBJECT (theEntity, aStream, "checkOverlap", "", &aPerfMeter, NULL);
-  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
-  #endif
-
   const Handle(SelectMgr_EntityOwner)& anOwner = theEntity->OwnerId();
   Handle(SelectMgr_SelectableObject) aSelectable = !anOwner.IsNull() ? anOwner->Selectable() : Handle(SelectMgr_SelectableObject)();
   SelectBasics_PickResult aPickResult;
-  #ifdef REPORT_SELECTION_BUILD
-  MESSAGE_INFO (TCollection_AsciiString ("Matches - start"), "", &aPerfMeter, aParentAlert);
-  #endif
   const Standard_Boolean isMatched = theEntity->Matches(theMgr, aPickResult);
-  #ifdef REPORT_SELECTION_BUILD
-  MESSAGE_INFO (TCollection_AsciiString ("Matches - end"), "", &aPerfMeter, aParentAlert);
-  #endif
   if (!isMatched
     || anOwner.IsNull())
   {
     return;
   }
-
-  //if (!mySelectingVolumeMgr.ViewClipping().IsNull())
-  //{
-  //  Standard_Real aDepth = /*aPickResult.HasPickedPoint() ?*+/ aPickResult.Depth();// :*/ aPickResult.DistToGeomCenter();
-  //  Standard_Boolean isClipped = mySelectingVolumeMgr.IsClipped (*mySelectingVolumeMgr.ViewClipping(),
-  //                                                                aDepth);
-  //  if (isClipped)
-  //    return;
-  //}
 
   SelectMgr_SortCriterion aCriterion;
   myZLayerOrderMap.Find (!aSelectable.IsNull() ? aSelectable->ZLayer() : Graphic3d_ZLayerId_Default, aCriterion.ZLayerPosition);
@@ -337,13 +307,6 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   {
     return;
   }
-
-  #ifdef REPORT_SELECTION_BUILD
-  Message_PerfMeter aPerfMeter;
-  Standard_SStream aStream;
-  MESSAGE_INFO_OBJECT (theObject, aStream, "traverseObject", "", &aPerfMeter, NULL);
-  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
-  #endif
 
   const opencascade::handle<BVH_Tree<Standard_Real, 3> >& aSensitivesTree = anEntitySet->BVH();
   gp_GTrsf aInversedTrsf;
@@ -454,10 +417,6 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   SelectMgr_SelectingVolumeManager aTmpMgr (false);
   for (;;)
   {
-    #ifdef REPORT_SELECTION_BUILD
-    MESSAGE_INFO (TCollection_AsciiString ("aNode") + aNode, "", &aPerfMeter, aParentAlert);
-    #endif
-
     if (!aSensitivesTree->IsOuter (aNode))
     {
       const Standard_Integer aLeftChildIdx  = aSensitivesTree->Child<0> (aNode);
@@ -584,24 +543,11 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 //=======================================================================
 void SelectMgr_ViewerSelector::TraverseSensitives()
 {
-#ifdef REPORT_SELECTION_BUILD
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("TraverseSensitives", "", &aPerfMeter, NULL);
-  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
-
-  Standard_SStream aStream;
-  Dump (aStream);
-  MESSAGE_INFO_STREAM (aStream, "Parameters", "", &aPerfMeter, aParentAlert);
-#endif
-
   mystored.Clear();
 
   Standard_Integer aWidth;
   Standard_Integer aHeight;
   mySelectingVolumeMgr.WindowSize (aWidth, aHeight);
-#ifdef REPORT_SELECTION_BUILD
-  MESSAGE_INFO ("UpdateBVH", "", &aPerfMeter, aParentAlert);
-#endif
   mySelectableObjects.UpdateBVH (mySelectingVolumeMgr.Camera(),
                                  mySelectingVolumeMgr.ProjectionMatrix(),
                                  mySelectingVolumeMgr.WorldViewMatrix(),
@@ -623,11 +569,6 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
   {
     SelectMgr_SelectableObjectSet::BVHSubset aBVHSubset =
       static_cast<SelectMgr_SelectableObjectSet::BVHSubset> (aBVHSetIt);
-
-    #ifdef REPORT_SELECTION_BUILD
-    MESSAGE_INFO (TCollection_AsciiString ("aBVHSetIt"), SelectMgr::BVHSubsetToString (aBVHSubset), &aPerfMeter, aParentAlert);
-    Handle(Message_Alert) aParentAlertLevel1 = OCCT_Message_Alert;
-    #endif
 
     if (mySelectableObjects.IsEmpty (aBVHSubset))
     {
@@ -684,9 +625,6 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
     Standard_Integer aHead = -1;
     for (;;)
     {
-      #ifdef REPORT_SELECTION_BUILD
-      MESSAGE_INFO (TCollection_AsciiString ("aNode - ") + aNode, "", &aPerfMeter, aParentAlertLevel1);
-      #endif
       if (!aBVHTree->IsOuter (aNode))
       {
         const Standard_Integer aLeftChildIdx  = aBVHTree->Child<0> (aNode);
@@ -740,15 +678,7 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
     }
   }
 
-#ifdef REPORT_SELECTION_BUILD
-  MESSAGE_INFO ("SortResult", "", &aPerfMeter, aParentAlert);
-#endif
   SortResult();
-#ifdef REPORT_SELECTION_BUILD
-  Standard_SStream aStreamDone;
-  Dump (aStreamDone);
-  MESSAGE_INFO_STREAM (aStreamDone, "Parameters", "", &aPerfMeter, aParentAlert);
-#endif
 }
 
 //==================================================
@@ -928,12 +858,6 @@ TCollection_AsciiString SelectMgr_ViewerSelector::Status (const Handle(SelectMgr
 //=======================================================================
 void SelectMgr_ViewerSelector::SortResult()
 {
-#ifdef REPORT_SELECTION_BUILD
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("SortResult", "", &aPerfMeter, NULL);
-  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
-#endif
-
   if(mystored.IsEmpty()) return;
 
   const Standard_Integer anExtent = mystored.Extent();
@@ -1121,28 +1045,4 @@ void SelectMgr_ViewerSelector::ActiveOwners (NCollection_List<Handle(SelectMgr_E
 void SelectMgr_ViewerSelector::AllowOverlapDetection (const Standard_Boolean theIsToAllow)
 {
   mySelectingVolumeMgr.AllowOverlapDetection (theIsToAllow);
-}
-
-//=======================================================================
-//function : Dump
-//purpose  : 
-//=======================================================================
-void SelectMgr_ViewerSelector::Dump(Standard_OStream& OS)const 
-{
-  DUMP_VALUES (OS, "SelectMgr_ViewerSelector", 2);
-
-  DUMP_VALUES (OS, "IsPickClosest", IsPickClosest());
-  DUMP_VALUES (OS, "ToUpdateTolerance", myToUpdateTolerance);
-  DUMP_VALUES (OS, "mystored", mystored.Extent());
-  //DUMP_VALUES (OS, "mySelectingVolumeMgr", mySelectingVolumeMgr);
-
-  Standard_Integer aNbOfSelected = 0;
-  for (SelectMgr_SelectableObjectSet::Iterator aSelectableIt (mySelectableObjects); aSelectableIt.More(); aSelectableIt.Next())
-  {
-    aNbOfSelected++;
-  }
-  DUMP_VALUES (OS, "mySelectableObjects", aNbOfSelected);
-  DUMP_VALUES (OS, "myTolerances.Tolerance()", myTolerances.Tolerance());
-  DUMP_VALUES (OS, "myTolerances.CustomTolerance()", myTolerances.CustomTolerance());
-  DUMP_VALUES (OS, "myZLayerOrderMap", myZLayerOrderMap.Size());
 }

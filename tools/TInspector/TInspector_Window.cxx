@@ -42,7 +42,7 @@
 
 const int TINSPECTOR_DEFAULT_WIDTH = 650;
 const int TINSPECTOR_DEFAULT_HEIGHT = 500;//350;
-const int TINSPECTOR_DEFAULT_POSITION_X = 100;//200;
+const int TINSPECTOR_DEFAULT_POSITION_X = 200;
 const int TINSPECTOR_DEFAULT_POSITION_Y = 60;
 
 // =======================================================================

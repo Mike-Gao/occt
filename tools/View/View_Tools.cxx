@@ -37,26 +37,6 @@ QAction* View_Tools::CreateAction (const QString& theText, const char* theSlot, 
 }
 
 // =======================================================================
-// function : GetView
-// purpose :
-// =======================================================================
-Handle(V3d_View) View_Tools::FindActiveView (const Handle(AIS_InteractiveContext)& theContext)
-{
-  if (theContext.IsNull())
-    return NULL;
-
-  const Handle(V3d_Viewer)& aViewer = theContext->CurrentViewer();
-  if (aViewer.IsNull())
-    return NULL;
-
-  aViewer->InitActiveViews();
-  if (!aViewer->MoreActiveViews())
-    return NULL;
-
-  return aViewer->ActiveView();
-}
-
-// =======================================================================
 // function : SaveState
 // purpose :
 // =======================================================================
@@ -65,11 +45,7 @@ void View_Tools::SaveState (View_Window* theView, QMap<QString, QString>& theIte
 {
   QStringList aCameraDirection;
   Standard_Real aVX, aVY, aVZ;
-  Handle(V3d_View) aView = theView->GetView()->GetViewer()->GetView();
-  if (aView.IsNull())
-    return;
-
-  aView->Proj (aVX, aVY, aVZ);
+  theView->GetView()->GetViewer()->GetView()->Proj (aVX, aVY, aVZ);
   aCameraDirection << QString::number (aVX) << QString::number (aVY) << QString::number (aVZ);
 
   theItems[thePrefix + "view_camera_direction"] = aCameraDirection.join (",");

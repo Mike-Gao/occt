@@ -1,14 +1,7 @@
 ShapeView.qrc
 ShapeView_Communicator.cxx
 ShapeView_Communicator.hxx
-ShapeView_ItemBase.cxx
 ShapeView_ItemBase.hxx
-ShapeView_ItemPropertiesEdge.cxx
-ShapeView_ItemPropertiesEdge.hxx
-ShapeView_ItemPropertiesFace.cxx
-ShapeView_ItemPropertiesFace.hxx
-ShapeView_ItemPropertiesVertex.cxx
-ShapeView_ItemPropertiesVertex.hxx
 ShapeView_ItemRoot.cxx
 ShapeView_ItemRoot.hxx
 ShapeView_ItemShape.cxx

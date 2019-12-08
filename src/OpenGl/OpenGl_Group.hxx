@@ -111,9 +111,6 @@ public:
   //! Returns OpenGL capping filling aspect.
   const OpenGl_CappingPlaneResource* AspectFillCapping() const { return myAspectFillCapping; }
 
-  //! Dumps the content of me on the stream <OS>.
-  Standard_EXPORT virtual void Dump (Standard_OStream& OS) const Standard_OVERRIDE;
-
 protected:
 
   Standard_EXPORT virtual ~OpenGl_Group();
