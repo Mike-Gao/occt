@@ -55,6 +55,9 @@ ViewControl_Table::ViewControl_Table (QWidget* theParent)
   int aDefCellSize = aVHeader->minimumSectionSize();
   aVHeader->setDefaultSectionSize (aDefCellSize);
 
+  connect (myTableView->horizontalHeader(), SIGNAL (sectionResized (int, int, int)),
+           this, SLOT(onHeaderResized (int, int, int)));
+
   aLayout->addWidget (myTableView);
 }
 
@@ -87,12 +90,10 @@ void ViewControl_Table::Init (ViewControl_TableModelValues* theModelValues)
   ViewControl_TableItemDelegate* aDelegate = dynamic_cast<ViewControl_TableItemDelegate*>(myTableView->itemDelegate());
   aDelegate->SetModelValues (theModelValues);
 
-  int aSectionSize;
   myTableView->horizontalHeader()->setVisible (theModelValues->IsHeaderVisible (Qt::Horizontal));
-  if (theModelValues->GetDefaultSectionSize (Qt::Horizontal, aSectionSize) )
-    myTableView->horizontalHeader()->setDefaultSectionSize (aSectionSize);
 
   myTableView->verticalHeader()->setVisible (theModelValues->IsHeaderVisible (Qt::Vertical));
+  int aSectionSize;
   if (theModelValues->GetDefaultSectionSize (Qt::Vertical, aSectionSize) )
   {
     myTableView->verticalHeader()->setDefaultSectionSize (aSectionSize);
@@ -197,4 +198,17 @@ void ViewControl_Table::GetSelectedPointers (QStringList& thePointers) const
         thePointers.append (aData);
     }
   }
+}
+
+// =======================================================================
+// function : onHeaderResized
+// purpose :
+// =======================================================================
+
+void ViewControl_Table::onHeaderResized (int theSectionId, int, int)
+{
+  if (theSectionId != 0)
+    return;
+
+  myTableView->horizontalHeader()->setDefaultSectionSize (myTableView->columnWidth (theSectionId));
 }

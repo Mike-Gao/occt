@@ -318,7 +318,6 @@ gp_Pnt Select3D_SensitivePoly::CenterOfGeometry() const
 void Select3D_SensitivePoly::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitivePoly);
-
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
 
   //Select3D_PointData              myPolyg;              //!< Points of the poly

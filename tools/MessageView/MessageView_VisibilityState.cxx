@@ -101,7 +101,7 @@ TopoDS_Shape MessageView_VisibilityState::getShape (const QModelIndex& theIndex)
   if (!anAlertItem)
     return TopoDS_Shape();
 
-  if (!anAlertItem->GetCustomShape().IsNull())
+  /*if (!anAlertItem->GetCustomShape().IsNull())
     return anAlertItem->GetCustomShape();
 
   Handle(Message_Alert) anAlert = anAlertItem->GetAlert();
@@ -115,7 +115,7 @@ TopoDS_Shape MessageView_VisibilityState::getShape (const QModelIndex& theIndex)
   Handle(TopoDS_AlertAttribute) aShapeAttribute = Handle(TopoDS_AlertAttribute)::DownCast (anAlertExtended->Attribute());
   if (!aShapeAttribute.IsNull())
     return aShapeAttribute->GetShape();
-
+  */
   return TopoDS_Shape();
 }
 

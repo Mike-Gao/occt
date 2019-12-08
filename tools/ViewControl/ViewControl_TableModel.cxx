@@ -74,5 +74,9 @@ bool ViewControl_TableModel::setData (const QModelIndex& theIndex, const QVarian
     return false;
 
   int aRow = theIndex.row(), aColumn = theIndex.column();
-  return myModelValues->SetData (aRow, aColumn, theValue, theRole);
+  bool aResult = myModelValues->SetData (aRow, aColumn, theValue, theRole);
+
+  emit dataChanged (theIndex, theIndex);
+
+  return aResult;
 }

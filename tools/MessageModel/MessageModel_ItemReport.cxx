@@ -198,3 +198,31 @@ Handle(Message_Report) MessageModel_ItemReport::FindReport (const MessageModel_I
   }
   return NULL;
 }
+
+// =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void MessageModel_ItemReport::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(Message_Report) aReport = GetReport();
+  if (aReport.IsNull())
+    return;
+
+  aReport->DumpJson (theOStream);
+}
+
+// =======================================================================
+// function : SetStream
+// purpose :
+// =======================================================================
+bool MessageModel_ItemReport::SetStream (const Standard_SStream& theSStream, Standard_Integer& theStartPos,
+                                         Standard_Integer& theLastPos) const
+{
+  Handle(Message_Report) aReport = GetReport();
+  if (aReport.IsNull())
+    return false;
+
+  Standard_Integer aStartPos = 1;
+  return aReport->InitJson (theSStream, aStartPos);
+}

@@ -451,7 +451,6 @@ gp_GTrsf Select3D_SensitiveTriangulation::InvInitLocation() const
 void Select3D_SensitiveTriangulation::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitiveTriangulation);
-
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTriangul.get());

@@ -123,20 +123,23 @@ void VInspector_ItemSelectMgrSensitiveEntity::Init()
 
   int aRowId = Row();
   int aCurrentId = 0;
-#if OCC_VERSION_HEX < 0x070201
-  for (aSelection->Init(); aSelection->More(); aSelection->Next(), aCurrentId++)
-#else
-  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next(), aCurrentId++)
-#endif
+  if (!aSelection.IsNull())
   {
-    if (aCurrentId != aRowId)
-      continue;
-#if OCC_VERSION_HEX < 0x070201
-    myEntity = aSelection->Sensitive();
-#else
-    myEntity = aSelEntIter.Value();
-#endif
-    break;
+  #if OCC_VERSION_HEX < 0x070201
+    for (aSelection->Init(); aSelection->More(); aSelection->Next(), aCurrentId++)
+  #else
+    for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next(), aCurrentId++)
+  #endif
+    {
+      if (aCurrentId != aRowId)
+        continue;
+  #if OCC_VERSION_HEX < 0x070201
+      myEntity = aSelection->Sensitive();
+  #else
+      myEntity = aSelEntIter.Value();
+  #endif
+      break;
+    }
   }
   TreeModel_ItemBase::Init();
 }
@@ -150,6 +153,19 @@ void VInspector_ItemSelectMgrSensitiveEntity::Reset()
   // an empty method to don't clear the main label, otherwise the model will be empty
   TreeModel_ItemBase::Reset();
   myEntity = NULL;
+}
+
+// =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemSelectMgrSensitiveEntity::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(SelectMgr_SensitiveEntity) anEntity = GetSensitiveEntity();
+  if (anEntity.IsNull())
+    return;
+
+  anEntity->DumpJson (theOStream);
 }
 
 // =======================================================================

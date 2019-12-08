@@ -21,6 +21,7 @@
 
 #include <Standard_WarningsDisable.hxx>
 #include <QAbstractTableModel>
+#include <QHeaderView>
 #include <QStackedWidget>
 #include <QScrollArea>
 #include <QTableView>
@@ -79,39 +80,38 @@ ViewControl_PropertyView::ViewControl_PropertyView (QWidget* theParent, const QS
   myAttributesStack->addWidget (myTableWidget);
 
   myAttributesStack->setCurrentWidget (myEmptyWidget);
+
+  // create table
+  ViewControl_Table* aTable = new ViewControl_Table (myMainWidget);
+  ViewControl_TableModel* aModel = new ViewControl_TableModel(aTable->GetTableView());
+  aTable->SetModel (aModel);
+
+  connect (aTable->GetTableView()->selectionModel(),
+          SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)),
+          this, SLOT(onTableSelectionChanged (const QItemSelection&, const QItemSelection&)));
+
+  connect (aModel, SIGNAL (dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
+           this, SIGNAL (propertyViewDataChanged()));
+
+  myTableWidgetLayout->addWidget (aTable->GetControl());
+  myTable = aTable;
 }
 
 // =======================================================================
 // function : Init
 // purpose :
 // =======================================================================
-void ViewControl_PropertyView::Init (const QList<ViewControl_TableModelValues*>& theTableValues)
+void ViewControl_PropertyView::Init (ViewControl_TableModelValues* theTableValues)
 {
-  for (int aTableId = 0; aTableId < theTableValues.size(); aTableId++)
+  ViewControl_Table* aTable = GetTable();
+  if (theTableValues)
   {
-    ViewControl_TableModelValues* aValues = theTableValues[aTableId];
-
-    ViewControl_Table* aTable = findTable (aTableId);
-
-    aTable->Init (aValues);
+    aTable->Init (theTableValues);
     ViewControl_Tools::SetDefaultHeaderSections (aTable->GetTableView(), Qt::Horizontal);
-
-    aTable->SetActive (true);
   }
-  // hide not used tables
-  for (int aTableId = theTableValues.size(); aTableId < myTables.size(); aTableId++)
-  {
-    ViewControl_Table* aTable = findTable (aTableId, false);
-    if (!aTable)
-      continue;
+  aTable->SetActive (theTableValues);
 
-    ViewControl_TableModel* aModel = dynamic_cast<ViewControl_TableModel*> (aTable->GetTableView()->model());
-    aModel->SetModelValues (0);
-
-    aTable->SetActive (false);
-  }
-
-  if (theTableValues.size() > 0)
+  if (theTableValues)
     myAttributesStack->setCurrentWidget (myTableWidget);
   else
     myAttributesStack->setCurrentWidget (myEmptyWidget);
@@ -126,17 +126,12 @@ void ViewControl_PropertyView::Init (QWidget*)
 }
 
 // =======================================================================
-// function : GetActiveTables
+// function : GetTable
 // purpose :
 // =======================================================================
-void ViewControl_PropertyView::GetActiveTables (QList<ViewControl_Table*>& theTables)
+ViewControl_Table* ViewControl_PropertyView::GetTable()
 {
-  for (int aTableId = 0; aTableId < myTables.size(); aTableId++)
-  {
-    ViewControl_Table* aTable = findTable (aTableId, false);
-    if (aTable && aTable->IsActive())
-      theTables.append (aTable);
-  }
+  return myTable;
 }
 
 // =======================================================================
@@ -149,12 +144,10 @@ void ViewControl_PropertyView::ClearActiveTablesSelection()
   myOwnSelectionChangeBlocked = true;
 
   QList<ViewControl_Table*> aTables;
-  for (int aTableId = 0; aTableId < myTables.size(); aTableId++)
-  {
-    ViewControl_Table* aTable = findTable (aTableId, false);
-    if (aTable && aTable->IsActive())
-      aTable->GetTableView()->selectionModel()->clearSelection();
-  }
+  ViewControl_Table* aTable = GetTable();
+  if (aTable->IsActive())
+    aTable->GetTableView()->selectionModel()->clearSelection();
+
   myOwnSelectionChangeBlocked = aWasBlocked;
 }
 
@@ -164,12 +157,9 @@ void ViewControl_PropertyView::ClearActiveTablesSelection()
 // =======================================================================
 void ViewControl_PropertyView::Clear()
 {
-  for (int aTableId = 0; aTableId < myTables.size(); aTableId++)
+  ViewControl_Table* aTable = GetTable();
+  if (aTable->IsActive())
   {
-    ViewControl_Table* aTable = findTable (aTableId, false);
-    if (!aTable)
-      continue;
-
     ViewControl_TableModel* aModel = dynamic_cast<ViewControl_TableModel*> (aTable->GetTableView()->model());
     aModel->SetModelValues (0);
 
@@ -179,31 +169,37 @@ void ViewControl_PropertyView::Clear()
 }
 
 // =======================================================================
-// function : findTable
+// function : SaveState
 // purpose :
 // =======================================================================
-ViewControl_Table* ViewControl_PropertyView::findTable (const int theTableId, const bool isToCreate)
+void ViewControl_PropertyView::SaveState (ViewControl_PropertyView* thePropertyView,
+                                          QMap<QString, QString>& theItems,
+                                          const QString& thePrefix)
 {
-  if (!isToCreate && theTableId >= myTables.size())
-    return 0;
+  ViewControl_Table* aTable = thePropertyView->GetTable();
+  int aColumnWidth = aTable->GetTableView()->columnWidth (0);
+  theItems[thePrefix + "column_width_0"] = QString::number (aColumnWidth);
+}
 
-  if (theTableId < myTables.size())
-    return myTables[theTableId];
-
-  ViewControl_Table* aTable = new ViewControl_Table (myMainWidget);
-  ViewControl_TableModel* aModel = new ViewControl_TableModel(aTable->GetTableView());
-  aTable->SetModel (aModel);
-
-
-  connect (aTable->GetTableView()->selectionModel(),
-          SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)),
-          this, SLOT(onTableSelectionChanged (const QItemSelection&, const QItemSelection&)));
-
-  myTableWidgetLayout->addWidget (aTable->GetControl());
-
-  myTables.insert (theTableId, aTable);
-
-  return myTables[theTableId];
+// =======================================================================
+// function : RestoreState
+// purpose :
+// =======================================================================
+bool ViewControl_PropertyView::RestoreState (ViewControl_PropertyView* thePropertyView,
+                                             const QString& theKey,
+                                             const QString& theValue,
+                                             const QString& thePrefix)
+{
+  if (theKey == thePrefix + "column_width_0")
+  {
+    bool isOk;
+    int aWidth = theValue.toInt (&isOk);
+    if (isOk)
+      thePropertyView->GetTable()->GetTableView()->horizontalHeader()->setDefaultSectionSize (aWidth);
+  }
+  else
+    return false;
+  return true;
 }
 
 // =======================================================================

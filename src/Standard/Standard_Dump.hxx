@@ -33,7 +33,7 @@ class Standard_DumpSentry;
 //!     It creates "key": { result of dump of the field }
 //! - OCCT_DUMP_FIELD_VALUES_NUMERICAL. Use it for unlimited list of fields of C++ double type.
 //!     It creates massive of values [value_1, value_2, ...]
-//! - OCCT_DUMP_FIELD_VALUES_STRING. Use it for unlimited list of fields of TCollection_AsciiString types.
+//! - OCCT_DUMP_FIELD_VALUES_STRING. Use it for unlimited list of fields of TCollection_AsciiString types.F
 //!     It creates massive of values ["value_1", "value_2", ...]
 //! - OCCT_DUMP_BASE_CLASS. Use if Dump implementation of the class is virtual, to perform ClassName::Dump() of the parent class,
 //!     expected parameter is the parent class name.
@@ -59,16 +59,30 @@ class Standard_DumpSentry;
 //! Append into output value: "Name": Field
 #define OCCT_DUMP_FIELD_VALUE_NUMERICAL(theOStream, theField) \
 { \
-  const char* aName = Standard_Dump::DumpFieldToName (#theField); \
+  TCollection_AsciiString aName = Standard_Dump::DumpFieldToName (#theField); \
   Standard_Dump::AddValuesSeparator (theOStream); \
   theOStream << "\"" << aName << "\": " << theField; \
+}
+
+//! @def OCCT_INIT_FIELD_VALUE_NUMERICAL
+//! Append vector values into output value: "Name": [value_1, value_2, ...]
+//! This macro is intended to have only one row for dumped object in Json.
+//! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
+#define OCCT_INIT_FIELD_VALUE_NUMERICAL(theOStream, theStreamPos, theField) \
+{ \
+  Standard_Integer aStreamPos = theStreamPos; \
+  if (!Standard_Dump::ProcessFieldName (theOStream, #theField, aStreamPos)) \
+    return Standard_False; \
+  if (!Standard_Dump::InitRealValue (theOStream, aStreamPos, theField)) \
+    return Standard_False; \
+  theStreamPos = aStreamPos; \
 }
 
 //! @def OCCT_DUMP_FIELD_VALUE_STRING
 //! Append into output value: "Name": "Field"
 #define OCCT_DUMP_FIELD_VALUE_STRING(theOStream, theField) \
 { \
-  const char* aName = Standard_Dump::DumpFieldToName (#theField); \
+  TCollection_AsciiString aName = Standard_Dump::DumpFieldToName (#theField); \
   Standard_Dump::AddValuesSeparator (theOStream); \
   theOStream << "\"" << aName << "\": \"" << theField << "\""; \
 }
@@ -77,7 +91,7 @@ class Standard_DumpSentry;
 //! Append into output value: "Name": "address of the pointer"
 #define OCCT_DUMP_FIELD_VALUE_POINTER(theOStream, theField) \
 { \
-  const char* aName = Standard_Dump::DumpFieldToName (#theField); \
+  TCollection_AsciiString aName = Standard_Dump::DumpFieldToName (#theField); \
   Standard_Dump::AddValuesSeparator (theOStream); \
   theOStream << "\"" << aName << "\": \"" << Standard_Dump::GetPointerInfo (theField) << "\""; \
 }
@@ -90,14 +104,25 @@ class Standard_DumpSentry;
 //! Depth = -1 is the default value, dump here is unlimited.
 #define OCCT_DUMP_FIELD_VALUES_DUMPED(theOStream, theDepth, theField) \
 { \
-  if (theDepth != 0) \
+  if (theDepth != 0 && (theField) != NULL) \
   { \
     Standard_SStream aFieldStream; \
-    if ((theField) != NULL) \
-      (theField)->DumpJson (aFieldStream, theDepth - 1); \
-    const char* aName = Standard_Dump::DumpFieldToName (#theField); \
+    (theField)->DumpJson (aFieldStream, theDepth - 1); \
+    TCollection_AsciiString aName = Standard_Dump::DumpFieldToName (#theField); \
     Standard_Dump::DumpKeyToClass (theOStream, aName, Standard_Dump::Text (aFieldStream)); \
   } \
+}
+
+//! @def OCCT_INIT_FIELD_VALUES_DUMPED
+//! Append into output value: "Name": { field dumped values }
+//! It computes Dump of the fields. The expected field is a pointer.
+//! Use this macro for fields of the dumped class which has own Dump implementation.
+//! The macros is recursive. Recursion is stopped when the depth value becomes equal to zero.
+//! Depth = -1 is the default value, dump here is unlimited.
+#define OCCT_INIT_FIELD_VALUES_DUMPED(theSStream, theStreamPos, theField) \
+{ \
+  if ((theField) == NULL || !(theField)->InitJson (theSStream, theStreamPos)) \
+    return Standard_False; \
 }
 
 //! @def OCCT_DUMP_FIELD_VALUES_NUMERICAL
@@ -143,21 +168,24 @@ class Standard_DumpSentry;
 //! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
 #define OCCT_DUMP_VECTOR_CLASS(theOStream, theName, theCount, ...) \
 { \
+  Standard_Dump::AddValuesSeparator (theOStream); \
   theOStream << "\"" << OCCT_CLASS_NAME(theName) << "\": ["; \
   Standard_Dump::DumpRealValues (theOStream, theCount, __VA_ARGS__);\
   theOStream << "]"; \
 }
 
-//! @def OCCT_DUMP_VECTOR_CLASS
+//! @def OCCT_INIT_VECTOR_CLASS
 //! Append vector values into output value: "Name": [value_1, value_2, ...]
 //! This macro is intended to have only one row for dumped object in Json.
 //! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
 #define OCCT_INIT_VECTOR_CLASS(theOStream, theName, theStreamPos, theCount, ...) \
 { \
-  if (!Standard_Dump::ProcessStreamName (theOStream, OCCT_CLASS_NAME(theName), theStreamPos)) \
+  Standard_Integer aStreamPos = theStreamPos; \
+  if (!Standard_Dump::ProcessStreamName (theOStream, OCCT_CLASS_NAME(theName), aStreamPos)) \
     return Standard_False; \
-  if (!Standard_Dump::InitRealValues (theOStream, theStreamPos, theCount, __VA_ARGS__)) \
+  if (!Standard_Dump::InitRealValues (theOStream, aStreamPos, theCount, __VA_ARGS__)) \
     return Standard_False; \
+  theStreamPos = aStreamPos; \
 }
 
 //! @brief Simple sentry class providing convenient interface to dump.
@@ -190,6 +218,17 @@ enum Standard_JsonKey
   Standard_JsonKey_SeparatorValueToValue //!< ", "
 };
 
+//! Type for storing a dump value with the stream position
+struct Standard_DumpValue
+{
+  Standard_DumpValue() {}
+  Standard_DumpValue (const TCollection_AsciiString& theValue, const Standard_Integer& theStartPos)
+    : myValue (theValue), myStartPosition (theStartPos) {}
+
+  TCollection_AsciiString myValue; //!< current string value
+  Standard_Integer myStartPosition; //!< position of the value first char in the whole stream
+};
+
 //! This interface has some tool methods for stream (in JSON format) processing.
 class Standard_Dump
 {
@@ -219,13 +258,9 @@ public:
   //! The last value might be processed later using the same method.
   //!
   //! \param theStream stream value
-  //! \param theValues [out] container of split values
+  //! \param theKeyToValues [out] container of split values
   Standard_EXPORT static Standard_Boolean SplitJson (const TCollection_AsciiString& theStreamStr,
-                                                     NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
-
-  //! Unites container of values into Json output in form: key_1 : value_1, key_2: value_2, ... key_n: value_n
-  Standard_EXPORT static void JoinJson (Standard_OStream& theOStream,
-                                        const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
+                                                     NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& theKeyToValues);
 
   //! Returns container of indices in values, that has hierarchical value
   Standard_EXPORT static NCollection_List<Standard_Integer> HierarchicalValueIndices (
@@ -265,7 +300,7 @@ public:
   //! @param theKey a source value
   //! @param theField stream value
   Standard_EXPORT static void DumpKeyToClass (Standard_OStream& theOStream,
-                                              const char* theKey,
+                                              const TCollection_AsciiString& theKey,
                                               const TCollection_AsciiString& theField);
 
   //! Unite values in one value using template: "value_1", "value_2", ..., "value_n"
@@ -286,6 +321,14 @@ public:
                                                              const TCollection_AsciiString& theName,
                                                              Standard_Integer& theStreamPos);
 
+  //! Check whether the field name is equal to the name in the stream at position
+  //! @param theSStream stream with values
+  //! @param theName stream key field value
+  //! @param theStreamPos current position in the stream
+  Standard_EXPORT static Standard_Boolean ProcessFieldName (const Standard_SStream& theStream,
+                                                             const TCollection_AsciiString& theName,
+                                                             Standard_Integer& theStreamPos);
+
   //! Unite values in one value using template: value_1, value_2, ..., value_n
   //! @param theSStream stream with values
   //! @param theStreamPos current position in the stream
@@ -294,11 +337,19 @@ public:
                                                           Standard_Integer& theStreamPos,
                                                           int theCount, ...);
 
+  //! Returns real value
+  //! @param theSStream stream with values
+  //! @param theStreamPos current position in the stream
+  //! @param theValue stream value
+  Standard_EXPORT static Standard_Boolean InitRealValue (const Standard_SStream& theStream,
+                                                         Standard_Integer& theStreamPos,
+                                                         Standard_Real& theValue);
+
   //! Convert field name into dump text value, removes "&" and "my" prefixes
   //! An example, for field myValue, theName is Value, for &myCLass, the name is Class
   //! @param theField a source value 
   //! @param theName [out] an updated name 
-  Standard_EXPORT static const char* DumpFieldToName (const char* theField);
+  Standard_EXPORT static TCollection_AsciiString DumpFieldToName (const TCollection_AsciiString theField);
 
 private:
   //! Extracts from the string value a pair (key, value), add it into output container, update index value
@@ -310,7 +361,7 @@ private:
   Standard_EXPORT static Standard_Boolean splitKeyToValue (const TCollection_AsciiString& theStreamStr,
                                                            Standard_Integer theStartIndex,
                                                            Standard_Integer& theNextIndex,
-                                                           NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& theValues);
+                                                           NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& theValues);
 
 
   //! Returns key of json in the index position. Incement the index position to the next symbol in the row

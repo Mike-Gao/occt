@@ -14,7 +14,12 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/Convert_Tools.hxx>
+#include <inspector/Convert_TransientShape.hxx>
 
+#include <AIS_Plane.hxx>
+#include <AIS_Shape.hxx>
+#include <Geom_Plane.hxx>
+#include <Prs3d_PlaneAspect.hxx>
 #include <TColgp_Array1OfPnt.hxx>
 #include <Standard_Dump.hxx>
 #include <BRep_Builder.hxx>
@@ -27,10 +32,107 @@
 //function : CreateShape
 //purpose  :
 //=======================================================================
-TopoDS_Shape Convert_Tools::CreateShape (const Bnd_Box& theBoundingBox)
+void Convert_Tools::ConvertStreamToPresentations (const Standard_SStream& theSStream,
+                                                  const Standard_Integer theStartPos,
+                                                  const Standard_Integer /*theLastPos*/,
+                                                  NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  int aStartPos = theStartPos;
+  gp_XYZ aPoint;
+  if (aPoint.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPoint)));
+    return;
+  }
+
+  gp_Pnt aPnt;
+  if (aPnt.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPnt)));
+    return;
+  }
+
+  gp_Dir aDir;
+  if (aDir.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeEdge (gp::Origin(), aDir.XYZ())));
+    return;
+  }
+
+  gp_Ax2 anAx2;
+  if (anAx2.InitJson (theSStream, aStartPos))
+  {
+    Handle(Geom_Plane) aGeomPlane = new Geom_Plane (gp_Ax3 (anAx2));
+    CreatePresentation (aGeomPlane, thePresentations);
+    return;
+  }
+
+  gp_Ax3 anAx3; // should be after gp_Ax2
+  if (anAx3.InitJson (theSStream, aStartPos))
+  {
+    Handle(Geom_Plane) aGeomPlane = new Geom_Plane (anAx3);
+    CreatePresentation (aGeomPlane, thePresentations);
+    return;
+  }
+
+  // should be after gp_Ax3
+  gp_Ax1 anAxis;
+  if (anAxis.InitJson (theSStream, aStartPos))
+  {
+    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeEdge (anAxis.Location(), anAxis.Location().Coord() + anAxis.Direction().XYZ())));
+    return;
+  }
+
+  gp_Trsf aTrsf;
+  if (aTrsf.InitJson (theSStream, aStartPos))
+  {
+    CreatePresentation (aTrsf, thePresentations);
+    return;
+  }
+
+  Bnd_Box aBox;
+  if (aBox.InitJson (theSStream, aStartPos))
+  {
+    TopoDS_Shape aShape;
+    if (Convert_Tools::CreateShape (aBox, aShape))
+      thePresentations.Append (new Convert_TransientShape (aShape));
+    return;
+  }
+}
+
+//=======================================================================
+//function : ConvertStreamToColor
+//purpose  :
+//=======================================================================
+Standard_Boolean Convert_Tools::ConvertStreamToColor (const Standard_SStream& theSStream,
+                                                      Quantity_Color& theColor)
+{
+  Standard_Integer aStartPos = 1;
+  Quantity_ColorRGBA aColorRGBA;
+  if (aColorRGBA.InitJson (theSStream, aStartPos))
+  {
+    theColor = aColorRGBA.GetRGB();
+    return Standard_True;
+  }
+
+  Quantity_Color aColor;
+  if (aColor.InitJson (theSStream, aStartPos))
+  {
+    theColor = aColor;
+    return Standard_True;
+  }
+
+  return Standard_False;
+}
+
+//=======================================================================
+//function : CreateShape
+//purpose  :
+//=======================================================================
+Standard_Boolean Convert_Tools::CreateShape (const Bnd_Box& theBoundingBox, TopoDS_Shape& theShape)
 {
   if (theBoundingBox.IsVoid() || theBoundingBox.IsWhole())
-    return TopoDS_Shape();
+    return Standard_False;
 
   Standard_Real aXmin, anYmin, aZmin, aXmax, anYmax, aZmax;
   theBoundingBox.Get (aXmin, anYmin, aZmin, aXmax, anYmax, aZmax);
@@ -38,17 +140,17 @@ TopoDS_Shape Convert_Tools::CreateShape (const Bnd_Box& theBoundingBox)
   gp_Pnt aPntMin = gp_Pnt (aXmin, anYmin, aZmin);
   gp_Pnt aPntMax = gp_Pnt (aXmax, anYmax, aZmax);
 
-  return CreateBoxShape (aPntMin, aPntMax);
+  return CreateBoxShape (aPntMin, aPntMax, theShape);
 }
 
 //=======================================================================
 //function : CreateShape
 //purpose  :
 //=======================================================================
-TopoDS_Shape Convert_Tools::CreateShape (const Bnd_OBB& theBoundingBox)
+Standard_Boolean Convert_Tools::CreateShape (const Bnd_OBB& theBoundingBox, TopoDS_Shape& theShape)
 {
   if (theBoundingBox.IsVoid())
-    return TopoDS_Shape();
+    return Standard_False;
 
   TColgp_Array1OfPnt anArrPnts(0, 8);
   theBoundingBox.GetVertex(&anArrPnts(0));
@@ -62,14 +164,15 @@ TopoDS_Shape Convert_Tools::CreateShape (const Bnd_OBB& theBoundingBox)
   aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt (anArrPnts.Value(1)), gp_Pnt (anArrPnts.Value(3))));
   aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (gp_Pnt (anArrPnts.Value(2)), gp_Pnt (anArrPnts.Value(3))));
 
-  return aCompound;
+  theShape = aCompound;
+  return Standard_True;
 }
 
 //=======================================================================
 //function : CreateBoxShape
 //purpose  :
 //=======================================================================
-TopoDS_Shape Convert_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax)
+Standard_Boolean Convert_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pnt& thePntMax, TopoDS_Shape& theShape)
 {
   Standard_Boolean aThinOnX = fabs (thePntMin.X() - thePntMax.X()) < Precision::Confusion();
   Standard_Boolean aThinOnY = fabs (thePntMin.Y() - thePntMax.Y()) < Precision::Confusion();
@@ -81,7 +184,8 @@ TopoDS_Shape Convert_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pn
     TopoDS_Compound aCompound;
     aBuilder.MakeCompound (aCompound);
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (thePntMin));
-    return aCompound;
+    theShape = aCompound;
+    return Standard_True;
   }
 
   if (aThinOnX || aThinOnY || aThinOnZ)
@@ -116,11 +220,66 @@ TopoDS_Shape Convert_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const gp_Pn
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt3, aPnt4));
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt4, aPnt1));
 
-    return aCompound;
+    theShape = aCompound;
+    return Standard_True;
   }
   else
   {
     BRepPrimAPI_MakeBox aBoxBuilder (thePntMin, thePntMax);
-    return aBoxBuilder.Shape();
+    theShape = aBoxBuilder.Shape();
+    return Standard_True;
   }
+}
+
+//=======================================================================
+//function : CreatePresentation
+//purpose  :
+//=======================================================================
+void Convert_Tools::CreatePresentation (const Handle(Geom_Plane)& thePlane,
+                                        NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  Handle(AIS_Plane) aPlanePrs = new AIS_Plane (thePlane);
+
+  // TODO - default fields to be defined in another place
+  aPlanePrs->Attributes()->SetPlaneAspect (new Prs3d_PlaneAspect());
+  Handle (Prs3d_PlaneAspect) aPlaneAspect = aPlanePrs->Attributes()->PlaneAspect();
+  aPlaneAspect->SetPlaneLength (100, 100);
+  aPlaneAspect->SetDisplayCenterArrow (Standard_True);
+  aPlaneAspect->SetDisplayEdgesArrows (Standard_True);
+  aPlaneAspect->SetArrowsSize (100);
+  aPlaneAspect->SetArrowsLength (100);
+  aPlaneAspect->SetDisplayCenterArrow (Standard_True);
+  aPlaneAspect->SetDisplayEdges (Standard_True);
+
+  aPlanePrs->SetColor (Quantity_NOC_WHITE);
+  aPlanePrs->SetTransparency (0);
+
+  thePresentations.Append (aPlanePrs);
+}
+
+//=======================================================================
+//function : CreatePresentation
+//purpose  :
+//=======================================================================
+void Convert_Tools::CreatePresentation (const gp_Trsf& theTrsf,
+                                        NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  Bnd_Box aBox (gp_Pnt(), gp_Pnt(10., 10., 10));
+
+  TopoDS_Shape aBoxShape;
+  if (!Convert_Tools::CreateShape (aBox, aBoxShape))
+    return;
+
+  Handle(AIS_Shape) aSourcePrs = new AIS_Shape (aBoxShape);
+  // TODO - default fields to be defined in another place
+  aSourcePrs->SetColor (Quantity_NOC_WHITE);
+  aSourcePrs->SetTransparency (0.5);
+  thePresentations.Append (aSourcePrs);
+
+  Handle(AIS_Shape) aTransformedPrs = new AIS_Shape (aBoxShape);
+  // TODO - default fields to be defined in another place
+  aTransformedPrs->SetColor (Quantity_NOC_TOMATO);
+  aTransformedPrs->SetTransparency (0.5);
+  aTransformedPrs->SetLocalTransformation (theTrsf);
+  thePresentations.Append (aTransformedPrs);
 }

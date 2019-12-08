@@ -64,6 +64,19 @@ void VInspector_ItemGraphic3dCamera::Reset()
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemGraphic3dCamera::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(Graphic3d_Camera) aCamera = GetCamera();
+  if (aCamera.IsNull())
+    return;
+
+  aCamera->DumpJson (theOStream);
+}
+
+// =======================================================================
 // function : initItem
 // purpose :
 // =======================================================================
@@ -80,6 +93,8 @@ void VInspector_ItemGraphic3dCamera::initItem() const
 // =======================================================================
 int VInspector_ItemGraphic3dCamera::initRowCount() const
 {
+  Handle(Graphic3d_Camera) aCamera = GetCamera(); // we need Init() call for having GetStream() filled
+
   return 0;
 }
 

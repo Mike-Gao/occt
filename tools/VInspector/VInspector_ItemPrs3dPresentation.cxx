@@ -139,7 +139,7 @@ void VInspector_ItemPrs3dPresentation::setPresentation (const Handle(Prs3d_Prese
 TopoDS_Shape VInspector_ItemPrs3dPresentation::buildPresentationShape()
 {
   if (!myPresentation.IsNull())
-    myPresentationShape = Convert_Tools::CreateShape (myPresentation->MinMaxValues());
+    Convert_Tools::CreateShape (myPresentation->MinMaxValues(), myPresentationShape);
 
   return TopoDS_Shape();
 }

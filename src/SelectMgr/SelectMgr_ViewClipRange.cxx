@@ -111,9 +111,9 @@ void SelectMgr_ViewClipRange::DumpJson (Standard_OStream& theOStream, const Stan
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_ViewClipRange);
 
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myUnclipRange);
   for (size_t aRangeIter = 0; aRangeIter < myClipRanges.size(); ++aRangeIter)
   {
     OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myClipRanges[aRangeIter]);
   }
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myUnclipRange);
 }

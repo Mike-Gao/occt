@@ -157,6 +157,20 @@ void VInspector_ItemPrs3dDrawer::initItem() const
   const_cast<VInspector_ItemPrs3dDrawer*>(this)->Init();
 }
 
+
+// =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemPrs3dDrawer::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(Prs3d_Drawer) aDrawer = GetDrawer();
+  if (aDrawer.IsNull())
+    return;
+
+  aDrawer->DumpJson (theOStream);
+}
+
 // =======================================================================
 // function : GetPrs3dAspect
 // purpose :

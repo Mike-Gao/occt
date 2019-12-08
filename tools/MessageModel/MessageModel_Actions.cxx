@@ -26,6 +26,9 @@
 
 #include <Message_AlertExtended.hxx>
 
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <Quantity_Color.hxx>
+#include <Quantity_ColorRGBA.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_AlertAttribute.hxx>
 
@@ -347,6 +350,45 @@ void MessageModel_Actions::OnTestPropertyPanel()
     aCoords.DumpJson (aStream);
     MESSAGE_INFO_STREAM(aStream, "gp_XYZ", "", &aPerfMeter, NULL);
   }
+  // gp_Dir
+  {
+    gp_Dir aDir (0.3, 0.3, 0.4);
+    Standard_SStream aStream;
+    aDir.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Dir", "", &aPerfMeter, NULL);
+  }
+  // gp_Ax1
+  {
+    gp_Ax1 aCoords (gp_Pnt (1.3, 2.3, 3.4), gp_Dir (0.3, 0.3, 0.4));
+    Standard_SStream aStream;
+    aCoords.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Ax1", "", &aPerfMeter, NULL);
+  }
+  // gp_Ax2
+  {
+    gp_Ax2 aCoords (gp_Pnt (10.3, 20.3, 30.4), gp_Dir (0.3, 0.3, 0.4));
+    Standard_SStream aStream;
+    aCoords.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Ax2", "", &aPerfMeter, NULL);
+  }
+  // gp_Ax3
+  {
+    gp_Ax3 aPln (gp_Pnt (10., 20., 15.), gp_Dir (0., 0., 1.), gp_Dir (1., 0., 0.));
+    Standard_SStream aStream;
+    aPln.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Ax3", "", &aPerfMeter, NULL);
+  }
+  // gp_Trsf
+  {
+    gp_Trsf aTrsf;
+    aTrsf.SetRotation (gp::OZ(), 0.3);
+    aTrsf.SetTranslationPart (gp_Vec (15., 15., 15.));
+    aTrsf.SetScaleFactor (3.);
+
+    Standard_SStream aStream;
+    aTrsf.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "gp_Trsf", "", &aPerfMeter, NULL);
+  }
   // Bnd_Box
   {
     Bnd_Box aBox (gp_Pnt (20., 15., 10.), gp_Pnt (25., 20., 15.));
@@ -362,6 +404,29 @@ void MessageModel_Actions::OnTestPropertyPanel()
     anOBB.DumpJson (aStream);
     MESSAGE_INFO_STREAM(aStream, "Bnd_OBB", "", &aPerfMeter, NULL);
   }
+  // Quantity_ColorRGBA
+  {
+    Quantity_ColorRGBA aColor (0.2f, 0.8f, 0.8f, 0.2f);
+    Standard_SStream aStream;
+    aColor.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "Quantity_ColorRGBA", "", &aPerfMeter, NULL);
+  }
+  // Quantity_Color
+  {
+    Quantity_Color aColor (0.8, 0.8, 0.8, Quantity_TOC_RGB);
+    Standard_SStream aStream;
+    aColor.DumpJson (aStream);
+    MESSAGE_INFO_STREAM(aStream, "Quantity_Color", "", &aPerfMeter, NULL);
+  }
+
+  // SHAPE messages
+  {
+    BRepBuilderAPI_MakeEdge aBuilder (gp_Pnt (0., 0., 0.), gp_Pnt (20., 10., 20.));
+    TopoDS_Shape aShape = aBuilder.Shape();
+
+    MESSAGE_INFO_SHAPE (aShape, "Shape message edge", "", &aPerfMeter, NULL);
+  }
+
   myTreeModel->UpdateTreeModel();
 #endif
 }

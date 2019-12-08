@@ -235,18 +235,25 @@ TopoDS_Shape VInspector_ItemSelectBasicsSensitiveEntity::buildPresentationShape
   TopoDS_Compound aCompound;
   aBuilder.MakeCompound (aCompound);
 
-  aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (aBaseEntity->CenterOfGeometry()));
+  BRepBuilderAPI_MakeVertex aVBuilder (aBaseEntity->CenterOfGeometry());
+  if (aVBuilder.IsDone())
+    aBuilder.Add (aCompound, aVBuilder.Shape());
   
   Select3D_BndBox3d aBoundingBox = aBaseEntity->BoundingBox();
   if (aBoundingBox.IsValid())
-    aBuilder.Add (aCompound, VInspector_Tools::CreateShape (aBoundingBox));
+  {
+    TopoDS_Shape aShape;
+    if (VInspector_Tools::CreateShape (aBoundingBox, aShape))
+      aBuilder.Add (aCompound, aShape);
+  }
 
   Standard_CString aTypeName = aBaseEntity->DynamicType()->Name();
   if (aTypeName == STANDARD_TYPE (Select3D_SensitiveBox)->Name())
   {
     Handle(Select3D_SensitiveBox) anEntity = Handle(Select3D_SensitiveBox)::DownCast (aBaseEntity);
-    TopoDS_Shape aShape = Convert_Tools::CreateShape(anEntity->Box());
-    aBuilder.Add (aCompound, aShape);
+    TopoDS_Shape aShape;
+    if (Convert_Tools::CreateShape(anEntity->Box(), aShape))
+      aBuilder.Add (aCompound, aShape);
   }
   else if (aTypeName == STANDARD_TYPE (Select3D_SensitiveFace)->Name())
   {

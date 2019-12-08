@@ -76,5 +76,7 @@ void StdSelect_Shape::DumpJson (Standard_OStream& theOStream, const Standard_Int
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, StdSelect_Shape);
 
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, PrsMgr_PresentableObject);
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &mysh);
 }

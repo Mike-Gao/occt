@@ -32,7 +32,6 @@
 #include <inspector/TreeModel_ColumnType.hxx>
 #include <inspector/TreeModel_ContextMenu.hxx>
 #include <inspector/TreeModel_ItemProperties.hxx>
-#include <inspector/TreeModel_ItemStream.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <inspector/ViewControl_MessageDialog.hxx>
@@ -255,6 +254,11 @@ void VInspector_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIte
   {
     theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
   }
+
+  anItems.clear();
+  ViewControl_PropertyView::SaveState (myPropertyView, anItems, "property_view_parameters_");
+  for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
+    theItem.Bind (anItemsIt.key().toStdString().c_str(), anItemsIt.value().toStdString().c_str());
 }
 
 // =======================================================================
@@ -272,15 +276,20 @@ void VInspector_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap& 
 
   for (TInspectorAPI_IteratorOfPreferencesDataMap anItemIt (theItem); anItemIt.More(); anItemIt.Next())
   {
-    if (anItemIt.Key().IsEqual ("geometry"))
-      myMainWindow->restoreState (TreeModel_Tools::ToByteArray (anItemIt.Value().ToCString()));
-    else if (TreeModel_Tools::RestoreState (myTreeView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
+    TCollection_AsciiString anItemKey = anItemIt.Key();
+    TCollection_AsciiString anItemValue = anItemIt.Value();
+    if (anItemKey.IsEqual ("geometry"))
+      myMainWindow->restoreState (TreeModel_Tools::ToByteArray (anItemValue.ToCString()));
+    else if (TreeModel_Tools::RestoreState (myTreeView, anItemKey.ToCString(), anItemValue.ToCString()))
       continue;
-    else if (TreeModel_Tools::RestoreState (myHistoryView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString(),
+    else if (TreeModel_Tools::RestoreState (myHistoryView, anItemKey.ToCString(), anItemValue.ToCString(),
                                             "history_view_"))
       continue;
-    else if (View_PreviewParameters::RestoreState (myDisplayPreview->GetPreviewParameters(), anItemIt.Key().ToCString(),
-      anItemIt.Value().ToCString(), "preview_parameters_"))
+    else if (View_PreviewParameters::RestoreState (myDisplayPreview->GetPreviewParameters(), anItemKey.ToCString(),
+      anItemValue.ToCString(), "preview_parameters_"))
+      continue;
+    else if (ViewControl_PropertyView::RestoreState (myPropertyView, anItemKey.ToCString(),
+      anItemValue.ToCString(), "property_view_parameters_"))
       continue;
   }
 }
@@ -425,12 +434,9 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
 
   // obtain selection from the property panel
   {
-    //QList<ViewControl_Table*> aPropertyTables;
-    //myPropertyView->GetActiveTables (aPropertyTables);
-    //if (!aPropertyTables.isEmpty())
+    //ViewControl_Table* aPropertyTable = myPropertyView->GetTable();
+    //if (aPropertyTable->IsActive())
     //{
-    //  ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
-
     //  Handle(Graphic3d_TransformPers) aSelectedPersistent = GetSelectedTransformPers();
 
     QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
@@ -451,17 +457,12 @@ NCollection_List<TopoDS_Shape> VInspector_Window::GetSelectedShapes (const QMode
 void VInspector_Window::GetSelectedPropertyPanelShapes (const TreeModel_ItemBasePtr& theTreeItem,
                                                         NCollection_List<TopoDS_Shape>& theShapes)
 {
-  QList<ViewControl_Table*> aPropertyTables;
-  myPropertyView->GetActiveTables (aPropertyTables);
-  if (aPropertyTables.isEmpty())
-    return;
-
-  ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
-  if (!aFirstTable)
+  ViewControl_Table* aPropertyTable = myPropertyView->GetTable();
+  if (!aPropertyTable->IsActive())
     return;
 
   NCollection_List<Handle(Standard_Transient)> theSelPresentations;
-  aFirstTable->GetSelectedPresentations (theTreeItem, theSelPresentations);
+  aPropertyTable->GetSelectedPresentations (theTreeItem, theSelPresentations);
 
   for (NCollection_List<Handle(Standard_Transient)>::Iterator anIterator (theSelPresentations); anIterator.More(); anIterator.Next())
   {
@@ -470,7 +471,7 @@ void VInspector_Window::GetSelectedPropertyPanelShapes (const TreeModel_ItemBase
       theShapes.Append (aShapePrs->GetShape());
   }
 
-  //QModelIndexList& thePropertyPanelIndices = aFirstTable->GetTableView()->selectionModel()->selectedIndexes(),
+  //QModelIndexList& thePropertyPanelIndices = aPropertyTable->GetTableView()->selectionModel()->selectedIndexes(),
 
   //QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::GetSelectedItems (theTreeViewIndices);
   //NCollection_List<Handle(Standard_Transient)> aPropertyPresentations;
@@ -768,26 +769,24 @@ void VInspector_Window::onPropertyViewSelectionChanged()
   if (!aTreeItemSelected)
     return;
 
-  QList<ViewControl_Table*> aPropertyTables;
-  myPropertyView->GetActiveTables (aPropertyTables);
-  if (aPropertyTables.isEmpty())
+  ViewControl_Table* aPropertyTable = myPropertyView->GetTable();
+  if (!aPropertyTable->IsActive())
     return;
 
-  ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
   NCollection_List<Handle(Standard_Transient)> aSelPresentations;
-  aFirstTable->GetSelectedPresentations (aTreeItemSelected, aSelPresentations);
+  aPropertyTable->GetSelectedPresentations (aTreeItemSelected, aSelPresentations);
 
   //Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->GetProperties();
 
 
   //QMap<int, QList<int>> aSelectedIndices;
-  //aFirstTable->GetSelectedIndices (aSelectedIndices);
+  //aPropertyTable->GetSelectedIndices (aSelectedIndices);
 
-  //ViewControl_TableModel* aTableModel = dynamic_cast<ViewControl_TableModel*>(aFirstTable->GetTableView()->model());
+  //ViewControl_TableModel* aTableModel = dynamic_cast<ViewControl_TableModel*>(aPropertyTable->GetTableView()->model());
   //ViewControl_TableModelValues* aTableValues = aTableModel->GetModelValues();
 
   QStringList aPointers;
-  aFirstTable->GetSelectedPointers (aPointers);
+  aPropertyTable->GetSelectedPointers (aPointers);
 
   //NCollection_List<Handle(Standard_Transient)> aSelPresentations;
   /*for (QMap<int, QList<int>>::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
@@ -815,7 +814,7 @@ void VInspector_Window::onPropertyViewSelectionChanged()
   //NCollection_List<TopoDS_Shape> aSelectedShapes = GetSelectedShapes (aTreeViewSelected);
 
   //GetSelectedPropertyPanelShapes(aTreeViewSelected,
-  //                               aFirstTable->GetTableView()->selectionModel()->selectedIndexes(),
+  //                               aPropertyTable->GetTableView()->selectionModel()->selectedIndexes(),
   //                               aSelectedShapes);
   //updatePreviewPresentation(aSelectedShapes, aSelectedPersistent);
 
@@ -845,11 +844,8 @@ void VInspector_Window::onTreeViewSelectionChanged (const QItemSelection&,
     return;
 
   NCollection_List<Handle(Standard_Transient)> aSelPresentations;
-  TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream> (aTreeItemSelected);
-  if (!aStreamParent)
-    return;
 
-  Handle(TreeModel_ItemProperties) anItemProperties = aStreamParent->Properties ();
+  Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->Properties ();
   if (anItemProperties)
     anItemProperties->GetPresentations (-1, -1, aSelPresentations);
   //else
@@ -1075,17 +1071,12 @@ void VInspector_Window::updatePropertyPanelBySelection()
   if (!anItemBase)
     return;
 
-  TreeModel_ItemStreamPtr aStreamItem = itemDynamicCast<TreeModel_ItemStream> (anItemBase);
-  if (!aStreamItem)
-    return;
-
-  Handle(TreeModel_ItemProperties) anItemProperties = aStreamItem->Properties ();
-  QList<ViewControl_TableModelValues*> aTableValuesList;
+  Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->Properties ();
+  ViewControl_TableModelValues* aTableValues = 0;
   if (!anItemProperties.IsNull())
   {
-    ViewControl_TableModelValues* aTableValues = new ViewControl_TableModelValues();
+    aTableValues = new ViewControl_TableModelValues();
     aTableValues->SetProperties (anItemProperties);
-    aTableValuesList.append (aTableValues);
   }
 
   /*QItemSelectionModel* aModel = myTreeView->selectionModel();
@@ -1100,7 +1091,7 @@ void VInspector_Window::updatePropertyPanelBySelection()
     TreeModel_ItemBasePtr aSelectedItem = TreeModel_ModelBase::GetItemByIndex(aSelected.first());
     VInspector_Tools::GetPropertyTableValues (aSelectedItem, myPaneCreators, aTableValues);
   }*/
-  myPropertyView->Init (aTableValuesList);
+  myPropertyView->Init (aTableValues);
 }
 
 // =======================================================================
@@ -1231,14 +1222,43 @@ void VInspector_Window::selectTreeViewItems (const QStringList& thePointers)
 // function : createView
 // purpose :
 // =======================================================================
+#include <Prs3d_DatumAspect.hxx>
 Handle(AIS_InteractiveContext) VInspector_Window::createView()
 {
   // create two view windows
   Handle(AIS_InteractiveContext) aContext = View_Viewer::CreateStandardViewer();
 
   Handle(AIS_Trihedron) aTrihedron = new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY()));
-  aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
-  aContext->Display (aTrihedron, Standard_True);
+  aTrihedron->SetSize (0.5);
+  //aTrihedron->SetDatumDisplayMode (Prs3d_DM_Shaded);
+  //aContext->Display (aTrihedron, Standard_True);
+      aContext->Display(aTrihedron,
+                        0 /*wireframe*/,
+                        -1 /* selection mode */,
+                        Standard_True /* update viewer*/,
+                        Standard_True /* allow decomposition */,
+                        AIS_DS_Displayed /* xdisplay status */);
+  aContext->Load (aTrihedron);
+  aContext->Activate (aTrihedron, AIS_TrihedronSelectionMode_Axes);
+  {
+    Handle(AIS_Trihedron) myTrihedron = aTrihedron;
+    myTrihedron->SetInfiniteState( Standard_True);
+
+    Quantity_Color Col(193 / 255., 205 / 255., 193 / 255., Quantity_TOC_RGB);
+    myTrihedron->SetArrowColor(Col.Name());
+    //myTrihedron->SetSize(myTrihedronSize);
+    Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
+    if (drawer->HasOwnDatumAspect()) {
+      Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
+      daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
+      daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
+      daspect->ThirdAxisAspect()->SetColor(Quantity_Color(0.0, 0.0, 1.0, Quantity_TOC_RGB));
+
+      daspect->FirstAxisAspect()->SetWidth(3.0);
+      daspect->SecondAxisAspect()->SetWidth(3.0);
+      daspect->ThirdAxisAspect()->SetWidth(3.0);
+    }
+  }
 
   myViewWindow = new View_Window (0, aContext, false /*for opening several BREP files*/, true);
   myViewWindow->GetView()->SetPredefinedSize (VINSPECTOR_DEFAULT_VIEW_WIDTH, VINSPECTOR_DEFAULT_VIEW_HEIGHT);

@@ -60,11 +60,34 @@ public:
   //! \returns type of active item of context selector
   Standard_EXPORT View_ContextType GetCurrentContextType() const;
 
+  //! Sets current context type
+  //! \param theType a context type
+  Standard_EXPORT void SetCurrentContextType (View_ContextType theType);
+
   //! \returns an active context of context selector
   Standard_EXPORT Handle(AIS_InteractiveContext) GetCurrentContext() const;
 
   //! \returns whether the action is checked(toggled). Acceptable only if the action is checkable.
   Standard_EXPORT bool IsActionChecked (const int theActionId) const;
+
+  //! Save state of three view in a container in form: key, value. It saves:
+  //! - visibiblity of columns,
+  //! - columns width
+  //! \param theTreeView a view instance
+  //! \param theItems [out] properties
+  //! \param thePrefix peference item prefix
+  Standard_EXPORT static void SaveState (View_ToolBar* theParameters,
+                                         QMap<QString, QString>& theItems,
+                                         const QString& thePrefix = QString());
+  //! Restore state of three view by a container
+  //! \param theTreeView a view instance
+  //! \param theKey property key
+  //! \param theValue property value
+  //! \param thePrefix peference item prefix
+  //! \return boolean value whether the property is applyed to the tree view
+  Standard_EXPORT static bool RestoreState (View_ToolBar* theParameters,
+                                            const QString& theKey, const QString& theValue,
+                                            const QString& thePrefix = QString());
 
 signals:
 

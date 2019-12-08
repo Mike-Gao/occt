@@ -523,8 +523,8 @@ void View_Widget::processLeftButtonUp (const int theFlags, const QPoint thePoint
   myDragMultiButtonDownX = 0;
   myDragMultiButtonDownY = 0;
 
-  myCurrentMode = View_CurrentAction3d_Nothing;
-  activateCursor (myCurrentMode);
+  //myCurrentMode = View_CurrentAction3d_Nothing;
+  //activateCursor (myCurrentMode);
   emit selectionChanged();
   emit leftButtonUp(thePoint.x(), thePoint.y());
 }

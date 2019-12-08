@@ -1086,3 +1086,19 @@ Standard_Boolean StdSelect_ViewerSelector3d::ToPixMap (Image_PixMap&            
   aFiller->Flush();
   return Standard_True;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void StdSelect_ViewerSelector3d::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const 
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_ViewerSelector);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myStructs.Length())
+  for (Graphic3d_SequenceOfStructure::Iterator aStructsIt (myStructs); aStructsIt.More(); aStructsIt.Next())
+  {
+    const Handle(Graphic3d_Structure)& aStructure = aStructsIt.Value();
+    OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, aStructure)
+  }
+}

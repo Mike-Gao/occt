@@ -127,6 +127,19 @@ void VInspector_ItemV3dViewer::Reset()
 }
 
 // =======================================================================
+// function : GetStream
+// purpose :
+// =======================================================================
+void VInspector_ItemV3dViewer::GetStream (Standard_OStream& theOStream) const
+{
+  Handle(V3d_Viewer) aViewer = GetViewer();
+  if (aViewer.IsNull())
+    return;
+
+  aViewer->DumpJson (theOStream);
+}
+
+// =======================================================================
 // function : initItem
 // purpose :
 // =======================================================================

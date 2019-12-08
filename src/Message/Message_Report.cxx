@@ -24,6 +24,7 @@
 
 #include <NCollection_Map.hxx>
 #include <Precision.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 
@@ -499,4 +500,34 @@ void Message_Report::SetActive (const Standard_Boolean theActive, const Standard
   Standard_ASSERT_RETURN (theGravity >= 0 && size_t (theGravity) < sizeof (myAlerts) / sizeof (myAlerts[0]), 
                           "Set active report with gravity not in valid range", );
   myIsActive[theGravity] = theActive;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Message_Report::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+{
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPerfMeterMode);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLimit);
+}
+
+//=======================================================================
+//function : InitJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean Message_Report::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  Standard_Integer aPos = theStreamPos;
+
+  Standard_Real PerfMeterMode;
+  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, PerfMeterMode);
+  myPerfMeterMode = (Message_PerfMeterMode)((Standard_Integer)PerfMeterMode);
+
+  Standard_Real Limit;
+  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, Limit);
+  myLimit = (Standard_Integer)Limit;
+
+  theStreamPos = aPos;
+  return Standard_True;
 }

@@ -85,8 +85,8 @@ QVariant ViewControl_TableModelValues::Data (const int theRow, const int theColu
 
 bool ViewControl_TableModelValues::SetData (const int theRow, const int theColumn, const QVariant& theValue, int)
 {
-  //if (!GetProperties().IsNull())
-  //  return GetProperties()->SetTableData (theRow, theColumn, theValue);
+  if (!GetProperties().IsNull())
+    return GetProperties()->SetData (theRow, theColumn, theValue);
 
   return false;
 }
@@ -113,10 +113,10 @@ QVariant ViewControl_TableModelValues::HeaderData (int theSection, Qt::Orientati
 // =======================================================================
 ViewControl_EditType ViewControl_TableModelValues::GetEditType (const int theRow, const int theColumn) const
 {
-  //if (!GetProperties().IsNull())
-  //{
-  //  return GetProperties()->GetTableEditType (theRow, theColumn);
-  //}
+  if (!GetProperties().IsNull())
+  {
+    return GetProperties()->GetEditType (theRow, theColumn);
+  }
   return ViewControl_EditType_None;
 }
 

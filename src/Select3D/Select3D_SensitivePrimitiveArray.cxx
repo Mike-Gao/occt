@@ -1226,7 +1226,6 @@ Standard_Boolean Select3D_SensitivePrimitiveArray::elementIsInside (SelectBasics
 void Select3D_SensitivePrimitiveArray::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_SensitivePrimitiveArray);
-
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
 
   //Handle(Select3D_PrimArraySubGroupArray) myGroups;         //!< sub-groups of sensitive entities

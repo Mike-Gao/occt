@@ -43,9 +43,9 @@ View_PreviewParameters::View_PreviewParameters()
   myDrawer->ShadingAspect()->SetColor (aColor);
   myDrawer->ShadingAspect()->SetMaterial (aShadingMaterial);
 
-  myDrawer->ShadingAspect()->Aspect()->ChangeFrontMaterial().SetTransparency (aTransparency);
-  myDrawer->ShadingAspect()->Aspect()->ChangeBackMaterial() .SetTransparency (aTransparency);
-  myDrawer->SetTransparency (aTransparency);
+  //myDrawer->ShadingAspect()->Aspect()->ChangeFrontMaterial().SetTransparency (aTransparency);
+  //myDrawer->ShadingAspect()->Aspect()->ChangeBackMaterial() .SetTransparency (aTransparency);
+  //myDrawer->SetTransparency (aTransparency);
 
   // common parameters
   myDrawer->SetZLayer (Graphic3d_ZLayerId_Topmost);
@@ -94,10 +94,10 @@ bool  View_PreviewParameters::RestoreState (View_PreviewParameters* theParameter
                                                   const QString& theKey, const QString& theValue,
                                                   const QString& thePrefix)
 {
-  //if (theKey == thePrefix + "has_point_aspect") // point parameters
-  //{
+  if (theKey == thePrefix + "has_point_aspect") // point parameters
+  {
   //  myDrawer->SetOwnPointAspect (theValue.toBool());
-  //}
+  }
   //else if (theKey == thePrefix + "point_aspect") // point parameters
   //{
   //  Standard_SStream aStream;
@@ -114,7 +114,7 @@ bool  View_PreviewParameters::RestoreState (View_PreviewParameters* theParameter
   //  aStream << theValue.ToString().ToStdString();
   //  myDrawer->ShadingAspect()->Init (aStream);
   //}
-  //else
-  //  return false;
+  else
+    return false;
   return true;
 }

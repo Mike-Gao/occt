@@ -116,7 +116,6 @@ void VInspector_ItemGraphic3dGroup::GetStream (Standard_OStream& theOStream) con
   aGroup->DumpJson (theOStream);
 }
 
-
 // =======================================================================
 // function : createChild
 // purpose :

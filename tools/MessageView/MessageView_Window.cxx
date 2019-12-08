@@ -25,14 +25,14 @@
 #include <inspector/MessageModel_TreeModel.hxx>
 
 #include <inspector/TreeModel_ContextMenu.hxx>
-#include <inspector/TreeModel_ItemStream.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <inspector/ViewControl_PropertyView.hxx>
 #include <inspector/ViewControl_TableModelValues.hxx>
 #include <inspector/ViewControl_TreeView.hxx>
-#include <inspector/Convert_TransientShape.hxx>
+#include <inspector/Convert_Tools.hxx>
 
+#include <inspector/View_DisplayPreview.hxx >
 #include <inspector/View_Tools.hxx>
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
@@ -142,6 +142,8 @@ Handle(Prs3d_Drawer) GetPreviewAttributes (const Handle(AIS_InteractiveContext)&
 MessageView_Window::MessageView_Window (QWidget* theParent)
 : QObject (theParent)
 {
+  myDisplayPreview = new View_DisplayPreview();
+
   myMainWindow = new QMainWindow (theParent);
 
   myTreeView = new ViewControl_TreeView (myMainWindow);
@@ -188,11 +190,14 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
   myPropertyPanelWidget->setWidget (myPropertyView->GetControl());
   myMainWindow->addDockWidget (Qt::RightDockWidgetArea, myPropertyPanelWidget);
   connect (myPropertyPanelWidget->toggleViewAction(), SIGNAL(toggled(bool)), this, SLOT (onPropertyPanelShown (bool)));
-  connect (myPropertyView, SIGNAL (propertyViewSelectionChanged()), this, SLOT (onPropertyViewSelectionChanged ()));
+  connect (myPropertyView, SIGNAL (propertyViewSelectionChanged()), this, SLOT (onPropertyViewSelectionChanged()));
+  connect (myPropertyView, SIGNAL (propertyViewDataChanged()), this, SLOT (onPropertyViewDataChanged()));
+
 
   // view
   myViewWindow = new View_Window (myMainWindow, false);
   connect (myViewWindow, SIGNAL(eraseAllPerformed()), this, SLOT(onEraseAllPerformed()));
+  connect (myViewWindow->GetViewToolBar(), SIGNAL (contextChanged()), this, SLOT (onContextSelected()));
   aVisibilityState->SetDisplayer (myViewWindow->GetDisplayer());
   aVisibilityState->SetPresentationType (View_PresentationType_Main);
   myViewWindow->GetView()->SetPredefinedSize (MESSAGEVIEW_DEFAULT_VIEW_WIDTH, MESSAGEVIEW_DEFAULT_VIEW_HEIGHT);
@@ -363,6 +368,7 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
   if (!aContext.IsNull())
   {
     myViewWindow->SetContext (View_ContextType_External, aContext);
+    myViewWindow->GetViewToolBar()->SetCurrentContextType (View_ContextType_External);
   }
 
   if (!aViewCamera.IsNull())
@@ -409,7 +415,7 @@ void MessageView_Window::addReport (const Handle(Message_Report)& theReport,
 }
 
 // =======================================================================
-// function : onTreeViewSelectionChanged
+// function : onTreeViewVisibilityClicked
 // purpose :
 // =======================================================================
 void MessageView_Window::onTreeViewVisibilityClicked(const QModelIndex& theIndex)
@@ -430,37 +436,7 @@ void MessageView_Window::onTreeViewSelectionChanged (const QItemSelection&, cons
     return;
 
   updatePropertyPanelBySelection();
-
-  NCollection_List<Handle(Standard_Transient)> aPresentations;
-  MessageModel_ItemRootPtr aRootItem;
-  QModelIndexList aSelectedIndices = myTreeView->selectionModel()->selectedIndexes();
-  for (QModelIndexList::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
-  {
-    QModelIndex anIndex = *aSelIt;
-    if (anIndex.column() != 0)
-      continue;
-
-    TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
-    if (!anItemBase)
-      continue;
-
-    //Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->GetProperties();
-    //if (anItemProperties)
-    //  anItemProperties->GetPresentations (-1, -1, aPresentations);
-    TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream> (anItemBase);
-    if (!aStreamParent)
-      return;
-
-    Handle(TreeModel_ItemProperties) anItemProperties = aStreamParent->Properties ();
-    if (anItemProperties)
-      anItemProperties->GetPresentations (-1, -1, aPresentations);
-
-    MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
-    if (!anAlertItem)
-      continue;
-    anAlertItem->GetPresentations (aPresentations);
-  }
-  updatePreviewPresentation (aPresentations);
+  updatePreviewPresentation();
 }
 
 // =======================================================================
@@ -553,15 +529,12 @@ void MessageView_Window::onPropertyViewSelectionChanged()
   if (!anAlertItem)
     return;
 
-  QList<ViewControl_Table*> aPropertyTables;
-  myPropertyView->GetActiveTables (aPropertyTables);
-  if (aPropertyTables.isEmpty())
+  ViewControl_Table* aPropertyTable = myPropertyView->GetTable();
+  if (!aPropertyTable->IsActive())
     return;
 
-  ViewControl_Table* aFirstTable = aPropertyTables[0]; // TODO: implement for several tables
-
   QMap<int, QList<int>> aSelectedIndices;
-  aFirstTable->GetSelectedIndices (aSelectedIndices);
+  aPropertyTable->GetSelectedIndices (aSelectedIndices);
 
   // clear presentation if selection is empty
   MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
@@ -573,7 +546,7 @@ void MessageView_Window::onPropertyViewSelectionChanged()
     return;
   }
 
-  /*TopoDS_Shape aShapeOfSelection = MessageModel_Tools::BuildShape (anAlertItem->GetAlert(), aSelectedIndices[0], aFirstTable);
+  /*TopoDS_Shape aShapeOfSelection = MessageModel_Tools::BuildShape (anAlertItem->GetAlert(), aSelectedIndices[0], aPropertyTable);
   if (aShapeOfSelection.IsNull())
     return;
 
@@ -594,6 +567,24 @@ void MessageView_Window::onPropertyViewSelectionChanged()
     anAlertItem->SetCustomShape (aShapeOfSelection);
     aVisibilityState->SetVisible (anIndex, true);
   }*/
+}
+
+// =======================================================================
+// function : onPropertyViewDataChanged
+// purpose :
+// =======================================================================
+void MessageView_Window::onPropertyViewDataChanged()
+{
+  QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (aModel->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+  if (!anItemBase)
+    return;
+
+  updatePropertyPanelBySelection();
+  updatePreviewPresentation();
 }
 
 // =======================================================================
@@ -704,6 +695,19 @@ void MessageView_Window::onReloadReport()
 }
 
 // =======================================================================
+// function : onContextSelected
+// purpose :
+// =======================================================================
+void MessageView_Window::onContextSelected()
+{
+  Handle(AIS_InteractiveContext) aContext = myViewWindow->GetViewToolBar()->GetCurrentContext();
+  if (aContext.IsNull())
+    return;
+
+  myDisplayPreview->SetContext (aContext);
+}
+
+// =======================================================================
 // function : updatePropertyPanelBySelection
 // purpose :
 // =======================================================================
@@ -722,97 +726,62 @@ void MessageView_Window::updatePropertyPanelBySelection()
   MessageModel_Tools::GetPropertyTableValues (anItemBase, aTableValues);
 
   myPropertyView->Init (aTableValues);*/
-  QList<ViewControl_TableModelValues*> aTableValuesList;
+  ViewControl_TableModelValues* aTableValues = 0;
 
   QItemSelectionModel* aModel = myTreeView->selectionModel();
   if (!aModel)
     return;
 
   QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (aModel->selectedIndexes(), 0);
-  TreeModel_ItemStreamPtr aStreamItem = itemDynamicCast<TreeModel_ItemStream> (TreeModel_ModelBase::GetItemByIndex (anIndex));
-  if (aStreamItem)
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+  if (anItemBase)
   {
-    Handle(TreeModel_ItemProperties) anItemProperties = aStreamItem->Properties ();
+    Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->Properties ();
     if (!anItemProperties.IsNull())
     {
-      ViewControl_TableModelValues* aTableValues = new ViewControl_TableModelValues();
+      aTableValues = new ViewControl_TableModelValues();
       aTableValues->SetProperties (anItemProperties);
-      aTableValuesList.append (aTableValues);
     }
   }
-  myPropertyView->Init (aTableValuesList);
+  myPropertyView->Init (aTableValues);
 }
 
 // =======================================================================
 // function : updatePreviewPresentation
 // purpose :
 // =======================================================================
-void MessageView_Window::updatePreviewPresentation (const NCollection_List<Handle(Standard_Transient)>& thePresentations)
+void MessageView_Window::updatePreviewPresentation()
 {
   Handle(AIS_InteractiveContext) aContext = myViewWindow->GetViewToolBar()->GetCurrentContext();
   if (aContext.IsNull())
     return;
 
-  if (!myPreviewPresentations.IsEmpty())
+  NCollection_List<Handle(Standard_Transient)> aPresentations;
+  MessageModel_ItemRootPtr aRootItem;
+  QModelIndexList aSelectedIndices = myTreeView->selectionModel()->selectedIndexes();
+  for (QModelIndexList::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
   {
-    for (NCollection_List<Handle(Standard_Transient)>::Iterator aDisplayedIt (myPreviewPresentations); aDisplayedIt.More(); aDisplayedIt.Next())
-    {
-      Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (aDisplayedIt.Value());
-      if (!aPrs.IsNull() && aPrs->GetContext() == aContext)
-        aContext->Remove (aPrs, Standard_True);
-    }
-  }
-  myPreviewPresentations.Clear();
+    QModelIndex anIndex = *aSelIt;
+    if (anIndex.column() != 0)
+      continue;
 
-  myPreviewPresentations = thePresentations;
-  if (myPreviewPresentations.IsEmpty())
-    return;
+    TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+    if (!anItemBase)
+      continue;
 
-  BRep_Builder aBuilder;
-  TopoDS_Compound aCompound;
-  aBuilder.MakeCompound (aCompound);
-  for (NCollection_List<Handle(Standard_Transient)>::Iterator aDisplayedIt (myPreviewPresentations); aDisplayedIt.More(); aDisplayedIt.Next())
-  {
-    Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast (aDisplayedIt.Value());
-    if (!aPrs.IsNull())
+    Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->Properties();
+    if (anItemProperties)
     {
-      if (!aPrs->GetContext().IsNull())
-        continue; // not possible to display one object in several contexts
-      aContext->Display (aPrs, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
+      anItemProperties->GetPresentations (-1, -1, aPresentations);
     }
-    else if (!Handle(Convert_TransientShape)::DownCast (aDisplayedIt.Value()).IsNull())
+
+    MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
+    if (anAlertItem)
     {
-      Handle(Convert_TransientShape) aShapeObject = Handle(Convert_TransientShape)::DownCast (aDisplayedIt.Value());
-      aBuilder.Add (aCompound, aShapeObject->GetShape());
+      anAlertItem->GetPresentations (aPresentations);
     }
   }
 
-  if (aCompound.IsNull())
-  {
-    if (!aContext.IsNull() && myPreviewPresentation->GetContext() == aContext)
-      aContext->Remove (myPreviewPresentation, Standard_True);
-    myPreviewPresentation = NULL;
-    return;
-
-  }
-  else
-  {
-    if (myPreviewPresentation.IsNull())
-    {
-      myPreviewPresentation = new AIS_Shape (aCompound);
-      myPreviewPresentation->SetAttributes (GetPreviewAttributes(aContext));
-      //myPreviewPresentation->SetAttributes (myPreviewParameters->GetDrawer());
-
-      //myPreviewPresentation->SetTransformPersistence(thePersistent);
-      if (!aContext.IsNull())
-        aContext->Display (myPreviewPresentation, AIS_Shaded, -1/*do not participate in selection*/, Standard_True);
-    }
-    else
-    {
-      Handle(AIS_Shape)::DownCast (myPreviewPresentation)->Set (aCompound);
-      //myPreviewPresentation->SetTransformPersistence(thePersistent);
-      if (!aContext.IsNull() && myPreviewPresentation->GetContext() == aContext)
-        aContext->Redisplay (myPreviewPresentation, Standard_True);
-    }
-  }
+  myDisplayPreview->SetContext (aContext);
+  myDisplayPreview->UpdatePreview (View_DisplayActionType_DisplayId, aPresentations);
 }

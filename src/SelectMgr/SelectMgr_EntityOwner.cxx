@@ -91,6 +91,8 @@ void SelectMgr_EntityOwner::DumpJson (Standard_OStream& theOStream, const Standa
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_EntityOwner);
 
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this);
+
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, mySelectable);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mypriority);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsSelected);

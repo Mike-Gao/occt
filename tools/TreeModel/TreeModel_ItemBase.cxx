@@ -14,6 +14,7 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/TreeModel_ItemBase.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/TreeModel_ItemRole.hxx>
 #include <inspector/TreeModel_ItemStream.hxx>
 
@@ -47,6 +48,11 @@ void TreeModel_ItemBase::Reset()
       anItem->Reset();
   }
   m_bInitialized = false;
+  if (!myProperties.IsNull())
+  {
+    myProperties->Reset();
+    //myProperties = 0;
+  }
   myCachedValues.clear();
 }
 
@@ -122,18 +128,46 @@ void TreeModel_ItemBase::Init()
 {
   m_bInitialized = true;
 
-  NCollection_List<Standard_Integer> aHierarchicalValues;
+  //NCollection_List<Standard_Integer> aHierarchicalValues;
+  int aStreamChildrenCount = 0;
   if (Column() == 0)
   {
-    NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
+    //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
     Standard_SStream aStream;
     GetStream (aStream);
-    Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
-    aHierarchicalValues = Standard_Dump::HierarchicalValueIndices (aValues);
+    if (!Standard_Dump::Text (aStream).IsEmpty())
+    {
+      if (!myProperties)
+      {
+        myProperties = new TreeModel_ItemProperties();
+        myProperties->SetItem (currentItem());
+      }
+      myProperties->Init();
+      aStreamChildrenCount = myProperties->Children().Extent();
+    }
+    //Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
+    //aHierarchicalValues = Standard_Dump::HierarchicalValueIndices (aValues);
+
+    //if (!aValues.IsEmpty())
+    //{
+    //  if (!myProperties)
+    //  {
+    //    myProperties = new TreeModel_ItemProperties();
+    //    myProperties->SetItem (currentItem());
+    //  }
+    //  TCollection_AsciiString aKeyValue, aPropertiesValue;
+    //  aKeyValue = aValues.FindFromIndex (/*Row() +*/ 1);
+    //  if (!Standard_Dump::SplitJson (aKeyValue, aValues))
+    //    aPropertiesValue = Standard_Dump::Text (aStream);
+    //  else
+    //    aPropertiesValue = aKeyValue;
+
+    //  myProperties->Init (aPropertiesValue);
+    //}
 
     //if (aHierarchicalValues.Size() == 1)
   }
-  m_iStreamChildren = aHierarchicalValues.Extent();
+  m_iStreamChildren = aStreamChildrenCount;//aHierarchicalValues.Extent();
 }
 
 // =======================================================================

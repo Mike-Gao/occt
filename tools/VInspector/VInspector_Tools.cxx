@@ -565,15 +565,15 @@ QVariant VInspector_Tools::ToVariant (const Select3D_BndBox3d& theBoundingBox)
 //function : CreateShape
 //purpose  :
 //=======================================================================
-TopoDS_Shape VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBoundingBox)
+Standard_Boolean VInspector_Tools::CreateShape (const Select3D_BndBox3d& theBoundingBox, TopoDS_Shape& theShape)
 {
   if (!theBoundingBox.IsValid())
-    return TopoDS_Shape();
+    return Standard_False;
 
   gp_Pnt aPntMin = gp_Pnt (theBoundingBox.CornerMin().x(), theBoundingBox.CornerMin().y(), theBoundingBox.CornerMin().z());
   gp_Pnt aPntMax = gp_Pnt (theBoundingBox.CornerMax().x(), theBoundingBox.CornerMax().y(), theBoundingBox.CornerMax().z());
 
-  return Convert_Tools::CreateBoxShape (aPntMin, aPntMax);
+  return Convert_Tools::CreateBoxShape (aPntMin, aPntMax, theShape);
 }
 
 //=======================================================================

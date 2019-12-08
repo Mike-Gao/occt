@@ -26,7 +26,7 @@
 TreeModel_ItemStream::TreeModel_ItemStream (TreeModel_ItemBasePtr theParent, const int theRow, const int theColumn)
  : TreeModel_ItemBase (theParent, theRow, theColumn)
 {
-  myProperties = new TreeModel_ItemProperties();
+  //myProperties = new TreeModel_ItemProperties();
 }
 
 // =======================================================================
@@ -35,53 +35,67 @@ TreeModel_ItemStream::TreeModel_ItemStream (TreeModel_ItemBasePtr theParent, con
 // =======================================================================
 void TreeModel_ItemStream::Init()
 {
-  if (!myProperties->Item())
-    myProperties->SetItem (currentItem());
+  //if (!GetProperties()->Item())
+  //  myProperties->SetItem (currentItem());
 
-  TCollection_AsciiString aKey, aKeyValue, aPropertiesValue;
-  TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(Parent());
-  if (!aStreamParent)
-  {
-    Standard_SStream aStream;
-    Parent()->GetStream (aStream);
+  //TCollection_AsciiString aKey, aKeyValue, aPropertiesValue;
+  //TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(Parent());
+  //if (!aStreamParent)
+  //{
+  //  Standard_SStream aStream;
+  //  Parent()->GetStream (aStream);
 
-    NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
-    Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
+  //  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
+  //  Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
 
-    aKey = aValues.FindKey (Row() + 1);
-    aKeyValue = aValues.FindFromIndex (Row() + 1);
+  //  aKey = aValues.FindKey (Row() + 1);
+  //  aKeyValue = aValues.FindFromIndex (Row() + 1);
 
-    // one row value, like gp_XYZ, without additional { for type
-    aValues.Clear();
-    if (!Standard_Dump::SplitJson (aKeyValue, aValues))
-      aPropertiesValue = Standard_Dump::Text (aStream);
-    else
-      aPropertiesValue = aKeyValue;
-  }
-  else
-  {
-    TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(Parent());
+  //  // one row value, like gp_XYZ, without additional { for type
+  //  aValues.Clear();
+  //  if (!Standard_Dump::SplitJson (aKeyValue, aValues))
+  //    aPropertiesValue = Standard_Dump::Text (aStream);
+  //  else
+  //    aPropertiesValue = aKeyValue;
+  //}
+  //else
+  //{
+  //  TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(Parent());
 
-    TCollection_AsciiString aValue;
-    aStreamParent->GetChildStream (Row(), aKey, aKeyValue);
-    aPropertiesValue = aKeyValue;
-  }
+  //  TCollection_AsciiString aValue;
+  //  aStreamParent->GetChildStream (Row(), aKey, aKeyValue);
+  //  aPropertiesValue = aKeyValue;
+  //}
 
-  myKey = aKey;
-  myProperties->Init (aPropertiesValue);
-  myStreamValue = aKeyValue;
+  //myKey = aKey;
+  ////myProperties->Init (aPropertiesValue);
+  //myStreamValue = aKeyValue;
 
-  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
-  Standard_Dump::SplitJson (aKeyValue, aValues);
+  //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
+  //Standard_Dump::SplitJson (aKeyValue, aValues);
 
-  for (Standard_Integer anIndex = 1; anIndex <= aValues.Size(); anIndex++)
-  {
-    TCollection_AsciiString aValue = aValues.FindFromIndex (anIndex);
-    if (Standard_Dump::HasChildKey (aValue))
-      myChildren.Add (aValues.FindKey (anIndex), aValue);
-  }
+  //for (Standard_Integer anIndex = 1; anIndex <= aValues.Size(); anIndex++)
+  //{
+  //  TCollection_AsciiString aValue = aValues.FindFromIndex (anIndex);
+  //  if (Standard_Dump::HasChildKey (aValue))
+  //    myChildren.Add (aValues.FindKey (anIndex), aValue);
+  //}
 
   TreeModel_ItemBase::Init();
+
+  //NCollection_List<Standard_Integer> aHierarchicalValues;
+  int aStreamChildrenCount = 0;
+  if (Column() == 0)
+  {
+    if (!myProperties)
+    {
+      myProperties = new TreeModel_ItemProperties();
+      myProperties->SetItem (currentItem());
+    }
+    myProperties->Init();
+    aStreamChildrenCount = myProperties->Children().Extent();
+  }
+  m_iStreamChildren = aStreamChildrenCount;//aHierarchicalValues.Extent();
 }
 
 // =======================================================================
@@ -90,11 +104,10 @@ void TreeModel_ItemStream::Init()
 // =======================================================================
 void TreeModel_ItemStream::Reset()
 {
-  myKey = "";
-  myStreamValue = "";
+  //myKey = "";
+  //myStreamValue = "";
 
-  myProperties->Reset();
-  myChildren.Clear();
+  //myChildren.Clear();
 
   TreeModel_ItemBase::Reset();
 }
@@ -112,31 +125,34 @@ QVariant TreeModel_ItemStream::initValue (const int theItemRole) const
   if (Column() != 0)
     return QVariant();
 
+  if (theItemRole == Qt::ForegroundRole)
+    return QColor (Qt::darkBlue);
+
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
   switch (Column())
   {
-    case 0: return GetKey().ToCString();
+    case 0: return Properties() ? Properties()->GetKey().ToCString() : "";
   }
   return QVariant();
 }
 
-// =======================================================================
-// function : GetChildStream
-// purpose :
-// =======================================================================
-void TreeModel_ItemStream::GetChildStream (const int theRowId,
-                                           TCollection_AsciiString& theKey,
-                                           TCollection_AsciiString& theValue) const
-{
-  TreeModel_ItemBasePtr aParentItem = Parent();
-  if (!aParentItem)
-    return;
-
-  theKey = myChildren.FindKey (theRowId + 1);
-  theValue = myChildren.FindFromIndex (theRowId + 1);
-}
+//// =======================================================================
+//// function : GetChildStream
+//// purpose :
+//// =======================================================================
+//void TreeModel_ItemStream::GetChildStream (const int theRowId,
+//                                           TCollection_AsciiString& theKey,
+//                                           TCollection_AsciiString& theValue) const
+//{
+//  TreeModel_ItemBasePtr aParentItem = Parent();
+//  if (!aParentItem)
+//    return;
+//
+//  theKey = myChildren.FindKey (theRowId + 1);
+//  theValue = myChildren.FindFromIndex (theRowId + 1);
+//}
 
 // =======================================================================
 // function : GetStream
@@ -144,12 +160,13 @@ void TreeModel_ItemStream::GetChildStream (const int theRowId,
 // =======================================================================
 void TreeModel_ItemStream::GetStream (Standard_OStream& theOStream) const
 {
+  if (!Properties())
+    return;
   //Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
   //if (anIO.IsNull())
   //  return;
 
-  theOStream << myStreamValue;
-
+  theOStream << Properties()->StreamValue();
   //anIO->DumpJson (theOStream);
 }
 

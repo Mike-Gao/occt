@@ -3932,6 +3932,19 @@ void call_rgbhls (float r, float g, float b, float& h, float& l, float& s)
 //=======================================================================
 void Quantity_Color::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Quantity_Color);
   OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "RGB", 3, MyRed, MyGreen, MyBlue)
+}
+
+//=======================================================================
+//function : InitJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean Quantity_Color::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  Standard_Integer aPos = theStreamPos;
+  Standard_Real  aRed, aGreen, aBlue;
+  OCCT_INIT_VECTOR_CLASS (theSStream, RGB, aPos, 3, &aRed, &aGreen, &aBlue)
+
+  SetValues ((Standard_ShortReal)aRed, (Standard_ShortReal)aGreen, (Standard_ShortReal)aBlue, Quantity_TOC_RGB);
+  return Standard_True;
 }

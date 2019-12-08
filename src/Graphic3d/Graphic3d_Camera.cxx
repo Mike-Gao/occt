@@ -1546,3 +1546,41 @@ void Graphic3d_Camera::FrustumPoints (NCollection_Array1<Graphic3d_Vec3d>& thePo
   aTmpPnt = anInvWorldView * aLeftBottomFar;
   thePoints.SetValue (FrustumVert_LeftBottomFar,   aTmpPnt.xyz() / aTmpPnt.w());
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_Camera::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_Camera);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myUp);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myDirection);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEye);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDistance);
+
+  /*gp_XYZ myAxialScale; //!< World axial scale.
+
+  Projection    myProjType; //!< Projection type used for rendering.
+  Standard_Real myFOVy;     //!< Field Of View in y axis.
+  Standard_Real myFOVyTan;  //!< Field Of View as Tan(DTR_HALF * myFOVy)
+  Standard_Real myZNear;    //!< Distance to near clipping plane.
+  Standard_Real myZFar;     //!< Distance to far clipping plane.
+  Standard_Real myAspect;   //!< Width to height display ratio.
+
+  Standard_Real myScale;      //!< Specifies parallel scale for orthographic projection.
+  Standard_Real myZFocus;     //!< Stereographic focus value.
+  FocusType     myZFocusType; //!< Stereographic focus definition type.
+
+  Standard_Real myIOD;     //!< Intraocular distance value.
+  IODType       myIODType; //!< Intraocular distance definition type.
+
+  Graphic3d_CameraTile myTile;//!< Tile defining sub-area for drawing
+
+  mutable TransformMatrices<Standard_Real>      myMatricesD;
+  mutable TransformMatrices<Standard_ShortReal> myMatricesF;
+
+  mutable Graphic3d_WorldViewProjState myWorldViewProjState;*/
+}

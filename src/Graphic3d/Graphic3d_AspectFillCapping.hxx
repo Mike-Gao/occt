@@ -121,6 +121,9 @@ public:
   //! Returns modification counter for hatching state.
   Standard_Size HatchingState() const { return myHatchingState; }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
+
 private:
 
   enum Flags

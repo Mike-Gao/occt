@@ -29,4 +29,25 @@ void TopoDS_TShape::DumpJson (Standard_OStream& theOStream, const Standard_Integ
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, TopoDS_TShape);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFlags);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, ShapeType());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, NbChildren());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Free());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Free());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Locked());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Modified());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Checked());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Orientable());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Closed());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Infinite());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Convex());
+
+  //for (TopoDS_ListIteratorOfListOfShape anIterator (myShapes); anIterator.More(); anIterator.Next())
+  //{
+  //  const TopoDS_Shape& subShape = anIterator.Value();
+  //  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &subShape);
+  //}
 }

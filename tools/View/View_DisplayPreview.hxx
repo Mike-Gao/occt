@@ -80,6 +80,7 @@ private:
 
   View_PreviewParameters* myPreviewParameters; //!< drawer of preview presentation
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
+  NCollection_List<Handle(AIS_InteractiveObject)> myPreviewReadyPresentations; //!< presentation of preview for a selected object
 };
 
 #endif

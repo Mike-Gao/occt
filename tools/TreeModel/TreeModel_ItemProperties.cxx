@@ -14,6 +14,8 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/TreeModel_ItemProperties.hxx>
+#include <inspector/TreeModel_ItemStream.hxx>
+#include <inspector/Convert_Tools.hxx>
 #include <inspector/Convert_TransientShape.hxx>
 
 #include <BRepBuilderAPI_MakeVertex.hxx>
@@ -27,18 +29,74 @@ IMPLEMENT_STANDARD_RTTIEXT(TreeModel_ItemProperties, Standard_Transient)
 // purpose :
 // =======================================================================
 
-void TreeModel_ItemProperties::Init (const TCollection_AsciiString& theStreamValue)
+void TreeModel_ItemProperties::Init ()
 {
-  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
-  if (!Standard_Dump::SplitJson (theStreamValue, aValues))
-    return;
+  Standard_SStream aStream;
+  Item()->GetStream (aStream);
+
+  NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> aValues;
+  TCollection_AsciiString aStreamText = Standard_Dump::Text (aStream);
+  Standard_Dump::SplitJson (aStreamText, aValues);
+
+  TreeModel_ItemStreamPtr aStreamParent = itemDynamicCast<TreeModel_ItemStream>(Item());
+  TCollection_AsciiString aKey;
+  Standard_DumpValue aKeyValue;
+  if (!aStreamParent)
+  {
+    Standard_SStream aStream;
+    Item()->GetStream (aStream);
+
+    //aKey = aValues.FindKey (1);
+    //aKeyValue = aValues.FindFromIndex (1);
+
+    //// one row value, like gp_XYZ, without additional { for type
+    //aValues.Clear();
+    //if (!Standard_Dump::SplitJson (aKeyValue.myValue, aValues))
+    //{
+    //  aKeyValue = Standard_DumpValue (aStreamText, 1);
+    //}
+
+    Handle(Standard_Transient) anItemObject = Item()->GetObject();
+    aKey = anItemObject.IsNull() ? "Dump" : anItemObject->DynamicType()->Name();
+    aKeyValue = Standard_DumpValue (aStreamText, 1);
+
+    myKey = aKey;
+    myStreamValue = aKeyValue;
+  }
+  else
+  {
+    TCollection_AsciiString aValue;
+    Handle(TreeModel_ItemProperties) aParentProperties = Item()->Parent() ? Item()->Parent()->Properties() : 0;
+    if (aParentProperties)
+      aParentProperties->GetChildStream (Item()->Row(), aKey, aKeyValue);
+
+    myKey = aKey;
+    myStreamValue = aKeyValue;
+
+    aValues.Clear();
+    Standard_Dump::SplitJson (myStreamValue.myValue, aValues);
+  }
 
   for (Standard_Integer anIndex = 1; anIndex <= aValues.Size(); anIndex++)
   {
-    TCollection_AsciiString aValue = aValues.FindFromIndex (anIndex);
-    if (!Standard_Dump::HasChildKey (aValue))
+    Standard_DumpValue aValue = aValues.FindFromIndex (anIndex);
+    if (Standard_Dump::HasChildKey (aValue.myValue))
+      myChildren.Add (aValues.FindKey (anIndex), aValue);
+    else
       myValues.Add (aValues.FindKey (anIndex), aValue);
   }
+
+  //aValues.Clear();
+  //if (!Standard_Dump::SplitJson (myStreamValue.myValue, aValues))
+  //{
+  //  return;
+  //}
+  //for (Standard_Integer anIndex = 1; anIndex <= aValues.Size(); anIndex++)
+  //{
+  //  Standard_DumpValue aValue = aValues.FindFromIndex (anIndex);
+  //  if (!Standard_Dump::HasChildKey (aValue.myValue))
+  //    myValues.Add (aValues.FindKey (anIndex), aValue);
+  //}
 }
 
 // =======================================================================
@@ -47,6 +105,10 @@ void TreeModel_ItemProperties::Init (const TCollection_AsciiString& theStreamVal
 // =======================================================================
 void TreeModel_ItemProperties::Reset()
 {
+  myKey = "";
+  myStreamValue = Standard_DumpValue();
+
+  myChildren.Clear();
   myValues.Clear();
 }
 
@@ -57,7 +119,7 @@ void TreeModel_ItemProperties::Reset()
 
 int TreeModel_ItemProperties::RowCount() const
 {
-  return myValues.Size();
+  return Values().Size();
 }
 
 // =======================================================================
@@ -67,13 +129,82 @@ int TreeModel_ItemProperties::RowCount() const
 
 QVariant TreeModel_ItemProperties::Data (const int theRow, const int theColumn, int theRole) const
 {
+  if (theColumn == 1 && theRole == Qt::BackgroundRole)
+  {
+    Quantity_Color aColor;
+    Standard_SStream aStream;
+    Item()->GetStream (aStream);
+    if (Convert_Tools::ConvertStreamToColor (aStream, aColor))
+    {
+      Standard_Real aRed, aGreen, aBlue;
+      aColor.Values (aRed, aGreen, aBlue, Quantity_TOC_RGB);
+
+      int aDelta = 255;
+      return QColor((int)(aRed * aDelta), (int)(aGreen * aDelta), (int)(aBlue * aDelta));
+    }
+  }
+
   if (theRole != Qt::DisplayRole && theRole != Qt::ToolTipRole)
     return QVariant();
 
-  if (theColumn == 0) return myValues.FindKey (theRow + 1).ToCString();
-  else if (theColumn == 1) return myValues.FindFromIndex (theRow + 1).ToCString();
+  if (theColumn == 0) return Values().FindKey (theRow + 1).ToCString();
+  else if (theColumn == 1) return Values().FindFromIndex (theRow + 1).myValue.ToCString();
 
   return QVariant();
+}
+
+// =======================================================================
+// function : GetEditType
+// purpose :
+// =======================================================================
+
+ViewControl_EditType TreeModel_ItemProperties::GetEditType (const int, const int theColumn) const
+{
+  if (theColumn == 0)
+    return ViewControl_EditType_None;
+
+  return ViewControl_EditType_Line;
+}
+
+// =======================================================================
+// function : SetData
+// purpose :
+// =======================================================================
+
+bool TreeModel_ItemProperties::SetData (const int theRow, const int theColumn, const QVariant& theValue, int)
+{
+  if (theColumn == 0)
+    return false;
+
+  TreeModel_ItemBasePtr aParent = Item()->Parent();
+  while (aParent && itemDynamicCast<TreeModel_ItemStream>(aParent))
+  {
+    aParent = aParent->Parent();
+  }
+  if (!aParent)
+    return false;
+
+  Standard_SStream aStream;
+  Item()->GetStream (aStream);
+
+  //TCollection_AsciiString aStreamValue = Standard_Dump::Text (aStream);
+
+  Standard_DumpValue aValue = Values().FindFromIndex (theRow + 1);
+  Standard_Integer aStartPos = aValue.myStartPosition;
+  Standard_Integer aLastPos = aStartPos + aValue.myValue.Length() - 1;
+
+  aStream.str ("");
+  //aStream << aStreamValue.SubString (1, aStartPos - 1);
+  aStream << theValue.toString().toStdString().c_str();
+  //if (aLastPos + 1 <= aStreamValue.Length())
+  //  aStream << aStreamValue.SubString (aLastPos + 1, aStreamValue.Length());
+
+  //TCollection_AsciiString aStreamValue_debug = Standard_Dump::Text (aStream);
+
+  Item()->SetStream (aStream, aStartPos, aLastPos);
+  Item()->Reset();
+
+  return true;
 }
 
 // =======================================================================
@@ -88,6 +219,10 @@ void TreeModel_ItemProperties::GetPresentations (const int theRow, const int the
 
   if (theRow < 0) // full presentation
   {
+    Standard_SStream aStream;
+    Item()->GetStream (aStream);
+
+    Convert_Tools::ConvertStreamToPresentations (aStream, 1, -1, thePresentations);
     return;
   }
 
@@ -98,8 +233,8 @@ void TreeModel_ItemProperties::GetPresentations (const int theRow, const int the
   NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
   aValues.Add (Data (theRow, 0).toString().toStdString().c_str(), Data (theRow, theColumn).toString().toStdString().c_str());
 
-  Standard_SStream aStreamOnSelected;
-  Standard_Dump::JoinJson (aStreamOnSelected, aValues);
+  //Standard_SStream aStreamOnSelected;
+  //Standard_Dump::JoinJson (aStreamOnSelected, aValues);
 
   //if (theRow < 0) // full presentation
   //{
@@ -108,12 +243,12 @@ void TreeModel_ItemProperties::GetPresentations (const int theRow, const int the
     //  thePresentations.Append (new Convert_TransientShape (Convert_Tools::CreateShape (aBox)));
   //}
 
-  gp_XYZ aPoint;
-  Standard_Integer aPosition = 1;
-  if (aPoint.InitJson (aStreamOnSelected, aPosition))
-  {
-    thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPoint)));
-  }
+  //gp_XYZ aPoint;
+  //Standard_Integer aPosition = 1;
+  //if (aPoint.InitJson (aStreamOnSelected, aPosition))
+  //{
+  //  thePresentations.Append (new Convert_TransientShape (BRepBuilderAPI_MakeVertex (aPoint)));
+  //}
 
 
   //QVariant aValue = GetTableData (theRow, theColumn, Qt::DisplayRole);
@@ -141,3 +276,30 @@ Qt::ItemFlags TreeModel_ItemProperties::GetTableFlags (const int, const int theC
   return aFlags;
 }
 
+// =======================================================================
+// function : GetChildStream
+// purpose :
+// =======================================================================
+void TreeModel_ItemProperties::GetChildStream (const int theRowId,
+                                               TCollection_AsciiString& theKey,
+                                               Standard_DumpValue& theValue) const
+{
+  if (myChildren.Size() <= theRowId)
+    return;
+
+  theKey = myChildren.FindKey (theRowId + 1);
+  theValue = myChildren.FindFromIndex (theRowId + 1);
+}
+
+// =======================================================================
+// function : GetChildStream
+// purpose :
+// =======================================================================
+void TreeModel_ItemProperties::initItem() const
+{
+  if (!Item())
+    return;
+  if (Item()->IsInitialized())
+    return;
+  Item()->Init();
+}

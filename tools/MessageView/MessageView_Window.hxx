@@ -40,6 +40,7 @@
 
 class View_Window;
 
+class View_DisplayPreview;
 class ViewControl_PropertyView;
 class MessageModel_ReportCallBack;
 
@@ -139,6 +140,9 @@ protected slots:
   //! \param theDeselected container of selected table cells
   void onPropertyViewSelectionChanged();
 
+  //! Update tree view item, preview presentation by item value change
+  void onPropertyViewDataChanged();
+
   //! Updates visibility states by erase all in context
   void onEraseAllPerformed();
 
@@ -157,13 +161,15 @@ protected slots:
   //! Reads if possible report of a selected item and updates this report in tree view
   void onReloadReport();
 
+  //! Updates context in preview display
+  void onContextSelected();
+
 protected:
   //! Updates property panel content by item selected in tree view.
   void updatePropertyPanelBySelection();
 
   //!< Updates presentation of preview for parameter shapes. Creates a compound of the shapes
-  //!< \param theShape container of shapes
-  void updatePreviewPresentation (const NCollection_List<Handle(Standard_Transient)>& thePresentations);
+  void updatePreviewPresentation();
 
 private:
   QMainWindow* myMainWindow; //!< main control, parent for all MessageView controls
@@ -171,6 +177,8 @@ private:
 
   QDockWidget* myPropertyPanelWidget; //!< property pane dockable widget
   ViewControl_PropertyView* myPropertyView; //!< property control to display model item values if exist
+
+  View_DisplayPreview* myDisplayPreview; //!< class for preview display
 
   View_Window* myViewWindow; //!< OCC 3d view to visualize presentations
   QTreeView* myTreeView; //!< tree view visualized shapes
@@ -180,7 +188,6 @@ private:
   Handle(Message_ReportCallBack) myCallBack; //! < message call back to update content of the view
 
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
-  NCollection_List<Handle(Standard_Transient)> myPreviewPresentations;
 };
 
 #endif

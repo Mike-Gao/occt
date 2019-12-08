@@ -216,17 +216,16 @@ void VInspector_ItemSelectMgrViewerSelector::initItem() const
 }
 
 // =======================================================================
-// function : Dump
+// function : GetStream
 // purpose :
 // =======================================================================
-Standard_Boolean VInspector_ItemSelectMgrViewerSelector::Dump (Standard_OStream& theOStream) const
+void VInspector_ItemSelectMgrViewerSelector::GetStream (Standard_OStream& theOStream) const
 {
   Handle(SelectMgr_ViewerSelector) aViewerSelector = GetViewerSelector();
   if (aViewerSelector.IsNull())
-    return Standard_False;
+    return;
 
   aViewerSelector->DumpJson (theOStream);
-  return Standard_True;
 }
 
 // =======================================================================

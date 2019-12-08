@@ -18,6 +18,7 @@
 #include <inspector/View_Displayer.hxx>
 #include <inspector/View_DisplayPreview.hxx>
 #include <inspector/View_PreviewParameters.hxx>
+#include <inspector/View_ToolBar.hxx>
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
 #include <inspector/View_Window.hxx>
@@ -79,6 +80,7 @@ void View_Tools::SaveState (View_Window* theView, QMap<QString, QString>& theIte
   theItems[thePrefix + "view_camera_direction"] = aCameraDirection.join (",");
 
   View_PreviewParameters::SaveState (theView->GetDisplayer()->GetDisplayPreview()->GetPreviewParameters(), theItems, "preview_parameters_");
+  View_ToolBar::SaveState (theView->GetViewToolBar(), theItems, "view_toolbar_");
 }
 
 // =======================================================================
@@ -103,6 +105,10 @@ bool View_Tools::RestoreState (View_Window* theView, const QString& theKey, cons
   }
   else if (View_PreviewParameters::RestoreState (theView->GetDisplayer()->GetDisplayPreview()->GetPreviewParameters(),
                                                  theKey, theValue, "preview_parameters_"))
+  {
+    return true;
+  }
+  else if (View_ToolBar::RestoreState (theView->GetViewToolBar(), theKey, theValue, "view_toolbar_"))
   {
     return true;
   }

@@ -36,6 +36,7 @@
 #include <Standard_WarningsRestore.hxx>
 
 class TreeModel_ItemBase;
+class TreeModel_ItemProperties;
 
 typedef QExplicitlySharedDataPointer<TreeModel_ItemBase> TreeModel_ItemBasePtr;
 
@@ -103,8 +104,11 @@ public:
   //! \return stream value or dummy
   virtual void GetStream (Standard_OStream& theOStream) const { (void)theOStream; }
 
-  //! Sets stream value into the object
-  virtual void SetStream (Standard_SStream& theStream) const { (void)theStream; }
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  virtual bool SetStream (const Standard_SStream& theSStream, Standard_Integer& theStartPos,
+                          Standard_Integer& theLastPos) const
+  { (void)theSStream; (void)theStartPos; (void)theLastPos; return false; }
 
   //! Gets the parent of the item, or TreeModel_ItemBasePtr() if it has no parent.
   //! \return pointer to the item
@@ -145,6 +149,9 @@ public:
   //! Dumps the content of me into the stream
   virtual Standard_Boolean Dump (Standard_OStream& theOStream) const { (void)theOStream; return Standard_False; }
 
+  //! Returns the item properties
+  Handle(TreeModel_ItemProperties) Properties() const { return myProperties; }
+
 protected:
 
   //! \param theParent the parent item
@@ -179,6 +186,10 @@ protected:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const;
 
+protected:
+  Handle(TreeModel_ItemProperties) myProperties; //!< the properties
+  int m_iStreamChildren; //!< the count of stream items
+
 private:
 
   typedef QHash< QPair<int, int>, TreeModel_ItemBasePtr > PositionToItemHash;
@@ -188,7 +199,6 @@ private:
   TreeModel_ItemBasePtr m_pParent; //!< the parent item
   int m_iRow;          //!< the item row position in the parent item
   int m_iColumn;       //!< the item column position in the parent item
-  int m_iStreamChildren; //!< the count of stream items
   bool m_bInitialized; //!< the state whether the item content is already initialized
 };
 
