@@ -31,6 +31,8 @@
 #include <Prs3d_Presentation.hxx>
 #include <Quantity_Color.hxx>
 #include <Select3D_SensitiveEntity.hxx>
+#include <SelectMgr_AndFilter.hxx>
+#include <SelectMgr_DisabledObjectsFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_Filter.hxx>
 #include <SelectMgr_OrFilter.hxx>
@@ -336,7 +338,8 @@ AIS_StatusOfDetection AIS_InteractiveContext::MoveTo (const Standard_Integer  th
   AIS_StatusOfDetection aStatus        = AIS_SOD_Nothing;
   Standard_Boolean      toUpdateViewer = Standard_False;
 
-  myFilters->SetDisabledObjects (theView->View()->HiddenObjects());
+  Handle(SelectMgr_DisabledObjectsFilter) anObjectsFilter = Handle(SelectMgr_DisabledObjectsFilter)::DownCast (myFilters->StoredFilters().First());
+  anObjectsFilter->SetDisabledObjects (theView->View()->HiddenObjects());
   myMainSel->Pick (theXPix, theYPix, theView);
 
   // filling of myAISDetectedSeq sequence storing information about detected AIS objects
