@@ -299,7 +299,7 @@ Standard_Boolean TObj_Object::SetName(const Handle(TCollection_HAsciiString)& th
 
 Standard_Boolean TObj_Object::SetName(const Standard_CString theName) const
 {
-  return SetName ( new TCollection_HExtendedString ( theName ) );
+  return SetName ( new TCollection_HAsciiString ( theName ) );
 }
 
 //=======================================================================
