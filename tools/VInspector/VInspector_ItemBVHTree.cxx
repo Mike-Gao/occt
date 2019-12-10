@@ -136,10 +136,10 @@ void VInspector_ItemBVHTree::initItem() const
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemBVHTree::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemBVHTree::initStream (Standard_OStream& theOStream) const
 {
   opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree = GetTree();
   if (aBVHTree.IsNull())

@@ -133,9 +133,9 @@ void SelectMgr_Selection::DumpJson (Standard_OStream& theOStream, const Standard
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myEntityIter);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMode);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUpdateStatus);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySelectionState);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBVHUpdateStatus);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensFactor);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUpdateStatus);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBVHUpdateStatus);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsCustomSens);
 }

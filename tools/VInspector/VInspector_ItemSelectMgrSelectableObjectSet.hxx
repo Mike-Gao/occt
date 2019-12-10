@@ -58,10 +58,6 @@ public:
   //! Returns child BVH tree of the row
   opencascade::handle<BVH_Tree<Standard_Real, 3> > GetBVHTree (const int theRow, TCollection_AsciiString& theName) const;
 
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
-
 protected:
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
@@ -74,6 +70,10 @@ protected:
   //! \param theItemRole a value role
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void initStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
 
 protected:
 

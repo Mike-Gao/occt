@@ -104,10 +104,10 @@ QVariant VInspector_ItemGraphic3dGroup::initValue (const int theItemRole) const
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemGraphic3dGroup::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemGraphic3dGroup::initStream (Standard_OStream& theOStream) const
 {
   Handle(Graphic3d_Group) aGroup = GetGroup();
   if (aGroup.IsNull())

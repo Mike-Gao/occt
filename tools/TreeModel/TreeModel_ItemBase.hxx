@@ -102,7 +102,7 @@ public:
 
   //! Returns stream value of the item to fulfill property panel.
   //! \return stream value or dummy
-  virtual void GetStream (Standard_OStream& theOStream) const { (void)theOStream; }
+  const Standard_SStream& Stream() const { return myStream; }
 
   //! Returns stream value of the item to fulfill property panel.
   //! \return stream value or dummy
@@ -181,14 +181,22 @@ protected:
   //! \return number of children. It should be reimplemented in child
   virtual int initRowCount() const = 0;
 
+  //! \return number of children. It should be reimplemented in child
+  Standard_EXPORT int initStreamRowCount();
+
   //! Return data value for the role. It should be reimplemented in child
   //! \param theItemRole a value role
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  virtual void initStream (Standard_OStream& theOStream) const { (void)theOStream; }
+
 protected:
   Handle(TreeModel_ItemProperties) myProperties; //!< the properties
   int m_iStreamChildren; //!< the count of stream items
+  Standard_SStream myStream; //!< stream value
 
 private:
 

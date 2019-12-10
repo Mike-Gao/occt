@@ -160,10 +160,10 @@ TreeModel_ItemBasePtr VInspector_ItemContext::createChild (int theRow, int theCo
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemContext::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemContext::initStream (Standard_OStream& theOStream) const
 {
   Handle(AIS_InteractiveContext) aContext = GetContext();
   if (aContext.IsNull())

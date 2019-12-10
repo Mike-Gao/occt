@@ -54,6 +54,7 @@ void TreeModel_ItemBase::Reset()
     //myProperties = 0;
   }
   myCachedValues.clear();
+  myStream.str ("");
 }
 
 // =======================================================================
@@ -112,7 +113,7 @@ QVariant TreeModel_ItemBase::cachedValue (const int theItemRole) const
 
   QVariant aValueToCache;
   if (theItemRole == TreeModel_ItemRole_RowCountRole)
-    aValueToCache = initRowCount() + m_iStreamChildren;
+    aValueToCache = initRowCount() + const_cast<TreeModel_ItemBase*>(this)->initStreamRowCount();
   else
     aValueToCache = initValue (theItemRole);
 
@@ -128,13 +129,22 @@ void TreeModel_ItemBase::Init()
 {
   m_bInitialized = true;
 
+  initStream(myStream);
+  initStreamRowCount();
+}
+
+// =======================================================================
+// function : initStreamRowCount
+// purpose :
+// =======================================================================
+int TreeModel_ItemBase::initStreamRowCount()
+{
   //NCollection_List<Standard_Integer> aHierarchicalValues;
   int aStreamChildrenCount = 0;
   if (Column() == 0)
   {
-    //NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
     Standard_SStream aStream;
-    GetStream (aStream);
+    initStream (aStream);
     if (!Standard_Dump::Text (aStream).IsEmpty())
     {
       if (!myProperties)
@@ -168,6 +178,7 @@ void TreeModel_ItemBase::Init()
     //if (aHierarchicalValues.Size() == 1)
   }
   m_iStreamChildren = aStreamChildrenCount;//aHierarchicalValues.Extent();
+  return m_iStreamChildren;
 }
 
 // =======================================================================

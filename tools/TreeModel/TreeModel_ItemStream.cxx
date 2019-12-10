@@ -43,7 +43,7 @@ void TreeModel_ItemStream::Init()
   //if (!aStreamParent)
   //{
   //  Standard_SStream aStream;
-  //  Parent()->GetStream (aStream);
+  //  Parent()->Stream (aStream);
 
   //  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
   //  Standard_Dump::SplitJson (Standard_Dump::Text (aStream), aValues);
@@ -96,6 +96,7 @@ void TreeModel_ItemStream::Init()
     aStreamChildrenCount = myProperties->Children().Extent();
   }
   m_iStreamChildren = aStreamChildrenCount;//aHierarchicalValues.Extent();
+  initStream (myStream);
 }
 
 // =======================================================================
@@ -109,6 +110,7 @@ void TreeModel_ItemStream::Reset()
 
   //myChildren.Clear();
 
+  myStream.str ("");
   TreeModel_ItemBase::Reset();
 }
 
@@ -155,10 +157,10 @@ QVariant TreeModel_ItemStream::initValue (const int theItemRole) const
 //}
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void TreeModel_ItemStream::GetStream (Standard_OStream& theOStream) const
+void TreeModel_ItemStream::initStream (Standard_OStream& theOStream) const
 {
   if (!Properties())
     return;

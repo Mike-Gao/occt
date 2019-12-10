@@ -156,10 +156,10 @@ void VInspector_ItemSelectBasicsEntityOwner::initItem() const
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectBasicsEntityOwner::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemSelectBasicsEntityOwner::initStream (Standard_OStream& theOStream) const
 {
   Handle(SelectMgr_EntityOwner) anEntityOwner = getEntityOwner();
   if (anEntityOwner.IsNull())

@@ -216,10 +216,10 @@ void VInspector_ItemSelectMgrViewerSelector::initItem() const
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectMgrViewerSelector::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemSelectMgrViewerSelector::initStream (Standard_OStream& theOStream) const
 {
   Handle(SelectMgr_ViewerSelector) aViewerSelector = GetViewerSelector();
   if (aViewerSelector.IsNull())

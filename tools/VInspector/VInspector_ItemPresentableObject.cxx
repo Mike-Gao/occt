@@ -133,7 +133,9 @@ QVariant VInspector_ItemPresentableObject::initValue (int theItemRole) const
 // =======================================================================
 int VInspector_ItemPresentableObject::initRowCount() const
 {
-  if (Column() != 0)
+  return 0;
+
+  /*if (Column() != 0)
     return 0;
 
   int aNbProperties = 2; // "Properties", "Presentations"
@@ -151,7 +153,7 @@ int VInspector_ItemPresentableObject::initRowCount() const
   int aNbSelected = !anIO.IsNull() ? anIO->Selections().Size() : 0;
 #endif
 
-  return aNbProperties + aNbSelected;
+  return aNbProperties + aNbSelected;*/
 }
 
 // =======================================================================
@@ -160,12 +162,13 @@ int VInspector_ItemPresentableObject::initRowCount() const
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemPresentableObject::createChild (int theRow, int theColumn)
 {
-  if (theRow == 0)
+  return TreeModel_ItemBasePtr();
+  /*if (theRow == 0)
     return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
   if (theRow == 1)
     return VInspector_ItemPresentations::CreateItem (currentItem(), theRow, theColumn);
   else
-    return VInspector_ItemSelectMgrSelection::CreateItem(currentItem(), theRow, theColumn);
+    return VInspector_ItemSelectMgrSelection::CreateItem(currentItem(), theRow, theColumn);*/
 }
 
 // =======================================================================
@@ -273,10 +276,10 @@ void VInspector_ItemPresentableObject::GetPresentations (NCollection_List<Handle
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemPresentableObject::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemPresentableObject::initStream (Standard_OStream& theOStream) const
 {
   Handle(AIS_InteractiveObject) anIO = GetInteractiveObject();
   if (anIO.IsNull())

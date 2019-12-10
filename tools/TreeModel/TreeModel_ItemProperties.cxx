@@ -31,8 +31,9 @@ IMPLEMENT_STANDARD_RTTIEXT(TreeModel_ItemProperties, Standard_Transient)
 
 void TreeModel_ItemProperties::Init ()
 {
-  Standard_SStream aStream;
-  Item()->GetStream (aStream);
+  myRowValues.Clear();
+
+  const Standard_SStream& aStream = Item()->Stream();
 
   NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> aValues;
   TCollection_AsciiString aStreamText = Standard_Dump::Text (aStream);
@@ -43,19 +44,6 @@ void TreeModel_ItemProperties::Init ()
   Standard_DumpValue aKeyValue;
   if (!aStreamParent)
   {
-    Standard_SStream aStream;
-    Item()->GetStream (aStream);
-
-    //aKey = aValues.FindKey (1);
-    //aKeyValue = aValues.FindFromIndex (1);
-
-    //// one row value, like gp_XYZ, without additional { for type
-    //aValues.Clear();
-    //if (!Standard_Dump::SplitJson (aKeyValue.myValue, aValues))
-    //{
-    //  aKeyValue = Standard_DumpValue (aStreamText, 1);
-    //}
-
     Handle(Standard_Transient) anItemObject = Item()->GetObject();
     aKey = anItemObject.IsNull() ? "Dump" : anItemObject->DynamicType()->Name();
     aKeyValue = Standard_DumpValue (aStreamText, 1);
@@ -83,20 +71,24 @@ void TreeModel_ItemProperties::Init ()
     if (Standard_Dump::HasChildKey (aValue.myValue))
       myChildren.Add (aValues.FindKey (anIndex), aValue);
     else
-      myValues.Add (aValues.FindKey (anIndex), aValue);
+    {
+      TreeModel_RowValue aRowValue (aValue.myStartPosition, aValues.FindKey (anIndex).ToCString(), aValue.myValue.ToCString());
+      myRowValues.Add (myRowValues.Size() + 1, aRowValue);
+    }
   }
+  if (myRowValues.Size() == 1)
+  {
+    Quantity_Color aColor;
+    if (Convert_Tools::ConvertStreamToColor (aStream, aColor))
+    {
+      Standard_Real aRed, aGreen, aBlue;
+      aColor.Values (aRed, aGreen, aBlue, Quantity_TOC_RGB);
 
-  //aValues.Clear();
-  //if (!Standard_Dump::SplitJson (myStreamValue.myValue, aValues))
-  //{
-  //  return;
-  //}
-  //for (Standard_Integer anIndex = 1; anIndex <= aValues.Size(); anIndex++)
-  //{
-  //  Standard_DumpValue aValue = aValues.FindFromIndex (anIndex);
-  //  if (!Standard_Dump::HasChildKey (aValue.myValue))
-  //    myValues.Add (aValues.FindKey (anIndex), aValue);
-  //}
+      int aDelta = 255;
+      myRowValues.ChangeFromIndex (1).myCustomValues.insert ((int)Qt::BackgroundRole, QColor((int)(aRed * aDelta),
+        (int)(aGreen * aDelta), (int)(aBlue * aDelta)));
+    }
+  }
 }
 
 // =======================================================================
@@ -109,7 +101,7 @@ void TreeModel_ItemProperties::Reset()
   myStreamValue = Standard_DumpValue();
 
   myChildren.Clear();
-  myValues.Clear();
+  myRowValues.Clear();
 }
 
 // =======================================================================
@@ -119,7 +111,7 @@ void TreeModel_ItemProperties::Reset()
 
 int TreeModel_ItemProperties::RowCount() const
 {
-  return Values().Size();
+  return RowValues().Size();
 }
 
 // =======================================================================
@@ -131,24 +123,16 @@ QVariant TreeModel_ItemProperties::Data (const int theRow, const int theColumn, 
 {
   if (theColumn == 1 && theRole == Qt::BackgroundRole)
   {
-    Quantity_Color aColor;
-    Standard_SStream aStream;
-    Item()->GetStream (aStream);
-    if (Convert_Tools::ConvertStreamToColor (aStream, aColor))
-    {
-      Standard_Real aRed, aGreen, aBlue;
-      aColor.Values (aRed, aGreen, aBlue, Quantity_TOC_RGB);
-
-      int aDelta = 255;
-      return QColor((int)(aRed * aDelta), (int)(aGreen * aDelta), (int)(aBlue * aDelta));
-    }
+    const QMap<int, QVariant>& aCachedValues = RowValues().FindFromIndex (theRow + 1).myCustomValues;
+    if (aCachedValues.contains ((int)theRole))
+      return aCachedValues[(int)theRole];
   }
 
   if (theRole != Qt::DisplayRole && theRole != Qt::ToolTipRole)
     return QVariant();
 
-  if (theColumn == 0) return Values().FindKey (theRow + 1).ToCString();
-  else if (theColumn == 1) return Values().FindFromIndex (theRow + 1).myValue.ToCString();
+  if (theColumn == 0) return RowValues().FindFromIndex (theRow + 1).myKey;
+  else if (theColumn == 1) return RowValues().FindFromIndex (theRow + 1).myValue;
 
   return QVariant();
 }
@@ -171,7 +155,7 @@ ViewControl_EditType TreeModel_ItemProperties::GetEditType (const int, const int
 // purpose :
 // =======================================================================
 
-bool TreeModel_ItemProperties::SetData (const int theRow, const int theColumn, const QVariant& theValue, int)
+bool TreeModel_ItemProperties::SetData (const int /*theRow*/, const int theColumn, const QVariant& /*theValue*/, int)
 {
   if (theColumn == 0)
     return false;
@@ -184,27 +168,27 @@ bool TreeModel_ItemProperties::SetData (const int theRow, const int theColumn, c
   if (!aParent)
     return false;
 
-  Standard_SStream aStream;
-  Item()->GetStream (aStream);
+  //const Standard_SStream& aStream = Item()->Stream();
 
   //TCollection_AsciiString aStreamValue = Standard_Dump::Text (aStream);
 
-  Standard_DumpValue aValue = Values().FindFromIndex (theRow + 1);
-  Standard_Integer aStartPos = aValue.myStartPosition;
-  Standard_Integer aLastPos = aStartPos + aValue.myValue.Length() - 1;
+  //Standard_DumpValue aValue = Values().FindFromIndex (theRow + 1);
+  //Standard_Integer aStartPos = aValue.myStartPosition;
+  //Standard_Integer aLastPos = aStartPos + aValue.myValue.Length() - 1;
 
-  aStream.str ("");
-  //aStream << aStreamValue.SubString (1, aStartPos - 1);
-  aStream << theValue.toString().toStdString().c_str();
-  //if (aLastPos + 1 <= aStreamValue.Length())
-  //  aStream << aStreamValue.SubString (aLastPos + 1, aStreamValue.Length());
+  //aStream.str ("");
+  ////aStream << aStreamValue.SubString (1, aStartPos - 1);
+  //aStream << theValue.toString().toStdString().c_str();
+  ////if (aLastPos + 1 <= aStreamValue.Length())
+  ////  aStream << aStreamValue.SubString (aLastPos + 1, aStreamValue.Length());
 
-  //TCollection_AsciiString aStreamValue_debug = Standard_Dump::Text (aStream);
+  ////TCollection_AsciiString aStreamValue_debug = Standard_Dump::Text (aStream);
 
-  Item()->SetStream (aStream, aStartPos, aLastPos);
-  Item()->Reset();
+  //Item()->SetStream (aStream, aStartPos, aLastPos);
+  //Item()->Reset();
 
-  return true;
+  //return true;
+  return false;
 }
 
 // =======================================================================
@@ -219,9 +203,7 @@ void TreeModel_ItemProperties::GetPresentations (const int theRow, const int the
 
   if (theRow < 0) // full presentation
   {
-    Standard_SStream aStream;
-    Item()->GetStream (aStream);
-
+    const Standard_SStream& aStream = Item()->Stream();
     Convert_Tools::ConvertStreamToPresentations (aStream, 1, -1, thePresentations);
     return;
   }

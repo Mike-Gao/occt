@@ -156,10 +156,10 @@ void VInspector_ItemSelectMgrSensitiveEntity::Reset()
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectMgrSensitiveEntity::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemSelectMgrSensitiveEntity::initStream (Standard_OStream& theOStream) const
 {
   Handle(SelectMgr_SensitiveEntity) anEntity = GetSensitiveEntity();
   if (anEntity.IsNull())

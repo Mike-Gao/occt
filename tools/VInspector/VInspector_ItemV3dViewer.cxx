@@ -127,10 +127,10 @@ void VInspector_ItemV3dViewer::Reset()
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemV3dViewer::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemV3dViewer::initStream (Standard_OStream& theOStream) const
 {
   Handle(V3d_Viewer) aViewer = GetViewer();
   if (aViewer.IsNull())

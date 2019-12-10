@@ -52,10 +52,6 @@ public:
   //! Returns the current entity owner
   Handle(SelectBasics_EntityOwner) EntityOwner() const { return myOwner; }
 
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
-
 protected:
   //! \return number of children.
   virtual int initRowCount() const Standard_OVERRIDE{ return 0; }
@@ -67,6 +63,10 @@ protected:
 
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void initStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
 
 protected:
   //! Build presentation shape

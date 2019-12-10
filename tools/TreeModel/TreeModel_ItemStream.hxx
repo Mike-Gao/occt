@@ -73,11 +73,10 @@ public:
   //const NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString>& GetChildren() const
   //  { initItem(); return myChildren; }
 
+protected:
   //! Returns stream value of the item to fulfill property panel.
   //! \return stream value or dummy
-  virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
-
-protected:
+  virtual void initStream (Standard_OStream& theOStream) const;
 
   //! Initialize the current item. It creates a backup of the specific item information
   //! Do nothing as context has been already set into item

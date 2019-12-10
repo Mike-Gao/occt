@@ -200,10 +200,10 @@ Handle(Message_Report) MessageModel_ItemReport::FindReport (const MessageModel_I
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void MessageModel_ItemReport::GetStream (Standard_OStream& theOStream) const
+void MessageModel_ItemReport::initStream (Standard_OStream& theOStream) const
 {
   Handle(Message_Report) aReport = GetReport();
   if (aReport.IsNull())

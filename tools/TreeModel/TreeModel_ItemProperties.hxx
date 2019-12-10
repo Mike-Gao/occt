@@ -24,6 +24,7 @@
 #include <Standard_Transient.hxx>
 
 #include <NCollection_IndexedDataMap.hxx>
+#include <NCollection_IndexedMap.hxx>
 #include <NCollection_List.hxx>
 
 #include <TCollection_AsciiString.hxx>
@@ -50,6 +51,18 @@ class TreeModel_ItemProperties : public Standard_Transient
   {
     TreeModel_DimType_Rows,   //! defines number of rows
     TreeModel_DimType_Columns //! defines number of columns
+  };
+
+  //! container of values in a row of property table
+  struct TreeModel_RowValue
+  {
+    TreeModel_RowValue (const Standard_Integer theValueStartPosition, const QVariant theKey, QVariant theValue)
+    : myValueStartPosition (theValueStartPosition), myKey (theKey), myValue (theValue) {}
+
+    Standard_Integer myValueStartPosition; //!< start position of the key
+    QVariant myKey; //!< value in the first column
+    QVariant myValue; //!< value in the second column
+    QMap<int, QVariant> myCustomValues; //!< custom values, e.g. key is Background, value is defined color
   };
 
 public:
@@ -129,7 +142,10 @@ public:
   const TCollection_AsciiString& StreamValue() const { return myStreamValue.myValue; }
 
   //! Returns children stream values
-  const NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& Values() const { initItem(); return myValues; }
+  //const NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& Values() const { initItem(); return myValues; }
+
+  //! Returns children stream values
+  const NCollection_IndexedDataMap<Standard_Integer, TreeModel_RowValue>& RowValues() const { initItem(); return myRowValues; }
 
   //! Returns children stream values
   const NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue>& Children() const { initItem(); return myChildren; }
@@ -146,8 +162,9 @@ private:
   TCollection_AsciiString myKey; //!< the item key
   Standard_DumpValue myStreamValue; //!< the stream value
   NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> myChildren; //!< the children
+  NCollection_IndexedDataMap<Standard_Integer, TreeModel_RowValue> myRowValues; //!< the values
 
-  NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> myValues; //!< the values
+  //NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> myValues; //!< the values
 };
 
 #endif

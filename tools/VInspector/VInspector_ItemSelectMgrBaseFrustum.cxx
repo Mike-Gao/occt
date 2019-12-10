@@ -104,10 +104,10 @@ void VInspector_ItemSelectMgrBaseFrustum::initItem() const
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemSelectMgrBaseFrustum::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemSelectMgrBaseFrustum::initStream (Standard_OStream& theOStream) const
 {
   Handle(SelectMgr_BaseFrustum) aFrustum = GetFrustum();
 

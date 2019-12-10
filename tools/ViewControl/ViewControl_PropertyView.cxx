@@ -109,7 +109,7 @@ void ViewControl_PropertyView::Init (ViewControl_TableModelValues* theTableValue
     aTable->Init (theTableValues);
     ViewControl_Tools::SetDefaultHeaderSections (aTable->GetTableView(), Qt::Horizontal);
   }
-  aTable->SetActive (theTableValues);
+  aTable->SetActive (theTableValues != 0);
 
   if (theTableValues)
     myAttributesStack->setCurrentWidget (myTableWidget);

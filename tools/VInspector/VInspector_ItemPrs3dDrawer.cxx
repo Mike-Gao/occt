@@ -159,10 +159,10 @@ void VInspector_ItemPrs3dDrawer::initItem() const
 
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void VInspector_ItemPrs3dDrawer::GetStream (Standard_OStream& theOStream) const
+void VInspector_ItemPrs3dDrawer::initStream (Standard_OStream& theOStream) const
 {
   Handle(Prs3d_Drawer) aDrawer = GetDrawer();
   if (aDrawer.IsNull())

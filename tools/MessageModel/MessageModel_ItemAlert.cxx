@@ -202,10 +202,10 @@ int MessageModel_ItemAlert::initRowCount() const
 }
 
 // =======================================================================
-// function : GetStream
+// function : initStream
 // purpose :
 // =======================================================================
-void MessageModel_ItemAlert::GetStream (Standard_OStream& OS) const
+void MessageModel_ItemAlert::initStream (Standard_OStream& OS) const
 {
   Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (getAlert());
   if (anExtendedAlert.IsNull() || anExtendedAlert->Attribute().IsNull())

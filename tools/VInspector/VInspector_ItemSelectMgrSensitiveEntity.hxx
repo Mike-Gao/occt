@@ -55,10 +55,6 @@ public:
   //! Resets cached values
   Standard_EXPORT virtual void Reset() Standard_OVERRIDE;
 
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT virtual void GetStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
-
 protected:
 
   //! Initialize the current item. It is empty because Reset() is also empty.
@@ -71,6 +67,10 @@ protected:
   //! \param theItemRole a value role
   //! \return the value
   virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
+
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void initStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
 
 protected:
 

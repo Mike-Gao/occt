@@ -112,6 +112,8 @@ void VInspector_ViewModel::FindPointers (const QStringList& thePointers,
                                          const QModelIndex& theParent,
                                          QModelIndexList& theFoundIndices)
 {
+  return; // should be used after GetObject of items is improved, as it takes a lot of time on BVH item
+
   if (thePointers.isEmpty())
     return;
 
