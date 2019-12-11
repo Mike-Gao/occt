@@ -15,7 +15,7 @@
 
 #include <Quantity_ColorRGBA.hxx>
 
-#include <Graphic3d_Vec4.hxx>
+#include <NCollection_Vec4.hxx>
 
 #include <algorithm>
 
@@ -68,7 +68,7 @@ namespace
     Standard_ASSERT_RETURN (theColorComponentBase >= 2,
                             __FUNCTION__ ": 'theColorComponentBase' must be greater than 1.",
                             0.0f);
-    Graphic3d_Vec4 aColor (1.0f);
+    NCollection_Vec4<float> aColor (1.0f);
     if (hasAlphaComponent)
     {
       const Standard_ShortReal anAlphaComponent = takeColorComponentFromInteger (theColorInteger,
