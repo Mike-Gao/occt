@@ -11,6 +11,7 @@ SelectMgr_EntityOwner.cxx
 SelectMgr_EntityOwner.hxx
 SelectMgr_Filter.cxx
 SelectMgr_Filter.hxx
+SelectMgr_FilterReaction.hxx
 SelectMgr_Frustum.hxx
 SelectMgr_Frustum.lxx
 SelectMgr_FrustumBuilder.cxx
