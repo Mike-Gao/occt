@@ -76,8 +76,8 @@ public:
   //! an AIS local context, you will need to implement the
   //! virtual function ActsOn.
   Standard_EXPORT virtual Standard_Boolean IsOk (const Handle(SelectMgr_EntityOwner)& theObj,
-                                                 const SelectMgr_FilterReaction& theReaction) 
-  { return IsOk (theObj); }
+                                                 const SelectMgr_FilterReaction& theReaction) const
+  { (void)theReaction; return IsOk (theObj); }
 
   //! Returns true in an AIS local context, if this filter
   //! operates on a type of subshape defined in a filter
