@@ -98,9 +98,10 @@ private:
       myIndex (0) {}
 
     //! Constructor
-    Iterator (const NCollection_IndexedDataMap& theMap)
+    Iterator (const NCollection_IndexedDataMap& theMap,
+              Standard_Boolean theToEnd = Standard_False)
     : myMap ((NCollection_IndexedDataMap*)&theMap),
-      myIndex (1) {}
+      myIndex (theToEnd ? theMap.Extent() + 1 : 1) {}
 
     //! Query if the end of collection is reached by iterator
     Standard_Boolean More(void) const
@@ -109,6 +110,37 @@ private:
     //! Make a step along the collection
     void Next(void)
     { ++myIndex; }
+
+    //! Query if it is possible decrementing iterator position.
+    Standard_Boolean HasPrevious() const
+    {
+      return myMap != NULL
+          && myIndex > 1;
+    }
+
+    //! Decrement operator.
+    void Previous()
+    {
+      --myIndex;
+    }
+
+    //! Offset operator.
+    void Offset (ptrdiff_t theOffset)
+    {
+      myIndex += static_cast<int>(theOffset);
+    }
+
+    //! Difference operator.
+    ptrdiff_t Differ (const Iterator& theOther) const
+    {
+      return myIndex - theOther.myIndex;
+    }
+
+    //! Value index access
+    Standard_Integer Index() const
+    {
+      return myIndex;
+    }
 
     //! Value access
     const TheItemType& Value(void) const
@@ -144,22 +176,22 @@ private:
   };
   
   //! Shorthand for a regular iterator type.
-  typedef NCollection_StlIterator<std::forward_iterator_tag, Iterator, TheItemType, false> iterator;
+  typedef NCollection_StlIterator<std::random_access_iterator_tag, Iterator, TheItemType, false> iterator;
 
   //! Shorthand for a constant iterator type.
-  typedef NCollection_StlIterator<std::forward_iterator_tag, Iterator, TheItemType, true> const_iterator;
+  typedef NCollection_StlIterator<std::random_access_iterator_tag, Iterator, TheItemType, true> const_iterator;
 
   //! Returns an iterator pointing to the first element in the map.
-  iterator begin() const { return Iterator (*this); }
+  iterator begin() const { return Iterator (*this, false); }
 
   //! Returns an iterator referring to the past-the-end element in the map.
-  iterator end() const { return Iterator(); }
+  iterator end() const { return Iterator (*this, true); }
 
   //! Returns a const iterator pointing to the first element in the map.
-  const_iterator cbegin() const { return Iterator (*this); }
+  const_iterator cbegin() const { return Iterator (*this, false); }
 
   //! Returns a const iterator referring to the past-the-end element in the map.
-  const_iterator cend() const { return Iterator(); }
+  const_iterator cend() const { return Iterator (*this, true); }
   
  public:
   // ---------- PUBLIC METHODS ------------
