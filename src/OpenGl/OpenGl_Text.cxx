@@ -30,6 +30,12 @@
 #include <Graphic3d_TransformUtils.hxx>
 #include <TCollection_HAsciiString.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
+
 namespace
 {
   static const OpenGl_Mat4d THE_IDENTITY_MATRIX;
@@ -279,7 +285,25 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
 // =======================================================================
 void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+
+  Standard_SStream aGroupStream;
+  DumpJson (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "OpenGl_Text::Render", "", &aPerfMeter, NULL)
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+
   const OpenGl_Aspects* aTextAspect = theWorkspace->ApplyAspects();
+  aGroupStream.str("");
+  aTextAspect->DumpJson (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "aTextAspect", "", &aPerfMeter, aParentAlert)
+
+  aGroupStream.str("");
+  OpenGl_Context::DumpJsonOpenGl (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters1", "", &aPerfMeter, aParentAlert)
+#endif
+
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
   const Handle(OpenGl_TextureSet) aPrevTexture = aCtx->BindTextures (Handle(OpenGl_TextureSet)());
 
@@ -315,6 +339,12 @@ void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   {
     glEnable (GL_DEPTH_TEST);
   }
+
+#ifdef DEBUG_INFO
+  aGroupStream.str("");
+  OpenGl_Context::DumpJsonOpenGl (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters2", "", &aPerfMeter, aParentAlert)
+#endif
 }
 
 // =======================================================================
@@ -326,7 +356,7 @@ void OpenGl_Text::Render (const Handle(OpenGl_Context)& theCtx,
                           unsigned int theResolution) const
 {
 #if !defined(GL_ES_VERSION_2_0)
-  const Standard_Integer aPrevPolygonMode  = theCtx->SetPolygonMode (GL_FILL);
+  const Standard_Integer aPrevPolygonMode  = theCtx->SetPolygonMode (GL_FILL && GL_LINE && GL_POINT);
   const bool             aPrevHatchingMode = theCtx->SetPolygonHatchEnabled (false);
 #endif
 
@@ -613,6 +643,14 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     return;
   }
 
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+
+  Standard_SStream aGroupStream;
+  OpenGl_Context::DumpJsonOpenGl (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters3", "", &aPerfMeter, NULL)
+#endif
+
   // Note that using difference resolution in different Views in same Viewer
   // will lead to performance regression (for example, text will be recreated every time).
   const TCollection_AsciiString aFontKey = FontKey (theTextAspect, (Standard_Integer)myText->Height(), theResolution);
@@ -768,10 +806,10 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     }
     case Aspect_TODT_SHADOW:
     {
-      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
-      theCtx->SetColor4fv (theColorSubs);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
-      drawText    (theCtx, theTextAspect);
+      //BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
+      //theCtx->SetColor4fv (theColorSubs);
+      //setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
+      //drawText    (theCtx, theTextAspect);
       break;
     }
     case Aspect_TODT_DIMENSION:
@@ -780,6 +818,12 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
       break;
     }
   }
+
+#ifdef DEBUG_INFO
+  aGroupStream.str("");
+  OpenGl_Context::DumpJsonOpenGl (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters4", "", &aPerfMeter, NULL)
+#endif
 
   // main draw call
   theCtx->SetColor4fv (theColorText);
@@ -791,6 +835,12 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     theCtx->ProjectionState.SetCurrent<Standard_Real> (myProjMatrix);
     theCtx->ApplyProjectionMatrix();
   }
+
+#ifdef DEBUG_INFO
+  aGroupStream.str("");
+  OpenGl_Context::DumpJsonOpenGl (aGroupStream);
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters5", "", &aPerfMeter, NULL)
+#endif
 
 #if !defined(GL_ES_VERSION_2_0)
   if (theCtx->core11 != NULL)
@@ -814,16 +864,16 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   #endif
     const bool aColorMaskBack = theCtx->SetColorMask (false);
 
-    glClear (GL_STENCIL_BUFFER_BIT);
-    glEnable (GL_STENCIL_TEST);
-    glStencilFunc (GL_ALWAYS, 1, 0xFF);
-    glStencilOp (GL_KEEP, GL_KEEP, GL_REPLACE);
+    //glClear (GL_STENCIL_BUFFER_BIT);
+    //glEnable (GL_STENCIL_TEST);
+    //glStencilFunc (GL_ALWAYS, 1, 0xFF);
+    //glStencilOp (GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    drawRect (theCtx, theTextAspect, OpenGl_Vec4 (1.0f, 1.0f, 1.0f, 1.0f));
+    //drawRect (theCtx, theTextAspect, OpenGl_Vec4 (1.0f, 1.0f, 1.0f, 1.0f));
 
-    glStencilFunc (GL_ALWAYS, 0, 0xFF);
+    //glStencilFunc (GL_ALWAYS, 0, 0xFF);
 
-    theCtx->SetColorMask (aColorMaskBack);
+    //theCtx->SetColorMask (aColorMaskBack);
   }
 
   // reset OpenGL state
@@ -850,13 +900,23 @@ void OpenGl_Text::DumpJson (Standard_OStream& theOStream, const Standard_Integer
 
   //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
   //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myShadingModel);
+
   //Handle(Graphic3d_Text)                                  myText;     //!< text parameters
   //mutable Handle(OpenGl_Font)                             myFont;
+  
   //mutable NCollection_Vector<GLuint>                      myTextures;   //!< textures' IDs
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTextures.Size());
+
   //mutable NCollection_Vector<Handle(OpenGl_VertexBuffer)> myVertsVbo;   //!< VBOs of vertices
-  //mutable NCollection_Vector<Handle(OpenGl_VertexBuffer)> myTCrdsVbo;   //!< VBOs of texture coordinates
+  for (NCollection_Vector<Handle(OpenGl_VertexBuffer)>::Iterator aCrdsIt (myTCrdsVbo); aCrdsIt.More(); aCrdsIt.Next())
+  {
+    Handle(OpenGl_VertexBuffer) aVertexBuffer = aCrdsIt.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aVertexBuffer.get());
+  }
   //mutable Handle(OpenGl_VertexBuffer)                     myBndVertsVbo;//!< VBOs of vertices for bounding box
-  //mutable Font_Rect                                       myBndBox;
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
+
   //mutable OpenGl_Mat4d myProjMatrix;
   //mutable OpenGl_Mat4d myModelMatrix;
   //mutable OpenGl_Mat4d myOrientationMatrix;

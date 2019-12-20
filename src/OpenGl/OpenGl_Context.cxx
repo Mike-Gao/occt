@@ -4045,7 +4045,102 @@ void OpenGl_Context::DumpJson (Standard_OStream& theOStream, const Standard_Inte
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Context)
 
+  //Handle(OpenGl_ResourcesMap)    mySharedResources;
+  //Handle(OpenGl_DelayReleaseMap) myDelayed;
+  //Handle(OpenGl_ResourcesStack)  myUnusedResources;
+  //OpenGl_Clipping myClippingState;
+  //void*            myGlLibHandle;
+  //NCollection_Handle<OpenGl_GlFunctions> myFuncs;
+  
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAnisoMax);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTexClamp);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxTexDim);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxTexCombined);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxDumpSizeX);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxDumpSizeY);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxClipPlanes);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxMsaaSamples);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxDrawBuffers);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxColorAttachments);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myGlVerMajor);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myGlVerMinor);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsInitialized);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsStereoBuffers);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsGlNormalizeEnabled);
+
+  //Graphic3d_TextureUnit mySpriteTexUnit;
+  
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasRayTracing);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasRayTracingTextures);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasRayTracingAdaptiveSampling);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasRayTracingAdaptiveSamplingAtomic);
+
+  //Handle(OpenGl_ShaderManager) myShaderManager;
+  //Handle(Font_TextFormatter) myDefaultFormatter;
+
+  //Handle(OpenGl_FrameStats)     myFrameStats;
+  //Handle(OpenGl_ShaderProgram)  myActiveProgram;
+  //Handle(OpenGl_TextureSet)     myActiveTextures;
+
+  //Handle(OpenGl_FrameBuffer)    myDefaultFbo;
+  //Handle(OpenGl_LineAttributes) myHatchStyles;
+
+  for (int i = 0; i < 4; i++)
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myViewport[i]);
+  }
+
+  for (int i = 0; i < 4; i++)
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myViewportVirt[i]);
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPointSpriteOrig);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRenderMode);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPolygonMode);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPolygonOffset)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToCullBackFaces);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myReadBuffer);
+
+  //NCollection_Array1<Standard_Integer> myDrawBuffers;
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDefaultVao);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myColorMask);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAllowAlphaToCov);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAlphaToCoverage);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsGlDebugCtx);
+
+  //TCollection_AsciiString       myVendor;
+  //TColStd_PackedMapOfInteger    myFilters[6];
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myResolution);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myResolutionRatio);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLineWidthScale);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLineFeather);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRenderScale);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRenderScaleInv); 
+  
+  //OpenGl_Material               myMatFront;
+  //OpenGl_Material               myMatBack;
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &ModelWorldState)
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &WorldViewState)
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &ProjectionState)
 }
+
+// =======================================================================
+// function : DumpJsonOpenGl
+// purpose  :
+// =======================================================================
+void OpenGl_Context::DumpJsonOpenGl (Standard_OStream& theOStream, const Standard_Integer)
+{
+  GLboolean isEnableBlend = glIsEnabled (GL_BLEND);
+  GLboolean isEnableCullFace = glIsEnabled (GL_CULL_FACE);
+  GLboolean isEnableDepthTest = glIsEnabled (GL_DEPTH_TEST);
+  
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, isEnableBlend);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, isEnableCullFace);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, isEnableDepthTest);
+}
+

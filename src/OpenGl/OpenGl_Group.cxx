@@ -28,6 +28,12 @@
 #include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_GroupDefinitionError.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif // DEBUG_INFO
+
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Group,Graphic3d_Group)
 
 namespace
@@ -298,12 +304,26 @@ void OpenGl_Group::AddElement (OpenGl_Element* theElem)
 // =======================================================================
 void OpenGl_Group::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  
+  Standard_SStream aGroupStream;
+  DumpJson (aGroupStream);
+  MESSAGE_INFO_OBJECT(this, aGroupStream, "OpenGl_Group::Render", "", &aPerfMeter, NULL)
+  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+
+  Standard_SStream aContextStream;
+  theWorkspace->GetGlContext()->DumpJson (aContextStream);
+  MESSAGE_INFO_OBJECT(this, aContextStream, "Context", "", &aPerfMeter, aParentAlert)
+#endif
+
   // Setup aspects
   theWorkspace->SetAllowFaceCulling (myIsClosed
                                  && !theWorkspace->GetGlContext()->Clipping().IsClippingOrCappingOn());
   const OpenGl_Aspects* aBackAspects = theWorkspace->Aspects();
   const bool isAspectSet = myAspects != NULL && renderFiltered (theWorkspace, myAspects);
-
+  
   // Render group elements
   for (OpenGl_ElementNode* aNodeIter = myFirst; aNodeIter != NULL; aNodeIter = aNodeIter->next)
   {

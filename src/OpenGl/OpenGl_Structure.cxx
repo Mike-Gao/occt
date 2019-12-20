@@ -25,6 +25,12 @@
 #include <OpenGl_View.hxx>
 #include <OpenGl_Workspace.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
+
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Structure,Graphic3d_CStructure)
 
 // =======================================================================
@@ -383,6 +389,9 @@ void OpenGl_Structure::Clear (const Handle(OpenGl_Context)& theGlCtx)
 void OpenGl_Structure::renderGeometry (const Handle(OpenGl_Workspace)& theWorkspace,
                                        bool&                           theHasClosed) const
 {
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_Structure::renderGeometry", "", &aPerfMeter, NULL)
+
   if (myInstancedStructure != NULL)
   {
     myInstancedStructure->renderGeometry (theWorkspace, theHasClosed);

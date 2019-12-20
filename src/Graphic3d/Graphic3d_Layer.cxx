@@ -635,6 +635,7 @@ void Graphic3d_Layer::DumpJson (Standard_OStream& theOStream, const Standard_Int
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_Layer);
 
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLayerId);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbStructures);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbStructuresNotCulled);

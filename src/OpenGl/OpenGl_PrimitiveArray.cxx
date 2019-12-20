@@ -29,6 +29,12 @@
 #include <Graphic3d_TextureParams.hxx>
 #include <NCollection_AlignedAllocator.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif // DEBUG_INFO
+
 namespace
 {
   //! Convert data type to GL info
@@ -768,6 +774,13 @@ void OpenGl_PrimitiveArray::Render (const Handle(OpenGl_Workspace)& theWorkspace
   {
     return;
   }
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  Standard_SStream aGroupStream;
+  DumpJson (aGroupStream);
+  MESSAGE_INFO_STREAM(aGroupStream, "OpenGl_PrimitiveArray::Render", Standard_Dump::GetPointerInfo(this), &aPerfMeter, NULL)
+#endif
 
   const OpenGl_Aspects* anAspectFace = theWorkspace->ApplyAspects();
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();

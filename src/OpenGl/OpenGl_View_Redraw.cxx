@@ -39,6 +39,12 @@
 #include <OpenGl_Structure.hxx>
 #include <OpenGl_ArbFBO.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
+
 namespace
 {
   //! Format Frame Buffer format for logging messages.
@@ -174,6 +180,11 @@ void OpenGl_View::Redraw()
   {
     return;
   }
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::Redraw", "", &aPerfMeter, NULL)
+#endif
 
   myWindow->SetSwapInterval();
 
@@ -614,6 +625,11 @@ void OpenGl_View::RedrawImmediate()
     return;
   }
 
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::RedrawImmediate", "", &aPerfMeter, NULL)
+#endif
+
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
   Graphic3d_Camera::Projection aProjectType = myCamera->ProjectionType();
   OpenGl_FrameBuffer*          aFrameBuffer = myFBO.get();
@@ -771,6 +787,12 @@ void OpenGl_View::redraw (const Graphic3d_Camera::Projection theProjection,
                           OpenGl_FrameBuffer*                theReadDrawFbo,
                           OpenGl_FrameBuffer*                theOitAccumFbo)
 {
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::redraw", "", &aPerfMeter, NULL)
+#endif
+
   Handle(OpenGl_Context) aCtx = myWorkspace->GetGlContext();
   if (theReadDrawFbo != NULL)
   {
@@ -817,6 +839,11 @@ bool OpenGl_View::redrawImmediate (const Graphic3d_Camera::Projection theProject
                                    OpenGl_FrameBuffer*                theOitAccumFbo,
                                    const Standard_Boolean             theIsPartialUpdate)
 {
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::redrawImmediate", "", &aPerfMeter, NULL)
+#endif
+
   Handle(OpenGl_Context) aCtx = myWorkspace->GetGlContext();
   GLboolean toCopyBackToFront = GL_FALSE;
   if (theDrawFbo == theReadFbo
@@ -892,6 +919,11 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   // ==================================
   //      Step 1: Prepare for render
   // ==================================
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::render", "", &aPerfMeter, NULL)
+#endif
 
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
   aContext->SetAllowSampleAlphaToCoverage (myRenderParams.ToEnableAlphaToCoverage
@@ -1103,6 +1135,11 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
   if ( myZLayers.NbStructures() <= 0 )
     return;
 
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::renderStructs", "", &aPerfMeter, NULL)
+#endif
+
   Handle(OpenGl_Context) aCtx = myWorkspace->GetGlContext();
   Standard_Boolean toRenderGL = theToDrawImmediate ||
     myRenderParams.Method != Graphic3d_RM_RAYTRACING ||
@@ -1226,6 +1263,12 @@ void OpenGl_View::renderScene (Graphic3d_Camera::Projection theProjection,
                                OpenGl_FrameBuffer*          theOitAccumFbo,
                                const Standard_Boolean       theToDrawImmediate)
 {
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_View::renderScene", "", &aPerfMeter, NULL)
+#endif
+
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
 
   // Specify clipping planes in view transformation space

@@ -250,3 +250,20 @@ void OpenGl_VertexBuffer::unbindFixedColor (const Handle(OpenGl_Context)& theCtx
   theCtx->ShaderManager()->UpdateMaterialState();
 }
 #endif
+
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_VertexBuffer::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_VertexBuffer)
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOffset);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBufferId);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myComponentsNb);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myElemsNb);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDataType);
+}

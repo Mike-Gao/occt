@@ -26,6 +26,12 @@
 
 #include <Graphic3d_GraphicDriver.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif
+
 namespace
 {
   //! Auxiliary class extending sequence iterator with index.
@@ -171,6 +177,38 @@ void OpenGl_LayerList::SetFrustumCullingBVHBuilder (const Handle(Select3D_BVHBui
     aLayerIter.ChangeValue()->SetFrustumCullingBVHBuilder (theBuilder);
   }
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_LayerList::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_LayerList);
+
+  for (NCollection_List<Handle(Graphic3d_Layer)>::Iterator aLayersIt (myLayers); aLayersIt.More(); aLayersIt.Next())
+  {
+    Handle(Graphic3d_Layer) aLayerId = aLayersIt.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aLayerId.get());
+  }
+
+
+  /*
+  NCollection_List<Handle(Graphic3d_Layer)> myLayers;
+  NCollection_DataMap<Graphic3d_ZLayerId, Handle(Graphic3d_Layer)> myLayerIds;
+  Handle(Select3D_BVHBuilder3d) myBVHBuilder;      //!< BVH tree builder for frustom culling
+  */
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbPriorities);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbStructures);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myImmediateNbStructures);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myModifStateOfRaytraceable);
+
+  /*
+  //! Collection of references to layers with transparency gathered during rendering pass.
+  mutable OpenGl_LayerStack myTransparentToProcess;
+  */
+}  
 
 //=======================================================================
 //function : InsertLayerBefore
@@ -548,6 +586,11 @@ void OpenGl_LayerList::renderLayer (const Handle(OpenGl_Workspace)& theWorkspace
                                     const OpenGl_GlobalLayerSettings& theDefaultSettings,
                                     const Graphic3d_Layer& theLayer) const
 {
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_LayerList::renderLayer", "", &aPerfMeter, NULL)
+#endif
+
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
 
   const Graphic3d_ZLayerSettings& aLayerSettings = theLayer.LayerSettings();
@@ -855,6 +898,11 @@ void OpenGl_LayerList::renderTransparent (const Handle(OpenGl_Workspace)&   theW
   {
     return;
   }
+
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+  MESSAGE_INFO("OpenGl_LayerList::renderTransparent", "", &aPerfMeter, NULL)
+#endif
 
   const Handle(OpenGl_Context) aCtx            = theWorkspace->GetGlContext();
   const Handle(OpenGl_ShaderManager)& aManager = aCtx->ShaderManager();

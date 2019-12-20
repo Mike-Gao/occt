@@ -72,6 +72,10 @@ protected:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
+  //! Returns stream value of the item to fulfill property panel.
+  //! \return stream value or dummy
+  Standard_EXPORT virtual void initStream (Standard_OStream& theOStream) const;
+
 protected:
 
   //! Creates a child item in the given position.

@@ -864,6 +864,9 @@ public: //! @name methods to alter or retrieve current state
 
   //! Dumps the content of me into the stream
   Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
+    
+  //! Dumps the content of openGL into the stream
+  static Standard_EXPORT void DumpJsonOpenGl (Standard_OStream& theOStream, const Standard_Integer theDepth = -1);
 
 private:
 

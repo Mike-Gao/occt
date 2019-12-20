@@ -33,6 +33,12 @@
 #include <Graphic3d_TransformUtils.hxx>
 #include <NCollection_AlignedAllocator.hxx>
 
+#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_PerfMeter.hxx>
+#endif // DEBUG_INFO
+
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Workspace,Standard_Transient)
 
 namespace
@@ -401,6 +407,14 @@ Standard_Boolean OpenGl_Workspace::BufferDump (const Handle(OpenGl_FrameBuffer)&
 // =======================================================================
 bool OpenGl_Workspace::ShouldRender (const OpenGl_Element* theElement)
 {
+#ifdef DEBUG_INFO
+  Message_PerfMeter aPerfMeter;
+
+  Standard_SStream aWorkspaceStream;
+  DumpJson (aWorkspaceStream);
+  MESSAGE_INFO_OBJECT(this, aWorkspaceStream, "Workspace", "", &aPerfMeter, NULL)
+#endif
+
   // render only non-raytracable elements when RayTracing is enabled
   if ((myRenderFilter & OpenGl_RenderFilter_NonRaytraceableOnly) != 0)
   {
@@ -446,4 +460,42 @@ bool OpenGl_Workspace::ShouldRender (const OpenGl_Element* theElement)
     }
   }
   return true;
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_Workspace::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Workspace);
+
+  //OpenGl_View*           myView;
+  //Handle(OpenGl_Window)  myWindow;
+  //Handle(OpenGl_Context) myGlContext;
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUseZBuffer);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUseDepthWrite);
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myNoneCulling);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myFrontCulling);
+  
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbSkippedTranspElems);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRenderFilter);
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myDefaultAspects);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspectsSet);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspectsApplied.get());
+  //Handle(Graphic3d_PresentationAttributes) myAspectFaceAppliedWithHL;
+
+  //const OpenGl_Matrix* ViewMatrix_applied;
+  //const OpenGl_Matrix* StructureMatrix_applied;
+  
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToAllowFaceCulling);
+  //Handle(Graphic3d_PresentationAttributes) myHighlightStyle;
+  //OpenGl_Matrix myModelViewMatrix;
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myAspectFaceHl);
+  //Handle(OpenGl_TextureSet) myEnvironmentTexture;
 }

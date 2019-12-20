@@ -153,6 +153,20 @@ QVariant VInspector_ItemOpenGlLayerList::initValue (const int theItemRole) const
   }
   return QVariant();
 }
+ 
+// ======================================================================
+// function : initStream
+// purpose :
+// =======================================================================
+void VInspector_ItemOpenGlLayerList::initStream (Standard_OStream& theOStream) const
+{
+  Standard_Boolean isDefault;
+  const OpenGl_LayerList& aListOfLayers = GetLayerList (isDefault);
+  if (isDefault)
+    return;
+  aListOfLayers.DumpJson (theOStream);
+}
+
 
 // =======================================================================
 // function : createChild

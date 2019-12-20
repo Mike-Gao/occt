@@ -456,6 +456,7 @@ void Graphic3d_Group::DumpJson (Standard_OStream& theOStream, const Standard_Int
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_Group);
 
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsClosed);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myContainsFacet);
 }

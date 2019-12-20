@@ -92,11 +92,12 @@ void Graphic3d_Aspects::DumpJson (Standard_OStream& theOStream, const Standard_I
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsTextZoomable);
 
   /*Aspect_InteriorStyle       myInteriorStyle;
-  Graphic3d_TypeOfShadingModel myShadingModel;
-  Graphic3d_AlphaMode          myAlphaMode;
-  Standard_ShortReal           myAlphaCutoff;
+  Graphic3d_TypeOfShadingModel myShadingModel;*/
 
-  Aspect_TypeOfLine            myLineType;
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAlphaMode);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAlphaCutoff);
+
+  /*Aspect_TypeOfLine            myLineType;
   Standard_ShortReal           myLineWidth;
 
   Aspect_TypeOfMarker          myMarkerType;

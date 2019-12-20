@@ -15,6 +15,8 @@
 
 #include <OpenGl_Element.hxx>
 
+#include <Standard_Dump.hxx>
+
 // =======================================================================
 // function : OpenGl_Element
 // purpose  :
@@ -31,4 +33,13 @@ OpenGl_Element::OpenGl_Element()
 OpenGl_Element::~OpenGl_Element()
 {
   //
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_Element::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+{
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this);
 }

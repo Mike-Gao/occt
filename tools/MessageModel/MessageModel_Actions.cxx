@@ -419,6 +419,15 @@ void MessageModel_Actions::OnTestPropertyPanel()
     MESSAGE_INFO_STREAM(aStream, "Quantity_Color", "", &aPerfMeter, NULL);
   }
 
+  // stream of some table values
+  {
+    Standard_SStream aStream;
+    OCCT_DUMP_FIELD_VALUES_NUMERICAL (aStream, "value_1", 1, 100);
+    OCCT_DUMP_FIELD_VALUES_STRING (aStream, "value_2", 2, "value_1", "value_2");
+
+    MESSAGE_INFO_STREAM(aStream, "Table: Name to value", "", &aPerfMeter, NULL);
+  }
+
   // SHAPE messages
   {
     BRepBuilderAPI_MakeEdge aBuilder (gp_Pnt (0., 0., 0.), gp_Pnt (20., 10., 20.));
