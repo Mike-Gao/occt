@@ -363,55 +363,71 @@ static void UpdateTol(const TopoDS_Edge& theE, const Standard_Real theTol)
 void BRepLib::SetPCurve(const TopoDS_Edge& theE,
                         const Handle(Geom2d_Curve)& theC,
                         const TopoDS_Face& theF, 
-                        const Standard_Real theMaxTol,
+                        const Standard_Real theMaxTol, const Standard_Boolean theForceProj,
                         Standard_Real& theTolReached, Handle(Geom2d_Curve)& theProjCurve)
 {
-  Standard_Real aSMTol = Precision::PConfusion();
-  Standard_Real aTol = BRep_Tool::Tolerance(theE);
-  BRep_Builder aBB;
-  Standard_Real fr, lr, f, l;
-  BRep_Tool::Range(theE, fr, lr);
-  Handle(Geom2d_Curve) aC = theC;
-  f = theC->FirstParameter();
-  l = theC->LastParameter();
-  if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
-  {
-    GeomLib::SameRange(aSMTol, theC, f, l, fr, lr, aC);
-  }
-  aBB.UpdateEdge(theE, aC, theF, aTol);
-  Handle(Geom_Surface) anS = BRep_Tool::Surface(theF);
-  Handle(Geom_Curve) aC3D = BRep_Tool::Curve(theE, f, l);
-  Standard_Real aTol1 = CompTol(aC3D, aC, anS, fr, lr);
-  if (aTol1 <= aTol)
-  {
-    theTolReached = aTol1;
-    aBB.SameParameter(theE, Standard_True);
-    return;
-  }
-  else if (theMaxTol < aTol && aTol1 < 2.*aTol)
-  {
-    theTolReached = aTol1;
-    UpdateTol(theE, theTolReached);
-    return;
-  }
-  aBB.SameParameter(theE, Standard_False);
   Standard_Real aNewTol = -1;
-  BRepLib::SameParameter(theE, aTol, aNewTol, Standard_True);
-  if (aNewTol > 0)
+  Standard_Real aSMTol = Precision::PConfusion();
+  Standard_Real fr, lr, f, l;
+  Handle(Geom_Curve) aC3D = BRep_Tool::Curve(theE, f, l);
+  Handle(Geom_Surface) anS = BRep_Tool::Surface(theF);
+  Handle(Geom2d_Curve) aC = theC;
+  BRep_Builder aBB;
+  Standard_Real aTol1 = RealLast();
+  BRep_Tool::Range(theE, fr, lr);
+  if (!theForceProj)
   {
-    //Set old tolerance for edge, which has been changed by sameparameter
-    static_cast<BRep_TEdge*>(theE.TShape().get())->Tolerance(aTol);
-  }
-  if (aNewTol > 0.)
-  {
-    aC = BRep_Tool::CurveOnSurface(theE, theF, f, l);
-    aNewTol = CompTol(aC3D, aC, anS, fr, lr);
-    if (aNewTol < theMaxTol)
+    Standard_Real aTol = BRep_Tool::Tolerance(theE);
+    f = theC->FirstParameter();
+    l = theC->LastParameter();
+    if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
     {
+      GeomLib::SameRange(aSMTol, theC, f, l, fr, lr, aC);
+    }
+    //
+    if (anS.IsNull())
+    {
+      return;
+    }
+    //
+    if (aC3D.IsNull())
+    {
+      return;
+    }
+    //
+    aBB.UpdateEdge(theE, aC, theF, aTol);
+    //
+    aTol1 = CompTol(aC3D, aC, anS, fr, lr);
+    if (aTol1 <= aTol)
+    {
+      theTolReached = aTol1;
       aBB.SameParameter(theE, Standard_True);
-      theTolReached = aNewTol;
+      return;
+    }
+    else if (theMaxTol < aTol && aTol1 < 2.*aTol)
+    {
+      theTolReached = aTol1;
       UpdateTol(theE, theTolReached);
-      return ;
+      return;
+    }
+    aBB.SameParameter(theE, Standard_False);
+    BRepLib::SameParameter(theE, aTol, aNewTol, Standard_True);
+    if (aNewTol < 0)
+    {
+      //Set old tolerance for edge, which has been changed by sameparameter
+      static_cast<BRep_TEdge*>(theE.TShape().get())->Tolerance(aTol);
+    }
+    if (aNewTol > 0.)
+    {
+      aC = BRep_Tool::CurveOnSurface(theE, theF, f, l);
+      aNewTol = CompTol(aC3D, aC, anS, fr, lr);
+      if (aNewTol < theMaxTol)
+      {
+        aBB.SameParameter(theE, Standard_True);
+        theTolReached = aNewTol;
+        UpdateTol(theE, theTolReached);
+        return;
+      }
     }
   }
   //Projection
@@ -508,7 +524,7 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
 void BRepLib::SetPCurve(const TopoDS_Edge& theE,
   const Handle(Geom2d_Curve)& theC1, const Handle(Geom2d_Curve)& theC2,
   const TopoDS_Face& theF,
-  const Standard_Real theMaxTol,
+  const Standard_Real theMaxTol, const Standard_Boolean theForceProj,
   Standard_Real& theTolReached, 
   Handle(Geom2d_Curve)& theProjCurve1,
   Handle(Geom2d_Curve)& theProjCurve2)
@@ -521,49 +537,64 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
   Handle(Geom2d_Curve) aC1 = theC1, aC2 = theC2;
   f = theC1->FirstParameter();
   l = theC1->LastParameter();
-  if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
-  {
-    GeomLib::SameRange(aSMTol, theC1, f, l, fr, lr, aC1);
-  }
-  f = theC2->FirstParameter();
-  l = theC2->LastParameter();
-  if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
-  {
-    GeomLib::SameRange(aSMTol, theC2, f, l, fr, lr, aC2);
-  }
-  aBB.UpdateEdge(theE, aC1, aC2, theF, aTol);
+  Standard_Real aTol1 = RealLast();
+  Standard_Real aNewTol = -1.;
   Handle(Geom_Surface) anS = BRep_Tool::Surface(theF);
   Handle(Geom_Curve) aC3D = BRep_Tool::Curve(theE, f, l);
-  Standard_Real aTol1 = CompTol(aC3D, aC1, anS, fr, lr);
-  aTol1 = Max(aTol1, CompTol(aC3D, aC2, anS, fr, lr));
-  if (aTol1 <= aTol)
+  if (!theForceProj)
   {
-    theTolReached = aTol1;
-    aBB.SameParameter(theE, Standard_True);
-    return;
-  }
-  aBB.SameParameter(theE, Standard_False);
-  Standard_Real aNewTol = -1;
-  BRepLib::SameParameter(theE, aTol, aNewTol, Standard_False);
-  if (aNewTol > 0)
-  {
-    //Set old tolerance for edge, which has been changed by sameparameter
-    static_cast<BRep_TEdge*>(theE.TShape().get())->Tolerance(aTol);
-  }
-  if (aNewTol > 0. && aNewTol < theMaxTol)
-  {
-    TopoDS_Vertex aV1, aV2;
-    TopExp::Vertices(theE, aV1, aV2);
-    if (!aV1.IsNull())
+    if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
     {
-      aBB.UpdateVertex(aV1, aNewTol);
+      GeomLib::SameRange(aSMTol, theC1, f, l, fr, lr, aC1);
     }
-    if (!aV2.IsNull())
+    f = theC2->FirstParameter();
+    l = theC2->LastParameter();
+    if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
     {
-      aBB.UpdateVertex(aV2, aNewTol);
+      GeomLib::SameRange(aSMTol, theC2, f, l, fr, lr, aC2);
     }
-    theTolReached = aNewTol;
-    return;
+    aBB.UpdateEdge(theE, aC1, aC2, theF, aTol);
+    //
+    if (anS.IsNull())
+    {
+      return;
+    }
+    //
+    if (aC3D.IsNull())
+    {
+      return;
+    }
+    //
+    aTol1 = CompTol(aC3D, aC1, anS, fr, lr);
+    aTol1 = Max(aTol1, CompTol(aC3D, aC2, anS, fr, lr));
+    if (aTol1 <= aTol)
+    {
+      theTolReached = aTol1;
+      aBB.SameParameter(theE, Standard_True);
+      return;
+    }
+    aBB.SameParameter(theE, Standard_False);
+    BRepLib::SameParameter(theE, aTol, aNewTol, Standard_False);
+    if (aNewTol > 0)
+    {
+      //Set old tolerance for edge, which has been changed by sameparameter
+      static_cast<BRep_TEdge*>(theE.TShape().get())->Tolerance(aTol);
+    }
+    if (aNewTol > 0. && aNewTol < theMaxTol)
+    {
+      TopoDS_Vertex aV1, aV2;
+      TopExp::Vertices(theE, aV1, aV2);
+      if (!aV1.IsNull())
+      {
+        aBB.UpdateVertex(aV1, aNewTol);
+      }
+      if (!aV2.IsNull())
+      {
+        aBB.UpdateVertex(aV2, aNewTol);
+      }
+      theTolReached = aNewTol;
+      return;
+    }
   }
   //Projection
   Handle(BRepAdaptor_HSurface) aBAHS = new BRepAdaptor_HSurface(theF);

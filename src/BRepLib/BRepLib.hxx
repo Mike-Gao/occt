@@ -124,7 +124,7 @@ public:
   //! Algorithm sets in theTolReached tolerance of edge after setting pcurve.
   Standard_EXPORT static void SetPCurve(const TopoDS_Edge& theE, 
     const Handle(Geom2d_Curve)& theC, 
-    const TopoDS_Face& theF, const Standard_Real theMaxTol, 
+    const TopoDS_Face& theF, const Standard_Real theMaxTol, const Standard_Boolean theForceProj,
     Standard_Real& theTolReached, Handle(Geom2d_Curve)& theProjCurve);
 
   //! Sets the pcurve theC1, theC2 for the edge theE on the closed face theF.
@@ -137,7 +137,7 @@ public:
   //! Algorithm sets in theTolReached tolerance of edge after setting pcurve.
   Standard_EXPORT static void SetPCurve(const TopoDS_Edge& theE,
     const Handle(Geom2d_Curve)& theC1, const Handle(Geom2d_Curve)& theC2,
-    const TopoDS_Face& theF, const Standard_Real theMaxTol,
+    const TopoDS_Face& theF, const Standard_Real theMaxTol, const Standard_Boolean theForceProj,
     Standard_Real& theTolReached, 
     Handle(Geom2d_Curve)& theProjCurve1, 
     Handle(Geom2d_Curve)& theProjCurve2);

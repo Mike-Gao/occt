@@ -622,6 +622,7 @@ TopoDS_Edge BRepBuilderAPI_Sewing::SameParameterEdge(const TopoDS_Edge& edgeFirs
       whichSec = 1;
     }
   }
+  //
 
   Standard_Real first, last;
   BRep_Tool::Range(edge1, first, last);
@@ -957,8 +958,20 @@ TopoDS_Edge BRepBuilderAPI_Sewing::SameParameterEdge(const TopoDS_Edge& edgeFirs
         static_cast<BRep_TVertex*>(aV1edge.TShape().get())->Tolerance(aTolV1);
         static_cast<BRep_TVertex*>(aV2edge.TShape().get())->Tolerance(aTolV2);
 
-        BRepLib::SetPCurve(edge, c2d2edge, fac2, myTolerance,
-                                  aTolReached_3, aProjCurve);
+        Standard_Real aLimTol = myTolerance;
+        aLimTol = Max(aLimTol, BRep_Tool::Tolerance(edgeFirst));
+        aLimTol = Max(aLimTol, BRep_Tool::Tolerance(edgeLast));
+
+        if (whichSec == 1) itf2.Initialize(listFacesLast);
+        else               itf2.Initialize(listFacesFirst);
+        for (; itf2.More(); itf2.Next()) {
+          Handle(Geom2d_Curve) c2d2, c2d21;
+          Standard_Real firstOld, lastOld;
+          fac2 = TopoDS::Face(itf2.Value());
+          c2d2 = BRep_Tool::CurveOnSurface(edge2, fac2, firstOld, lastOld);
+          BRepLib::SetPCurve(edge, c2d2, fac2, aLimTol, Standard_True,
+            aTolReached_3, aProjCurve);
+        }
       }
       else
       {

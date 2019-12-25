@@ -125,11 +125,17 @@ static Standard_Integer setpcurve(Draw_Interpretor&, Standard_Integer n, const c
   if (n > 4) {
     tol = Draw::Atof(a[4]);
   }
+  Standard_Boolean ForceProj = Standard_False;
+  if (n > 5)
+  {
+    Standard_Integer i = Draw::Atoi(a[5]);
+    if (i > 0) ForceProj = Standard_True;
+  }
   //BRep_Builder BB;
   //BB.UpdateEdge(TopoDS::Edge(E), PC, TopoDS::Face(F), tol);
   Standard_Real tolreached;
   Handle(Geom2d_Curve) ProjC;
-  BRepLib::SetPCurve(TopoDS::Edge(E), PC, TopoDS::Face(F), tol,
+  BRepLib::SetPCurve(TopoDS::Edge(E), PC, TopoDS::Face(F), tol, ForceProj,
     tolreached, ProjC);
   DBRep::Set(a[1], E);
   return 0;
@@ -1427,7 +1433,7 @@ void  BRepTest::BasicCommands(Draw_Interpretor& theCommands)
 		  __FILE__,
 		  addpcurve,g);
   theCommands.Add("setpcurve",
-                  "addpcurve edge 2dcurve face [tol (default 1.e-4)]",
+                  "setpcurve edge 2dcurve face [tol (default 1.e-4)] [proj]",
                   __FILE__,
                   setpcurve, g);
 
