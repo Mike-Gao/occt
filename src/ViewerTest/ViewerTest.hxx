@@ -90,6 +90,22 @@ public:
                                                    const Standard_Boolean               theToUpdate = Standard_True,
                                                    const Standard_Boolean               theReplaceIfExists = Standard_True);
 
+  //! Display AIS object in active Viewer and register it in the map of Interactive Objects with specified name.
+  //! Sets status, display mode and selection mode for the Object
+  //! @param theName            key to be associated to displayed interactive object
+  //! @param theObject          object to display
+  //! @param theDispMode        display mode how the object should be displayed
+  //! @param theSelectionMode   if theSelectionMode equals -1, theIObj will not be activated
+  //! @param theToUpdate        redraw viewer after displaying object
+  //! @param theReplaceIfExists replace the object assigned to specified key
+  //! @return true if new object has been displayed
+  Standard_EXPORT static Standard_Boolean Display (const TCollection_AsciiString&       theName,
+                                                   const Handle(AIS_InteractiveObject)& theObject,
+                                                   const Standard_Integer               theDispMode,
+                                                   const Standard_Integer               theSelectionMode,
+                                                   const Standard_Boolean               theToUpdate = Standard_True,
+                                                   const Standard_Boolean               theReplaceIfExists = Standard_True);
+
   //! waits until a shape of type <aType> is picked in the AIS Viewer and returns it.
   //! if <aType> == TopAbs_Shape, any shape can be picked...
   //! MaxPick  is the Max number before exiting, if no pick is successful

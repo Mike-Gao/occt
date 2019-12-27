@@ -149,15 +149,6 @@ void VInspector_ItemBVHTree::initStream (Standard_OStream& theOStream) const
 }
 
 // =======================================================================
-// function : createChild
-// purpose :
-// =======================================================================
-TreeModel_ItemBasePtr VInspector_ItemBVHTree::createChild (int theRow, int theColumn)
-{
-  return VInspector_ItemBVHTreeNode::CreateItem (currentItem(), theRow, theColumn);
-}
-
-// =======================================================================
 // function : buildPresentationShape
 // purpose :
 // =======================================================================
@@ -196,4 +187,13 @@ TopoDS_Shape VInspector_ItemBVHTree::buildPresentationShape()
     }
   }
   return aCompound;*/
+}
+
+// =======================================================================
+// function : createChild
+// purpose :
+// =======================================================================
+TreeModel_ItemBasePtr VInspector_ItemBVHTree::createChild (int theRow, int theColumn)
+{
+  return TreeModel_ItemBasePtr();
 }

@@ -22,6 +22,11 @@
 #include <gp_XYZ.hxx>
 #include <Standard_Dump.hxx>
 
+#include <Standard_WarningsDisable.hxx>
+#include <QApplication>
+#include <QFont>
+#include <Standard_WarningsRestore.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(TreeModel_ItemProperties, Standard_Transient)
 
 // =======================================================================
@@ -128,11 +133,26 @@ QVariant TreeModel_ItemProperties::Data (const int theRow, const int theColumn, 
       return aCachedValues[(int)theRole];
   }
 
-  if (theRole != Qt::DisplayRole && theRole != Qt::ToolTipRole)
-    return QVariant();
+  if (theRole == Qt::FontRole) // method name is in italic
+  {
+    if (Data(theRow, 0, Qt::DisplayRole).toString().contains("className"))
+    {
+      QFont aFont = qApp->font();
+      aFont.setItalic (true);
+      return aFont;
+    }
+  }
+  if (theRole == Qt::ForegroundRole)
+  {
+    if (Data(theRow, 0, Qt::DisplayRole).toString().contains("className"))
+      return QColor (Qt::darkGray).darker(150);
+  }
 
-  if (theColumn == 0) return RowValues().FindFromIndex (theRow + 1).myKey;
-  else if (theColumn == 1) return RowValues().FindFromIndex (theRow + 1).myValue;
+  if (theRole == Qt::DisplayRole || theRole == Qt::ToolTipRole)
+  {
+    if (theColumn == 0) return RowValues().FindFromIndex (theRow + 1).myKey;
+    else if (theColumn == 1) return RowValues().FindFromIndex (theRow + 1).myValue;
+  }
 
   return QVariant();
 }

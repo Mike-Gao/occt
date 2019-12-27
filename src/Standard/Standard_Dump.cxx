@@ -19,10 +19,11 @@
 // function : Constructor
 // purpose :
 // =======================================================================
-Standard_DumpSentry::Standard_DumpSentry (Standard_OStream& theOStream, const char*)
+Standard_DumpSentry::Standard_DumpSentry (Standard_OStream& theOStream, const char* className)
 : myOStream (&theOStream)
 {
-  //(*myOStream) << "\"" << theClassName << "\": {";
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, className)
+//(*myOStream) << "\"" << theClassName << "\": {";
 }
 
 // =======================================================================
@@ -284,7 +285,15 @@ TCollection_AsciiString Standard_Dump::DumpFieldToName (const TCollection_AsciiS
     aName.Remove (1, 1);
   }
 
-  if (::LowerCase (aName.Value(1)) == 'm' && aName.Value (2) == 'y')
+  if (::LowerCase (aName.Value(1)) == 'a' && aName.Value (2) == 'n')
+  {
+    aName.Remove (1, 2);
+  }
+  else if (::LowerCase (aName.Value(1)) == 'a')
+  {
+    aName.Remove (1, 1);
+  }
+  else if (::LowerCase (aName.Value(1)) == 'm' && aName.Value (2) == 'y')
   {
     aName.Remove (1, 2);
   }

@@ -758,6 +758,56 @@ Standard_Boolean ViewerTest::Display (const TCollection_AsciiString&       theNa
   return Standard_True;
 }
 
+//=======================================================================
+//function : Display
+//purpose  :
+//=======================================================================
+Standard_Boolean ViewerTest::Display (const TCollection_AsciiString&       theName,
+                                      const Handle(AIS_InteractiveObject)& theObject,
+                                      const Standard_Integer               theDispMode,
+                                      const Standard_Integer               theSelectionMode,
+                                      const Standard_Boolean               theToUpdate,
+                                      const Standard_Boolean               theReplaceIfExists)
+{
+  ViewerTest_DoubleMapOfInteractiveAndName& aMap = GetMapOfAIS();
+  Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext();
+  if (aCtx.IsNull())
+  {
+    std::cout << "Error: AIS context is not available.\n";
+    return Standard_False;
+  }
+
+  if (aMap.IsBound2 (theName))
+  {
+    if (!theReplaceIfExists)
+    {
+      std::cout << "Error: other interactive object has been already registered with name: " << theName << ".\n"
+                << "Please use another name.\n";
+      return Standard_False;
+    }
+
+    if (Handle(AIS_InteractiveObject) anOldObj = aMap.Find2 (theName))
+    {
+      aCtx->Remove (anOldObj, theObject.IsNull() && theToUpdate);
+    }
+    aMap.UnBind2 (theName);
+  }
+
+  if (theObject.IsNull())
+  {
+    // object with specified name has been already unbound
+    return Standard_True;
+  }
+
+  // unbind AIS object if it was bound with another name
+  aMap.UnBind1 (theObject);
+
+  // can be registered without rebinding
+  aMap.Bind (theObject, theName);
+  aCtx->Display (theObject, theDispMode, theSelectionMode, theToUpdate);
+  return Standard_True;
+}
+
 //! Alias for ViewerTest::Display(), compatibility with old code.
 Standard_EXPORT Standard_Boolean VDisplayAISObject (const TCollection_AsciiString&       theName,
                                                     const Handle(AIS_InteractiveObject)& theObject,
