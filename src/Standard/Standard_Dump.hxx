@@ -64,17 +64,51 @@ class Standard_DumpSentry;
   theOStream << "\"" << aName << "\": " << theField; \
 }
 
-//! @def OCCT_INIT_FIELD_VALUE_NUMERICAL
+//! @def OCCT_INIT_FIELD_VALUE_REAL
 //! Append vector values into output value: "Name": [value_1, value_2, ...]
 //! This macro is intended to have only one row for dumped object in Json.
 //! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
-#define OCCT_INIT_FIELD_VALUE_NUMERICAL(theOStream, theStreamPos, theField) \
+#define OCCT_INIT_FIELD_VALUE_REAL(theOStream, theStreamPos, theField) \
 { \
   Standard_Integer aStreamPos = theStreamPos; \
   if (!Standard_Dump::ProcessFieldName (theOStream, #theField, aStreamPos)) \
     return Standard_False; \
-  if (!Standard_Dump::InitRealValue (theOStream, aStreamPos, theField)) \
+  TCollection_AsciiString aValueText; \
+  if (!Standard_Dump::InitValue (theOStream, aStreamPos, aValueText) || !aValueText.IsRealValue()) \
     return Standard_False; \
+  theField = aValueText.RealValue(); \
+  theStreamPos = aStreamPos; \
+}
+
+//! @def OCCT_INIT_FIELD_VALUE_NUMERICAL
+//! Append vector values into output value: "Name": [value_1, value_2, ...]
+//! This macro is intended to have only one row for dumped object in Json.
+//! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
+#define OCCT_INIT_FIELD_VALUE_INTEGER(theOStream, theStreamPos, theField) \
+{ \
+  Standard_Integer aStreamPos = theStreamPos; \
+  if (!Standard_Dump::ProcessFieldName (theOStream, #theField, aStreamPos)) \
+    return Standard_False; \
+  TCollection_AsciiString aValueText; \
+  if (!Standard_Dump::InitValue (theOStream, aStreamPos, aValueText) || !aValueText.IsIntegerValue()) \
+    return Standard_False; \
+  theField = aValueText.IntegerValue(); \
+  theStreamPos = aStreamPos; \
+}
+
+//! @def OCCT_INIT_FIELD_VALUE_NUMERICAL
+//! Append vector values into output value: "Name": [value_1, value_2, ...]
+//! This macro is intended to have only one row for dumped object in Json.
+//! It's possible to use it without necessity of OCCT_DUMP_CLASS_BEGIN call, but pay attention that it should be only one row in the object dump.
+#define OCCT_INIT_FIELD_VALUE_BOOLEAN(theOStream, theStreamPos, theField) \
+{ \
+  Standard_Integer aStreamPos = theStreamPos; \
+  if (!Standard_Dump::ProcessFieldName (theOStream, #theField, aStreamPos)) \
+    return Standard_False; \
+  TCollection_AsciiString aValueText; \
+  if (!Standard_Dump::InitValue (theOStream, aStreamPos, aValueText) || !aValueText.IsIntegerValue()) \
+    return Standard_False; \
+  theField = (Standard_Boolean)aValueText.IntegerValue(); \
   theStreamPos = aStreamPos; \
 }
 
@@ -169,7 +203,7 @@ class Standard_DumpSentry;
 #define OCCT_DUMP_VECTOR_CLASS(theOStream, theName, theCount, ...) \
 { \
   Standard_Dump::AddValuesSeparator (theOStream); \
-  theOStream << "\"" << OCCT_CLASS_NAME(theName) << "\": ["; \
+  theOStream << "\"" << theName << "\": ["; \
   Standard_Dump::DumpRealValues (theOStream, theCount, __VA_ARGS__);\
   theOStream << "]"; \
 }
@@ -181,7 +215,7 @@ class Standard_DumpSentry;
 #define OCCT_INIT_VECTOR_CLASS(theOStream, theName, theStreamPos, theCount, ...) \
 { \
   Standard_Integer aStreamPos = theStreamPos; \
-  if (!Standard_Dump::ProcessStreamName (theOStream, OCCT_CLASS_NAME(theName), aStreamPos)) \
+  if (!Standard_Dump::ProcessStreamName (theOStream, theName, aStreamPos)) \
     return Standard_False; \
   if (!Standard_Dump::InitRealValues (theOStream, aStreamPos, theCount, __VA_ARGS__)) \
     return Standard_False; \
@@ -341,9 +375,9 @@ public:
   //! @param theSStream stream with values
   //! @param theStreamPos current position in the stream
   //! @param theValue stream value
-  Standard_EXPORT static Standard_Boolean InitRealValue (const Standard_SStream& theStream,
-                                                         Standard_Integer& theStreamPos,
-                                                         Standard_Real& theValue);
+  Standard_EXPORT static Standard_Boolean InitValue (const Standard_SStream& theStream,
+                                                     Standard_Integer& theStreamPos,
+                                                     TCollection_AsciiString& theValue);
 
   //! Convert field name into dump text value, removes "&" and "my" prefixes
   //! An example, for field myValue, theName is Value, for &myCLass, the name is Class

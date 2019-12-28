@@ -3943,7 +3943,7 @@ Standard_Boolean Quantity_Color::InitJson (const Standard_SStream& theSStream, S
 {
   Standard_Integer aPos = theStreamPos;
   Standard_Real  aRed, aGreen, aBlue;
-  OCCT_INIT_VECTOR_CLASS (theSStream, RGB, aPos, 3, &aRed, &aGreen, &aBlue)
+  OCCT_INIT_VECTOR_CLASS (theSStream, "RGB", aPos, 3, &aRed, &aGreen, &aBlue)
 
   SetValues ((Standard_ShortReal)aRed, (Standard_ShortReal)aGreen, (Standard_ShortReal)aBlue, Quantity_TOC_RGB);
   return Standard_True;

@@ -18,8 +18,9 @@
 
 #include <BVH_Constants.hxx>
 #include <BVH_Types.hxx>
-#include <Standard_ShortReal.hxx>
+#include <Standard_Macro.hxx>
 #include <Standard_Dump.hxx>
+#include <Standard_ShortReal.hxx>
 
 #include <limits>
 
@@ -113,7 +114,7 @@ public:
   void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const
   {
     (void)theDepth;
-    OCCT_DUMP_CLASS_BEGIN (theOStream, BVH_Box);
+    //OCCT_DUMP_CLASS_BEGIN (theOStream, BVH_Box);
     OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsInited);
 
     int n = Min (N, 3);
@@ -132,6 +133,34 @@ public:
       OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "MinPoint", n, myMinPoint[0], myMinPoint[1], myMinPoint[2]);
       OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "MaxPoint", n, myMaxPoint[0], myMaxPoint[1], myMaxPoint[2]);
     }
+  }
+
+  //! Inits the content of me into the stream
+  Standard_Boolean InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+  {
+    Standard_Integer aPos = theStreamPos;
+
+    OCCT_INIT_FIELD_VALUE_BOOLEAN (theSStream, aPos, myIsInited);
+
+    int n = Min (N, 3);
+    if (n == 1)
+    {
+      OCCT_INIT_FIELD_VALUE_REAL (theSStream, aPos, myMinPoint[0]);
+      OCCT_INIT_FIELD_VALUE_REAL (theSStream, aPos, myMinPoint[0]);
+    }
+    if (n == 2)
+    {
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MinPoint", aPos, n, &myMinPoint[0], &myMinPoint[1]);
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MaxPoint", aPos, n, &myMaxPoint[0], &myMaxPoint[1]);
+    }
+    if (n == 3)
+    {
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MinPoint", aPos, n, &myMinPoint[0], &myMinPoint[1], &myMinPoint[2]);
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MaxPoint", aPos, n, &myMaxPoint[0], &myMaxPoint[1], &myMaxPoint[2]);
+    }
+
+    theStreamPos = aPos;
+    return Standard_True;
   }
 
 public:

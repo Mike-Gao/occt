@@ -164,7 +164,7 @@ void Select3D_SensitiveGroup::Clear()
 // function : NbSubElements
 // purpose  : Returns the amount of sub-entities
 //=======================================================================
-Standard_Integer Select3D_SensitiveGroup::NbSubElements()
+Standard_Integer Select3D_SensitiveGroup::NbSubElements() const
 {
   return myEntities.Size();
 }
@@ -379,7 +379,7 @@ void Select3D_SensitiveGroup::DumpJson (Standard_OStream& theOStream, const Stan
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMustMatchAll);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToCheckOverlapAll);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCenter);
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
 
   //NCollection_Vector<Standard_Integer> myBVHPrimIndexes;     //!< Vector of sub-entities indexes for BVH tree build

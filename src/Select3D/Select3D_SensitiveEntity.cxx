@@ -41,4 +41,15 @@ void Select3D_SensitiveEntity::DumpJson (Standard_OStream& theOStream, const Sta
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myOwnerId.get());
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySFactor);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, NbSubElements());
+
+  gp_Pnt aCenterOfGeometry = CenterOfGeometry();
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aCenterOfGeometry);
+
+  Standard_Boolean aHasInitLocation = HasInitLocation();
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aHasInitLocation);
+
+  gp_GTrsf anInvInitLocation = InvInitLocation();
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &anInvInitLocation);
 }

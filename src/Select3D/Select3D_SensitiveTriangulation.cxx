@@ -421,7 +421,7 @@ gp_Pnt Select3D_SensitiveTriangulation::CenterOfGeometry() const
 // function : NbSubElements
 // purpose  : Returns the amount of nodes in triangulation
 //=======================================================================
-Standard_Integer Select3D_SensitiveTriangulation::NbSubElements()
+Standard_Integer Select3D_SensitiveTriangulation::NbSubElements() const
 {
   return myTriangul->Nodes().Length();
 }
@@ -455,7 +455,6 @@ void Select3D_SensitiveTriangulation::DumpJson (Standard_OStream& theOStream, co
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTriangul.get());
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInitLocation);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCDG3D);
   //Handle(TColStd_HArray1OfInteger) myFreeEdges;
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPrimitivesNb);

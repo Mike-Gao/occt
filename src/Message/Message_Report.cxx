@@ -521,12 +521,10 @@ Standard_Boolean Message_Report::InitJson (const Standard_SStream& theSStream, S
   Standard_Integer aPos = theStreamPos;
 
   Standard_Real PerfMeterMode;
-  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, PerfMeterMode);
+  OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, PerfMeterMode);
   myPerfMeterMode = (Message_PerfMeterMode)((Standard_Integer)PerfMeterMode);
 
-  Standard_Real Limit;
-  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, Limit);
-  myLimit = (Standard_Integer)Limit;
+  OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, myLimit);
 
   theStreamPos = aPos;
   return Standard_True;

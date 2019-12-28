@@ -319,7 +319,7 @@ gp_Pnt Select3D_InteriorSensitivePointSet::CenterOfGeometry() const
 // function : NbSubElements
 // purpose  : Returns the amount of points in set
 //=======================================================================
-Standard_Integer Select3D_InteriorSensitivePointSet::NbSubElements()
+Standard_Integer Select3D_InteriorSensitivePointSet::NbSubElements() const
 {
   return myPlanarPolygons.Length();
 }
@@ -333,9 +333,7 @@ void Select3D_InteriorSensitivePointSet::DumpJson (Standard_OStream& theOStream,
   OCCT_DUMP_CLASS_BEGIN (theOStream, Select3D_InteriorSensitivePointSet);
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
 
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
   //Select3D_VectorOfHPoly          myPlanarPolygons;     //!< Vector of planar polygons
   //Handle(TColStd_HArray1OfInteger) myPolygonsIdxs;       //!< Indexes array for BVH calculation
-
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCOG);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
 }

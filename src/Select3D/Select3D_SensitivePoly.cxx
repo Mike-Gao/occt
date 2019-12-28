@@ -284,7 +284,7 @@ Standard_Real Select3D_SensitivePoly::distanceToCOG (SelectBasics_SelectingVolum
 // Function: NbSubElements
 // Purpose : Returns the amount of segments in poly
 //==================================================
-Standard_Integer Select3D_SensitivePoly::NbSubElements()
+Standard_Integer Select3D_SensitivePoly::NbSubElements() const
 {
   return myPolyg.Size();
 }
@@ -321,7 +321,6 @@ void Select3D_SensitivePoly::DumpJson (Standard_OStream& theOStream, const Stand
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet);
 
   //Select3D_PointData              myPolyg;              //!< Points of the poly
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCOG);
   //Handle(TColStd_HArray1OfInteger) mySegmentIndexes;     //!< Segment indexes for BVH tree build
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsComputed);

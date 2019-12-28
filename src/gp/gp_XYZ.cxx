@@ -40,7 +40,7 @@ Standard_Boolean gp_XYZ::IsEqual (const gp_XYZ& Other,
 //=======================================================================
 void gp_XYZ::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
 {
-  OCCT_DUMP_VECTOR_CLASS (theOStream, gp_XYZ, 3, x, y, z)
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "gp_XYZ", 3, x, y, z)
 }
 
 //=======================================================================
@@ -50,7 +50,7 @@ void gp_XYZ::DumpJson (Standard_OStream& theOStream, const Standard_Integer) con
 Standard_Boolean gp_XYZ::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
 {
   Standard_Integer aPos = theStreamPos;
-  OCCT_INIT_VECTOR_CLASS (theSStream, gp_XYZ, aPos, 3, &x, &y, &z)
+  OCCT_INIT_VECTOR_CLASS (theSStream, "gp_XYZ", aPos, 3, &x, &y, &z)
 
   theStreamPos = aPos;
   return Standard_True;

@@ -98,6 +98,17 @@ void Convert_Tools::ConvertStreamToPresentations (const Standard_SStream& theSSt
       thePresentations.Append (new Convert_TransientShape (aShape));
     return;
   }
+
+  BVH_Box<Standard_Real, 3> aBVHBox;  // Graphic3d_BndBox3d
+  if (aBVHBox.InitJson (theSStream, aStartPos))
+  {
+    Bnd_Box aCornerBox (gp_Pnt (aBVHBox.CornerMin().x(), aBVHBox.CornerMin().y(), aBVHBox.CornerMin().z()),
+                        gp_Pnt (aBVHBox.CornerMax().x(), aBVHBox.CornerMax().y(), aBVHBox.CornerMax().z()));
+    TopoDS_Shape aShape;
+    if (Convert_Tools::CreateShape (aCornerBox, aShape))
+      thePresentations.Append (new Convert_TransientShape (aShape));
+    return;
+  }
 }
 
 //=======================================================================
@@ -178,19 +189,28 @@ Standard_Boolean Convert_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const g
   Standard_Boolean aThinOnY = fabs (thePntMin.Y() - thePntMax.Y()) < Precision::Confusion();
   Standard_Boolean aThinOnZ = fabs (thePntMin.Z() - thePntMax.Z()) < Precision::Confusion();
 
-  if (((int)aThinOnX + (int)aThinOnY + (int)aThinOnZ) > 1) // thin box in several directions is a point
+  BRep_Builder aBuilder;
+  TopoDS_Compound aCompound;
+  aBuilder.MakeCompound (aCompound);
+
+  if (((int)aThinOnX + (int)aThinOnY + (int)aThinOnZ) == 3) // thin box in all directions is a point
   {
-    BRep_Builder aBuilder;
-    TopoDS_Compound aCompound;
-    aBuilder.MakeCompound (aCompound);
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeVertex (thePntMin));
     theShape = aCompound;
     return Standard_True;
   }
 
+  if (((int)aThinOnX + (int)aThinOnY + (int)aThinOnZ) == 2) // thin box in two directions is a point
+  {
+    aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (thePntMin, thePntMax));
+    theShape = aCompound;
+    return Standard_True;
+  }
+
+  // thin box in only one direction is a compuund of edges
   if (aThinOnX || aThinOnY || aThinOnZ)
   {
-    gp_Pnt aPnt1, aPnt2, aPnt3, aPnt4 ;
+    gp_Pnt aPnt1, aPnt2, aPnt3, aPnt4;
     if (aThinOnX)
     {
       aPnt1 = gp_Pnt(thePntMin.X(), thePntMin.Y(), thePntMin.Z());
@@ -212,9 +232,6 @@ Standard_Boolean Convert_Tools::CreateBoxShape (const gp_Pnt& thePntMin, const g
       aPnt3 = gp_Pnt(thePntMax.X(), thePntMax.Y(), thePntMin.Z());
       aPnt4 = gp_Pnt(thePntMin.X(), thePntMax.Y(), thePntMin.Z());
     }
-    BRep_Builder aBuilder;
-    TopoDS_Compound aCompound;
-    aBuilder.MakeCompound (aCompound);
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt1, aPnt2));
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt2, aPnt3));
     aBuilder.Add (aCompound, BRepBuilderAPI_MakeEdge (aPnt3, aPnt4));

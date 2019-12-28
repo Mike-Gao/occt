@@ -54,7 +54,7 @@ void Select3D_SensitiveWire::Add (const Handle(Select3D_SensitiveEntity)& theSen
 // function : NbSubElements
 // purpose  : Returns the amount of sub-entities
 //=======================================================================
-Standard_Integer Select3D_SensitiveWire::NbSubElements()
+Standard_Integer Select3D_SensitiveWire::NbSubElements() const
 {
   return myEntities.Length();
 }
@@ -242,6 +242,5 @@ void Select3D_SensitiveWire::DumpJson (Standard_OStream& theOStream, const Stand
     OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anEntity.get());
   }
   //NCollection_Vector<Standard_Integer>                 myEntityIndexes;     //!< Indexes of entities for BVH build
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCenter);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
 }

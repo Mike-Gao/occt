@@ -993,13 +993,11 @@ Standard_Boolean Bnd_Box::InitJson (const Standard_SStream& theSStream, Standard
 {
   Standard_Integer aPos = theStreamPos;
 
-  OCCT_INIT_VECTOR_CLASS (theSStream, CornerMin, aPos, 3, &Xmin, &Ymin, &Zmin)
-  OCCT_INIT_VECTOR_CLASS (theSStream, CornerMax, aPos, 3, &Xmax, &Ymax, &Zmax)
+  OCCT_INIT_VECTOR_CLASS (theSStream, "CornerMin", aPos, 3, &Xmin, &Ymin, &Zmin)
+  OCCT_INIT_VECTOR_CLASS (theSStream, "CornerMax", aPos, 3, &Xmax, &Ymax, &Zmax)
 
-  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, Gap);
-  Standard_Real myFlags;
-  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, myFlags);
-  Flags = (Standard_Integer)myFlags;
+  OCCT_INIT_FIELD_VALUE_REAL (theSStream, aPos, Gap);
+  OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, Flags);
 
   theStreamPos = aPos;
   return Standard_True;

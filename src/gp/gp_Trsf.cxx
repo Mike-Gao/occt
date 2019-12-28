@@ -857,11 +857,10 @@ void gp_Trsf::Orthogonalize()
 //=======================================================================
 void gp_Trsf::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
-  OCCT_DUMP_VECTOR_CLASS (theOStream, Location, 3, loc.X(), loc.Y(), loc.Z())
-  OCCT_DUMP_VECTOR_CLASS (theOStream, Matrix, 9, matrix.Value(1, 1), matrix.Value(1, 2), matrix.Value(1, 3),
-                                                 matrix.Value(2, 1), matrix.Value(2, 2), matrix.Value(2, 3),
-                                                 matrix.Value(3, 1), matrix.Value(3, 2), matrix.Value(3, 3))
-
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "Location", 3, loc.X(), loc.Y(), loc.Z())
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "Matrix", 9, matrix.Value(1, 1), matrix.Value(1, 2), matrix.Value(1, 3),
+                                                   matrix.Value(2, 1), matrix.Value(2, 2), matrix.Value(2, 3),
+                                                   matrix.Value(3, 1), matrix.Value(3, 2), matrix.Value(3, 3))
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, shape);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, scale);
 }
@@ -875,22 +874,13 @@ Standard_Boolean  gp_Trsf::InitJson (const Standard_SStream& theSStream, Standar
   Standard_Integer aPos = theStreamPos;
 
   gp_XYZ anXYZLoc;
-  OCCT_INIT_VECTOR_CLASS (theSStream, Location, aPos, 3, &anXYZLoc.ChangeCoord (1), &anXYZLoc.ChangeCoord (2), &anXYZLoc.ChangeCoord (3))
+  OCCT_INIT_VECTOR_CLASS (theSStream, "Location", aPos, 3, &anXYZLoc.ChangeCoord (1), &anXYZLoc.ChangeCoord (2), &anXYZLoc.ChangeCoord (3))
   SetTranslation (anXYZLoc);
 
-  //OCCT_INIT_VECTOR_CLASS (theSStream, Matrix, aPos, 9, matrix.ChangeValue (1, 1), matrix.ChangeValue (1, 2), matrix.ChangeValue (1, 3),
-  //                                                     matrix.ChangeValue (2, 1), matrix.ChangeValue (2, 2), matrix.ChangeValue (2, 3),
-  //                                                     matrix.ChangeValue (3, 1), matrix.ChangeValue (3, 2), matrix.ChangeValue (3, 3))
-
   Standard_Real mymatrix[3][3];
-  //Standard_Real M00, M01, M02, M10, M11, M12, M20, M21, M22;
-  //OCCT_INIT_VECTOR_CLASS (theSStream, Matrix, aPos, 9, &mymatrix[0][0], &mymatrix[0][1], &mymatrix[0][2],
-  //                                                     &mymatrix[1][0], &mymatrix[1][1], &mymatrix[1][2],
-  //                                                     &mymatrix[2][0], &mymatrix[2][1], &mymatrix[2][2])
-
-  OCCT_INIT_VECTOR_CLASS (theSStream, Matrix, aPos, 9, &mymatrix[0][0], &mymatrix[0][1], &mymatrix[0][2],
-                                                       &mymatrix[1][0], &mymatrix[1][1], &mymatrix[1][2],
-                                                       &mymatrix[2][0], &mymatrix[2][1], &mymatrix[2][2])
+  OCCT_INIT_VECTOR_CLASS (theSStream, "Matrix", aPos, 9, &mymatrix[0][0], &mymatrix[0][1], &mymatrix[0][2],
+                                                         &mymatrix[1][0], &mymatrix[1][1], &mymatrix[1][2],
+                                                         &mymatrix[2][0], &mymatrix[2][1], &mymatrix[2][2])
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
@@ -900,10 +890,10 @@ Standard_Boolean  gp_Trsf::InitJson (const Standard_SStream& theSStream, Standar
   }
 
   Standard_Real myshape;
-  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, myshape);
+  OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, myshape);
   shape = (gp_TrsfForm)((Standard_Integer)myshape);
 
-  OCCT_INIT_FIELD_VALUE_NUMERICAL (theSStream, aPos, scale);
+  OCCT_INIT_FIELD_VALUE_REAL (theSStream, aPos, scale);
 
   theStreamPos = aPos;
   return Standard_True;

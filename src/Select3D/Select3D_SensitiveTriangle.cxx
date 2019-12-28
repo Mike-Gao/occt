@@ -105,8 +105,10 @@ void Select3D_SensitiveTriangle::DumpJson (Standard_OStream& theOStream, const S
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType);
 
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCentroid);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[0]);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[1]);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[2]);
+
+  Select3D_BndBox3d aBoundingBox = ((Select3D_SensitiveTriangle*)this)->BoundingBox();
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aBoundingBox);
 }

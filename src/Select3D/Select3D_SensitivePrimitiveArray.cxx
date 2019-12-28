@@ -1240,7 +1240,6 @@ void Select3D_SensitivePrimitiveArray::DumpJson (Standard_OStream& theOStream, c
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPatchDistance);
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIs3d);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInitLocation);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCDG3D);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox);
   //Handle(TColStd_HPackedMapOfInteger) myDetectedElemMap;    //!< index map of last detected elements
   //Handle(TColStd_HPackedMapOfInteger) myDetectedNodeMap;    //!< index map of last detected nodes

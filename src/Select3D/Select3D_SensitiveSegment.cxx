@@ -98,7 +98,7 @@ Select3D_BndBox3d Select3D_SensitiveSegment::BoundingBox()
 // function : NbSubElements
 // purpose  : Returns the amount of points
 //=======================================================================
-Standard_Integer Select3D_SensitiveSegment::NbSubElements()
+Standard_Integer Select3D_SensitiveSegment::NbSubElements() const
 {
   return 2;
 }
@@ -114,4 +114,7 @@ void Select3D_SensitiveSegment::DumpJson (Standard_OStream& theOStream, const St
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myStart);
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEnd);
+
+  Select3D_BndBox3d aBoundingBox = ((Select3D_SensitiveSegment*)this)->BoundingBox();
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aBoundingBox);
 }

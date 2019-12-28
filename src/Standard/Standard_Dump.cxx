@@ -187,7 +187,8 @@ Standard_Boolean Standard_Dump::InitRealValues (const Standard_SStream& theStrea
     if (!aValueText.IsRealValue())
       return Standard_False;
 
-    *(va_arg(vl, Standard_Real*)) = aValueText.RealValue();
+    Standard_Real aValue = aValueText.RealValue();
+    *(va_arg(vl, Standard_Real*)) = aValue;
 
     aStreamPos = aNextPos + JsonKeyLength (Standard_JsonKey_SeparatorValueToValue);
     //theOStream << va_arg(vl, Standard_Real);
@@ -200,12 +201,12 @@ Standard_Boolean Standard_Dump::InitRealValues (const Standard_SStream& theStrea
 }
 
 //=======================================================================
-//function : InitRealValue
+//function : InitValue
 //purpose  : 
 //=======================================================================
-Standard_Boolean Standard_Dump::InitRealValue (const Standard_SStream& theStream,
-                                               Standard_Integer& theStreamPos,
-                                               Standard_Real& theValue)
+Standard_Boolean Standard_Dump::InitValue (const Standard_SStream& theStream,
+                                           Standard_Integer& theStreamPos,
+                                           TCollection_AsciiString& theValue)
 {
   Standard_Integer aStreamPos = theStreamPos;
 
@@ -224,13 +225,8 @@ Standard_Boolean Standard_Dump::InitRealValue (const Standard_SStream& theStream
     aNextKey = Standard_JsonKey_CloseChild;
   }
 
-  TCollection_AsciiString aValueText = aNextPos ? aSubText.SubString (aStreamPos, aNextPos - 1) : aSubText;
-  if (!aValueText.IsRealValue())
-    return Standard_False;
-
-  theValue = aValueText.RealValue();
+  theValue = aNextPos ? aSubText.SubString (aStreamPos, aNextPos - 1) : aSubText;
   theStreamPos = aNextPos ? (theStreamPos + (aNextPos - aStreamPos) + JsonKeyLength (aNextKey)) : aText.Length();
-
   return Standard_True;
 }
 

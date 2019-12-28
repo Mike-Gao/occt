@@ -218,7 +218,7 @@ Standard_Boolean Quantity_ColorRGBA::InitJson (const Standard_SStream& theSStrea
   Standard_Integer aPos = theStreamPos;
 
   Standard_Real aRed, aGreen, aBlue, anAlpha;
-  OCCT_INIT_VECTOR_CLASS (theSStream, RGBA, aPos, 4, &aRed, &aGreen, &aBlue, &anAlpha)
+  OCCT_INIT_VECTOR_CLASS (theSStream, "RGBA", aPos, 4, &aRed, &aGreen, &aBlue, &anAlpha)
 
   SetValues ((Standard_ShortReal)aRed, (Standard_ShortReal)aGreen, (Standard_ShortReal)aBlue, (Standard_ShortReal)anAlpha);
   return Standard_True;

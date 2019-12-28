@@ -116,11 +116,11 @@ gp_Ax2 gp_Ax2::Mirrored(const gp_Ax2& A2) const
 
 void gp_Ax2::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
 {
-  OCCT_DUMP_VECTOR_CLASS (theOStream, Location, 3, axis.Location().X(), axis.Location().Y(), axis.Location().Z())
-  OCCT_DUMP_VECTOR_CLASS (theOStream, Direction, 3, axis.Direction().X(), axis.Direction().Y(), axis.Direction().Z())
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "Location", 3, axis.Location().X(), axis.Location().Y(), axis.Location().Z())
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "Direction", 3, axis.Direction().X(), axis.Direction().Y(), axis.Direction().Z())
 
-  OCCT_DUMP_VECTOR_CLASS (theOStream, XDirection, 3, vxdir.X(), vxdir.Y(), vxdir.Z())
-  OCCT_DUMP_VECTOR_CLASS (theOStream, YDirection, 3, vydir.X(), vydir.Y(), vydir.Z())
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "XDirection", 3, vxdir.X(), vxdir.Y(), vxdir.Z())
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "YDirection", 3, vydir.X(), vydir.Y(), vydir.Z())
 }
 
 Standard_Boolean gp_Ax2::InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
@@ -128,15 +128,15 @@ Standard_Boolean gp_Ax2::InitJson (const Standard_SStream& theSStream, Standard_
   Standard_Integer aPos = theStreamPos;
 
   gp_XYZ anXYZLoc;
-  OCCT_INIT_VECTOR_CLASS (theSStream, Location, aPos, 3, &anXYZLoc.ChangeCoord (1), &anXYZLoc.ChangeCoord (2), &anXYZLoc.ChangeCoord (3))
+  OCCT_INIT_VECTOR_CLASS (theSStream, "Location", aPos, 3, &anXYZLoc.ChangeCoord (1), &anXYZLoc.ChangeCoord (2), &anXYZLoc.ChangeCoord (3))
   SetLocation (anXYZLoc);
 
   gp_XYZ aDir;
-  OCCT_INIT_VECTOR_CLASS (theSStream, Direction, aPos, 3, &aDir.ChangeCoord (1), &aDir.ChangeCoord (2), &aDir.ChangeCoord (3))
+  OCCT_INIT_VECTOR_CLASS (theSStream, "Direction", aPos, 3, &aDir.ChangeCoord (1), &aDir.ChangeCoord (2), &aDir.ChangeCoord (3))
   gp_XYZ aXDir;
-  OCCT_INIT_VECTOR_CLASS (theSStream, XDirection, aPos, 3, &aXDir.ChangeCoord (1), &aXDir.ChangeCoord (2), &aXDir.ChangeCoord (3))
+  OCCT_INIT_VECTOR_CLASS (theSStream, "XDirection", aPos, 3, &aXDir.ChangeCoord (1), &aXDir.ChangeCoord (2), &aXDir.ChangeCoord (3))
   gp_XYZ anYDir;
-  OCCT_INIT_VECTOR_CLASS (theSStream, YDirection, aPos, 3, &anYDir.ChangeCoord (1), &anYDir.ChangeCoord (2), &anYDir.ChangeCoord (3))
+  OCCT_INIT_VECTOR_CLASS (theSStream, "YDirection", aPos, 3, &anYDir.ChangeCoord (1), &anYDir.ChangeCoord (2), &anYDir.ChangeCoord (3))
 
   SetXDirection (aXDir);
   SetYDirection (anYDir);
