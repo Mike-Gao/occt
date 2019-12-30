@@ -29,7 +29,7 @@
 #include <Graphic3d_TextureParams.hxx>
 #include <NCollection_AlignedAllocator.hxx>
 
-#define DEBUG_INFO
+//#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>

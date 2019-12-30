@@ -30,7 +30,7 @@
 #include <Graphic3d_TransformUtils.hxx>
 #include <TCollection_HAsciiString.hxx>
 
-#define DEBUG_INFO
+//#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
@@ -285,7 +285,6 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
 // =======================================================================
 void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
-
 #ifdef DEBUG_INFO
   Message_PerfMeter aPerfMeter;
 
@@ -293,8 +292,10 @@ void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   DumpJson (aGroupStream);
   MESSAGE_INFO_STREAM (aGroupStream, "OpenGl_Text::Render", "", &aPerfMeter, NULL)
   Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
-
+#endif
   const OpenGl_Aspects* aTextAspect = theWorkspace->ApplyAspects();
+
+#ifdef DEBUG_INFO
   aGroupStream.str("");
   aTextAspect->DumpJson (aGroupStream);
   MESSAGE_INFO_STREAM (aGroupStream, "aTextAspect", "", &aPerfMeter, aParentAlert)
@@ -356,7 +357,7 @@ void OpenGl_Text::Render (const Handle(OpenGl_Context)& theCtx,
                           unsigned int theResolution) const
 {
 #if !defined(GL_ES_VERSION_2_0)
-  const Standard_Integer aPrevPolygonMode  = theCtx->SetPolygonMode (GL_FILL && GL_LINE && GL_POINT);
+  const Standard_Integer aPrevPolygonMode  = theCtx->SetPolygonMode (GL_FILL);
   const bool             aPrevHatchingMode = theCtx->SetPolygonHatchEnabled (false);
 #endif
 
@@ -806,10 +807,10 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     }
     case Aspect_TODT_SHADOW:
     {
-      //BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
-      //theCtx->SetColor4fv (theColorSubs);
-      //setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
-      //drawText    (theCtx, theTextAspect);
+      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
+      theCtx->SetColor4fv (theColorSubs);
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
+      drawText    (theCtx, theTextAspect);
       break;
     }
     case Aspect_TODT_DIMENSION:
@@ -864,16 +865,16 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   #endif
     const bool aColorMaskBack = theCtx->SetColorMask (false);
 
-    //glClear (GL_STENCIL_BUFFER_BIT);
-    //glEnable (GL_STENCIL_TEST);
-    //glStencilFunc (GL_ALWAYS, 1, 0xFF);
-    //glStencilOp (GL_KEEP, GL_KEEP, GL_REPLACE);
+    glClear (GL_STENCIL_BUFFER_BIT);
+    glEnable (GL_STENCIL_TEST);
+    glStencilFunc (GL_ALWAYS, 1, 0xFF);
+    glStencilOp (GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    //drawRect (theCtx, theTextAspect, OpenGl_Vec4 (1.0f, 1.0f, 1.0f, 1.0f));
+    drawRect (theCtx, theTextAspect, OpenGl_Vec4 (1.0f, 1.0f, 1.0f, 1.0f));
 
-    //glStencilFunc (GL_ALWAYS, 0, 0xFF);
+    glStencilFunc (GL_ALWAYS, 0, 0xFF);
 
-    //theCtx->SetColorMask (aColorMaskBack);
+    theCtx->SetColorMask (aColorMaskBack);
   }
 
   // reset OpenGL state

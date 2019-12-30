@@ -28,7 +28,7 @@
 #include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_GroupDefinitionError.hxx>
 
-#define DEBUG_INFO
+//#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
 #include <Message_PerfMeter.hxx>
