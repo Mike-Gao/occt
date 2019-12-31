@@ -56,12 +56,33 @@ Handle(Graphic3d_TransformPers) Graphic3d_TransformPers::FromDeprecatedParams (G
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void Graphic3d_TransformPers::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+void Graphic3d_TransformPers::PersParams3d::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  gp_Pnt anAttachPoint (PntX, PntY, PntZ);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &anAttachPoint);
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Graphic3d_TransformPers::PersParams2d::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+{
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, OffsetX);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, OffsetY);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Corner);
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Graphic3d_TransformPers::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_TransformPers);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMode)
 
-  OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "Params3d", 3, myParams.Params3d.PntX, myParams.Params3d.PntY, myParams.Params3d.PntZ)
-  OCCT_DUMP_FIELD_VALUES_NUMERICAL (theOStream, "Params2d", 3, myParams.Params2d.OffsetX, myParams.Params2d.OffsetY, myParams.Params2d.Corner)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParams.Params3d);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParams.Params2d);
 }

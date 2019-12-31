@@ -294,6 +294,9 @@ private:
     Standard_Real PntX;
     Standard_Real PntY;
     Standard_Real PntZ;
+
+    //! Dumps the content of me into the stream
+    Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
   };
 
   //! 2d/trihedron transformation persistence parameters.
@@ -302,6 +305,9 @@ private:
     Standard_Integer OffsetX;
     Standard_Integer OffsetY;
     Aspect_TypeOfTriedronPosition Corner;
+
+    //! Dumps the content of me into the stream
+    Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
   };
 
 private:

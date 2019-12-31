@@ -1139,15 +1139,15 @@ void OpenGl_PrimitiveArray::DumpJson (Standard_OStream& theOStream, const Standa
 
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Element);
 
-  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
-  //OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myShadingModel);
-  //mutable Handle(OpenGl_VertexBuffer)   myVboIndices;
-  //mutable Handle(OpenGl_VertexBuffer)   myVboAttribs;
-  //mutable Handle(Graphic3d_IndexBuffer) myIndices;
-  //mutable Handle(Graphic3d_Buffer)      myAttribs;
-  //mutable Handle(Graphic3d_BoundBuffer) myBounds;
-  //GLshort                               myDrawMode;
-  //mutable Standard_Boolean              myIsFillType;
-  //mutable Standard_Boolean              myIsVboInit;
-  //Standard_Size                         myUID; //!< Unique ID of primitive array. 
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myVboIndices.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myVboAttribs.get());
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myIndices.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAttribs.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myBounds.get());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDrawMode);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsFillType);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsVboInit);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUID);
 }

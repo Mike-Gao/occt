@@ -41,5 +41,6 @@ OpenGl_Element::~OpenGl_Element()
 // =======================================================================
 void OpenGl_Element::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
 {
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Element);
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this);
 }

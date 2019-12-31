@@ -757,7 +757,6 @@ void MessageView_Window::updatePreviewPresentation()
     return;
 
   NCollection_List<Handle(Standard_Transient)> aPresentations;
-  MessageModel_ItemRootPtr aRootItem;
   QModelIndexList aSelectedIndices = myTreeView->selectionModel()->selectedIndexes();
   for (QModelIndexList::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
   {

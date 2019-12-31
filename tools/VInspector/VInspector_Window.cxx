@@ -838,17 +838,26 @@ void VInspector_Window::onTreeViewSelectionChanged (const QItemSelection&,
   if (myPropertyPanelWidget->toggleViewAction()->isChecked())
     updatePropertyPanelBySelection();
 
-  QModelIndex aTreeItemIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
-  TreeModel_ItemBasePtr aTreeItemSelected = TreeModel_ModelBase::GetItemByIndex (aTreeItemIndex);
-  if (!aTreeItemSelected)
-    return;
-
   NCollection_List<Handle(Standard_Transient)> aSelPresentations;
 
-  Handle(TreeModel_ItemProperties) anItemProperties = aTreeItemSelected->Properties ();
-  if (anItemProperties)
-    anItemProperties->GetPresentations (-1, -1, aSelPresentations);
-  //else
+  QModelIndexList aSelectedIndices = myTreeView->selectionModel()->selectedIndexes();
+  for (QModelIndexList::const_iterator aSelIt = aSelectedIndices.begin(); aSelIt != aSelectedIndices.end(); aSelIt++)
+  {
+    QModelIndex anIndex = *aSelIt;
+    if (anIndex.column() != 0)
+      continue;
+
+    TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+    if (!anItemBase)
+      continue;
+
+    Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->Properties();
+    if (anItemProperties)
+    {
+      anItemProperties->GetPresentations (-1, -1, aSelPresentations);
+    }
+  }
+
   GetSelectedShapes (aSelPresentations);
   myDisplayPreview->UpdatePreview (View_DisplayActionType_DisplayId, aSelPresentations);
 

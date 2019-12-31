@@ -256,9 +256,10 @@ void OpenGl_VertexBuffer::unbindFixedColor (const Handle(OpenGl_Context)& theCtx
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void OpenGl_VertexBuffer::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+void OpenGl_VertexBuffer::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_VertexBuffer)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Resource);
 
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOffset);
 

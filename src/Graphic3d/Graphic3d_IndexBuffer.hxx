@@ -77,6 +77,12 @@ public:
     }
   }
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_IndexBuffer);
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_Buffer);
+  }
 
 };
 
