@@ -146,3 +146,16 @@ void Geom_ElementarySurface::VReverse () {
 }
 
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_ElementarySurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_ElementarySurface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_Surface);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &pos);
+}

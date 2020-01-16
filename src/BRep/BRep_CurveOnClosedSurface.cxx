@@ -180,4 +180,21 @@ void  BRep_CurveOnClosedSurface::Update()
   BRep_CurveOnSurface::Update();
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_CurveOnClosedSurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_CurveOnClosedSurface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRep_CurveOnSurface);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myPCurve2.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myContinuity);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myUV21);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myUV22);
+}
 

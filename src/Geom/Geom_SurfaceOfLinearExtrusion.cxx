@@ -391,3 +391,17 @@ gp_GTrsf2d Geom_SurfaceOfLinearExtrusion::ParametricTransformation
  
   return TU * TV;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_SurfaceOfLinearExtrusion::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_SurfaceOfLinearExtrusion);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_SweptSurface);
+
+  //Handle(GeomEvaluator_SurfaceOfExtrusion) myEvaluator;
+}

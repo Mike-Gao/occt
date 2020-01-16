@@ -104,3 +104,18 @@ Handle(BRep_CurveRepresentation) BRep_PolygonOnTriangulation::Copy() const
   
   return P;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_PolygonOnTriangulation::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_PolygonOnTriangulation);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRep_CurveRepresentation);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myPolygon.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTriangulation.get());
+}

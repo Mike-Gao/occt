@@ -92,3 +92,17 @@ Handle(BRep_CurveRepresentation) BRep_Curve3D::Copy() const
   C->SetRange(First(), Last());
   return C;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_Curve3D::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_Curve3D);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRep_GCurve);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCurve.get());
+}

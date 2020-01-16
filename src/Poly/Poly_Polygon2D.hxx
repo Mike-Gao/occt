@@ -78,6 +78,8 @@ public:
   //! Returns the table of nodes for this polygon.
   Standard_EXPORT const TColgp_Array1OfPnt2d& Nodes() const;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
 
 
 

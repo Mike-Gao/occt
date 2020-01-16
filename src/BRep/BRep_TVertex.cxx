@@ -47,3 +47,37 @@ Handle(TopoDS_TShape) BRep_TVertex::EmptyCopy() const
   return TV;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_TVertex::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_TVertex);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TopoDS_TEdge);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFlags);
+
+  BRep_ListIteratorOfListOfCurveRepresentation itr(myCurves);
+  while (itr.More())
+  {
+    Handle(BRep_CurveRepresentation) aCurveRepresentation = itr.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aCurveRepresentation.get());
+
+    itr.Next();
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPnt);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance);
+  BRep_ListIteratorOfListOfPointRepresentation itr(myPoints);
+  while (itr.More())
+  {
+    Handle(BRep_PointRepresentation) aPointRepresentation = itr.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aPointRepresentation.get());
+
+    itr.Next();
+  }
+}

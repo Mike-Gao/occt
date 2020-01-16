@@ -457,3 +457,17 @@ gp_GTrsf2d Geom_SurfaceOfRevolution::ParametricTransformation
   return T2;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_SurfaceOfRevolution::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_SurfaceOfRevolution);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_SweptSurface);
+
+  //Handle(GeomEvaluator_SurfaceOfRevolution) myEvaluator;
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &loc);
+}

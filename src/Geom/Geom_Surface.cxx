@@ -122,3 +122,15 @@ gp_Pnt  Geom_Surface::Value(const Standard_Real U,
   D0(U,V,P);
   return P;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_Surface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_Surface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_Geometry);
+}

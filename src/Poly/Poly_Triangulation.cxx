@@ -321,8 +321,11 @@ void Poly_Triangulation::DumpJson (Standard_OStream& theOStream, const Standard_
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeflection);
 
-  //TColgp_Array1OfPnt                 myNodes;
-  //Handle(TColgp_HArray1OfPnt2d)      myUVNodes;
-  //Poly_Array1OfTriangle              myTriangles;
-  //Handle(TShort_HArray1OfShortReal)  myNormals;
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNodes.Size());
+  if (!myUVNodes.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUVNodes->Size());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTriangles.Size());
+  if (!myNormals.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNormals->Size());
 }

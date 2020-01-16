@@ -433,3 +433,17 @@ const
   return T2;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_ConicalSurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_ConicalSurface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_ElementarySurface);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, radius);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, semiAngle);
+}

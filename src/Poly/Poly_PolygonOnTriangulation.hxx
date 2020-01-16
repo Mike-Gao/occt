@@ -101,6 +101,8 @@ public:
   //! are associated with the nodes in this polygon.
   Standard_EXPORT Handle(TColStd_HArray1OfReal) Parameters() const;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
 
 
 

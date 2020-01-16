@@ -133,4 +133,18 @@ TColStd_Array1OfReal& Poly_Polygon3D::ChangeParameters() const
   return myParameters->ChangeArray1();
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Poly_Polygon3D::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Poly_Polygon3D);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeflection);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNodes.Size());
+  if (!myParameters.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myParameters->Size());
+}
 

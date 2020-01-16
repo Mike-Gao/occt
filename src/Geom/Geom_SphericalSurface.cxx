@@ -360,3 +360,17 @@ void Geom_SphericalSurface::Transform (const Trsf& T) {
    radius = radius * Abs(T.ScaleFactor());
    pos.Transform (T);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_SphericalSurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_SphericalSurface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_ElementarySurface);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, radius);
+}

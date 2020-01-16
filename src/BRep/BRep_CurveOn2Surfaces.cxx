@@ -147,3 +147,21 @@ Handle(BRep_CurveRepresentation) BRep_CurveOn2Surfaces::Copy() const
 			  myContinuity);
   return C;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_CurveOn2Surfaces::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_CurveOn2Surfaces);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRep_CurveRepresentation);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySurface.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySurface2.get());
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myLocation2);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myContinuity);
+}

@@ -799,5 +799,24 @@ void Geom_OsculatingSurface::ClearOsculFlags()
 
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
 
+void Geom_OsculatingSurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_OsculatingSurface);
 
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myBasisSurf.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTol);
+
+  if (!myOsculSurf1.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOsculSurf1->Size());
+  if (!myOsculSurf2.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOsculSurf2->Size());
+  if (!myKdeg.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myKdeg->Size());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAlong.Size());
+}

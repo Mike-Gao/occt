@@ -91,6 +91,8 @@ public:
   //! the data structure of this polygon.
   Standard_EXPORT TColStd_Array1OfReal& ChangeParameters() const;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
 
 
 

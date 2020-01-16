@@ -28,10 +28,11 @@ IMPLEMENT_STANDARD_RTTIEXT(TopoDS_TShape,Standard_Transient)
 void TopoDS_TShape::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, TopoDS_TShape);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFlags);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, ShapeType());
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, NbChildren());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFlags);
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Free());
 

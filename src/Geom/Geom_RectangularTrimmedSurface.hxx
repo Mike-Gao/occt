@@ -306,6 +306,8 @@ public:
   Standard_EXPORT Handle(Geom_Geometry) Copy() const Standard_OVERRIDE;
 
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
 
   DEFINE_STANDARD_RTTIEXT(Geom_RectangularTrimmedSurface,Geom_BoundedSurface)

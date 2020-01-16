@@ -84,4 +84,17 @@ void  BRep_PointOnCurveOnSurface::PCurve(const Handle(Geom2d_Curve)& C)
   myPCurve = C;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_PointOnCurveOnSurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_PointOnCurveOnSurface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRep_PointRepresentation);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySurface.get());
+}
 

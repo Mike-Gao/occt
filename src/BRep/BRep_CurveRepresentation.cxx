@@ -426,3 +426,14 @@ void BRep_CurveRepresentation::Polygon2(const Handle(Poly_Polygon2D)&)
   throw Standard_DomainError("BRep_CurveRepresentation");
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void BRep_CurveRepresentation::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRep_CurveRepresentation);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myLocation);
+}

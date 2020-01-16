@@ -66,3 +66,16 @@ const TColgp_Array1OfPnt2d& Poly_Polygon2D::Nodes() const
 }
 
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Poly_Polygon2D::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Poly_Polygon2D);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeflection);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNodes.Size());
+}
+

@@ -397,3 +397,18 @@ void Geom_ToroidalSurface::Transform (const Trsf& T) {
    minorRadius = minorRadius * Abs(T.ScaleFactor());
    pos.Transform (T);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_ToroidalSurface::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_ToroidalSurface);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_ElementarySurface);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, majorRadius);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, minorRadius);
+}

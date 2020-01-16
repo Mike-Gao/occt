@@ -61,3 +61,9 @@ Ax1 Geom_Conic::YAxis () const {return Ax1(pos.Location(), pos.YDirection());}
 
 Standard_Boolean Geom_Conic::IsCN (const Standard_Integer ) const { return Standard_True; }
 
+void Geom_Conic::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_Conic);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_Curve);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &pos);
+}

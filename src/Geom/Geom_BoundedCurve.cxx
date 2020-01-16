@@ -20,3 +20,15 @@
 #include <Standard_Type.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Geom_BoundedCurve,Geom_Curve)
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom_BoundedCurve::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom_BoundedCurve);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom_Curve);
+}
