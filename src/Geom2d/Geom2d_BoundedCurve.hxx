@@ -61,6 +61,8 @@ public:
   //! "FirstParameter" of the curve.
   Standard_EXPORT virtual gp_Pnt2d StartPoint() const = 0;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
 
 

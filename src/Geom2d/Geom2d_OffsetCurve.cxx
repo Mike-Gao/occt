@@ -388,3 +388,21 @@ GeomAbs_Shape Geom2d_OffsetCurve::GetBasisCurveContinuity() const
 {
   return myBasisCurveContinuity;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom2d_OffsetCurve::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom2d_OffsetCurve);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2d_Curve);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, basisCurve.get());
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myEvaluator.get());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, offsetValue);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBasisCurveContinuity);
+}

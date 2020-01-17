@@ -436,3 +436,18 @@ void Geom2d_Hyperbola::Transform (const Trsf2d& T)
   minorRadius = minorRadius * Abs (T.ScaleFactor());
   pos.Transform(T);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom2d_Hyperbola::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom2d_Hyperbola);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2d_Conic);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, majorRadius);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, minorRadius);
+}

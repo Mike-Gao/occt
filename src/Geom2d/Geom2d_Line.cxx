@@ -293,3 +293,15 @@ Standard_Real Geom2d_Line::Distance (const gp_Pnt2d& P) const {
   return L.Distance (P);
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom2d_Line::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom2d_Line);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2d_Curve);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &pos);
+}

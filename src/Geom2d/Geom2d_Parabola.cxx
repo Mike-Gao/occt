@@ -335,4 +335,16 @@ Standard_Real Geom2d_Parabola::ParametricTransformation(const gp_Trsf2d& T) cons
   return Abs(T.ScaleFactor());
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom2d_Parabola::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom2d_Parabola);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2d_Conic);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, focalLength);
+}
 

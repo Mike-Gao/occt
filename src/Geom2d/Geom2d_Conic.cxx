@@ -145,3 +145,17 @@ Standard_Boolean Geom2d_Conic::IsCN (const Standard_Integer ) const
 {
   return Standard_True; 
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom2d_Conic::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom2d_Conic);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2d_Curve);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &pos);
+}

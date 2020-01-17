@@ -95,6 +95,6 @@ void BRep_PointOnCurveOnSurface::DumpJson (Standard_OStream& theOStream, const S
 
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRep_PointRepresentation);
 
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySurface.get());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPCurve.get());
 }
 

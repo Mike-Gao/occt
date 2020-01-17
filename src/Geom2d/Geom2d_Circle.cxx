@@ -263,3 +263,16 @@ void Geom2d_Circle::Transform (const Trsf2d& T)
    radius = radius * Abs(T.ScaleFactor());
    pos.Transform (T);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+
+void Geom2d_Circle::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Geom2d_Circle);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2d_Conic);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, radius);
+}
