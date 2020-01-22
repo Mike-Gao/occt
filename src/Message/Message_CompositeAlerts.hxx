@@ -42,18 +42,31 @@ public:
   //! Empty constructor
   Standard_EXPORT Message_CompositeAlerts () {}
 
-  //! If possible, merge data contained in this alert to theTarget.
-  //! @return True if merged.
-  //! Base implementation always returns true.
-  virtual Standard_EXPORT Standard_Boolean Merge (const Handle(Message_Alert)& theTarget);
-  
+  //! Add alert with specified gravity.
+  Standard_EXPORT Standard_Boolean AddAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert);
+
+  //! Removes alert with specified gravity.
+  Standard_EXPORT Standard_Boolean RemoveAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert);
+
   //! Returns list of collected alerts with specified gravity
-  Standard_EXPORT Message_ListOfAlert& GetAlerts (const Message_Gravity theGravity);
+  Standard_EXPORT const Message_ListOfAlert& GetAlerts (const Message_Gravity theGravity) const;
 
   //! Returns true if the alert belong the list of the child alerts.
   //! \param theAlert an alert to be checked as a child alert
   //! \return true if the alert is found in a container of children
   Standard_EXPORT Standard_Boolean HasAlert (const Handle(Message_Alert)& theAlert);
+
+  //! Returns true if specific type of alert is recorded with specified gravity
+  Standard_EXPORT Standard_Boolean HasAlert (const Handle(Standard_Type)& theType, Message_Gravity theGravity);
+
+  //! Clears all collected alerts
+  Standard_EXPORT void Clear ();
+
+  //! Clears collected alerts with specified gravity
+  Standard_EXPORT void Clear (Message_Gravity theGravity);
+
+  //! Clears collected alerts with specified type
+  Standard_EXPORT void Clear (const Handle(Standard_Type)& theType);
 
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_CompositeAlerts,Standard_Transient)
@@ -61,7 +74,7 @@ public:
 protected:
   // store messages in a lists sorted by gravity;
   // here we rely on knowledge that Message_Fail is the last element of the enum
-  Message_ListOfAlert myChildAlerts[Message_Fail + 1];
+  Message_ListOfAlert myAlerts[Message_Fail + 1];
 };
 
 #endif // _Message_CompositeAlerts_HeaderFile

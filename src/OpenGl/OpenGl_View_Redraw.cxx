@@ -42,7 +42,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif
 
 namespace
@@ -182,8 +182,8 @@ void OpenGl_View::Redraw()
   }
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::Redraw", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::Redraw")
 #endif
 
   myWindow->SetSwapInterval();
@@ -626,8 +626,8 @@ void OpenGl_View::RedrawImmediate()
   }
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::RedrawImmediate", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::RedrawImmediate")
 #endif
 
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
@@ -789,8 +789,8 @@ void OpenGl_View::redraw (const Graphic3d_Camera::Projection theProjection,
 {
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::redraw", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::redraw")
 #endif
 
   Handle(OpenGl_Context) aCtx = myWorkspace->GetGlContext();
@@ -840,8 +840,8 @@ bool OpenGl_View::redrawImmediate (const Graphic3d_Camera::Projection theProject
                                    const Standard_Boolean             theIsPartialUpdate)
 {
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::redrawImmediate", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::redrawImmediate")
 #endif
 
   Handle(OpenGl_Context) aCtx = myWorkspace->GetGlContext();
@@ -921,8 +921,8 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   // ==================================
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::render", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::render")
 #endif
 
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
@@ -1136,8 +1136,8 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
     return;
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::renderStructs", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::renderStructs")
 #endif
 
   Handle(OpenGl_Context) aCtx = myWorkspace->GetGlContext();
@@ -1265,8 +1265,8 @@ void OpenGl_View::renderScene (Graphic3d_Camera::Projection theProjection,
 {
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_View::renderScene", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_View::renderScene")
 #endif
 
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();

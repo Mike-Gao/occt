@@ -30,10 +30,7 @@
 #include <QStringList>
 #include <Standard_WarningsRestore.hxx>
 
-const int COLUMN_NAME_WIDTH = 260;
-const int COLUMN_SIZE_WIDTH = 30;
 const int COLUMN_POINTER_WIDTH = 70;
-const int COLUMN_SHAPE_TYPE_WIDTH = 75;
 
 // =======================================================================
 // function : Constructor
@@ -42,44 +39,27 @@ const int COLUMN_SHAPE_TYPE_WIDTH = 75;
 VInspector_ViewModel::VInspector_ViewModel (QObject* theParent)
   : TreeModel_ModelBase (theParent)
 {
-  SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
-  SetHeaderItem (1, TreeModel_HeaderSection ("Size", COLUMN_SIZE_WIDTH));
-  SetHeaderItem (2, TreeModel_HeaderSection ("Pointer", COLUMN_POINTER_WIDTH));
-  SetHeaderItem (3, TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
-  SetHeaderItem (4, TreeModel_HeaderSection ("SelectedOwners", -1)); // ItemContext, ItemPresentableObject, ItemSelection
-  //SetHeaderItem (5, TreeModel_HeaderSection ("ActivatedModes", -1)); // ItemPresentableObject
-  //SetHeaderItem (6, TreeModel_HeaderSection ("DeviationCoefficient", -1, true)); // ItemContext, ItemPresentableObject
-  //SetHeaderItem (7, TreeModel_HeaderSection ("Deflection", -1, true)); // ItemPresentableObject
-  //SetHeaderItem (8, TreeModel_HeaderSection ("IsAutoTriangulation", -1, true)); // ItemPresentableObject
+}
 
-  //SetHeaderItem (9, TreeModel_HeaderSection ("SelectionState", -1)); // ItemSelection
-  //SetHeaderItem (10, TreeModel_HeaderSection ("Sensitivity", -1, true)); // ItemSelection
-  //SetHeaderItem (11, TreeModel_HeaderSection ("UpdateStatus", -1, true)); // ItemSelection
-  //SetHeaderItem (12, TreeModel_HeaderSection ("BVHUpdateStatus", -1, true)); // ItemSelection
+// =======================================================================
+// function : InitColumns
+// purpose :
+// =======================================================================
+void VInspector_ViewModel::InitColumns()
+{
+  TreeModel_ModelBase::InitColumns();
 
-  //SetHeaderItem (13, TreeModel_HeaderSection ("IsActiveForSelection", -1, true)); // ItemSensitiveEntity
-  //SetHeaderItem (14, TreeModel_HeaderSection ("SensitivityFactor", -1, true)); // ItemSensitiveEntity
-  //SetHeaderItem (15, TreeModel_HeaderSection ("NbSubElements", -1, true)); // ItemSensitiveEntity
-  //SetHeaderItem (16, TreeModel_HeaderSection ("Priority", -1, true)); // ItemSensitiveEntity
-
-  //SetHeaderItem (17, TreeModel_HeaderSection ("TShape", COLUMN_POINTER_WIDTH, true)); // ItemEntityOwner
-  //SetHeaderItem (18, TreeModel_HeaderSection ("Orientation", -1, true)); // ItemEntityOwner
-  //SetHeaderItem (19, TreeModel_HeaderSection ("Location", -1, true)); // ItemEntityOwner
-
-  //SetHeaderItem (20, TreeModel_HeaderSection ("Color", -1)); // ItemPresentableObject
-
-  //SetHeaderItem (21, TreeModel_HeaderSection ("Owner Location", -1, true)); // ItemEntityOwner
+  SetHeaderItem (3, TreeModel_HeaderSection ("Pointer", COLUMN_POINTER_WIDTH));
+  SetHeaderItem (4, TreeModel_HeaderSection ("SelectedOwners", -1));
 }
 
 // =======================================================================
 // function : createRootItem
 // purpose :
 // =======================================================================
-void VInspector_ViewModel::createRootItem (const int theColumnId)
+TreeModel_ItemBasePtr VInspector_ViewModel::createRootItem (const int theColumnId)
 {
-  myRootItems.insert (theColumnId, VInspector_ItemContext::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId));
-  if (theColumnId == 0)
-      m_pRootItem = myRootItems[0];
+  return VInspector_ItemContext::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId);
 }
 
 // =======================================================================

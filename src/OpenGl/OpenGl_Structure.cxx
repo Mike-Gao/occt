@@ -28,7 +28,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif
 
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Structure,Graphic3d_CStructure)
@@ -390,8 +390,8 @@ void OpenGl_Structure::renderGeometry (const Handle(OpenGl_Workspace)& theWorksp
                                        bool&                           theHasClosed) const
 {
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_Structure::renderGeometry", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_Structure::renderGeometry")
 #endif
 
   if (myInstancedStructure != NULL)

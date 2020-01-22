@@ -40,6 +40,9 @@ public:
   //! Destructor
   virtual ~DFBrowserPane_TDataStdTreeNodeModel() Standard_OVERRIDE {};
 
+  //! Creates model columns and root items.
+  Standard_EXPORT virtual void InitColumns() Standard_OVERRIDE;
+
   //! Initializes the tree model by the attribute
   //! \param theAttribute a current attribute
   Standard_EXPORT void SetAttribute (const Handle(TDF_Attribute)& theAttribute);
@@ -59,7 +62,7 @@ public:
 protected:
   //! Creates root item
   //! \param theColumnId index of a column
-  virtual void createRootItem (const int theColumnId) Standard_OVERRIDE;
+  virtual TreeModel_ItemBasePtr createRootItem (const int theColumnId) Standard_OVERRIDE;
 
 private:
 

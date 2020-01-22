@@ -33,7 +33,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif
 
 namespace
@@ -286,23 +286,22 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
 void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
+  MESSAGE_ADD_LEVEL_SENTRY
 
   Standard_SStream aGroupStream;
   DumpJson (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "OpenGl_Text::Render", "", &aPerfMeter, NULL)
-  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+  MESSAGE_INFO_STREAM (aGroupStream, "OpenGl_Text::Render")
 #endif
   const OpenGl_Aspects* aTextAspect = theWorkspace->ApplyAspects();
 
 #ifdef DEBUG_INFO
   aGroupStream.str("");
   aTextAspect->DumpJson (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "aTextAspect", "", &aPerfMeter, aParentAlert)
+  MESSAGE_INFO_STREAM (aGroupStream, "aTextAspect")
 
   aGroupStream.str("");
   OpenGl_Context::DumpJsonOpenGl (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters1", "", &aPerfMeter, aParentAlert)
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters1")
 #endif
 
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
@@ -344,7 +343,7 @@ void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 #ifdef DEBUG_INFO
   aGroupStream.str("");
   OpenGl_Context::DumpJsonOpenGl (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters2", "", &aPerfMeter, aParentAlert)
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters2")
 #endif
 }
 
@@ -645,11 +644,11 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   }
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
+  MESSAGE_ADD_LEVEL_SENTRY
 
   Standard_SStream aGroupStream;
   OpenGl_Context::DumpJsonOpenGl (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters3", "", &aPerfMeter, NULL)
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters3")
 #endif
 
   // Note that using difference resolution in different Views in same Viewer
@@ -823,7 +822,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
 #ifdef DEBUG_INFO
   aGroupStream.str("");
   OpenGl_Context::DumpJsonOpenGl (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters4", "", &aPerfMeter, NULL)
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters4")
 #endif
 
   // main draw call
@@ -840,7 +839,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
 #ifdef DEBUG_INFO
   aGroupStream.str("");
   OpenGl_Context::DumpJsonOpenGl (aGroupStream);
-  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters5", "", &aPerfMeter, NULL)
+  MESSAGE_INFO_STREAM (aGroupStream, "openGl_parameters5")
 #endif
 
 #if !defined(GL_ES_VERSION_2_0)

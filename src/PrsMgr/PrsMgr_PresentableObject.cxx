@@ -340,6 +340,9 @@ void PrsMgr_PresentableObject::recomputeComputed() const
 //=======================================================================
 void PrsMgr_PresentableObject::SetTransformPersistence (const Handle(Graphic3d_TransformPers)& theTrsfPers)
 {
+  if (myTransformPersistence == theTrsfPers)
+    return;
+
   myTransformPersistence = theTrsfPers;
   for (PrsMgr_Presentations::Iterator aPrsIter (myPresentations); aPrsIter.More(); aPrsIter.Next())
   {

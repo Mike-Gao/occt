@@ -81,10 +81,6 @@ QVariant ShapeView_ItemShape::initValue(const int theRole) const
   switch (Column())
   {
     case 0: return TopAbs::ShapeTypeToString (aShape.ShapeType());
-    //case 2: return rowCount() > 0 ? QVariant (rowCount()) : QVariant();
-    case 3: return TShapePointer().ToCString();
-    case 5: return TopAbs::ShapeOrientationToString (aShape.Orientation());
-    case 6: return ViewControl_Tools::ToString (aShape.Location()).ToCString();
     default: break;
   }
   return QVariant();
@@ -116,6 +112,19 @@ int ShapeView_ItemShape::initRowCount() const
 }
 
 // =======================================================================
+// function : initStream
+// purpose :
+// =======================================================================
+void ShapeView_ItemShape::initStream (Standard_OStream& theOStream) const
+{
+  TopoDS_Shape aShape = getShape();
+  if (aShape.IsNull())
+    return;
+
+  aShape.DumpJson (theOStream);
+}
+
+// =======================================================================
 // function : createChild
 // purpose :
 // =======================================================================
@@ -135,6 +144,7 @@ void ShapeView_ItemShape::Init()
   myShape = aRootItem ? aRootItem->GetShape (Row()) : aShapeItem->GetShape (Row());
 
   //SetProperties (createItemProperties());
+  TreeModel_ItemBase::Init();
 }
 
 // =======================================================================

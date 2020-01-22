@@ -29,7 +29,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif
 
 namespace
@@ -587,8 +587,8 @@ void OpenGl_LayerList::renderLayer (const Handle(OpenGl_Workspace)& theWorkspace
                                     const Graphic3d_Layer& theLayer) const
 {
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_LayerList::renderLayer", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_LayerList::renderLayer")
 #endif
 
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
@@ -900,8 +900,8 @@ void OpenGl_LayerList::renderTransparent (const Handle(OpenGl_Workspace)&   theW
   }
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO("OpenGl_LayerList::renderTransparent", "", &aPerfMeter, NULL)
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO("OpenGl_LayerList::renderTransparent")
 #endif
 
   const Handle(OpenGl_Context) aCtx            = theWorkspace->GetGlContext();

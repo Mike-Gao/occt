@@ -32,7 +32,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif // DEBUG_INFO
 
 namespace
@@ -776,10 +776,12 @@ void OpenGl_PrimitiveArray::Render (const Handle(OpenGl_Workspace)& theWorkspace
   }
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
+  MESSAGE_ADD_LEVEL_SENTRY
+
+  MESSAGE_INFO_OBJECT(this, "OpenGl_PrimitiveArray::Render")
   Standard_SStream aGroupStream;
   DumpJson (aGroupStream);
-  MESSAGE_INFO_STREAM(aGroupStream, "OpenGl_PrimitiveArray::Render", Standard_Dump::GetPointerInfo(this), &aPerfMeter, NULL)
+  MESSAGE_INFO_STREAM(aGroupStream, "parameters")
 #endif
 
   const OpenGl_Aspects* anAspectFace = theWorkspace->ApplyAspects();

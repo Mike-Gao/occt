@@ -63,6 +63,9 @@
 #include <QVBoxLayout>
 #include <Standard_WarningsRestore.hxx>
 
+#include <Message_Alerts.hxx>
+#include <Message_Level.hxx>
+
 const int DEFAULT_TEXT_VIEW_WIDTH = 800;
 const int DEFAULT_TEXT_VIEW_HEIGHT = 700;
 const int DEFAULT_TEXT_VIEW_POSITION_X = 430;
@@ -85,7 +88,7 @@ const int SHAPEVIEW_DEFAULT_VIEW_HEIGHT = 1000;
 // purpose :
 // =======================================================================
 ShapeView_Window::ShapeView_Window (QWidget* theParent)
-: QObject (theParent), myNextPosition (0)
+: QObject (theParent)
 {
   myMainWindow = new QMainWindow (theParent);
 
@@ -97,13 +100,7 @@ ShapeView_Window::ShapeView_Window (QWidget* theParent)
           this, SLOT (onTreeViewContextMenuRequested (const QPoint&)));
   new TreeModel_ContextMenu (myTreeView);
   ShapeView_TreeModel* aModel = new ShapeView_TreeModel (myTreeView);
-  for (int i = 5; i <= 6; i++) // hide shape parameters columns
-  {
-    TreeModel_HeaderSection anItem = aModel->GetHeaderItem (i);
-    anItem.SetIsHidden (true);
-    aModel->SetHeaderItem (i, anItem);
-  }
-
+  aModel->InitColumns();
 
   myTreeView->setModel (aModel);
   ShapeView_VisibilityState* aVisibilityState = new ShapeView_VisibilityState (aModel);
@@ -153,7 +150,6 @@ ShapeView_Window::ShapeView_Window (QWidget* theParent)
 // =======================================================================
 ShapeView_Window::~ShapeView_Window()
 {
-  onCloseAllBREPViews();
 }
 
 // =======================================================================
@@ -341,8 +337,6 @@ void ShapeView_Window::RemoveAllShapes()
 {
   ShapeView_TreeModel* aModel = dynamic_cast<ShapeView_TreeModel*> (myTreeView->model());
   aModel->RemoveAllShapes();
-
-  onCloseAllBREPViews();
 }
 
 // =======================================================================
@@ -377,10 +371,7 @@ void ShapeView_Window::onTreeViewContextMenuRequested (const QPoint& thePosition
     aMenu->addAction (ViewControl_Tools::CreateAction ("Remove all shape items", SLOT (onClearView()), myMainWindow, this));
   }
   else {
-    if (!GetTemporaryDirectory().IsEmpty())
-      aMenu->addAction (ViewControl_Tools::CreateAction ("BREP view", SLOT (onBREPView()), myMainWindow, this));
-    aMenu->addAction (ViewControl_Tools::CreateAction ("Close All BREP views", SLOT (onCloseAllBREPViews()), myMainWindow, this));
-    aMenu->addAction (ViewControl_Tools::CreateAction ("BREP directory", SLOT (onBREPDirectory()), myMainWindow, this));
+    aMenu->addAction (ViewControl_Tools::CreateAction ("Export to BREP", SLOT (onExportToBREP()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("ShapeFix_Shape", SLOT (onShapeFixShape()), myMainWindow, this));
 
     ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
@@ -444,20 +435,6 @@ void ShapeView_Window::onEraseAllPerformed()
 }
 
 // =======================================================================
-// function : onBREPDirectory
-// purpose :
-// =======================================================================
-void ShapeView_Window::onBREPDirectory()
-{
-  QString aFilter (tr ("BREP file (*.brep*)"));
-  QString aSelectedFilter;
-  QString aFileName = QFileDialog::getOpenFileName (0, tr ("Export shape to BREP file"),
-                                                    GetTemporaryDirectory().ToCString(), aSelectedFilter);
-  if (!aFileName.isEmpty())
-    viewFile (aFileName);
-}
-
-// =======================================================================
 // function : onExplode
 // purpose :
 // =======================================================================
@@ -483,6 +460,7 @@ void ShapeView_Window::onShapeFixShape()
   Handle(ShapeFix_Shape) Fixer = new ShapeFix_Shape (aShape);
   Fixer->SetPrecision (LinTol);
   Fixer->SetMaxTolerance (LinTol);
+
   Fixer->Perform();
 
   TopoDS_Shape aFixedShape = Fixer->Shape();
@@ -548,13 +526,14 @@ void ShapeView_Window::onLoadFile()
 }
 
 // =======================================================================
-// function : onBREPView
+// function : onExportToBREP
 // purpose :
 // =======================================================================
-void ShapeView_Window::onBREPView()
+void ShapeView_Window::onExportToBREP()
 {
-  if (GetTemporaryDirectory().IsEmpty())
-    return;
+  QString aFilter (tr ("Boundary representation file (*.brep *)"));
+  QString aSelectedFilter;
+  QString aFileName = QFileDialog::getSaveFileName (0, tr ("Export shape to file"), QString(), aFilter, &aSelectedFilter);
 
   QItemSelectionModel* aModel = myTreeView->selectionModel();
   if (!aModel)
@@ -573,83 +552,12 @@ void ShapeView_Window::onBREPView()
   if (!anItem)
     return;
 
-  QString aFileName = anItem->GetFileName();
-  QDir aDir;
-  if (aFileName.isEmpty() || !aDir.exists (aFileName))
-  {
-    TCollection_AsciiString aFileNameIndiced = GetTemporaryDirectory() + TCollection_AsciiString ("\\") +
-                                               getNextTmpName (anItem->TShapePointer());
-    const TopoDS_Shape& aShape = anItem->GetItemShape();
-    BRepTools::Write (aShape, aFileNameIndiced.ToCString());
-    anItem->SetFileName (aFileNameIndiced.ToCString());
-    aFileName = aFileNameIndiced.ToCString();
-  }
-  viewFile (aFileName);
+  TCollection_AsciiString aFileNameIndiced = aFileName.toStdString().c_str();
+  const TopoDS_Shape& aShape = anItem->GetItemShape();
+  BRepTools::Write (aShape, aFileNameIndiced.ToCString());
+  anItem->SetFileName (aFileNameIndiced.ToCString());
+  aFileName = aFileNameIndiced.ToCString();
 }
-
-// =======================================================================
-// function : onCloseAllBREPViews
-// purpose :
-// =======================================================================
-void ShapeView_Window::onCloseAllBREPViews()
-{
-  removeBREPFiles();
-
-  for (int aViewId = myBREPViews.size()-1; aViewId >= 0; aViewId--)
-    delete myBREPViews[aViewId];
-
-  myBREPViews.clear();
-}
-
-// =======================================================================
-// function : onEditorDestroyed
-// purpose :
-// =======================================================================
-void ShapeView_Window::onEditorDestroyed(QObject* theObject)
-{
-  QWidget* aWidget = dynamic_cast<QWidget*> (theObject);
-
-  for (int aViewId = myBREPViews.size()-1; aViewId >= 0; aViewId--)
-  {
-    if (myBREPViews[aViewId] == aWidget)
-      myBREPViews.removeAll(aWidget);
-  }
-}
-
-// =======================================================================
-// function : viewFile
-// purpose :
-// =======================================================================
-void ShapeView_Window::viewFile (const QString& theFileName)
-{
-  QApplication::setOverrideCursor (Qt::WaitCursor);
-  QString aFileText;
-  QFile aFile (theFileName);
-  if (aFile.open (QIODevice::ReadOnly | QIODevice::Text))
-  {
-    QTextStream aStream(&aFile);
-    QString aLine = aStream.readLine();
-    while (!aLine.isNull())
-    {
-      aLine = aStream.readLine();
-      aFileText.append (aLine + QString ("\n"));
-    }
-    if (!aFileText.isEmpty())
-    {
-      QPlainTextEdit* anEditor = new QPlainTextEdit (0);
-      anEditor->setAttribute (Qt::WA_DeleteOnClose, true);
-      connect (anEditor, SIGNAL (destroyed(QObject*)), this, SLOT (onEditorDestroyed(QObject*)));
-      anEditor->setPlainText (aFileText);
-      anEditor->resize (DEFAULT_TEXT_VIEW_WIDTH, DEFAULT_TEXT_VIEW_HEIGHT);
-      anEditor->move (DEFAULT_TEXT_VIEW_POSITION_X + myNextPosition, DEFAULT_TEXT_VIEW_POSITION_Y);
-      myNextPosition += DEFAULT_TEXT_VIEW_DELTA;
-      anEditor->show();
-      myBREPViews.append (anEditor);
-    }
-  }
-  QApplication::restoreOverrideCursor();
-}
-
 
 // =======================================================================
 // function : updatePropertyPanelBySelection
@@ -657,6 +565,23 @@ void ShapeView_Window::viewFile (const QString& theFileName)
 // =======================================================================
 void ShapeView_Window::updatePropertyPanelBySelection()
 {
+  QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (aModel->selectedIndexes(), 0);
+  TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
+  if (!anItemBase)
+    return;
+
+  Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->Properties ();
+  ViewControl_TableModelValues* aTableValues = 0;
+  if (!anItemProperties.IsNull())
+  {
+    aTableValues = new ViewControl_TableModelValues();
+    aTableValues->SetProperties (anItemProperties);
+  }
+  myPropertyView->Init (aTableValues);
   /*QItemSelectionModel* aModel = myTreeView->selectionModel();
   if (!aModel)
     return;
@@ -670,32 +595,4 @@ void ShapeView_Window::updatePropertyPanelBySelection()
     ShapeView_Tools::GetPropertyTableValues (aSelectedItem, aTableValues);
   }
   myPropertyView->Init (aTableValues);*/
-}
-
-// =======================================================================
-// function : removeBREPFiles
-// purpose :
-// =======================================================================
-void ShapeView_Window::removeBREPFiles()
-{
-  QDir aDir (GetTemporaryDirectory().ToCString());
-
-  QStringList anEntries = aDir.entryList();
-  QString aPrefix(viewBREPPrefix().ToCString());
-  for (int anEntryId = 0, aSize = anEntries.size(); anEntryId < aSize; anEntryId++)
-  {
-    if (anEntries[anEntryId].contains (aPrefix))
-      aDir.remove (anEntries[anEntryId]);
-  }
-}
-
-// =======================================================================
-// function : getNextTmpName
-// purpose :
-// =======================================================================
-TCollection_AsciiString ShapeView_Window::getNextTmpName (const TCollection_AsciiString& thePointerInfo)
-{
-  TCollection_AsciiString aTmpName(viewBREPPrefix());
-  aTmpName += thePointerInfo;
-  return aTmpName;
 }

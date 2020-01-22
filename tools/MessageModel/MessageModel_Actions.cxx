@@ -24,9 +24,13 @@
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
 #include <inspector/ViewControl_Tools.hxx>
 
+#include <Message.hxx>
 #include <Message_AlertExtended.hxx>
+#include <Message_Messenger.hxx>
+#include <Message_PrinterToReport.hxx>
 
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <OSD_Chronometer.hxx>
 #include <Quantity_Color.hxx>
 #include <Quantity_ColorRGBA.hxx>
 #include <TCollection_AsciiString.hxx>
@@ -41,13 +45,6 @@
 #include <QWidget>
 #include <Standard_WarningsRestore.hxx>
 
-#define DEBUG_ALERTS
-
-#ifdef DEBUG_ALERTS
-#include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
-#endif
-
 // =======================================================================
 // function : Constructor
 // purpose :
@@ -56,20 +53,14 @@ MessageModel_Actions::MessageModel_Actions (QWidget* theParent,
   MessageModel_TreeModel* theTreeModel, QItemSelectionModel* theModel)
 : QObject (theParent), myTreeModel (theTreeModel), mySelectionModel (theModel)
 {
-  myActions.insert (MessageModel_ActionType_Deactivate,
-                    ViewControl_Tools::CreateAction ("Deactivate", SLOT (OnDeactivateReport()), parent(), this));
   myActions.insert (MessageModel_ActionType_Activate,
                     ViewControl_Tools::CreateAction ("Activate", SLOT (OnActivateReport()), parent(), this));
+  myActions.insert (MessageModel_ActionType_Deactivate,
+                    ViewControl_Tools::CreateAction ("Deactivate", SLOT (OnDeactivateReport()), parent(), this));
   myActions.insert (MessageModel_ActionType_Clear,
                     ViewControl_Tools::CreateAction ("Clear", SLOT (OnClearReport()), parent(), this));
   myActions.insert (MessageModel_ActionType_ExportToShapeView,
                     ViewControl_Tools::CreateAction (tr ("Export to ShapeView"), SLOT (OnExportToShapeView()), parent(), this));
-#ifdef DEBUG_ALERTS
-  myActions.insert (MessageModel_ActionType_TestMetric,
-                    ViewControl_Tools::CreateAction ("Test <metric>", SLOT (OnTestMetric()), parent(), this));
-  myActions.insert (MessageModel_ActionType_TestProperties,
-                    ViewControl_Tools::CreateAction ("Test <PropertyPanel>", SLOT (OnTestPropertyPanel()), parent(), this));
-#endif
 }
 
 // =======================================================================
@@ -121,10 +112,6 @@ void MessageModel_Actions::AddMenuActions (const QModelIndexList& theSelectedInd
     theMenu->addAction (myActions[MessageModel_ActionType_Deactivate]);
     theMenu->addAction (myActions[MessageModel_ActionType_Activate]);
     theMenu->addAction (myActions[MessageModel_ActionType_Clear]);
-#ifdef DEBUG_ALERTS
-    theMenu->addAction (myActions[MessageModel_ActionType_TestMetric]);
-    theMenu->addAction (myActions[MessageModel_ActionType_TestProperties]);
-#endif
   }
   else if (anAlertItem)
   {
@@ -135,7 +122,7 @@ void MessageModel_Actions::AddMenuActions (const QModelIndexList& theSelectedInd
 }
 
 // =======================================================================
-// function : onImportReport
+// function : getSelectedReport
 // purpose :
 // =======================================================================
 Handle(Message_Report) MessageModel_Actions::getSelectedReport (QModelIndex& theReportIndex) const
@@ -164,33 +151,40 @@ Handle(Message_Report) MessageModel_Actions::getSelectedReport (QModelIndex& the
 }
 
 // =======================================================================
+// function : OnActivateReport
+// purpose :
+// =======================================================================
+static Handle(Message_PrinterToReport) MyPrinterToReport;
+static Message_SequenceOfPrinters MyDeactivatedPrinters;
+
+void MessageModel_Actions::OnActivateReport()
+{
+  if (MyPrinterToReport.IsNull())
+    MyPrinterToReport = new Message_PrinterToReport();
+
+  if (MyPrinterToReport->Report()->IsActiveInMessenger())
+    return;
+
+  MyDeactivatedPrinters = Message::DefaultMessenger()->Printers();
+  Message::DefaultMessenger()->ChangePrinters().Clear();
+
+  Message::DefaultMessenger()->AddPrinter (MyPrinterToReport);
+  myTreeModel->UpdateTreeModel();
+}
+
+// =======================================================================
 // function : OnDeactivateReport
 // purpose :
 // =======================================================================
 void MessageModel_Actions::OnDeactivateReport()
 {
-  QModelIndex aReportIndex;
-  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
-  if (aReport.IsNull())
+  if (MyPrinterToReport.IsNull() || !MyPrinterToReport->Report()->IsActiveInMessenger())
     return;
 
-  aReport->SetActive (Standard_False);
-  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
-}
+  Message::DefaultMessenger()->RemovePrinter (MyPrinterToReport);
+  Message::DefaultMessenger()->ChangePrinters().Assign (MyDeactivatedPrinters);
 
-// =======================================================================
-// function : OnActivateReport
-// purpose :
-// =======================================================================
-void MessageModel_Actions::OnActivateReport()
-{
-  QModelIndex aReportIndex;
-  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
-  if (aReport.IsNull())
-    return;
-
-  aReport->SetActive (Standard_True);
-  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
+  myTreeModel->UpdateTreeModel();
 }
 
 // =======================================================================
@@ -205,7 +199,7 @@ void MessageModel_Actions::OnClearReport()
     return;
 
   aReport->Clear();
-  ((MessageModel_TreeModel*)mySelectionModel->model())->EmitDataChanged (aReportIndex, aReportIndex);
+  myTreeModel->UpdateTreeModel();
 }
 
 // =======================================================================
@@ -269,173 +263,4 @@ void MessageModel_Actions::OnExportToShapeView()
   myParameters->SetParameters (aPluginName, aPluginParameters);
   QMessageBox::information (0, "Information", QString ("TShapes '%1' are sent to %2 tool.")
     .arg (anExportedPointers.join (", ")).arg (QString (aPluginName.ToCString())));
-}
-
-// =======================================================================
-// function : OnTestMetric
-// purpose :
-// =======================================================================
-#include <OSD_Chronometer.hxx>
-#include <ctime>
-void MessageModel_Actions::OnTestMetric()
-{
-#ifdef DEBUG_ALERTS
-  QModelIndex aReportIndex;
-  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
-  if (aReport.IsNull())
-    return;
-
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("MessageModel_Actions::OnTestAlerts()", "", &aPerfMeter, NULL);
-  unsigned int start_time =  clock();
-  //Standard_Real aSystemSeconds, aCurrentSeconds;
-  //OSD_Chronometer::GetThreadCPU (aCurrentSeconds, aSystemSeconds);
-
-  Standard_Integer aCounter = 5000;//0;
-  Standard_Real aValue = 0., aValue2 = 0.1;
-
-  double* aMemValue;
-  for (int aTopIt = 0; aTopIt < 4; aTopIt++)
-  {
-    for (int j = 0; j < aCounter; j++)
-    {
-      for (int i = 0; i < aCounter; i++)
-      {
-        aValue = (aValue * 2. + 3.) * 0.5 - 0.3 * 0.5;
-
-        Standard_Real aValue3 = aValue + aValue2 * 0.2;
-        (void)aValue3;
-
-        aMemValue = new double;
-      }
-    }
-    MESSAGE_INFO ("Calculate", "", &aPerfMeter, NULL);
-  }
-
-  //((MessageModel_TreeModel*)mySelectionModel->model())->EmitLayoutChanged();
-
-  myTreeModel->UpdateTreeModel();
-
-  //Standard_Real aSystemSeconds1, aCurrentSeconds1;
-  //OSD_Chronometer::GetThreadCPU (aCurrentSeconds1, aSystemSeconds1);
-
-  //std::cout << aValue << std::endl;
-  //std::cout << "user time = " << aCurrentSeconds1 - aCurrentSeconds
-  //          << ",  system time = " << aSystemSeconds1 - aSystemSeconds << std::endl;
-
-  unsigned int end_time = clock();
-  std::cout << "clock() = " << end_time - start_time << std::endl;
-#endif
-}
-
-// =======================================================================
-// function : OnTestPropertyPanel
-// purpose :
-// =======================================================================
-void MessageModel_Actions::OnTestPropertyPanel()
-{
-#ifdef DEBUG_ALERTS
-  QModelIndex aReportIndex;
-  Handle(Message_Report) aReport = getSelectedReport (aReportIndex);
-  if (aReport.IsNull())
-    return;
-
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("MessageModel_Actions::OnTestAlerts()", "", &aPerfMeter, NULL);
-
-  // gp_XYZ
-  {
-    gp_XYZ aCoords (1.3, 2.3, 3.4);
-    Standard_SStream aStream;
-    aCoords.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "gp_XYZ", "", &aPerfMeter, NULL);
-  }
-  // gp_Dir
-  {
-    gp_Dir aDir (0.3, 0.3, 0.4);
-    Standard_SStream aStream;
-    aDir.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "gp_Dir", "", &aPerfMeter, NULL);
-  }
-  // gp_Ax1
-  {
-    gp_Ax1 aCoords (gp_Pnt (1.3, 2.3, 3.4), gp_Dir (0.3, 0.3, 0.4));
-    Standard_SStream aStream;
-    aCoords.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "gp_Ax1", "", &aPerfMeter, NULL);
-  }
-  // gp_Ax2
-  {
-    gp_Ax2 aCoords (gp_Pnt (10.3, 20.3, 30.4), gp_Dir (0.3, 0.3, 0.4));
-    Standard_SStream aStream;
-    aCoords.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "gp_Ax2", "", &aPerfMeter, NULL);
-  }
-  // gp_Ax3
-  {
-    gp_Ax3 aPln (gp_Pnt (10., 20., 15.), gp_Dir (0., 0., 1.), gp_Dir (1., 0., 0.));
-    Standard_SStream aStream;
-    aPln.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "gp_Ax3", "", &aPerfMeter, NULL);
-  }
-  // gp_Trsf
-  {
-    gp_Trsf aTrsf;
-    aTrsf.SetRotation (gp::OZ(), 0.3);
-    aTrsf.SetTranslationPart (gp_Vec (15., 15., 15.));
-    aTrsf.SetScaleFactor (3.);
-
-    Standard_SStream aStream;
-    aTrsf.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "gp_Trsf", "", &aPerfMeter, NULL);
-  }
-  // Bnd_Box
-  {
-    Bnd_Box aBox (gp_Pnt (20., 15., 10.), gp_Pnt (25., 20., 15.));
-    Standard_SStream aStream;
-    aBox.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "Bnd_Box", "", &aPerfMeter, NULL);
-  }
-  // Bnd_OBB
-  {
-    Bnd_OBB anOBB (gp_Pnt (-10., -15., -10.), gp_Dir (1., 0., 0.), gp_Dir (0., 1., 0.), gp_Dir (0., 0., 1.),
-                  5., 10., 5.);
-    Standard_SStream aStream;
-    anOBB.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "Bnd_OBB", "", &aPerfMeter, NULL);
-  }
-  // Quantity_ColorRGBA
-  {
-    Quantity_ColorRGBA aColor (0.2f, 0.8f, 0.8f, 0.2f);
-    Standard_SStream aStream;
-    aColor.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "Quantity_ColorRGBA", "", &aPerfMeter, NULL);
-  }
-  // Quantity_Color
-  {
-    Quantity_Color aColor (0.8, 0.8, 0.8, Quantity_TOC_RGB);
-    Standard_SStream aStream;
-    aColor.DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "Quantity_Color", "", &aPerfMeter, NULL);
-  }
-
-  // stream of some table values
-  {
-    Standard_SStream aStream;
-    OCCT_DUMP_FIELD_VALUES_NUMERICAL (aStream, "value_1", 1, 100);
-    OCCT_DUMP_FIELD_VALUES_STRING (aStream, "value_2", 2, "value_1", "value_2");
-
-    MESSAGE_INFO_STREAM(aStream, "Table: Name to value", "", &aPerfMeter, NULL);
-  }
-
-  // SHAPE messages
-  {
-    BRepBuilderAPI_MakeEdge aBuilder (gp_Pnt (0., 0., 0.), gp_Pnt (20., 10., 20.));
-    TopoDS_Shape aShape = aBuilder.Shape();
-
-    MESSAGE_INFO_SHAPE (aShape, "Shape message edge", "", &aPerfMeter, NULL);
-  }
-
-  myTreeModel->UpdateTreeModel();
-#endif
 }

@@ -83,9 +83,6 @@ public:
   //! Returns current tree view
   QTreeView* GetTreeView() const { return myTreeView; }
 
-  //! Returns path to temporary directory
-  TCollection_AsciiString GetTemporaryDirectory() const { return myParameters->GetTemporaryDirectory(); }
-
   //! Removes all shapes in tree view model, remove all stored BREP files
   Standard_EXPORT void RemoveAllShapes();
 
@@ -120,9 +117,6 @@ protected slots:
   //! Updates visibility states by erase all in context
   void onEraseAllPerformed();
 
-  //! Exports shape to BREP file and view result file
-  void onBREPDirectory();
-
   //! Perform shape fix for the selected shape. Result is a new shape in the tree.
   void onShapeFixShape();
 
@@ -136,13 +130,7 @@ protected slots:
   void onLoadFile();
 
   //! View BREP files of selected items if exist
-  void onBREPView();
-
-  //! Remove BREP views, close views
-  void onCloseAllBREPViews();
-
-  //! Remove all BREP Viewse excepting active
-  void onEditorDestroyed (QObject* theObject);
+  void onExportToBREP();
 
   //! Convers file name to Ascii String and perform opeging file
   //! \param theFileName a file name to be opened
@@ -153,26 +141,10 @@ protected:
   //! Updates property panel content by item selected in tree view.
   void updatePropertyPanelBySelection();
 
-  //! Views file name content in a text editor. It creates new Qt free control with content.
-  //! \param theFileName a file name
-  void viewFile (const QString& theFileName);
-
-  //! Removes all BREP files in tmp directory
-  void removeBREPFiles();
-
   //! Creates new action and connect it to the given slot
   //! \param theText an action text
   //! \param theSlot a listener method
   QAction* createAction (const QString& theText, const char* theSlot);
-
-  //! Key that uses to generate BREP file name
-  //! \return string value
-  static TCollection_AsciiString viewBREPPrefix() { return "ShapeView_Window"; }
-
-  //! Returns newxt temporary name using BREPPrefix and pointer information
-  //! \param thePointerInfo a pointer value
-  //! \return string value
-  TCollection_AsciiString getNextTmpName (const TCollection_AsciiString& thePointerInfo);
 
 private:
 
@@ -184,9 +156,6 @@ private:
   View_Window* myViewWindow; //!< OCC 3d view to visualize presentations
   QTreeView* myTreeView; //!< tree view visualized shapes
 
-  int myNextPosition; //!< delta of moving control of view BREP file
-
-  QList<QWidget*> myBREPViews; //!< list of view BREP file controls
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
 };
 

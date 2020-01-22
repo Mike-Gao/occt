@@ -53,7 +53,9 @@ DFBrowser_Module::DFBrowser_Module()
 // =======================================================================
 void DFBrowser_Module::CreateViewModel (void* theParent)
 {
-  myOCAFViewModel = new DFBrowser_TreeModel ((QWidget*)theParent, this);
+  myOCAFViewModel = new DFBrowser_TreeModel ((QWidget*)theParent);
+  myOCAFViewModel->InitColumns();
+  myOCAFViewModel->SetModule (this);
 }
 
 // =======================================================================

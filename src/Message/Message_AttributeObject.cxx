@@ -15,7 +15,7 @@
 
 #include <Message_AttributeObject.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeObject, Message_AttributeStream)
+IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeObject, Message_Attribute)
 
 //=======================================================================
 //function : Message_AttributeObject
@@ -23,10 +23,8 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeObject, Message_AttributeStream)
 //=======================================================================
 
 Message_AttributeObject::Message_AttributeObject (const Handle(Standard_Transient)& theObject,
-                                                  const Standard_SStream& theStream,
-                                                  const TCollection_AsciiString& theName,
-                                                  const TCollection_AsciiString& theDescription)
-: Message_AttributeStream (theStream, theName, theDescription)
+                                                  const TCollection_AsciiString& theName)
+: Message_Attribute (theName)
 {
   myObject = theObject;
 }

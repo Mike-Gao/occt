@@ -18,6 +18,7 @@
 
 #include <inspector/TInspector_Communicator.hxx>
 
+#include <Message.hxx>
 #include <Message_Report.hxx>
 #include <OSD_Environment.hxx>
 
@@ -126,9 +127,8 @@ int main (int argc, char** argv)
     aPlugins.insert("TKShapeView");
     aPlugins.insert("TKVInspector");
 
-    Handle(Message_Report) aReport = Message_Report::CurrentReport (Standard_True);
+    Handle(Message_Report) aReport = Message::DefaultReport (Standard_True);
     aReport->SetLimit (100);//30);
-    aReport->SetActive (Standard_True);//Standard_False);
     aPlugins.insert("TKMessageView");
 
     anActivatedPluginName = "TKVInspector";

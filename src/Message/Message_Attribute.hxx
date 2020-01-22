@@ -27,9 +27,8 @@ class Message_Attribute : public Standard_Transient
 {
 public:
   //! Empty constructor
-  Standard_EXPORT Message_Attribute (const TCollection_AsciiString& theName = TCollection_AsciiString(),
-                                     const TCollection_AsciiString& theDescription = TCollection_AsciiString())
-    : myName (theName), myDescription (theDescription) {}
+  Standard_EXPORT Message_Attribute (const TCollection_AsciiString& theName = TCollection_AsciiString())
+    : myName (theName) {}
 
   //! Return a C string to be used as a key for generating text user 
   //! messages describing this alert.
@@ -46,21 +45,12 @@ public:
   //! @param theName a name for the alert
   void SetName (const TCollection_AsciiString& theName) { myName = theName; }
 
-  //! Sets desription of alert
-  //! @param theName a name for the alert
-  void SetDescription (const TCollection_AsciiString& theDescription) { myDescription = theDescription; }
-
-  //! Returns description of alert if it is set
-  //! @return alert description
-  virtual const TCollection_AsciiString& GetDescription() const { return myDescription; }
-
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_Attribute, Standard_Transient)
 
 private:
 
   TCollection_AsciiString myName; //!< alert name, if defined is used in GetMessageKey
-  TCollection_AsciiString myDescription; //!< alert description if defined
 
 };
 

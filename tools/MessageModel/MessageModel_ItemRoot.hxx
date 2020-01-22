@@ -27,23 +27,23 @@
 class MessageModel_ItemRoot;
 typedef QExplicitlySharedDataPointer<MessageModel_ItemRoot> MessageModel_ItemRootPtr;
 
+//! \struct to extend report by description
+struct MessageModel_ReportInformation
+{
+  //! Constructor
+  MessageModel_ReportInformation (Handle(Message_Report) theReport, const TCollection_AsciiString& theDescription)
+    : myReport (theReport), myDescription (theDescription) {}
+
+  Handle(Message_Report) myReport; //! report
+  TCollection_AsciiString myDescription; //! report description
+};
+
 //! \class MessageModel_ItemRoot
 //! Collects message reports that should be visualized in tree view. Reports are cached and if reports are not needed,
 //! cache should be cleared using RemoveAllReports
 //! Parent is NULL, children are MessageModel_ItemReport items.
 class MessageModel_ItemRoot : public MessageModel_ItemBase
 {
-private:
-  //! \struct to extend report by description
-  struct MessageModel_ReportInformation
-  {
-    //! Constructor
-    MessageModel_ReportInformation (Handle(Message_Report) theReport, const TCollection_AsciiString& theDescription)
-      : myReport (theReport), myDescription (theDescription) {}
-
-    Handle(Message_Report) myReport; //! report
-    TCollection_AsciiString myDescription; //! report description
-  };
 public:
 
   //! Creates an item wrapped by a shared pointer
@@ -70,6 +70,9 @@ public:
   //! \param theReport a report instance
   //! \return boolen value
   Standard_EXPORT Standard_Boolean HasReport (const Handle(Message_Report)& theReport);
+
+  //!< Returns processed reports
+  const NCollection_List<MessageModel_ReportInformation>& Reports() const { return myReports; }
 
   //! Clears internal container of added reports
   void RemoveAllReports() { myReports.Clear(); }

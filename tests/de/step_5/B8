@@ -1,0 +1,23 @@
+pload ALL
+
+dsetreportprinter on
+
+dsetreportmetric 1
+
+ReadStep d d:/dmu/step1.stp -tracelevel 4
+#ReadStep d [locate_data_file bug21802_as1-oc-214.stp]
+dsetreportprinter off
+dsetreportmetric
+
+set aFile d:/dmu/B8_report.xml
+#set aFile ${imagedir}/B8_report.xml
+
+file delete ${aFile}
+WriteReport ${aFile}
+if { ![file exists ${aFile}] } {
+	puts "There is not ${aFile} file; WriteReport command: Error"
+	return
+}
+
+pload INSPECTOR
+tinspector -plugins MessageView

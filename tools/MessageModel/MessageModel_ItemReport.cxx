@@ -18,7 +18,13 @@
 #include <inspector/MessageModel_ItemAlert.hxx>
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_Tools.hxx>
+#include <inspector/MessageModel_TreeModel.hxx>
 
+#include <Message.hxx>
+#include <Message_Alert.hxx>
+#include <Message_AttributeMeter.hxx>
+#include <Message_Messenger.hxx>
+#include <Message_PrinterToReport.hxx>
 #include <OSD_Path.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -41,45 +47,33 @@ QVariant MessageModel_ItemReport::initValue (const int theRole) const
 
   if (theRole == Qt::ForegroundRole)
   {
-    if (!aReport->GetAlerts (Message_Fail).IsEmpty())
+    if (!aReport->GetAlerts (Message_Fail).IsEmpty() ||
+        !aReport->GetAlerts (Message_Alarm).IsEmpty())
       return QColor(Qt::darkRed);
 
-    for (int aGravityId = (int)Message_Trace; aGravityId <= (int)Message_Fail; aGravityId++)
-    {
-      if (!aReport->IsActive ((Message_Gravity)aGravityId))
-        return QColor(Qt::darkGray);
-    }
+    if (!aReport->IsActiveInMessenger())
+      return QColor(Qt::darkGray);
+
     return QVariant();
   }
-  if (theRole == Qt::ToolTipRole && !myDescription.IsEmpty() && Column() == 8)
-    return myDescription.ToCString();
+  if (theRole == Qt::ToolTipRole && !myDescription.IsEmpty() && Column() == 0) // display the exported file name in tool tip
+  {
+    OSD_Path aPath(myDescription);
+    return QString ("%1%2").arg (aPath.Name().ToCString()).arg (aPath.Extension().ToCString());
+  }
 
   if (theRole != Qt::DisplayRole)
     return QVariant();
 
-  switch (Column())
-  {
-    case 0: return aReport->DynamicType()->Name();
-    //case 1: return QVariant(); // visibility state
-    //case 2: return rowCount() > 0 ? QVariant (rowCount()) : QVariant();
-    case 4: return aReport->CumulativeMetric (Message_Info);
-    case 5:
-    {
-      if (aReport->PerfMeterMode() == Message_PerfMeterMode_UserTimeCPU ||
-          aReport->PerfMeterMode() == Message_PerfMeterMode_SystemTimeInfo)
-        return "100";
-      else
-        return QVariant();
-    }
-    case 9:
-    {
-      if (myDescription.IsEmpty())
-        return QVariant();
+  if (Column() == 0)
+    return aReport->DynamicType()->Name();
 
-      OSD_Path aPath(myDescription);
-      return QString ("%1%2").arg (aPath.Name().ToCString()).arg (aPath.Extension().ToCString());
-    }
-    default: break;
+  Message_MetricType aMetricType;
+  int aPosition;
+  if (MessageModel_TreeModel::IsMetricColumn (Column(), aMetricType, aPosition))
+  {
+    if (aPosition == 0) return CumulativeMetric (aReport, aMetricType);
+    else if (aPosition == 1) return "100";
   }
   return QVariant();
 }
@@ -200,29 +194,38 @@ Handle(Message_Report) MessageModel_ItemReport::FindReport (const MessageModel_I
 }
 
 // =======================================================================
-// function : initStream
+// function : CumulativeMetric
 // purpose :
 // =======================================================================
-void MessageModel_ItemReport::initStream (Standard_OStream& theOStream) const
+Standard_Real MessageModel_ItemReport::CumulativeMetric (const Handle(Message_Report)& theReport, const Message_MetricType theMetricType)
 {
-  Handle(Message_Report) aReport = GetReport();
-  if (aReport.IsNull())
-    return;
+  if (!theReport->ActiveMetrics().Contains (theMetricType))
+    return 0;
 
-  aReport->DumpJson (theOStream);
-}
+  Standard_Real aMetric = 0;
+  for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
+  {
+    const Message_ListOfAlert& anAlerts = theReport->GetAlerts ((Message_Gravity)iGravity);
+    Handle(Message_AttributeMeter) aFirstAttribute, aLastAttribute;
+    for (Message_ListOfAlert::Iterator anAlertsIterator (anAlerts); anAlertsIterator.More(); anAlertsIterator.Next())
+    {
+      Handle(Message_AlertExtended) anAlert = Handle(Message_AlertExtended)::DownCast (anAlertsIterator.Value());
+      if (anAlert.IsNull())
+        continue;
+      Handle(Message_AttributeMeter) anAttribute = Handle(Message_AttributeMeter)::DownCast (anAlert->Attribute());
+      if (anAttribute.IsNull())
+        continue;
+      if (aFirstAttribute.IsNull())
+        aFirstAttribute = anAttribute;
+      else
+        aLastAttribute = anAttribute;
+    }
+    if (aFirstAttribute.IsNull())
+      continue;
+    if (aLastAttribute.IsNull())
+      aLastAttribute = aFirstAttribute;
 
-// =======================================================================
-// function : SetStream
-// purpose :
-// =======================================================================
-bool MessageModel_ItemReport::SetStream (const Standard_SStream& theSStream, Standard_Integer& theStartPos,
-                                         Standard_Integer& theLastPos) const
-{
-  Handle(Message_Report) aReport = GetReport();
-  if (aReport.IsNull())
-    return false;
-
-  Standard_Integer aStartPos = 1;
-  return aReport->InitJson (theSStream, aStartPos);
+    aMetric += aLastAttribute->StopValue (theMetricType) - aFirstAttribute->StartValue (theMetricType);
+  }
+  return aMetric;
 }

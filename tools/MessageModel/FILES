@@ -10,8 +10,6 @@ MessageModel_ItemReport.cxx
 MessageModel_ItemReport.hxx
 MessageModel_ItemRoot.cxx
 MessageModel_ItemRoot.hxx
-MessageModel_ReportCallBack.cxx
-MessageModel_ReportCallBack.hxx
 MessageModel_Tools.cxx
 MessageModel_Tools.hxx
 MessageModel_TreeModel.cxx

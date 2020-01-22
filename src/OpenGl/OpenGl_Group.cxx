@@ -31,7 +31,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif // DEBUG_INFO
 
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Group,Graphic3d_Group)
@@ -306,16 +306,16 @@ void OpenGl_Group::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
 
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
-  
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO_OBJECT(this, "OpenGl_Group::Render")
+
   Standard_SStream aGroupStream;
   DumpJson (aGroupStream);
-  MESSAGE_INFO_OBJECT(this, aGroupStream, "OpenGl_Group::Render", "", &aPerfMeter, NULL)
-  Handle(Message_Alert) aParentAlert = OCCT_Message_Alert;
+  MESSAGE_INFO_STREAM(aGroupStream, "group")
 
   Standard_SStream aContextStream;
   theWorkspace->GetGlContext()->DumpJson (aContextStream);
-  MESSAGE_INFO_OBJECT(this, aContextStream, "Context", "", &aPerfMeter, aParentAlert)
+  MESSAGE_INFO_STREAM(aContextStream, "context")
 #endif
 
   // Setup aspects

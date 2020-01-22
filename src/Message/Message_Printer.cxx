@@ -15,6 +15,7 @@
 
 #include <Message_Printer.hxx>
 
+#include <Standard_Dump.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 
@@ -56,5 +57,39 @@ void Message_Printer::Send (const TCollection_AsciiString& theString,
   if (theGravity >= myTraceLevel)
   {
     Send (TCollection_ExtendedString (theString), theGravity, theToOutEol);
+  }
+}
+
+//=======================================================================
+//function : Send
+//purpose  :
+//=======================================================================
+
+void Message_Printer::Send (const Standard_SStream& theStream,
+                            const Message_Gravity   theGravity,
+                            const Standard_Boolean  theToOutEol) const
+{
+  if (theGravity >= myTraceLevel)
+  {
+    Send (TCollection_ExtendedString (theStream.str().c_str()), theGravity, theToOutEol);
+  }
+}
+
+//=======================================================================
+//function : Send
+//purpose  :
+//=======================================================================
+void Message_Printer::Send (const Handle(Standard_Transient)& theObject,
+                            const Message_Gravity          theGravity,
+                            const Standard_Boolean         theToOutEol) const
+{
+  if (theObject.IsNull())
+    return;
+
+  if (theGravity >= myTraceLevel)
+  {
+    TCollection_ExtendedString aString = TCollection_ExtendedString (theObject->DynamicType()->Name())
+      + ": " + Standard_Dump::GetPointerInfo (theObject);
+    Send (aString, theGravity, theToOutEol);
   }
 }

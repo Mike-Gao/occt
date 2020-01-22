@@ -24,7 +24,9 @@ enum MessageModel_ActionType
   MessageModel_ActionType_Clear, //!< clear Message_Report alerts
   MessageModel_ActionType_ExportToShapeView, //!< export TopoDS_Shape of selected item into TKShapeView plugin
   MessageModel_ActionType_TestMetric, //!< test alerts
-  MessageModel_ActionType_TestProperties //!< test alerts
+  MessageModel_ActionType_TestProperties, //!< test alerts
+  MessageModel_ActionType_TestMessenger, //!< test message view on messenger printer to report
+  MessageModel_ActionType_TestReportTree //!< test message view on hierarchical report
 };
 
 #endif

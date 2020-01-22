@@ -17,14 +17,16 @@
 #define _Message_Report_HeaderFile
 
 #include <Message_Gravity.hxx>
+#include <Message_Level.hxx>
 #include <Message_ListOfAlert.hxx>
-#include <Message_PerfMeterMode.hxx>
+#include <Message_MetricType.hxx>
+#include <NCollection_Map.hxx>
+#include <NCollection_Sequence.hxx>
 #include <Standard_Mutex.hxx>
 
+class Message_CompositeAlerts;
 class Message_Messenger;
-class Message_PerfMeter;
 class Message_Report;
-class Message_ReportCallBack;
 
 DEFINE_STANDARD_HANDLE(Message_Report, Standard_Transient)
 
@@ -57,23 +59,18 @@ public:
   //! Empty constructor
   Standard_EXPORT Message_Report ();
   
-  //! returns the only one instance of Report
-  //! When theToCreate is true - automatically creates message report when not exist.
-  //! that has been created.
-  Standard_EXPORT static Handle(Message_Report) CurrentReport (const Standard_Boolean theToCreate = Standard_False);
+  //! Returns true if report printer is registered in the messenger
+  Standard_EXPORT Standard_Boolean IsActiveInMessenger() const;
+
+  //! Add new level of alerts
+  Standard_EXPORT void AddLevel (Message_Level* theLevel);
+
+  //! Remove level of alerts
+  Standard_EXPORT void RemoveLevel (Message_Level* theLevel);
 
   //! Add alert with specified gravity.
   //! This method is thread-safe, i.e. alerts can be added from parallel threads safely.
   Standard_EXPORT void AddAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert);
-
-  //! Add alert with specified gravity. The alert is a sub-alert of report or another alert
-  //! The parent alert is the parameter alert or the last alert if found else report.
-  //! \param theGravity a message gravity
-  //! \param theAlert a new alert to be added
-  //! \param thePerfMeter performance meter calculates the alert spent time and participate in searching the last alert if needed
-  //! \param theParentAlert if not NULL specifies parent alert where the alert should be placed, if the parent is an extednded alert
-  Standard_EXPORT void AddAlert (const Message_Gravity theGravity, const Handle(Message_Alert)& theAlert,
-                                 Message_PerfMeter* thePerfMeter, const Handle(Message_Alert)& theParentAlert = Handle(Message_Alert)());
 
   //! Returns list of collected alerts with specified gravity
   Standard_EXPORT const Message_ListOfAlert& GetAlerts (Message_Gravity theGravity) const;
@@ -111,24 +108,15 @@ public:
   //! Merges alerts with specified gravity from theOther report into this
   Standard_EXPORT void Merge (const Handle(Message_Report)& theOther, Message_Gravity theGravity);
 
-  //! Returns a state whether the report is active
-  //! \return the state
-  Standard_Boolean IsActive (const Message_Gravity theGravity) const { return myIsActive[theGravity]; }
+  //! Sets metrics to compute when alerts are performed
+  //! \param theMetrics container of metrics
+  Standard_EXPORT void SetActiveMetric (const Message_MetricType theMetricType, const Standard_Boolean theActivate);
 
-  //! Starts a timer to compute time between messages. If a timer has already been started, it will be stopped
-  //! \param theActive new state of report active
-  //! \param theGravity gravity type, if '-1', apply value for all gravity kinds
-  Standard_EXPORT void SetActive (const Standard_Boolean theActive, const Standard_Integer theGravity = -1);
+  //! Returns computed metrics when alerts are performed
+  const NCollection_Map<Message_MetricType>& ActiveMetrics() const { return myActiveMetrics; }
 
-  //! Sets a perf meter mode
-  //! \param theMode new mode
-  Standard_EXPORT void SetPerfMeterMode (const Message_PerfMeterMode theMode)
-  { myPerfMeterMode = theMode; }
-
-  //! Returns mode of perf meter
-  //! \return the state
-  Standard_EXPORT Message_PerfMeterMode PerfMeterMode() const
-  { return myPerfMeterMode; }
+  //! Removes all activated metrics
+  void ClearMetrics() { myActiveMetrics.Clear(); }
 
   //! Returns maximum number of collecting alerts. If the limit is achieved,
   //! adding of a new alert after removing the first cached alert.
@@ -139,48 +127,29 @@ public:
   //! \return theLimit limit value
   Standard_EXPORT void SetLimit(const Standard_Integer theLimit) { myLimit = theLimit; }
 
-  //! Returns the report cumulative metric. It includes time/mem of sub alerts depending on PerfMeter mode
-  //! @return value
-  Standard_EXPORT Standard_Real CumulativeMetric (const Message_Gravity theGravity) const;
-
-  //! Sets a listener for the report events
-  void SetCallBack(const Handle(Message_ReportCallBack)& theCallBack) { myCallBack = theCallBack; }
-
-  //! Returns listener of the reports events
-  const Handle(Message_ReportCallBack)& GetCallBack() const { return myCallBack; }
-
   //! Dumps the content of me into the stream
   Standard_EXPORT void DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth = -1) const;
-
-  //! Inits the content of me into the stream
-  Standard_EXPORT Standard_Boolean InitJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos);
 
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 
 protected:
-  //! Returns last alert in list of report alerts or last alert in hierarchical tree of alerts provided by
-  //! the last alert
-  //! \parm theGravity a message gravity
-  Standard_EXPORT Handle(Message_Alert) getLastAlert (const Message_Gravity theGravity) const;
-
-  //! Returns last alert in list of report alerts or last alert in hierarchical tree of alerts provided by
-  //! the last alert
-  //! \parm theGravity a message gravity
-  Standard_EXPORT Handle(Message_Alert) getLastAlertInPerfMeter (const Message_Gravity theGravity) const;
+  //! Returns class provided hierarchy of alerts if created or create if the parameter is true
+  //! \param isCreate if composite alert has not been created for this alert, it should be created
+  //! \return instance or NULL
+  Standard_EXPORT Handle (Message_CompositeAlerts) compositeAlerts (const Standard_Boolean isCreate = Standard_False);
 
 protected:
   Standard_Mutex myMutex;
 
   // store messages in a lists sorted by gravity;
   // here we rely on knowledge that Message_Fail is the last element of the enum
-  Message_ListOfAlert myAlerts[Message_Fail + 1];
+  Handle(Message_CompositeAlerts) myCompositAlerts;
 
-  Standard_Boolean myIsActive[Message_Fail + 1];
-  Message_PerfMeterMode myPerfMeterMode; //! If true, each alert will store the mode information
   Standard_Integer myLimit; //! Maximum number of collected alerts
 
-  Handle(Message_ReportCallBack) myCallBack; //! signal about performed modifications
+  NCollection_Sequence <Message_Level*> myAlertLevels; //! container of alerts, new alerts are added below the latest level
+  NCollection_Map<Message_MetricType> myActiveMetrics; //! metrics to compute on alerts
 };
 
 #endif // _Message_Report_HeaderFile

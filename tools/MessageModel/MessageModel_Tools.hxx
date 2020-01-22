@@ -48,27 +48,6 @@ public:
   //! \return the string value 
   Standard_EXPORT static TCollection_AsciiString GetPointerInfo (const Handle(Standard_Transient)& thePointer,
                                                                  const bool isShortInfo = true);
-
-  //! Returns pointer alert information depening on type of alert (Transient_Object or TopoDS_TShape)
-  //! \param theAlert a message alert
-  //! \return text presentation
-  Standard_EXPORT static TCollection_AsciiString GetPointerAlertInfo (const Handle(Message_Alert)& theAlert);
-
-  //! Returns TopoDS_Shape type alert information or empty string
-  //! \param theAlert a message alert
-  //! \return text presentation
-  Standard_EXPORT static TCollection_AsciiString GetShapeTypeAlertInfo (const Handle(Message_Alert)& theAlert);
-
-  //! Returns dynamic type of an alert object/shape
-  //! \param theAlert a message alert
-  //! \return text presentation
-  Standard_EXPORT static TCollection_AsciiString GetStandardTypeAlertInfo (const Handle(Message_Alert)& theAlert);
-
-  //! Fills container of table values
-  //! \param theAlert a message alert
-  //! \param theTableValue container of values
-  Standard_EXPORT static void GetPropertyTableValues (const TreeModel_ItemBasePtr& theItem,
-                                                      QList<ViewControl_TableModelValues*>& theTableValues);
 };
 
 #endif

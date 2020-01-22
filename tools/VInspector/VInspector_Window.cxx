@@ -19,7 +19,7 @@
 #include <AIS_Shape.hxx>
 #include <AIS_Trihedron.hxx>
 //#include <BRep_Builder.hxx>
-//#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
 //#include <BRepBuilderAPI_MakeEdge.hxx>
 //#include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom_Axis2Placement.hxx>
@@ -77,6 +77,8 @@
 #include <QWidget>
 #include <Standard_WarningsRestore.hxx>
 
+#define DEBUG_ALERTS
+
 const int VINSPECTOR_DEFAULT_PROPERTY_VIEW_WIDTH = 300;//600;
 const int VINSPECTOR_DEFAULT_PROPERTY_VIEW_HEIGHT = 1000;
 
@@ -125,6 +127,7 @@ VInspector_Window::VInspector_Window()
   //((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (VINSPECTOR_DEFAULT_TREE_VIEW_WIDTH,
   //                                                               VINSPECTOR_DEFAULT_TREE_VIEW_HEIGHT));
   VInspector_ViewModel* aTreeModel = new VInspector_ViewModel (myTreeView);
+  aTreeModel->InitColumns();
   //aTreeModel->AddPropertiesCreator(new VInspector_PropertiesCreator());
   myTreeView->setModel (aTreeModel);
   // hide Visibility column
@@ -166,6 +169,7 @@ VInspector_Window::VInspector_Window()
 
   myHistoryView->setSelectionMode (QAbstractItemView::ExtendedSelection);
   VInspector_ViewModelHistory* aHistoryModel = new VInspector_ViewModelHistory (myHistoryView);
+  aHistoryModel->InitColumns();
   myHistoryView->setModel (aHistoryModel);
 
   QItemSelectionModel* aSelectionModel = new QItemSelectionModel (aHistoryModel);
@@ -700,6 +704,11 @@ void VInspector_Window::onTreeViewContextMenuRequested(const QPoint& thePosition
   aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Expand All"), SLOT (onExpandAll()), GetMainWindow(), this));
   aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Collapse All"), SLOT (onCollapseAll()), GetMainWindow(), this));
 
+#ifdef DEBUG_ALERTS
+  aMenu->addSeparator();
+  aMenu->addAction (ViewControl_Tools::CreateAction ("Test AddChild", SLOT (OnTestAddChild()), GetMainWindow(), this));
+#endif
+
   QPoint aPoint = myTreeView->mapToGlobal (thePosition);
   aMenu->exec(aPoint);
 }
@@ -1052,6 +1061,24 @@ void VInspector_Window::onCollapseAll()
     int aLevels = -1;
     TreeModel_Tools::SetExpanded (myTreeView, aSelectedIndices[aSelectedId], false, aLevels);
   }
+}
+
+// =======================================================================
+// function : UpdateTreeModel
+// purpose :
+// =======================================================================
+void VInspector_Window::OnTestAddChild()
+{
+  Handle(AIS_Shape) aPresentation = new AIS_Shape (BRepBuilderAPI_MakeVertex (gp_Pnt()));
+
+  aPresentation->AddChild (new AIS_Shape (BRepBuilderAPI_MakeVertex (gp_Pnt (10., 10., 10.))));
+  aPresentation->AddChild (new AIS_Shape (BRepBuilderAPI_MakeVertex (gp_Pnt(20., 10., 10.))));
+  aPresentation->AddChild (new AIS_Shape (BRepBuilderAPI_MakeVertex (gp_Pnt(30., 10., 10.))));
+
+  View_Displayer* aDisplayer = myViewWindow->GetDisplayer();
+  aDisplayer->DisplayPresentation (aPresentation);
+
+  UpdateTreeModel();
 }
 
 // =======================================================================

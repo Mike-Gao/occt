@@ -40,7 +40,6 @@ Standard_CString Message_AlertExtended::GetMessageKey () const
 //function : GetCompositeAlerts
 //purpose  : 
 //=======================================================================
-
 Handle (Message_CompositeAlerts) Message_AlertExtended::GetCompositeAlerts (const Standard_Boolean isCreate)
 {
   if (myCompositAlerts.IsNull() && isCreate)
@@ -50,32 +49,45 @@ Handle (Message_CompositeAlerts) Message_AlertExtended::GetCompositeAlerts (cons
 }
 
 //=======================================================================
-//function : IsMetricValid
+//function : SupportsMerge
 //purpose  : 
 //=======================================================================
-
-Standard_Boolean Message_AlertExtended::IsMetricValid() const
+Standard_Boolean Message_AlertExtended::SupportsMerge () const
 {
-  return fabs (myMetricStart - GetUndefinedMetric()) > Precision::Confusion() &&
-         fabs (myMetricStop  - GetUndefinedMetric()) > Precision::Confusion();
+  if (myCompositAlerts.IsNull())
+    return Standard_True;
+
+  // hierarchical alerts can not be merged
+  for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
+  {
+    if (!myCompositAlerts->GetAlerts ((Message_Gravity)iGravity).IsEmpty())
+      return Standard_False;
+  }
+
+  return Standard_True;
+}
+
+//=======================================================================
+//function : Merge
+//purpose  : 
+//=======================================================================
+Standard_Boolean Message_AlertExtended::Merge (const Handle(Message_Alert)& /*theTarget*/)
+{
+  // by default, merge trivially
+  return Standard_False;
 }
 
 //=======================================================================
 //function : AddAlert
 //purpose  : 
 //=======================================================================
-
 Handle(Message_Alert) Message_AlertExtended::AddAlert (const Handle(Message_Report)& theReport,
                                                        const Handle(Message_Attribute)& theAttribute,
-                                                       Message_PerfMeter* thePerfMeter,
-                                                       const Handle(Message_Alert)& theParentAlert)
+                                                       const Message_Gravity theGravity)
 {
-  if (!theReport->IsActive (Message_Info))
-    return Handle(Message_Alert)();
-
   Handle(Message_AlertExtended) anAlert = new Message_AlertExtended();
   anAlert->SetAttribute (theAttribute);
-  theReport->AddAlert (Message_Info, anAlert, thePerfMeter, theParentAlert);
+  theReport->AddAlert (theGravity, anAlert);
 
   return anAlert;
 }

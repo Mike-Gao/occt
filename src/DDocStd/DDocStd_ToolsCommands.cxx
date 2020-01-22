@@ -17,6 +17,7 @@
 
 #include <Draw.hxx>
 #include <Draw_Interpretor.hxx>
+#include <Message.hxx>
 #include <TDocStd_Document.hxx>
 #include <TDF_Label.hxx>
 #include <TCollection_AsciiString.hxx>
@@ -34,6 +35,7 @@
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx> 
 #include <Standard_DomainError.hxx>
 
+#include <XmlDrivers_MessageReportStorage.hxx>
 
 
 //=======================================================================
@@ -151,7 +153,23 @@ static Standard_Integer DDocStd_DumpCommand (Draw_Interpretor& di,
   return 1;
 }
 
+//=======================================================================
+//function : DDocStd_WriteReport 
+//=======================================================================
 
+static Standard_Integer DDocStd_WriteReport(Draw_Interpretor& di,Standard_Integer n, const char** a)
+{
+  if (n < 2)
+  {
+    di << "DDocStd_WriteReport : Error not enough argument\n";
+    return 1;
+  }
+
+  TCollection_ExtendedString path (a[1]); 
+  MESSAGE_STORE_XML_REPORT (path);
+
+  return 0;
+}
 
 //=======================================================================
 //function : ModificationCommands
@@ -173,6 +191,10 @@ void DDocStd::ToolsCommands(Draw_Interpretor& theCommands)
   theCommands.Add ("DumpCommand", 
                    "DumpCommand (DOC)",
 		   __FILE__, DDocStd_DumpCommand, g);   
+
+  theCommands.Add ("WriteReport", 
+                   "WriteReport path",
+		   __FILE__, DDocStd_WriteReport, g);   
 
 }
 

@@ -25,16 +25,30 @@
 #include <QIcon>
 #include <Standard_WarningsRestore.hxx>
 
+const int COLUMN_NAME_WIDTH = 260;
+const int COLUMN_SIZE_WIDTH = 30;
+
 // =======================================================================
 // function : Constructor
 // purpose :
 // =======================================================================
 TreeModel_ModelBase::TreeModel_ModelBase (QObject* theParent)
-: QAbstractItemModel (theParent), m_pRootItem (0), m_pUseVisibilityColumn (false),
+: QAbstractItemModel (theParent), m_pUseVisibilityColumn (false),
   myVisibilityState (0)
 {
   myVisibleIcon = QIcon (":/icons/item_visible.png");
   myInvisibleIcon = QIcon (":/icons/item_invisible.png");
+}
+
+// =======================================================================
+// function :  InitColumns
+// purpose :
+// =======================================================================
+void TreeModel_ModelBase::InitColumns()
+{
+  SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
+  SetHeaderItem (1, TreeModel_HeaderSection ("Visibility", TreeModel_ModelBase::ColumnVisibilityWidth()));
+  SetHeaderItem (2, TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
 }
 
 // =======================================================================
@@ -221,6 +235,23 @@ void TreeModel_ModelBase::EmitDataChanged (const QModelIndex& theTopLeft, const 
 // function : GetSelected
 // purpose :
 // =======================================================================
+void TreeModel_ModelBase::SetHeaderItem (const int theColumnId, const TreeModel_HeaderSection& theSection)
+{
+  if (theSection.IsEmpty())
+  {
+    // remove section
+    myHeaderValues.remove (theColumnId);
+    myRootItems.remove (theColumnId);
+  }
+
+  myHeaderValues[theColumnId] = theSection;
+  createRoot (theColumnId);
+}
+
+// =======================================================================
+// function : GetSelected
+// purpose :
+// =======================================================================
 QModelIndexList TreeModel_ModelBase::GetSelected (const QModelIndexList& theIndices, const int theCellId,
                                                   const Qt::Orientation theOrientation)
 {
@@ -262,6 +293,15 @@ QList<TreeModel_ItemBasePtr> TreeModel_ModelBase::GetSelectedItems (const QModel
     anItems.append (anItem);
   }
   return anItems;
+}
+
+// =======================================================================
+// function : createRoot
+// purpose :
+// =======================================================================
+void TreeModel_ModelBase::createRoot (const int theColumnId)
+{
+  myRootItems.insert (theColumnId, createRootItem (theColumnId));
 }
 
 // =======================================================================

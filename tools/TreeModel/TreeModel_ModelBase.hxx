@@ -50,6 +50,10 @@ public:
   //! Destructor
   virtual ~TreeModel_ModelBase() {}
 
+  //! Creates model columns and root items.
+  //! Default columns are: [0] - Name, [1] - Visibility, [2] - Row
+  Standard_EXPORT virtual void InitColumns();
+
   //! Returns the item shared pointer by the model index
   //! if it is in the index internal pointer
   //! @param theIndex a model index
@@ -61,7 +65,7 @@ public:
 
   //! Returns the model root item.
   //! It is realized for OCAFBrowser
-  virtual TreeModel_ItemBasePtr RootItem (const int theColumn) const { (void)theColumn; return m_pRootItem; }
+  TreeModel_ItemBasePtr RootItem (const int theColumn) const { return myRootItems[theColumn]; }
 
   //! Emits the layoutChanged signal from outside of this class
   Standard_EXPORT void EmitLayoutChanged();
@@ -142,8 +146,7 @@ public:
   //! Set header properties item.
   //! \param theColumnId a column index
   //! \param theSection a section value
-  void SetHeaderItem (const int theColumnId, const TreeModel_HeaderSection& theSection)
-  { myHeaderValues[theColumnId] = theSection; createRootItem (theColumnId); }
+  Standard_EXPORT void SetHeaderItem (const int theColumnId, const TreeModel_HeaderSection& theSection);
 
   //! Returns count of columns in the model
   //! \param theParent an index of the parent item
@@ -181,16 +184,21 @@ public:
 protected:
   //! Creates root item
   //! \param theColumnId index of a column
-  virtual void createRootItem (const int theColumnId) = 0;
+  virtual TreeModel_ItemBasePtr createRootItem (const int theColumnId) = 0;
 
   //! Converts the item shared pointer to void* type
   //! \param theItem
   //!  \return an item pointer
   Standard_EXPORT static void* getIndexValue (const TreeModel_ItemBasePtr& theItem);
 
+private:
+  //! Creates root item
+  //! \param theColumnId index of a column
+  Standard_EXPORT void createRoot (const int theColumnId);
+
 protected:
 
-  TreeModel_ItemBasePtr m_pRootItem; //!< the model root item. It should be created in the
+  QMap<int, TreeModel_ItemBasePtr> myRootItems; //!< container of root items, for each column own root item
   QMap<int, TreeModel_HeaderSection> myHeaderValues; //!< header values
   //!< model subclass. The model is fulfilled by this item content
 

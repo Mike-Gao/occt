@@ -25,6 +25,12 @@
 #include <OpenGl_Structure.hxx>
 #include <OpenGl_ShaderManager.hxx>
 
+//#define DEBUG_INFO
+#ifdef DEBUG_INFO
+#include <Message_Alerts.hxx>
+#include <Message_Level.hxx>
+#endif // DEBUG_INFO
+
 namespace
 {
   static const OpenGl_CappingPlaneResource* THE_DEFAULT_ASPECT = new OpenGl_CappingPlaneResource (new Graphic3d_AspectFillCapping);
@@ -341,13 +347,13 @@ namespace
 // function : RenderCapping
 // purpose  :
 // =======================================================================
-#include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
 void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorkspace,
                                         const OpenGl_Structure&         theStructure)
 {
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("RenderCapping", "", &aPerfMeter, NULL);
+#ifdef DEBUG_INFO
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO ("RenderCapping");
+#endif
 
   const Handle(OpenGl_Context)& aContext = theWorkspace->GetGlContext();
   if (!aContext->Clipping().IsCappingOn())
@@ -394,8 +400,9 @@ void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorks
 
     Standard_SStream aStream;
     aClipChain->DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "ClipChain", "", &aPerfMeter, NULL);
-
+#ifdef DEBUG_INFO
+    MESSAGE_INFO_STREAM(aStream, "ClipChain");
+#endif
     Standard_Integer aSubPlaneIndex = 1;
     for (const Graphic3d_ClipPlane* aSubPlaneIter = aClipChain.get(); aSubPlaneIter != NULL; aSubPlaneIter = aSubPlaneIter->ChainNextPlane().get(), ++aSubPlaneIndex)
     {

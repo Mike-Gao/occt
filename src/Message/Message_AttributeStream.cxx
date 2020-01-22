@@ -17,7 +17,6 @@
 
 #include <Message.hxx>
 #include <Message_Msg.hxx>
-#include <Message_PerfMeter.hxx>
 #include <Message_Report.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeStream, Message_Attribute)
@@ -27,9 +26,8 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeStream, Message_Attribute)
 //purpose  : 
 //=======================================================================
 Message_AttributeStream::Message_AttributeStream (const Standard_SStream& theStream,
-                                                  const TCollection_AsciiString& theName,
-                                                  const TCollection_AsciiString& theDescription)
-: Message_Attribute(theName, theDescription)
+                                                  const TCollection_AsciiString& theName)
+: Message_Attribute(theName)
 {
   SetStream (theStream);
 }

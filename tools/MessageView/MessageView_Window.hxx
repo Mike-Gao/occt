@@ -42,10 +42,12 @@ class View_Window;
 
 class View_DisplayPreview;
 class ViewControl_PropertyView;
-class MessageModel_ReportCallBack;
+
+class MessageView_ActionsTest;
 
 class QDockWidget;
 class QMainWindow;
+class QMenu;
 class QWidget;
 
 //! \class MessageView_Window
@@ -70,10 +72,6 @@ public:
   //! \param theParameters a parameters container
   void SetParameters (const Handle(TInspectorAPI_PluginParameters)& theParameters)
   { myParameters = theParameters; myTreeViewActions->SetParameters (theParameters); }
-
-  //! Sets message callback to update the current content of the view
-  //! \param theCallBack
-  void SetCallBack (const Handle(Message_ReportCallBack)& theCallBack) { myCallBack = theCallBack; }
 
   //! Provide container for actions available in inspector on general level
   //! \param theMenu if Qt implementation, it is QMenu object
@@ -161,15 +159,27 @@ protected slots:
   //! Reads if possible report of a selected item and updates this report in tree view
   void onReloadReport();
 
+  //! Switch active state in report for clicked type of metric
+  void OnActivateMetric();
+
+  //! Deactivate all types of metrics for the current report
+  void OnDeactivateAllMetrics();
+
   //! Updates context in preview display
   void onContextSelected();
 
 protected:
+  //! Appends items to activate report metrics
+  void addActivateMetricActions (QMenu* theMenu);
+
   //! Updates property panel content by item selected in tree view.
   void updatePropertyPanelBySelection();
 
   //!< Updates presentation of preview for parameter shapes. Creates a compound of the shapes
   void updatePreviewPresentation();
+
+  //!< Sets reports metric columns visible if used
+  void updateVisibleColumns();
 
 private:
   QMainWindow* myMainWindow; //!< main control, parent for all MessageView controls
@@ -183,9 +193,9 @@ private:
   View_Window* myViewWindow; //!< OCC 3d view to visualize presentations
   QTreeView* myTreeView; //!< tree view visualized shapes
   MessageModel_Actions* myTreeViewActions; //!< processing history view actions
+  MessageView_ActionsTest* myTestViewActions; //!< check view actions
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
-  Handle(Message_ReportCallBack) myCallBack; //! < message call back to update content of the view
 
   Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
 };

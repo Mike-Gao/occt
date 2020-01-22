@@ -173,6 +173,9 @@ private slots:
   //! Collapse all levels for all selected items
   void onCollapseAll();
 
+  //! Creates a tree of inherited presentable objects
+  void OnTestAddChild();
+
 private:
 
   //! Inits the window content by the given context

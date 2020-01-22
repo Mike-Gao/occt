@@ -17,10 +17,10 @@
 #define _Message_AlertExtended_HeaderFile
 
 #include <Message_Alert.hxx>
+#include <Message_Gravity.hxx>
 #include <TCollection_AsciiString.hxx>
 
 class Message_Attribute;
-class Message_PerfMeter;
 class Message_Report;
 
 DEFINE_STANDARD_HANDLE(Message_AlertExtended, Message_Alert)
@@ -29,8 +29,7 @@ class Message_CompositeAlerts;
 
 //! Inherited class of Message_Alert with some additional information.
 //!
-//! It has Message_Attributes to provide the alert name, description and
-//! other custom information
+//! It has Message_Attributes to provide the alert name, and other custom information
 //!
 //! It is possible to set performance meter into alert to store time/memory metric information
 //! spent between the next alert adding. Also time of child alerts are collected
@@ -43,8 +42,7 @@ class Message_AlertExtended : public Message_Alert
 {
 public:
   //! Empty constructor
-  Standard_EXPORT Message_AlertExtended()
-    : Message_Alert(), myMetricStart (GetUndefinedMetric()), myMetricStop (GetUndefinedMetric()) {}
+  Standard_EXPORT Message_AlertExtended() : Message_Alert() {}
 
   //! Return a C string to be used as a key for generating text user 
   //! messages describing this alert.
@@ -59,75 +57,41 @@ public:
 
   //! Returns container of the alert attributes
   //! \param theAttributes an attribute values
-  const Handle(Message_Attribute)& Attribute () const { return myAttribute; }
+  const Handle(Message_Attribute)& Attribute() const { return myAttribute; }
 
   //! Returns class provided hierarchy of alerts if created or create if the parameter is true
   //! \param isCreate if composite alert has not been created for this alert, it should be created
   //! \return instance or NULL
   Standard_EXPORT Handle (Message_CompositeAlerts) GetCompositeAlerts (const Standard_Boolean isCreate = Standard_False);
 
-  //! Returns performance meter
-  //! \return instance or NULL
-  Message_PerfMeter* GetPerfMeter() { return myPerfMeter; }
-
-  //! Returns true if metric is computed
-  //! @return value
-  Standard_EXPORT Standard_Boolean IsMetricValid() const;
-
-  //! Returns the alert cumulative metric. It includes time/mem of sub alerts
-  //! @return value
-  Standard_Real MetricStart() const { return myMetricStart; }
-
-  //! Returns the alert cumulative metric. It includes time/mem of sub alerts
-  //! @return value
-  Standard_Real MetricStop() const { return myMetricStop; }
-
-  //! Sets cumulative time/mem of alert
-  //! \param theCumulativeMetric time/mem of the alert
-  void SetMetricValues (const Standard_Real theStartValue, const Standard_Real theStopValue)
-    { myMetricStart = theStartValue; myMetricStop = theStopValue; }
-
   //! Return true if this type of alert can be merged with other
   //! of the same type to avoid duplication.
+  //! Hierarchical alerts can not be merged
   //! Basis implementation returns true.
-  virtual Standard_EXPORT Standard_Boolean SupportsMerge () const { return Standard_False; }
+  virtual Standard_EXPORT Standard_Boolean SupportsMerge() const;
 
-  //! Returns default value of the time/mem when it is not defined
-  //! \return integer value
-  static Standard_Real GetUndefinedMetric() { return -1.0; }
+  //! If possible, merge data contained in this alert to theTarget.
+  //! @return True if merged.
+  //! Base implementation always returns false.
+  virtual Standard_EXPORT Standard_Boolean Merge (const Handle(Message_Alert)& theTarget);
 
   //! Creates new instance of the alert and put it into report with Message_Info gravity.
   //! It does nothing if such kind of gravity is not active in the report
   //! @param theReport the message report where new alert is placed
   //! @param theAttribute container of additional values of the alert
-  //! @param thePerfMeter performance meter calculates the alert spent time and participate in searching the last alert if needed
-  //! @param theParentAlert parent for the new alert, or alert is placed under the report
   //! @return created alert or NULL if Message_Info is not active in report
   static Standard_EXPORT Handle(Message_Alert) AddAlert (const Handle(Message_Report)& theReport,
                                                          const Handle(Message_Attribute)& theAttribute,
-                                                         Message_PerfMeter* thePerfMeter,
-                                                         const Handle(Message_Alert)& theParentAlert = Handle(Message_Alert)());
+                                                         const Message_Gravity theGravity);
 
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_AlertExtended, Message_Alert)
 
 protected:
-  //! Sets performance meter
-  //! \param theMeter instance pointer or NULL
-  void SetPerfMeter (Message_PerfMeter* theMeter) { myPerfMeter = theMeter; }
-
-protected:
 
   Handle(Message_CompositeAlerts) myCompositAlerts; //!< class provided hierarchical structure of alerts
   //!< It should be created by an attempt of a child alert creation
-
   Handle(Message_Attribute) myAttribute; //!< container of the alert attributes
-
-  Message_PerfMeter* myPerfMeter; //!< performance meter
-  Standard_Real myMetricStart; //!< value on start metric computation
-  Standard_Real myMetricStop; //!< value on stop metric computation
-
-  friend Message_PerfMeter;
 };
 
 #endif // _Message_Alert_HeaderFile

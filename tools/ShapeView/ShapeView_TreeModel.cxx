@@ -19,14 +19,6 @@
 #include <inspector/ShapeView_ItemRoot.hxx>
 #include <inspector/ShapeView_ItemShape.hxx>
 
-const int COLUMN_NAME_WIDTH = 190;
-const int COLUMN_SIZE_WIDTH = 30;
-const int COLUMN_POINTER_WIDTH = 70;
-const int COLUMN_SHAPE_TYPE_WIDTH = 75;
-
-const int COLUMN_ORIENTATION_WIDTH = 70;
-const int COLUMN_LOCATION_WIDTH = 120;
-
 // =======================================================================
 // function : Constructor
 // purpose :
@@ -34,24 +26,15 @@ const int COLUMN_LOCATION_WIDTH = 120;
 ShapeView_TreeModel::ShapeView_TreeModel (QObject* theParent)
 : TreeModel_ModelBase (theParent)
 {
-  SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
-  // column 1 is reserved for visiblity state
-  SetHeaderItem (2, TreeModel_HeaderSection ("Size", COLUMN_SIZE_WIDTH));
-  SetHeaderItem (3, TreeModel_HeaderSection ("Pointer", COLUMN_POINTER_WIDTH));
-  SetHeaderItem (4, TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
-  SetHeaderItem (5, TreeModel_HeaderSection ("Orientation", COLUMN_ORIENTATION_WIDTH));
-  SetHeaderItem (6, TreeModel_HeaderSection ("Location", COLUMN_LOCATION_WIDTH));
 }
 
 // =======================================================================
 // function : createRootItem
 // purpose :
 // =======================================================================
-void ShapeView_TreeModel::createRootItem (const int theColumnId)
+TreeModel_ItemBasePtr ShapeView_TreeModel::createRootItem (const int theColumnId)
 {
-  myRootItems.insert (theColumnId, ShapeView_ItemRoot::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId));
-  if (theColumnId == 0)
-      m_pRootItem = myRootItems[0];
+  return ShapeView_ItemRoot::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId);
 }
 
 // =======================================================================

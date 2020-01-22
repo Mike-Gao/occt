@@ -19,11 +19,10 @@
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 
-const int COLUMN_NAME_WIDTH = 310;
-const int COLUMN_SIZE_WIDTH = 30;
-const int COLUMN_POINTER_WIDTH = 70;
-const int COLUMN_SHAPE_TYPE_WIDTH = 75;
-const int COLUMN_STANDARD_TYPE_WIDTH = 120;
+#include <Message.hxx>
+
+const int COLUMN_REAL_VALUE_WIDTH = 115;
+const int COLUMN_PERCENT_VALUE_WIDTH = 40;
 
 // =======================================================================
 // function : Constructor
@@ -32,33 +31,78 @@ const int COLUMN_STANDARD_TYPE_WIDTH = 120;
 MessageModel_TreeModel::MessageModel_TreeModel (QObject* theParent)
 : TreeModel_ModelBase (theParent), myIsReversed (Standard_False)
 {
-  SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
-  SetHeaderItem (1, TreeModel_HeaderSection ("Size", COLUMN_SIZE_WIDTH));
-  SetHeaderItem (2, TreeModel_HeaderSection ("Pointer", COLUMN_POINTER_WIDTH));
-  SetHeaderItem (3, TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
+}
 
-  //SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
-  // column 1 is reserved for visiblity state
-  //SetHeaderItem (2, TreeModel_HeaderSection ("Size", COLUMN_SIZE_WIDTH));
+// =======================================================================
+// function : InitColumns
+// purpose :
+// =======================================================================
+void MessageModel_TreeModel::InitColumns()
+{
+  TreeModel_ModelBase::InitColumns();
+  // 0 - Name, 1 - visibility, 2 - Row
 
-  SetHeaderItem (4, TreeModel_HeaderSection ("Metric", -1));
-  SetHeaderItem (5, TreeModel_HeaderSection ("Difference", -1));
+  int aNextIndex = 3;
+  for (int aMetricId = (int)Message_MetricType_None + 1; aMetricId <= (int)Message_MetricType_MemHeapUsage; aMetricId++)
+  {
+    Message_MetricType aMetricType = (Message_MetricType)aMetricId;
+    OSD_MemInfo::Counter aMemInfo;
+    bool isMemInfo = Message::ToOSDMetric (aMetricType, aMemInfo);
 
-  SetHeaderItem (6, TreeModel_HeaderSection ("Pointer", COLUMN_POINTER_WIDTH));
-  SetHeaderItem (7, TreeModel_HeaderSection ("Shape Type", COLUMN_SHAPE_TYPE_WIDTH));
-  SetHeaderItem (8, TreeModel_HeaderSection ("Standard Type", COLUMN_STANDARD_TYPE_WIDTH));
-  SetHeaderItem (9, TreeModel_HeaderSection ("Description", -1));
+    SetHeaderItem (aNextIndex++,
+      TreeModel_HeaderSection (QString("%1 [%2]").arg (Message::MetricToString (aMetricType)).arg(isMemInfo ? "Mb" : "s"),
+      COLUMN_REAL_VALUE_WIDTH));
+    SetHeaderItem (aNextIndex++, TreeModel_HeaderSection ("%", COLUMN_PERCENT_VALUE_WIDTH));
+  }
+}
+
+// =======================================================================
+// function : GetMetricColumns
+// purpose :
+// =======================================================================
+void MessageModel_TreeModel::GetMetricColumns (const Message_MetricType theMetricType, QList<int>& theMetricColumns)
+{
+  theMetricColumns.clear();
+  int aNextIndex = 3; // after default parent columns, see InitColumns
+  for (int aMetricId = (int)Message_MetricType_None + 1; aMetricId <= (int)Message_MetricType_MemHeapUsage; aMetricId++)
+  {
+    if (theMetricType != (Message_MetricType)aMetricId)
+    {
+      aNextIndex += 2;
+      continue;
+    }
+    theMetricColumns.append (aNextIndex++);
+    theMetricColumns.append (aNextIndex++);
+  }
+}
+
+// =======================================================================
+// function : IsMetricColumn
+// purpose :
+// =======================================================================
+bool MessageModel_TreeModel::IsMetricColumn (const int theColumnId, Message_MetricType& theMetricType, int& thePosition)
+{
+  int aNextIndex = 3; // after default parent columns, see InitColumns
+  for (int aMetricId = (int)Message_MetricType_None + 1; aMetricId <= (int)Message_MetricType_MemHeapUsage; aMetricId++)
+  {
+    if (theColumnId == aNextIndex || theColumnId == aNextIndex + 1)
+    {
+      theMetricType = (Message_MetricType)aMetricId;
+      thePosition = theColumnId - aNextIndex;
+      return true;
+    }
+    aNextIndex += 2;
+  }
+  return false;
 }
 
 // =======================================================================
 // function : createRootItem
 // purpose :
 // =======================================================================
-void MessageModel_TreeModel::createRootItem (const int theColumnId)
+TreeModel_ItemBasePtr MessageModel_TreeModel::createRootItem (const int theColumnId)
 {
-  myRootItems.insert (theColumnId, MessageModel_ItemRoot::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId));
-  if (theColumnId == 0)
-      m_pRootItem = myRootItems[0];
+  return MessageModel_ItemRoot::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId);
 }
 
 // =======================================================================
@@ -110,6 +154,16 @@ void MessageModel_TreeModel::SetReport (const int theRowId, const Handle(Message
   }
   Reset();
   EmitLayoutChanged();
+}
+
+// =======================================================================
+// function : Reports
+// purpose :
+// =======================================================================
+const NCollection_List<MessageModel_ReportInformation>& MessageModel_TreeModel::Reports() const
+{
+  MessageModel_ItemRootPtr aRootItem = itemDynamicCast<MessageModel_ItemRoot> (RootItem (0));
+  return aRootItem->Reports();
 }
 
 // =======================================================================

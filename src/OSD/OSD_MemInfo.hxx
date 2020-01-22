@@ -16,6 +16,7 @@
 #ifndef _OSD_MemInfo_H__
 #define _OSD_MemInfo_H__
 
+#include <NCollection_Map.hxx>
 #include <TCollection_AsciiString.hxx>
 
 //! This class provide information about memory utilized by current process.
@@ -75,7 +76,7 @@ public:
   Standard_EXPORT void Update();
 
   //! Update counter of specified counter
-  Standard_EXPORT void Update (const OSD_MemInfo::Counter theCounter);
+  Standard_EXPORT void Update (const NCollection_Map<OSD_MemInfo::Counter> theCounters);
 
   //! Return the string representation for all available counter.
   Standard_EXPORT TCollection_AsciiString ToString() const;

@@ -23,6 +23,8 @@
 #include <Draw_ProgressIndicator.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_PrinterToReport.hxx>
+#include <Message_Report.hxx>
 #include <OSD.hxx>
 #include <OSD_Chronometer.hxx>
 #include <OSD_Environment.hxx>
@@ -932,6 +934,91 @@ static int dsetsignal (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
 }
 
 //==============================================================================
+//function : dsetreportprinter
+//purpose  :
+//==============================================================================
+static Handle(Message_PrinterToReport) MyPrinterToReport;
+static Message_SequenceOfPrinters MyDeactivatedPrinters;
+
+static Standard_Integer dsetreportprinter(Draw_Interpretor&, Standard_Integer n, const char** a)
+{
+  if (n != 2)
+  {
+    std::cout << "Enable or disable report printer: " << a[0] << " {on|off}" << std::endl;
+    return 1;
+  }
+
+  const Handle(Message_Messenger)& aMsgMgr = Message::DefaultMessenger();
+  if (aMsgMgr.IsNull())
+    return 1;
+
+  if (! strcmp (a[1], "on") && n == 2)
+  {
+    if (MyPrinterToReport.IsNull())
+      MyPrinterToReport = new Message_PrinterToReport;
+
+    if (MyPrinterToReport->Report()->IsActiveInMessenger())
+    {
+      std::cout << "Report printer has been already activated." << std::endl;
+      return 1;
+    }
+
+    MyDeactivatedPrinters = Message::DefaultMessenger()->Printers();
+    Message::DefaultMessenger()->ChangePrinters().Clear();
+    aMsgMgr->AddPrinter (MyPrinterToReport);
+
+  }
+  else if (! strcmp (a[1], "off") && n == 2)
+  {
+    if (MyPrinterToReport.IsNull() || !MyPrinterToReport->Report()->IsActiveInMessenger())
+    {
+      std::cout << "Report printer was not activated." << std::endl;
+      return 1;
+    }
+
+    Message::DefaultMessenger()->ChangePrinters().Assign (MyDeactivatedPrinters);
+  }
+  else {
+    std::cout << "Unrecognized option(s): " << a[1] << std::endl;
+    return 1;
+  }
+  return 0;
+}
+
+//==============================================================================
+//function : dsetreportmetric
+//purpose  :
+//==============================================================================
+static Standard_Integer dsetreportmetric(Draw_Interpretor&, Standard_Integer n, const char** a)
+{
+  if (n < 1)
+  {
+    std::cout << "Report metric activation: " << a[0] << " [metric_1 metric_2 ...]" << std::endl;
+    return 1;
+  }
+
+  const Handle(Message_Messenger)& aMsgMgr = Message::DefaultMessenger();
+  const Handle(Message_Report)& aDefReport = Message::DefaultReport();
+
+  if (aMsgMgr.IsNull() || aDefReport.IsNull())
+    return 1;
+
+  aDefReport->ClearMetrics();
+  for (int i = 1; i < n; i++)
+  {
+    Standard_Integer aMetricId = atoi (a [i]);
+    if (aMetricId < Message_MetricType_UserTimeCPU || aMetricId > Message_MetricType_MemHeapUsage)
+    {
+      std::cout << "Unrecognized message metric: " << aMetricId << std::endl;
+      return 1;
+    }
+    aDefReport->SetActiveMetric ((Message_MetricType)aMetricId, Standard_True);
+  }
+   
+  return 0;
+}
+
+//==============================================================================
 //function : dtracelevel
 //purpose  :
 //==============================================================================
@@ -1059,6 +1146,10 @@ void Draw::BasicCommands(Draw_Interpretor& theCommands)
 		  __FILE__,dperf,g);
   theCommands.Add("dsetsignal","dsetsignal [fpe=0] -- set OSD signal handler, with FPE option if argument is given",
 		  __FILE__,dsetsignal,g);
+  theCommands.Add("dsetreportprinter", "manage logging of messenger into current report",
+		  __FILE__,dsetreportprinter,g);
+  theCommands.Add("dsetreportmetric", "manage logging of messenger into current report",
+		  __FILE__,dsetreportmetric,g);
 
   theCommands.Add("dparallel",
     "dparallel [-occt {0|1}] [-nbThreads Count] [-nbDefThreads Count]"

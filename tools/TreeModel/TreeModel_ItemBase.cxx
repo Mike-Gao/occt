@@ -192,9 +192,7 @@ QVariant TreeModel_ItemBase::initValue (const int theItemRole) const
 
   switch (Column())
   {
-    case 1: { return rowCount(); }
-    //case 2: return ViewControl_Tools::GetPointerInfo (GetObject(), true).ToCString();
-    case 3: { return Row(); }
+    case 1: { return Row(); }
   }
 
   return QVariant();

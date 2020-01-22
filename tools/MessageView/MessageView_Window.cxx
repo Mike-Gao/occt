@@ -15,12 +15,12 @@
 
 #include <inspector/MessageView_Window.hxx>
 #include <inspector/MessageView_VisibilityState.hxx>
+#include <inspector/MessageView_ActionsTest.hxx>
 
 #include <inspector/MessageModel_Actions.hxx>
 #include <inspector/MessageModel_ItemAlert.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/MessageModel_ItemRoot.hxx>
-#include <inspector/MessageModel_ReportCallBack.hxx>
 #include <inspector/MessageModel_Tools.hxx>
 #include <inspector/MessageModel_TreeModel.hxx>
 
@@ -40,12 +40,12 @@
 #include <AIS_Shape.hxx>
 #include <Graphic3d_Camera.hxx>
 #include <OSD_Environment.hxx>
-
 #include <OSD_Directory.hxx>
 #include <OSD_Protection.hxx>
-
+#include <Message.hxx>
 #include <TCollection_AsciiString.hxx>
-//#include <TopoDS_AlertWithShape.hxx>
+
+#define DEBUG_ALERTS
 
 #include <XmlDrivers_MessageReportStorage.hxx>
 
@@ -150,13 +150,8 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
   ((ViewControl_TreeView*)myTreeView)->SetPredefinedSize (QSize (MESSAGEVIEW_DEFAULT_TREE_VIEW_WIDTH,
                                                                  MESSAGEVIEW_DEFAULT_TREE_VIEW_HEIGHT));
   MessageModel_TreeModel* aModel = new MessageModel_TreeModel (myTreeView);
+  aModel->InitColumns();
   //aModel->SetReversed (Standard_True);
-  for (int i = 6; i <= 8; i++) // hide shape parameters columns
-  {
-    TreeModel_HeaderSection anItem = aModel->GetHeaderItem (i);
-    anItem.SetIsHidden (true);
-    aModel->SetHeaderItem (i, anItem);
-  }
 
   myTreeView->setModel (aModel);
   MessageView_VisibilityState* aVisibilityState = new MessageView_VisibilityState (aModel);
@@ -172,10 +167,12 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
            this, SLOT (onTreeViewSelectionChanged (const QItemSelection&, const QItemSelection&)));
 
   myTreeViewActions = new MessageModel_Actions (myMainWindow, aModel, aSelectionModel);
+  myTestViewActions = new MessageView_ActionsTest (myMainWindow, aModel, aSelectionModel);
+
   myTreeView->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (myTreeView, SIGNAL (customContextMenuRequested (const QPoint&)),
           this, SLOT (onTreeViewContextMenuRequested (const QPoint&)));
-  new TreeModel_ContextMenu (myTreeView);
+  //new TreeModel_ContextMenu (myTreeView);
 
   QModelIndex aParentIndex = myTreeView->model()->index (0, 0);
   myTreeView->setExpanded (aParentIndex, true);
@@ -209,6 +206,8 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
 
   myMainWindow->resize (DEFAULT_SHAPE_VIEW_WIDTH, DEFAULT_SHAPE_VIEW_HEIGHT);
   myMainWindow->move (DEFAULT_SHAPE_VIEW_POSITION_X, DEFAULT_SHAPE_VIEW_POSITION_Y);
+
+  updateVisibleColumns();
 }
 
 // =======================================================================
@@ -257,7 +256,7 @@ void MessageView_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIt
   theItem.Bind ("geometry",  TreeModel_Tools::ToString (myMainWindow->saveState()).toStdString().c_str());
 
   QMap<QString, QString> anItems;
-  TreeModel_Tools::SaveState (myTreeView, anItems);
+  //TreeModel_Tools::SaveState (myTreeView, anItems);
   View_Tools::SaveState (myViewWindow, anItems);
 
   for (QMap<QString, QString>::const_iterator anItemsIt = anItems.begin(); anItemsIt != anItems.end(); anItemsIt++)
@@ -280,8 +279,8 @@ void MessageView_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap&
   {
     if (anItemIt.Key().IsEqual ("geometry"))
       myMainWindow->restoreState (TreeModel_Tools::ToByteArray (anItemIt.Value().ToCString()));
-    else if (TreeModel_Tools::RestoreState (myTreeView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
-      continue;
+    //else if (TreeModel_Tools::RestoreState (myTreeView, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
+    //  continue;
     else if (View_Tools::RestoreState (myViewWindow, anItemIt.Key().ToCString(), anItemIt.Value().ToCString()))
       continue;
   }
@@ -313,11 +312,10 @@ void MessageView_Window::UpdateContent()
     myParameters->SetFileNames (aName, aNames);
     isUpdated = true;
   }
-  Handle(Message_Report) aDefaultReport = Message_Report::CurrentReport( Standard_False);
+  Handle(Message_Report) aDefaultReport = Message::DefaultReport (Standard_False);
   MessageModel_TreeModel* aViewModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
   if (!aDefaultReport.IsNull() && !aViewModel->HasReport (aDefaultReport))
   {
-    aDefaultReport->SetCallBack (myCallBack);
     addReport (aDefaultReport);
   }
   // reload report of selected item
@@ -335,7 +333,6 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
   Handle(AIS_InteractiveContext) aContext;
   NCollection_List<Handle(Standard_Transient)> aParameters;
 
-  Handle(Message_ReportCallBack) aReportCallBack;
   Handle(Graphic3d_Camera) aViewCamera;
 
   for (NCollection_List<Handle(Standard_Transient)>::Iterator aParamsIt (theParameters);
@@ -345,7 +342,6 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
     Handle(Message_Report) aMessageReport = Handle(Message_Report)::DownCast (anObject);
     if (!aMessageReport.IsNull())
     {
-      aMessageReport->SetCallBack (myCallBack);
       addReport (aMessageReport);
     }
     else if (!Handle(AIS_InteractiveContext)::DownCast (anObject).IsNull())
@@ -368,7 +364,7 @@ void MessageView_Window::Init (NCollection_List<Handle(Standard_Transient)>& the
   if (!aContext.IsNull())
   {
     myViewWindow->SetContext (View_ContextType_External, aContext);
-    myViewWindow->GetViewToolBar()->SetCurrentContextType (View_ContextType_External);
+    //myViewWindow->GetViewToolBar()->SetCurrentContextType (View_ContextType_External);
   }
 
   if (!aViewCamera.IsNull())
@@ -412,6 +408,8 @@ void MessageView_Window::addReport (const Handle(Message_Report)& theReport,
 {
   MessageModel_TreeModel* aModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
   aModel->AddReport (theReport, theReportDescription);
+
+  updateVisibleColumns();
 }
 
 // =======================================================================
@@ -492,7 +490,14 @@ void MessageView_Window::onTreeViewContextMenuRequested (const QPoint& thePositi
      }
   }
   aMenu->addSeparator();
+
   myTreeViewActions->AddMenuActions (aSelectedIndices, aMenu);
+  addActivateMetricActions (aMenu);
+
+#ifdef DEBUG_ALERTS
+  aMenu->addSeparator();
+  myTestViewActions->AddMenuActions (aSelectedIndices, aMenu);
+#endif
 
   QPoint aPoint = myTreeView->mapToGlobal (thePosition);
   aMenu->exec (aPoint);
@@ -635,6 +640,9 @@ void MessageView_Window::onImportReport()
   QString aFilter (tr ("Document file (*.cbf *)"));
   QString aSelectedFilter;
 
+  QItemSelectionModel* aSelectionModel = myTreeView->selectionModel();
+  aSelectionModel->clear();
+
   QString aFileName = QFileDialog::getOpenFileName (0, tr("Import report"), QString(), aSelectedFilter);
   openFile (TCollection_AsciiString (aFileName.toStdString().c_str()));
 }
@@ -662,7 +670,6 @@ void MessageView_Window::onSetReversedAlerts()
 
   aTreeModel->SetReversed (!isReversed);
 }
-
 
 // =======================================================================
 // function : onReloadReport
@@ -692,6 +699,65 @@ void MessageView_Window::onReloadReport()
   MessageModel_TreeModel* aTreeModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
   aModel->clearSelection();
   aTreeModel->SetReport (aReportItem->Row(), aReport, aDescription);
+}
+
+// =======================================================================
+// function : addActivateMetricActions
+// purpose :
+// =======================================================================
+void MessageView_Window::addActivateMetricActions (QMenu* theMenu)
+{
+  QMenu* aSubMenu = new QMenu ("Activate metric");
+
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_True);
+
+  for (int aMetricId = (int)Message_MetricType_None + 1; aMetricId <= (int)Message_MetricType_MemHeapUsage; aMetricId++)
+  {
+    Message_MetricType aMetricType = (Message_MetricType)aMetricId;
+    QAction* anAction = ViewControl_Tools::CreateAction (Message::MetricToString (aMetricType),
+      SLOT (OnActivateMetric()), parent(), this);
+    anAction->setCheckable (true);
+    anAction->setChecked (aReport->ActiveMetrics().Contains (aMetricType));
+    aSubMenu->addAction (anAction);
+  }
+  aSubMenu->addSeparator();
+  aSubMenu->addAction (ViewControl_Tools::CreateAction ("Deactivate all", SLOT (OnDeactivateAllMetrics()), parent(), this));
+
+  theMenu->addMenu (aSubMenu);
+}
+
+// =======================================================================
+// function : OnActivateMetric
+// purpose :
+// =======================================================================
+void MessageView_Window::OnActivateMetric()
+{
+  QAction* anAction = (QAction*)(sender());
+
+  Message_MetricType aMetricType;
+  if (!Message::MetricFromString (anAction->text().toStdString().c_str(), aMetricType))
+    return;
+
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_True);
+  const NCollection_Map<Message_MetricType>& anActiveMetrics = aReport->ActiveMetrics();
+
+  aReport->SetActiveMetric (aMetricType, !anActiveMetrics.Contains (aMetricType));
+
+  updateVisibleColumns();
+}
+
+// =======================================================================
+// function : OnDeactivateAllMetrics
+// purpose :
+// =======================================================================
+void MessageView_Window::OnDeactivateAllMetrics()
+{
+  Handle(Message_Report) aReport = Message::DefaultReport();
+  if (aReport.IsNull())
+    return;
+  aReport->ClearMetrics();
+
+  updateVisibleColumns();
 }
 
 // =======================================================================
@@ -783,4 +849,42 @@ void MessageView_Window::updatePreviewPresentation()
 
   myDisplayPreview->SetContext (aContext);
   myDisplayPreview->UpdatePreview (View_DisplayActionType_DisplayId, aPresentations);
+}
+
+// =======================================================================
+// function : updateVisibleColumns
+// purpose :
+// =======================================================================
+void MessageView_Window::updateVisibleColumns()
+{
+  MessageModel_TreeModel* aViewModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
+  const NCollection_List<MessageModel_ReportInformation>& aReports = aViewModel->Reports();
+
+  NCollection_Map<Message_MetricType> anActiveMetrics;
+  for (NCollection_List<MessageModel_ReportInformation>::Iterator anIterator (aViewModel->Reports()); anIterator.More(); anIterator.Next())
+  {
+    Handle(Message_Report) aReport = anIterator.Value().myReport;
+    for (NCollection_Map<Message_MetricType>::Iterator aMetricsIterator (aReport->ActiveMetrics()); aMetricsIterator.More(); aMetricsIterator.Next())
+    {
+      if (anActiveMetrics.Contains (aMetricsIterator.Value()))
+        continue;
+      anActiveMetrics.Add (aMetricsIterator.Value());
+    }
+  }
+
+  for (int aMetricId = (int)Message_MetricType_None + 1; aMetricId <= (int)Message_MetricType_MemHeapUsage; aMetricId++)
+  {
+    Message_MetricType aMetricType = (Message_MetricType)aMetricId;
+    QList<int> aMetricColumns;
+    aViewModel->GetMetricColumns (aMetricType, aMetricColumns);
+    bool isColumnHidden = !anActiveMetrics.Contains (aMetricType);
+    for (int i = 0; i < aMetricColumns.size(); i++)
+    {
+      int aColumnId = aMetricColumns[i];
+      myTreeView->setColumnHidden (aColumnId, isColumnHidden);
+      TreeModel_HeaderSection aSection = aViewModel->GetHeaderItem (aColumnId);
+      aSection.SetIsHidden (isColumnHidden);
+      aViewModel->SetHeaderItem (aColumnId, aSection);
+    }
+  }
 }

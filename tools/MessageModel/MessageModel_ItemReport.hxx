@@ -78,19 +78,13 @@ public:
   //! Returns report of the item
   static Handle(Message_Report) FindReport (const MessageModel_ItemBasePtr& thetItem);
 
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT virtual bool SetStream (const Standard_SStream& theSStream, Standard_Integer& theStartPos,
-                                          Standard_Integer& theLastPos) const Standard_OVERRIDE;
+  //! Returns report cumulative metric as stop time of the last alert minus start time of the first alert
+  Standard_EXPORT static Standard_Real CumulativeMetric (const Handle(Message_Report)& theReport, const Message_MetricType theMetricType);
 
 protected:
 
   //! Initialize the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;
-
-  //! Returns stream value of the item to fulfill property panel.
-  //! \return stream value or dummy
-  Standard_EXPORT virtual void initStream (Standard_OStream& theOStream) const Standard_OVERRIDE;
 
   //! Creates a child item in the given position.
   //! \param theRow the child row position

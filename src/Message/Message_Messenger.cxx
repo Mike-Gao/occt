@@ -25,6 +25,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_Messenger,Standard_Transient)
 //purpose  : 
 //=======================================================================
 Message_Messenger::Message_Messenger ()
+: myOutputGravity (Message_Info)
 {
   AddPrinter ( new Message_PrinterOStream );
 }
@@ -35,6 +36,7 @@ Message_Messenger::Message_Messenger ()
 //=======================================================================
 
 Message_Messenger::Message_Messenger (const Handle(Message_Printer)& thePrinter)
+: myOutputGravity (Message_Info)
 {
   AddPrinter (thePrinter);
 }
@@ -158,6 +160,44 @@ void Message_Messenger::Send (const TCollection_ExtendedString& theString,
     if (!aPrinter.IsNull())
     {
       aPrinter->Send (theString, theGravity, putEndl);
+    }
+  }
+}
+
+//=======================================================================
+//function : Send
+//purpose  : 
+//=======================================================================
+
+void Message_Messenger::Send (const Standard_SStream& theStream,
+                              const Message_Gravity theGravity,
+                              const Standard_Boolean putEndl) const
+{
+  for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
+  {
+    const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
+    if (!aPrinter.IsNull())
+    {
+      aPrinter->Send (theStream, theGravity, putEndl);
+    }
+  }
+}
+
+//=======================================================================
+//function : Send
+//purpose  : 
+//=======================================================================
+
+void Message_Messenger::Send (const Handle(Standard_Transient)& theObject,
+                              const Message_Gravity theGravity,
+                              const Standard_Boolean putEndl) const
+{
+  for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
+  {
+    const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
+    if (!aPrinter.IsNull())
+    {
+      aPrinter->Send (theObject, theGravity, putEndl);
     }
   }
 }

@@ -28,12 +28,14 @@
 #include <STEPCAFControl_Writer.hxx>
 #include <STEPControl_Controller.hxx>
 #include <TCollection_ExtendedString.hxx>
+#include <Transfer_TransientProcess.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Data.hxx>
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
 #include <XDEDRAW.hxx>
 #include <XDEDRAW_Common.hxx>
+#include <XSControl_TransferReader.hxx>
 #include <XSControl_WorkSession.hxx>
 #include <XSDRAW.hxx>
 #include <XSDRAW_Vars.hxx>
@@ -312,11 +314,17 @@ static Standard_Integer ReadStep (Draw_Interpretor& di, Standard_Integer argc, c
 
   Standard_CString aDocName = NULL;
   TCollection_AsciiString aFilePath, aModeStr;
+  Standard_Integer aTraceLevel = 0;
   for (Standard_Integer anArgIter = 1; anArgIter < argc; ++anArgIter)
   {
     TCollection_AsciiString anArgCase (argv[anArgIter]);
     anArgCase.LowerCase();
-    if (aDocName == NULL)
+    if (anArgCase == "-tracelevel" && anArgIter < argc)
+    {
+      anArgIter++;
+      aTraceLevel = atoi (argv[anArgIter]);
+    }
+    else if (aDocName == NULL)
     {
       aDocName = argv[anArgIter];
     }
@@ -382,6 +390,12 @@ static Standard_Integer ReadStep (Draw_Interpretor& di, Standard_Integer argc, c
     Handle(DDocStd_DrawDocument) DD = new DDocStd_DrawDocument(doc);
     Draw::Set (aDocName, DD);
 //     di << "Document saved with name " << aDocName;
+  }
+
+  if (aTraceLevel > 0)
+  {
+    const Handle(XSControl_TransferReader) &TR1 = reader.Reader().WS()->TransferReader();
+    TR1->TransientProcess()->SetTraceLevel (aTraceLevel);
   }
   if ( ! reader.Transfer ( doc ) ) {
     di << "Cannot read any relevant data from the STEP file\n";
@@ -617,7 +631,7 @@ void XDEDRAW_Common::InitCommands(Draw_Interpretor& di)
   di.Add("ReadIges" , "Doc filename: Read IGES file to DECAF document" ,__FILE__, ReadIges, g);
   di.Add("WriteIges" , "Doc filename: Write DECAF document to IGES file" ,__FILE__, WriteIges, g);
   di.Add("ReadStep" ,
-         "Doc filename [mode]"
+         "Doc filename [mode] [-traceLevel level]"
          "\n\t\t: Read STEP file to a document.",
          __FILE__, ReadStep, g);
   di.Add("WriteStep" , "Doc filename [mode=a [multifile_prefix] [label]]: Write DECAF document to STEP file" ,__FILE__, WriteStep, g);  

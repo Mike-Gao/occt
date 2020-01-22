@@ -18,8 +18,9 @@
 #define _Message_HeaderFile
 
 #include <Message_Gravity.hxx>
-#include <Message_PerfMeterMode.hxx>
+#include <Message_MetricType.hxx>
 #include <NCollection_Vector.hxx>
+#include <OSD_MemInfo.hxx>
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
@@ -39,6 +40,7 @@ class Message_PrinterOStream;
 class Message_ProgressIndicator;
 class Message_ProgressScale;
 class Message_ProgressSentry;
+class Message_Report;
 
 
 //! Defines
@@ -56,7 +58,12 @@ public:
   //! By default, it contains single printer directed to std::cout.
   //! It can be customized according to the application needs.
   Standard_EXPORT static const Handle(Message_Messenger)& DefaultMessenger();
-  
+
+  //! returns the only one instance of Report
+  //! When theToCreate is true - automatically creates message report when not exist.
+  //! that has been created.
+  Standard_EXPORT static const Handle(Message_Report)& DefaultReport (const Standard_Boolean theToCreate = Standard_False);
+
   //! Returns the string filled with values of hours, minutes and seconds.
   //! Example:
   //! 1. (5, 12, 26.3345) returns "05h:12m:26.33s",
@@ -64,132 +71,41 @@ public:
   //! 3. (0,  0,  4.5   ) returns "4.50s"
   Standard_EXPORT static TCollection_AsciiString FillTime (const Standard_Integer Hour, const Standard_Integer Minute, const Standard_Real Second);
 
-  //! Returns the string name for a given gravity.
-  //! @param Gravity gravity type
-  //! @return string identifier from the list Message_Trace, Message_Info, Message_Warning, Message_Alarm and Message_Fail
-  Standard_EXPORT static Standard_CString GravityToString (const Message_Gravity theGravity);
+  //! Determines the metric from the given string identifier.
+  //! @param theString string identifier
+  //! @param theType detected type of metric
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean MetricFromString (const Standard_CString theString,
+                                                            Message_MetricType& theType);
 
-  //! Returns the gravity type from the given string identifier (using case-insensitive comparison).
-  //! @param theGravityString string identifier
-  //! @return gravity or Message_Trace if string identifier is invalid
-  static Message_Gravity GravityFromString (const Standard_CString theGravityString)
+  //! Returns the string name for a given metric type.
+  //! @param theType metric type
+  //! @return string identifier from the list of Message_MetricType
+  Standard_EXPORT static Standard_CString MetricToString (const Message_MetricType theType);
+
+  //! Returns the metric type from the given string identifier.
+  //! @param theString string identifier
+  //! @return metric type or Message_MetricType_None if string identifier is invalid
+  static Message_MetricType MetricFromString (const Standard_CString theString)
   {
-    Message_Gravity aGravity = Message_Trace;
-    GravityFromString (theGravityString, aGravity);
-    return aGravity;
+    Message_MetricType aMetric = Message_MetricType_None;
+    MetricFromString (theString, aMetric);
+    return aMetric;
   }
 
-  //! Determines the gravity from the given string identifier (using case-insensitive comparison).
-  //! @param theGravityString string identifier
-  //! @param theGravity detected shape type
-  //! @return TRUE if string identifier is known
-  Standard_EXPORT static Standard_Boolean GravityFromString (const Standard_CString theGravityString,
-                                                             Message_Gravity& theGravity);
+  //! Converts message metric to OSD memory info type.
+  //! \param theMetric [in] message metric
+  //! \param theMemInfo [out] filled memory info type
+  //! \return true if converted
+  static Standard_EXPORT Standard_Boolean ToOSDMetric (const Message_MetricType theMetric, OSD_MemInfo::Counter& theMemInfo);
 
-  //! Returns the string name for a perf meter mode.
-  //! @param theValue mode
-  //! @return string identifier
-  Standard_EXPORT static Standard_CString PerfMeterModeToString (const Message_PerfMeterMode theValue);
-
-  //! Returns the enum value from the given string identifier (using case-insensitive comparison).
-  //! @param theString string identifier
-  //! @return enum or Message_PerfMeterMode_None if string identifier is invalid
-  static Message_PerfMeterMode PerfMeterModeFromString (const Standard_CString theString)
-  {
-    Message_PerfMeterMode aValue = Message_PerfMeterMode_None;
-    PerfMeterModeFromString (theString, aValue);
-    return aValue;
-  }
-
-  //! Returns the enum value from the given string identifier (using case-insensitive comparison).
-  //! @param theString string identifier
-  //! @return enum or Message_PerfMeterMode_None if string identifier is invalid
-  //! @return TRUE if string identifier is known
-  Standard_EXPORT static Standard_Boolean PerfMeterModeFromString (const Standard_CString theString,
-                                                                   Message_PerfMeterMode& theValue);
-
-
-  //! Returns separator symbol of Dump information
-  static Standard_Character DumpSeparator() { return '\\'; }
-
-  //! Returns separator symbol of values vector union
-  static TCollection_AsciiString VectorSeparator() { return " ,"; }
-
-  //! Convert handle pointer to string value
-  //! \param thePointer a pointer
-  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString TransientToString (const Handle(Standard_Transient)& thePointer,
-                                                                    const bool isShortInfo = true);
-
-  //! Convert pointer to string value
-  //! \param thePointer a pointer
-  //! \param isShortInfo if true, all '0' symbols in the beginning of the pointer are skipped
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString PointerToString (const void* thePointer,
-                                                                  const bool isShortInfo = true);
-  //! Convert vector of real values to string, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString StrVectorToString
-    (const NCollection_Vector<TCollection_AsciiString>& theValues);
-
-  //! Convert string to vector of real values, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static Standard_Boolean StrVectorFromString
-    (const TCollection_AsciiString& theValue,
-     NCollection_Vector<TCollection_AsciiString>& theValues);
-
-  //! Convert vector of real values to string, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString RealVectorToString
-    (const NCollection_Vector<Standard_Real>& theValues);
-
-  //! Convert string to vector of real values, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static Standard_Boolean RealVectorFromString
-    (const TCollection_AsciiString& theValue,
-     NCollection_Vector<Standard_Real>& theValues);
-
-  //! Convert vector of real values to string, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString CoordVectorToString
-    (const NCollection_Vector<Standard_Real>& theValues);
-
-  //! Convert string to vector of real values, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static Standard_Boolean CoordVectorFromString
-    (const TCollection_AsciiString& theValue,
-     NCollection_Vector<Standard_Real>& theValues);
-
-  //! Convert vector of real values to string, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static TCollection_AsciiString ColorVectorToString
-    (const NCollection_Vector<Standard_Real>& theValues);
-
-  //! Convert string to vector of real values, separator is vector separator
-  //! \param thePointer a container of real values
-  //! \return the string value
-  Standard_EXPORT static Standard_Boolean ColorVectorFromString
-    (const TCollection_AsciiString& theValue,
-     NCollection_Vector<Standard_Real>& theValues);
-
-  //! Converts stream to vector of values and column count
-  //! \param theStream stream value
-  //! \param theColumnCount [out] number of columns
-  //! \param theValues [out] container of split values
-  static Standard_EXPORT void ConvertStream (const Standard_SStream& theStream,
-    Standard_Integer& theColumnCount,
-    NCollection_Vector<TCollection_AsciiString>& theValues);
+  //! Converts OSD memory info type to message metric.
+  //! \param theMemInfo [int] memory info type
+  //! \param theMetric [out] filled message metric
+  //! \return true if converted
+  static Standard_EXPORT Standard_Boolean ToMessageMetric (const OSD_MemInfo::Counter theMemInfo, Message_MetricType& theMetric);
 
 protected:
-
 
 
 

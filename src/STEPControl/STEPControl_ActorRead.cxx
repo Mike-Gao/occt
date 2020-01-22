@@ -28,6 +28,7 @@
 #include <Interface_InterfaceModel.hxx>
 #include <Interface_Macros.hxx>
 #include <Interface_Static.hxx>
+#include <Message_Level.hxx>
 #include <Message_Messenger.hxx>
 #include <Message_ProgressSentry.hxx>
 #include <OSD_Timer.hxx>
@@ -96,6 +97,7 @@
 #include <TColStd_HSequenceOfTransient.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_AlertAttribute.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -467,6 +469,10 @@ static void getSDR(const Handle(StepRepr_ProductDefinitionShape)& PDS,
 
 {
   Handle(Message_Messenger) sout = TP->Messenger();
+#ifdef TRANSLOG
+  //if (TP->TraceLevel() > 1) 
+  MESSAGE_ADD_LEVEL_SENTRY
+#endif
   Handle(TransferBRep_ShapeBinder) shbinder;
   
   TopoDS_Compound Cund;
@@ -550,6 +556,8 @@ static void getSDR(const Handle(StepRepr_ProductDefinitionShape)& PDS,
 
     TopoDS_Shape theResult = TransferBRep::ShapeResult (binder);
     if (!theResult.IsNull()) {
+      if (TP->TraceLevel() > 3) 
+        sout<<"TransferBRep::ShapeResult"<<theResult;
       Result1 = theResult;
       // [BEGIN] ssv: OCCT#22436: extra compound in NMSSR case
       if (NM_DETECTED && Result1.ShapeType() == TopAbs_COMPOUND)

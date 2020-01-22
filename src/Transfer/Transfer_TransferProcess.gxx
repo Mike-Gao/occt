@@ -1086,6 +1086,8 @@ Handle(Transfer_Binder) Transfer_TransferProcess::Transferring(const TheStart& s
       thelevel = oldlev;
     }
     catch (Standard_Failure const& anException) {
+      Message_Gravity aPrevGravity = themessenger->OuputGravity();
+      themessenger->SetOuputGravity (Message_Fail);
       if (binder.IsNull()) {
 	themessenger << "                  *** Exception Raised with no Result" << Message_EndLine;
 	binder = new Transfer_VoidBinder;
@@ -1097,6 +1099,7 @@ Handle(Transfer_Binder) Transfer_TransferProcess::Transferring(const TheStart& s
 	StartTrace (binder, start, thelevel-1,4);
       }
       thelevel = oldlev;
+      themessenger->SetOuputGravity (aPrevGravity);
     }
   }
 

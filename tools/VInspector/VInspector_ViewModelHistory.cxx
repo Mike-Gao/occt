@@ -42,8 +42,18 @@ const int HISTORY_AIS_NAME_COLUMN_WIDTH = 140;
 // purpose :
 // =======================================================================
 VInspector_ViewModelHistory::VInspector_ViewModelHistory (QObject* theParent, const int theHistoryTypesMaxAmount)
-: TreeModel_ModelBase (theParent)
+: TreeModel_ModelBase (theParent), myHistoryTypesMaxAmount (theHistoryTypesMaxAmount)
 {
+}
+
+// =======================================================================
+// function : InitColumns
+// purpose :
+// =======================================================================
+void VInspector_ViewModelHistory::InitColumns()
+{
+  TreeModel_ModelBase::InitColumns();
+
   SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
   SetHeaderItem (1, TreeModel_HeaderSection ("Visibility", COLUMN_SIZE_WIDTH)); // visualization item
   SetHeaderItem (2, TreeModel_HeaderSection ("Size", COLUMN_SIZE_WIDTH));
@@ -55,20 +65,17 @@ VInspector_ViewModelHistory::VInspector_ViewModelHistory (QObject* theParent, co
   for (int aColumnId = 0, aNbColumns = columnCount(); aColumnId < aNbColumns; aColumnId++)
   {
     VInspector_ItemHistoryRootPtr aRootItem = itemDynamicCast<VInspector_ItemHistoryRoot> (myRootItems[aColumnId]);
-    aRootItem->SetHistoryTypesMaxAmount (theHistoryTypesMaxAmount);
+    aRootItem->SetHistoryTypesMaxAmount (myHistoryTypesMaxAmount);
   }
 }
-
 
 // =======================================================================
 // function : createRootItem
 // purpose :
 // =======================================================================
-void VInspector_ViewModelHistory::createRootItem (const int theColumnId)
+TreeModel_ItemBasePtr VInspector_ViewModelHistory::createRootItem (const int theColumnId)
 {
-  myRootItems.insert (theColumnId, VInspector_ItemHistoryRoot::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId));
-  if (theColumnId == 0)
-      m_pRootItem = myRootItems[0];
+  return VInspector_ItemHistoryRoot::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId);
 }
 
 // =======================================================================

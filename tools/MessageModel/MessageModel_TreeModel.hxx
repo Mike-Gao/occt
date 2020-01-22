@@ -17,6 +17,7 @@
 #define MessageModel_TreeModel_H
 
 #include <inspector/MessageModel_ItemBase.hxx>
+#include <inspector/MessageModel_ItemRoot.hxx>
 #include <Standard.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <Message_Report.hxx>
@@ -41,6 +42,21 @@ public:
   //! Destructor
   virtual ~MessageModel_TreeModel() Standard_OVERRIDE {};
 
+  //! Creates model columns and root items.
+  Standard_EXPORT virtual void InitColumns() Standard_OVERRIDE;
+
+  //!< Returns columns of the model for the metric
+  //!< \param theMetricType metric
+  //!< \param theMetricColumns [out] container of metric columns
+  static Standard_EXPORT void GetMetricColumns (const Message_MetricType theMetricType, QList<int>& theMetricColumns);
+
+  //!< Returns metric type for the column
+  //!< \param theColumnId [in] index of the tree column
+  //!< \param theMetricType [out] metric type if found
+  //!< \param thePosition [out] index of the metric column, 0 - is metric, 1 - is delta
+  //!< \return true if the column has metric parameters
+  static Standard_EXPORT bool IsMetricColumn (const int theColumnId, Message_MetricType& theMetricType, int& thePosition);
+
   //! Returns true if parameter report was added into the model
   //! \param theReport a report instance
   //! \return boolen value
@@ -59,6 +75,9 @@ public:
   Standard_EXPORT void SetReport (const int theRowId, const Handle(Message_Report)& theReport,
     const TCollection_AsciiString& theReportDescription = "");
 
+  //!< Returns processed reports
+  Standard_EXPORT const NCollection_List<MessageModel_ReportInformation>& Reports() const;
+
   //! Set the view reversed. If reversed, the last report alert is upper item in the tree view
   //! \param theReversed boolean flag
   Standard_EXPORT void SetReversed (const Standard_Boolean& theReversed);
@@ -71,22 +90,15 @@ public:
   //! \theName visulized text of root item
   Standard_EXPORT void SetRootItemName (const TCollection_AsciiString& theName);
 
-  //! Returns root item by column
-  //! \param theColumn an index of the column
-  //! \return root item instance
-  virtual TreeModel_ItemBasePtr RootItem (const int theColumn) const Standard_OVERRIDE
-  { return myRootItems.contains (theColumn) ? myRootItems[theColumn] : TreeModel_ItemBasePtr(); }
-
   //! Updates tree model
   Standard_EXPORT void UpdateTreeModel();
 
 protected:
   //! Creates root item
   //! \param theColumnId index of a column
-  virtual void createRootItem (const int theColumnId) Standard_OVERRIDE;
+  virtual TreeModel_ItemBasePtr createRootItem (const int theColumnId) Standard_OVERRIDE;
 
 private:
-  QMap<int, TreeModel_ItemBasePtr> myRootItems; //!< container of root items, for each column own root item
   Standard_Boolean myIsReversed; //!< state if the model is reversed
 };
 

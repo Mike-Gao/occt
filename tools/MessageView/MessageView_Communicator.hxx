@@ -16,7 +16,6 @@
 #ifndef MessageView_Communicator_H
 #define MessageView_Communicator_H
 
-#include <inspector/MessageModel_ReportCallBack.hxx>
 #include <inspector/MessageView_Window.hxx>
 #include <inspector/TInspectorAPI_Communicator.hxx>
 
@@ -27,8 +26,7 @@ class MessageView_Communicator : public TInspectorAPI_Communicator
 public:
 
   //! Constructor
-  MessageView_Communicator() : TInspectorAPI_Communicator(), myWindow (new MessageView_Window (0))
-  { myWindow->SetCallBack (new MessageModel_ReportCallBack (this)); }
+  MessageView_Communicator() : TInspectorAPI_Communicator(), myWindow (new MessageView_Window (0)) {}
 
   //! Destructor
   virtual ~MessageView_Communicator() Standard_OVERRIDE {}

@@ -21,7 +21,6 @@
 
 #include <NCollection_Vector.hxx>
 
-class Message_PerfMeter;
 class Message_Report;
 
 //! Alert object storing container of Standard_Real values in its field
@@ -31,8 +30,7 @@ public:
 
   //! Constructor with string argument
   Standard_EXPORT Message_AttributeStream (const Standard_SStream& theStream,
-                                           const TCollection_AsciiString& theName = TCollection_AsciiString(),
-                                           const TCollection_AsciiString& theDescription = TCollection_AsciiString());
+                                           const TCollection_AsciiString& theName = TCollection_AsciiString());
 
   //! Sets stream value
   Standard_EXPORT void SetStream (const Standard_SStream& theStream);

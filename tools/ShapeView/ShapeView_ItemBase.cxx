@@ -14,22 +14,3 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/ShapeView_ItemBase.hxx>
-
-// =======================================================================
-// function : initValue
-// purpose :
-// =======================================================================
-QVariant ShapeView_ItemBase::initValue (const int theItemRole) const
-{
-  if (theItemRole != Qt::DisplayRole && theItemRole != Qt::ToolTipRole)
-    return QVariant();
-
-  switch (Column())
-  {
-    case 2: { return rowCount(); }
-    //case 3: return ViewControl_Tools::GetPointerInfo (GetObject(), true).ToCString();
-    case 4: { return Row(); }
-  }
-
-  return QVariant();
-}

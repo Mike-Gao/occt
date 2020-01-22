@@ -65,4 +65,10 @@ private:
   static Handle(Message_Alert) importAlertParameters (const TDF_Label& aParametersLabel);
 };
 
+#define MESSAGE_STORE_XML_REPORT(FileName) \
+{ \
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_False); \
+  if (!aReport.IsNull()) XmlDrivers_MessageReportStorage::ExportReport (aReport, FileName); \
+}
+
 #endif // _XmlDrivers_MessageReportStorage

@@ -36,7 +36,7 @@
 //#define DEBUG_INFO
 #ifdef DEBUG_INFO
 #include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
+#include <Message_Level.hxx>
 #endif // DEBUG_INFO
 
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Workspace,Standard_Transient)
@@ -408,11 +408,12 @@ Standard_Boolean OpenGl_Workspace::BufferDump (const Handle(OpenGl_FrameBuffer)&
 bool OpenGl_Workspace::ShouldRender (const OpenGl_Element* theElement)
 {
 #ifdef DEBUG_INFO
-  Message_PerfMeter aPerfMeter;
+  MESSAGE_ADD_LEVEL_SENTRY
+  MESSAGE_INFO_OBJECT(this, "Workspace")
 
   Standard_SStream aWorkspaceStream;
   DumpJson (aWorkspaceStream);
-  MESSAGE_INFO_OBJECT(this, aWorkspaceStream, "Workspace", "", &aPerfMeter, NULL)
+  MESSAGE_INFO_STREAM(aWorkspaceStream, "parameters")
 #endif
 
   // render only non-raytracable elements when RayTracing is enabled

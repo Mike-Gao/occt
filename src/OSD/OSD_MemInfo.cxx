@@ -190,12 +190,12 @@ void OSD_MemInfo::Update()
 // function : Update
 // purpose  :
 // =======================================================================
-void OSD_MemInfo::Update (const OSD_MemInfo::Counter theCounter)
+void OSD_MemInfo::Update (const NCollection_Map<OSD_MemInfo::Counter> theCounters)
 {
 #ifndef OCCT_UWP
 #if defined(_WIN32)
 
-  if (theCounter == MemVirtual)
+  if (theCounters.Contains (MemVirtual))
   {
   #if (_WIN32_WINNT >= 0x0500)
     MEMORYSTATUSEX aStatEx;
@@ -212,11 +212,11 @@ void OSD_MemInfo::Update (const OSD_MemInfo::Counter theCounter)
     return;
   }
 
-  if (theCounter == MemPrivate ||
-      theCounter == MemWorkingSet ||
-      theCounter == MemWorkingSetPeak ||
-      theCounter == MemSwapUsage ||
-      theCounter == MemSwapUsagePeak)
+  if (theCounters.Contains (MemPrivate) ||
+      theCounters.Contains (MemWorkingSet) ||
+      theCounters.Contains (MemWorkingSetPeak) ||
+      theCounters.Contains (MemSwapUsage) ||
+      theCounters.Contains (MemSwapUsagePeak))
   {
     // use Psapi library
     HANDLE aProcess = GetCurrentProcess();
@@ -238,7 +238,7 @@ void OSD_MemInfo::Update (const OSD_MemInfo::Counter theCounter)
     return;
   }
 
-  if (theCounter == MemHeapUsage)
+  if (theCounters.Contains (MemHeapUsage))
   {
     _HEAPINFO hinfo;
     int heapstatus;

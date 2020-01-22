@@ -47,12 +47,6 @@ public:
   //! Remove all shapes in the model root item
   Standard_EXPORT void RemoveAllShapes();
 
-  //! Returns root item by column
-  //! \param theColumn an index of the column
-  //! \return root item instance
-  virtual TreeModel_ItemBasePtr RootItem(const int theColumn) const Standard_OVERRIDE
-  { return myRootItems[theColumn]; }
-
   //! Returns model index of the shape.
   //! \param theShape a shape object
   //! \return the model index
@@ -61,10 +55,8 @@ public:
 protected:
   //! Creates root item
   //! \param theColumnId index of a column
-  virtual void createRootItem (const int theColumnId) Standard_OVERRIDE;
+  virtual TreeModel_ItemBasePtr createRootItem (const int theColumnId) Standard_OVERRIDE;
 
-private:
-  QMap<int, TreeModel_ItemBasePtr> myRootItems; //!< container of root items, for each column own root item
 };
 
 #endif

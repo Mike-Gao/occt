@@ -17,9 +17,13 @@
 
 #include <Message.hxx>
 #include <Message_AlertExtended.hxx>
+#include <Message_AttributeObject.hxx>
 #include <Message_AttributeStream.hxx>
 #include <Message_CompositeAlerts.hxx>
+#include <Message_Level.hxx>
 #include <Message_Report.hxx>
+
+#include <Standard_Dump.hxx>
 
 #include <TCollection.hxx>
 #include <TDataStd_AsciiString.hxx>
@@ -30,6 +34,8 @@
 #include <TDF_ChildIterator.hxx>
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
+#include <TopoDS_AlertAttribute.hxx>
+
 #include <XmlDrivers.hxx>
 
 // =======================================================================
@@ -73,7 +79,7 @@ void XmlDrivers_MessageReportStorage::ExportReport (const Handle(Message_Report)
     // Gravity Label
     TDF_Label aGravityLabel = aMainLabel.NewChild();
     // set gravity kind string
-    TCollection_ExtendedString aName (Message::GravityToString ((Message_Gravity)aGravity));
+    TCollection_ExtendedString aName (aGravity);
     if (!aName.IsEmpty())
       TDataStd_Name::Set (aGravityLabel, aName);
 
@@ -88,6 +94,7 @@ void XmlDrivers_MessageReportStorage::ExportReport (const Handle(Message_Report)
     }
   }
   GetApplication()->SaveAs (aDocument, theFileName);
+  GetApplication()->Close (aDocument);
 }
 
 // =======================================================================
@@ -131,7 +138,7 @@ Handle(Message_Report) XmlDrivers_MessageReportStorage::ImportReport (const TCol
 
     // get gravity type
     const TCollection_ExtendedString& aGravityName = aNameAttribute->Get();
-    Message_Gravity aGravity = Message::GravityFromString (TCollection_AsciiString (aGravityName).ToCString());
+    Message_Gravity aGravity = (Message_Gravity) (TCollection_AsciiString (aGravityName).IntegerValue());
 
     /// reserved label to store gravity information
     //TDF_Label aFirstAlertLabel = aGravityLabel.FindChild (1, Standard_False);
@@ -168,7 +175,7 @@ void XmlDrivers_MessageReportStorage::exportAlert (const Handle(Message_Alert)& 
     // Gravity Label
     TDF_Label aGravityLabel = anAlertLabel.NewChild();
     // set gravity kind string
-    TDataStd_Name::Set (aGravityLabel, Message::GravityToString ((Message_Gravity)aGravityId));
+    TDataStd_Name::Set (aGravityLabel, aGravityId);
 
     Handle(Message_AlertExtended) anAlertExtended = Handle(Message_AlertExtended)::DownCast (theAlert);
     if (anAlertExtended.IsNull())
@@ -214,7 +221,7 @@ void XmlDrivers_MessageReportStorage::importAlert (const TDF_Label& theAlertLabe
       continue;
 
     // get gravity type
-    Message_Gravity aGravity = Message::GravityFromString (TCollection_AsciiString (aNameAttribute->Get()).ToCString());
+    Message_Gravity aGravity = (Message_Gravity) (TCollection_AsciiString (aNameAttribute->Get()).IntegerValue());
     // find alerts information, add corresponded alerts to the report
     for (TDF_ChildIterator anAlertLabelsIt (aGravityLabel); anAlertLabelsIt.More(); anAlertLabelsIt.Next())
     {
@@ -225,7 +232,13 @@ void XmlDrivers_MessageReportStorage::importAlert (const TDF_Label& theAlertLabe
       importAlert (anAlertLabel, aGravity, theReport, anAlert);
     }
   }
-  theReport->AddAlert (theGravity, anAlert, 0, theParentAlert);
+  if (theParentAlert.IsNull())
+    theReport->AddAlert (theGravity, anAlert);
+  else
+  {
+    MESSAGE_ADD_LEVEL_SENTRY
+    theReport->AddAlert (theGravity, anAlert);
+  }
 }
 
 // =======================================================================
@@ -234,40 +247,30 @@ void XmlDrivers_MessageReportStorage::importAlert (const TDF_Label& theAlertLabe
 // =======================================================================
 void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Message_Alert)& theAlert, const TDF_Label& theAlertLabel)
 {
-  //Handle(Message_AlertExtended) anAlertExtended = Handle(Message_AlertExtended)::DownCast (theAlert);
-  //if (anAlertExtended.IsNull()) // name attribute is empty
-  //  return;
+  Handle(Message_AlertExtended) anAlertExtended = Handle(Message_AlertExtended)::DownCast (theAlert);
+  if (anAlertExtended.IsNull()) // name attribute is empty
+    return;
 
-  //// store attribute time
-  //Handle(Message_Attribute) anAttribute = anAlertExtended->Attribute();
+  // store attribute time
+  Handle(Message_Attribute) anAttribute = anAlertExtended->Attribute();
 
-  //TDataStd_Name::Set (theAlertLabel, anAttribute->DynamicType()->Name());
-  ////TDataStd_Real::Set (theAlertLabel, anAlertExtended->CumulativeMetric());
+  TDataStd_Name::Set (theAlertLabel, anAttribute->DynamicType()->Name());
+  //TDataStd_Real::Set (theAlertLabel, anAlertExtended->CumulativeMetric());
 
-  //TDataStd_AsciiString::Set (theAlertLabel, anAttribute->GetName());
-  //TCollection_AsciiString aDescription = anAttribute->GetDescription();
-  //if (!aDescription.IsEmpty())
-  //  TDataStd_Comment::Set (theAlertLabel, anAttribute->GetDescription());
+  TDataStd_AsciiString::Set (theAlertLabel, anAttribute->GetName());
 
-  //Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
-  //if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
-  //{
-  //  Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
-  //  // store values
-  //  NCollection_IndexedDataMap<TCollection_AsciiString, TCollection_AsciiString> aValues;
-  //  TCollection_AsciiString aKey;
-  //  TCollection::Split (aValuesArrayAlert->GetStream(), aValues, aKey);
-  //  if (aValues.IsEmpty())
-  //    return;
-  //  int anArraySize = 2 * aValues.Size();
-  //  Handle(TDataStd_ExtStringArray) aListAttribute = TDataStd_ExtStringArray::Set (theAlertLabel, 0, anArraySize - 1);
-  //  for (int aValueId = 0; aValueId < anArraySize; aValueId++)
-  //  {
-  //    TCollection_AsciiString aKey = aValues.FindKey (aValueId);
-  //    aListAttribute->SetValue (aValueId * 2, aKey);
-  //    aListAttribute->SetValue (aValueId * 2 + 1, aValues.FindFromKey (aKey));
-  //  }
-  //}
+  Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
+  if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name() ||
+      aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertAttribute)->Name())
+  {
+    Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
+    // store values
+    TCollection_AsciiString aStreamText = Standard_Dump::Text (aValuesArrayAlert->GetStream());
+    if (aStreamText.IsEmpty())
+      return;
+    Handle(TDataStd_ExtStringArray) aListAttribute = TDataStd_ExtStringArray::Set (theAlertLabel, 0, 0);
+    aListAttribute->SetValue (0, aStreamText);
+  }
 }
 
 // =======================================================================
@@ -276,72 +279,59 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
 // =======================================================================
 Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (const TDF_Label& aParametersLabel)
 {
-  //Handle(TDF_Attribute) anAttribute;
-  //if (!aParametersLabel.FindAttribute (TDataStd_Name::GetID(), anAttribute))
-  //  return Handle(Message_Alert)();
+  Handle(TDF_Attribute) anAttribute;
+  if (!aParametersLabel.FindAttribute (TDataStd_Name::GetID(), anAttribute))
+    return Handle(Message_Alert)();
 
-  //Handle(TDataStd_Name) aDynamicTypeAttribute = Handle(TDataStd_Name)::DownCast (anAttribute);
-  //if (aDynamicTypeAttribute.IsNull())
-  //  return Handle(Message_Alert)();
-  //const TCollection_ExtendedString& aDynamicTypeName = aDynamicTypeAttribute->Get();
+  Handle(TDataStd_Name) aDynamicTypeAttribute = Handle(TDataStd_Name)::DownCast (anAttribute);
+  if (aDynamicTypeAttribute.IsNull())
+    return Handle(Message_Alert)();
+  const TCollection_ExtendedString& aDynamicTypeName = aDynamicTypeAttribute->Get();
 
-  //TCollection_ExtendedString aDescription;
-  //if (aParametersLabel.FindAttribute (TDataStd_Comment::GetID(), anAttribute))
-  //{
-  //  Handle(TDataStd_Comment) aDescriptionAttribute = Handle(TDataStd_Comment)::DownCast (anAttribute);
-  //  if (!aDescriptionAttribute.IsNull())
-  //    aDescription = aDescriptionAttribute->Get();
-  //}
+  Handle(Message_AlertExtended) anAlert = new Message_AlertExtended();
+  Handle(Message_Attribute) aMessageAttribute;
+  if (aDynamicTypeName == STANDARD_TYPE (Message_Attribute)->Name())
+    aMessageAttribute = new Message_Attribute();
+  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name() ||
+           aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertAttribute)->Name())
+  {
+    // values
+    NCollection_Vector<TCollection_AsciiString> anArrayValues;
+    if (!aParametersLabel.FindAttribute (TDataStd_ExtStringArray::GetID(), anAttribute))
+      return Handle(Message_Alert)();
 
-  //Handle(Message_AlertExtended) anAlert = new Message_AlertExtended();
-  //Handle(Message_Attribute) aMessageAttribute;
-  //if (aDynamicTypeName == STANDARD_TYPE (Message_Attribute)->Name())
-  //  aMessageAttribute = new Message_Attribute();
-  //else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
-  //{
-  //  // values
-  //  NCollection_Vector<TCollection_AsciiString> anArrayValues;
-  //  if (!aParametersLabel.FindAttribute (TDataStd_ExtStringArray::GetID(), anAttribute))
-  //    return Handle(Message_Alert)();
+    Handle(TDataStd_ExtStringArray) aValuesAttribute = Handle(TDataStd_ExtStringArray)::DownCast (anAttribute);
+    if (aValuesAttribute.IsNull())
+      return Handle(Message_Alert)();
 
-  //  Handle(TDataStd_ExtStringArray) aValuesAttribute = Handle(TDataStd_ExtStringArray)::DownCast (anAttribute);
-  //  if (aValuesAttribute.IsNull())
-  //    return Handle(Message_Alert)();
+    Standard_SStream aStream;
+    for (int aValueId = aValuesAttribute->Lower(); aValueId <= aValuesAttribute->Upper(); aValueId++)
+    {
+      aStream << aValuesAttribute->Value (aValueId);
+    }
+    Handle(Message_AttributeStream) anAlert = new Message_AttributeStream (aStream);
+    aMessageAttribute = anAlert;
+  }
 
-  //  Standard_SStream aStream;
-  //  for (int aValueId = aValuesAttribute->Lower(); aValueId <= aValuesAttribute->Upper(); aValueId++)
-  //  {
-  //    TCollection_AsciiString aKey = aValuesAttribute->Value (aValueId++);
-  //    if (aValueId > aValuesAttribute->Upper())
-  //      break;
-  //    DUMP_VALUES (aStream, aKey, aValuesAttribute->Value (aValueId));
-  //  }
-  //  Handle(Message_AttributeStream) anAlert = new Message_AttributeStream (aStream);
-  //  aMessageAttribute = anAlert;
-  //}
+  if (!aMessageAttribute.IsNull())
+  {
+    // name
+    if (!aParametersLabel.FindAttribute (TDataStd_AsciiString::GetID(), anAttribute))
+      return Handle(Message_Alert)();
+    Handle(TDataStd_AsciiString) aNameAttribute = Handle(TDataStd_AsciiString)::DownCast (anAttribute);
+    if (aNameAttribute.IsNull())
+      return Handle(Message_Alert)();
 
-  //if (!aMessageAttribute.IsNull())
-  //{
-  //  // name
-  //  if (!aParametersLabel.FindAttribute (TDataStd_AsciiString::GetID(), anAttribute))
-  //    return Handle(Message_Alert)();
-  //  Handle(TDataStd_AsciiString) aNameAttribute = Handle(TDataStd_AsciiString)::DownCast (anAttribute);
-  //  if (aNameAttribute.IsNull())
-  //    return Handle(Message_Alert)();
+    aMessageAttribute->SetName (aNameAttribute->Get());
+    anAlert->SetAttribute (aMessageAttribute);
+  }
 
-  //  aMessageAttribute->SetName (aNameAttribute->Get());
-  //  aMessageAttribute->SetDescription (aDescription);
-
-  //  anAlert->SetAttribute (aMessageAttribute);
-  //}
-
-  //// time
+  // time
   //Standard_Real aTime = -1;
   //Handle(TDataStd_Real) aTimeAttribute;
   //if (aParametersLabel.FindAttribute (TDataStd_Real::GetID(), aTimeAttribute))
   //  aTime = aTimeAttribute->Get();
 
-  ////anAlert->SetCumulativeMetric (aTime);
-  //return anAlert;
-  return NULL;
+  //anAlert->SetCumulativeMetric (aTime);
+  return anAlert;
 }

@@ -18,12 +18,15 @@
 #include <inspector/MessageModel_ItemRoot.hxx>
 #include <inspector/MessageModel_ItemReport.hxx>
 #include <inspector/MessageModel_Tools.hxx>
+#include <inspector/MessageModel_TreeModel.hxx>
+
 #include <inspector/ViewControl_Tools.hxx>
 #include <inspector/Convert_TransientShape.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 
 #include <Message_AlertExtended.hxx>
 #include <Message_AttributeObject.hxx>
+#include <Message_AttributeMeter.hxx>
 #include <Message_AttributeStream.hxx>
 #include <Message_CompositeAlerts.hxx>
 
@@ -55,22 +58,15 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
   if (aReport.IsNull())
     return QVariant();
 
-  Standard_Boolean isTimeReport = aReport->PerfMeterMode() == Message_PerfMeterMode_UserTimeCPU ||
-                                  aReport->PerfMeterMode() == Message_PerfMeterMode_SystemTimeInfo;
-
-  if (aReport->PerfMeterMode() == Message_PerfMeterMode_UserTimeCPU ||
-      aReport->PerfMeterMode() == Message_PerfMeterMode_SystemTimeInfo)
-
   if (theRole == Qt::ForegroundRole)
   {
-    if (!aReport->GetAlerts (Message_Fail).IsEmpty())
+    if (!aReport->GetAlerts (Message_Fail).IsEmpty() ||
+        !aReport->GetAlerts (Message_Alarm).IsEmpty())
       return QColor(Qt::darkRed);
 
-    for (int aGravityId = (int)Message_Trace; aGravityId <= (int)Message_Fail; aGravityId++)
-    {
-      if (!aReport->IsActive ((Message_Gravity)aGravityId))
-        return QColor(Qt::darkGray);
-    }
+    if (!aReport->IsActiveInMessenger())
+      return QColor(Qt::darkGray);
+
     return QVariant();
   }
 
@@ -84,11 +80,13 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
       return QVariant();
 
     Handle(Message_Attribute) anAttribute = anExtendedAlert->Attribute();
+    if (anAttribute.IsNull())
+      return QVariant();
 
     if (anAttribute->IsKind (STANDARD_TYPE (TopoDS_AlertAttribute)))
       return QIcon (":/icons/item_shape.png");
     else if (!Handle(Message_AttributeStream)::DownCast (anAttribute).IsNull())
-      return QIcon (":/icons/item_vectorOfValues.png");
+      return QIcon (":/icons/item_streamValues.png");
     else
       return QVariant();
   }
@@ -99,69 +97,33 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
   if (anAlert.IsNull())
     return QVariant();
 
-  switch (Column())
+  if (Column() == 0)
+    return theRole == Qt::DisplayRole ? anAlert->GetMessageKey() : anAlert->DynamicType()->Name();
+
+  Message_MetricType aMetricType;
+  int aPosition;
+  if (MessageModel_TreeModel::IsMetricColumn (Column(), aMetricType, aPosition))
   {
-    case 0:
-      return theRole == Qt::DisplayRole ? anAlert->GetMessageKey() : anAlert->DynamicType()->Name();
-    //case 1: return QVariant(); // visibility state
-    //case 2: return rowCount() > 0 ? QVariant (rowCount()) : QVariant();
-    //case 3: return anAlert->ElapsedTime() < 0 ? QVariant() : anAlert->ElapsedTime();
-    case 4:
-    {
-      if (!anExtendedAlert->IsMetricValid())
-        return QVariant();
+    if (anExtendedAlert.IsNull())
+      return QVariant();
 
-      if (isTimeReport)
-        return anExtendedAlert->MetricStop() - anExtendedAlert->MetricStart();
+    Handle(Message_AttributeMeter) anAttribute = Handle(Message_AttributeMeter)::DownCast (anExtendedAlert->Attribute());
+    if (anAttribute.IsNull())
+      return QVariant();
+
+    Standard_Real aCumulativeMetric = anAttribute->StopValue (aMetricType) - anAttribute->StartValue (aMetricType);
+    if (fabs (aCumulativeMetric) < Precision::Confusion())
+      return QVariant();
+
+    if (aPosition == 0) return aCumulativeMetric;
+    else if (aPosition == 1)
+    {
+      Standard_Real aReportCumulativeMetric = MessageModel_ItemReport::CumulativeMetric (aReport, aMetricType);
+      if (fabs (aReportCumulativeMetric) > Precision::Confusion())
+        return 100. * aCumulativeMetric / aReportCumulativeMetric;
       else
-        return anExtendedAlert->MetricStart();
-    }
-    case 5:
-    {
-      if (!anExtendedAlert->IsMetricValid())
         return QVariant();
-
-      if (isTimeReport)
-      {
-        TreeModel_ItemBasePtr aParentItem = Parent();
-        MessageModel_ItemReportPtr aReportItem = itemDynamicCast<MessageModel_ItemReport> (aParentItem);
-        while (!aReportItem)
-        {
-          aParentItem = aParentItem->Parent();
-          aReportItem = itemDynamicCast<MessageModel_ItemReport> (aParentItem);
-        }
-        double aDivideTo = aReport->CumulativeMetric (Message_Info);
-        double anAlertTime = anExtendedAlert->MetricStop() - anExtendedAlert->MetricStart();
-
-        return aDivideTo == 0 ? QVariant() : 100. * anAlertTime / aDivideTo;
-      }
-      else
-      {
-        TreeModel_ItemBasePtr aParentItem = Parent();
-        //MessageModel_ItemAlertPtr aParentAlertItem = itemDynamicCast<MessageModel_ItemAlert> (aParentItem);
-        //if (aParentAlertItem)
-        //{
-          //double aDeltaToParent = CumulativeMetric (anAlert) - CumulativeMetric (aParentAlertItem->GetAlert());
-
-          //return fabs (aDeltaToParent) > Precision::Confusion() ? QVariant (aDeltaToParent) : QVariant();
-        //}
-        double anAlertMem = anExtendedAlert->MetricStop() - anExtendedAlert->MetricStart();
-        return anAlertMem;
-      }
     }
-    case 6: return MessageModel_Tools::GetPointerAlertInfo (anAlert).ToCString();
-    case 7: return MessageModel_Tools::GetShapeTypeAlertInfo (anAlert).ToCString();
-    case 8: return MessageModel_Tools::GetStandardTypeAlertInfo (anAlert).ToCString();
-    case 9:
-    {
-      if (!anExtendedAlert.IsNull() && !anExtendedAlert->Attribute().IsNull())
-      {
-        TCollection_AsciiString aDescription = anExtendedAlert->Attribute()->GetDescription();
-        return theRole == Qt::DisplayRole ? TreeModel_Tools::CutString (aDescription.ToCString())
-                                          : aDescription.ToCString();
-      }
-    }
-    default: break;
   }
   return QVariant();
 }

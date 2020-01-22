@@ -49,6 +49,9 @@ public:
   //! Destructor
   virtual ~VInspector_ViewModel() Standard_OVERRIDE {};
 
+  //! Creates model columns and root items.
+  Standard_EXPORT virtual void InitColumns() Standard_OVERRIDE;
+
   //! Initialize the model by the given context
   //! \param theContext viewer context
   Standard_EXPORT Handle(AIS_InteractiveContext) GetContext() const;
@@ -70,12 +73,6 @@ public:
   //! \return model index if the value is found or Null model index
   Standard_EXPORT QModelIndex FindIndex (const Handle(AIS_InteractiveObject)& thePresentation) const;
 
-  //! Returns root item by column
-  //! \param theColumn an index of the column
-  //! \return root item instance
-  virtual TreeModel_ItemBasePtr RootItem (const int theColumn) const Standard_OVERRIDE
-  { return myRootItems[theColumn]; }
-
   //! Returns select owners for tree view selected items
   //! \param theSelectionModel a selection model
   //! \param theOwners an output list of owners
@@ -86,14 +83,10 @@ public:
   Standard_EXPORT void UpdateTreeModel();
 
 protected:
-
   //! Creates root item
   //! \param theColumnId index of a column
-  virtual void createRootItem (const int theColumnId) Standard_OVERRIDE;
+  virtual TreeModel_ItemBasePtr createRootItem (const int theColumnId) Standard_OVERRIDE;
 
-private:
-
-  QMap<int, TreeModel_ItemBasePtr> myRootItems; //!< container of root items, for each column own root item
 };
 
 #endif
