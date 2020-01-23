@@ -373,11 +373,11 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
   Handle(Geom_Surface) anS = BRep_Tool::Surface(theF);
   Handle(Geom2d_Curve) aC = theC;
   BRep_Builder aBB;
-  Standard_Real aTol1 = RealLast();
+  Standard_Real aTol = BRep_Tool::Tolerance(theE);
+  Standard_Real aTol1;
   BRep_Tool::Range(theE, fr, lr);
   if (!theForceProj)
   {
-    Standard_Real aTol = BRep_Tool::Tolerance(theE);
     f = theC->FirstParameter();
     l = theC->LastParameter();
     if (!(Precision::IsInfinite(f) || Precision::IsInfinite(l)))
@@ -402,12 +402,6 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
     {
       theTolReached = aTol1;
       aBB.SameParameter(theE, Standard_True);
-      return;
-    }
-    else if (theMaxTol < aTol && aTol1 < 2.*aTol)
-    {
-      theTolReached = aTol1;
-      UpdateTol(theE, theTolReached);
       return;
     }
     aBB.SameParameter(theE, Standard_False);
@@ -480,7 +474,7 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
     }
     Standard_Real aTolR = CompTol(aC3D, theProjCurve, anS, fr, lr);
     //
-    if ((aNewTol > 0. && aTolR < aNewTol) || aNewTol < 0.) 
+    if (aTolR < theMaxTol) 
     {
       theTolReached = aTolR;
       //
@@ -493,11 +487,14 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
     {
       if (aNewTol > 0.)
       {
+        //method SameParameter was called
         theTolReached = aNewTol;
       }
       else
       {
-        theTolReached = aTol1;
+        //SameParameter failed or was not called (theForceProj = true)
+        //Old pcurve is kept
+        theTolReached = aTol;
       }
       UpdateTol(theE, theTolReached);
       aBB.SameParameter(theE, Standard_True);
@@ -511,6 +508,15 @@ void BRepLib::SetPCurve(const TopoDS_Edge& theE,
     }
     else
     {
+      aTol1 = aTol;
+      if (theForceProj)
+      {
+        aC = BRep_Tool::CurveOnSurface(theE, theF, fr, lr);
+        if (!aC.IsNull())
+        {
+          aTol1 = CompTol(aC3D, aC, anS, fr, lr);
+        }
+      }
       theTolReached = aTol1;
     }
     UpdateTol(theE, theTolReached);
