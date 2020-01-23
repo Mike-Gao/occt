@@ -23,7 +23,6 @@
 #include <Draw_ProgressIndicator.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
-#include <Message_PrinterToReport.hxx>
 #include <Message_Report.hxx>
 #include <OSD.hxx>
 #include <OSD_Chronometer.hxx>
@@ -769,49 +768,57 @@ static int dmeminfo (Draw_Interpretor& theDI,
                      Standard_Integer  theArgNb,
                      const char**      theArgVec)
 {
-  OSD_MemInfo aMemInfo;
   if (theArgNb <= 1)
   {
+    OSD_MemInfo aMemInfo;
     theDI << aMemInfo.ToString();
     return 0;
   }
 
+  NCollection_Map<OSD_MemInfo::Counter> aCounters;
   for (Standard_Integer anIter = 1; anIter < theArgNb; ++anIter)
   {
     TCollection_AsciiString anArg (theArgVec[anIter]);
     anArg.LowerCase();
     if (anArg == "virt" || anArg == "v")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemVirtual)) << " ";
+      aCounters.Add (OSD_MemInfo::MemVirtual);
     }
     else if (anArg == "heap" || anArg == "h")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemHeapUsage)) << " ";
+      aCounters.Add (OSD_MemInfo::MemHeapUsage);
     }
     else if (anArg == "wset" || anArg == "w")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemWorkingSet)) << " ";
+      aCounters.Add (OSD_MemInfo::MemWorkingSet);
     }
     else if (anArg == "wsetpeak")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemWorkingSetPeak)) << " ";
+      aCounters.Add (OSD_MemInfo::MemWorkingSetPeak);
     }
     else if (anArg == "swap")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemSwapUsage)) << " ";
+      aCounters.Add (OSD_MemInfo::MemSwapUsage);
     }
     else if (anArg == "swappeak")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemSwapUsagePeak)) << " ";
+      aCounters.Add (OSD_MemInfo::MemSwapUsagePeak);
     }
     else if (anArg == "private")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemPrivate)) << " ";
+      aCounters.Add (OSD_MemInfo::MemPrivate);
     }
     else
     {
       std::cerr << "Unknown argument '" << theArgVec[anIter] << "'!\n";
     }
+  }
+
+  OSD_MemInfo aMemInfo;
+  aMemInfo.SetActiveCounters (aCounters);
+  for (NCollection_Map<OSD_MemInfo::Counter>::Iterator aCountersIt (aCounters); aCountersIt.More(); aCountersIt.Next())
+  {
+    theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemVirtual)) << " ";
   }
   theDI << "\n";
   return 0;
@@ -937,7 +944,6 @@ static int dsetsignal (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
 //function : dsetreportprinter
 //purpose  :
 //==============================================================================
-static Handle(Message_PrinterToReport) MyPrinterToReport;
 static Message_SequenceOfPrinters MyDeactivatedPrinters;
 
 static Standard_Integer dsetreportprinter(Draw_Interpretor&, Standard_Integer n, const char** a)
@@ -948,35 +954,31 @@ static Standard_Integer dsetreportprinter(Draw_Interpretor&, Standard_Integer n,
     return 1;
   }
 
-  const Handle(Message_Messenger)& aMsgMgr = Message::DefaultMessenger();
-  if (aMsgMgr.IsNull())
-    return 1;
-
+  const Handle(Message_Report)& aReport = Message::DefaultReport (Standard_True);
+  const Handle(Message_Messenger)& aMessenger = Message::DefaultMessenger();
   if (! strcmp (a[1], "on") && n == 2)
   {
-    if (MyPrinterToReport.IsNull())
-      MyPrinterToReport = new Message_PrinterToReport;
-
-    if (MyPrinterToReport->Report()->IsActiveInMessenger())
+    if (aReport->IsActiveInMessenger (aMessenger))
     {
       std::cout << "Report printer has been already activated." << std::endl;
       return 1;
     }
+    // store current printers in cache to restore them by deactivation current printer
+    MyDeactivatedPrinters = aMessenger->Printers();
+    aMessenger->ChangePrinters().Clear();
 
-    MyDeactivatedPrinters = Message::DefaultMessenger()->Printers();
-    Message::DefaultMessenger()->ChangePrinters().Clear();
-    aMsgMgr->AddPrinter (MyPrinterToReport);
-
+    aReport->ActivateInMessenger (Standard_True);
   }
   else if (! strcmp (a[1], "off") && n == 2)
   {
-    if (MyPrinterToReport.IsNull() || !MyPrinterToReport->Report()->IsActiveInMessenger())
+    if (!aReport->IsActiveInMessenger())
     {
       std::cout << "Report printer was not activated." << std::endl;
       return 1;
     }
+    aReport->ActivateInMessenger (Standard_False);
 
-    Message::DefaultMessenger()->ChangePrinters().Assign (MyDeactivatedPrinters);
+    aMessenger->ChangePrinters().Assign (MyDeactivatedPrinters);
   }
   else {
     std::cout << "Unrecognized option(s): " << a[1] << std::endl;
@@ -997,13 +999,11 @@ static Standard_Integer dsetreportmetric(Draw_Interpretor&, Standard_Integer n, 
     return 1;
   }
 
-  const Handle(Message_Messenger)& aMsgMgr = Message::DefaultMessenger();
-  const Handle(Message_Report)& aDefReport = Message::DefaultReport();
-
-  if (aMsgMgr.IsNull() || aDefReport.IsNull())
+  const Handle(Message_Report)& aReport = Message::DefaultReport (Standard_True);
+  if (aReport.IsNull())
     return 1;
 
-  aDefReport->ClearMetrics();
+  aReport->ClearMetrics();
   for (int i = 1; i < n; i++)
   {
     Standard_Integer aMetricId = atoi (a [i]);
@@ -1012,9 +1012,9 @@ static Standard_Integer dsetreportmetric(Draw_Interpretor&, Standard_Integer n, 
       std::cout << "Unrecognized message metric: " << aMetricId << std::endl;
       return 1;
     }
-    aDefReport->SetActiveMetric ((Message_MetricType)aMetricId, Standard_True);
+    aReport->SetActiveMetric ((Message_MetricType)aMetricId, Standard_True);
   }
-   
+
   return 0;
 }
 

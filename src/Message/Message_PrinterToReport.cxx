@@ -32,7 +32,6 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_PrinterToReport, Message_Printer)
 //function : Report
 //purpose  : 
 //=======================================================================
-
 const Handle(Message_Report)& Message_PrinterToReport::Report() const
 {
   if (!myReport.IsNull())
@@ -42,29 +41,18 @@ const Handle(Message_Report)& Message_PrinterToReport::Report() const
 }
 
 //=======================================================================
-//function : Clear
-//purpose  :
-//=======================================================================
-void Message_PrinterToReport::Clear()
-{
-  myKey.Clear();
-}
-
-//=======================================================================
 //function : Send
 //purpose  : 
 //=======================================================================
-
 void Message_PrinterToReport::Send (const TCollection_ExtendedString& theString,
                                     const Message_Gravity theGravity,
                                     const Standard_Boolean putEndl) const
 {
   TCollection_AsciiString aString (theString/*, myUseUtf8 ? Standard_Character(0) : '?'*/);
 
-  Message_PrinterToReport* aThis = (Message_PrinterToReport*)this; // TODO!
   if (putEndl)
   {
-    if (myKey.IsEmpty())
+    if (myValue.IsEmpty())
       return;
 
     const Handle(Message_Report)& aReport = Report();
@@ -73,18 +61,17 @@ void Message_PrinterToReport::Send (const TCollection_ExtendedString& theString,
       sendMetricAlert (aString, theGravity);
       return;
     }
-    Message_AlertExtended::AddAlert (aReport, new Message_Attribute (myKey), theGravity);
-    aThis->Clear();
+    Message_AlertExtended::AddAlert (aReport, new Message_Attribute (myValue), theGravity);
+    ((Message_PrinterToReport*)this)->Clear();
     return;
   }
-  aThis->myKey += aString;
+  ((Message_PrinterToReport*)this)->myValue += aString;
 }
 
 //=======================================================================
 //function : Send
 //purpose  : 
 //=======================================================================
-
 void Message_PrinterToReport::Send (const Standard_SStream& theStream,
                                     const Message_Gravity theGravity,
                                     const Standard_Boolean /*putEndl*/) const
@@ -92,12 +79,11 @@ void Message_PrinterToReport::Send (const Standard_SStream& theStream,
   const Handle(Message_Report)& aReport = Report();
   if (!aReport->ActiveMetrics().IsEmpty())
   {
-    sendMetricAlert (myKey, theGravity);
+    sendMetricAlert (myValue, theGravity);
     return;
   }
-  Message_AlertExtended::AddAlert (aReport, new Message_AttributeStream (theStream, myKey), theGravity);
-  Message_PrinterToReport* aThis = (Message_PrinterToReport*)this; // TODO!
-  aThis->Clear();
+  Message_AlertExtended::AddAlert (aReport, new Message_AttributeStream (theStream, myValue), theGravity);
+  ((Message_PrinterToReport*)this)->Clear();
 
   return;
 }
@@ -106,7 +92,6 @@ void Message_PrinterToReport::Send (const Standard_SStream& theStream,
 //function : Send
 //purpose  : 
 //=======================================================================
-
 void Message_PrinterToReport::Send (const Handle(Standard_Transient)& theObject,
                                     const Message_Gravity theGravity,
                                     const Standard_Boolean /*putEndl*/) const
@@ -114,24 +99,21 @@ void Message_PrinterToReport::Send (const Handle(Standard_Transient)& theObject,
   const Handle(Message_Report)& aReport = Report();
   if (!aReport->ActiveMetrics().IsEmpty())
   {
-    sendMetricAlert (myKey, theGravity);
+    sendMetricAlert (myValue, theGravity);
     return;
   }
 
-  Message_AlertExtended::AddAlert (aReport, new Message_AttributeObject (theObject, myKey), theGravity);
-  Message_PrinterToReport* aThis = (Message_PrinterToReport*)this; // TODO!
-  aThis->Clear();
+  Message_AlertExtended::AddAlert (aReport, new Message_AttributeObject (theObject, myValue), theGravity);
+  ((Message_PrinterToReport*)this)->Clear();
 }
 
 //=======================================================================
 //function : sendMetricAlert
 //purpose  : 
 //=======================================================================
-
 void Message_PrinterToReport::sendMetricAlert (const TCollection_AsciiString theValue,
                                                const Message_Gravity theGravity) const
 {
-  Message_AlertExtended::AddAlert (Report(), new Message_AttributeMeter (myKey), theGravity);
-  Message_PrinterToReport* aThis = (Message_PrinterToReport*)this; // TODO!
-  aThis->Clear();
+  Message_AlertExtended::AddAlert (Report(), new Message_AttributeMeter (myValue), theGravity);
+  ((Message_PrinterToReport*)this)->Clear();
 }

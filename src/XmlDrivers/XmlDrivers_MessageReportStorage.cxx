@@ -180,11 +180,11 @@ void XmlDrivers_MessageReportStorage::exportAlert (const Handle(Message_Alert)& 
     Handle(Message_AlertExtended) anAlertExtended = Handle(Message_AlertExtended)::DownCast (theAlert);
     if (anAlertExtended.IsNull())
       continue;
-    Handle(Message_CompositeAlerts) aComposite = anAlertExtended->GetCompositeAlerts();
+    Handle(Message_CompositeAlerts) aComposite = anAlertExtended->CompositeAlerts();
     if (aComposite.IsNull())
       continue;
 
-    const Message_ListOfAlert& anAlerts = aComposite->GetAlerts ((Message_Gravity)aGravityId);
+    const Message_ListOfAlert& anAlerts = aComposite->Alerts ((Message_Gravity)aGravityId);
     for (Message_ListOfAlert::Iterator anAlertsIt (anAlerts); anAlertsIt.More(); anAlertsIt.Next())
       exportAlert (anAlertsIt.Value(), aGravityLabel);
   }
@@ -265,7 +265,7 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
   {
     Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
     // store values
-    TCollection_AsciiString aStreamText = Standard_Dump::Text (aValuesArrayAlert->GetStream());
+    TCollection_AsciiString aStreamText = Standard_Dump::Text (aValuesArrayAlert->Stream());
     if (aStreamText.IsEmpty())
       return;
     Handle(TDataStd_ExtStringArray) aListAttribute = TDataStd_ExtStringArray::Set (theAlertLabel, 0, 0);

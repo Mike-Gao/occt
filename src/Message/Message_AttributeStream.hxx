@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -17,26 +15,24 @@
 #define _Message_AttributeStream_HeaderFile
 
 #include <Message_Attribute.hxx>
-#include <TCollection_AsciiString.hxx>
 
 #include <NCollection_Vector.hxx>
+#include <Standard_SStream.hxx>
 
-class Message_Report;
-
-//! Alert object storing container of Standard_Real values in its field
+//! Alert object storing stream values
 class Message_AttributeStream : public Message_Attribute
 {
 public:
 
   //! Constructor with string argument
   Standard_EXPORT Message_AttributeStream (const Standard_SStream& theStream,
-                                           const TCollection_AsciiString& theName = TCollection_AsciiString());
+    const TCollection_AsciiString& theName = TCollection_AsciiString());
+
+  //! Returns stream value
+  const Standard_SStream& Stream() const { return myStream; }
 
   //! Sets stream value
   Standard_EXPORT void SetStream (const Standard_SStream& theStream);
-
-  //! Returns stream value
-  const Standard_SStream& GetStream() const { return myStream; }
 
   // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_AttributeStream, Message_Attribute)

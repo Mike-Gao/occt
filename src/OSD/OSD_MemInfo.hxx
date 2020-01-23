@@ -69,14 +69,18 @@ public:
   //! Create and initialize
   Standard_EXPORT OSD_MemInfo (const Standard_Boolean theImmediateUpdate = Standard_True);
 
+  //! Set counters that information should be collected. By default, all counters are active.
+  //! @param theCounters container of ids
+  void SetActiveCounters (const NCollection_Map<OSD_MemInfo::Counter>& theCounters) { myActiveCounters = theCounters; }
+
+  //! Return true if the counter is active
+  Standard_Boolean IsActiveCounter (const OSD_MemInfo::Counter theCounter) const { return myActiveCounters.Contains (theCounter); }
+
   //! Clear counters
   Standard_EXPORT void Clear();
 
   //! Update counters
   Standard_EXPORT void Update();
-
-  //! Update counter of specified counter
-  Standard_EXPORT void Update (const NCollection_Map<OSD_MemInfo::Counter> theCounters);
 
   //! Return the string representation for all available counter.
   Standard_EXPORT TCollection_AsciiString ToString() const;
@@ -101,10 +105,16 @@ public:
   //! Return the string representation for all available counter.
   Standard_EXPORT static TCollection_AsciiString PrintInfo();
 
+protected:
+
+  //! Return true if the counter is active and the value is valid
+  Standard_Boolean hasValue (const OSD_MemInfo::Counter theCounter) const;
+
 private:
 
   Standard_Size myCounters[MemCounter_NB]; //!< Counters' values, in bytes
 
+  NCollection_Map<OSD_MemInfo::Counter> myActiveCounters; //!< container of information to collect
 };
 
 #endif // _OSD_MemInfo_H__

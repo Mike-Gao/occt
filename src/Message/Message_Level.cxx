@@ -17,6 +17,7 @@
 #include <Message_AlertExtended.hxx>
 #include <Message_CompositeAlerts.hxx>
 #include <Message_AttributeMeter.hxx>
+#include <Message_Messenger.hxx>
 #include <Message_Report.hxx>
 
 #include <OSD_Chronometer.hxx>
@@ -37,7 +38,6 @@ Message_Level::Message_Level()
 //function : Destructor
 //purpose  :
 //=======================================================================
-
 Message_Level::~Message_Level()
 {
   Remove();
@@ -47,7 +47,6 @@ Message_Level::~Message_Level()
 //function : SetRootAlert
 //purpose  :
 //=======================================================================
-
 void Message_Level::SetRootAlert (const Handle(Message_AlertExtended)& theAlert)
 {
   myRootAlert = theAlert;
@@ -58,7 +57,6 @@ void Message_Level::SetRootAlert (const Handle(Message_AlertExtended)& theAlert)
 //function : AddAlert
 //purpose  :
 //=======================================================================
-
 Standard_Boolean Message_Level::AddAlert (const Message_Gravity theGravity,
                                           const Handle(Message_Alert)& theAlert)
 {
@@ -71,13 +69,14 @@ Standard_Boolean Message_Level::AddAlert (const Message_Gravity theGravity,
 
   // looking for the parent of the parameter alert to release the previous alert
   Handle(Message_AlertExtended) aRootAlert = myRootAlert;
-  Handle(Message_CompositeAlerts) aCompositeAlert = aRootAlert->GetCompositeAlerts (Standard_True);
+  Handle(Message_CompositeAlerts) aCompositeAlert = aRootAlert->CompositeAlerts (Standard_True);
 
   // update metrics of the previous alert
   stopAlert (myLastAlert);
 
-  // set start metrics of the new alert
   myLastAlert = anAlertExtended;
+
+  // set start metrics of the new alert
   startAlert (myLastAlert);
 
   // add child alert
@@ -87,16 +86,17 @@ Standard_Boolean Message_Level::AddAlert (const Message_Gravity theGravity,
 }
 
 //=======================================================================
-//function : AddAlert
+//function : AddLevelAlert
 //purpose  :
 //=======================================================================
-
 Standard_Boolean Message_Level::AddLevelAlert (const Message_Gravity theGravity,
                                                const Handle(Message_Alert)& theAlert)
 {
   Handle(Message_AlertExtended) aRootAlert = !myLastAlert.IsNull() ? myLastAlert : myRootAlert;
+  if (aRootAlert.IsNull())
+    return Standard_False;
 
-  Handle(Message_CompositeAlerts) aCompositeAlert = aRootAlert->GetCompositeAlerts (Standard_True);
+  Handle(Message_CompositeAlerts) aCompositeAlert = aRootAlert->CompositeAlerts (Standard_True);
   // add child alert
   aCompositeAlert->AddAlert (theGravity, theAlert);
 
@@ -107,7 +107,6 @@ Standard_Boolean Message_Level::AddLevelAlert (const Message_Gravity theGravity,
 //function : Remove()
 //purpose  :
 //=======================================================================
-
 void Message_Level::Remove()
 {
   const Handle(Message_Report)& aDefaultReport = Message::DefaultReport();
@@ -122,39 +121,18 @@ void Message_Level::Remove()
 }
 
 //=======================================================================
-//function : startAlert
-//purpose  :
-//=======================================================================
-
-Standard_Boolean Message_Level::startAlert (const Handle(Message_AlertExtended)& theAlert)
-{
-  return setAlertMetrics (theAlert, Standard_True);
-}
-
-//=======================================================================
-//function : stopAlert
-//purpose  :
-//=======================================================================
-
-Standard_Boolean Message_Level::stopAlert (const Handle(Message_AlertExtended)& theAlert)
-{
-  return setAlertMetrics (theAlert, Standard_False);
-}
-
-//=======================================================================
 //function : setAlertMetrics
 //purpose  :
 //=======================================================================
-
-Standard_Boolean Message_Level::setAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
+void Message_Level::setAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
                                                  const Standard_Boolean theStartValue)
 {
   if (theAlert.IsNull())
-    return Standard_False;
+    return;
 
   Handle(Message_AttributeMeter) aMeterAttribute = Handle(Message_AttributeMeter)::DownCast (theAlert->Attribute());
   if (aMeterAttribute.IsNull())
-    return Standard_False;
+    return;
 
   Handle(Message_Report) aReport = Message::DefaultReport (Standard_True);
   const NCollection_Map<Message_MetricType>& anActiveMetrics = aReport->ActiveMetrics();
@@ -192,10 +170,11 @@ Standard_Boolean Message_Level::setAlertMetrics (const Handle(Message_AlertExten
     aCounters.Add (aMemInfo);
   }
   if (aCounters.IsEmpty())
-    return Standard_True;
+    return;
 
   OSD_MemInfo aMemInfo (Standard_False);
-  aMemInfo.Update (aCounters);
+  //aMemInfo.SetActiveCounters (aCounters);
+  aMemInfo.Update ();
   Message_MetricType aMetricType;
   for (NCollection_Map<OSD_MemInfo::Counter>::Iterator anIterator (aCounters); anIterator.More(); anIterator.Next())
   {
@@ -207,5 +186,4 @@ Standard_Boolean Message_Level::setAlertMetrics (const Handle(Message_AlertExten
     else
       aMeterAttribute->SetStopValue (aMetricType, (Standard_Real)aMemInfo.ValuePreciseMiB (anIterator.Value()));
   }
-  return Standard_True;
 }

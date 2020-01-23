@@ -25,7 +25,7 @@ class Message_PrinterToReport;
 DEFINE_STANDARD_HANDLE(Message_PrinterToReport, Message_Printer)
 
 //! Implementation of a message printer associated with Message_Report
-//! Send will create a new alert of the report.
+//! Send will create a new alert of the report. If string is sent, an alert is created by Eol only.
 //! The alerts are sent into set report or default report of Message.
 class Message_PrinterToReport : public Message_Printer
 {
@@ -33,24 +33,24 @@ class Message_PrinterToReport : public Message_Printer
 
 public:
   //! Create printer for redirecting messages into report.
-  Standard_EXPORT Message_PrinterToReport () {}
+  Message_PrinterToReport() {}
 
   ~Message_PrinterToReport() {}
 
   //! Returns the current or default report
   Standard_EXPORT const Handle(Message_Report)& Report() const;
 
-  //!< Returns the first sent value
-  TCollection_AsciiString Key() const { return myKey; }
-
-  //! Clears current values
-  Standard_EXPORT void Clear();
-
   //! Sets the printer report
   //! @param theReport report for messages processing, if NULL, the default report is used
-  void SetReport (const Handle(Message_Report)& theReport);
+  Standard_EXPORT void SetReport (const Handle(Message_Report)& theReport) { myReport = theReport; }
 
-  //! Appends a new alert into message report
+  //!< Returns the first sent value
+  TCollection_AsciiString Value() const { return myValue; }
+
+  //! Clears current values
+  Standard_EXPORT void Clear() { myValue.Clear(); }
+
+  //! Appends a new alert into message report if Endl is false or send a new extended alert with attribute on value
   Standard_EXPORT virtual void Send (const TCollection_ExtendedString& theString,
                                      const Message_Gravity theGravity,
                                      const Standard_Boolean putEndl = Standard_True) const Standard_OVERRIDE;
@@ -78,7 +78,7 @@ protected:
 
 private:
   Handle(Message_Report) myReport; //!< the report for sending alerts
-  TCollection_AsciiString myKey; //!< the sent string value
+  TCollection_AsciiString myValue; //!< the union of sent strings until Eol
 };
 
 #endif // _Message_PrinterToReport_HeaderFile

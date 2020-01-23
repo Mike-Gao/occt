@@ -12,7 +12,6 @@ Message_Attribute.cxx
 Message_Attribute.hxx
 Message_AttributeMeter.cxx
 Message_AttributeMeter.hxx
-Message_AttributeObject.cxx
 Message_AttributeObject.hxx
 Message_AttributeStream.cxx
 Message_AttributeStream.hxx

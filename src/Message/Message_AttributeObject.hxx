@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -17,28 +15,31 @@
 #define _Message_AttributeObject_HeaderFile
 
 #include <Message_Attribute.hxx>
-#include <TCollection_AsciiString.hxx>
 
-//! Alert object storing Transient object in its field
+class Standard_Transient;
+
+//! Alert object storing a transient object
 class Message_AttributeObject : public Message_Attribute
 {
 public:
   //! Constructor with string argument
-  Standard_EXPORT Message_AttributeObject (const Handle(Standard_Transient)& theObject,
-    const TCollection_AsciiString& theName = TCollection_AsciiString());
+  Message_AttributeObject (const Handle(Standard_Transient)& theObject,
+    const TCollection_AsciiString& theName = TCollection_AsciiString())
+  : Message_Attribute (theName) { myObject = theObject; }
+
+  //! Returns object
+  //! @return the object instance
+  Handle(Standard_Transient) Object() const { return myObject; }
 
   //! Sets the object
   //! @param theObject an instance
   void SetObject (const Handle(Standard_Transient)& theObject) { myObject = theObject; }
 
-  //! Returns object
-  Handle(Standard_Transient) GetObject() const { return myObject; }
-
   // OCCT RTTI
-  DEFINE_STANDARD_RTTIEXT(Message_AttributeObject, Message_Attribute)
+  DEFINE_STANDARD_RTTI_INLINE(Message_AttributeObject, Message_Attribute)
 
 private:
-  Handle(Standard_Transient) myObject;
+  Handle(Standard_Transient) myObject; //!< alert object
 };
 
 #endif // _Message_AttributeObject_HeaderFile

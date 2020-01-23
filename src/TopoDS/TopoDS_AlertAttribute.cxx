@@ -49,7 +49,7 @@ void TopoDS_AlertAttribute::Send (const Handle(Message_Messenger)& theMessenger,
     Handle (Message_PrinterToReport) aPrinterToReport = Handle(Message_PrinterToReport)::DownCast (aPrinter);
     const Handle(Message_Report)& aReport = aPrinterToReport->Report();
 
-    Message_AlertExtended::AddAlert (aReport, new TopoDS_AlertAttribute (theShape, aPrinterToReport->Key()),
+    Message_AlertExtended::AddAlert (aReport, new TopoDS_AlertAttribute (theShape, aPrinterToReport->Value()),
                                      theMessenger->OuputGravity());
     aPrinterToReport->Clear();
   }

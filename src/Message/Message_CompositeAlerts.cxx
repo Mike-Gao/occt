@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -20,10 +18,22 @@
 IMPLEMENT_STANDARD_RTTIEXT(Message_CompositeAlerts, Standard_Transient)
 
 //=======================================================================
+//function : Alerts
+//purpose  :
+//=======================================================================
+const Message_ListOfAlert& Message_CompositeAlerts::Alerts (const Message_Gravity theGravity) const
+{
+  static const Message_ListOfAlert anEmptyList;
+  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
+                          "Requesting alerts for gravity not in valid range", anEmptyList);
+
+  return myAlerts[theGravity];
+}
+
+//=======================================================================
 //function : AddAlert
 //purpose  :
 //=======================================================================
-
 Standard_Boolean Message_CompositeAlerts::AddAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert)
 {
   Standard_ASSERT_RETURN (! theAlert.IsNull(), "Attempt to add null alert", Standard_False);
@@ -52,7 +62,6 @@ Standard_Boolean Message_CompositeAlerts::AddAlert (Message_Gravity theGravity, 
 //function : Merge
 //purpose  : 
 //=======================================================================
-
 Standard_Boolean Message_CompositeAlerts::RemoveAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert)
 {
   Standard_ASSERT_RETURN (! theAlert.IsNull(), "Attempt to add null alert", Standard_False);
@@ -68,20 +77,6 @@ Standard_Boolean Message_CompositeAlerts::RemoveAlert (Message_Gravity theGravit
 }
 
 //=======================================================================
-//function : GetAlerts
-//purpose  :
-//=======================================================================
-
-const Message_ListOfAlert& Message_CompositeAlerts::GetAlerts (const Message_Gravity theGravity) const
-{
-  static const Message_ListOfAlert anEmptyList;
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Requesting alerts for gravity not in valid range", anEmptyList);
-
-  return myAlerts[theGravity];
-}
-
-//=======================================================================
 //function : HasAlerts
 //purpose  :
 //=======================================================================
@@ -90,7 +85,7 @@ Standard_Boolean Message_CompositeAlerts::HasAlert (const Handle(Message_Alert)&
 {
   for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
   {
-    const Message_ListOfAlert& anAlerts = GetAlerts ((Message_Gravity)iGravity);
+    const Message_ListOfAlert& anAlerts = Alerts ((Message_Gravity)iGravity);
     if (anAlerts.Contains (theAlert))
       return Standard_True;
   }
@@ -101,7 +96,6 @@ Standard_Boolean Message_CompositeAlerts::HasAlert (const Handle(Message_Alert)&
 //function : HasAlerts
 //purpose  :
 //=======================================================================
-
 Standard_Boolean Message_CompositeAlerts::HasAlert (const Handle(Standard_Type)& theType, Message_Gravity theGravity)
 {
   Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
@@ -119,7 +113,6 @@ Standard_Boolean Message_CompositeAlerts::HasAlert (const Handle(Standard_Type)&
 //function : Clear
 //purpose  :
 //=======================================================================
-
 void Message_CompositeAlerts::Clear ()
 {
   for (unsigned int i = 0; i < sizeof(myAlerts)/sizeof(myAlerts[0]); ++i)
@@ -132,7 +125,6 @@ void Message_CompositeAlerts::Clear ()
 //function : Clear
 //purpose  :
 //=======================================================================
-
 void Message_CompositeAlerts::Clear (Message_Gravity theGravity)
 {
   Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
@@ -144,7 +136,6 @@ void Message_CompositeAlerts::Clear (Message_Gravity theGravity)
 //function : Clear
 //purpose  :
 //=======================================================================
-
 void Message_CompositeAlerts::Clear (const Handle(Standard_Type)& theType)
 {
   for (unsigned int i = 0; i < sizeof(myAlerts)/sizeof(myAlerts[0]); ++i)

@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -24,48 +22,48 @@
 class Message_CompositeAlerts;
 DEFINE_STANDARD_HANDLE(Message_CompositeAlerts, Standard_Transient)
 
-//! Base class of the hierarchy of classes describing various situations
-//! occurring during execution of some algorithm or procedure.
-//!
-//! Alert should provide unique text identifier that can be used to distinguish 
-//! particular type of alerts, e.g. to get text message string describing it. 
-//! See method GetMessageKey(); by default, dynamic type name is used.
-//!
-//! Alert can contain some data. To avoid duplication of data, new alert
-//! can be merged with another one of the same type. Method SupportsMerge() 
-//! should return true if merge is supported; method Merge() should do the
-//! merge if possible and return true in that case and false otherwise.
-//! 
+//! Class providing container of alerts
 class Message_CompositeAlerts : public Standard_Transient
 {
 public:
   //! Empty constructor
-  Standard_EXPORT Message_CompositeAlerts () {}
+  Standard_EXPORT Message_CompositeAlerts() {}
 
-  //! Add alert with specified gravity.
+  //! Returns list of collected alerts with specified gravity
+  Standard_EXPORT const Message_ListOfAlert& Alerts (const Message_Gravity theGravity) const;
+
+  //! Add alert with specified gravity. If the alert supports merge it will be merged.
+  //! @param theGravity an alert gravity
+  //! @param theAlert an alert to be added as a child alert
+  //! @return true if the alert is added or merged
   Standard_EXPORT Standard_Boolean AddAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert);
 
   //! Removes alert with specified gravity.
+  //! @param theGravity an alert gravity
+  //! @param theAlert an alert to be removed from the children
+  //! @return true if the alert is removed
   Standard_EXPORT Standard_Boolean RemoveAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert);
 
-  //! Returns list of collected alerts with specified gravity
-  Standard_EXPORT const Message_ListOfAlert& GetAlerts (const Message_Gravity theGravity) const;
-
   //! Returns true if the alert belong the list of the child alerts.
-  //! \param theAlert an alert to be checked as a child alert
-  //! \return true if the alert is found in a container of children
+  //! @param theAlert an alert to be checked as a child alert
+  //! @return true if the alert is found in a container of children
   Standard_EXPORT Standard_Boolean HasAlert (const Handle(Message_Alert)& theAlert);
 
   //! Returns true if specific type of alert is recorded with specified gravity
+  //! @param theType an alert type
+  //! @param theGravity an alert gravity
+  //! @return true if the alert is found in a container of children
   Standard_EXPORT Standard_Boolean HasAlert (const Handle(Standard_Type)& theType, Message_Gravity theGravity);
 
   //! Clears all collected alerts
   Standard_EXPORT void Clear ();
 
   //! Clears collected alerts with specified gravity
+  //! @param theGravity an alert gravity
   Standard_EXPORT void Clear (Message_Gravity theGravity);
 
   //! Clears collected alerts with specified type
+  //! @param theType an alert type
   Standard_EXPORT void Clear (const Handle(Standard_Type)& theType);
 
   // OCCT RTTI
@@ -74,7 +72,7 @@ public:
 protected:
   // store messages in a lists sorted by gravity;
   // here we rely on knowledge that Message_Fail is the last element of the enum
-  Message_ListOfAlert myAlerts[Message_Fail + 1];
+  Message_ListOfAlert myAlerts[Message_Fail + 1]; //!< container of child alert for each type of gravity
 };
 
 #endif // _Message_CompositeAlerts_HeaderFile

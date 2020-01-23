@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -37,10 +35,10 @@ Standard_CString Message_AlertExtended::GetMessageKey () const
 }
 
 //=======================================================================
-//function : GetCompositeAlerts
+//function : CompositeAlerts
 //purpose  : 
 //=======================================================================
-Handle (Message_CompositeAlerts) Message_AlertExtended::GetCompositeAlerts (const Standard_Boolean isCreate)
+Handle (Message_CompositeAlerts) Message_AlertExtended::CompositeAlerts (const Standard_Boolean isCreate)
 {
   if (myCompositAlerts.IsNull() && isCreate)
     myCompositAlerts = new Message_CompositeAlerts();
@@ -60,7 +58,7 @@ Standard_Boolean Message_AlertExtended::SupportsMerge () const
   // hierarchical alerts can not be merged
   for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
   {
-    if (!myCompositAlerts->GetAlerts ((Message_Gravity)iGravity).IsEmpty())
+    if (!myCompositAlerts->Alerts ((Message_Gravity)iGravity).IsEmpty())
       return Standard_False;
   }
 

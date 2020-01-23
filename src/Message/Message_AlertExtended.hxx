@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -31,13 +29,9 @@ class Message_CompositeAlerts;
 //!
 //! It has Message_Attributes to provide the alert name, and other custom information
 //!
-//! It is possible to set performance meter into alert to store time/memory metric information
-//! spent between the next alert adding. Also time of child alerts are collected
-//!
 //! It has a container of composite alerts, if the alert might provide
 //! sub-alerts collecting.
 //!
-
 class Message_AlertExtended : public Message_Alert
 {
 public:
@@ -52,17 +46,17 @@ public:
   virtual Standard_EXPORT Standard_CString GetMessageKey () const;
 
   //! Sets container of the alert attributes
-  //! \param theAttributes an attribute values
+  //! @param theAttributes an attribute values
   void SetAttribute (const Handle(Message_Attribute)& theAttribute) { myAttribute = theAttribute; }
 
   //! Returns container of the alert attributes
-  //! \param theAttributes an attribute values
+  //! @param theAttributes an attribute values
   const Handle(Message_Attribute)& Attribute() const { return myAttribute; }
 
   //! Returns class provided hierarchy of alerts if created or create if the parameter is true
-  //! \param isCreate if composite alert has not been created for this alert, it should be created
-  //! \return instance or NULL
-  Standard_EXPORT Handle (Message_CompositeAlerts) GetCompositeAlerts (const Standard_Boolean isCreate = Standard_False);
+  //! @param isCreate if composite alert has not been created for this alert, it should be created
+  //! @return instance or NULL
+  Standard_EXPORT Handle (Message_CompositeAlerts) CompositeAlerts (const Standard_Boolean isCreate = Standard_False);
 
   //! Return true if this type of alert can be merged with other
   //! of the same type to avoid duplication.
@@ -90,7 +84,6 @@ public:
 protected:
 
   Handle(Message_CompositeAlerts) myCompositAlerts; //!< class provided hierarchical structure of alerts
-  //!< It should be created by an attempt of a child alert creation
   Handle(Message_Attribute) myAttribute; //!< container of the alert attributes
 };
 

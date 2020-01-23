@@ -23,14 +23,28 @@
 #include <stdio.h>
 #include <string.h>
 
+static Handle(Message_Messenger) MyMessenger;
+
 //=======================================================================
 //function : DefaultMessenger
 //purpose  : 
 //=======================================================================
-const Handle(Message_Messenger)& Message::DefaultMessenger ()
+
+const Handle(Message_Messenger)& Message::DefaultMessenger()
 {
-  static Handle(Message_Messenger) aMessenger = new Message_Messenger;
-  return aMessenger;
+  if (MyMessenger.IsNull())
+   MyMessenger = new Message_Messenger;
+  return MyMessenger;
+}
+
+//=======================================================================
+//function : SetDefaultMessenger
+//purpose  : 
+//=======================================================================
+
+void Message::SetDefaultMessenger (const Handle(Message_Messenger)& theMessenger)
+{
+  MyMessenger = theMessenger;
 }
 
 //=======================================================================

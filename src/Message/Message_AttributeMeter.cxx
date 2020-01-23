@@ -39,11 +39,10 @@ Standard_Boolean Message_AttributeMeter::HasMetric (const Message_MetricType& th
 //function : IsMetricValid
 //purpose  : 
 //=======================================================================
-
 Standard_Boolean Message_AttributeMeter::IsMetricValid (const Message_MetricType& theMetric) const
 {
-  return fabs (StartValue (theMetric) - GetUndefinedMetric()) > Precision::Confusion() &&
-         fabs (StopValue (theMetric) - GetUndefinedMetric()) > Precision::Confusion();
+  return fabs (StartValue (theMetric) - UndefinedMetricValue()) > Precision::Confusion() &&
+         fabs (StopValue (theMetric) - UndefinedMetricValue()) > Precision::Confusion();
 }
 
 //=======================================================================
@@ -53,7 +52,7 @@ Standard_Boolean Message_AttributeMeter::IsMetricValid (const Message_MetricType
 Standard_Real Message_AttributeMeter::StartValue (const Message_MetricType& theMetric) const
 {
   if (!HasMetric (theMetric))
-    return GetUndefinedMetric();
+    return UndefinedMetricValue();
 
   return myMetrics.Find (theMetric).first;
 }
@@ -66,7 +65,7 @@ void Message_AttributeMeter::SetStartValue (const Message_MetricType& theMetric,
 {
   if (!HasMetric (theMetric))
   {
-    myMetrics.Bind (theMetric, std::make_pair (theValue, GetUndefinedMetric()));
+    myMetrics.Bind (theMetric, std::make_pair (theValue, UndefinedMetricValue()));
   }
   myMetrics.ChangeFind (theMetric).first = theValue;
 }
@@ -78,7 +77,7 @@ void Message_AttributeMeter::SetStartValue (const Message_MetricType& theMetric,
 Standard_Real Message_AttributeMeter::StopValue (const Message_MetricType& theMetric) const
 {
   if (!HasMetric (theMetric))
-    return GetUndefinedMetric();
+    return UndefinedMetricValue();
 
   return myMetrics.Find (theMetric).second;
 }

@@ -21,13 +21,23 @@
 #include <NCollection_DataMap.hxx>
 #include <Standard.hxx>
 
-//! This class defines level of alerts in the current report.
-//! The first added alert is the root alert, next alerts are children of the root alert.
+//! This class is an instance of Sentry to create a level in a message report
+//! Constructor of the class add new (active) level in the report, destructor removes it
+//! While the level is active in the report, new alerts are added below the level root alert.
+//!
+//! The first added alert is a root alert, other are added below the root alert
+//!
+//! If alert has Message_AttributeMeter attribute, active metrics of the default report are stored in
+//! the attriute: start value of metric on adding alert, stop on adding another alert or closing (delete) the level
+//! in the report.
+//!
+//! Processing of this class is implemented in Message_Report, it is used only insided it.
+//! Levels using should be only through using MESSAGE_ADD_LEVEL_SENTRY only. No other code is required outside.
 class Message_Level
 {
 
 public:
-  //! Constructs and starts (if autoStart is true) the named meter
+  //! Constructor. Append
   //! One string key is used for all alert meters. The perf meter is not started automatically, it will be done in
   //! AddAlert method
   Standard_EXPORT Message_Level();
@@ -35,59 +45,55 @@ public:
   //! Assures stopping upon destruction
   Standard_EXPORT ~Message_Level();
 
-  //! Returns message alert on the level, by default the upper alert is returned
-  //! \param theLevelId a level of child position inside the upper alert of performance meter
-  //! \return alert instance or NULL
+  //! Returns root alert of the level
+  //! @return alert instance or NULL
   Handle(Message_AlertExtended) RootAlert() const { return myRootAlert; }
 
-  //! Returns message alert on the level, by default the upper alert is returned
-  //! \param theLevelId a level of child position inside the upper alert of performance meter
-  //! \return alert instance or NULL
+  //! Sets the root alert. Starts collects alert metrics if active.
+  //! @param theAlert an alert  
   Standard_EXPORT void SetRootAlert (const Handle(Message_AlertExtended)& theAlert);
 
-  //! Processes the parameter alert. There are some variants:
-  //! - current alert is NULL, the alert becomes the current one and perf meter is started
-  //! - last alert of the current alert is stopped (perf meter becomes NULL, time is calculated),
-  //! the parameter alert is started (perf meter becomes the current one)
+  //! Adds new alert on the level. Stops the last alert metric, appends the alert and starts the alert metrics collecting.
+  //! Sets root alert beforehead this method using, if the root is NULL, it does nothing.
+  //! @param theGravity an alert gravity
+  //! @param theAlert an alert  
+  //! @return true if alert is added
   Standard_EXPORT Standard_Boolean AddAlert (const Message_Gravity theGravity,
                                              const Handle(Message_Alert)& theAlert);
 
-  //! Add level alert, that is placed under the previous last alert if exists or under the root alert
+  //! Add new alert as a child of the last alert if exists or as a child of the root alert.
+  //! @param theGravity an alert gravity
+  //! @param theAlert an alert  
+  //! @return true if alert is added
   Standard_EXPORT Standard_Boolean AddLevelAlert (const Message_Gravity theGravity,
                                                   const Handle(Message_Alert)& theAlert);
 
-  //! Remove the current level from the report
+  //! Remove the current level from the report. It stops metric collecting for the last and the root alerts.
   Standard_EXPORT void Remove();
 
 protected:
-  //! Sets stop time into the alert
-  //! \param theAlert a level of child position inside the upper alert of performance meter
-  Standard_Boolean startAlert (const Handle(Message_AlertExtended)& theAlert);
+  //! Sets start values of default report metrics into the alert
+  //! @param theAlert an alert  
+  void startAlert (const Handle(Message_AlertExtended)& theAlert) { setAlertMetrics (theAlert, Standard_True); }
 
-  //! Sets start time into the alert
-  //! \param theAlert a level of child position inside the upper alert of performance meter
-  Standard_Boolean stopAlert (const Handle(Message_AlertExtended)& theAlert);
+  //! Sets stop values of default report metrics into the alert
+  //! @param theAlert an alert  
+  void stopAlert (const Handle(Message_AlertExtended)& theAlert) { setAlertMetrics (theAlert, Standard_True); }
 
-  //! Fills the alert with metric values
-  //! \param theAlert a level of child position inside the upper alert of performance meter
-  //! \param theStartValue flag whether the computed value is the start value, if false, stop value is filled
-  //! \return true if the alert is filled
-  Standard_Boolean setAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
-                                    const Standard_Boolean theStartValue);
+  //! Sets current values of default report metrics into the alert.
+  //! Processed oly alert with Message_AttributeMeter attribute
+  //! @param theAlert an alert  
+  //! @param theStartValue flag, if true, the start value is collected otherwise stop
+  void setAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
+                        const Standard_Boolean theStartValue);
 
 protected:
-  Handle(Message_AlertExtended) myRootAlert; //!< root alerts
-  Handle(Message_AlertExtended) myLastAlert; //!< last added alert
+  Handle(Message_AlertExtended) myRootAlert; //!< root alert
+  Handle(Message_AlertExtended) myLastAlert; //!< last added alert on the root alert
 };
 
 //! @def MESSAGE_NEW_LEVEL
 //! Creates a new level instance of Sentry. This row should be inserted before messages using in the method.
 #define MESSAGE_ADD_LEVEL_SENTRY Message_Level aLevel;
-
-//! @def MESSAGE_NEW_LEVEL
-//! Removed the current level from report. It is not necessary to call it as the level will be removed at the method end.
-//! This macro might be useful for creation several levels in one method to remove previous and add new one.
-#define MESSAGE_REMOVE_LEVEL_SENTRY() aLevel.Remove();
-
 
 #endif // _Message_Level_HeaderFile

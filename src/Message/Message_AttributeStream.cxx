@@ -1,6 +1,4 @@
-// Created on: 2018-06-10
-// Created by: Natalia Ermolaeva
-// Copyright (c) 2017 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -14,10 +12,6 @@
 // commercial license or contractual agreement.
 
 #include <Message_AttributeStream.hxx>
-
-#include <Message.hxx>
-#include <Message_Msg.hxx>
-#include <Message_Report.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Message_AttributeStream, Message_Attribute)
 

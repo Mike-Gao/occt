@@ -59,6 +59,9 @@ public:
   //! It can be customized according to the application needs.
   Standard_EXPORT static const Handle(Message_Messenger)& DefaultMessenger();
 
+  //! Sets default messenger for OCCT applications.
+  Standard_EXPORT static void SetDefaultMessenger (const Handle(Message_Messenger)& theMessenger);
+
   //! returns the only one instance of Report
   //! When theToCreate is true - automatically creates message report when not exist.
   //! that has been created.
@@ -94,15 +97,15 @@ public:
   }
 
   //! Converts message metric to OSD memory info type.
-  //! \param theMetric [in] message metric
-  //! \param theMemInfo [out] filled memory info type
-  //! \return true if converted
+  //! @param theMetric [in] message metric
+  //! @param theMemInfo [out] filled memory info type
+  //! @return true if converted
   static Standard_EXPORT Standard_Boolean ToOSDMetric (const Message_MetricType theMetric, OSD_MemInfo::Counter& theMemInfo);
 
   //! Converts OSD memory info type to message metric.
-  //! \param theMemInfo [int] memory info type
-  //! \param theMetric [out] filled message metric
-  //! \return true if converted
+  //! @param theMemInfo [int] memory info type
+  //! @param theMetric [out] filled message metric
+  //! @return true if converted
   static Standard_EXPORT Standard_Boolean ToMessageMetric (const OSD_MemInfo::Counter theMemInfo, Message_MetricType& theMetric);
 
 protected:
