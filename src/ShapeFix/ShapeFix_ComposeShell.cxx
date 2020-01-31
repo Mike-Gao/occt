@@ -983,15 +983,16 @@ ShapeFix_WireSegment ShapeFix_ComposeShell::SplitWire (ShapeFix_WireSegment &wir
       else {
         currPnt2d = C2d->Value(currPar);
         currPnt = myGrid->Value ( currPnt2d );
-        if ( currPnt.Distance ( lastVPnt ) <= lastVTol && 
-            lastPnt.Distance ( currPnt ) <= tol && 
+        if ( (currPnt.Distance ( lastVPnt ) <= lastVTol || 
+            lastPnt.Distance ( currPnt ) <= tol ) && 
             // Tolerance is increased to prevent degenerated cuts in cases where all vertex
             // tolerance is covered by distance of the edge curve from vertex point.
             // Doubled to prevent edge being fully covered by its vertices tolerance (invalid edge).
-            CheckByCurve3d ( lastVPnt, c3d, f3d+(currPar-firstPar)*(l3d-f3d)/span2d, 
-                            T, lastVTol + 2 * Precision::Confusion() ) && 
-            lastPnt.Distance ( myGrid->Value ( C2d->Value(0.5*(currPar+lastPar)) ) ) <= tol ) {
+            (CheckByCurve3d ( lastVPnt, c3d, f3d+(currPar-firstPar)*(l3d-f3d)/span2d, 
+                            T, lastVTol + 2 * Precision::Confusion() ) || 
+            lastPnt.Distance ( myGrid->Value ( C2d->Value(0.5*(currPar+lastPar)) ) ) <= lastVTol )) {
           V = lastV;
+          tol = lastVTol;
           Standard_Real uRes = myUResolution;
           Standard_Real vRes = myVResolution;
           if(isCutByU) {
@@ -1002,19 +1003,20 @@ ShapeFix_WireSegment ShapeFix_ComposeShell::SplitWire (ShapeFix_WireSegment &wir
             Standard_Real gridRes = GetGridResolution(myGrid->VJointValues(),cutIndex)/tol;
             vRes = Min(myVResolution,gridRes);
           }
-          if ( IsCoincided ( lastPnt2d, currPnt2d, uRes, vRes, tol ) &&
-               IsCoincided ( lastPnt2d, C2d->Value(0.5*(currPar+lastPar)), uRes, vRes, tol ) )
+          /*if ( IsCoincided ( lastPnt2d, currPnt2d, uRes, vRes, tol ) &&
+               IsCoincided ( lastPnt2d, C2d->Value(0.5*(currPar+lastPar)), uRes, vRes, tol ) )*/
             doCut = Standard_False;
         }
-        else if ( currPnt.Distance ( prevVPnt ) <= prevVTol && 
-                 prevPnt.Distance ( currPnt ) <= tol && 
+        else if ( (currPnt.Distance ( prevVPnt ) <= prevVTol || 
+                 prevPnt.Distance ( currPnt ) <= tol )&& 
                  // Tolerance is increased to prevent degenerated cuts in cases where all vertex
                  // tolerance is covered by distance of the edge curve from vertex point.
                  // Doubled to prevent edge being fully covered by its vertices tolerance (invalid edge).
-                 CheckByCurve3d ( prevVPnt, c3d, f3d+(currPar-firstPar)*(l3d-f3d)/span2d, 
+                 (CheckByCurve3d ( prevVPnt, c3d, f3d+(currPar-firstPar)*(l3d-f3d)/span2d, 
                                  T, prevVTol + 2 * Precision::Confusion()) &&
-                 prevPnt.Distance ( myGrid->Value ( C2d->Value(0.5*(currPar+prevPar)) ) ) <= tol ) {
+                 prevPnt.Distance ( myGrid->Value ( C2d->Value(0.5*(currPar+prevPar)) ) ) <= prevVTol )) {
           V = prevV;
+          tol = prevVTol;
           Standard_Real uRes = myUResolution;
           Standard_Real vRes = myVResolution;
           if(isCutByU) {
@@ -1025,8 +1027,8 @@ ShapeFix_WireSegment ShapeFix_ComposeShell::SplitWire (ShapeFix_WireSegment &wir
             Standard_Real gridRes = GetGridResolution(myGrid->VJointValues(),cutIndex)/tol;
             vRes = Min(myVResolution,gridRes);
           }
-          if ( IsCoincided ( prevPnt2d, currPnt2d, uRes, vRes, tol ) &&
-               IsCoincided ( prevPnt2d, C2d->Value(0.5*(currPar+prevPar)), uRes, vRes, tol ) ) {
+          /*if ( IsCoincided ( prevPnt2d, currPnt2d, uRes, vRes, tol ) &&
+               IsCoincided ( prevPnt2d, C2d->Value(0.5*(currPar+prevPar)), uRes, vRes, tol ) )*/ {
             vertices.Append ( prevV );
             code = SegmentCodes ( j ); // classification code - update for next segment
             continue; // no splitting at this point, go to next one
@@ -1348,8 +1350,11 @@ Standard_Boolean ShapeFix_ComposeShell::SplitByLine (ShapeFix_WireSegment &wire,
         Standard_Integer i;
         for ( i = 1; i <= Inter.NbPoints(); i++ ) {
           IntRes2d_IntersectionPoint IP = Inter.Point (i);
-          IntLinePar.Append ( IP.ParamOnFirst() );
-          IntEdgePar.Append ( IP.ParamOnSecond() );
+          if( IP.TransitionOfSecond().PositionOnCurve() == IntRes2d_Middle)
+          {
+            IntLinePar.Append ( IP.ParamOnFirst() );
+            IntEdgePar.Append ( IP.ParamOnSecond() );
+          }
         }
         for ( i = 1; i <= Inter.NbSegments(); i++ ) {
           IntRes2d_IntersectionSegment IS = Inter.Segment (i);
