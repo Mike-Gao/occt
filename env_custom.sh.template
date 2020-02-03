@@ -1,0 +1,17 @@
+export aNbJobs=${NUMBER_OF_PROCESSORS}
+export EMSDK_ROOT=`pwd`/fips/fips-sdks/emsdk
+export aBuildRoot=work
+
+export toCMake=1
+export toClean=0
+export toMake=1
+export toInstall=1
+export toPack=0
+
+export BUILD_AppFramework=OFF
+export BUILD_DataExchange=OFF
+export BUILD_Draw=OFF
+export BUILD_FndClasses=ON
+export BUILD_ModAlg=OFF
+export BUILD_ModData=OFF
+export BUILD_Viz=OFF

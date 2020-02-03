@@ -7,28 +7,6 @@ rem to CMake, 3rd-parties and Emscripten SDK.
 rem FreeType and RapidJSON should be specified as mandatory dependency (should be manually build or taken from earlier builds).
 
 set "aCasSrc=%~dp0"
-set aNbJobs=%NUMBER_OF_PROCESSORS%
-
-set "aFreeType=%~dp0..\3rdparty\freetype-2.7.1-wasm"
-set "aRapidJson=%~dp0..\3rdparty\rapidjson-1.1.0"
-set "EMSDK_ROOT=%~dp0..\occ-web3d\fips\fips-sdks\emsdk"
-set "aBuildRoot=work"
-
-rem  build stages to perform
-set "toCMake=1"
-set "toClean=0"
-set "toMake=1"
-set "toInstall=1"
-set "toPack=0"
-
-rem Selection of modules
-set BUILD_AppFramework=ON
-set BUILD_DataExchange=ON
-set BUILD_Draw=OFF
-set BUILD_FndClasses=ON
-set BUILD_ModAlg=ON
-set BUILD_ModData=ON
-set BUILD_Viz=ON
 
 if exist env_custom.bat call env_custom.bat
 
@@ -78,12 +56,6 @@ if ["%toCMake%"] == ["1"] (
  -D INSTALL_DIR:PATH="%aDestDir%" ^
  -D INSTALL_DIR_INCLUDE:STRING="inc" ^
  -D INSTALL_DIR_RESOURCE:STRING="src" ^
- -D 3RDPARTY_FREETYPE_DIR:PATH="%aFreeType%" ^
- -D 3RDPARTY_FREETYPE_INCLUDE_DIR_freetype2:FILEPATH="%aFreeType%/include" ^
- -D 3RDPARTY_FREETYPE_INCLUDE_DIR_ft2build:FILEPATH="%aFreeType%/include" ^
- -D USE_RAPIDJSON:BOOL="ON" ^
- -D 3RDPARTY_RAPIDJSON_DIR:PATH="%aRapidJson%" ^
- -D 3RDPARTY_RAPIDJSON_INCLUDE_DIR:PATH="%aRapidJson%/include" ^
  -D BUILD_MODULE_ApplicationFramework:BOOL="%BUILD_AppFramework%" ^
  -D BUILD_MODULE_DataExchange:BOOL="%BUILD_DataExchange%" ^
  -D BUILD_MODULE_Draw:BOOL="%BUILD_Draw%" ^
