@@ -372,8 +372,53 @@ static int OCC105(Draw_Interpretor& di, Standard_Integer argc, const char ** arg
 
 }
 
-#include <TColStd_SequenceOfTransient.hxx>
+#include<Geom_Circle.hxx>
+#include<Geom_BezierCurve.hxx>
 #include <GeomFill_Pipe.hxx>
+#include<Geom_TrimmedCurve.hxx>
+#include<GeomConvert.hxx>
+#include<BRepBuilderAPI_MakeFace.hxx>
+#include<Adaptor3d_HCurve.hxx>
+#include<BRepAdaptor_HCurve.hxx>
+#include<Geom_Line.hxx>
+#include<BRepBuilderAPI_MakeEdge.hxx>
+#include<BRepAdaptor_HCompCurve.hxx>
+Standard_Integer OCC31217(Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
+{
+	TColgp_Array1OfPnt pathPoles(1, 4);
+	pathPoles(1) = gp_Pnt(0, 0, 0);
+	pathPoles(2) = gp_Pnt(100, 0, 0);
+	pathPoles(3) = gp_Pnt(100, 100, 0);
+	pathPoles(4) = gp_Pnt(0, 99, 0);
+
+	Handle(Geom_BezierCurve) path = new Geom_BezierCurve(pathPoles);
+
+	Handle(Geom_Curve) c1 = GeomConvert::CurveToBSplineCurve(new Geom_TrimmedCurve(new Geom_Circle(gp_Ax2(gp::Origin(), gp::DX()), 10.0), 0, 2 * M_PI), Convert_Polynomial);
+	Handle(Geom_Curve) c2 = GeomConvert::CurveToBSplineCurve(new Geom_TrimmedCurve(new Geom_Circle(gp_Ax2(gp::Origin(), gp::DX()), 10.0), 0, 2 * M_PI), Convert_Polynomial);
+
+	GeomFill_Pipe pipe(path, c1, c2);
+	pipe.Perform();
+
+	Handle(Geom_Surface) pipeSurf = pipe.Surface();
+
+	DrawTrSurf::Set("c1", c1);
+	DrawTrSurf::Set("c2", c2);
+	DrawTrSurf::Set("bc", path);
+	DrawTrSurf::Set("surf", pipeSurf);
+
+	TopoDS_Shape surfFace = BRepBuilderAPI_MakeFace(pipeSurf, Precision::Confusion());
+
+	Handle(AIS_InteractiveContext) myAISContext = ViewerTest::GetAISContext();
+	Handle(AIS_Shape) aShape = new AIS_Shape(surfFace);
+	myAISContext->Display(aShape, AIS_Shaded, 0, true);
+
+	return 0;
+}
+
+
+
+#include <TColStd_SequenceOfTransient.hxx>
+
 static int pipe_OCC9 (Draw_Interpretor& di,
 		      Standard_Integer n, const char ** a)
 {
@@ -4873,5 +4918,6 @@ void QABugs::Commands_11(Draw_Interpretor& theCommands) {
   theCommands.Add("CR23403", "CR23403 string", __FILE__, CR23403, group);
   theCommands.Add("OCC23429", "OCC23429 res shape tool [appr]", __FILE__, OCC23429, group);
   theCommands.Add("OCC28478", "OCC28478 [nb_outer=3 [nb_inner=2] [-inf]: test progress indicator on nested cycles", __FILE__, OCC28478, group);
+  theCommands.Add("OCC31217", "OCC31217", __FILE__, OCC31217, group);
   return;
 }
