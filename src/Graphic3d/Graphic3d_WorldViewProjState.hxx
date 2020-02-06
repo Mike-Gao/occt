@@ -149,6 +149,14 @@ public:
     myProjectionState = theOther.myProjectionState;
     myWorldViewState  = theOther.myWorldViewState;
   }
+  
+  void DumpJson (Standard_OStream& theOStream, Standard_Integer /*theDepth*/) const
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsValid)
+    OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myCamera)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myProjectionState)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myWorldViewState)
+  }
 
 private:
 
