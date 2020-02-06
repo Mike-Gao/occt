@@ -1083,3 +1083,39 @@ void Graphic3d_CView::SetShadingModel (Graphic3d_TypeOfShadingModel theModel)
 
   myShadingModel = theModel;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_CView::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_DataStructureManager);
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myId)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myRenderParams)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBgColor)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myStructureManager)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCamera.get())
+
+  for (Graphic3d_SequenceOfStructure::Iterator anIter (myStructsToCompute); anIter.More(); anIter.Next())
+  {
+    Handle(Graphic3d_Structure) aStructToCompute = anIter.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aStructToCompute.get())
+  }
+
+  for (Graphic3d_SequenceOfStructure::Iterator anIter (myStructsComputed); anIter.More(); anIter.Next())
+  {
+    Handle(Graphic3d_Structure) aStructComputed = anIter.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aStructComputed.get())
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsInComputedMode)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsActive)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsRemoved)
+  
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myShadingModel)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVisualization)
+}
