@@ -58,6 +58,9 @@ public:
 
   SelectMgr_Frustum() : SelectMgr_BaseFrustum() {};
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
+
 protected:
 
   // SAT Tests for different objects
