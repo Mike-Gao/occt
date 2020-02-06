@@ -281,3 +281,28 @@ void Graphic3d_GraphicDriver::SetZLayerSettings (const Graphic3d_ZLayerId theLay
                          "Graphic3d_GraphicDriver::SetZLayerSettings, Layer with theLayerId does not exist");
   aLayerDef->SetLayerSettings (theSettings);
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Graphic3d_GraphicDriver::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myStructGenId)
+
+  for (NCollection_List<Handle(Graphic3d_Layer)>::Iterator anIter (myLayers); anIter.More(); anIter.Next())
+  {
+    Handle(Graphic3d_Layer) aLayer = anIter.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aLayer.get())
+  }
+  
+  for (NCollection_DataMap<Graphic3d_ZLayerId, Handle(Graphic3d_Layer)>::Iterator anIter (myLayerIds); anIter.More(); anIter.Next())
+  {
+    Handle(Graphic3d_Layer) aLayerId = anIter.Value();
+    Graphic3d_ZLayerId aZLayerId = anIter.Key();
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aZLayerId)
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aLayerId.get())
+  }
+}

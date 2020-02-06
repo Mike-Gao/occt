@@ -246,3 +246,27 @@ void Graphic3d_CLight::SetRange (Standard_ShortReal theValue)
   updateRevisionIf (Abs (Range() - theValue) > ShortRealEpsilon());
   myDirection.w() = theValue;
 };
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_CLight::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myId)
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myName)
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPosition)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myColor)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myDirection)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParams)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySmoothness)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIntensity)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myType)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRevision)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsHeadlight)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsEnabled)
+}
