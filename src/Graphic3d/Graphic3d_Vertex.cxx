@@ -15,9 +15,20 @@
 
 #include <Graphic3d_Vertex.hxx>
 
+#include <Standard_Dump.hxx>
+
 Standard_ShortReal Graphic3d_Vertex::Distance(const Graphic3d_Vertex& AOther) const
 {
   return sqrt( (X() - AOther.X()) * (X() - AOther.X())
 		     + (Y() - AOther.Y()) * (Y() - AOther.Y())
 		     + (Z() - AOther.Z()) * (Z() - AOther.Z()) );
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Graphic3d_Vertex::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_VECTOR_CLASS (theOStream, "Graphic3d_Vertex", 3, xyz[0], xyz[1], xyz[2])
 }

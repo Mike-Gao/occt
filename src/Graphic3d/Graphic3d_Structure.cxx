@@ -1037,9 +1037,23 @@ void Graphic3d_Structure::SetZLayer (const Graphic3d_ZLayerId theLayerId)
 void Graphic3d_Structure::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
   OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myStructureManager)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myCStructure)
 
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCStructure.get())
+  for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (myAncestors); anIter.More(); anIter.Next())
+  {
+    Graphic3d_Structure* anAncestor = anIter.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anAncestor)
+  }
 
+  for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (myDescendants); anIter.More(); anIter.Next())
+  {
+    Graphic3d_Structure* aDescendant = anIter.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aDescendant)
+  }
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOwner)
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVisual)
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myComputeVisual)
 }

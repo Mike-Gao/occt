@@ -33,6 +33,9 @@ class Graphic3d_DataStructureManager : public Standard_Transient
 {
 
 public:
+  
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
   DEFINE_STANDARD_RTTIEXT(Graphic3d_DataStructureManager,Standard_Transient)
 
