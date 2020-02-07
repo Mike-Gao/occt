@@ -390,6 +390,9 @@ Standard_Integer OCC31217(Draw_Interpretor& di, Standard_Integer argc, const cha
 	pathPoles(2) = gp_Pnt(100, 0, 0);
 	pathPoles(3) = gp_Pnt(100, 100, 0);
 	pathPoles(4) = gp_Pnt(0, 99, 0);
+	//pathPoles(4) = gp_Pnt(-100, 50, 0);
+	//pathPoles(3) = gp_Pnt(-100, 10, 0);
+
 
 	Handle(Geom_BezierCurve) path = new Geom_BezierCurve(pathPoles);
 
@@ -406,11 +409,11 @@ Standard_Integer OCC31217(Draw_Interpretor& di, Standard_Integer argc, const cha
 	DrawTrSurf::Set("bc", path);
 	DrawTrSurf::Set("surf", pipeSurf);
 
-	TopoDS_Shape surfFace = BRepBuilderAPI_MakeFace(pipeSurf, Precision::Confusion());
+	/*TopoDS_Shape surfFace = BRepBuilderAPI_MakeFace(pipeSurf, Precision::Confusion());
 
 	Handle(AIS_InteractiveContext) myAISContext = ViewerTest::GetAISContext();
 	Handle(AIS_Shape) aShape = new AIS_Shape(surfFace);
-	myAISContext->Display(aShape, AIS_Shaded, 0, true);
+	myAISContext->Display(aShape, AIS_Shaded, 0, true);*/
 
 	return 0;
 }
