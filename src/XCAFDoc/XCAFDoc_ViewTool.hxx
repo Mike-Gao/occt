@@ -86,6 +86,11 @@ public:
   //! Set Clipping planes to  given View
   Standard_EXPORT void SetClippingPlanes(const TDF_LabelSequence& theClippingPlaneLabels,
                                          const TDF_Label& theViewL) const;
+
+  //! Set Sections to  given View
+  Standard_EXPORT void SetSections(const TDF_LabelSequence& theSectionsLabels,
+                                   const TDF_Label& theViewL) const;
+
   Standard_EXPORT void  SetEnabledShapes(const TDF_LabelSequence& theShapesTransparencyLabels,
                                          const TDF_Label& theViewL) const;
 
@@ -128,6 +133,10 @@ public:
   //! Returns ClippingPlane labels defined for label theViewL
   //! Returns False if the theViewL is not in View table
   Standard_EXPORT Standard_Boolean GetRefClippingPlaneLabel(const TDF_Label& theViewL, TDF_LabelSequence& theClippingPlaneLabels) const;
+
+  //! Returns Sections labels defined for label theViewL
+  //! Returns False if the theViewL is not in View table
+  Standard_EXPORT Standard_Boolean GetRefSectionsLabels(const TDF_Label& theViewL, TDF_LabelSequence& theSectionsLabels) const;
 
   //! Returns shapes transparency labels defined for label theViewL
   //! Returns False if the theViewL is not in View table

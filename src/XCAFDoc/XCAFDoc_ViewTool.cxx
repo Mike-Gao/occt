@@ -464,6 +464,46 @@ void XCAFDoc_ViewTool::SetClippingPlanes(const TDF_LabelSequence& theClippingPla
     aChGNode->SetFather(aPlaneGNode);
   }
 }
+
+//=======================================================================
+//function : SetSections
+//purpose  : 
+//=======================================================================
+void XCAFDoc_ViewTool::SetSections(const TDF_LabelSequence& theSectionsLabels,
+                                         const TDF_Label& theViewL) const
+{
+  if (!IsView(theViewL))
+    return;
+
+  Handle(XCAFDoc_GraphNode) aChGNode;
+  Handle(XCAFDoc_GraphNode) aSectionGNode;
+
+  if (theViewL.FindAttribute(XCAFDoc::ViewRefSectionGUID(), aChGNode)) {
+    while (aChGNode->NbFathers() > 0) {
+      aSectionGNode = aChGNode->GetFather(1);
+      aSectionGNode->UnSetChild(aChGNode);
+      if (aSectionGNode->NbChildren() == 0)
+        aSectionGNode->ForgetAttribute(XCAFDoc::ViewRefSectionGUID());
+    }
+    theViewL.ForgetAttribute(XCAFDoc::ViewRefSectionGUID());
+  }
+
+  if (!theViewL.FindAttribute(XCAFDoc::ViewRefSectionGUID(), aChGNode) && theSectionsLabels.Length() > 0) {
+    aChGNode = new XCAFDoc_GraphNode;
+    aChGNode = XCAFDoc_GraphNode::Set(theViewL);
+    aChGNode->SetGraphID(XCAFDoc::ViewRefSectionGUID());
+  }
+  for (Standard_Integer i = theSectionsLabels.Lower(); i <= theSectionsLabels.Upper(); i++) {
+    if (!theSectionsLabels.Value(i).FindAttribute(XCAFDoc::ViewRefSectionGUID(), aSectionGNode)) {
+      aSectionGNode = new XCAFDoc_GraphNode;
+      aSectionGNode = XCAFDoc_GraphNode::Set(theSectionsLabels.Value(i));
+    }
+    aSectionGNode->SetGraphID(XCAFDoc::ViewRefSectionGUID());
+    aSectionGNode->SetChild(aChGNode);
+    aChGNode->SetFather(aSectionGNode);
+  }
+}
+
 //=======================================================================
 //function : SetEnabledShapes
 //purpose  : 
@@ -654,6 +694,29 @@ Standard_Boolean XCAFDoc_ViewTool::GetRefClippingPlaneLabel(const TDF_Label& the
   }
 
   theClippingPlaneLabels.Append(aNode->Father()->Label());
+  return Standard_True;
+}
+
+//=======================================================================
+//function : GetRefSectionsLabels
+//purpose  : 
+//=======================================================================
+Standard_Boolean XCAFDoc_ViewTool::GetRefSectionsLabels(const TDF_Label& theViewL,
+                                                        TDF_LabelSequence& theSectionsLabels) const
+{
+  theSectionsLabels.Clear();
+  Handle(TDataStd_TreeNode) aNode;
+  if (!theViewL.FindAttribute(XCAFDoc::ViewRefGUID(), aNode) || !aNode->HasFather()) {
+    Handle(XCAFDoc_GraphNode) aGNode;
+    if (theViewL.FindAttribute(XCAFDoc::ViewRefSectionGUID(), aGNode) && aGNode->NbFathers() > 0) {
+      for (Standard_Integer i = 1; i <= aGNode->NbFathers(); i++)
+        theSectionsLabels.Append(aGNode->GetFather(i)->Label());
+      return Standard_True;
+    } else
+      return Standard_False;
+  }
+
+  theSectionsLabels.Append(aNode->Father()->Label());
   return Standard_True;
 }
 
