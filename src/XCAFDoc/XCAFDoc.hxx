@@ -123,6 +123,9 @@ public:
   //! Return GUIDs for TreeNode representing specified types of View
   Standard_EXPORT static const Standard_GUID& ViewRefPlaneGUID();
 
+  //! Return GUIDs for GraphNode representing Section
+  Standard_EXPORT static const Standard_GUID& ViewRefSectionGUID();
+
   //! Return GUIDs for GraphNode representing specified types of View
   Standard_EXPORT static const Standard_GUID& ViewRefNoteGUID();
 

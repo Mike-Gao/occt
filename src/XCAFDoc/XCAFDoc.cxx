@@ -263,6 +263,17 @@ const Standard_GUID& XCAFDoc::ViewRefPlaneGUID()
 }
 
 //=======================================================================
+//function : ViewRefSectionGUID
+//purpose  : 
+//=======================================================================
+
+const Standard_GUID& XCAFDoc::ViewRefSectionGUID()
+{
+  static const Standard_GUID ID("25709d87-4b29-49cd-9982-1a71e34e43fa");
+  return ID;
+}
+
+//=======================================================================
 //function : ViewRefNoteGUID
 //purpose  : 
 //=======================================================================
