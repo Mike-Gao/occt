@@ -84,6 +84,12 @@ public:
   //! The sequence can be modified.
   Message_SequenceOfPrinters& ChangePrinters() { return myPrinters; }
 
+  //! Returns the output gavity used in operator <<
+  Message_Gravity OuputGravity() const { return myOutputGravity; }
+
+  //! Sets the output gavity used in operator <<
+  void SetOuputGravity (const Message_Gravity theValue) { myOutputGravity = theValue; }
+
   //! Dispatch a message to all the printers in the list.
   //! Three versions of string representations are accepted for
   //! convenience, by default all are converted to ExtendedString.
@@ -98,17 +104,23 @@ public:
   //! See above
   Standard_EXPORT void Send (const TCollection_ExtendedString& theString, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
 
+  //! See above
+  Standard_EXPORT void Send (const Standard_SStream& theStream, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
+
+  //! See above
+  Standard_EXPORT void Send (const Handle(Standard_Transient)& theObject, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
+
 private:
 
   Message_SequenceOfPrinters myPrinters;
-
+  Message_Gravity myOutputGravity; //!< gravity used in operator <<
 };
 
 // CString
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Standard_CString theStr)
 {
-  theMessenger->Send (theStr, Message_Info, Standard_False);
+  theMessenger->Send (theStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -116,7 +128,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const TCollection_AsciiString& theStr)
 {
-  theMessenger->Send (theStr, Message_Info, Standard_False);
+  theMessenger->Send (theStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -124,7 +136,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Handle(TCollection_HAsciiString)& theStr)
 {
-  theMessenger->Send (theStr->String(), Message_Info, Standard_False);
+  theMessenger->Send (theStr->String(), theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -132,7 +144,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const TCollection_ExtendedString& theStr)
 {
-  theMessenger->Send (theStr, Message_Info, Standard_False);
+  theMessenger->Send (theStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -140,7 +152,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Handle(TCollection_HExtendedString)& theStr)
 {
-  theMessenger->Send (theStr->String(), Message_Info, Standard_False);
+  theMessenger->Send (theStr->String(), theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -149,7 +161,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
                                                     const Standard_Integer theVal)
 {
   TCollection_AsciiString aStr (theVal);
-  theMessenger->Send (aStr, Message_Info, Standard_False);
+  theMessenger->Send (aStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -158,7 +170,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
                                                     const Standard_Real theVal)
 {
   TCollection_AsciiString aStr (theVal);
-  theMessenger->Send (aStr, Message_Info, Standard_False);
+  theMessenger->Send (aStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -166,7 +178,15 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Standard_SStream& theStream)
 {
-  theMessenger->Send (theStream.str().c_str(), Message_Info, Standard_False);
+  theMessenger->Send (theStream, theMessenger->OuputGravity(), Standard_False);
+  return theMessenger;
+}
+
+// AsciiString
+inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
+                                                    const Handle(Standard_Transient)& theObject)
+{
+  theMessenger->Send (theObject, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -181,7 +201,7 @@ inline const Handle(Message_Messenger)&
 // Message_EndLine
 inline const Handle(Message_Messenger)& Message_EndLine (const Handle(Message_Messenger)& theMessenger)
 {
-  theMessenger->Send ("", Message_Info, Standard_True);
+  theMessenger->Send ("", theMessenger->OuputGravity(), Standard_True);
   return theMessenger;
 }
 

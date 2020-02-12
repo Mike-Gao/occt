@@ -14,9 +14,17 @@
 // commercial license or contractual agreement.
 
 #include <Message_Report.hxx>
+
+#include <Message.hxx>
+#include <Message_AlertExtended.hxx>
+#include <Message_CompositeAlerts.hxx>
 #include <Message_Msg.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_PrinterToReport.hxx>
+
 #include <NCollection_Map.hxx>
+#include <Precision.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 
@@ -26,6 +34,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 //=======================================================================
 
 Message_Report::Message_Report ()
+: myLimit (-1)
 {
 }
 
@@ -36,28 +45,50 @@ Message_Report::Message_Report ()
 
 void Message_Report::AddAlert (Message_Gravity theGravity, const Handle(Message_Alert)& theAlert)
 {
-  Standard_ASSERT_RETURN (! theAlert.IsNull(), "Attempt to add null alert",);
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Adding alert with gravity not in valid range",);
-
   Standard_Mutex::Sentry aSentry (myMutex);
 
-  // iterate by already recorded alerts and try to merge new one with one of those
-  Message_ListOfAlert &aList = myAlerts[theGravity];
-  if (theAlert->SupportsMerge() && ! aList.IsEmpty())
+   // alerts of the top level
+  if (myAlertLevels.IsEmpty())
   {
-    // merge is performed only for alerts of exactly same type
-    const Handle(Standard_Type)& aType = theAlert->DynamicType();
-    for (Message_ListOfAlert::Iterator anIt(aList); anIt.More(); anIt.Next())
+    Handle (Message_CompositeAlerts) aCompositeAlert = compositeAlerts (Standard_True);
+    if (aCompositeAlert->AddAlert (theGravity, theAlert))
+      return;
+
+    // remove alerts under the report only
+    const Message_ListOfAlert& anAlerts = aCompositeAlert->Alerts (theGravity);
+    if (anAlerts.Extent() > myLimit)
     {
-      // if merged successfully, just return
-      if (aType == anIt.Value()->DynamicType() && theAlert->Merge (anIt.Value()))
-        return;
+      aCompositeAlert->RemoveAlert (theGravity, anAlerts.First());
     }
+    return;
   }
 
-  // if not merged, just add to the list
-  aList.Append (theAlert);
+  // if there are some levels of alerts
+  // iterate by already recorded alerts and try to merge new one with one of those
+  Message_Level* aLevel = myAlertLevels.Last();
+
+  // level has root alert, the new alert will be placed below the root
+  if (!aLevel->RootAlert().IsNull())
+  {
+    aLevel->AddAlert (theGravity, theAlert);
+    return;
+  }
+
+  Handle(Message_AlertExtended) anAlert = Handle(Message_AlertExtended)::DownCast (theAlert);
+  if (anAlert.IsNull())
+    return;
+  // place new alert as a root of the level, after place the level alert below the report or
+  // below the previous level
+  aLevel->SetRootAlert (anAlert);
+
+  if (myAlertLevels.Size() == 1) // this is the first level, so root alert should be pushed in the report composite of alerts
+    compositeAlerts (Standard_True)->AddAlert (theGravity, theAlert);
+  else
+  {
+    // root alert of next levels should be pushed under the previous level
+    Message_Level* aPrevLevel = myAlertLevels.Value (myAlertLevels.Size() - 1); // previous level
+    aPrevLevel->AddLevelAlert (theGravity, theAlert);
+  }
 }
 
 //=======================================================================
@@ -68,9 +99,10 @@ void Message_Report::AddAlert (Message_Gravity theGravity, const Handle(Message_
 const Message_ListOfAlert& Message_Report::GetAlerts (Message_Gravity theGravity) const
 {
   static const Message_ListOfAlert anEmptyList;
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Requesting alerts for gravity not in valid range", anEmptyList);
-  return myAlerts[theGravity];
+  if (myCompositAlerts.IsNull())
+    return anEmptyList;
+
+  return myCompositAlerts->Alerts (theGravity);
 }
 
 //=======================================================================
@@ -80,9 +112,9 @@ const Message_ListOfAlert& Message_Report::GetAlerts (Message_Gravity theGravity
 
 Standard_Boolean Message_Report::HasAlert (const Handle(Standard_Type)& theType)
 {
-  for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
+  for (int aGravIter = Message_Trace; aGravIter <= Message_Fail; ++aGravIter)
   {
-    if (HasAlert (theType, (Message_Gravity)iGravity))
+    if (HasAlert (theType, (Message_Gravity)aGravIter))
       return Standard_True;
   }
   return Standard_False;
@@ -95,14 +127,89 @@ Standard_Boolean Message_Report::HasAlert (const Handle(Standard_Type)& theType)
 
 Standard_Boolean Message_Report::HasAlert (const Handle(Standard_Type)& theType, Message_Gravity theGravity)
 {
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Requesting alerts for gravity not in valid range", Standard_False);
-  for (Message_ListOfAlert::Iterator anIt (myAlerts[theGravity]); anIt.More(); anIt.Next())
+  if (compositeAlerts().IsNull())
+    return Standard_False;
+
+  return compositeAlerts()->HasAlert (theType, theGravity);
+}
+
+//=======================================================================
+//function : IsActiveInMessenger
+//purpose  :
+//=======================================================================
+
+Standard_Boolean Message_Report::IsActiveInMessenger (const Handle(Message_Messenger)& theMessenger) const
+{
+  Handle(Message_Messenger) aMessenger = theMessenger.IsNull() ? Message::DefaultMessenger() : theMessenger;
+  for (Message_SequenceOfPrinters::Iterator anIterator (aMessenger->Printers()); anIterator.More(); anIterator.Next())
   {
-    if (anIt.Value()->IsInstance(theType))
+    if (anIterator.Value()->IsKind(STANDARD_TYPE (Message_PrinterToReport)) &&
+        Handle(Message_PrinterToReport)::DownCast (anIterator.Value())->Report() == this)
       return Standard_True;
   }
   return Standard_False;
+}
+
+//=======================================================================
+//function : ActivateInMessenger
+//purpose  :
+//=======================================================================
+
+void Message_Report::ActivateInMessenger (const Standard_Boolean toActivate,
+                                          const Handle(Message_Messenger)& theMessenger) const
+{
+  if (toActivate == IsActiveInMessenger())
+    return;
+
+  Handle(Message_Messenger) aMessenger = theMessenger.IsNull() ? Message::DefaultMessenger() : theMessenger;
+  if (toActivate)
+  {
+    Handle (Message_PrinterToReport) aPrinterToReport = new Message_PrinterToReport();
+    aPrinterToReport->SetReport (this);
+    aMessenger->AddPrinter (aPrinterToReport);
+  }
+  else // deactivate
+  {
+    Message_SequenceOfPrinters aPrintersToRemove;
+    for (Message_SequenceOfPrinters::Iterator anIterator (aMessenger->Printers()); anIterator.More(); anIterator.Next())
+    {
+      const Handle(Message_Printer) aPrinter = anIterator.Value();
+      if (aPrinter->IsKind(STANDARD_TYPE (Message_PrinterToReport)) &&
+          Handle(Message_PrinterToReport)::DownCast (aPrinter)->Report() == this)
+        aPrintersToRemove.Append (aPrinter);
+    }
+    for (Message_SequenceOfPrinters::Iterator anIterator (aPrintersToRemove); anIterator.More(); anIterator.Next())
+    {
+      aMessenger->RemovePrinter (anIterator.Value());
+    }
+  }
+}
+
+//=======================================================================
+//function : AddLevel
+//purpose  :
+//=======================================================================
+
+void Message_Report::AddLevel (Message_Level* theLevel)
+{
+  myAlertLevels.Append (theLevel);
+}
+
+//=======================================================================
+//function : RemoveLevel
+//purpose  :
+//=======================================================================
+
+void Message_Report::RemoveLevel (Message_Level* theLevel)
+{
+  for (int aLevelIndex = myAlertLevels.Size(); aLevelIndex >= 1; aLevelIndex--)
+  {
+    Message_Level* aLevel = myAlertLevels.Value (aLevelIndex);
+    myAlertLevels.Remove (aLevelIndex);
+
+    if (aLevel == theLevel)
+      return;
+  }
 }
 
 //=======================================================================
@@ -110,12 +217,13 @@ Standard_Boolean Message_Report::HasAlert (const Handle(Standard_Type)& theType,
 //purpose  :
 //=======================================================================
 
-void Message_Report::Clear ()
+void Message_Report::Clear()
 {
-  for (unsigned int i = 0; i < sizeof(myAlerts)/sizeof(myAlerts[0]); ++i)
-  {
-    myAlerts[i].Clear();
-  }
+  if (compositeAlerts().IsNull())
+    return;
+
+  compositeAlerts()->Clear();
+  myAlertLevels.Clear();
 }
 
 //=======================================================================
@@ -125,9 +233,11 @@ void Message_Report::Clear ()
 
 void Message_Report::Clear (Message_Gravity theGravity)
 {
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Requesting alerts for gravity not in valid range", );
-  myAlerts[theGravity].Clear();
+  if (compositeAlerts().IsNull())
+    return;
+
+  compositeAlerts()->Clear (theGravity);
+  myAlertLevels.Clear();
 }
 
 //=======================================================================
@@ -137,20 +247,28 @@ void Message_Report::Clear (Message_Gravity theGravity)
 
 void Message_Report::Clear (const Handle(Standard_Type)& theType)
 {
-  for (unsigned int i = 0; i < sizeof(myAlerts)/sizeof(myAlerts[0]); ++i)
-  {
-    for (Message_ListOfAlert::Iterator anIt (myAlerts[i]); anIt.More(); )
-    {
-      if (anIt.Value().IsNull() || anIt.Value()->IsInstance (theType))
-      {
-        myAlerts[i].Remove (anIt);
-      }
-      else
-      {
-        anIt.More();
-      }
-    }
-  }
+  if (compositeAlerts().IsNull())
+    return;
+
+  compositeAlerts()->Clear (theType);
+  myAlertLevels.Clear();
+}
+
+//=======================================================================
+//function : SetActiveMetric
+//purpose  :
+//=======================================================================
+
+void Message_Report::SetActiveMetric (const Message_MetricType theMetricType,
+                                      const Standard_Boolean theActivate)
+{
+  if (theActivate == myActiveMetrics.Contains (theMetricType))
+    return;
+
+  if (theActivate)
+    myActiveMetrics.Add (theMetricType);
+  else
+    myActiveMetrics.Remove (theMetricType);
 }
 
 //=======================================================================
@@ -160,9 +278,9 @@ void Message_Report::Clear (const Handle(Standard_Type)& theType)
 
 void Message_Report::Dump (Standard_OStream& theOS)
 {
-  for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
+  for (int aGravIter = Message_Trace; aGravIter <= Message_Fail; ++aGravIter)
   {
-    Dump (theOS, (Message_Gravity)iGravity);
+    Dump (theOS, (Message_Gravity)aGravIter);
   }
 }
 
@@ -173,19 +291,13 @@ void Message_Report::Dump (Standard_OStream& theOS)
 
 void Message_Report::Dump (Standard_OStream& theOS, Message_Gravity theGravity)
 {
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Requesting alerts for gravity not in valid range", );
+  if (compositeAlerts().IsNull())
+    return;
 
-  // report each type of warning only once
-  NCollection_Map<Handle(Standard_Type)> aPassedAlerts;
-  for (Message_ListOfAlert::Iterator anIt (myAlerts[theGravity]); anIt.More(); anIt.Next())
-  {
-    if (aPassedAlerts.Add (anIt.Value()->DynamicType()))
-    {
-      Message_Msg aMsg (anIt.Value()->GetMessageKey());
-      theOS << aMsg.Original() << std::endl;
-    }
-  }
+  if (compositeAlerts().IsNull())
+    return;
+
+  dumpMessages (theOS, theGravity, compositeAlerts());
 }
 
 //=======================================================================
@@ -195,9 +307,9 @@ void Message_Report::Dump (Standard_OStream& theOS, Message_Gravity theGravity)
 
 void Message_Report::SendMessages (const Handle(Message_Messenger)& theMessenger)
 {
-  for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
+  for (int aGravIter = Message_Trace; aGravIter <= Message_Fail; ++aGravIter)
   {
-    SendMessages (theMessenger, (Message_Gravity)iGravity);
+    SendMessages (theMessenger, (Message_Gravity)aGravIter);
   }
 }
 
@@ -208,19 +320,10 @@ void Message_Report::SendMessages (const Handle(Message_Messenger)& theMessenger
 
 void Message_Report::SendMessages (const Handle(Message_Messenger)& theMessenger, Message_Gravity theGravity)
 {
-  Standard_ASSERT_RETURN (theGravity >= 0 && size_t(theGravity) < sizeof(myAlerts)/sizeof(myAlerts[0]), 
-                          "Requesting alerts for gravity not in valid range", );
+  if (compositeAlerts().IsNull())
+    return;
 
-  // report each type of warning only once
-  NCollection_Map<Handle(Standard_Type)> aPassedAlerts;
-  for (Message_ListOfAlert::Iterator anIt (myAlerts[theGravity]); anIt.More(); anIt.Next())
-  {
-    if (aPassedAlerts.Add (anIt.Value()->DynamicType()))
-    {
-      Message_Msg aMsg (anIt.Value()->GetMessageKey());
-      theMessenger->Send (aMsg, theGravity);
-    }
-  }
+  sendMessages (theMessenger, theGravity, compositeAlerts());
 }
 
 //=======================================================================
@@ -230,9 +333,9 @@ void Message_Report::SendMessages (const Handle(Message_Messenger)& theMessenger
 
 void Message_Report::Merge (const Handle(Message_Report)& theOther)
 {
-  for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
+  for (int aGravIter = Message_Trace; aGravIter <= Message_Fail; ++aGravIter)
   {
-    Merge (theOther, (Message_Gravity)iGravity);
+    Merge (theOther, (Message_Gravity)aGravIter);
   }
 }
 
@@ -246,5 +349,80 @@ void Message_Report::Merge (const Handle(Message_Report)& theOther, Message_Grav
   for (Message_ListOfAlert::Iterator anIt (theOther->GetAlerts(theGravity)); anIt.More(); anIt.Next())
   {
     AddAlert (theGravity, anIt.Value());
+  }
+}
+
+//=======================================================================
+//function : ñompositeAlerts
+//purpose  : 
+//=======================================================================
+const Handle(Message_CompositeAlerts)& Message_Report::compositeAlerts (const Standard_Boolean isCreate)
+{
+  if (myCompositAlerts.IsNull() && isCreate)
+    myCompositAlerts = new Message_CompositeAlerts();
+
+  return myCompositAlerts;
+}
+
+//=======================================================================
+//function : sendMessages
+//purpose  :
+//=======================================================================
+
+void Message_Report::sendMessages (const Handle(Message_Messenger)& theMessenger, Message_Gravity theGravity,
+                                   const Handle(Message_CompositeAlerts)& theCompositeAlert)
+{
+  if (theCompositeAlert.IsNull())
+    return;
+
+  const Message_ListOfAlert& anAlerts = theCompositeAlert->Alerts (theGravity);
+  // report each type of warning only once
+  //NCollection_Map<Handle(Standard_Type)> aPassedAlerts;
+  for (Message_ListOfAlert::Iterator anIt (anAlerts); anIt.More(); anIt.Next())
+  {
+    //if (aPassedAlerts.Add (anIt.Value()->DynamicType()))
+    {
+      //Message_Msg aMsg (anIt.Value()->GetMessageKey());
+      //theMessenger->Send (aMsg, theGravity);
+      theMessenger->Send (anIt.Value()->GetMessageKey(), theGravity);
+    }
+    Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (anIt.Value());
+    if (anExtendedAlert.IsNull())
+      continue;
+
+    Handle(Message_CompositeAlerts) aCompositeAlerts = anExtendedAlert->CompositeAlerts();
+    if (aCompositeAlerts.IsNull())
+      continue;
+
+    sendMessages (theMessenger, theGravity, aCompositeAlerts);
+  }
+}
+
+//=======================================================================
+//function : dumpMessages
+//purpose  :
+//=======================================================================
+void Message_Report::dumpMessages (Standard_OStream& theOS, Message_Gravity theGravity,
+                                   const Handle(Message_CompositeAlerts)& theCompositeAlert)
+{
+  if (theCompositeAlert.IsNull())
+    return;
+
+  const Message_ListOfAlert& anAlerts = theCompositeAlert->Alerts (theGravity);
+  // report each type of war++ning only once
+  //NCollection_Map<Handle(Standard_Type)> aPassedAlerts;
+  for (Message_ListOfAlert::Iterator anIt (anAlerts); anIt.More(); anIt.Next())
+  {
+    //if (aPassedAlerts.Add (anIt.Value()->DynamicType()))
+    {
+      //Message_Msg aMsg (anIt.Value()->GetMessageKey());
+      //theOS << aMsg.Original() << std::endl;
+      theOS << anIt.Value()->GetMessageKey() << std::endl;
+    }
+
+    Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (anIt.Value());
+    if (anExtendedAlert.IsNull())
+      continue;
+    dumpMessages (theOS, theGravity, anExtendedAlert->CompositeAlerts());
   }
 }
