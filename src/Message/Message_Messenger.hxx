@@ -16,6 +16,7 @@
 #ifndef _Message_Messenger_HeaderFile
 #define _Message_Messenger_HeaderFile
 
+//#include <Message.hxx>
 #include <Message_Gravity.hxx>
 #include <Message_SequenceOfPrinters.hxx>
 
@@ -154,6 +155,9 @@ public:
   //! Returns True if printer has been added.
   Standard_EXPORT Standard_Boolean AddPrinter (const Handle(Message_Printer)& thePrinter);
   
+  //! Returns true if messenger printers contain a printer of specified type (including derived classes) 
+  Standard_EXPORT Standard_Boolean HasPrinter (const Handle(Standard_Type)& theType);
+
   //! Removes specified printer from the messenger.
   //! Returns True if this printer has been found in the list
   //! and removed.
@@ -171,6 +175,16 @@ public:
   //! The sequence can be modified.
   Message_SequenceOfPrinters& ChangePrinters() { return myPrinters; }
 
+  //! Sets trace level used for outputting messages
+  //! - 0: no trace at all
+  //! - 1/2/3: messages of the first level are processed
+  //! - -1: all messages are processed
+  //! Default is 0 : no messages are processed
+  void SetTraceLevel (const Standard_Integer theTraceLevel) { myTraceLevel = theTraceLevel; }
+  
+  //! Returns trace level used for outputting messages.
+  Standard_Integer TraceLevel() const { return myTraceLevel; }
+
   //! Dispatch a message to all the printers in the list.
   //! Three versions of string representations are accepted for
   //! convenience, by default all are converted to ExtendedString.
@@ -187,6 +201,13 @@ public:
 
   //! Create string buffer for message of specified type
   StreamBuffer Send (Message_Gravity theGravity) { return StreamBuffer (this, theGravity); }
+
+  //! See above
+  Standard_EXPORT void Send (const Handle(Standard_Transient)& theObject, const Message_Gravity theGravity = Message_Warning) const;
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
 
   //! Create string buffer for sending Fail message
   StreamBuffer SendFail () { return Send (Message_Fail); }
@@ -221,7 +242,7 @@ public:
 private:
 
   Message_SequenceOfPrinters myPrinters;
-
+  Standard_Integer myTraceLevel; //!< leel of processed messages
 };
 
 #endif // _Message_Messenger_HeaderFile

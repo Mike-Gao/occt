@@ -81,6 +81,9 @@ protected:
   //! to the trace level set by SetTraceLevel()
   Standard_EXPORT virtual void send (const TCollection_AsciiString& theString, const Message_Gravity theGravity) const Standard_OVERRIDE;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
+
 private:
 
   Standard_Address myStream;

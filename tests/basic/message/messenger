@@ -1,0 +1,16 @@
+puts "=================================="
+puts ""
+puts "=================================="
+
+#ostream printer
+SetMessagePrinter -type ostream
+DumpMessenger
+SendMessage "processing a text message in ostream" "information message" "error message" "warning message"
+
+#report printer
+SetMessagePrinter -clear
+SetMessagePrinter -type report
+DumpMessenger
+SendMessage "processing a text message in report" "information message" "error message" "warning message"
+
+#WriteMessageReport d:/tmp.xml

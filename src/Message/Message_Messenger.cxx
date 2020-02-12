@@ -18,6 +18,8 @@
 #include <Message_Printer.hxx>
 #include <Message_PrinterOStream.hxx>
 
+#include <Standard_Dump.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(Message_Messenger,Standard_Transient)
 
 //=======================================================================
@@ -25,6 +27,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_Messenger,Standard_Transient)
 //purpose  : 
 //=======================================================================
 Message_Messenger::Message_Messenger ()
+: myTraceLevel (-1)
 {
   AddPrinter ( new Message_PrinterOStream );
 }
@@ -35,6 +38,7 @@ Message_Messenger::Message_Messenger ()
 //=======================================================================
 
 Message_Messenger::Message_Messenger (const Handle(Message_Printer)& thePrinter)
+: myTraceLevel (-1)
 {
   AddPrinter (thePrinter);
 }
@@ -58,6 +62,23 @@ Standard_Boolean Message_Messenger::AddPrinter (const Handle(Message_Printer)& t
 
   myPrinters.Append (thePrinter);
   return Standard_True;
+}
+
+//=======================================================================
+//function : HasPrinters
+//purpose  : 
+//=======================================================================
+Standard_Boolean Message_Messenger::HasPrinter (const Handle(Standard_Type)& theType)
+{
+  for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More();)
+  {
+    const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
+    if (!aPrinter.IsNull() && aPrinter->IsKind (theType))
+    {
+      return Standard_True;
+    }
+  }
+  return Standard_False;
 }
 
 //=======================================================================
@@ -113,6 +134,9 @@ Standard_Integer Message_Messenger::RemovePrinters (const Handle(Standard_Type)&
 void Message_Messenger::Send (const Standard_CString theString,
 			      const Message_Gravity theGravity) const
 {
+  if (TraceLevel() == 0)
+    return;
+
   for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
   {
     const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
@@ -131,6 +155,8 @@ void Message_Messenger::Send (const Standard_CString theString,
 void Message_Messenger::Send (const TCollection_AsciiString& theString,
                               const Message_Gravity theGravity) const
 {
+  if (TraceLevel() == 0)
+    return;
   for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
   {
     const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
@@ -149,6 +175,8 @@ void Message_Messenger::Send (const TCollection_AsciiString& theString,
 void Message_Messenger::Send (const TCollection_ExtendedString& theString,
                               const Message_Gravity theGravity) const
 {
+  if (TraceLevel() == 0)
+    return;
   for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
   {
     const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
@@ -157,4 +185,42 @@ void Message_Messenger::Send (const TCollection_ExtendedString& theString,
       aPrinter->Send (theString, theGravity);
     }
   }
+}
+
+//=======================================================================
+//function : Send
+//purpose  : 
+//=======================================================================
+void Message_Messenger::Send (const Handle(Standard_Transient)& theObject,
+                              const Message_Gravity theGravity) const
+{
+  if (TraceLevel() == 0)
+    return;
+  for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
+  {
+    const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
+    if (!aPrinter.IsNull())
+    {
+      aPrinter->Send (theObject, theGravity);
+    }
+  }
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Message_Messenger::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
+  {
+    const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
+    if (aPrinter.IsNull())
+      continue;
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aPrinter.get())
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTraceLevel)
 }

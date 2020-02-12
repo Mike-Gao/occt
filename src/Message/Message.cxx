@@ -17,18 +17,123 @@
 
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_Report.hxx>
 #include <TCollection_AsciiString.hxx>
 
 #include <stdio.h>
 #include <string.h>
+
+static Handle(Message_Messenger) MyMessenger;
+
+namespace
+{
+  static Standard_CString Message_Table_PrintMetricTypeEnum[10] =
+  {
+    "NONE", "UserTimeCPU", "SystemTimeInfo", "MemPrivate", "MemVirtual",
+    "MemWorkingSet", "MemWorkingSetPeak", "MemSwapUsage", "MemSwapUsagePeak", "MemHeapUsage"
+  };
+}
+
 //=======================================================================
 //function : DefaultMessenger
 //purpose  : 
 //=======================================================================
 const Handle(Message_Messenger)& Message::DefaultMessenger ()
 {
-  static Handle(Message_Messenger) aMessenger = new Message_Messenger;
-  return aMessenger;
+  if (MyMessenger.IsNull())
+   MyMessenger = new Message_Messenger;
+  return MyMessenger;
+}
+
+//=======================================================================
+//function : SetDefaultMessenger
+//purpose  : 
+//=======================================================================
+void Message::SetDefaultMessenger (const Handle(Message_Messenger)& theMessenger)
+{
+  MyMessenger = theMessenger;
+}
+
+//=======================================================================
+//function : DefaultReport
+//purpose  :
+//=======================================================================
+const Handle(Message_Report)& Message::DefaultReport(const Standard_Boolean theToCreate)
+{
+  static Handle(Message_Report) MyReport;
+
+  if (MyReport.IsNull() && theToCreate)
+    MyReport = new Message_Report();
+
+  return MyReport;
+}
+
+//=======================================================================
+//function : MetricToString
+//purpose  :
+//=======================================================================
+Standard_CString Message::MetricToString (const Message_MetricType theType)
+{
+  return Message_Table_PrintMetricTypeEnum[theType];
+}
+
+//=======================================================================
+//function : MetricFromString
+//purpose  :
+//=======================================================================
+Standard_Boolean Message::MetricFromString (const Standard_CString theString,
+                                            Message_MetricType& theGravity)
+{
+  TCollection_AsciiString aName (theString);
+  for (Standard_Integer aMetricIter = 0; aMetricIter <= Message_MetricType_MemHeapUsage; ++aMetricIter)
+  {
+    Standard_CString aMetricName = Message_Table_PrintMetricTypeEnum[aMetricIter];
+    if (aName == aMetricName)
+    {
+      theGravity = Message_MetricType (aMetricIter);
+      return Standard_True;
+    }
+  }
+  return Standard_False;
+}
+
+// =======================================================================
+// function : ToOSDMetric
+// purpose :
+// =======================================================================
+Standard_Boolean Message::ToOSDMetric (const Message_MetricType theMetric, OSD_MemInfo::Counter& theMemInfo)
+{
+  switch (theMetric)
+  {
+    case Message_MetricType_MemPrivate:        theMemInfo = OSD_MemInfo::MemPrivate; break;
+    case Message_MetricType_MemVirtual:        theMemInfo = OSD_MemInfo::MemVirtual; break;
+    case Message_MetricType_MemWorkingSet:     theMemInfo = OSD_MemInfo::MemWorkingSet; break;
+    case Message_MetricType_MemWorkingSetPeak: theMemInfo = OSD_MemInfo::MemWorkingSetPeak; break;
+    case Message_MetricType_MemSwapUsage:      theMemInfo = OSD_MemInfo::MemSwapUsage; break;
+    case Message_MetricType_MemSwapUsagePeak:  theMemInfo = OSD_MemInfo::MemSwapUsagePeak; break;
+    case Message_MetricType_MemHeapUsage:      theMemInfo = OSD_MemInfo::MemHeapUsage; break;
+  }
+  return Standard_True;
+}
+
+// =======================================================================
+// function : ToMessageMetric
+// purpose :
+// =======================================================================
+Standard_Boolean Message::ToMessageMetric (const OSD_MemInfo::Counter theMemInfo, Message_MetricType& theMetric)
+{
+  switch (theMemInfo)
+  {
+    case OSD_MemInfo::MemPrivate:        theMetric = Message_MetricType_MemPrivate;        break;
+    case OSD_MemInfo::MemVirtual:        theMetric = Message_MetricType_MemVirtual;        break;
+    case OSD_MemInfo::MemWorkingSet:     theMetric = Message_MetricType_MemWorkingSet;     break;
+    case OSD_MemInfo::MemWorkingSetPeak: theMetric = Message_MetricType_MemWorkingSetPeak; break;
+    case OSD_MemInfo::MemSwapUsage:      theMetric = Message_MetricType_MemSwapUsage;      break;
+    case OSD_MemInfo::MemSwapUsagePeak:  theMetric = Message_MetricType_MemSwapUsagePeak;  break;
+    case OSD_MemInfo::MemHeapUsage:      theMetric = Message_MetricType_MemHeapUsage;      break;
+    default: return Standard_False;
+  }
+  return Standard_True;
 }
 
 //=======================================================================
