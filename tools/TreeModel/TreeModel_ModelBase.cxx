@@ -16,6 +16,7 @@
 #include <inspector/TreeModel_ModelBase.hxx>
 
 #include <inspector/TreeModel_ItemBase.hxx>
+#include <inspector/TreeModel_ItemProperties.hxx>
 #include <inspector/TreeModel_Tools.hxx>
 #include <inspector/TreeModel_VisibilityState.hxx>
 
@@ -293,6 +294,43 @@ QList<TreeModel_ItemBasePtr> TreeModel_ModelBase::SelectedItems (const QModelInd
     anItems.append (anItem);
   }
   return anItems;
+}
+
+// =======================================================================
+// function : SubItemsPresentations
+// purpose :
+// =======================================================================
+void TreeModel_ModelBase::SubItemsPresentations (const QModelIndexList& theIndices,
+                                                 NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  QList<TreeModel_ItemBasePtr> anItems;
+
+  for (QModelIndexList::const_iterator anIndicesIt = theIndices.begin(); anIndicesIt != theIndices.end(); anIndicesIt++)
+  {
+    TreeModel_ItemBasePtr anItem = TreeModel_ModelBase::GetItemByIndex (*anIndicesIt);
+    if (!anItem || anItems.contains (anItem))
+      continue;
+    subItemsPresentations (anItem, thePresentations);
+  }
+}
+
+// =======================================================================
+// function : subItemPresentations
+// purpose :
+// =======================================================================
+void TreeModel_ModelBase::subItemsPresentations (const TreeModel_ItemBasePtr& theItem,
+                                                 NCollection_List<Handle(Standard_Transient)>& thePresentations)
+{
+  theItem->Presentations (thePresentations);
+  if (!theItem->Properties().IsNull())
+    theItem->Properties()->Presentations (thePresentations);
+
+  QList<TreeModel_ItemBasePtr> anItems;
+
+  for (int aRowId = 0; aRowId < theItem->rowCount(); aRowId++)
+  {
+    subItemsPresentations (theItem->Child (aRowId, theItem->Column()), thePresentations);
+  }
 }
 
 // =======================================================================

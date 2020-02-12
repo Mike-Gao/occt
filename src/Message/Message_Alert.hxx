@@ -54,7 +54,6 @@ public:
   //! Base implementation always returns true.
   virtual Standard_EXPORT Standard_Boolean Merge (const Handle(Message_Alert)& theTarget);
   
-  // OCCT RTTI
   DEFINE_STANDARD_RTTIEXT(Message_Alert,Standard_Transient)
 };
 

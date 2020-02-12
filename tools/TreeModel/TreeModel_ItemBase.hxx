@@ -21,6 +21,7 @@
 #include <Standard_Handle.hxx>
 #include <Standard_OStream.hxx>
 #include <Standard_SStream.hxx>
+#include <NCollection_List.hxx>
 
 #include <inspector/TreeModel_ItemRole.hxx>
 
@@ -148,6 +149,10 @@ public:
 
   //! Returns the item properties
   const Handle(TreeModel_ItemProperties)& Properties() const { return myProperties; }
+
+  //! Returns presentation of the attribute to be visualized in the view
+  //! \thePresentations [out] container of presentation handles to be visualized
+  virtual void Presentations (NCollection_List<Handle(Standard_Transient)>& thePresentations) { (void)thePresentations; }
 
 protected:
 
