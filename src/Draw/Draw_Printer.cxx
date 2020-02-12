@@ -15,6 +15,7 @@
 
 #include <Draw_Printer.hxx>
 
+#include <Standard_Dump.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 
@@ -43,4 +44,13 @@ void Draw_Printer::send (const TCollection_AsciiString& theString,
   }
 
   *myTcl << theString << "\n";
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Draw_Printer::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 }

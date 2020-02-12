@@ -23,6 +23,8 @@
 #include <Standard_Transient.hxx>
 #include <Standard_Boolean.hxx>
 #include <Standard_CString.hxx>
+#include <Standard_SStream.hxx>
+
 class TCollection_ExtendedString;
 class TCollection_AsciiString;
 
@@ -64,6 +66,19 @@ public:
   //! Default implementation redirects to send().
   Standard_EXPORT virtual void Send (const TCollection_AsciiString& theString,
                                      const Message_Gravity theGravity) const;
+
+  //! Send a string message with specified trace level.
+  //! Stream is converted to string value.
+  //! Default implementation calls first method Send().
+  Standard_EXPORT virtual void Send (const Standard_SStream& theStream, const Message_Gravity theGravity) const;
+
+  //! Send a string message with specified trace level.
+  //! The object is converted to string in format: <object kind> : <object pointer>.
+  //! Default implementation calls first method Send().
+  Standard_EXPORT virtual void Send (const Handle(Standard_Transient)& theObject, const Message_Gravity theGravity) const;
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
 protected:
 
