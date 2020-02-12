@@ -32,6 +32,8 @@ public:
   //! Creates a printer connected to the interpretor.
   Standard_EXPORT Draw_Printer (Draw_Interpretor& theTcl);
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 protected:
 
   //! Send a string message with specified trace level.
