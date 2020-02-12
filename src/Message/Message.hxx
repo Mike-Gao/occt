@@ -17,14 +17,20 @@
 #ifndef _Message_HeaderFile
 #define _Message_HeaderFile
 
+#include <Message_Gravity.hxx>
+#include <Message_MetricType.hxx>
+#include <NCollection_Vector.hxx>
+#include <OSD_MemInfo.hxx>
+
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
 
 #include <Standard_Integer.hxx>
 #include <Standard_Real.hxx>
+#include <TCollection_AsciiString.hxx>
+
 class Message_Messenger;
-class TCollection_AsciiString;
 class Message_Msg;
 class Message_MsgFile;
 class Message_Messenger;
@@ -34,6 +40,7 @@ class Message_PrinterOStream;
 class Message_ProgressIndicator;
 class Message_ProgressScale;
 class Message_ProgressSentry;
+class Message_Report;
 
 
 //! Defines
@@ -51,7 +58,15 @@ public:
   //! By default, it contains single printer directed to std::cout.
   //! It can be customized according to the application needs.
   Standard_EXPORT static const Handle(Message_Messenger)& DefaultMessenger();
-  
+
+  //! Sets default messenger.
+  Standard_EXPORT static void SetDefaultMessenger (const Handle(Message_Messenger)& theMessenger);
+
+  //! returns the only one instance of Report
+  //! When theToCreate is true - automatically creates message report when not exist.
+  //! that has been created.
+  Standard_EXPORT static const Handle(Message_Report)& DefaultReport (const Standard_Boolean theToCreate = Standard_False);
+
   //! Returns the string filled with values of hours, minutes and seconds.
   //! Example:
   //! 1. (5, 12, 26.3345) returns "05h:12m:26.33s",
@@ -59,11 +74,41 @@ public:
   //! 3. (0,  0,  4.5   ) returns "4.50s"
   Standard_EXPORT static TCollection_AsciiString FillTime (const Standard_Integer Hour, const Standard_Integer Minute, const Standard_Real Second);
 
+  //! Determines the metric from the given string identifier.
+  //! @param theString string identifier
+  //! @param theType detected type of metric
+  //! @return TRUE if string identifier is known
+  Standard_EXPORT static Standard_Boolean MetricFromString (const Standard_CString theString,
+                                                            Message_MetricType& theType);
 
+  //! Returns the string name for a given metric type.
+  //! @param theType metric type
+  //! @return string identifier from the list of Message_MetricType
+  Standard_EXPORT static Standard_CString MetricToString (const Message_MetricType theType);
 
+  //! Returns the metric type from the given string identifier.
+  //! @param theString string identifier
+  //! @return metric type or Message_MetricType_None if string identifier is invalid
+  static Message_MetricType MetricFromString (const Standard_CString theString)
+  {
+    Message_MetricType aMetric = Message_MetricType_None;
+    MetricFromString (theString, aMetric);
+    return aMetric;
+  }
+
+  //! Converts message metric to OSD memory info type.
+  //! @param theMetric [in] message metric
+  //! @param theMemInfo [out] filled memory info type
+  //! @return true if converted
+  static Standard_EXPORT Standard_Boolean ToOSDMetric (const Message_MetricType theMetric, OSD_MemInfo::Counter& theMemInfo);
+
+  //! Converts OSD memory info type to message metric.
+  //! @param theMemInfo [int] memory info type
+  //! @param theMetric [out] filled message metric
+  //! @return true if converted
+  static Standard_EXPORT Standard_Boolean ToMessageMetric (const OSD_MemInfo::Counter theMemInfo, Message_MetricType& theMetric);
 
 protected:
-
 
 
 

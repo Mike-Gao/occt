@@ -21,6 +21,8 @@
 #include <Message_StatusType.hxx>
 #include <Message_Status.hxx>
 
+#include <Standard_Dump.hxx>
+
 /**
  * Tiny class for extended handling of error / execution
  * status of algorithm in universal way.
@@ -161,6 +163,16 @@ class Message_ExecStatus
   }
   const Message_ExecStatus& operator &= ( const Message_ExecStatus& theOther )
   { And ( theOther ); return *this; }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDone)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myWarn)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAlarm)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFail)
+  }
 
   //@}
 

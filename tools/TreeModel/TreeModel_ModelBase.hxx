@@ -180,6 +180,12 @@ public:
   //! \return model items from the list
   Standard_EXPORT static QList<TreeModel_ItemBasePtr> SelectedItems (const QModelIndexList& theIndices);
 
+  //! Returns presentations of sub items
+  //! \param theIndices a container of selected indices
+  //! \thePresentations [out] container of presentation handles to be visualized
+  Standard_EXPORT static void SubItemsPresentations (const QModelIndexList& theIndices,
+                                                     NCollection_List<Handle(Standard_Transient)>& thePresentations);
+
 protected:
   //! Creates root item
   //! \param theColumnId index of a column
@@ -189,6 +195,12 @@ protected:
   //! \param theItem
   //!  \return an item pointer
   Standard_EXPORT static void* getIndexValue (const TreeModel_ItemBasePtr& theItem);
+
+  //! Returns presentations of sub items
+  //! \param theIndices a container of selected indices
+  //! \thePresentations [out] container of presentation handles to be visualized
+  static void subItemsPresentations (const TreeModel_ItemBasePtr& theItem,
+                                    NCollection_List<Handle(Standard_Transient)>& thePresentations);
 
 private:
   //! Creates root item

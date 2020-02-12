@@ -17,6 +17,7 @@
 
 #include <Draw.hxx>
 #include <Draw_Interpretor.hxx>
+#include <Message.hxx>
 #include <TDocStd_Document.hxx>
 #include <TDF_Label.hxx>
 #include <TCollection_AsciiString.hxx>
@@ -34,6 +35,7 @@
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx> 
 #include <Standard_DomainError.hxx>
 
+#include <XmlDrivers_MessageReportStorage.hxx>
 
 
 //=======================================================================
@@ -147,11 +149,81 @@ static Standard_Integer DDocStd_DumpCommand (Draw_Interpretor& di,
     }
     return 0;
   } 
-  di << "TDocStd_DumpCommand : Error\n";
+  std::cerr << "TDocStd_DumpCommand : Error\n";
   return 1;
 }
 
+//=======================================================================
+//function : DDocStd_ReadMessageReport
+//=======================================================================
+static Standard_Integer DDocStd_ReadMessageReport (Draw_Interpretor& theDI, Standard_Integer theArgNb, const char** theArgVec)
+{
+  if (theArgNb < 2)
+  {
+    std::cout << "Error: wrong number of arguments! See usage:\n";
+    theDI.PrintHelp (theArgVec[0]);
+    return 1;
+  }
 
+  TCollection_ExtendedString aFileName (theArgVec[1]);
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_False);
+  if (aReport.IsNull())
+  {
+    std::cerr << "Error: Message_Report is not created.\n";
+    return 0;
+  }
+
+  Handle(Message_ReportWriter) aWriter = aReport->MessageWriter();
+  if (aWriter.IsNull())
+  {
+    aWriter = new XmlDrivers_MessageReportStorage();
+    aWriter->SetFileName (aFileName);
+    aReport->SetMessageWriter (aWriter);
+  }
+
+  if (!aWriter->ImportReport (aReport))
+  {
+    std::cerr << "Error: Message_Report can not be exported in " << aFileName << ".\n";
+    return 0;
+  }
+  return 0;
+}
+
+//=======================================================================
+//function : DDocStd_WriteMessageReport
+//=======================================================================
+static Standard_Integer DDocStd_WriteMessageReport (Draw_Interpretor& theDI, Standard_Integer theArgNb, const char** theArgVec)
+{
+  if (theArgNb < 2)
+  {
+    std::cout << "Error: wrong number of arguments! See usage:\n";
+    theDI.PrintHelp (theArgVec[0]);
+    return 1;
+  }
+
+  TCollection_ExtendedString aFileName (theArgVec[1]);
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_False);
+  if (aReport.IsNull())
+  {
+    std::cerr << "Error: Message_Report is not created.\n";
+    return 0;
+  }
+
+  Handle(Message_ReportWriter) aWriter = aReport->MessageWriter();
+  if (aWriter.IsNull())
+  {
+    aWriter = new XmlDrivers_MessageReportStorage();
+    aWriter->SetFileName (aFileName);
+    aReport->SetMessageWriter (aWriter);
+  }
+
+  if (!aWriter->ExportReport (aReport))
+  {
+    std::cerr << "Error: Message_Report can not be exported in " << aFileName << ".\n";
+    return 0;
+  }
+  return 0;
+}
 
 //=======================================================================
 //function : ModificationCommands
@@ -174,5 +246,15 @@ void DDocStd::ToolsCommands(Draw_Interpretor& theCommands)
                    "DumpCommand (DOC)",
 		   __FILE__, DDocStd_DumpCommand, g);   
 
-}
+  theCommands.Add ("ReadMessageReport",
+                   "ReadMessageReport FileName"
+    "\nRestores content of the default Message_Report from the file. This file is an XML document."
+    "\nIt might be restored into report using ReadMessageReport."
+                   __FILE__, DDocStd_ReadMessageReport, g);
 
+  theCommands.Add ("WriteMessageReport",
+                   "WriteMessageReport FileName"
+    "\nStores the default Message_Report into a file. This is an XML document."
+    "\nIt might be restored into report using ReadMessageReport."
+                   __FILE__, DDocStd_WriteMessageReport, g);
+}

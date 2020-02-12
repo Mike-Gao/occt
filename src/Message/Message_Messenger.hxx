@@ -16,6 +16,7 @@
 #ifndef _Message_Messenger_HeaderFile
 #define _Message_Messenger_HeaderFile
 
+#include <Message.hxx>
 #include <Message_Gravity.hxx>
 #include <Message_SequenceOfPrinters.hxx>
 #include <Standard_Transient.hxx>
@@ -67,6 +68,9 @@ public:
   //! Returns True if printer has been added.
   Standard_EXPORT Standard_Boolean AddPrinter (const Handle(Message_Printer)& thePrinter);
   
+  //! Returns true if messenger printers contain a printer of specified type (including derived classes) 
+  Standard_EXPORT Standard_Boolean HasPrinter (const Handle(Standard_Type)& theType);
+
   //! Removes specified printer from the messenger.
   //! Returns True if this printer has been found in the list
   //! and removed.
@@ -76,13 +80,29 @@ public:
   //! from the messenger.
   //! Returns number of removed printers.
   Standard_EXPORT Standard_Integer RemovePrinters (const Handle(Standard_Type)& theType);
-  
+
   //! Returns current sequence of printers
   const Message_SequenceOfPrinters& Printers() const { return myPrinters; }
 
   //! Returns sequence of printers
   //! The sequence can be modified.
   Message_SequenceOfPrinters& ChangePrinters() { return myPrinters; }
+
+  //! Returns the output gavity used in operator <<
+  Message_Gravity OuputGravity() const { return myOutputGravity; }
+
+  //! Sets the output gavity used in operator <<
+  void SetOuputGravity (const Message_Gravity theValue) { myOutputGravity = theValue; }
+
+  //! Sets trace level used for outputting messages
+  //! - 0: no trace at all
+  //! - 1/2/3: messages of the first level are processed
+  //! - -1: all messages are processed
+  //! Default is 0 : no messages are processed
+  void SetTraceLevel (const Standard_Integer theTraceLevel) { myTraceLevel = theTraceLevel; }
+  
+  //! Returns trace level used for outputting messages.
+  Standard_Integer TraceLevel() const { return myTraceLevel; }
 
   //! Dispatch a message to all the printers in the list.
   //! Three versions of string representations are accepted for
@@ -98,17 +118,27 @@ public:
   //! See above
   Standard_EXPORT void Send (const TCollection_ExtendedString& theString, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
 
+  //! See above
+  Standard_EXPORT void Send (const Standard_SStream& theStream, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
+
+  //! See above
+  Standard_EXPORT void Send (const Handle(Standard_Transient)& theObject, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
 private:
 
   Message_SequenceOfPrinters myPrinters;
-
+  Message_Gravity myOutputGravity; //!< gravity used in operator <<
+  Standard_Integer myTraceLevel; //!< leel of processed messages
 };
 
 // CString
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Standard_CString theStr)
 {
-  theMessenger->Send (theStr, Message_Info, Standard_False);
+  theMessenger->Send (theStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -116,7 +146,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const TCollection_AsciiString& theStr)
 {
-  theMessenger->Send (theStr, Message_Info, Standard_False);
+  theMessenger->Send (theStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -124,7 +154,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Handle(TCollection_HAsciiString)& theStr)
 {
-  theMessenger->Send (theStr->String(), Message_Info, Standard_False);
+  theMessenger->Send (theStr->String(), theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -132,7 +162,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const TCollection_ExtendedString& theStr)
 {
-  theMessenger->Send (theStr, Message_Info, Standard_False);
+  theMessenger->Send (theStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -140,7 +170,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Handle(TCollection_HExtendedString)& theStr)
 {
-  theMessenger->Send (theStr->String(), Message_Info, Standard_False);
+  theMessenger->Send (theStr->String(), theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -149,7 +179,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
                                                     const Standard_Integer theVal)
 {
   TCollection_AsciiString aStr (theVal);
-  theMessenger->Send (aStr, Message_Info, Standard_False);
+  theMessenger->Send (aStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -158,7 +188,7 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
                                                     const Standard_Real theVal)
 {
   TCollection_AsciiString aStr (theVal);
-  theMessenger->Send (aStr, Message_Info, Standard_False);
+  theMessenger->Send (aStr, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -166,7 +196,15 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
                                                     const Standard_SStream& theStream)
 {
-  theMessenger->Send (theStream.str().c_str(), Message_Info, Standard_False);
+  theMessenger->Send (theStream, theMessenger->OuputGravity(), Standard_False);
+  return theMessenger;
+}
+
+// AsciiString
+inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messenger)& theMessenger,
+                                                    const Handle(Standard_Transient)& theObject)
+{
+  theMessenger->Send (theObject, theMessenger->OuputGravity(), Standard_False);
   return theMessenger;
 }
 
@@ -181,8 +219,31 @@ inline const Handle(Message_Messenger)&
 // Message_EndLine
 inline const Handle(Message_Messenger)& Message_EndLine (const Handle(Message_Messenger)& theMessenger)
 {
-  theMessenger->Send ("", Message_Info, Standard_True);
+  theMessenger->Send ("", theMessenger->OuputGravity(), Standard_True);
   return theMessenger;
+}
+
+//! @def OCCT_SEND_DUMPJSON
+//! Append into messenger  result of DumpJson for the field
+//! It computes Dump of the fields. The expected field is a pointer.
+//! Use this macro for fields of the dumped class which has own DumpJson implementation.
+#define OCCT_SEND_DUMPJSON(theField) \
+{ \
+  if ((void*)(theField) != NULL) \
+  { \
+    Standard_SStream aFieldStream; \
+    (theField)->DumpJson (aFieldStream, Message::DefaultMessenger()->TraceLevel()); \
+    Message::DefaultMessenger() << aFieldStream; \
+  } \
+}
+
+//! @def OCCT_SEND_MESSAGE
+//! Append into messenger  result of DumpJson for the field
+//! It computes Dump of the fields. The expected field is a pointer.
+//! Use this macro for fields of the dumped class which has own DumpJson implementation.
+#define OCCT_SEND_MESSAGE(theMessage) \
+{ \
+  Message::DefaultMessenger() << theMessage << "" << Message_EndLine; \
 }
 
 #endif // _Message_Messenger_HeaderFile
