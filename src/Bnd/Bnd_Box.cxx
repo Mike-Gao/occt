@@ -983,3 +983,21 @@ void Bnd_Box::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Gap)
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, Flags)
 }
+
+//=======================================================================
+//function : InitFromJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean Bnd_Box::InitFromJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  Standard_Integer aPos = theStreamPos;
+
+  OCCT_INIT_VECTOR_CLASS (theSStream, "CornerMin", aPos, 3, &Xmin, &Ymin, &Zmin)
+  OCCT_INIT_VECTOR_CLASS (theSStream, "CornerMax", aPos, 3, &Xmax, &Ymax, &Zmax)
+
+  OCCT_INIT_FIELD_VALUE_REAL (theSStream, aPos, Gap);
+  OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, Flags);
+
+  theStreamPos = aPos;
+  return Standard_True;
+}
