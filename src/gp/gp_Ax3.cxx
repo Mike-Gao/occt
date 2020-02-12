@@ -115,3 +115,25 @@ void gp_Ax3::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
   OCCT_DUMP_VECTOR_CLASS (theOStream, "XDirection", 3, XDirection().X(), XDirection().Y(), XDirection().Z())
   OCCT_DUMP_VECTOR_CLASS (theOStream, "YDirection", 3, YDirection().X(), YDirection().Y(), YDirection().Z())
 }
+
+Standard_Boolean  gp_Ax3::InitFromJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+{
+  Standard_Integer aPos = theStreamPos;
+
+  gp_XYZ anXYZLoc;
+  OCCT_INIT_VECTOR_CLASS (theSStream, "Location", aPos, 3, &anXYZLoc.ChangeCoord (1), &anXYZLoc.ChangeCoord (2), &anXYZLoc.ChangeCoord (3))
+  SetLocation (anXYZLoc);
+
+  gp_XYZ aDir;
+  OCCT_INIT_VECTOR_CLASS (theSStream, "Direction", aPos, 3, &aDir.ChangeCoord (1), &aDir.ChangeCoord (2), &aDir.ChangeCoord (3))
+  gp_XYZ aXDir;
+  OCCT_INIT_VECTOR_CLASS (theSStream, "XDirection", aPos, 3, &aXDir.ChangeCoord (1), &aXDir.ChangeCoord (2), &aXDir.ChangeCoord (3))
+  gp_XYZ anYDir;
+  OCCT_INIT_VECTOR_CLASS (theSStream, "YDirection", aPos, 3, &anYDir.ChangeCoord (1), &anYDir.ChangeCoord (2), &anYDir.ChangeCoord (3))
+
+  SetXDirection (aXDir);
+  SetYDirection (anYDir);
+
+  theStreamPos = aPos;
+  return Standard_True;
+}
