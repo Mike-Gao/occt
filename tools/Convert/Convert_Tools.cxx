@@ -41,6 +41,18 @@ void Convert_Tools::ConvertStreamToPresentations (const Standard_SStream&,
                                                   const Standard_Integer,
                                                   NCollection_List<Handle(Standard_Transient)>&)
 {
+
+  Select3D_BndBox3d aSelectBndBox;
+  if (aSelectBndBox.InitFromJson (theSStream, aStartPos))
+  {
+    TopoDS_Shape aShape;
+
+    gp_Pnt aPntMin = gp_Pnt (aSelectBndBox.CornerMin().x(), aSelectBndBox.CornerMin().y(), aSelectBndBox.CornerMin().z());
+    gp_Pnt aPntMax = gp_Pnt (aSelectBndBox.CornerMax().x(), aSelectBndBox.CornerMax().y(), aSelectBndBox.CornerMax().z());
+    if (CreateBoxShape (aPntMin, aPntMax, aShape))
+      thePresentations.Append (new Convert_TransientShape (aShape));
+    return;
+  }
 }
 
 //=======================================================================

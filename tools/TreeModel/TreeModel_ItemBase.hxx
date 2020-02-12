@@ -149,6 +149,7 @@ public:
   //! Returns the item properties
   const Handle(TreeModel_ItemProperties)& Properties() const { return myProperties; }
 
+  Standard_EXPORT virtual void Presentations (NCollection_List<Handle(Standard_Transient)>& thePresentations);
 protected:
 
   //! \param theParent the parent item
