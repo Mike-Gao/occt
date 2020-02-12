@@ -207,6 +207,51 @@ public:
     }
   }
 
+  //! Inits the content of me into the stream
+  Standard_Boolean InitFromJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos)
+  {
+    Standard_Integer aPos = theStreamPos;
+
+    Standard_Integer anIsInited = 0;
+    OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, anIsInited);
+    myIsInited = anIsInited != 0;
+
+    int n = Min (N, 3);
+    if (n == 1)
+    {
+      Standard_Real aValue;
+      OCCT_INIT_FIELD_VALUE_REAL (theSStream, aPos, aValue);
+      myMinPoint[0] = (T)aValue;
+    }
+    if (n == 2)
+    {
+      Standard_Real aValue1, aValue2;
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MinPoint", aPos, n, &aValue1, &aValue2);
+      myMinPoint[0] = (T)aValue1;
+      myMinPoint[1] = (T)aValue2;
+
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MaxPoint", aPos, n, &aValue1, &aValue2);
+      myMaxPoint[0] = (T)aValue1;
+      myMaxPoint[1] = (T)aValue2;
+    }
+    if (n == 3)
+    {
+      Standard_Real aValue1, aValue2, aValue3;
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MinPoint", aPos, n, &aValue1, &aValue2, &aValue3);
+      myMinPoint[0] = (T)aValue1;
+      myMinPoint[1] = (T)aValue2;
+      myMinPoint[2] = (T)aValue3;
+
+      OCCT_INIT_VECTOR_CLASS (theSStream, "MaxPoint", aPos, n, &aValue1, &aValue2, &aValue3);
+      myMaxPoint[0] = (T)aValue1;
+      myMaxPoint[1] = (T)aValue2;
+      myMaxPoint[2] = (T)aValue3;
+    }
+
+    theStreamPos = aPos;
+    return Standard_True;
+  }
+
 public:
 
   //! Checks if the Box is out of the other box.
