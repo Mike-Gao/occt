@@ -353,7 +353,7 @@ void Message_Report::Merge (const Handle(Message_Report)& theOther, Message_Grav
 }
 
 //=======================================================================
-//function : ñompositeAlerts
+//function : CompositeAlerts
 //purpose  : 
 //=======================================================================
 const Handle(Message_CompositeAlerts)& Message_Report::compositeAlerts (const Standard_Boolean isCreate)
