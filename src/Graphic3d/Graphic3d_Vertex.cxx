@@ -28,7 +28,7 @@ Standard_ShortReal Graphic3d_Vertex::Distance(const Graphic3d_Vertex& AOther) co
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void Graphic3d_Vertex::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+void Graphic3d_Vertex::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
 {
   OCCT_DUMP_VECTOR_CLASS (theOStream, "Graphic3d_Vertex", 3, xyz[0], xyz[1], xyz[2])
 }

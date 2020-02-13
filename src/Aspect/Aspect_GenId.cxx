@@ -121,7 +121,7 @@ Standard_Boolean Aspect_GenId::Next (Standard_Integer& theId)
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void Aspect_GenId::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+void Aspect_GenId::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
 {
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFreeCount)
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLength)

@@ -110,7 +110,7 @@ public:
   Standard_EXPORT Standard_ShortReal Distance (const Graphic3d_Vertex& theOther) const;
   
   //! Dumps the content of me into the stream
-  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
   float xyz[3];
 

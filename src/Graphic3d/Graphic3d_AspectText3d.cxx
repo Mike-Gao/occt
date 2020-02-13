@@ -56,6 +56,10 @@ Graphic3d_AspectText3d::Graphic3d_AspectText3d (const Quantity_Color& theColor,
   }
 }
 
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
 void Graphic3d_AspectText3d::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
   OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
