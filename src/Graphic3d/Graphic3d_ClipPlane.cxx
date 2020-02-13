@@ -285,11 +285,11 @@ void Graphic3d_ClipPlane::DumpJson (Standard_OStream& theOStream, Standard_Integ
 
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this)
 
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySectionStyle.get())
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myNextInChain.get())
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myPrevInChain)
 
-  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myId)
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myEntityUID)
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPlane)
 
