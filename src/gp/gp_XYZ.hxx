@@ -24,6 +24,7 @@
 #include <Standard_Boolean.hxx>
 
 #include <Standard_OStream.hxx>
+#include <Standard_SStream.hxx>
 
 class Standard_ConstructionError;
 class Standard_OutOfRange;
