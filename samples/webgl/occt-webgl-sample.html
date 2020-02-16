@@ -16,6 +16,7 @@
 <div><label for="fileInput">Choose BREP file to upload: </label><input type="file" id="fileInput" accept=".brep"></div>
 <h4>Console output:</h4>
 <p id="output"></p>
+<script src="three.min.js"></script>
 <script>
 //! Resize canvas to fit into window.
 function updateCanvasSize()
@@ -57,6 +58,7 @@ if (!isWasmSupported())
 {
   var anElement = document.getElementById('output');
   anElement.innerHTML += "Browser is too old - WebAssembly support is missing!<br>Please check updates or install a modern browser.<br>";
+  throw new Error();
 }
 
 //! Define OCCT WebGL Viewer module.
@@ -75,6 +77,44 @@ var Module =
     return aCanvas;
   })()
 };
+
+var aCanvas = document.getElementById ('canvas');
+var aGlCtx  = aCanvas.getContext ('webgl2', { alpha: false, depth: true, antialias: false, preserveDrawingBuffer: true } );
+if (aGlCtx == null)
+{
+  aGlCtx    = aCanvas.getContext ('webgl',  { alpha: false, depth: true, antialias: false, preserveDrawingBuffer: true } );
+}
+var aScene  = new THREE.Scene();
+var aCamera = new THREE.PerspectiveCamera (75, window.innerWidth / window.innerHeight);
+//var aRenderer = new THREE.WebGLRenderer ({antialias: true});
+var aRenderer = new THREE.WebGLRenderer ({antialias: false, canvas: aCanvas, context: aGlCtx});
+aRenderer.autoClear = false;
+aRenderer.autoClearColor = false;
+aRenderer.autoClearDepth = false;
+aRenderer.autoClearStencil = false;
+aRenderer.setSize (window.innerWidth,window.innerHeight);
+//document.body.appendChild (aRenderer.domElement);
+var aGeom = new THREE.BoxGeometry (1,1,1);
+var aMat  = new THREE.MeshBasicMaterial ({color: 0xff0000});
+var aCube = new THREE.Mesh (aGeom, aMat);
+aScene.add (aCube);
+aCube.position.z = -5; aCube.rotation.x = 10; aCube.rotation.y = 5;
+/*aRenderer.render (aScene, aCamera);
+var anAnimate = function(){
+  aCube.rotation.x += 0.01;
+  aRenderer.state.reset();
+  aRenderer.render (aScene, aCamera);
+  requestAnimationFrame (anAnimate);
+}
+anAnimate();*/
+
+function postFrameRender()
+{
+  //console.log("postFrameRender()"); ///
+  //aCamera.
+  aRenderer.state.reset();
+  aRenderer.render (aScene, aCamera)
+}
 
 //! Handle file uploading.
 fileInput.onchange = function()

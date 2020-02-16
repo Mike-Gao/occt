@@ -52,6 +52,14 @@ namespace
     return aDevicePixelRatio;
   });
 
+  /*EM_JS(void, jsSetOcctCamera, (float theFOV, float theAspect, float theNear, float theFar), {
+    setOcctCamera();
+  });*/
+
+  EM_JS(void, jsPostFrameRender, (), {
+    postFrameRender();
+  });
+
   //! Return cavas size in pixels.
   static Graphic3d_Vec2i jsCanvasSize()
   {
@@ -336,7 +344,13 @@ void WasmOcctView::handleViewRedraw (const Handle(AIS_InteractiveContext)& theCt
                                      const Handle(V3d_View)& theView)
 {
   myUpdateRequests = 0;
+
+  theView->Invalidate(); /// Three.js cannot be rendered properly without full redraw
+  glEnable (GL_POLYGON_OFFSET_FILL); /// reset defaults Graphic3d_PolygonOffset after Three.js
+  glPolygonOffset (1.0f, 1.0f);
+
   AIS_ViewController::handleViewRedraw (theCtx, theView);
+  jsPostFrameRender();
   if (myToAskNextFrame)
   {
     // ask more frames
