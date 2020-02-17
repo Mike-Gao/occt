@@ -46,9 +46,11 @@ BRepAdaptor_CompCurve::BRepAdaptor_CompCurve()
 : TFirst  (0.0),
   TLast   (0.0),
   PTol    (0.0),
+  myPeriod(0.0),
   CurIndex(-1),
   Forward (Standard_False),
-  IsbyAC  (Standard_False)
+  IsbyAC  (Standard_False),
+  Periodic(Standard_False)
 {
 }
 
@@ -58,9 +60,11 @@ BRepAdaptor_CompCurve::BRepAdaptor_CompCurve(const TopoDS_Wire&     theWire,
   TFirst  (0.0),
   TLast   (0.0),
   PTol    (0.0),
+  myPeriod(0.0),
   CurIndex(-1),
   Forward (Standard_False),
-  IsbyAC  (theIsAC)
+  IsbyAC  (theIsAC),
+  Periodic(Standard_False)
 {
   Initialize(theWire, theIsAC);
 }
@@ -74,9 +78,11 @@ BRepAdaptor_CompCurve::BRepAdaptor_CompCurve(const TopoDS_Wire& theWire,
   TFirst  (theFirst),
   TLast   (theLast),
   PTol    (theTolerance),
+  myPeriod(0.0),
   CurIndex(-1),
   Forward (Standard_False),
-  IsbyAC  (theIsAC)
+  IsbyAC  (theIsAC),
+  Periodic(Standard_False)
 {
   Initialize(theWire, theIsAC, theFirst, theLast, theTolerance);
 }
