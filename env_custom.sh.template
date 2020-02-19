@@ -1,4 +1,5 @@
 export aNbJobs=${NUMBER_OF_PROCESSORS}
+export aFreeType=$PWD/../3rdparty/freetype-2.7.1-wasm
 export EMSDK_ROOT=`pwd`/fips/fips-sdks/emsdk
 export aBuildRoot=work
 
@@ -14,4 +15,4 @@ export BUILD_Draw=OFF
 export BUILD_FndClasses=ON
 export BUILD_ModAlg=OFF
 export BUILD_ModData=OFF
-export BUILD_Viz=OFF
+export BUILD_Viz=ON

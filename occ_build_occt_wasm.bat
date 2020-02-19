@@ -56,6 +56,9 @@ if ["%toCMake%"] == ["1"] (
  -D INSTALL_DIR:PATH="%aDestDir%" ^
  -D INSTALL_DIR_INCLUDE:STRING="inc" ^
  -D INSTALL_DIR_RESOURCE:STRING="src" ^
+ -D 3RDPARTY_FREETYPE_DIR:PATH="%aFreeType%" ^
+ -D 3RDPARTY_FREETYPE_INCLUDE_DIR_freetype2:FILEPATH="%aFreeType%/include" ^
+ -D 3RDPARTY_FREETYPE_INCLUDE_DIR_ft2build:FILEPATH="%aFreeType%/include" ^
  -D BUILD_MODULE_ApplicationFramework:BOOL="%BUILD_AppFramework%" ^
  -D BUILD_MODULE_DataExchange:BOOL="%BUILD_DataExchange%" ^
  -D BUILD_MODULE_Draw:BOOL="%BUILD_Draw%" ^

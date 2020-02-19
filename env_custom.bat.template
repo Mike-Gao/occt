@@ -1,4 +1,5 @@
 set aNbJobs=%NUMBER_OF_PROCESSORS%
+set "aFreeType=%~dp0..\3rdparty\freetype-2.7.1-wasm"
 set "EMSDK_ROOT=%~dp0..\occ-web3d\fips\fips-sdks\emsdk"
 set "PATH=C:\Program Files\CMake\bin;%PATH%"
 set "aBuildRoot=work"
@@ -15,4 +16,4 @@ set BUILD_Draw=OFF
 set BUILD_FndClasses=ON
 set BUILD_ModAlg=OFF
 set BUILD_ModData=OFF
-set BUILD_Viz=OFF
+set BUILD_Viz=ON
