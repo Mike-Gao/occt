@@ -17,6 +17,7 @@
 #define _IMeshData_Shape_HeaderFile
 
 #include <Standard_Type.hxx>
+#include <Standard_Dump.hxx>
 #include <TopoDS_Shape.hxx>
 
 //! Interface class representing model with associated TopoDS_Shape.
@@ -41,6 +42,13 @@ public:
   const TopoDS_Shape& GetShape () const
   {
     return myShape;
+  }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShape)
   }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_Shape, Standard_Transient)

@@ -331,3 +331,13 @@ void BRepMesh_EdgeDiscret::Tessellate2d(
     }
   }
 }
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_EdgeDiscret::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
+}

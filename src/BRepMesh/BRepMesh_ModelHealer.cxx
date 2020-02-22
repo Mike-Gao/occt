@@ -497,3 +497,13 @@ Standard_Boolean BRepMesh_ModelHealer::connectClosestPoints(
 
   return Standard_True;
 }
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_ModelHealer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
+}

@@ -431,3 +431,22 @@ TCollection_ExtendedString Message_Algorithm::PrepareReport
   }
   return aNewReport;
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Message_Algorithm::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myStatus)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myMessenger)
+
+  if (!myReportIntegers.IsEmpty())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myReportIntegers.Length())
+  if (!myReportStrings.IsEmpty())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myReportStrings.Length())
+  if (!myReportMessages.IsEmpty())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myReportMessages.Length())
+}

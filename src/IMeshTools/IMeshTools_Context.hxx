@@ -63,6 +63,10 @@ public:
       return Standard_False;
     }
 
+    MESSAGE_ADD_LEVEL_SENTRY
+    Handle(Message_Messenger) sout = GetModelBuilder()->GetMessenger();
+    sout << "DiscretizeEdges" << "" << Message_EndLine;
+
     // Discretize edges of a model.
     return myEdgeDiscret->Perform(myModel, myParameters);
   }
@@ -77,6 +81,9 @@ public:
       return Standard_False;
     }
 
+    MESSAGE_ADD_LEVEL_SENTRY
+    Handle(Message_Messenger) sout = GetModelBuilder()->GetMessenger();
+    sout << "HealModel" << "" << Message_EndLine;
     return myModelHealer.IsNull() ?
       Standard_True :
       myModelHealer->Perform(myModel, myParameters);
@@ -92,6 +99,9 @@ public:
       return Standard_False;
     }
 
+    MESSAGE_ADD_LEVEL_SENTRY
+    Handle(Message_Messenger) sout = GetModelBuilder()->GetMessenger();
+    sout << "PreProcessModel" << "" << Message_EndLine;
     return myPreProcessor.IsNull() ? 
       Standard_True :
       myPreProcessor->Perform(myModel, myParameters);
@@ -106,6 +116,9 @@ public:
       return Standard_False;
     }
 
+    MESSAGE_ADD_LEVEL_SENTRY
+    Handle(Message_Messenger) sout = GetModelBuilder()->GetMessenger();
+    sout << "DiscretizeFaces" << "" << Message_EndLine;
     // Discretize faces of a model.
     return myFaceDiscret->Perform(myModel, myParameters);
   }
@@ -119,6 +132,9 @@ public:
       return Standard_False;
     }
 
+    MESSAGE_ADD_LEVEL_SENTRY
+    Handle(Message_Messenger) sout = GetModelBuilder()->GetMessenger();
+    sout << "PostProcessModel" << "" << Message_EndLine;
     return myPostProcessor.IsNull() ?
       Standard_True :
       myPostProcessor->Perform(myModel, myParameters);
@@ -222,6 +238,9 @@ public:
   {
     return myModel;
   }
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshTools_Context, IMeshData_Shape)
 

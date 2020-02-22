@@ -164,5 +164,19 @@ void BRepMesh_IncrementalMesh::SetParallelDefault(
   IS_IN_PARALLEL = theInParallel;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_IncrementalMesh::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRepMesh_DiscretRoot)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParameters)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myModified)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myStatus)
+}
+
 //! Export Mesh Plugin entry function
 DISCRETPLUGIN(BRepMesh_IncrementalMesh)

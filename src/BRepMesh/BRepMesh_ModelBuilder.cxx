@@ -46,6 +46,10 @@ Handle (IMeshData_Model) BRepMesh_ModelBuilder::performInternal (
   const TopoDS_Shape&          theShape,
   const IMeshTools_Parameters& theParameters)
 {
+  MESSAGE_ADD_LEVEL_SENTRY
+  Handle(Message_Messenger) sout = aContext->GetModelBuilder()->GetMessenger();
+  sout << "BRepMesh_ModelBuilder::performInternal" << "" << Message_EndLine;
+
   Handle (BRepMeshData_Model) aModel;
 
   Bnd_Box aBox;
@@ -81,4 +85,15 @@ Handle (IMeshData_Model) BRepMesh_ModelBuilder::performInternal (
   }
 
   return aModel;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_ModelBuilder::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelBuilder)
 }

@@ -51,6 +51,13 @@ public:
     }
   }
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  }
+
   DEFINE_STANDARD_RTTI_INLINE(IMeshTools_ModelAlgo, Standard_Transient)
 
 protected:

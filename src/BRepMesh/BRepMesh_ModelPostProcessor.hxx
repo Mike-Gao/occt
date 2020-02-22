@@ -32,7 +32,15 @@ public:
   //! Destructor.
   Standard_EXPORT virtual ~BRepMesh_ModelPostProcessor();
 
-  DEFINE_STANDARD_RTTI_INLINE(BRepMesh_ModelPostProcessor, IMeshTools_ModelAlgo)
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
+  }
 
 protected:
 

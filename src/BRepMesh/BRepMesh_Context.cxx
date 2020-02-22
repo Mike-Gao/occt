@@ -43,3 +43,13 @@ BRepMesh_Context::BRepMesh_Context ()
 BRepMesh_Context::~BRepMesh_Context ()
 {
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_Context::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_Context)
+}

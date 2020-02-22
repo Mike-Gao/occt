@@ -38,6 +38,9 @@ public:
   //! Clears parameters list.
   Standard_EXPORT virtual void Clear(const Standard_Boolean isKeepEndPoints) = 0;
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const {}
+
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_ParametersList, Standard_Transient)
 
 protected:

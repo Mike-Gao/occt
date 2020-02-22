@@ -23,6 +23,7 @@
 #include <Message_Level.hxx>
 #include <Message_Report.hxx>
 
+#include <BinTools.hxx>
 #include <Standard_Dump.hxx>
 
 #include <TCollection.hxx>
@@ -34,6 +35,8 @@
 #include <TDF_ChildIterator.hxx>
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
+
+#include <TopoDS_AlertWithShape.hxx>
 
 #include <XmlDrivers.hxx>
 
@@ -259,13 +262,21 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
   TDataStd_AsciiString::Set (theAlertLabel, anAttribute->GetName());
 
   Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
+  TCollection_AsciiString aStreamText;
   if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
   {
     Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
-    // store values
-    TCollection_AsciiString aStreamText = Standard_Dump::Text (aValuesArrayAlert->Stream());
-    if (aStreamText.IsEmpty())
-      return;
+    aStreamText = Standard_Dump::Text (aValuesArrayAlert->Stream());
+  }
+  else if (aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertWithShape)->Name())
+  {
+    Handle(TopoDS_AlertWithShape) aShapeAttribute = Handle(TopoDS_AlertWithShape)::DownCast (anAttribute);
+    Standard_SStream aStream;
+    if (BinTools::Write (aShapeAttribute->GetShape(), aStream))
+      aStreamText = Standard_Dump::Text (aStream);
+  }
+  if (!aStreamText.IsEmpty())
+  {
     Handle(TDataStd_ExtStringArray) aListAttribute = TDataStd_ExtStringArray::Set (theAlertLabel, 0, 0);
     aListAttribute->SetValue (0, aStreamText);
   }
@@ -290,7 +301,8 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
   Handle(Message_Attribute) aMessageAttribute;
   if (aDynamicTypeName == STANDARD_TYPE (Message_Attribute)->Name())
     aMessageAttribute = new Message_Attribute();
-  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
+  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name() ||
+           aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertWithShape)->Name())
   {
     // values
     NCollection_Vector<TCollection_AsciiString> anArrayValues;
@@ -306,7 +318,17 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
     {
       aStream << aValuesAttribute->Value (aValueId);
     }
-    aMessageAttribute = new Message_AttributeStream (aStream);
+
+    if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
+    {
+      aMessageAttribute = new Message_AttributeStream (aStream);
+    }
+    else if (aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertWithShape)->Name())
+    {
+      TopoDS_Shape aShape;
+      if (BinTools::Read (aShape, aStream))
+        aMessageAttribute = new TopoDS_AlertWithShape (aShape);
+    }
   }
 
   if (!aMessageAttribute.IsNull())

@@ -58,6 +58,10 @@ void IMeshTools_MeshBuilder::Perform ()
     return;
   }
 
+  MESSAGE_ADD_LEVEL_SENTRY
+  Handle(Message_Messenger) sout = aContext->GetModelBuilder()->GetMessenger();
+  sout << "IMeshTools_MeshBuilder::Perform" << "" << Message_EndLine;
+
   if (aContext->BuildModel ())
   {
     if (aContext->DiscretizeEdges ())
@@ -115,4 +119,16 @@ void IMeshTools_MeshBuilder::Perform ()
   }
 
   aContext->Clean ();
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void IMeshTools_MeshBuilder::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Message_Algorithm)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myContext.get())
 }

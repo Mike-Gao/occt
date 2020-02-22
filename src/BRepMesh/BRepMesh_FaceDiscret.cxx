@@ -93,3 +93,13 @@ void BRepMesh_FaceDiscret::process(const Standard_Integer theFaceIndex) const
     aDFace->SetStatus (IMeshData_Failure);
   }
 }
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_FaceDiscret::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
+}
