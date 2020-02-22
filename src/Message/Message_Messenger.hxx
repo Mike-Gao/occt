@@ -67,6 +67,9 @@ public:
   //! Returns True if printer has been added.
   Standard_EXPORT Standard_Boolean AddPrinter (const Handle(Message_Printer)& thePrinter);
   
+  //! Returns true if messenger printers contain a printer of specified type (including derived classes) 
+  Standard_EXPORT Standard_Boolean HasPrinter (const Handle(Standard_Type)& theType);
+
   //! Removes specified printer from the messenger.
   //! Returns True if this printer has been found in the list
   //! and removed.
@@ -76,7 +79,7 @@ public:
   //! from the messenger.
   //! Returns number of removed printers.
   Standard_EXPORT Standard_Integer RemovePrinters (const Handle(Standard_Type)& theType);
-  
+
   //! Returns current sequence of printers
   const Message_SequenceOfPrinters& Printers() const { return myPrinters; }
 
@@ -109,6 +112,9 @@ public:
 
   //! See above
   Standard_EXPORT void Send (const Handle(Standard_Transient)& theObject, const Message_Gravity theGravity = Message_Warning, const Standard_Boolean putEndl = Standard_True) const;
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
 private:
 

@@ -26,15 +26,19 @@
 class XmlDrivers_MessageReportStorage
 {
 public:
-  //! Create document for the report
+  //! Stores the report into a file. The file format is an XML document.
   //! \param theReport the source report
   //! \param theFileName a file name
-  Standard_EXPORT static void ExportReport (const Handle(Message_Report)& theReport, const TCollection_AsciiString& theFileName);
+  //! \return true if success
+  Standard_EXPORT static Standard_Boolean ExportReport (const Handle(Message_Report)& theReport,
+                                                        const TCollection_AsciiString& theFileName);
 
-  //! Restores document file content into report instance
+  //! Restores the report from the file. The file format should be an XML document.
+  //! \return theReport the report to get the file content
   //! \param theFileName a file name
-  //! \return new report or NULL
-  Standard_EXPORT static Handle(Message_Report) ImportReport (const TCollection_AsciiString& theFileName);
+  //! \return true if success
+  Standard_EXPORT static Standard_Boolean ImportReport (const Handle(Message_Report)& theReport,
+                                                        const TCollection_AsciiString& theFileName);
 
 private:
   //! Create labels/attributes for the alert and place it under the parent label.
@@ -50,14 +54,13 @@ private:
   //! \param theParentAlert a parent alert, if null, the parent is report
   static void importAlert (const TDF_Label& theAlertLabel,
                            const Message_Gravity theGravity,
-                           Handle(Message_Report)& theReport,
+                           const Handle(Message_Report)& theReport,
                            const Handle(Message_Alert)& theParentAlert);
 
   //! Convert alert to a custom type and store parameters in child labels and attributes
   //! \param theAlert a source alert
   //! \parm theAlertLabel an alert label
-  static void exportAlertParameters (const Handle(Message_Alert)& theAlert,
-                                     const TDF_Label& theAlertLabel);
+  static void exportAlertParameters (const Handle(Message_Alert)& theAlert, const TDF_Label& theAlertLabel);
 
   //! Creates alert by label type filled by the label content
   //! \param theParametersLabel a label
@@ -65,10 +68,16 @@ private:
   static Handle(Message_Alert) importAlertParameters (const TDF_Label& aParametersLabel);
 };
 
-#define MESSAGE_STORE_XML_REPORT(FileName) \
+#define MESSAGE_REPORT_EXPORT(FileName) \
 { \
   Handle(Message_Report) aReport = Message::DefaultReport (Standard_False); \
   if (!aReport.IsNull()) XmlDrivers_MessageReportStorage::ExportReport (aReport, FileName); \
+}
+
+#define MESSAGE_REPORT_IMPORT(FileName) \
+{ \
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_True); \
+  if (!aReport.IsNull()) XmlDrivers_MessageReportStorage::ImportReport (aReport, FileName); \
 }
 
 #endif // _XmlDrivers_MessageReportStorage

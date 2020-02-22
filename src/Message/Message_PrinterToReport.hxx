@@ -71,6 +71,9 @@ public:
   Standard_EXPORT virtual void Send (const Handle(Standard_Transient)& theObject,
                                      const Message_Gravity theGravity,
                                      const Standard_Boolean theToPutEol) const Standard_OVERRIDE;
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
+
 protected:
 
   //! Send an alert with metrics active in the current report

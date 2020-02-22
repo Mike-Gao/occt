@@ -17,6 +17,7 @@
 
 #include <Message_PrinterSystemLog.hxx>
 
+#include <Standard_Dump.hxx>
 #include <TCollection_ExtendedString.hxx>
 
 #if defined(OCCT_UWP)
@@ -187,4 +188,13 @@ void Message_PrinterSystemLog::Send (const TCollection_ExtendedString& theString
 #else
   Send (TCollection_AsciiString (theString), theGravity, true);
 #endif
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Message_PrinterSystemLog::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 }

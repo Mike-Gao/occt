@@ -44,7 +44,6 @@
 // function : GetApplication
 // purpose :
 // =======================================================================
-
 const Handle(TDocStd_Application)& GetApplication()
 {
   static Handle(TDocStd_Application) anApp;
@@ -60,12 +59,11 @@ const Handle(TDocStd_Application)& GetApplication()
 // function : ExportReport
 // purpose :
 // =======================================================================
-
-void XmlDrivers_MessageReportStorage::ExportReport (const Handle(Message_Report)& theReport,
-                                                    const TCollection_AsciiString& theFileName)
+Standard_Boolean XmlDrivers_MessageReportStorage::ExportReport (const Handle(Message_Report)& theReport,
+                                                                const TCollection_AsciiString& theFileName)
 {
   if (theReport.IsNull())
-    return;
+    return Standard_False;
 
   Handle(TDocStd_Document) aDocument;
   GetApplication()->NewDocument (TCollection_ExtendedString ("XmlOcaf"), aDocument);
@@ -95,16 +93,19 @@ void XmlDrivers_MessageReportStorage::ExportReport (const Handle(Message_Report)
       exportAlert (anAlertsIt.Value(), aGravityLabel);
     }
   }
-  GetApplication()->SaveAs (aDocument, theFileName);
+  if (GetApplication()->SaveAs (aDocument, theFileName) != PCDM_SS_OK)
+    return Standard_False;
+
   GetApplication()->Close (aDocument);
+  return Standard_True;
 }
 
 // =======================================================================
 // function : ImportReport
 // purpose :
 // =======================================================================
-
-Handle(Message_Report) XmlDrivers_MessageReportStorage::ImportReport (const TCollection_AsciiString& theFileName)
+Standard_Boolean XmlDrivers_MessageReportStorage::ImportReport (const Handle(Message_Report)& theReport,
+                                                                const TCollection_AsciiString& theFileName)
 {
   Handle(TDocStd_Application) anApplication = GetApplication();
   Standard_Integer aDocumentId = anApplication->IsInSession (theFileName);
@@ -118,14 +119,13 @@ Handle(Message_Report) XmlDrivers_MessageReportStorage::ImportReport (const TCol
   Handle(TDocStd_Document) aDocument;
   GetApplication()->Open (theFileName, aDocument);
   if (aDocument.IsNull())
-    return Handle(Message_Report)();
+    return Standard_False;
 
   TDF_Label aMainLabel = aDocument->Main();
   if (aMainLabel.IsNull())
-    return Handle(Message_Report)();
+    return Standard_False;
 
   TDF_Label aLabel;
-  Handle(Message_Report) aReport = new Message_Report();
   for (TDF_ChildIterator aLabelsIt(aMainLabel); aLabelsIt.More(); aLabelsIt.Next())
   {
     TDF_Label aGravityLabel = aLabelsIt.Value();
@@ -152,17 +152,16 @@ Handle(Message_Report) XmlDrivers_MessageReportStorage::ImportReport (const TCol
       if (anAlertLabel.IsNull())
         continue;
 
-      importAlert (anAlertLabel, aGravity, aReport, Handle(Message_Alert)());
+      importAlert (anAlertLabel, aGravity, theReport, Handle(Message_Alert)());
     }
   }
-  return aReport;
+  return Standard_True;
 }
 
 // =======================================================================
 // function : exportAlert
 // purpose :
 // =======================================================================
- 
 void XmlDrivers_MessageReportStorage::exportAlert (const Handle(Message_Alert)& theAlert, const TDF_Label& theParentLabel)
 {
    TDF_Label anAlertLabel = theParentLabel.NewChild();
@@ -196,10 +195,9 @@ void XmlDrivers_MessageReportStorage::exportAlert (const Handle(Message_Alert)& 
 // function : importAlert
 // purpose :
 // =======================================================================
-
 void XmlDrivers_MessageReportStorage::importAlert (const TDF_Label& theAlertLabel,
                                                    const Message_Gravity theGravity,
-                                                   Handle(Message_Report)& theReport,
+                                                   const Handle(Message_Report)& theReport,
                                                    const Handle(Message_Alert)& theParentAlert)
 {
   TDF_Label aParametersLabel = theAlertLabel.FindChild (1, Standard_False);

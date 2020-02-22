@@ -20,6 +20,7 @@
 #include <Message_PrinterOStream.hxx>
 
 #include <OSD_OpenFile.hxx>
+#include <Standard_Dump.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 
@@ -282,4 +283,13 @@ void Message_PrinterOStream::SetConsoleTextColor (Standard_OStream* theOStream,
   }
   *theOStream << aCode;
 #endif
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Message_PrinterOStream::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 }

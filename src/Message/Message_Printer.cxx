@@ -93,3 +93,12 @@ void Message_Printer::Send (const Handle(Standard_Transient)& theObject,
     Send (aString, theGravity, theToOutEol);
   }
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Message_Printer::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+}

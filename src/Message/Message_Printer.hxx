@@ -76,6 +76,9 @@ public:
   //! Default implementation calls first method Send().
   Standard_EXPORT virtual void Send (const Handle(Standard_Transient)& theObject, const Message_Gravity theGravity, const Standard_Boolean theToPutEol) const;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
 protected:
 
   //! Empty constructor with Message_Info trace level

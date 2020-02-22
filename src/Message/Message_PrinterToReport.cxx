@@ -117,3 +117,12 @@ void Message_PrinterToReport::sendMetricAlert (const TCollection_AsciiString the
   Message_AlertExtended::AddAlert (Report(), new Message_AttributeMeter (theValue), theGravity);
   ((Message_PrinterToReport*)this)->Clear();
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Message_PrinterToReport::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+}

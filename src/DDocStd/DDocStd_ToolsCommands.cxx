@@ -149,25 +149,63 @@ static Standard_Integer DDocStd_DumpCommand (Draw_Interpretor& di,
     }
     return 0;
   } 
-  di << "TDocStd_DumpCommand : Error\n";
+  std::cerr << "TDocStd_DumpCommand : Error\n";
   return 1;
 }
 
 //=======================================================================
-//function : DDocStd_WriteReport 
+//function : DDocStd_ReadMessageReport
 //=======================================================================
-
-static Standard_Integer DDocStd_WriteReport(Draw_Interpretor& di,Standard_Integer n, const char** a)
+static Standard_Integer DDocStd_ReadMessageReport (Draw_Interpretor& theDI, Standard_Integer theArgNb, const char** theArgVec)
 {
-  if (n < 2)
+  if (theArgNb < 2)
   {
-    di << "DDocStd_WriteReport : Error not enough argument\n";
+    std::cout << "Error: wrong number of arguments! See usage:\n";
+    theDI.PrintHelp (theArgVec[0]);
     return 1;
   }
 
-  TCollection_ExtendedString aPath (a[1]); 
-  MESSAGE_STORE_XML_REPORT (aPath);
+  TCollection_ExtendedString aFileName (theArgVec[1]);
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_False);
+  if (aReport.IsNull())
+  {
+    std::cerr << "Error: Message_Report is not created.\n";
+    return 0;
+  }
 
+  if (!XmlDrivers_MessageReportStorage::ExportReport (aReport, aFileName))
+  {
+    std::cerr << "Error: Message_Report can not be exported in " << aFileName << ".\n";
+    return 0;
+  }
+  return 0;
+}
+
+//=======================================================================
+//function : DDocStd_WriteMessageReport
+//=======================================================================
+static Standard_Integer DDocStd_WriteMessageReport (Draw_Interpretor& theDI, Standard_Integer theArgNb, const char** theArgVec)
+{
+  if (theArgNb < 2)
+  {
+    std::cout << "Error: wrong number of arguments! See usage:\n";
+    theDI.PrintHelp (theArgVec[0]);
+    return 1;
+  }
+
+  TCollection_ExtendedString aFileName (theArgVec[1]);
+  Handle(Message_Report) aReport = Message::DefaultReport (Standard_False);
+  if (aReport.IsNull())
+  {
+    std::cerr << "Error: Message_Report is not created.\n";
+    return 0;
+  }
+
+  if (!XmlDrivers_MessageReportStorage::ExportReport (aReport, aFileName))
+  {
+    std::cerr << "Error: Message_Report can not be exported in " << aFileName << ".\n";
+    return 0;
+  }
   return 0;
 }
 
@@ -192,9 +230,15 @@ void DDocStd::ToolsCommands(Draw_Interpretor& theCommands)
                    "DumpCommand (DOC)",
 		   __FILE__, DDocStd_DumpCommand, g);   
 
-  theCommands.Add ("WriteReport", 
-                   "WriteReport path",
-		   __FILE__, DDocStd_WriteReport, g);   
+  theCommands.Add ("ReadMessageReport",
+                   "ReadMessageReport FileName"
+    "\nRestores content of the default Message_Report from the file. This file is an XML document."
+    "\nIt might be restored into report using ReadMessageReport."
+                   __FILE__, DDocStd_ReadMessageReport, g);
 
+  theCommands.Add ("WriteMessageReport",
+                   "WriteMessageReport FileName"
+    "\nStores the default Message_Report into a file. This is an XML document."
+    "\nIt might be restored into report using ReadMessageReport."
+                   __FILE__, DDocStd_WriteMessageReport, g);
 }
-
