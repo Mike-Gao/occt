@@ -46,6 +46,9 @@ struct IMeshTools_Parameters {
     return 0.1;
   }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
   //! Angular deflection used to tessellate the boundary edges
   Standard_Real                                    Angle;
 

@@ -133,6 +133,10 @@ options:\n\
         {
           aMeshParams.Angle = aVal * M_PI / 180.;
         }
+        if (aOpt == "-ae")
+        {
+          aMeshParams.Angle = aVal;
+        }
         else if (aOpt == "-ai")
         {
           aMeshParams.AngleInterior = aVal * M_PI / 180.;

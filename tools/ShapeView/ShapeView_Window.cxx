@@ -107,6 +107,7 @@ ShapeView_Window::ShapeView_Window (QWidget* theParent)
                     aVisibilityState, SLOT (OnClicked(const QModelIndex&)));
 
   QItemSelectionModel* aSelModel = new QItemSelectionModel (myTreeView->model(), myTreeView);
+  myTreeView->setSelectionMode (QAbstractItemView::ExtendedSelection);
   myTreeView->setSelectionModel (aSelModel);
   connect (aSelModel, SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)),
            this, SLOT (onTreeViewSelectionChanged (const QItemSelection&, const QItemSelection&)));
@@ -360,17 +361,16 @@ void ShapeView_Window::onTreeViewContextMenuRequested (const QPoint& thePosition
 
   QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (aModel->selectedIndexes(), 0);
   TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
-  if (!anItemBase)
-    return;
-
   QMenu* aMenu = new QMenu(myMainWindow);
+
   ShapeView_ItemRootPtr aRootItem = itemDynamicCast<ShapeView_ItemRoot> (anItemBase);
   if (aRootItem) {
     aMenu->addAction (ViewControl_Tools::CreateAction ("Load BREP file", SLOT (onLoadFile()), myMainWindow, this));
     aMenu->addAction (ViewControl_Tools::CreateAction ("Remove all shape items", SLOT (onClearView()), myMainWindow, this));
   }
-  else {
+  else if (anItemBase) { // single selection
     aMenu->addAction (ViewControl_Tools::CreateAction ("Export to BREP", SLOT (onExportToBREP()), myMainWindow, this));
+
     ShapeView_ItemShapePtr aShapeItem = itemDynamicCast<ShapeView_ItemShape>(anItemBase);
     const TopoDS_Shape& aShape = aShapeItem->GetItemShape();
     TopAbs_ShapeEnum anExplodeType = aShapeItem->ExplodeType();
@@ -396,6 +396,7 @@ void ShapeView_Window::onTreeViewContextMenuRequested (const QPoint& thePosition
       anExplodeMenu->addAction (anAction);
     }
   }
+  aMenu->addAction (ViewControl_Tools::CreateAction ("Create Compound", SLOT (onCreateCompound()), myMainWindow, this));
 
   QPoint aPoint = myTreeView->mapToGlobal (thePosition);
   aMenu->exec (aPoint);
@@ -520,4 +521,34 @@ void ShapeView_Window::onExportToBREP()
   BRepTools::Write (aShape, aFileNameIndiced.ToCString());
   anItem->SetFileName (aFileNameIndiced.ToCString());
   aFileName = aFileNameIndiced.ToCString();
+}
+
+// =======================================================================
+// function : onCreateCompound
+// purpose :
+// =======================================================================
+void ShapeView_Window::onCreateCompound()
+{
+  QItemSelectionModel* aModel = myTreeView->selectionModel();
+  if (!aModel)
+    return;
+  QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::SelectedItems (aModel->selectedIndexes());
+
+  QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
+  NCollection_List<Handle(Standard_Transient)> anItemPresentations;
+
+  BRep_Builder aBB;
+  TopoDS_Compound aC;
+  aBB.MakeCompound(aC);
+
+  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); ++anItemIt)
+  {
+    ShapeView_ItemShapePtr anItem = itemDynamicCast<ShapeView_ItemShape>(*anItemIt);
+    if (!anItem)
+      return;
+
+    aBB.Add(aC, anItem->GetItemShape());
+  }
+
+  addShape (aC);
 }

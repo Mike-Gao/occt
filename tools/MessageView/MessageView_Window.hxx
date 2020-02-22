@@ -13,15 +13,23 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement. 
 
-#ifndef ShapeView_Window_H
-#define ShapeView_Window_H
+#ifndef MessageView_Window_H
+#define MessageView_Window_H
 
+#include <Message_Report.hxx>
 #include <Standard.hxx>
 #include <TCollection_AsciiString.hxx>
+
+#include <inspector/MessageModel_Actions.hxx>
 #include <inspector/TInspectorAPI_PluginParameters.hxx>
+
+#include <AIS_InteractiveContext.hxx>
+#include <AIS_InteractiveObject.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <Standard_WarningsDisable.hxx>
+#ifdef _MSC_VER
+#pragma warning(disable : 4127) // conditional expression is constant
+#endif
 #include <QItemSelection>
 #include <QList>
 #include <QModelIndexList>
@@ -29,29 +37,31 @@
 #include <QPoint>
 #include <QString>
 #include <QTreeView>
-#include <Standard_WarningsRestore.hxx>
 
+class View_Displayer;
 class View_Window;
 
 class ViewControl_PropertyView;
 
-class QAction;
+class MessageView_ActionsTest;
+
 class QDockWidget;
 class QMainWindow;
+class QMenu;
 class QWidget;
 
-//! \class ShapeView_Window
-//! Window that unites all ShapeView controls.
-class ShapeView_Window : public QObject
+//! \class MessageView_Window
+//! Window that unites all MessageView controls.
+class MessageView_Window : public QObject
 {
   Q_OBJECT
 public:
 
   //! Constructor
-  Standard_EXPORT ShapeView_Window (QWidget* theParent);
+  Standard_EXPORT MessageView_Window (QWidget* theParent);
 
   //! Destructor
-  Standard_EXPORT virtual ~ShapeView_Window();
+  virtual ~MessageView_Window() {}
 
   //! Provides the container with a parent where this container should be inserted.
   //! If Qt implementation, it should be QWidget with QLayout set inside
@@ -60,9 +70,10 @@ public:
 
   //! Sets parameters container, it should be used when the plugin is initialized or in update content
   //! \param theParameters a parameters container
-  void SetParameters (const Handle(TInspectorAPI_PluginParameters)& theParameters) { myParameters = theParameters; }
+  void SetParameters (const Handle(TInspectorAPI_PluginParameters)& theParameters)
+  { myParameters = theParameters; myTreeViewActions->SetParameters (theParameters); }
 
-  //! Provides container for actions available in inspector on general level
+  //! Provide container for actions available in inspector on general level
   //! \param theMenu if Qt implementation, it is QMenu object
   Standard_EXPORT virtual void FillActionsMenu (void* theMenu);
 
@@ -83,13 +94,12 @@ public:
   //! Returns current tree view
   QTreeView* GetTreeView() const { return myTreeView; }
 
-  //! Removes all shapes in tree view model, remove all stored BREP files
-  Standard_EXPORT void RemoveAllShapes();
-
 protected:
   //! Appends shape into tree view model
   //! \param theShape a shape instance
-  Standard_EXPORT void addShape (const TopoDS_Shape& theShape);
+  //! \param theReportDescription an additional report information
+  void addReport (const Handle(Message_Report)& theReport,
+                  const TCollection_AsciiString& theReportDescription = "");
 
 private:
 
@@ -98,61 +108,90 @@ private:
   //! \param theParameters a parameters container
   void Init (NCollection_List<Handle(Standard_Transient)>& theParameters);
 
-  //! Reads Shape from the file name, add Shape into tree view
+  //! Read Shape from the file name, add Shape into tree view
   //! \param theFileName BREP file name
-  void OpenFile (const TCollection_AsciiString& theFileName);
+  void openFile (const TCollection_AsciiString& theFileName);
+
+  //! Updates tree model
+  void updateTreeModel();
 
 protected slots:
+  //! Updates property view selection in table if the item is hidden
+  //! \param theIndex tree view model index
+  void onTreeViewVisibilityClicked(const QModelIndex& theIndex);
+
+  //! Udpates all controls by changed selection in OCAF tree view
+  //! \param theSelected list of selected tree view items
+  //! \param theDeselected list of deselected tree view items
+  void onTreeViewSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
   //! Shows context menu for tree view selected item. It contains expand/collapse actions.
   //! \param thePosition a clicked point
   void onTreeViewContextMenuRequested (const QPoint& thePosition);
 
-  //! Processes selection in tree view: make presentation or owner selected in the context if corresponding
-  //! check box is checked
-  //! \param theSelected a selected items
-  //! \param theDeselected a deselected items
-  void onTreeViewSelectionChanged (const QItemSelection& theSelected, const QItemSelection& theDeselected);
+  //! Display content of selected tree view item if isToggled is true
+  //! \param isToggled true if the property dock widget is shown
+  void onPropertyPanelShown (bool isToggled);
+
+  //! Update tree view item, preview presentation by item value change
+  void onPropertyViewDataChanged();
 
   //! Updates visibility states by erase all in context
   void onEraseAllPerformed();
 
-  //! Sets the shape item exploded
-  void onExplode();
+  //! Export report into document
+  void onExportReport();
 
-  //! Removes all shapes in tree view
-  void onClearView() { RemoveAllShapes(); }
+  //! Import report into document
+  void onImportReport();
 
-  //! Loads BREP file and updates tree model to have shape of the file
-  void onLoadFile();
+  //! Unite alerts in view model
+  //void onUniteAlerts();
 
-  //! Views BREP files of selected items if exist
-  void onExportToBREP();
+  //! Sets report reversed 
+  void onSetReversedAlerts();
 
-  //! Create a compound of selected shapes
-  void onCreateCompound();
+  //! Reads if possible report of a selected item and updates this report in tree view
+  void onReloadReport();
 
-  //! Convers file name to Ascii String and perform opeging file
-  //! \param theFileName a file name to be opened
-  void onOpenFile(const QString& theFileName) { OpenFile (TCollection_AsciiString (theFileName.toUtf8().data())); }
+  //! Switch active state in report for clicked type of metric
+  void OnActivateMetric();
+
+  //! Deactivate all types of metrics for the current report
+  void OnDeactivateAllMetrics();
 
 protected:
-  //! Creates new action and connect it to the given slot
-  //! \param theText an action text
-  //! \param theSlot a listener method
-  QAction* createAction (const QString& theText, const char* theSlot);
+  //! Appends items to activate report metrics
+  void addActivateMetricActions (QMenu* theMenu);
+
+  //! Returns displayer where the presentations/preview should be shown/erased
+  //! If default view is created, it returns displayer of this view
+  Standard_EXPORT View_Displayer* displayer();
+
+  //! Updates property panel content by item selected in tree view.
+  void updatePropertyPanelBySelection();
+
+  //!< Updates presentation of preview for parameter shapes. Creates a compound of the shapes
+  void updatePreviewPresentation();
+
+  //!< Sets reports metric columns visible if used
+  void updateVisibleColumns();
 
 private:
-
-  QMainWindow* myMainWindow; //!< main control, parent for all ShapeView controls
+  QMainWindow* myMainWindow; //!< main control, parent for all MessageView controls
+  QDockWidget* myViewDockWidget; //!< view dock widget to hide/show
 
   QDockWidget* myPropertyPanelWidget; //!< property pane dockable widget
   ViewControl_PropertyView* myPropertyView; //!< property control to display model item values if exist
 
   View_Window* myViewWindow; //!< OCC 3d view to visualize presentations
   QTreeView* myTreeView; //!< tree view visualized shapes
+  MessageModel_Actions* myTreeViewActions; //!< processing history view actions
+  MessageView_ActionsTest* myTestViewActions; //!< check view actions
 
   Handle(TInspectorAPI_PluginParameters) myParameters; //!< plugins parameters container
+
+  Handle(AIS_InteractiveObject) myPreviewPresentation; //!< presentation of preview for a selected object
 };
 
 #endif

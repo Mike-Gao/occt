@@ -21,6 +21,8 @@
 #include <IMeshData_Face.hxx>
 #include <IMeshData_Wire.hxx>
 #include <IMeshTools_MeshBuilder.hxx>
+#include <Message.hxx>
+#include <Message_Messenger.hxx>
 
 namespace
 {
@@ -97,6 +99,9 @@ void BRepMesh_IncrementalMesh::Perform()
 //=======================================================================
 void BRepMesh_IncrementalMesh::Perform(const Handle(IMeshTools_Context)& theContext)
 {
+  Handle(Message_Messenger) sout = Message::DefaultMessenger();
+  sout << "BRepMesh_IncrementalMesh::Perform" << Message_EndLine;
+
   initParameters();
 
   theContext->SetShape(Shape());

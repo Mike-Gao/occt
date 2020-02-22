@@ -603,7 +603,7 @@ void VInspector_Window::onTreeViewSelectionChanged (const QItemSelection&,
   }
 
   SelectedShapes (aSelPresentations);
-  displayer()->DisplayPreview()->UpdatePreview (View_DisplayActionType_DisplayId, aSelPresentations, myViewWindow->ViewWidget()->DisplayMode());
+  displayer()->DisplayPreview()->UpdatePreview (View_DisplayActionType_DisplayId, aSelPresentations, displayer()->DisplayMode());
 }
 
 // =======================================================================
@@ -636,12 +636,12 @@ void VInspector_Window::onExportToShapeView()
 
   TCollection_AsciiString aPluginName ("TKShapeView");
   NCollection_List<Handle(Standard_Transient)> aParameters;
-  if (myParameters->FindParameters (aPluginName))
-    aParameters = myParameters->Parameters (aPluginName);
+  //if (myParameters->FindParameters (aPluginName))
+  //  aParameters = myParameters->Parameters (aPluginName);
 
   NCollection_List<TCollection_AsciiString> anItemNames;
-  if (myParameters->FindSelectedNames (aPluginName))
-    anItemNames = myParameters->GetSelectedNames (aPluginName);
+  //if (myParameters->FindSelectedNames (aPluginName))
+  //  anItemNames = myParameters->GetSelectedNames (aPluginName);
 
   QStringList anExportedPointers;
   if (aSelectedShapes.Extent() > 0)
@@ -661,23 +661,23 @@ void VInspector_Window::onExportToShapeView()
     }
   }
 
-  // search for objects to be exported
-  QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::SelectedItems (myTreeView->selectionModel()->selectedIndexes());
-  for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); ++anItemIt)
-  {
-    TreeModel_ItemBasePtr anItem = *anItemIt;
-    VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
-    if (!aVItem)
-    continue;
+  //// search for objects to be exported
+  //QList<TreeModel_ItemBasePtr> anItems = TreeModel_ModelBase::SelectedItems (myTreeView->selectionModel()->selectedIndexes());
+  //for (QList<TreeModel_ItemBasePtr>::const_iterator anItemIt = anItems.begin(); anItemIt != anItems.end(); ++anItemIt)
+  //{
+  //  TreeModel_ItemBasePtr anItem = *anItemIt;
+  //  VInspector_ItemBasePtr aVItem = itemDynamicCast<VInspector_ItemBase>(anItem);
+  //  if (!aVItem)
+  //  continue;
 
-    const Handle(Standard_Transient)& anObject = aVItem->Object();
-    if (anObject.IsNull())
-      continue;
+  //  const Handle(Standard_Transient)& anObject = aVItem->Object();
+  //  if (anObject.IsNull())
+  //    continue;
 
-    aParameters.Append (anObject);
-    anItemNames.Append (anObject->DynamicType()->Name());
-    anExportedPointers.append (Standard_Dump::GetPointerInfo (anObject, true).ToCString());
-  }
+  //  aParameters.Append (anObject);
+  //  anItemNames.Append (anObject->DynamicType()->Name());
+  //  anExportedPointers.append (Standard_Dump::GetPointerInfo (anObject, true).ToCString());
+  //}
 
   if (anExportedPointers.isEmpty())
     return;
