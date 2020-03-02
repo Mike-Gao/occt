@@ -114,6 +114,10 @@ public:
   //! Computes angular step for the arc using the given parameters.
   Standard_EXPORT static Standard_Real ArcAngularStep (const Standard_Real theRadius, const Standard_Real theLinearDeflection, const Standard_Real theAngularDeflection, const Standard_Real theMinLength);
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
+
 private:
   
   Standard_EXPORT void PerformLinear (const Adaptor3d_Curve& C);

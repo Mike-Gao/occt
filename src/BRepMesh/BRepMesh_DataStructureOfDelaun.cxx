@@ -18,6 +18,7 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepMesh_Edge.hxx>
+#include <Message_Messenger.hxx>
 
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
@@ -191,6 +192,8 @@ Standard_Integer BRepMesh_DataStructureOfDelaun::AddElement(
 {
   myElements.Append(theElement);
   Standard_Integer aElementIndex = myElements.Size();
+  OCCT_SEND_MESSAGE (TCollection_AsciiString ("AddElement: ") + aElementIndex)
+
   myElementsOfDomain.Add(aElementIndex);
 
   const Standard_Integer (&e)[3] = theElement.myEdges;
@@ -207,6 +210,8 @@ Standard_Integer BRepMesh_DataStructureOfDelaun::AddElement(
 void BRepMesh_DataStructureOfDelaun::RemoveElement(
   const Standard_Integer theIndex)
 {
+  OCCT_SEND_MESSAGE (TCollection_AsciiString ("RemoveElement: ") + theIndex)
+
   BRepMesh_Triangle& aElement = (BRepMesh_Triangle&)GetElement(theIndex);
   if (aElement.Movability() == BRepMesh_Deleted)
     return;
@@ -483,6 +488,80 @@ void BRepMesh_DataStructureOfDelaun::Statistics(Standard_OStream& theStream) con
 }
 
 //=======================================================================
+//function : BRepMesh_DumpToShape
+//purpose  : 
+//  Global function not declared in any public header, intended for use 
+//  from debugger prompt (Command Window in Visual Studio).
+//
+//  Stores the mesh data structure to BRep file with the given name.
+//=======================================================================
+TopoDS_Shape BRepMesh_DumpToShape(void* theMeshHandlePtr)
+{
+  if (theMeshHandlePtr == 0)
+  {
+    return TopoDS_Shape();
+  }
+
+  Handle(BRepMesh_DataStructureOfDelaun) aMeshData =
+    *(Handle(BRepMesh_DataStructureOfDelaun)*)theMeshHandlePtr;
+
+  if (aMeshData.IsNull())
+    return TopoDS_Shape();
+
+  TopoDS_Compound aMesh;
+  BRep_Builder aBuilder;
+  aBuilder.MakeCompound(aMesh);
+
+  try
+  {
+    OCC_CATCH_SIGNALS
+
+    if (aMeshData->LinksOfDomain().IsEmpty())
+    {
+      const Standard_Integer aNodesNb = aMeshData->NbNodes();
+      for (Standard_Integer i = 1; i <= aNodesNb; ++i)
+      {
+        const gp_XY& aNode = aMeshData->GetNode(i).Coord();
+        gp_Pnt aPnt(aNode.X(), aNode.Y(), 0.);
+        aBuilder.Add(aMesh, BRepBuilderAPI_MakeVertex(aPnt));
+      }
+    }
+    else
+    {
+      IMeshData::IteratorOfMapOfInteger aLinksIt(aMeshData->LinksOfDomain());
+      for (; aLinksIt.More(); aLinksIt.Next())
+      {
+        const BRepMesh_Edge& aLink = aMeshData->GetLink(aLinksIt.Key());
+        gp_Pnt aPnt[2];
+        for (Standard_Integer i = 0; i < 2; ++i)
+        {
+          const Standard_Integer aNodeId = 
+            (i == 0) ? aLink.FirstNode() : aLink.LastNode();
+
+          const gp_XY& aNode = aMeshData->GetNode(aNodeId).Coord();
+          aPnt[i] = gp_Pnt(aNode.X(), aNode.Y(), 0.);
+        }
+
+        if (aPnt[0].SquareDistance(aPnt[1]) < Precision::SquareConfusion())
+          continue;
+
+        aBuilder.Add(aMesh, BRepBuilderAPI_MakeEdge(aPnt[0], aPnt[1]));
+      }
+    }
+
+    //if (!BRepTools::Write(aMesh, theFileNameStr))
+    //  return "Error: write failed";
+  }
+  catch (Standard_Failure const& anException)
+  {
+    //return anException.GetMessageString();
+  }
+  return aMesh;
+
+  //return theFileNameStr;
+}
+
+//=======================================================================
 //function : BRepMesh_Write
 //purpose  : 
 //  Global function not declared in any public header, intended for use 
@@ -504,7 +583,11 @@ Standard_CString BRepMesh_Dump(void*            theMeshHandlePtr,
   if (aMeshData.IsNull())
     return "Error: mesh data is empty";
 
-  TopoDS_Compound aMesh;
+  TopoDS_Shape aShape = BRepMesh_DumpToShape(theMeshHandlePtr);
+  if (!BRepTools::Write(aShape, theFileNameStr))
+    return "Error: write failed";
+
+  /*TopoDS_Compound aMesh;
   BRep_Builder aBuilder;
   aBuilder.MakeCompound(aMesh);
 
@@ -551,13 +634,48 @@ Standard_CString BRepMesh_Dump(void*            theMeshHandlePtr,
   catch (Standard_Failure const& anException)
   {
     return anException.GetMessageString();
-  }
+  }*/
 
   return theFileNameStr;
+}
+
+TopoDS_Shape BRepMesh_DataStructureOfDelaun::DumpToShape()
+{
+  Handle(BRepMesh_DataStructureOfDelaun) aMeshData (this);
+  return BRepMesh_DumpToShape((void*)&aMeshData);
 }
 
 void BRepMesh_DataStructureOfDelaun::Dump(Standard_CString theFileNameStr)
 {
   Handle(BRepMesh_DataStructureOfDelaun) aMeshData (this);
   BRepMesh_Dump((void*)&aMeshData, theFileNameStr);
+}
+
+void BRepMesh_DataStructureOfDelaun::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myNodes.get())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNodeLinks.Size())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLinks.Size())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDelLinks.Size())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myElements.Size())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myElementsOfDomain.Extent())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLinksOfDomain.Extent())
+
+  for (IMeshData::VectorOfElements::Iterator aElementIt(myElements); aElementIt.More(); aElementIt.Next())
+  {
+    const BRepMesh_Triangle& anElement = aElementIt.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &anElement)
+  }
+
+  for (IMeshData::IDMapOfLink::Iterator aLinkIt (myLinks); aLinkIt.More(); aLinkIt.Next())
+  {
+    const BRepMesh_Edge& anEdge = aLinkIt.Key();
+    const BRepMesh_PairOfIndex& aPair = aLinkIt.Value();
+
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &anEdge)
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aPair)
+  }
 }

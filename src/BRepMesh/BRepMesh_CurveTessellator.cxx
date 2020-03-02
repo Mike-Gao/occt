@@ -340,3 +340,32 @@ void BRepMesh_CurveTessellator::splitSegment (
   splitSegment (theSurf, theCurve2d, theFirst, midpar, theNbIter + 1);
   splitSegment (theSurf, theCurve2d, midpar, theLast, theNbIter + 1);
 }
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_CurveTessellator::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_CurveTessellator)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDEdge.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParameters)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEdge)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCurve)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myDiscretTool)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myFirstVertex)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myLastVertex)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySquareEdgeDef)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySquareMinSize)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myEdgeSqTol)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceRangeU[0])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceRangeU[1])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceRangeV[0])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceRangeV[1])
+}

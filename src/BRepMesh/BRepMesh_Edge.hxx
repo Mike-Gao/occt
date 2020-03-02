@@ -81,6 +81,15 @@ public:
     return IsEqual(Other);
   }
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_Edge)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRepMesh_OrientedEdge)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMovability)
+  }
+
 private:
 
   BRepMesh_DegreeOfFreedom  myMovability;

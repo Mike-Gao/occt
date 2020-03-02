@@ -29,7 +29,7 @@ void TopoDS_TShape::DumpJson (Standard_OStream& theOStream, Standard_Integer) co
 {
   OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 
-  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this)
+  //OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this)
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, ShapeType())
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, NbChildren())

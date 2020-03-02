@@ -19,6 +19,7 @@
 #include <Message_Algorithm.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -59,6 +60,13 @@ public:
       SetStatus (Message_Fail2);
       return NULL;
     }
+  }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Message_Algorithm)
   }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshTools_ModelBuilder, Message_Algorithm)

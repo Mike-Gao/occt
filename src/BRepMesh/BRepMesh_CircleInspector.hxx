@@ -127,6 +127,22 @@ public:
     return (theIndex == theTargetIndex);
   }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_VertexInspector)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySqTolerance)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myResIndices.Extent())
+
+    for (Standard_Integer anIt = 1; anIt <= myCircles.Length(); ++anIt)
+    {
+      const BRepMesh_Circle& aCircle = myCircles.Value(anIt - 1);
+      OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aCircle)
+    }
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoint)
+  }
+
 private:
   Standard_Real             mySqTolerance;
   IMeshData::ListOfInteger  myResIndices;

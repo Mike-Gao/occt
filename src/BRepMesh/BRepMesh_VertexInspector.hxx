@@ -149,6 +149,27 @@ public:
     return (theIndex == theTargetIndex);
   }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_VertexInspector)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIndex)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMinSqDist)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance[0])
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance[1])
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVertices->Length())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDelNodes.Extent())
+
+    for (Standard_Integer anIt = 1; anIt <= myVertices->Length(); ++anIt)
+    {
+      BRepMesh_Vertex& aVertex = myVertices->ChangeValue(anIt - 1);
+      OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aVertex)
+    }
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoint)
+  }
+
 private:
 
   Standard_Integer                  myIndex;

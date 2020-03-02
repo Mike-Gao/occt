@@ -186,3 +186,18 @@ void BRepMesh_CircleTool::MocBind(const Standard_Integer theIndex)
   BRepMesh_Circle aNullCir(gp::Origin2d().Coord(), -1.);
   mySelector.Bind(theIndex, aNullCir);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_CircleTool::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_CircleTool)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &mySelector)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myFaceMax)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myFaceMin)
+}

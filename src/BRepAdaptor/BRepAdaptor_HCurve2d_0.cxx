@@ -40,3 +40,14 @@
 #define Handle_Adaptor2d_GenHCurve2d Handle(BRepAdaptor_HCurve2d)
 #include <Adaptor2d_GenHCurve2d.gxx>
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepAdaptor_HCurve2d::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor2d_HCurve2d)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCurve)
+}

@@ -51,3 +51,8 @@ gp_Circ gp_Circ::Mirrored (const gp_Ax2& A2) const
   return C; 
 }
 
+void gp_Circ::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &pos)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, radius)
+}

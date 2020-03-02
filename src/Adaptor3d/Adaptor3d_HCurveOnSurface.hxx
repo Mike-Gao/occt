@@ -59,6 +59,8 @@ public:
   //! Returns the curve used to create the GenHCurve.
     Adaptor3d_CurveOnSurface& ChangeCurve();
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
 
 

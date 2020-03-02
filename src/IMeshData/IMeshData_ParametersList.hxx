@@ -17,6 +17,7 @@
 #define _IMeshData_ParametersList_HeaderFile
 
 #include <Standard_Transient.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 
 //! Interface class representing list of parameters on curve.
@@ -37,6 +38,13 @@ public:
 
   //! Clears parameters list.
   Standard_EXPORT virtual void Clear(const Standard_Boolean isKeepEndPoints) = 0;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_ParametersList, Standard_Transient)
 

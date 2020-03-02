@@ -16,6 +16,8 @@
 #include <BRepMesh_DelaunayBaseMeshAlgo.hxx>
 #include <BRepMesh_MeshTool.hxx>
 #include <BRepMesh_Delaun.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
 
 //=======================================================================
 // Function: Constructor
@@ -39,6 +41,8 @@ BRepMesh_DelaunayBaseMeshAlgo::~BRepMesh_DelaunayBaseMeshAlgo()
 //=======================================================================
 void BRepMesh_DelaunayBaseMeshAlgo::generateMesh()
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("generateMesh")
   const Handle(BRepMesh_DataStructureOfDelaun)& aStructure = getStructure();
   const Handle(VectorOfPnt)&                    aNodesMap  = getNodesMap();
 

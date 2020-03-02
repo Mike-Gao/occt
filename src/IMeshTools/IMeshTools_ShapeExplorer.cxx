@@ -24,6 +24,8 @@
 #include <BRep_Tool.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <Geom_Surface.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
 
 namespace
 {
@@ -79,11 +81,16 @@ IMeshTools_ShapeExplorer::~IMeshTools_ShapeExplorer ()
 void IMeshTools_ShapeExplorer::Accept (
   const Handle (IMeshTools_ShapeVisitor)& theVisitor)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("IMeshTools_ShapeExplorer::Accept")
+
   // Explore all free edges in shape.
+  OCCT_SEND_MESSAGE ("visit free edges")
   visitEdges (theVisitor, GetShape (), Standard_True, TopAbs_EDGE, TopAbs_FACE);
 
   // Explore all related to some face edges in shape.
   // make array of faces suitable for processing (excluding faces without surface)
+  OCCT_SEND_MESSAGE ("explore all related to some face edges in shape")
   TopTools_ListOfShape aFaceList;
   BRepLib::ReverseSortFaces (GetShape (), aFaceList);
   TopTools_MapOfShape aFaceMap;

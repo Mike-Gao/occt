@@ -22,6 +22,8 @@
 #include <IMeshData_Curve.hxx>
 #include <BRepMesh_Delaun.hxx>
 #include <BRepMesh_ShapeTool.hxx>
+#include <Message.hxx>
+#include <TopoDS_AlertAttribute.hxx>
 #include <Standard_ErrorHandler.hxx>
 
 //=======================================================================
@@ -61,7 +63,11 @@ void BRepMesh_BaseMeshAlgo::Perform(
 
     if (initDataStructure())
     {
+      OCCT_SEND_DUMPJSON (myStructure.get())
+      OCCT_SEND_SHAPE (myStructure->DumpToShape());
       generateMesh();
+      OCCT_SEND_DUMPJSON (myStructure.get())
+      OCCT_SEND_SHAPE (myStructure->DumpToShape());
       commitSurfaceTriangulation();
     }
   }
@@ -82,6 +88,10 @@ void BRepMesh_BaseMeshAlgo::Perform(
 //=======================================================================
 Standard_Boolean BRepMesh_BaseMeshAlgo::initDataStructure()
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("initDataStructure")
+  OCCT_SEND_DUMPJSON (this)
+
   for (Standard_Integer aWireIt = 0; aWireIt < myDFace->WiresNb(); ++aWireIt)
   {
     const IMeshData::IWireHandle& aDWire = myDFace->GetWire(aWireIt);
@@ -96,6 +106,9 @@ Standard_Boolean BRepMesh_BaseMeshAlgo::initDataStructure()
     {
       const IMeshData::IEdgeHandle    aDEdge = aDWire->GetEdge(aEdgeIt);
       const IMeshData::ICurveHandle&  aCurve = aDEdge->GetCurve();
+
+      OCCT_SEND_DUMPJSON (aCurve.get())
+
       const IMeshData::IPCurveHandle& aPCurve = aDEdge->GetPCurve(
         myDFace.get(), aDWire->GetEdgeOrientation(aEdgeIt));
 
@@ -110,17 +123,29 @@ Standard_Boolean BRepMesh_BaseMeshAlgo::initDataStructure()
           aPCurve->GetPoint(aPointIt),
           BRepMesh_Frontier, Standard_False/*aPointIt > 0 && aPointIt < aLastPoint*/);
 
+        gp_Pnt aPnt1 = aCurve ->GetPoint(aPointIt);
+        gp_Pnt2d aPnt1_2d = aPCurve ->GetPoint(aPointIt);
+        gp_Pnt aPnt2 (aPnt1_2d.X(), aPnt1_2d.Y(), 0.0);
+        OCCT_SEND_DUMPJSON (&aPnt1)
+        OCCT_SEND_DUMPJSON (&aPnt2)
+        TCollection_AsciiString anIndexStr = TCollection_AsciiString ("Index = ") + aNodeIndex;
+        OCCT_SEND_MESSAGE (anIndexStr)
+        TCollection_AsciiString aPIndexStr = TCollection_AsciiString ("PrevNodeIndex = ") + aPrevNodeIndex;
+        OCCT_SEND_MESSAGE (aPIndexStr)
+
         aPCurve->GetIndex(aPointIt) = aNodeIndex;
         myUsedNodes->Bind(aNodeIndex, aNodeIndex);
 
         if (aPrevNodeIndex != -1 && aPrevNodeIndex != aNodeIndex)
         {
+          OCCT_SEND_MESSAGE ("Add link")
           const Standard_Integer aLinksNb   = myStructure->NbLinks();
           const Standard_Integer aLinkIndex = addLinkToMesh(aPrevNodeIndex, aNodeIndex, aOri);
           if (aWireIt != 0 && aLinkIndex <= aLinksNb)
           {
             // Prevent holes around wire of zero area.
             BRepMesh_Edge& aLink = const_cast<BRepMesh_Edge&>(myStructure->GetLink(aLinkIndex));
+            OCCT_SEND_DUMPJSON (&aLink)
             aLink.SetMovability(BRepMesh_Fixed);
           }
         }
@@ -130,6 +155,7 @@ Standard_Boolean BRepMesh_BaseMeshAlgo::initDataStructure()
     }
   }
 
+  OCCT_SEND_DUMPJSON (this)
   return Standard_True;
 }
 
@@ -313,4 +339,40 @@ gp_Pnt2d BRepMesh_BaseMeshAlgo::getNodePoint2d(
   const BRepMesh_Vertex& theVertex) const
 {
   return theVertex.Coord();
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_BaseMeshAlgo::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_MeshAlgo)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDFace.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParameters)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myStructure.get())
+
+  if (!myNodesMap.IsNull())
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNodesMap->Size())
+    for (VectorOfPnt::Iterator aNodesIt (*myNodesMap); aNodesIt.More(); aNodesIt.Next())
+    {
+      const gp_Pnt aNodePoint = aNodesIt.Value();
+      OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aNodePoint)
+    }
+  }
+  if (!myUsedNodes.IsNull())
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUsedNodes->Extent())
+    for (DMapOfIntegerInteger::Iterator aUsedIt (*myUsedNodes); aUsedIt.More(); aUsedIt.Next())
+    {
+      Standard_Integer aNodeIndex = aUsedIt.Key();
+      Standard_Integer aUsedCount = aUsedIt.Value();
+
+      OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aNodeIndex)
+      OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aUsedCount)
+    }
+  }
 }

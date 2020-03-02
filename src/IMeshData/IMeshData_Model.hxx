@@ -17,6 +17,7 @@
 #define _IMeshData_Model_HeaderFile
 
 #include <IMeshData_Shape.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS_Shape.hxx>
 #include <IMeshData_Types.hxx>
@@ -62,6 +63,13 @@ public: //! @name discrete edges
 
   //! Gets model's edge with the given index.
   Standard_EXPORT virtual const IMeshData::IEdgeHandle& GetEdge (const Standard_Integer theIndex) const = 0;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_Shape)
+  }
 
 protected:
 

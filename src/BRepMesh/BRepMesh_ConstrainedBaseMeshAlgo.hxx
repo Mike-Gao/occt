@@ -19,6 +19,7 @@
 #include <BRepMesh_BaseMeshAlgo.hxx>
 #include <NCollection_Shared.hxx>
 #include <IMeshTools_Parameters.hxx>
+#include <Standard_Dump.hxx>
 
 class BRepMesh_DataStructureOfDelaun;
 class BRepMesh_Delaun;
@@ -37,6 +38,14 @@ public:
   //! Destructor.
   virtual ~BRepMesh_ConstrainedBaseMeshAlgo ()
   {
+  }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    (void)theDepth;
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRepMesh_BaseMeshAlgo)
   }
 
   DEFINE_STANDARD_RTTI_INLINE(BRepMesh_ConstrainedBaseMeshAlgo, BRepMesh_BaseMeshAlgo)

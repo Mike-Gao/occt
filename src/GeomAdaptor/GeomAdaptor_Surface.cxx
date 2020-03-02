@@ -1439,3 +1439,30 @@ void GeomAdaptor_Surface::Span(const Standard_Integer Side,
     } 
   }
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void GeomAdaptor_Surface::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, GeomAdaptor_Surface)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor3d_Surface)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySurface.get())
+
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUFirst)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myULast)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVFirst)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVLast)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolU)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolV)
+
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myBSplineSurface.get())
+  //mutable Handle(BSplSLib_Cache) mySurfaceCache; ///< Cached data for B-spline or Bezier surface
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySurfaceType)
+  //Handle(GeomEvaluator_Surface) myNestedEvaluator; ///< Calculates values of nested complex surfaces (offset surface, surface of extrusion or revolution)
+}

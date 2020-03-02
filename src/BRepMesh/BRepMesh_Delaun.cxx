@@ -32,6 +32,11 @@
 #include <BRepMesh_Triangle.hxx>
 
 #include <NCollection_Vector.hxx>
+#include <Message.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
+#include <TopoDS_AlertAttribute.hxx>
+
 
 #include <algorithm>
 #include <stack>
@@ -245,6 +250,10 @@ void BRepMesh_Delaun::perform(IMeshData::VectorOfInteger& theVertexIndices,
                               const Standard_Integer      theCellsCountU /* = -1 */,
                               const Standard_Integer      theCellsCountV /* = -1 */)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("BRepMesh_Delaun::perform")
+  OCCT_SEND_DUMPJSON (this)
+
   if (theVertexIndices.Length () <= 2)
   {
     return;
@@ -267,6 +276,7 @@ void BRepMesh_Delaun::perform(IMeshData::VectorOfInteger& theVertexIndices,
   std::make_heap(theVertexIndices.begin(), theVertexIndices.end(), aCmp);
   std::sort_heap(theVertexIndices.begin(), theVertexIndices.end(), aCmp);
 
+  OCCT_SEND_DUMPJSON (this)
   compute( theVertexIndices );
 }
 
@@ -347,6 +357,9 @@ void BRepMesh_Delaun::deleteTriangle(const Standard_Integer          theIndex,
 //=======================================================================
 void BRepMesh_Delaun::compute(IMeshData::VectorOfInteger& theVertexIndexes)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("BRepMesh_Delaun::compute")
+
   // Insertion of edges of super triangles in the list of free edges:
   Handle(NCollection_IncAllocator) aAllocator = new NCollection_IncAllocator(
     IMeshData::MEMORY_BLOCK_SIZE_HUGE);
@@ -358,15 +371,18 @@ void BRepMesh_Delaun::compute(IMeshData::VectorOfInteger& theVertexIndexes)
   aLoopEdges.Bind( e[1], Standard_True );
   aLoopEdges.Bind( e[2], Standard_True );
 
+  OCCT_SEND_SHAPE (myMeshData->DumpToShape());
   if ( theVertexIndexes.Length() > 0 )
   {
     // Creation of 3 trianglers with the first node and the edges of the super triangle:
     Standard_Integer anVertexIdx = theVertexIndexes.Lower();
     createTriangles( theVertexIndexes( anVertexIdx ), aLoopEdges );
+    OCCT_SEND_SHAPE (myMeshData->DumpToShape());
 
     // Add other nodes to the mesh
     createTrianglesOnNewVertices( theVertexIndexes );
   }
+  OCCT_SEND_SHAPE (myMeshData->DumpToShape());
 
   // Destruction of triangles containing a top of the super triangle
   BRepMesh_SelectorOfDataStructureOfDelaun aSelector( myMeshData );
@@ -399,6 +415,9 @@ void BRepMesh_Delaun::compute(IMeshData::VectorOfInteger& theVertexIndexes)
 void BRepMesh_Delaun::createTriangles(const Standard_Integer          theVertexIndex,  
                                       IMeshData::MapOfIntegerInteger& thePoly)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("createTriangles")
+
   IMeshData::ListOfInteger aLoopEdges, anExternalEdges;
   const gp_XY& aVertexCoord = myMeshData->GetNode( theVertexIndex ).Coord();
   
@@ -520,6 +539,8 @@ void BRepMesh_Delaun::createTriangles(const Standard_Integer          theVertexI
 void BRepMesh_Delaun::createTrianglesOnNewVertices(
   IMeshData::VectorOfInteger& theVertexIndexes)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("createTrianglesOnNewVertices")
   Handle(NCollection_IncAllocator) aAllocator =
     new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE);
 
@@ -611,6 +632,9 @@ void BRepMesh_Delaun::createTrianglesOnNewVertices(
 //=======================================================================
 void BRepMesh_Delaun::insertInternalEdges()
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("insertInternalEdges")
+
   Handle(IMeshData::MapOfInteger) anInternalEdges = InternalEdges();
 
   // Destruction of triancles intersecting internal edges 
@@ -831,6 +855,10 @@ void BRepMesh_Delaun::cleanupMesh()
 //=======================================================================
 void BRepMesh_Delaun::frontierAdjust()
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("frontierAdjust")
+  OCCT_SEND_SHAPE (myMeshData->DumpToShape());
+
   Handle(IMeshData::MapOfInteger)  aFrontier = Frontier();
 
   Handle(NCollection_IncAllocator) aAllocator =
@@ -904,7 +932,16 @@ void BRepMesh_Delaun::frontierAdjust()
     }
   }
 
-  cleanupMesh();
+  OCCT_SEND_DUMPJSON (myMeshData.get())
+  OCCT_SEND_SHAPE (myMeshData->DumpToShape());
+  OCCT_SEND_MESSAGE ("cleanupMesh")
+
+  //Standard_SStream aStream;
+  //myMeshData->Statistics (aStream);
+  //Message::DefaultMessenger() << aStream;
+
+  OCCT_SEND_SHAPE (myMeshData->DumpToShape());
+  //cleanupMesh();
 
   // When the mesh has been cleaned up, try to process frontier edges 
   // once again to fill the possible gaps that might be occured in case of "saw" -
@@ -2549,3 +2586,22 @@ Standard_CString BRepMesh_DumpPoly(void*            thePolygon,
   return theFileNameStr;
 }
 #endif
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_Delaun::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_Delaun)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myMeshData.get())
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCircles)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySupVert[0])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySupVert[1])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySupVert[2])
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &mySupTrian)
+}

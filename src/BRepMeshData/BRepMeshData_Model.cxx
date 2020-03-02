@@ -100,3 +100,33 @@ const IMeshData::IEdgeHandle& BRepMeshData_Model::GetEdge (const Standard_Intege
 {
   return myDEdges (theIndex);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMeshData_Model::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_Model)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaxSize)
+  if (!myDFaces.IsEmpty())
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDFaces.Size())
+    for (Standard_Integer aFaceIt = 0; aFaceIt < FacesNb(); ++aFaceIt)
+    {
+      const IMeshData::IFaceHandle& aFace = GetFace(aFaceIt);
+      OCCT_SEND_DUMPJSON (aFace.get())
+    }
+  }
+  if (!myDEdges.IsEmpty())
+  {
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDEdges.Size())
+    for (int anEdgeIt = 0; anEdgeIt < EdgesNb(); anEdgeIt++)
+    {
+      const IMeshData::IEdgeHandle& anEdge = GetEdge (anEdgeIt);
+      OCCT_SEND_DUMPJSON (anEdge.get())
+    }
+  }
+}

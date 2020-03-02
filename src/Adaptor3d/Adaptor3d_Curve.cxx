@@ -364,3 +364,12 @@ Handle(Geom_OffsetCurve) Adaptor3d_Curve::OffsetCurve() const
 {
   throw Standard_NotImplemented("Adaptor3d_Curve::OffsetCurve");
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Adaptor3d_Curve::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Adaptor3d_Curve)
+}

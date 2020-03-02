@@ -679,3 +679,19 @@ Handle(Geom_OffsetCurve) BRepAdaptor_Curve::OffsetCurve() const
   return myTrsf.Form() == gp_Identity
     ? anOffC : Handle(Geom_OffsetCurve)::DownCast(anOffC->Transformed(myTrsf));
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepAdaptor_Curve::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRepAdaptor_Curve)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor3d_Curve)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myTrsf)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCurve)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myConSurf.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEdge)
+}

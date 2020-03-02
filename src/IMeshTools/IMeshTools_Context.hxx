@@ -23,6 +23,9 @@
 #include <IMeshTools_Parameters.hxx>
 #include <IMeshTools_ModelAlgo.hxx>
 
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
+
 //! Interface class representing context of BRepMesh algorithm.
 //! Intended to cache discrete model and instances of tools for 
 //! its processing.
@@ -63,6 +66,9 @@ public:
       return Standard_False;
     }
 
+    OCCT_ADD_MESSAGE_LEVEL_SENTRY
+    OCCT_SEND_MESSAGE ("DiscretizeEdges")
+
     // Discretize edges of a model.
     return myEdgeDiscret->Perform(myModel, myParameters);
   }
@@ -77,6 +83,8 @@ public:
       return Standard_False;
     }
 
+    OCCT_ADD_MESSAGE_LEVEL_SENTRY
+    OCCT_SEND_MESSAGE ("HealModel")
     return myModelHealer.IsNull() ?
       Standard_True :
       myModelHealer->Perform(myModel, myParameters);
@@ -92,6 +100,8 @@ public:
       return Standard_False;
     }
 
+    OCCT_ADD_MESSAGE_LEVEL_SENTRY
+    OCCT_SEND_MESSAGE ("PreProcessModel")
     return myPreProcessor.IsNull() ? 
       Standard_True :
       myPreProcessor->Perform(myModel, myParameters);
@@ -106,6 +116,8 @@ public:
       return Standard_False;
     }
 
+    OCCT_ADD_MESSAGE_LEVEL_SENTRY
+    OCCT_SEND_MESSAGE ("DiscretizeFaces")
     // Discretize faces of a model.
     return myFaceDiscret->Perform(myModel, myParameters);
   }
@@ -119,6 +131,8 @@ public:
       return Standard_False;
     }
 
+    OCCT_ADD_MESSAGE_LEVEL_SENTRY
+    OCCT_SEND_MESSAGE ("PostProcessModel")
     return myPostProcessor.IsNull() ?
       Standard_True :
       myPostProcessor->Perform(myModel, myParameters);
@@ -222,6 +236,9 @@ public:
   {
     return myModel;
   }
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshTools_Context, IMeshData_Shape)
 

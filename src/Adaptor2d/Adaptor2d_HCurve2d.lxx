@@ -294,3 +294,11 @@ inline Standard_Integer  Adaptor2d_HCurve2d::NbKnots() const
   return Curve2d().BSpline();
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+ inline void Adaptor2d_HCurve2d::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Adaptor2d_HCurve2d)
+}

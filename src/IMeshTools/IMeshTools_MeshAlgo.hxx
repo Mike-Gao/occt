@@ -17,6 +17,7 @@
 #define _IMeshTools_MeshAlgo_HeaderFile
 
 #include <Standard_Transient.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <IMeshData_Types.hxx>
 
@@ -36,6 +37,13 @@ public:
   Standard_EXPORT virtual void Perform(
     const IMeshData::IFaceHandle& theDFace,
     const IMeshTools_Parameters&  theParameters) = 0;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshTools_MeshAlgo, Standard_Transient)
 

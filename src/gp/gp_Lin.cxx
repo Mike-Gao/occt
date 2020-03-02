@@ -69,3 +69,8 @@ gp_Lin gp_Lin::Mirrored (const gp_Ax2& A2) const
   return L;
 }
 
+void gp_Lin::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  pos.DumpJson (theOStream, theDepth);
+}
+

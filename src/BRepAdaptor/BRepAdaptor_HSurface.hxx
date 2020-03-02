@@ -55,6 +55,8 @@ public:
   //! Returns the surface used to create the GenHSurface.
     BRepAdaptor_Surface& ChangeSurface();
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
 
 

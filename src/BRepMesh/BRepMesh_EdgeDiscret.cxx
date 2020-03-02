@@ -24,6 +24,7 @@
 #include <BRepMesh_EdgeTessellationExtractor.hxx>
 #include <IMeshData_ParametersListArrayAdaptor.hxx>
 #include <BRepMesh_CurveTessellator.hxx>
+#include <Message_Level.hxx>
 #include <OSD_Parallel.hxx>
 
 //=======================================================================
@@ -96,6 +97,7 @@ Standard_Boolean BRepMesh_EdgeDiscret::performInternal (
   }
 
   OSD_Parallel::For (0, myModel->EdgesNb (), *this, !myParameters.InParallel);
+  OCCT_SEND_DUMPJSON (myModel.get())
 
   myModel.Nullify(); // Do not hold link to model.
   return Standard_True;
@@ -334,4 +336,17 @@ void BRepMesh_EdgeDiscret::Tessellate2d(
       }
     }
   }
+}
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_EdgeDiscret::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myModel.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParameters)
 }

@@ -140,6 +140,7 @@ Standard_Boolean BRepMesh_ModelHealer::performInternal(
   }
 
   // TODO: Here we can process edges in order to remove close discrete points.
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
   OSD_Parallel::For(0, myModel->FacesNb(), *this, !isParallel());
   amplifyEdges();
 
@@ -153,6 +154,7 @@ Standard_Boolean BRepMesh_ModelHealer::performInternal(
       aDFace->SetStatus(IMeshData_Failure);
     }
   }
+  OCCT_SEND_DUMPJSON (myModel.get())
 
   myFaceIntersectingEdges.Nullify();
   myModel.Nullify(); // Do not hold link to model.
@@ -496,4 +498,14 @@ Standard_Boolean BRepMesh_ModelHealer::connectClosestPoints(
   }
 
   return Standard_True;
+}
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_ModelHealer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
 }

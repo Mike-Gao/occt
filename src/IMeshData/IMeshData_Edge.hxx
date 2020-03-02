@@ -18,6 +18,7 @@
 
 #include <IMeshData_TessellatedShape.hxx>
 #include <IMeshData_StatusOwner.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -25,6 +26,8 @@
 #include <IMeshData_PCurve.hxx>
 #include <IMeshData_Types.hxx>
 #include <BRep_Tool.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
 
 class IMeshData_Face;
 
@@ -138,6 +141,20 @@ public:
   inline void SetDegenerated (const Standard_Boolean theValue)
   {
     myDegenerated = theValue;
+  }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_TessellatedShape)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySameParam)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySameRange)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDegenerated)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAngDeflection)
+
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCurve.get())
   }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_Edge, IMeshData_TessellatedShape)

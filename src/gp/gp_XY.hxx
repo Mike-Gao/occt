@@ -22,6 +22,8 @@
 #include <Standard_Real.hxx>
 #include <Standard_Integer.hxx>
 #include <Standard_Boolean.hxx>
+#include <Standard_OStream.hxx>
+#include <Standard_SStream.hxx>
 class Standard_ConstructionError;
 class Standard_OutOfRange;
 class gp_Mat2d;
@@ -268,6 +270,11 @@ public:
   return Subtracted(Right);
 }
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
+  //! Inits the content of me into the stream
+  Standard_EXPORT Standard_Boolean InitFromJson (const Standard_SStream& theSStream, Standard_Integer& theStreamPos);
 
 
 

@@ -378,3 +378,11 @@ Standard_Integer Adaptor2d_Curve2d::NbSamples() const
   return 20;  
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Adaptor2d_Curve2d::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Adaptor2d_Curve2d)
+}

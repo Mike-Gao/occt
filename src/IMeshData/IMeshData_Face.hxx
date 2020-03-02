@@ -18,6 +18,7 @@
 
 #include <IMeshData_TessellatedShape.hxx>
 #include <IMeshData_StatusOwner.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
@@ -70,6 +71,15 @@ public:
     return (IsEqual(IMeshData_NoError) ||
             IsEqual(IMeshData_ReMesh)  ||
             IsEqual(IMeshData_UnorientedWire));
+  }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_TessellatedShape)
+
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySurface.get())
   }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_Face, IMeshData_TessellatedShape)

@@ -483,3 +483,12 @@ inline Standard_Boolean  Adaptor3d_HSurface::IsVRational() const
 {
   return Surface().OffsetValue();
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+ inline void Adaptor3d_HSurface::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+}

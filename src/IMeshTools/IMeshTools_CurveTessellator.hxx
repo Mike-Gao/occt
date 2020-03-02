@@ -17,6 +17,7 @@
 #define _IMeshTools_EdgeTessellator_HeaderFile
 
 #include <Standard_Transient.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 
 class gp_Pnt;
@@ -43,6 +44,13 @@ public:
     const Standard_Integer theIndex,
     gp_Pnt&                thePoint,
     Standard_Real&         theParameter) const = 0;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshTools_CurveTessellator, Standard_Transient)
 

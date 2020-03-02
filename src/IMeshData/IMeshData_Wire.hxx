@@ -18,6 +18,7 @@
 
 #include <IMeshData_TessellatedShape.hxx>
 #include <IMeshData_StatusOwner.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS_Wire.hxx>
 #include <TopoDS.hxx>
@@ -58,6 +59,13 @@ public:
   //! Returns True if orientation of discrete edge with the given index is forward.
   Standard_EXPORT virtual TopAbs_Orientation GetEdgeOrientation (
     const Standard_Integer theIndex) const = 0;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_TessellatedShape)
+  }
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_Wire, IMeshData_TessellatedShape)
 

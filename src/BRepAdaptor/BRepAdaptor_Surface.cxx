@@ -442,3 +442,16 @@ Standard_Real BRepAdaptor_Surface::OffsetValue() const
   return mySurf.OffsetValue();
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepAdaptor_Surface::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRepAdaptor_Surface)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor3d_Surface)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &mySurf)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myTrsf)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myFace)
+}

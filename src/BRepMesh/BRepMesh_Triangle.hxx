@@ -19,6 +19,7 @@
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Macro.hxx>
 
 #include <BRepMesh_DegreeOfFreedom.hxx>
@@ -138,6 +139,21 @@ public:
     return IsEqual(theOther);
   }
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myEdges[0])
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myEdges[1])
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myEdges[2])
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOrientations[0])
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOrientations[1])
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOrientations[2])
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMovability)
+  }
   Standard_Integer          myEdges[3];
   Standard_Boolean          myOrientations[3];
   BRepMesh_DegreeOfFreedom  myMovability;

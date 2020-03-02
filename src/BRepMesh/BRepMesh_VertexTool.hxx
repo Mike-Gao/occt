@@ -158,6 +158,10 @@ public:
   //! Prints statistics.
   Standard_EXPORT void Statistics(Standard_OStream& theStream) const;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
+
   DEFINE_STANDARD_RTTI_INLINE(BRepMesh_VertexTool, Standard_Transient)
 
 private:

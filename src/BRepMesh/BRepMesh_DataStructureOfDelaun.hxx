@@ -59,7 +59,7 @@ public: //! @name API for accessing mesh nodes.
 
   //! Finds the index of the given node.
   //! @param theNode node to find.
-  //! @return index of the given element of zero if node is not in the mesh.
+  //! @return index of the given element or zero if node is not in the mesh.
   Standard_Integer IndexOf(const BRepMesh_Vertex& theNode)
   {
     return myNodes->FindIndex(theNode);
@@ -218,6 +218,8 @@ public: //! @name API for accessing mesh elements.
     const BRepMesh_Triangle& theElement,
     Standard_Integer         (&theNodes)[3]);
 
+  Standard_EXPORT TopoDS_Shape DumpToShape();
+
   Standard_EXPORT void Dump(Standard_CString theFileNameStr);
 
 
@@ -250,6 +252,9 @@ public: //! @name Auxilary API
     clearDeletedLinks();
     clearDeletedNodes();
   }
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
   DEFINE_STANDARD_RTTI_INLINE(BRepMesh_DataStructureOfDelaun, Standard_Transient)
 

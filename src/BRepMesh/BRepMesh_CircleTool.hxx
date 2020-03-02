@@ -133,6 +133,9 @@ public:
   //! @param thePoint bullet point.
   Standard_EXPORT IMeshData::ListOfInteger& Select(const gp_XY& thePoint);
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
 private:
 
   //! Creates circle with the given parameters and binds it to the tool.

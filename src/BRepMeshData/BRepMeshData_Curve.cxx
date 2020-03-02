@@ -124,3 +124,28 @@ void BRepMeshData_Curve::Clear(const Standard_Boolean isKeepEndPoints)
     myParameters.erase(myParameters.begin() + 1, myParameters.begin() + (myParameters.size() - 1));
   }
 }
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMeshData_Curve::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_Curve)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPoints.size())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myParameters.size())
+
+  for (IMeshData::Model::SequenceOfPnt::const_iterator aPointIt = myPoints.begin(); aPointIt != myPoints.end(); aPointIt++)
+  {
+    const gp_Pnt& aPoint = *aPointIt;
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aPoint)
+  }
+
+  for (IMeshData::Model::SequenceOfReal::const_iterator aParamIt = myParameters.begin(); aParamIt != myParameters.end(); aParamIt++)
+  {
+    Standard_Real aParameter = *aParamIt;
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aParameter)
+  }
+}

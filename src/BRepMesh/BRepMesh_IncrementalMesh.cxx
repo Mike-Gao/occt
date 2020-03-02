@@ -97,14 +97,20 @@ void BRepMesh_IncrementalMesh::Perform()
 //=======================================================================
 void BRepMesh_IncrementalMesh::Perform(const Handle(IMeshTools_Context)& theContext)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("BRepMesh_IncrementalMesh::Perform")
   initParameters();
 
   theContext->SetShape(Shape());
   theContext->ChangeParameters()            = myParameters;
   theContext->ChangeParameters().CleanModel = Standard_False;
 
+  OCCT_SEND_DUMPJSON (this)
+
   IMeshTools_MeshBuilder aIncMesh(theContext);
   aIncMesh.Perform();
+
+  OCCT_SEND_DUMPJSON (&aIncMesh)
 
   myStatus = IMeshData_NoError;
   const Handle(IMeshData_Model)& aModel = theContext->GetModel();
@@ -162,6 +168,20 @@ void BRepMesh_IncrementalMesh::SetParallelDefault(
   const Standard_Boolean theInParallel)
 {
   IS_IN_PARALLEL = theInParallel;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_IncrementalMesh::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, BRepMesh_DiscretRoot)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParameters)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myModified)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myStatus)
 }
 
 //! Export Mesh Plugin entry function

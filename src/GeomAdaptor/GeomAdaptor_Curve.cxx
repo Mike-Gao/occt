@@ -999,3 +999,24 @@ Handle(Geom_OffsetCurve) GeomAdaptor_Curve::OffsetCurve() const
     throw Standard_NoSuchObject("GeomAdaptor_Curve::OffsetCurve");
   return Handle(Geom_OffsetCurve)::DownCast(myCurve);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void GeomAdaptor_Curve::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, GeomAdaptor_Curve)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor3d_Curve)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCurve.get())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeCurve)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFirst)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLast)
+
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myBSplineCurve.get())
+  //mutable Handle(BSplCLib_Cache) myCurveCache; ///< Cached data for B-spline or Bezier curve
+  //Handle(GeomEvaluator_Curve) myNestedEvaluator; ///< Calculates value of offset curve
+}

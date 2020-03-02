@@ -174,6 +174,29 @@ Standard_Real GCPnts_TangentialDeflection::ArcAngularStep(
   return Du;
 }
 
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void GCPnts_TangentialDeflection::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, GCPnts_TangentialDeflection)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, angularDeflection)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, curvatureDeflection)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, uTol)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, minNbPnts)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMinLen)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, lastu)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, firstu)
+
+  if (!points.IsEmpty())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, points.Length())
+
+  if (!parameters.IsEmpty())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, parameters.Length())
+}
+
 #include <Geom_BezierCurve.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <gp_Circ.hxx>

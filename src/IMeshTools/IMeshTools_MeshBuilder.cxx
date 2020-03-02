@@ -15,6 +15,8 @@
 
 #include <IMeshTools_MeshBuilder.hxx>
 #include <IMeshData_Face.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
 #include <OSD_Parallel.hxx>
 
 //=======================================================================
@@ -57,6 +59,9 @@ void IMeshTools_MeshBuilder::Perform ()
     SetStatus (Message_Fail1);
     return;
   }
+
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("IMeshTools_MeshBuilder::Perform")
 
   if (aContext->BuildModel ())
   {
@@ -115,4 +120,16 @@ void IMeshTools_MeshBuilder::Perform ()
   }
 
   aContext->Clean ();
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void IMeshTools_MeshBuilder::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Message_Algorithm)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myContext.get())
 }

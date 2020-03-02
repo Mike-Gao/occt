@@ -1796,5 +1796,23 @@ void Adaptor3d_CurveOnSurface::LocatePart(const gp_Pnt2d& UV, const gp_Vec2d& DU
     }
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Adaptor3d_CurveOnSurface::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Adaptor3d_CurveOnSurface)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor3d_CurveOnSurface)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myType)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCirc)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myLin)
+
+  if (!myIntervals.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIntervals->Length())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIntCont)
+}
 
 

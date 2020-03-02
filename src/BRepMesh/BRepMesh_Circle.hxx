@@ -68,6 +68,13 @@ public:
     return myRadius;
   }
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myLocation)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRadius)
+  }
+
 private:
 
   gp_XY         myLocation;

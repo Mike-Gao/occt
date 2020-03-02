@@ -118,6 +118,9 @@ public:
   
     virtual Handle(Geom2d_BSplineCurve) BSpline() const;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
+
 
   DEFINE_STANDARD_RTTIEXT(Adaptor2d_HCurve2d,Standard_Transient)
 };

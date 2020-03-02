@@ -309,6 +309,7 @@ Standard_Boolean BRepMesh_ModelPreProcessor::performInternal(
       }
     }
   }
+  OCCT_SEND_DUMPJSON (theModel.get())
 
   return Standard_True;
 }

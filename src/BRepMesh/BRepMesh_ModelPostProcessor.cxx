@@ -188,5 +188,6 @@ Standard_Boolean BRepMesh_ModelPostProcessor::performInternal(
 
   // TODO: Force single threaded solution due to data races on edges sharing the same TShape
   OSD_Parallel::For(0, theModel->EdgesNb(), PolygonCommitter(theModel), Standard_True/*!theParameters.InParallel*/);
+  OCCT_SEND_DUMPJSON (theModel.get())
   return Standard_True;
 }

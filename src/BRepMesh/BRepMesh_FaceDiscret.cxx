@@ -54,8 +54,13 @@ Standard_Boolean BRepMesh_FaceDiscret::performInternal(
     return Standard_False;
   }
 
-  OSD_Parallel::For(0, myModel->FacesNb(), *this, !(myParameters.InParallel && myModel->FacesNb() > 1));
+  for (int i = 0; i < myModel->FacesNb(); i++)
+  {
+    process (i);
+  }
+  //OSD_Parallel::For(0, myModel->FacesNb(), *this, !(myParameters.InParallel && myModel->FacesNb() > 1));
 
+  OCCT_SEND_DUMPJSON (myModel.get())
   myModel.Nullify(); // Do not hold link to model.
   return Standard_True;
 }
@@ -92,4 +97,18 @@ void BRepMesh_FaceDiscret::process(const Standard_Integer theFaceIndex) const
   {
     aDFace->SetStatus (IMeshData_Failure);
   }
+}
+
+//=======================================================================
+// Function: DumpJson
+// Purpose : 
+//=======================================================================
+void BRepMesh_FaceDiscret::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelAlgo)
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myAlgoFactory)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myModel.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myParameters)
 }

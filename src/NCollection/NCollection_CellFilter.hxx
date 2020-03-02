@@ -237,7 +237,7 @@ public: // work-around against obsolete SUN WorkShop 5.3 compiler
 #else
 protected:
 #endif
- 
+  public:
   /**
    * Auxiliary class for storing points belonging to the cell as the list
    */
@@ -317,6 +317,8 @@ protected:
       return Standard_True;
     }
 
+    const NCollection_LocalArray<long, 10>& Index() const { return index; }
+
     //! Returns hash code for this cell, in the range [1, theUpperBound]
     //! @param theUpperBound the upper bound of the range a computing hash code must be within
     //! @return a computed hash code, in the range [1, theUpperBound]
@@ -340,6 +342,9 @@ protected:
     ListNode *Objects;
   };
   
+  const NCollection_Map<Cell>& Cells() const { return myCells; }
+  const NCollection_Array1<Standard_Real>& CellSize() const { return myCellSize; }
+
   //! Returns hash code for the given cell, in the range [1, theUpperBound]
   //! @param theCell the cell object which hash code is to be computed
   //! @param theUpperBound the upper bound of the range a computing hash code must be within

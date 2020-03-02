@@ -122,6 +122,16 @@ public:
     myIndex[1] = -1;
   }
 
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_PairOfIndex)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIndex[0])
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIndex[1])
+  }
+
 private:
   Standard_Integer myIndex[2];
 };

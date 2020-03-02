@@ -100,3 +100,23 @@ const IMeshData::IPCurveHandle& BRepMeshData_Edge::GetPCurve (
 {
   return myPCurves (theIndex);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMeshData_Edge::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_Edge)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPCurves.Size())
+  for (Standard_Integer aPCurveIt = 0; aPCurveIt < myPCurves.Size(); ++aPCurveIt)
+  {
+    const IMeshData::IPCurveHandle& aPCurve = myPCurves (aPCurveIt);
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aPCurve.get())
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPCurvesMap.Size())
+  //IMeshData::DMapOfIFacePtrsListOfInteger myPCurvesMap;
+}

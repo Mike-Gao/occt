@@ -17,6 +17,7 @@
 #define _IMeshData_TessellatedShape_HeaderFile
 
 #include <IMeshData_Shape.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -41,6 +42,16 @@ public:
   {
     myDeflection = theValue;
   }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_Shape)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeflection)
+  }
+
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_TessellatedShape, IMeshData_Shape)
 

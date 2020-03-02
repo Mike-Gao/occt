@@ -44,6 +44,9 @@ public:
     const IMeshData::IFaceHandle& theDFace,
     const IMeshTools_Parameters&  theParameters) Standard_OVERRIDE;
 
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
+
   DEFINE_STANDARD_RTTI_INLINE(BRepMesh_BaseMeshAlgo, IMeshTools_MeshAlgo)
 
 protected:

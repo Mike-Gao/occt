@@ -77,4 +77,15 @@ const TopoDS_Face& BRepAdaptor_Curve2d::Face() const
   return myFace;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepAdaptor_Curve2d::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, BRepAdaptor_Curve2d)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Geom2dAdaptor_Curve)
 
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEdge)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myFace)
+}

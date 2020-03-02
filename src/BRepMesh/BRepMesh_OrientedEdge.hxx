@@ -16,6 +16,7 @@
 
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Macro.hxx>
 #include <BRepMesh_DegreeOfFreedom.hxx>
 
@@ -74,6 +75,16 @@ public:
   inline Standard_Boolean operator ==(const BRepMesh_OrientedEdge& Other) const
   {
     return IsEqual(Other);
+  }
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const
+  {
+    (void)theDepth;
+    OCCT_DUMP_CLASS_BEGIN (theOStream, BRepMesh_OrientedEdge)
+
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFirstNode)
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLastNode)
   }
 
 private:

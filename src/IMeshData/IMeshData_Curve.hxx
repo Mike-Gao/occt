@@ -17,6 +17,7 @@
 #define _IMeshData_Curve_HeaderFile
 
 #include <IMeshData_ParametersList.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 
 class gp_Pnt;
@@ -48,6 +49,14 @@ public:
 
   //! Removes point with the given index.
   Standard_EXPORT virtual void RemovePoint (const Standard_Integer theIndex) = 0;
+
+  //! Dumps the content of me into the stream
+  virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE
+  {
+    OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+    OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_ParametersList)
+  }
+
 
   DEFINE_STANDARD_RTTI_INLINE(IMeshData_Curve, IMeshData_ParametersList)
 

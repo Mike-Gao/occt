@@ -84,3 +84,27 @@ TopAbs_Orientation BRepMeshData_Wire::GetEdgeOrientation (
 {
   return myDEdgesOri (theIndex);
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMeshData_Wire::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshData_Wire)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDEdges.Size())
+  for (int anEdgeId = 0; anEdgeId < myDEdges.Size(); anEdgeId++)
+  {
+    const IMeshData::IEdgePtr& anEdge = GetEdge (anEdgeId);
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anEdge)
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDEdgesOri.Size())
+  for (int anEdgeId = 0; anEdgeId < myDEdgesOri.Size(); anEdgeId++)
+  {
+    TopAbs_Orientation anEdgeOri = GetEdgeOrientation (anEdgeId);
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, &anEdgeOri)
+  }
+}

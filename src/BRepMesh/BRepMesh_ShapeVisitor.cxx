@@ -32,6 +32,9 @@
 #include <IMeshData_Status.hxx>
 #include <IMeshTools_Context.hxx>
 #include <BRepTools.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
+#include <TopoDS_AlertAttribute.hxx>
 
 //=======================================================================
 // Function: Constructor
@@ -59,6 +62,9 @@ void BRepMesh_ShapeVisitor::Visit(const TopoDS_Edge& theEdge)
 {
   if (!myDEdgeMap.IsBound (theEdge))
   {
+    OCCT_SEND_MESSAGE ("BRepMesh_ShapeVisitor::Visit edge")
+    OCCT_SEND_SHAPE (theEdge)
+
     myModel->AddEdge (theEdge);
     myDEdgeMap.Bind  (theEdge, myModel->EdgesNb () - 1);
   }
@@ -70,6 +76,9 @@ void BRepMesh_ShapeVisitor::Visit(const TopoDS_Edge& theEdge)
 //=======================================================================
 void BRepMesh_ShapeVisitor::Visit (const TopoDS_Face& theFace)
 {
+  OCCT_SEND_MESSAGE ("BRepMesh_ShapeVisitor::Visit face")
+  OCCT_SEND_SHAPE (theFace)
+
   BRepTools::Update(theFace);
   const IMeshData::IFaceHandle& aDFace = myModel->AddFace (theFace);
 

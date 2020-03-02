@@ -571,3 +571,12 @@ Standard_Real Adaptor3d_Surface::OffsetValue() const
 {
   throw Standard_NotImplemented("Adaptor3d_Surface::OffsetValue");
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Adaptor3d_Surface::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Adaptor3d_Surface)
+}

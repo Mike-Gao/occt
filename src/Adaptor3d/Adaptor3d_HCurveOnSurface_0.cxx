@@ -40,3 +40,14 @@
 #define Handle_Adaptor3d_GenHCurve Handle(Adaptor3d_HCurveOnSurface)
 #include <Adaptor3d_GenHCurve.gxx>
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Adaptor3d_HCurveOnSurface::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Adaptor3d_HCurve)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCurve)
+}

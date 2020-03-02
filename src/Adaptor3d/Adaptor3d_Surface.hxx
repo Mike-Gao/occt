@@ -20,6 +20,7 @@
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
+#include <Standard_OStream.hxx>
 
 #include <Standard_Real.hxx>
 #include <GeomAbs_Shape.hxx>
@@ -210,6 +211,9 @@ public:
   
   Standard_EXPORT virtual Standard_Real OffsetValue() const;
   Standard_EXPORT virtual ~Adaptor3d_Surface();
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
 
 

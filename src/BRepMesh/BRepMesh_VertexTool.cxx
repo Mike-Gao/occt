@@ -134,3 +134,35 @@ void BRepMesh_VertexTool::Statistics(Standard_OStream& theStream) const
   theStream << "\nStructure Statistics\n---------------\n\n";
   theStream << "This structure has " << mySelector.NbVertices() << " Nodes\n\n";
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_VertexTool::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  //OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCellFilter)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance[0])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerance[1])
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &mySelector)
+
+  const NCollection_Map<NCollection_CellFilter<BRepMesh_VertexInspector>::Cell>& aCells = myCellFilter.Cells();
+  const NCollection_Array1<Standard_Real>& aCellSizes = myCellFilter.CellSize();
+
+  for (NCollection_Map<NCollection_CellFilter<BRepMesh_VertexInspector>::Cell>::Iterator aCellsIt (aCells); aCellsIt.More(); aCellsIt.Next())
+  {
+    const NCollection_LocalArray<long, 10>& anIndex = aCellsIt.Value().index;
+
+    const std::size_t aDim = anIndex.Size();
+    TCollection_AsciiString anIndexPair;
+    for (std::size_t i = 0; i < aDim; ++i)
+    {
+      if (!anIndexPair.IsEmpty()) anIndexPair += ", ";
+      anIndexPair += TCollection_AsciiString (anIndex[i]);
+    }
+    OCCT_DUMP_FIELD_VALUE_STRING (theOStream, anIndexPair)
+  }
+}

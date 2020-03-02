@@ -26,6 +26,8 @@
 #include <IMeshData_Types.hxx>
 #include <BRepMesh_DataStructureOfDelaun.hxx>
 #include <BRepMesh_GeomTool.hxx>
+#include <Message_Level.hxx>
+#include <Message_Messenger.hxx>
 #include <TColStd_Array1OfInteger.hxx>
 #include <TColStd_SequenceOfInteger.hxx>
 #include <TColStd_MapOfInteger.hxx>
@@ -90,6 +92,8 @@ public:
   //! Forces insertion of constraint edges into the base triangulation. 
   inline void ProcessConstraints()
   {
+    OCCT_ADD_MESSAGE_LEVEL_SENTRY
+    OCCT_SEND_MESSAGE ("ProcessConstraints")
     insertInternalEdges();
 
     // Adjustment of meshes to boundary edges
@@ -146,6 +150,9 @@ public:
                                              const BRepMesh_Vertex& theVertex,
                                              const Standard_Real    theSqTolerance,
                                              Standard_Integer&      theEdgeOn) const;
+
+  //! Dumps the content of me into the stream
+  Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
 private:
 

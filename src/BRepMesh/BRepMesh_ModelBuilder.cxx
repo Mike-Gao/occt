@@ -46,10 +46,14 @@ Handle (IMeshData_Model) BRepMesh_ModelBuilder::performInternal (
   const TopoDS_Shape&          theShape,
   const IMeshTools_Parameters& theParameters)
 {
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY
+  OCCT_SEND_MESSAGE ("BRepMesh_ModelBuilder::performInternal")
+
   Handle (BRepMeshData_Model) aModel;
 
   Bnd_Box aBox;
   BRepBndLib::Add (theShape, aBox, Standard_False);
+  OCCT_SEND_DUMPJSON (&aBox)
 
   if (!aBox.IsVoid ())
   {
@@ -71,6 +75,8 @@ Handle (IMeshData_Model) BRepMesh_ModelBuilder::performInternal (
     Handle (IMeshTools_ShapeVisitor) aVisitor =
       new BRepMesh_ShapeVisitor (aModel);
 
+    OCCT_SEND_DUMPJSON (aModel.get())
+
     IMeshTools_ShapeExplorer aExplorer (theShape);
     aExplorer.Accept (aVisitor);
     SetStatus (Message_Done1);
@@ -81,4 +87,15 @@ Handle (IMeshData_Model) BRepMesh_ModelBuilder::performInternal (
   }
 
   return aModel;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void BRepMesh_ModelBuilder::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, IMeshTools_ModelBuilder)
 }
