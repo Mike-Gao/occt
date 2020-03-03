@@ -4079,12 +4079,25 @@ void OpenGl_Context::ApplyModelWorldMatrix()
 // =======================================================================
 void OpenGl_Context::ApplyWorldViewMatrix()
 {
-  if (myShaderManager->ModelWorldState().ModelWorldMatrix() != THE_IDENTITY_MATRIX)
+  /*if (myShaderManager->ModelWorldState().ModelWorldMatrix() != THE_IDENTITY_MATRIX)
   {
     myShaderManager->UpdateModelWorldStateTo (THE_IDENTITY_MATRIX);
   }
   if (myShaderManager->WorldViewState().WorldViewMatrix() != WorldViewState.Current())
   {
+    myShaderManager->UpdateWorldViewStateTo (WorldViewState.Current());
+  }*/
+#if !defined(GL_ES_VERSION_2_0)
+  if (core11 != NULL)
+  {
+    core11->glMatrixMode (GL_MODELVIEW);
+    core11->glLoadMatrixf (WorldViewState.Current());
+  }
+#endif
+
+  if (!myShaderManager->IsEmpty())
+  {
+    myShaderManager->UpdateModelWorldStateTo (THE_IDENTITY_MATRIX);
     myShaderManager->UpdateWorldViewStateTo (WorldViewState.Current());
   }
 }
