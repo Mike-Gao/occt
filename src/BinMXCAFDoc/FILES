@@ -26,6 +26,12 @@ BinMXCAFDoc_GeomToleranceDriver.cxx
 BinMXCAFDoc_GeomToleranceDriver.hxx
 BinMXCAFDoc_GraphNodeDriver.cxx
 BinMXCAFDoc_GraphNodeDriver.hxx
+BinMXCAFDoc_KinematicPairDriver.cxx
+BinMXCAFDoc_KinematicPairDriver.hxx
+BinMXCAFDoc_KinematicPairValueDriver.cxx
+BinMXCAFDoc_KinematicPairValueDriver.hxx
+BinMXCAFDoc_KinematicToolDriver.cxx
+BinMXCAFDoc_KinematicToolDriver.hxx
 BinMXCAFDoc_LayerToolDriver.cxx
 BinMXCAFDoc_LayerToolDriver.hxx
 BinMXCAFDoc_LocationDriver.cxx

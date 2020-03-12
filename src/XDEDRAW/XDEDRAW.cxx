@@ -91,6 +91,7 @@
 #include <XDEDRAW_GDTs.hxx>
 #include <XDEDRAW_Views.hxx>
 #include <XDEDRAW_Notes.hxx>
+#include <XDEDRAW_Kinematics.hxx>
 #include <XSDRAW.hxx>
 #include <XSDRAWIGES.hxx>
 #include <XSDRAWSTEP.hxx>
@@ -1116,6 +1117,12 @@ static Standard_Integer XAttributeValue (Draw_Interpretor& di, Standard_Integer 
     else if (att->ID() == XCAFDoc::ViewRefPlaneGUID()) {
       type = "View Clipping Plane Link";
     }
+    else if (att->ID() == XCAFDoc::KinematicRefShapeGUID()){
+      type = "Kinematic Link to Shape";
+    }
+    else if (att->ID() == XCAFDoc::KinematicRefLink1GUID() || att->ID() == XCAFDoc::KinematicRefLink2GUID()){
+      type = "Kinematic Joint to Link";
+    }
     else return 0;
 
     Handle(XCAFDoc_GraphNode) DETGN = Handle(XCAFDoc_GraphNode)::DownCast(att);
@@ -1496,6 +1503,7 @@ void XDEDRAW::Init(Draw_Interpretor& di)
   XDEDRAW_GDTs::InitCommands ( di );
   XDEDRAW_Views::InitCommands(di);
   XDEDRAW_Notes::InitCommands(di);
+  XDEDRAW_Kinematics::InitCommands(di);
   XDEDRAW_Common::InitCommands ( di );//moved from EXE
 
 }

@@ -1,0 +1,72 @@
+# Rolling curve pair
+
+# Prepare a document
+XNewDoc D
+box b 1 1 1
+box bb 2 0 0 1 1 1
+XAddShape D b
+XAddShape D bb
+set mech [XAddMechanism D]
+set link1 [XAddLink D $mech 0:1:1:1]
+set link2 [XAddLink D $mech 0:1:1:2]
+set joint [XAddJoint D $mech $link1 $link2]
+
+# Start testing
+XSetPairName D $joint rolling curve
+set name [XGetPairName D $joint]
+if {$name != "rolling curve"} {
+  puts "Error: wrong parameter"
+}
+XSetPairType D $joint 19
+set type [XGetPairType D $joint]
+if {$type != "19"} {
+  puts "Error: wrong parameter"
+}
+
+plane p1 0 0 0 0 1 0 1 1 0
+plane p2 0 0 0 0 0 1 0 1 -1
+XSetPairTransformation D $joint 1 p1
+XSetPairTransformation D $joint 2 p2
+set dump_in [dump p1]
+XGetPairTransformation D $joint 1 p1
+set dump_out [dump p1]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+set dump_in [dump p2]
+XGetPairTransformation D $joint 2 p2
+set dump_out [dump p2]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+circle cir1 4 4 4 1
+line l2 0 0 0 1 1 1
+XSetPairGeomParam D $joint 1 cir1
+set dump_in [dump cir1]
+XGetPairGeomParam D $joint 1 cir1
+set dump_out [dump cir1]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+XSetPairGeomParam D $joint 2 l2
+set dump_in [dump l2]
+XGetPairGeomParam D $joint 2 l2
+set dump_out [dump l2]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairOrientation D $joint 1
+set ori [XGetPairOrientation D $joint]
+if {$ori != 1} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairValues D $joint -point_on_curve 1.5
+set values [XGetPairValues D $joint -first_point_on_curve]
+if {$values != "1.5"} {
+  puts "Error: wrong parameter"
+}
+
+Close D

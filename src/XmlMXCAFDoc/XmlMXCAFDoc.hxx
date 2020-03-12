@@ -43,6 +43,7 @@ class XmlMXCAFDoc_ShapeToolDriver;
 class XmlMXCAFDoc_DimTolToolDriver;
 class XmlMXCAFDoc_MaterialToolDriver;
 class XmlMXCAFDoc_ViewToolDriver;
+class XmlMXCAFDoc_KinematicToolDriver;
 
 
 //! Storage and Retrieval drivers for modelling attributes.
@@ -88,6 +89,7 @@ friend class XmlMXCAFDoc_ShapeToolDriver;
 friend class XmlMXCAFDoc_DimTolToolDriver;
 friend class XmlMXCAFDoc_MaterialToolDriver;
 friend class XmlMXCAFDoc_ViewToolDriver;
+friend class XmlMXCAFDoc_KinematicToolDriver;
 
 };
 
