@@ -169,7 +169,11 @@ public:
   //! Get View mode
   Standard_EXPORT Standard_Boolean GetViewMode() const;
 
+  //! Set Kinematic mode
+  Standard_EXPORT void SetKinematicMode(const Standard_Boolean kinematicmode);
 
+  //! Get Kinematic mode
+  Standard_EXPORT Standard_Boolean GetKinematicMode() const;
 
 
 protected:
@@ -227,6 +231,9 @@ protected:
   
   //! Reads Views for instances defined in the STEP model
   Standard_EXPORT Standard_Boolean ReadViews(const Handle(XSControl_WorkSession)& theWS, Handle(TDocStd_Document)& theDoc) const;
+
+  //!Reads Kinematic Pairs for instances defined in the STEP model
+  Standard_EXPORT Standard_Boolean ReadKinematics(const Handle(XSControl_WorkSession)& theWS, Handle(TDocStd_Document)& theDoc, const XCAFDoc_DataMapOfShapeLabel& ShapeLabelMap) const;
 
   //! Populates the sub-Label of the passed TDF Label with shape
   //! data associated with the given STEP Representation Item,
@@ -292,6 +299,7 @@ private:
   Standard_Boolean myGDTMode;
   Standard_Boolean myMatMode;
   Standard_Boolean myViewMode;
+  Standard_Boolean myKinematicMode;
   NCollection_DataMap<Handle(Standard_Transient), TDF_Label> myGDTMap;
 
 };

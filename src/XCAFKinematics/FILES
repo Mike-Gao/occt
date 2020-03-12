@@ -1,0 +1,11 @@
+XCAFKinematics_HighOrderPairObject.cxx
+XCAFKinematics_HighOrderPairObject.hxx
+XCAFKinematics_LowOrderPairObject.cxx
+XCAFKinematics_LowOrderPairObject.hxx
+XCAFKinematics_LowOrderPairObjectWithCoupling.cxx
+XCAFKinematics_LowOrderPairObjectWithCoupling.hxx
+XCAFKinematics_PairObject.cxx
+XCAFKinematics_PairObject.hxx
+XCAFKinematics_PairType.hxx
+XCAFKinematics_PairValueObject.cxx
+XCAFKinematics_PairValueObject.hxx

@@ -303,3 +303,43 @@ const Standard_GUID& XCAFDoc::LockGUID()
   static const Standard_GUID ID("efd213eb-6dfd-11d4-b9c8-0060b0ee281b");
   return ID;
 }
+
+//=======================================================================
+//function : KinematicRefShapeGUID
+//purpose  : 
+//=======================================================================
+
+const Standard_GUID& XCAFDoc::KinematicRefShapeGUID()
+{
+  static const Standard_GUID ID("CD65A782-448C-4935-8499-2210D970C175");
+  return ID;
+}
+
+//=======================================================================
+//function : KinematicRefLink1GUID
+//purpose  : 
+//=======================================================================
+
+const Standard_GUID& XCAFDoc::KinematicRefLink1GUID()
+{
+  static const Standard_GUID ID("35FF1462-E684-465F-B0B9-5CAD14B5018F");
+  return ID;
+}
+
+//=======================================================================
+//function : KinematicRefLink2GUID
+//purpose  : 
+//=======================================================================
+
+const Standard_GUID& XCAFDoc::KinematicRefLink2GUID()
+{
+  static const Standard_GUID ID("6AA96F91-7436-46F9-A955-4B3CCC42592B");
+  return ID;
+}
+
+Standard_EXPORT const Standard_GUID& XCAFDoc::KinematicRefJointGUID()
+{
+  static const Standard_GUID ID("596B048C-A965-4514-A059-464560BFAE4E");
+  return ID;
+}
+

@@ -1,0 +1,83 @@
+# Sliding surface pair
+
+# Prepare a document
+XNewDoc D
+box b 1 1 1
+box bb 2 0 0 1 1 1
+XAddShape D b
+XAddShape D bb
+set mech [XAddMechanism D]
+set link1 [XAddLink D $mech 0:1:1:1]
+set link2 [XAddLink D $mech 0:1:1:2]
+set joint [XAddJoint D $mech $link1 $link2]
+
+# Start testing
+XSetPairName D $joint sliding surface
+set name [XGetPairName D $joint]
+if {$name != "sliding surface"} {
+  puts "Error: wrong parameter"
+}
+XSetPairType D $joint 16
+set type [XGetPairType D $joint]
+if {$type != "16"} {
+  puts "Error: wrong parameter"
+}
+
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
+XSetPairTransformation D $joint 1 p1
+XSetPairTransformation D $joint 2 p2
+set dump_in [dump p1]
+XGetPairTransformation D $joint 1 p1
+set dump_out [dump p1]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+set dump_in [dump p2]
+XGetPairTransformation D $joint 2 p2
+set dump_out [dump p2]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+sphere sph1 4 4 4 1
+plane p2 0 0 0 1 0 0
+XSetPairGeomParam D $joint 1 sph1
+set dump_in [dump sph1]
+XGetPairGeomParam D $joint 1 sph1
+set dump_out [dump sph1]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+XSetPairGeomParam D $joint 2 p2
+set dump_in [dump p2]
+XGetPairGeomParam D $joint 2 p2
+set dump_out [dump p2]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairOrientation D $joint 0
+set ori [XGetPairOrientation D $joint]
+if {$ori != 0} {
+  puts "Error: wrong parameter"
+}
+
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -point_on_surface 1 2 -second_point_on_surface 2 1 -rotation 30
+set values [XGetPairValues D $value -first_point_on_surface]
+if {$values != "1 2"} {
+  puts "Error: wrong parameter"
+}
+set values [XGetPairValues D $value -second_point_on_surface]
+if {$values != "2 1"} {
+  puts "Error: wrong parameter"
+}
+set values [XGetPairValues D $value -rotation]
+if {$values != "30"} {
+  puts "Error: wrong parameter"
+}
+
+Close D

@@ -144,6 +144,47 @@ Notes API provides the following functionality:
   * Removes note(s) from an annotated assembly item; orphan note(s) might be deleted optionally (items without linked notes will be deleted automatically);
   * Deletes note(s) and removes them from annotated items;
   * Gets / deletes orphan notes.
+  
+@subsection occt_xde_1_11 Kinematics
+
+Kinematic data storage is realized according to ISO 10303-105:2019(E) and STEP Schema AP242 2019 year.
+All kinematic data is divided onto mechanisms each mechanism has its graph of links (references to shapes), joints (kinematic pair information) and (optional) states(sets of kinematic values).
+Each joint corresponds to one kinematic pair from the list:
+* Low order pairs
+  - fully constrained pair (no DOF);
+  - revolute pair (one rotation DOF);
+  - prismatic pair (one translation DOF);
+  - cylindrical pair (one rotation and one translation DOF);
+  - universal pair (two rotation DOF);
+  - homokinetic pair (two rotation DOF);
+  - spherical pair with pin (two rotation DOF);
+  - spherical pair (three rotation DOF);
+  - planar pair (one rotation and two translation DOF);
+  - unconstrained pair (3 rotation and 3 translation DOF);
+* Low order pairs with motion coupling
+  - screw pair;
+  - rack and pinion pair;
+  - gear pair;
+  - linear flexible and pinion pair
+* High order pairs
+  - point on surface pair;
+  - sliding surface pair;
+  - rolling surface pair;
+  - point on planar curve pair;
+  - sliding curve pair;
+  - rolling curve pair;
+  - linear flexible and planar curve pair.
+  
+The kinematic pair information consists of
+* parameters;
+* limits (optional);
+* current position (optional).
+
+The kinematic value consist of
+* reference to joint; 
+* paramters;
+
+All mentioned data depends on the kinematic pair type.
 
 @section occt_xde_2 Working with XDE
 
@@ -1058,8 +1099,140 @@ To delete note(s) use the following *XCAFDoc_NotesTool* methods:
 - *DeleteOrphanNotes* : deletes notes not bound to Document items.
 
 All these methods except for the last one break all links with Document items as well.
+
+@subsection occt_xde_2_11 Kinematics
+
+In XDE Document Kinematics is managed via *XCAFDoc_KinematicTool*. The Kinematic pair entities are described by two attributes
+*XCAFDoc_KinematicPair* and *XCAFDoc_KinematicPairValue (optional)*. The second attribute is a dependant attribute, 
+it cannot be assigned to label without the main attribute or to a label with the main attribute of another kinematic pair type.
   
-@subsection occt_xde_2_11 Reading and Writing STEP or IGES
+@subsubsection occt_xde_2_11_1 Creation
+
+All kinematic data refers to the mechanism, so, first of all, it needs to *AddMechanism*, 
+this method creates a new mechanism and two empty subfolders for links and joints. 
+The next step is specifying of links (mechanism details)  via *AddLink* and *SetLink* commands.
+The last step of kinematic graph creation is adding of joints with using *AddJoint* and *SetJoint* commands.
+
+Here is an example of creating a new mechanism and adding a new joint with two links:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+TDF_Label aMechaism = myKTool->AddMechanism(); 
+TDF_Label aStartShape = ...
+TDF_Label aLink1 = myKTool->AddLink(aMechaism, aStartShape); // start link of joint
+TDF_Label aEndShape = ...
+TDF_Label aLink2 = myKTool->AddLink(aMechaism, aEndShape); // end link of joint
+TDF_Label aJoint = myKTool->AddJoint(aMechaism, aLink1, aLink2).
+~~~~~
+
+(Optional) the state label contains pair values to each kinematic joint within the kinematic mechanism.
+You can create new state with the empty kinematic value of joint, use:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+TDF_Label aMechaism = myKTool->AddMechanism(); 
+TDF_Label aJoint = ...
+TDF_Label aState = myKTool->AddState(aMechanism);
+TDF_Label aValue = myKTool->AddValue(aState).
+~~~~~
+
+**Note** Any mechanism has a base link. By default, the end link of the first joint is the base of the mechanism.
+You can specify any link as basic, use: 
+~~~~~
+TDF_Label aLink2 = myKTool->AddLink(aMechaism, aEndShape, Standard_True); // if base link exist, old base loses specification.
+~~~~~
+
+@subsubsection occt_xde_2_11_2 Checking
+
+Commands to check that created labels are valid:
+- *IsMechanism* : checking for main labels of links and joints;
+- *IsLink* : checking for references to shape of the given link;
+- *IsJoint* : checking for references to end and start link of the given joint;
+- *IsValue* : checking for conteined  assigning data.
+
+To retrieve current graph state use the next methods:
+- *GetMechanisms* : retrieves all mechanisms labels;
+- *GetStates* : retrieves all state labels of the given mechanism;
+- *GetValuesOfState* : retrieves all references to values labels of the given state;
+- *GetStateOfValue* : retrieves the state label of the given value;
+- *GetLinks* : retrieves all links labels of the given mechanism;
+- *GetJoints* : retrieves all joint labels of the given mechanism;
+- *GetLinksOfJoint* : retrieves two references to links labels of the given joint;
+- *GetJointOfLink* : retrieves all references to joint labels of the given link;
+- *GetValuesOfJoint* : retrieves all references to value labels of the given joint;
+- *GetJointOfValue* : retrieves the joint label of the given value;
+- *GetRefShapes* : retrieves all references to shape labels of the given **link**.
+
+@subsubsection occt_xde_2_11_3 Editing
+
+To change links's referred shapes use:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+TDF_Label aLink = ...
+TDF_Label aShape = ... // or TDF_LabelSequence aShape
+aKTool->*SetLink*(aLink, aShape).
+~~~~~
+
+To change joint's referred links use:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+aKTool->*SetJoint*(aJointLabel, aLink1Label, aLink2Label).
+~~~~~
+
+@subsubsection occt_xde_2_11_4 Deleting
+
+All kinematic data can be removed use the next methods:
+- *RemoveLink* : removes the given link and all joints reference to it;
+- *RemoveJoint* : removes the given joint;
+- *RemoveMechanism* : removes the given mechanism with all its childrens;
+- *RemoveState* : removes the given state with all its values;
+- *RemoveValue* : removes the given value.
+
+@subsubsection occt_xde_2_11_5 Assigning data
+
+Each kinematic pair type has its set of parameters and so should be processed separately. The code below is a common example.
+
+Set pair data:
+~~~~~
+// Create an object according to necessary type (LowOrder/LowOrderWithCoupling/HighOrder)
+XCAFKinematics_PairObject anObject = new XCAFKinematics_PairObject();
+// Fill type, parameters if existed and limits if needed
+anObject->SetType(XCAFKinematics_PairType_Screw);
+...
+// Add attribute
+Handle(XCAFDoc_KinematicPair) aPair = XCAFDoc_KinematicPair::Set(aJointLabel);
+aPair->SetObject(anObject);
+~~~~~
+
+(Optional) set kinematic value data:
+~~~~~
+// Create an object according to necessary type (RevolutePair, PrismaticPair, ...)
+Handle(StepKinematics_PairValue) aValueObject = new StepKinematics_PairValue;
+// Fill parameters according type
+...
+// Add attribute
+Handle(XCAFDoc_KinematicPairValue) aXCAFValue = XCAFDoc_KinematicPairValue::Set(aValueLabel, aJointLabel);
+aXCAFValue->SetObject(aValueObject);
+~~~~~
+
+Get pair data:
+~~~~~
+// Get attribute from the label
+Handle(XCAFDoc_KinematicPair) aPair;
+if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  TCollection_AsciiString aName = anObject->Name();
+}
+~~~~~
+
+(Optional) get kinematic value data:
+~~~~~
+// Get attribute from the label
+Handle(XCAFDoc_KinematicPairValue) aPairValue;
+if (aValueLabel.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue)) {
+  Handle(XCAFKinematics_PairValueObject) aPairValueObject = aPairValue->GetObject();
+}
+~~~~~
+
+@subsection occt_xde_2_12 Reading and Writing STEP or IGES
 Note that saving and restoring the document itself are standard OCAF operations. As the various previously described definitions enter into this frame, they will not be explained any further. 
 The same can be said for Viewing: presentations can be defined from Shapes and Colors. 
 
@@ -1071,7 +1244,7 @@ There are several important points to consider:
   
 The packages to manage this are *IGESCAFControl* for IGES, and *STEPCAFControl* for STEP. 
 
-@subsubsection occt_xde_2_11_1 Reading a STEP file
+@subsubsection occt_xde_2_12_1 Reading a STEP file
 To read a STEP file by itself, use: 
 
 ~~~~~
@@ -1092,7 +1265,7 @@ if ( !reader.Transfer ( doc ) ) {
 ~~~~~
 
 In addition, the reader provides methods that are applicable to document transfers and for directly querying of the data produced. 
-@subsubsection occt_xde_2_11_2 Writing a STEP file
+@subsubsection occt_xde_2_12_2 Writing a STEP file
 To write a STEP file by itself, use: 
 
 ~~~~~
@@ -1113,19 +1286,19 @@ if ( ! writer.Transfer ( Doc, mode ) ) {
 IFSelect_ReturnStatus stat = writer.Write(file-name); 
 ~~~~~
 
-@subsubsection occt_xde_2_11_3 Reading an IGES File
+@subsubsection occt_xde_2_12_3 Reading an IGES File
 Use the same procedure as for a STEP file but with IGESCAFControl instead of STEPCAFControl. 
-@subsubsection occt_xde_2_11_4 Writing an IGES File
+@subsubsection occt_xde_2_12_4 Writing an IGES File
 Use the same procedure as for a STEP file but with IGESCAFControl instead of STEPCAFControl.
  
-@subsection occt_xde_2_12 Using an XDE Document
+@subsection occt_xde_2_13 Using an XDE Document
 There are several ways of exploiting XDE data from an application, you can: 
  1. Get the data relevant for the application by mapping XDE/Appli, then discard the XDE data once it has been used.
  2. Create a reference from the Application Document to the XDE Document, to have its data available as external data.
  3. Embed XDE data inside the Application Document (see the following section for details).
  4. Directly exploit XDE data such as when using file checkers.
 
-@subsubsection occt_xde_2_12_1 XDE Data inside an Application Document
+@subsubsection occt_xde_2_13_1 XDE Data inside an Application Document
 To have XCAF data elsewhere than under label 0.1, you use the DocLabel of XDE. The method DocLabel from XCAFDoc_DocumentTool determines the relevant Label for XCAF. However, note that the default is 0.1. 
 
 In addition, as XDE data is defined and managed in a modular way, you can consider exclusively Assembly Structure, only Colors, and so on. 

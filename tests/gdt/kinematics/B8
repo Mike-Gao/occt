@@ -1,0 +1,78 @@
+# point on planar curve pair
+
+# Prepare a document
+XNewDoc D
+box b 1 1 1
+box bb 2 0 0 1 1 1
+XAddShape D b
+XAddShape D bb
+set mech [XAddMechanism D]
+set link1 [XAddLink D $mech 0:1:1:1]
+set link2 [XAddLink D $mech 0:1:1:2]
+set joint [XAddJoint D $mech $link1 $link2]
+
+# Start testing
+XSetPairName D $joint point on planar curve
+set name [XGetPairName D $joint]
+if {$name != "point on planar curve"} {
+  puts "Error: wrong parameter"
+}
+XSetPairType D $joint 18
+set type [XGetPairType D $joint]
+if {$type != "18"} {
+  puts "Error: wrong parameter"
+}
+
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
+XSetPairTransformation D $joint 1 p1
+XSetPairTransformation D $joint 2 p2
+set dump_in [dump p1]
+XGetPairTransformation D $joint 1 p1
+set dump_out [dump p1]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+set dump_in [dump p2]
+XGetPairTransformation D $joint 2 p2
+set dump_out [dump p2]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairLimits D $joint 10 20 30 40 50 60
+set limits [XGetPairLimits D $joint]
+if {$limits != "10 20 30 40 50 60 "} {
+  puts "Error: wrong parameter"
+}
+
+circle cir 4 4 4 1
+trim cir cir 0 pi/2 
+XSetPairGeomParam D $joint 1 cir
+set dump_in [dump cir]
+XGetPairGeomParam D $joint 1 cir
+set dump_out [dump cir]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairOrientation D $joint 1
+set ori [XGetPairOrientation D $joint]
+if {$ori != 1} {
+  puts "Error: wrong parameter"
+}
+
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -point_on_curve 1.5 -ypr 12 13 14
+set values [XGetPairValues D $value -point_on_curve]
+if {$values != "1.5"} {
+  puts "Error: wrong parameter"
+}
+set values [XGetPairValues D $value -ypr]
+if {$values != "12 13 14"} {
+  puts "Error: wrong parameter"
+}
+
+Close D
