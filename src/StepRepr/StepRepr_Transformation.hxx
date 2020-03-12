@@ -26,6 +26,7 @@
 class Standard_Transient;
 class StepRepr_ItemDefinedTransformation;
 class StepRepr_FunctionallyDefinedTransformation;
+class StepKinematics_KinematicPair;
 
 
 
@@ -51,7 +52,8 @@ public:
   //! returns Value as a FunctionallyDefinedTransformation (Null if another type)
   Standard_EXPORT Handle(StepRepr_FunctionallyDefinedTransformation) FunctionallyDefinedTransformation() const;
 
-
+  //! returns Value as a StepKinematics_KinematicPair (Null if another type)
+  Standard_EXPORT Handle(StepKinematics_KinematicPair) KinematicPair() const;
 
 
 protected:

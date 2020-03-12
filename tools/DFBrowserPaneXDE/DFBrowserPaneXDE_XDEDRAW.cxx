@@ -253,6 +253,12 @@ TCollection_AsciiString DFBrowserPaneXDE_XDEDRAW::GetAttributeInfo (Handle(TDF_A
     else if ( att->ID() == XCAFDoc::GeomToleranceRefGUID() ){
       type = "GeomTolerance Link";
     }
+    else if (att->ID() == XCAFDoc::KinematicRefShapeGUID()){
+      type = "Kinematic Link to Shape";
+    }
+    else if (att->ID() == XCAFDoc::KinematicRefLink1GUID() || att->ID() == XCAFDoc::KinematicRefLink2GUID()){
+      type = "Kinematic Joint to Link";
+    }
     else
       return TCollection_AsciiString();
 

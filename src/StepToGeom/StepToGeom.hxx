@@ -100,6 +100,7 @@ class StepGeom_CartesianTransformationOperator2d;
 class StepGeom_CartesianTransformationOperator3d;
 class StepGeom_TrimmedCurve;
 class StepGeom_Vector;
+class StepKinematics_SuParameters;
 
 //! This class provides static methods to convert STEP geometric entities to OCCT.
 //! The methods returning handles will return null handle in case of error.
@@ -111,6 +112,7 @@ public:
 
   Standard_EXPORT static Handle(Geom_Axis1Placement) MakeAxis1Placement (const Handle(StepGeom_Axis1Placement)& SA);
   Standard_EXPORT static Handle(Geom_Axis2Placement) MakeAxis2Placement (const Handle(StepGeom_Axis2Placement3d)& SA);
+  Standard_EXPORT static Handle(Geom_Axis2Placement) MakeAxis2Placement (const Handle(StepKinematics_SuParameters)& SP);
   Standard_EXPORT static Handle(Geom2d_AxisPlacement) MakeAxisPlacement (const Handle(StepGeom_Axis2Placement2d)& SA);
   Standard_EXPORT static Handle(Geom_BoundedCurve) MakeBoundedCurve (const Handle(StepGeom_BoundedCurve)& SC);
   Standard_EXPORT static Handle(Geom2d_BoundedCurve) MakeBoundedCurve2d (const Handle(StepGeom_BoundedCurve)& SC);

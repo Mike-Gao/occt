@@ -131,6 +131,7 @@
 #include <StepGeom_UniformSurface.hxx>
 #include <StepGeom_UniformSurfaceAndRationalBSplineSurface.hxx>
 #include <StepGeom_Vector.hxx>
+#include <StepKinematics_SuParameters.hxx>
 
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
@@ -200,6 +201,28 @@ Handle(Geom_Axis2Placement) StepToGeom::MakeAxis2Placement (const Handle(StepGeo
     return new Geom_Axis2Placement(gpAx2);
   }
   return 0;
+}
+
+//=============================================================================
+// Creation d' un AxisPlacement de Geom2d a partir d' un SuParameters de Step
+//=============================================================================
+
+Handle(Geom_Axis2Placement) StepToGeom::MakeAxis2Placement(const Handle(StepKinematics_SuParameters)& SP)
+{
+  Standard_Real aLocX = SP->A() * cos(SP->Gamma()) + SP->B() * sin(SP->Gamma()) * sin(SP->Alpha());
+  Standard_Real aLocY = SP->A() * sin(SP->Gamma()) - SP->B() * cos(SP->Gamma()) * sin(SP->Alpha());
+  Standard_Real aLocZ = SP->C() + SP->B() * cos(SP->Alpha());
+  Standard_Real anAsisX = sin(SP->Gamma()) * sin(SP->Alpha());
+  Standard_Real anAxisY = -cos(SP->Gamma()) * sin(SP->Alpha());
+  Standard_Real anAxisZ = cos(SP->Alpha());
+  Standard_Real aDirX = cos(SP->Gamma()) * cos(SP->Beta()) - sin(SP->Gamma()) * cos(SP->Alpha()) * sin(SP->Beta());
+  Standard_Real aDirY = sin(SP->Gamma()) * cos(SP->Beta()) + cos(SP->Gamma()) * cos(SP->Alpha()) * sin(SP->Beta());
+  Standard_Real aDirZ = sin(SP->Alpha())*sin(SP->Beta());
+  const gp_Pnt Pgp (aLocX, aLocY, aLocZ);
+  const gp_Dir Ngp (anAsisX,anAxisY,anAxisZ);
+  const gp_Dir Vxgp(aDirX, aDirY, aDirZ);
+  gp_Ax2 gpAx2 = gp_Ax2(Pgp, Ngp, Vxgp);
+    return new Geom_Axis2Placement(gpAx2);
 }
 
 //=============================================================================

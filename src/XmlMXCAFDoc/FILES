@@ -22,6 +22,8 @@ XmlMXCAFDoc_DocumentToolDriver.cxx
 XmlMXCAFDoc_DocumentToolDriver.hxx
 XmlMXCAFDoc_GraphNodeDriver.cxx
 XmlMXCAFDoc_GraphNodeDriver.hxx
+XmlMXCAFDoc_KinematicToolDriver.cxx
+XmlMXCAFDoc_KinematicToolDriver.hxx
 XmlMXCAFDoc_LayerToolDriver.cxx
 XmlMXCAFDoc_LayerToolDriver.hxx
 XmlMXCAFDoc_LocationDriver.cxx

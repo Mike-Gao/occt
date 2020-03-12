@@ -33,6 +33,7 @@ class XCAFDoc_MaterialTool;
 class XCAFDoc_NotesTool;
 class XCAFDoc_ViewTool;
 class XCAFDoc_VisMaterialTool;
+class XCAFDoc_KinematicTool;
 class TDF_Attribute;
 class TDF_RelocationTable;
 
@@ -92,6 +93,9 @@ public:
   //! Returns sub-label of DocLabel() with tag 10.
   Standard_EXPORT static TDF_Label VisMaterialLabel (const TDF_Label& theLabel);
 
+  //! Returns sub-label of DocLabel() with tag 11.
+  Standard_EXPORT static TDF_Label KinematicsLabel (const TDF_Label& acces);
+
   //! Creates (if it does not exist) ShapeTool attribute on ShapesLabel().
   Standard_EXPORT static Handle(XCAFDoc_ShapeTool) ShapeTool (const TDF_Label& acces);
   
@@ -119,6 +123,9 @@ public:
 
   //! Creates (if it does not exist) NotesTool attribute on NotesLabel().
   Standard_EXPORT static Handle(XCAFDoc_NotesTool) NotesTool(const TDF_Label& acces);
+
+  //! Creates (if it does not exist) KinematicTool attribute on KinematicsLabel().
+  Standard_EXPORT static Handle(XCAFDoc_KinematicTool) KinematicTool(const TDF_Label& acces);
 
 public:
 

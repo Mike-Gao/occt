@@ -30,6 +30,7 @@
 #include <XmlMXCAFDoc_DimTolToolDriver.hxx>
 #include <XmlMXCAFDoc_DocumentToolDriver.hxx>
 #include <XmlMXCAFDoc_GraphNodeDriver.hxx>
+#include <XmlMXCAFDoc_KinematicToolDriver.hxx>
 #include <XmlMXCAFDoc_LayerToolDriver.hxx>
 #include <XmlMXCAFDoc_LocationDriver.hxx>
 #include <XmlMXCAFDoc_MaterialDriver.hxx>
@@ -89,4 +90,5 @@ void XmlMXCAFDoc::AddDrivers (const Handle(XmlMDF_ADriverTable)& aDriverTable,
   aDriverTable -> AddDriver (new XmlMXCAFDoc_NotesToolDriver    (anMsgDrv));
   aDriverTable -> AddDriver (new XmlMXCAFDoc_ViewToolDriver     (anMsgDrv));
   aDriverTable -> AddDriver (new XmlMXCAFDoc_ClippingPlaneToolDriver(anMsgDrv));
+  aDriverTable -> AddDriver (new XmlMXCAFDoc_KinematicToolDriver(anMsgDrv));
 }

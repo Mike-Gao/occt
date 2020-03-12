@@ -43,6 +43,7 @@ class XCAFDoc_MaterialTool;
 class XCAFDoc_GraphNode;
 class XCAFDoc_Editor;
 class XCAFDoc_ViewTool;
+class XCAFDoc_KinematicTool;
 
 
 //! Definition of general structure of DECAF document
@@ -132,6 +133,15 @@ public:
 
   //! Returns GUID for UAttribute identifying lock flag
   Standard_EXPORT static const Standard_GUID& LockGUID();
+
+  //! Return GUIDs for GraphNode representing specified types of Kinematics
+  Standard_EXPORT static const Standard_GUID& KinematicRefShapeGUID();
+
+  //! Return GUIDs for TreeNode representing specified types of Kinematics
+  Standard_EXPORT static const Standard_GUID& KinematicRefLink1GUID();
+
+  //! Return GUIDs for TreeNode representing specified types of Kinematics
+  Standard_EXPORT static const Standard_GUID& KinematicRefLink2GUID();
 
 };
 

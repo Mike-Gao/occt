@@ -1,0 +1,74 @@
+# Point on surface pair
+
+# Prepare a document
+XNewDoc D
+box b 1 1 1
+box bb 2 0 0 1 1 1
+XAddShape D b
+XAddShape D bb
+set mech [XAddMechanism D]
+set link1 [XAddLink D $mech 0:1:1:1]
+set link2 [XAddLink D $mech 0:1:1:2]
+set joint [XAddJoint D $mech $link1 $link2]
+
+# Start testing
+XSetPairName D $joint point on surface
+set name [XGetPairName D $joint]
+if {$name != "point on surface"} {
+  puts "Error: wrong parameter"
+}
+XSetPairType D $joint 14
+set type [XGetPairType D $joint]
+if {$type != "14"} {
+  puts "Error: wrong parameter"
+}
+
+plane p1 0 0 0 0 1 0 1 1 0
+plane p2 0 0 0 0 0 1 0 1 -1
+XSetPairTransformation D $joint 1 p1
+XSetPairTransformation D $joint 2 p2
+set dump_in [dump p1]
+XGetPairTransformation D $joint 1 p1
+set dump_out [dump p1]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+set dump_in [dump p2]
+XGetPairTransformation D $joint 2 p2
+set dump_out [dump p2]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairLimits D $joint 10 20 30 40 50 60
+set limits [XGetPairLimits D $joint]
+if {$limits != "10 20 30 40 50 60 "} {
+  puts "Error: wrong parameter"
+}
+
+sphere sph 4 4 4 1
+XSetPairGeomParam D $joint 1 sph
+set dump_in [dump sph]
+XGetPairGeomParam D $joint 1 sph
+set dump_out [dump sph]
+if {$dump_in != $dump_out} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairOrientation D $joint 1
+set ori [XGetPairOrientation D $joint]
+if {$ori != 1} {
+  puts "Error: wrong parameter"
+}
+
+XSetPairValues D $joint -point_on_surface 1 2 -ypr 12 13 14
+set values [XGetPairValues D $joint -point_on_surface]
+if {$values != "1 2"} {
+  puts "Error: wrong parameter"
+}
+set values [XGetPairValues D $joint -ypr]
+if {$values != "12 13 14"} {
+  puts "Error: wrong parameter"
+}
+
+Close D

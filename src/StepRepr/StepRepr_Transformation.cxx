@@ -14,9 +14,12 @@
 
 #include <Interface_Macros.hxx>
 #include <Standard_Transient.hxx>
+#include <Standard_Type.hxx>
 #include <StepRepr_FunctionallyDefinedTransformation.hxx>
 #include <StepRepr_ItemDefinedTransformation.hxx>
 #include <StepRepr_Transformation.hxx>
+#include <StepKinematics_KinematicPair.hxx>
+#include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
 
 StepRepr_Transformation::StepRepr_Transformation () {  }
 
@@ -25,6 +28,7 @@ Standard_Integer StepRepr_Transformation::CaseNum(const Handle(Standard_Transien
 	if (ent.IsNull()) return 0;
 	if (ent->IsKind(STANDARD_TYPE(StepRepr_ItemDefinedTransformation))) return 1;
 	if (ent->IsKind(STANDARD_TYPE(StepRepr_FunctionallyDefinedTransformation))) return 2;
+	if (ent->IsKind(STANDARD_TYPE(StepGeom_GeometricRepresentationItem))) return 1;
 	return 0;
 }
 
@@ -37,3 +41,12 @@ Handle(StepRepr_FunctionallyDefinedTransformation) StepRepr_Transformation::Func
 {
 	return GetCasted(StepRepr_FunctionallyDefinedTransformation,Value());
 }
+
+Handle(StepKinematics_KinematicPair) StepRepr_Transformation::KinematicPair() const
+{
+	Handle(StepKinematics_ActuatedKinPairAndOrderKinPair) aComplexPair = GetCasted(StepKinematics_ActuatedKinPairAndOrderKinPair, Value());
+	if (aComplexPair.IsNull())
+		return  GetCasted(StepKinematics_KinematicPair, Value());
+	return GetCasted(StepKinematics_KinematicPair, aComplexPair->GetOrderKinematicPair());
+}
+
