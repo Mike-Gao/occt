@@ -111,7 +111,7 @@ protected:
   //! written by newer applications.
   //! The default implementation: if the version of the file is greater than the
   //! current or lesser than 2, then return false, else true
-  Standard_EXPORT virtual Standard_Boolean CheckDocumentVersion (const Standard_Integer theFileVersion, const Standard_Integer theCurVersion);
+  Standard_EXPORT virtual Standard_Boolean CheckDocumentVersion (const BinLDrivers_FormatVersion theFileVersion, const BinLDrivers_FormatVersion theCurVersion);
 
   Handle(BinMDF_ADriverTable) myDrivers;
   BinObjMgt_RRelocationTable myRelocTable;

@@ -59,7 +59,7 @@ Standard_Boolean BinMDataStd_IntegerDriver::Paste
   Standard_Boolean ok = theSource >> aValue;
   if (ok)
     anAtt->Set(aValue);
-  if(theRT.GetHeaderData()->StorageVersion().IntegerValue() > 8) { // process user defined guid
+  if(theRT.GetHeaderData()->BinStorageVersion() >= BinLDrivers_FormatVersion::VERSION_9) { // process user defined guid
 	const Standard_Integer& aPos = theSource.Position();
 	Standard_GUID aGuid;
 	ok = theSource >> aGuid;	

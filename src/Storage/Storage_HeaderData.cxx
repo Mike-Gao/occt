@@ -202,14 +202,34 @@ void Storage_HeaderData::SetStorageVersion(const TCollection_AsciiString& v)
   myStorageVersion = v;
 }
 
+void Storage_HeaderData::SetStorageVersion(const BinLDrivers_FormatVersion& aBinVersion)
+{
+  myStorageVersion = TCollection_AsciiString(static_cast<Standard_Integer>(aBinVersion));
+}
+
+void Storage_HeaderData::SetStorageVersion(const XmlLDrivers_FormatVersion& aXmlVersion)
+{
+  myStorageVersion = TCollection_AsciiString(static_cast<Standard_Integer>(aXmlVersion));
+}
+
 void Storage_HeaderData::SetCreationDate(const TCollection_AsciiString& d)
 {
   myDate = d;
 }
 
-TCollection_AsciiString Storage_HeaderData::StorageVersion() const
+TCollection_AsciiString Storage_HeaderData::StringStorageVersion() const
 {
   return myStorageVersion;
+}
+
+BinLDrivers_FormatVersion Storage_HeaderData::BinStorageVersion() const
+{
+  return static_cast<BinLDrivers_FormatVersion>(myStorageVersion.IntegerValue());
+}
+
+XmlLDrivers_FormatVersion Storage_HeaderData::XmlStorageVersion() const
+{
+  return static_cast<XmlLDrivers_FormatVersion>(myStorageVersion.IntegerValue());
 }
 
 Storage_Error  Storage_HeaderData::ErrorStatus() const

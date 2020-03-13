@@ -119,7 +119,7 @@ public:
   Standard_EXPORT TCollection_AsciiString CreationDate() const;
   
   //! return the Storage package version
-  Standard_EXPORT TCollection_AsciiString StorageVersion() const;
+  Standard_EXPORT TCollection_AsciiString StringStorageVersion() const;
   
   //! get the version of the schema
   Standard_EXPORT TCollection_AsciiString SchemaVersion() const;

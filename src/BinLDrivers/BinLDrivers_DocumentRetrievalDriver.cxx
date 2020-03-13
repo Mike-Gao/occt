@@ -161,21 +161,21 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
   }
 
   // 1.a Version of writer
-  if (!aHeaderData->StorageVersion().IsIntegerValue()) {
+  if (!aHeaderData->StringStorageVersion().IsIntegerValue()) {
     // file has no format version
     myMsgDriver->Send (aMethStr + "error: file has no format version", Message_Fail);
     myReaderStatus = PCDM_RS_FormatFailure;
     return;
   }
-  Standard_Integer aFileVer = aHeaderData->StorageVersion().IntegerValue();
-  Standard_Integer aCurrVer = BinLDrivers::StorageVersion().IntegerValue();
+  BinLDrivers_FormatVersion aFileVer = aHeaderData->BinStorageVersion();
+  BinLDrivers_FormatVersion aCurrVer = BinLDrivers::THE_CURRENT_VERSION;
   // maintain one-way compatibility starting from version 2+
   if (!CheckDocumentVersion(aFileVer, aCurrVer)) {
     myReaderStatus = PCDM_RS_NoVersion;
     // file was written with another version
     myMsgDriver->Send (aMethStr + "error: wrong file version: " +
-                 aHeaderData->StorageVersion() + " while current is " +
-                 BinLDrivers::StorageVersion(), Message_Fail);
+                 aHeaderData->StringStorageVersion() + " while current is " +
+                 BinLDrivers::StringStorageVersion(), Message_Fail);
     return;
   }
 
@@ -192,7 +192,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     else if (aStr == END_TYPES)
       break;
     else if (begin) {
-      if ( aFileVer < 8 ) {
+      if ( aFileVer < BinLDrivers_FormatVersion::VERSION_8) {
 #ifdef DATATYPE_MIGRATION
         TCollection_AsciiString  newName;	
         if(Storage_Schema::CheckTypeMigration(aStr, newName)) {
@@ -236,7 +236,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
   Message_ProgressSentry aPS(theProgress, "Reading data", 0, 3, 1);
 
   // 2b. Read the TOC of Sections
-  if (aFileVer >= 3) {
+  if (aFileVer >= BinLDrivers_FormatVersion::VERSION_3) {
     BinLDrivers_DocumentSection aSection;
     do {
       BinLDrivers_DocumentSection::ReadTOC (aSection, theIStream, aFileVer);
@@ -349,7 +349,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
   }
 
   // Read Sections (post-reading type)
-  if (aFileVer >= 3) {
+  if (aFileVer >= BinLDrivers_FormatVersion::VERSION_3) {
     BinLDrivers_VectorOfDocumentSection::Iterator aSectIter (mySections);
     for (; aSectIter.More(); aSectIter.Next()) {
       BinLDrivers_DocumentSection& aCurSection = aSectIter.ChangeValue();
@@ -568,10 +568,10 @@ void BinLDrivers_DocumentRetrievalDriver::Clear()
 //purpose  : 
 //=======================================================================
 Standard_Boolean BinLDrivers_DocumentRetrievalDriver::CheckDocumentVersion(
-                                                          const Standard_Integer theFileVersion,
-                                                          const Standard_Integer theCurVersion)
+                                                          const BinLDrivers_FormatVersion theFileVersion,
+                                                          const BinLDrivers_FormatVersion theCurVersion)
 {
-  if (theFileVersion < 2 || theFileVersion > theCurVersion) {
+  if (theFileVersion < BinLDrivers_FormatVersion::VERSION_2 || theFileVersion > theCurVersion) {
     // file was written with another version
     return Standard_False;
   }

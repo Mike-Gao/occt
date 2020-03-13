@@ -159,7 +159,7 @@ private:
   GeomTools_Curve2dSet myCurves2d;
   TColStd_IndexedMapOfTransient myPolygons2D;
   TColStd_IndexedMapOfTransient myPolygons3D;
-  TColStd_IndexedMapOfTransient myTriangulations;
+  NCollection_IndexedDataMap<Handle(Standard_Transient), Standard_Boolean, TColStd_MapTransientHasher> myTriangulations;
   TColStd_IndexedMapOfTransient myNodes;
   Standard_Boolean myWithTriangles;
 

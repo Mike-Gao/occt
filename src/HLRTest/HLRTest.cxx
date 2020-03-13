@@ -600,67 +600,66 @@ void HLRTest::Commands (Draw_Interpretor& theCommands)
 //purpose  : 
 //=======================================================================
 
-static Standard_Boolean stest(const Handle(Draw_Drawable3D)& d) 
+Standard_Boolean Draw_SaveAndRestoreHLRTest::Test(const Handle(Draw_Drawable3D)& theDrawable3D) const
 {
-  return d->IsInstance(STANDARD_TYPE(HLRTest_Projector));
+  return theDrawable3D->IsInstance(STANDARD_TYPE(HLRTest_Projector));
 }
 
 //=======================================================================
-//function : ssave
+//function : Draw_SaveAndRestoreHLRTest::Save
 //purpose  : 
 //=======================================================================
 
-static void ssave (const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Draw_SaveAndRestoreHLRTest::Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const
 {
-  Handle(HLRTest_Projector) HP =
-    Handle(HLRTest_Projector)::DownCast(d);
+  theVersion; // to suppress a warning
+  Handle(HLRTest_Projector) HP = Handle(HLRTest_Projector)::DownCast(theDrawable3D);
 
   const HLRAlgo_Projector& P = HP->Projector();
-  OS << (P.Perspective() ? "1" : "0") << "\n";
+  os << (P.Perspective() ? "1" : "0") << "\n";
   if (P.Perspective())
-    OS << P.Focus() << "\n";
+    os << P.Focus() << "\n";
   
   gp_Trsf T = P.Transformation();
   gp_XYZ V = T.TranslationPart();
   gp_Mat M = T.VectorialPart();
 
-  OS << M(1,1) << " ";
-  OS << M(1,2) << " ";
-  OS << M(1,3) << " ";
-  OS << V.Coord(1) << " ";
-  OS << "\n";
-  OS << M(2,1) << " ";
-  OS << M(2,2) << " ";
-  OS << M(2,3) << " ";
-  OS << V.Coord(2) << " ";
-  OS << "\n";
-  OS << M(3,1) << " ";
-  OS << M(3,2) << " ";
-  OS << M(3,3) << " ";
-  OS << V.Coord(3) << " ";
-  OS << "\n";
-
+  os << M(1,1) << " ";
+  os << M(1,2) << " ";
+  os << M(1,3) << " ";
+  os << V.Coord(1) << " ";
+  os << "\n";
+  os << M(2,1) << " ";
+  os << M(2,2) << " ";
+  os << M(2,3) << " ";
+  os << V.Coord(2) << " ";
+  os << "\n";
+  os << M(3,1) << " ";
+  os << M(3,2) << " ";
+  os << M(3,3) << " ";
+  os << V.Coord(3) << " ";
+  os << "\n";
 }
 
 //=======================================================================
-//function : srestore
+//function : Draw_SaveAndRestoreHLRTest::Restore
 //purpose  : 
 //=======================================================================
 
-static Handle(Draw_Drawable3D) srestore (std::istream& IS)
+Handle(Draw_Drawable3D) Draw_SaveAndRestoreHLRTest::Restore(std::istream& is) const
 {
   Standard_Boolean pers;
-  IS >> pers;
+  is >> pers;
   Standard_Real focus = 1;
-  if (pers) IS >> focus;
+  if (pers) is >> focus;
   
   gp_Trsf T;
   Standard_Real V1[3],V2[3],V3[3];
   Standard_Real V[3];
 
-  IS >> V1[0] >> V1[1] >> V1[2] >> V[0];
-  IS >> V2[0] >> V2[1] >> V2[2] >> V[1];
-  IS >> V3[0] >> V3[1] >> V3[2] >> V[2];
+  is >> V1[0] >> V1[1] >> V1[2] >> V[0];
+  is >> V2[0] >> V2[1] >> V2[2] >> V[1];
+  is >> V3[0] >> V3[1] >> V3[2] >> V[2];
 
   gp_Dir D1(V1[0],V1[1],V1[2]);
   gp_Dir D2(V2[0],V2[1],V2[2]);
@@ -682,5 +681,5 @@ static Handle(Draw_Drawable3D) srestore (std::istream& IS)
 //purpose  : 
 //=======================================================================
 
-static Draw_SaveAndRestore ssr("HLRTest_Projector",stest,ssave,srestore);
+static Draw_SaveAndRestoreHLRTest saveAndRestoreHLRTest;
 

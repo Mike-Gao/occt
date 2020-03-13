@@ -17,6 +17,7 @@
 #define _XmlLDrivers_HeaderFile
 
 #include <Standard_Handle.hxx>
+#include <XmlLDrivers_FormatVersion.hxx>
 
 class Standard_Transient;
 class Standard_GUID;
@@ -41,8 +42,12 @@ public:
   Standard_EXPORT static void DefineFormat (const Handle(TDocStd_Application)& theApp);
 
   Standard_EXPORT static Handle(XmlMDF_ADriverTable) AttributeDrivers (const Handle(Message_Messenger)& theMsgDriver);
-  
-  Standard_EXPORT static int StorageVersion();
+
+  Standard_EXPORT static TCollection_AsciiString StringFormatVersion();
+
+public:
+
+  static const XmlLDrivers_FormatVersion THE_CURRENT_VERSION = XmlLDrivers_FormatVersion::VERSION_10;
 };
 
 #endif // _XmlLDrivers_HeaderFile
