@@ -341,7 +341,7 @@ TCollection_AsciiString Storage_Schema::Name() const
 //=======================================================================
 
 void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
-                            const Handle(Storage_Data)& aData) const
+                          const Handle(Storage_Data)& aData) const
 {
  if (aData.IsNull()) return;
 
@@ -391,13 +391,13 @@ void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
       errorContext = "WriteInfo";
       theDriver->WriteInfo(aData->NumberOfObjects(),
                            aData->StringStorageVersion(),
-                           aData->CreationDate(),
-                           aData->SchemaName(),
-                           aData->SchemaVersion(),
-                           aData->ApplicationName(),
-                           aData->ApplicationVersion(),
-                           aData->DataType(),
-                           aData->UserInfo());
+                  aData->CreationDate(),
+                  aData->SchemaName(),
+                  aData->SchemaVersion(),
+                  aData->ApplicationName(),
+                  aData->ApplicationVersion(),
+                  aData->DataType(),
+                  aData->UserInfo());
       errorContext = "EndWriteInfoSection";
       theDriver->EndWriteInfoSection();
 
@@ -774,16 +774,16 @@ Standard_Boolean Storage_Schema::CheckTypeMigration(
       else
       {
         // hard-code migration table for known types	
-	aDMap.Bind("TDataStd_Shape",          "TDataXtd_Shape");
-	aDMap.Bind("TDataStd_Constraint",     "TDataXtd_Constraint");
+        aDMap.Bind("TDataStd_Shape",          "TDataXtd_Shape");
+        aDMap.Bind("TDataStd_Constraint",     "TDataXtd_Constraint");
         aDMap.Bind("TDataStd_Geometry",       "TDataXtd_Geometry");
-	aDMap.Bind("TDataStd_Axis",           "TDataXtd_Axis");
-	aDMap.Bind("TDataStd_Point",          "TDataXtd_Point");
-	aDMap.Bind("TDataStd_Plane",          "TDataXtd_Plane");
-	aDMap.Bind("TDataStd_Position",       "TDataXtd_Position");
-	aDMap.Bind("TDataStd_Placement",      "TDataXtd_Placement");
-	aDMap.Bind("TDataStd_PatternStd",     "TDataXtd_PatternStd");
-	aDMap.Bind("TPrsStd_AISPresentation", "TDataXtd_Presentation");
+        aDMap.Bind("TDataStd_Axis",           "TDataXtd_Axis");
+        aDMap.Bind("TDataStd_Point",          "TDataXtd_Point");
+        aDMap.Bind("TDataStd_Plane",          "TDataXtd_Plane");
+        aDMap.Bind("TDataStd_Position",       "TDataXtd_Position");
+        aDMap.Bind("TDataStd_Placement",      "TDataXtd_Placement");
+        aDMap.Bind("TDataStd_PatternStd",     "TDataXtd_PatternStd");
+        aDMap.Bind("TPrsStd_AISPresentation", "TDataXtd_Presentation");
         aDMap.Bind("PDataStd_Shape",          "PDataXtd_Shape");
         aDMap.Bind("PDataStd_Constraint",     "PDataXtd_Constraint");
         aDMap.Bind("PDataStd_Geometry",       "PDataXtd_Geometry");

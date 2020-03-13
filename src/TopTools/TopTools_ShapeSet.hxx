@@ -191,7 +191,6 @@ public:
 
   static const TopTools_FormatVersion THE_CURRENT_VERSION = TopTools_FormatVersion::VERSION_3;
 
-
 private:
   
   //! Reads  from <IS>  a shape  and  returns  it in  S.
