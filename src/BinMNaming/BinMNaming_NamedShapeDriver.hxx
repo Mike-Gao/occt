@@ -72,15 +72,15 @@ public:
   //! First : does not write CurveOnSurface UV Points into the file
   //! on reading calls Check() method.
   //! Second: stores CurveOnSurface UV Points.
-    void SetFormatNb (const Standard_Integer theFormat);
+    void SetFormat (const BinTools_FormatVersion theFormat);
   
   //! get the format of topology
-    Standard_Integer GetFormatNb() const;
+    BinTools_FormatVersion GetFormat() const;
   
   //! get the format of topology
     BinTools_LocationSet& GetShapesLocations();
 
-
+  static const BinTools_FormatVersion THE_CURRENT_VERSION = BinTools_FormatVersion::VERSION_4;
 
 
   DEFINE_STANDARD_RTTIEXT(BinMNaming_NamedShapeDriver,BinMDF_ADriver)
@@ -94,7 +94,7 @@ private:
 
 
   BinTools_ShapeSet myShapeSet;
-  Standard_Integer myFormatNb;
+  BinTools_FormatVersion myFormat;
 
 
 };

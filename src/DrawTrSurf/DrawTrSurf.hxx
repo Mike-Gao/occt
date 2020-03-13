@@ -25,6 +25,7 @@
 #include <Geom_Geometry.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom2d_Curve.hxx>
+#include <Draw_SaveAndRestore.hxx>
 
 class gp_Pnt;
 class gp_Pnt2d;
@@ -54,6 +55,7 @@ class DrawTrSurf_Triangulation;
 class DrawTrSurf_Polygon3D;
 class DrawTrSurf_Polygon2D;
 
+enum class TopTools_FormatVersion;
 
 //! This  package supports the   display of parametric
 //! curves and surfaces.
@@ -205,10 +207,173 @@ friend class DrawTrSurf_Polygon2D;
 
 };
 
+class Draw_SaveAndRestoreCurve : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreCurve()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Curve") {}
 
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
 
+};
 
+class Draw_SaveAndRestoreBezierCurve : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreBezierCurve()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_BezierCurve") {}
 
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
 
+};
+
+class Draw_SaveAndRestoreBSplineCurve : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreBSplineCurve()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineCurve") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreCurve2d()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Curve2d") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreBezierCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreBezierCurve2d()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_BezierCurve2d") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreBSplineCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreBSplineCurve2d()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineCurve2d") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreSurface : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreSurface()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Surface") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreBezierSurface : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreBezierSurface()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_BezierSurface") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreBSplineSurface : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreBSplineSurface()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineSurface") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestorePoint : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestorePoint()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Point") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestoreTriangulation : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestoreTriangulation()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Triangulation") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestorePolygon3D : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestorePolygon3D()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Polygon3D") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
+
+class Draw_SaveAndRestorePolygon2D : public Draw_SaveAndRestoreBase
+{
+public:
+  Draw_SaveAndRestorePolygon2D()
+    :Draw_SaveAndRestoreBase("DrawTrSurf_Polygon2D") {}
+
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
 
 #endif // _DrawTrSurf_HeaderFile

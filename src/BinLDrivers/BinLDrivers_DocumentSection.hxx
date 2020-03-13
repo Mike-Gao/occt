@@ -15,6 +15,7 @@
 #ifndef _BinLDrivers_DocumentSection_HeaderFile
 #define _BinLDrivers_DocumentSection_HeaderFile
 
+#include <BinLDrivers_FormatVersion.hxx>
 #include <Standard.hxx>
 #include <Standard_DefineAlloc.hxx>
 #include <Standard_Handle.hxx>
@@ -75,7 +76,7 @@ public:
   //! Fill a DocumentSection instance from the data that are read
   //! from TOC.
   Standard_EXPORT static void ReadTOC (BinLDrivers_DocumentSection& theSection, Standard_IStream& theIS,
-                                       const Standard_Integer theDocFormatVersion);
+                                       const BinLDrivers_FormatVersion theDocFormatVersion);
 
 
 

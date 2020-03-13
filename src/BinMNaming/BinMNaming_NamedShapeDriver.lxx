@@ -18,9 +18,9 @@
 //purpose  : 
 //=======================================================================
 
-inline Standard_Integer BinMNaming_NamedShapeDriver::GetFormatNb() const
+inline BinTools_FormatVersion BinMNaming_NamedShapeDriver::GetFormat() const
 {
-  return myFormatNb;
+  return myFormat;
 }
 
 //=======================================================================
@@ -28,9 +28,9 @@ inline Standard_Integer BinMNaming_NamedShapeDriver::GetFormatNb() const
 //purpose  : 
 //=======================================================================
 
-inline void BinMNaming_NamedShapeDriver::SetFormatNb(const Standard_Integer theFormatNb) 
+inline void BinMNaming_NamedShapeDriver::SetFormat(const BinTools_FormatVersion theFormat) 
 {
-  myFormatNb = theFormatNb;
+  myFormat = theFormat;
 }
 
 //=======================================================================
