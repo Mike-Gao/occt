@@ -36,9 +36,27 @@ Poly_Triangulation::Poly_Triangulation(const Standard_Integer theNbNodes,
   myNodes     (1, theNbNodes),
   myTriangles (1, theNbTriangles)
 {
-  if (theHasUVNodes) myUVNodes = new TColgp_HArray1OfPnt2d(1, theNbNodes);
+  if (theHasUVNodes) 
+    myUVNodes = new TColgp_HArray1OfPnt2d(1, theNbNodes);
 }
 
+//=======================================================================
+//function : Poly_Triangulation
+//purpose  : 
+//=======================================================================
+Poly_Triangulation::Poly_Triangulation(const Standard_Integer theNbNodes,
+                                       const Standard_Integer theNbTriangles,
+                                       const Standard_Boolean theHasUVNodes,
+                                       const Standard_Boolean theHasNormals)
+  : myDeflection(0),
+  myNodes(1, theNbNodes),
+  myTriangles(1, theNbTriangles)
+{
+  if (theHasUVNodes)
+    myUVNodes = new TColgp_HArray1OfPnt2d(1, theNbNodes);
+  if (theHasNormals)
+    myNormals = new TShort_HArray1OfShortReal(1, theNbNodes * 3);
+}
 //=======================================================================
 //function : Poly_Triangulation
 //purpose  : 

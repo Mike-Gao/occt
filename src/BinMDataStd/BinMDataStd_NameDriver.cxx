@@ -59,7 +59,7 @@ Standard_Boolean BinMDataStd_NameDriver::Paste
   Standard_Boolean ok = Source >> aStr;
   if (ok)
     aName->Set( aStr );
-  if(RelocTable.GetHeaderData()->StorageVersion().IntegerValue() > 8) { // process user defined guid
+  if(RelocTable.GetHeaderData()->BinStorageVersion() >= BIN_LDRIVERS_VERSION_9) { // process user defined guid
 	const Standard_Integer& aPos = Source.Position();
 	Standard_GUID aGuid;
 	ok = Source >> aGuid;	

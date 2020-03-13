@@ -22,6 +22,7 @@
 
 #include <Standard_Integer.hxx>
 #include <BinObjMgt_Persistent.hxx>
+#include <BinLDrivers_FormatVersion.hxx>
 
 class BinMDF_ADriverTable;
 class Message_Messenger;
@@ -38,10 +39,10 @@ public:
   Standard_EXPORT static void AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable, const Handle(Message_Messenger)& aMsgDrv);
 
 template<class T>
-static void SetAttributeID(const BinObjMgt_Persistent& theSource, const Handle(T)& anAtt, const Standard_Integer aDocFormatVersion)
+static void SetAttributeID(const BinObjMgt_Persistent& theSource, const Handle(T)& anAtt, const BinLDrivers_FormatVersion aDocFormatVersion)
 {
   Standard_Boolean ok = Standard_True;
-  if(aDocFormatVersion > 9) { // process user defined guid
+  if(aDocFormatVersion >= BIN_LDRIVERS_VERSION_8) { // process user defined guid
     const Standard_Integer& aPos = theSource.Position();
     Standard_GUID aGuid;
     ok = theSource >> aGuid;

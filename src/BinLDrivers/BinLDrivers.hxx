@@ -17,6 +17,7 @@
 #define _BinLDrivers_HeaderFile
 
 #include <Standard_Handle.hxx>
+#include <BinLDrivers_FormatVersion.hxx>
 
 class Standard_Transient;
 class Standard_GUID;
@@ -27,6 +28,8 @@ class BinLDrivers_DocumentStorageDriver;
 class BinLDrivers_DocumentRetrievalDriver;
 class BinLDrivers_DocumentSection;
 class TDocStd_Application;
+
+
 
 class BinLDrivers 
 {
@@ -42,7 +45,11 @@ public:
   Standard_EXPORT static Handle(BinMDF_ADriverTable) AttributeDrivers (const Handle(Message_Messenger)& MsgDrv);
   
   //! returns last storage version
-  Standard_EXPORT static TCollection_AsciiString StorageVersion();
+  Standard_EXPORT static TCollection_AsciiString StringStorageVersion();
+
+public:
+
+  static const BinLDrivers_FormatVersion THE_CURRENT_VERSION = BIN_LDRIVERS_VERSION_11;
 };
 
 #endif // _BinLDrivers_HeaderFile

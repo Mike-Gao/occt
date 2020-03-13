@@ -24,6 +24,7 @@
 #include <Standard_CString.hxx>
 #include <Standard_Boolean.hxx>
 #include <Draw_Interpretor.hxx>
+
 class HLRAlgo_Projector;
 class TopoDS_Shape;
 class HLRTopoBRep_OutLiner;
@@ -85,7 +86,18 @@ friend class HLRTest_OutLiner;
 };
 
 
+class HLRTest_SaveAndRestore : public Draw_SaveAndRestoreBase
+{
+public:
+  HLRTest_SaveAndRestore()
+    :Draw_SaveAndRestoreBase("HLRTest_Projector") {}
 
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
+
+};
 
 
 

@@ -390,7 +390,7 @@ void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
       theDriver->BeginWriteInfoSection();
       errorContext = "WriteInfo";
       theDriver->WriteInfo(aData->NumberOfObjects(),
-                           aData->StorageVersion(),
+                           aData->StringStorageVersion(),
                            aData->CreationDate(),
                            aData->SchemaName(),
                            aData->SchemaVersion(),

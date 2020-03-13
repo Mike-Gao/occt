@@ -25,6 +25,7 @@
 #include <TColStd_SequenceOfExtendedString.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <Standard_OStream.hxx>
+#include <XmlLDrivers_FormatVersion.hxx>
 
 class CDM_MetaData;
 class CDM_Application;
@@ -344,10 +345,10 @@ Standard_OStream& operator << (Standard_OStream& anOStream);
   Standard_EXPORT void SetReferenceCounter (const Standard_Integer aReferenceCounter);
 
   //! Returns version of the format to be used to store the document
-  Standard_EXPORT Standard_Integer StorageFormatVersion() const;
+  Standard_EXPORT XmlLDrivers_FormatVersion StorageFormatVersion() const;
 
   //! Sets <theVersion> of the format to be used to store the document
-  Standard_EXPORT void ChangeStorageFormatVersion(const Standard_Integer theVersion);
+  Standard_EXPORT void ChangeStorageFormatVersion(const XmlLDrivers_FormatVersion theVersion);
 
   //! Dumps the content of me into the stream
   Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
@@ -406,7 +407,7 @@ private:
   Standard_Boolean myFileExtensionWasFound;
   Standard_Boolean myDescriptionWasFound;
   Handle(CDM_Application) myApplication;
-  Standard_Integer myStorageFormatVersion;
+  XmlLDrivers_FormatVersion myStorageFormatVersion;
 
 };
 
