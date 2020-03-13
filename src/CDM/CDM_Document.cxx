@@ -55,7 +55,7 @@ CDM_Document::CDM_Document():
   myRequestedPreviousVersionIsDefined(Standard_False),
   myFileExtensionWasFound       (Standard_False),
   myDescriptionWasFound         (Standard_False),
-  myStorageFormatVersion        (0)
+  myStorageFormatVersion        (XML_LDRIVERS_VERSION_2)
 {}
 
 
@@ -1154,7 +1154,7 @@ void CDM_Document::SetReferenceCounter (const Standard_Integer aReferenceCounter
 //function : StorageFormatVersion
 //purpose  : 
 //=======================================================================
-Standard_Integer CDM_Document::StorageFormatVersion() const
+XmlLDrivers_FormatVersion CDM_Document::StorageFormatVersion() const
 {
   return myStorageFormatVersion;
 }
@@ -1164,7 +1164,7 @@ Standard_Integer CDM_Document::StorageFormatVersion() const
 //function : ChangeStorageFormatVersion
 //purpose  : Sets <theVersion> of the format to be used to store the document
 //=======================================================================
-void CDM_Document::ChangeStorageFormatVersion(const Standard_Integer theVersion)
+void CDM_Document::ChangeStorageFormatVersion(const XmlLDrivers_FormatVersion theVersion)
 {
   myStorageFormatVersion = theVersion;
 }
@@ -1215,5 +1215,5 @@ void CDM_Document::DumpJson (Standard_OStream& theOStream, Standard_Integer theD
 
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myApplication.get())
 
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myStorageFormatVersion)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, static_cast<Standard_Integer>(myStorageFormatVersion))
 }

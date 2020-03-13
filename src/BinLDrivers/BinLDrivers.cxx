@@ -33,7 +33,6 @@
 //#include <BinMNaming.hxx>
 static Standard_GUID BinLStorageDriver  ("13a56835-8269-11d5-aab2-0050044b1af1");
 static Standard_GUID BinLRetrievalDriver("13a56836-8269-11d5-aab2-0050044b1af1");
-#define CURRENT_DOCUMENT_VERSION 10
 
 //=======================================================================
 //function : Factory
@@ -98,9 +97,9 @@ Handle(BinMDF_ADriverTable) BinLDrivers::AttributeDrivers
 //purpose  : 
 //=======================================================================
 
-TCollection_AsciiString BinLDrivers::StorageVersion()
+TCollection_AsciiString BinLDrivers::StringStorageVersion()
 {
-  TCollection_AsciiString aVersionStr (CURRENT_DOCUMENT_VERSION);
+  TCollection_AsciiString aVersionStr (static_cast<Standard_Integer>(BinLDrivers::THE_CURRENT_VERSION));
   return aVersionStr;
 }
 

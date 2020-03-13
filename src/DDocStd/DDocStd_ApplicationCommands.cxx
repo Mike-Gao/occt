@@ -506,9 +506,10 @@ static Standard_Integer DDocStd_SetStorageVersion (Draw_Interpretor& ,
   if (nb == 3)
   {
     Handle(TDocStd_Document) D;
-    if (!DDocStd::GetDocument(a[1], D)) return 1;
-    const int version = atoi(a[2]);
-    D->ChangeStorageFormatVersion(version);
+    if (!DDocStd::GetDocument(a[1], D)) 
+      return 1;
+    const XmlLDrivers_FormatVersion aVersion = static_cast<XmlLDrivers_FormatVersion>(atoi(a[2]));
+    D->ChangeStorageFormatVersion(aVersion);
     return 0;
   }
   return 1;
@@ -524,8 +525,9 @@ static Standard_Integer DDocStd_GetStorageVersion (Draw_Interpretor& di,
 { 
   if (nb == 2) {
     Handle(TDocStd_Document) D;
-    if (!DDocStd::GetDocument(a[1], D)) return 1;
-    di << D->StorageFormatVersion() << "\n";
+    if (!DDocStd::GetDocument(a[1], D)) 
+      return 1;
+    di << static_cast<Standard_Integer>(D->StorageFormatVersion()) << "\n";
     return 0;
   }
   return 1;

@@ -34,7 +34,6 @@
 IMPLEMENT_STANDARD_RTTIEXT(BinMNaming_NamedShapeDriver,BinMDF_ADriver)
 
 #define SHAPESET "SHAPE_SECTION"
-#define FORMAT_NUMBER 3
 //=======================================================================
 static Standard_Character EvolutionToChar(const TNaming_Evolution theEvol)
 {
@@ -142,7 +141,7 @@ static int TranslateFrom  (const BinObjMgt_Persistent&  theSource,
 
 BinMNaming_NamedShapeDriver::BinMNaming_NamedShapeDriver
                         (const Handle(Message_Messenger)& theMsgDriver)
-     : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TNaming_NamedShape)->Name()), myShapeSet(Standard_False),myFormatNb(FORMAT_NUMBER)
+     : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TNaming_NamedShape)->Name()), myShapeSet(Standard_False),myFormat(THE_CURRENT_VERSION)
 {
 }
 
@@ -280,7 +279,7 @@ void BinMNaming_NamedShapeDriver::WriteShapeSection (Standard_OStream& theOS,
                                                      const Message_ProgressRange& theRange)
 {
   theOS << SHAPESET; 
-  myShapeSet.SetFormatNb(myFormatNb);
+  myShapeSet.SetFormat(myFormat);
   myShapeSet.Write (theOS, theRange);
   myShapeSet.Clear();
 }
@@ -311,7 +310,7 @@ void BinMNaming_NamedShapeDriver::ReadShapeSection (Standard_IStream& theIS,
   if(aSectionTitle.Length() > 0 && aSectionTitle == SHAPESET) {
     myShapeSet.Clear();
     myShapeSet.Read (theIS, theRange);
-    SetFormatNb(myShapeSet.FormatNb());
+    SetFormat(myShapeSet.Format());
   }
   else
     theIS.seekg(aPos); // no shape section is present, try to return to initial point

@@ -248,41 +248,45 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
                                  const Handle(CDM_Application)& theApplication,
                                 const Message_ProgressRange&    theRange)
 {
-  const Handle(Message_Messenger) aMsgDriver =
-    theApplication -> MessageDriver();
+  const Handle(Message_Messenger) aMsgDriver = theApplication->MessageDriver();
   // 1. Read info // to be done
   TCollection_AsciiString anAbsoluteDirectory = GetDirFromFile(myFileName);
-  Standard_Integer aCurDocVersion = 0;
+  XmlLDrivers_FormatVersion aCurDocVersion = XML_LDRIVERS_VERSION_2; // minimum supported version
   TCollection_ExtendedString anInfo;
-  const XmlObjMgt_Element anInfoElem =
-    theElement.GetChildByTagName ("info");
-  if (anInfoElem != NULL) {
+  const XmlObjMgt_Element anInfoElem = theElement.GetChildByTagName ("info");
+  if (anInfoElem != NULL) 
+  {
     XmlObjMgt_DOMString aDocVerStr = anInfoElem.getAttribute("DocVersion");
-    if(aDocVerStr == NULL)
-      aCurDocVersion = 2;
-    else if (!aDocVerStr.GetInteger(aCurDocVersion)) {
-      TCollection_ExtendedString aMsg =
-        TCollection_ExtendedString ("Cannot retrieve the current Document version"
-                                    " attribute as \"") + aDocVerStr + "\"";
-      if(!aMsgDriver.IsNull()) 
-        aMsgDriver->Send(aMsg.ToExtString(), Message_Fail);
+
+    if (aDocVerStr != nullptr)
+    {
+      Standard_Integer anIntegerVersion;
+      if (aDocVerStr.GetInteger(anIntegerVersion))
+        aCurDocVersion = static_cast<XmlLDrivers_FormatVersion>(anIntegerVersion);
+      else
+      {
+        TCollection_ExtendedString aMsg =
+          TCollection_ExtendedString("Cannot retrieve the current Document version"
+            " attribute as \"") + aDocVerStr + "\"";
+        if (!aMsgDriver.IsNull())
+          aMsgDriver->Send(aMsg.ToExtString(), Message_Fail);
+      }
     }
     
     // oan: OCC22305 - check a document verison and if it's greater than
     // current version of storage driver set an error status and return
-    if( aCurDocVersion > XmlLDrivers::StorageVersion() )
+    if( aCurDocVersion > XmlLDrivers::THE_CURRENT_VERSION )
     {
       TCollection_ExtendedString aMsg =
         TCollection_ExtendedString ("error: wrong file version: ") +
                                     aDocVerStr  + " while current is " +
-                                    XmlLDrivers::StorageVersion();
+                                    XmlLDrivers::StringFormatVersion();
       myReaderStatus = PCDM_RS_NoVersion;
       if(!aMsgDriver.IsNull()) 
         aMsgDriver->Send(aMsg.ToExtString(), Message_Fail);
       return;
     }
 
-    if( aCurDocVersion < 2) aCurDocVersion = 2;
     Standard_Boolean isRef = Standard_False;
     for (LDOM_Node aNode = anInfoElem.getFirstChild();
          aNode != NULL; aNode = aNode.getNextSibling()) {

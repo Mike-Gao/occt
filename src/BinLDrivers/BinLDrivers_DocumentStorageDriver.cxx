@@ -471,7 +471,7 @@ void BinLDrivers_DocumentStorageDriver::WriteInfoSection
 
   aHeader.einfo += FSD_BinaryFile::WriteInfo (theOStream,
                                               aObjNb,
-                                              BinLDrivers::StorageVersion(),
+                                              BinLDrivers::StringStorageVersion(),
                                               Storage_Schema::ICreationDate(),
                                               "", // schema name
                                               aShemaVer,
@@ -500,7 +500,7 @@ void BinLDrivers_DocumentStorageDriver::WriteInfoSection
   // write info section
   FSD_BinaryFile::WriteInfo (theOStream,
                              aObjNb,
-                             BinLDrivers::StorageVersion(),
+                             BinLDrivers::StringStorageVersion(),
                              Storage_Schema::ICreationDate(),
                              "", // schema name
                              aShemaVer,
