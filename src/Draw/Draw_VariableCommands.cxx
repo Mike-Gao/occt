@@ -24,11 +24,13 @@
 #include <Draw_Grid.hxx>
 #include <Draw_Number.hxx>
 #include <Draw_ProgressIndicator.hxx>
+#include <Draw_SaveAndRestore.hxx>
 #include <Draw_SequenceOfDrawable3D.hxx>
 #include <NCollection_Map.hxx>
 #include <Standard_SStream.hxx>
 #include <Standard_Stream.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <TopTools_ShapeSet.hxx>
 
 #include <ios>
 #ifdef _WIN32
@@ -66,82 +68,53 @@ static Standard_Integer p_b;
 static const char* p_Name = "";
 
 
-static Draw_SaveAndRestore* Draw_First = NULL;
-
-//=======================================================================
-//function : Draw_SaveAndRestore
-//purpose  : 
-//=======================================================================
-
-Draw_SaveAndRestore::Draw_SaveAndRestore
-  (const char* name,
-   Standard_Boolean (*test)(const Handle(Draw_Drawable3D)&),
-  void (*save)(const Handle(Draw_Drawable3D)&, std::ostream&),
-  Handle(Draw_Drawable3D) (*restore) (std::istream&),
-  Standard_Boolean display) :
-  myName(name),
-  myTest(test),
-  mySave(save), 
-  myRestore(restore),
-  myDisplay(display),
-  myNext(Draw_First)
-{
-  Draw_First = this;
-}
-
-Standard_Boolean Draw_SaveAndRestore::Test(const Handle(Draw_Drawable3D)&d)
-{return (*myTest) (d);}
-
-void Draw_SaveAndRestore::Save(const Handle(Draw_Drawable3D)& d, 
-			       std::ostream& os) const
-{ (*mySave) (d,os);}
-
-Handle(Draw_Drawable3D) Draw_SaveAndRestore::Restore(std::istream& is) const
-{return (*myRestore) (is);}
-
-//=======================================================================
-// numeric save and restore
-//=======================================================================
-
-static Standard_Boolean numtest(const Handle(Draw_Drawable3D)& d) 
-{
-  return d->IsInstance(STANDARD_TYPE(Draw_Number));
-}
-
-static void numsave (const Handle(Draw_Drawable3D)& theDrawable,
-                     std::ostream&                       theStream)
-{
-  Handle(Draw_Number) aNum = Handle(Draw_Number)::DownCast (theDrawable);
-  std::ios::fmtflags aFlags = theStream.flags();
-  theStream.setf      (std::ios::scientific);
-  theStream.precision (15);
-  theStream.width     (30);
-  theStream << aNum->Value() << "\n";
-  theStream.setf      (aFlags);
-}
-
-static Handle(Draw_Drawable3D) numrestore (std::istream& is)
-{
-  Standard_Real val;
-  is >> val;
-  Handle(Draw_Number) N = new Draw_Number(val);
-  return N;
-}
-
-
-static Draw_SaveAndRestore numsr("Draw_Number",
-				 numtest,numsave,numrestore,
-				 Standard_False);
 
 //=======================================================================
 // save
 //=======================================================================
-
-static Standard_Integer save(Draw_Interpretor& di, Standard_Integer n, const char** a)
+static Standard_Integer save(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  if (n <= 2) return 1;
+  if (argc < 3)
+  {
+    std::cout << "Syntax error: wrong number of arguments!\n";
+    di.PrintHelp(argv[0]);
+    return 1;
+  }
 
-  const char* name = a[2];
+  TopTools_FormatVersion aVersion = TopTools_ShapeSet::THE_CURRENT_VERSION;;
+
+  for (Standard_Integer i = 3; i < argc; ++i)
+  {
+    TCollection_AsciiString aParam(argv[i]);
+    aParam.LowerCase();
+    if (aParam == "-version")
+    {
+      ++i;
+      if (i < argc)
+        aVersion = static_cast<TopTools_FormatVersion>(Draw::Atoi(argv[i]));
+      if (aVersion == TopTools_FormatVersion::DEFAULT_VERSION)
+        aVersion = TopTools_ShapeSet::THE_CURRENT_VERSION;
+      if (aVersion < TopTools_FormatVersion::VERSION_1)
+      {
+        std::cout << "Version must not be negative\n";
+        return 1;
+      }
+      if (aVersion > TopTools_ShapeSet::THE_CURRENT_VERSION)
+      {
+        std::cout << "Version higher than " 
+                  << static_cast<Standard_Integer>(TopTools_ShapeSet::THE_CURRENT_VERSION) 
+                  << " is not supported\n"; \
+        return 1;
+      }
+    }
+    else
+    {
+      std::cout << "Syntax error: unknown argument '" << aParam << "'\n";
+      return 1;
+    }
+  }
+
+  Standard_CString name = argv[2];
   std::ofstream os;
   os.precision(15);
   OSD_OpenStream(os, name, std::ios::out);
@@ -151,29 +124,31 @@ static Standard_Integer save(Draw_Interpretor& di, Standard_Integer n, const cha
     return 1;
   }
 
-  Handle(Draw_Drawable3D) D = Draw::Get(a[1]);
+  Handle(Draw_Drawable3D) D = Draw::Get(argv[1]);
   if (!D.IsNull()) {
     // find a tool
-    Draw_SaveAndRestore* tool = Draw_First;
+    const Draw_SaveAndRestoreBase* saveTool = Draw_SaveAndRestoreBase::GetFirst();
     Handle(Draw_ProgressIndicator) progress = new Draw_ProgressIndicator ( di, 1 );
     progress->SetScale ( 0, 100, 1 );
     progress->NewScope(100,"Writing");
     progress->Show();
 
-    while (tool) {
-      if (tool->Test(D)) break;
-      tool = tool->Next();
+    while (saveTool) {
+      if (saveTool->Test(D)) 
+        break;
+      saveTool = saveTool->Next();
     }
-    if (tool) {
-      os << tool->Name() << "\n";
+    if (saveTool) {
+      os << saveTool->Name() << "\n";
       Draw::SetProgressBar(progress);
-      tool->Save(D,os);
+      saveTool->Save(D, os, aVersion);
       os << "\n";
     }
     else {
-      di << "No method for saving " << a[1];
+      di << "No method for saving " << argv[1];
       return 1;
     }
+
     Draw::SetProgressBar( 0 );
     progress->EndScope();
     progress->Show();
@@ -192,7 +167,7 @@ static Standard_Integer save(Draw_Interpretor& di, Standard_Integer n, const cha
     return 1;
   }
 
-  di << a[1];
+  di << argv[1];
   return 0;
 }
 
@@ -224,34 +199,38 @@ static Standard_Integer restore(Draw_Interpretor& di, Standard_Integer n, const 
     progress->NewScope(100,"Reading");
     progress->Show();
 
-    Draw_SaveAndRestore* tool = Draw_First;
-    Draw_SaveAndRestore* aDBRepTool = NULL;
-    while (tool) {
-      const char* toolName = tool->Name();
-      if (!strcmp(typ,toolName)) break;
-      if (!strcmp("DBRep_DrawableShape",toolName))
-        aDBRepTool = tool;
+    const Draw_SaveAndRestoreBase* restoreTool = Draw_SaveAndRestoreBase::GetFirst();
+    const Draw_SaveAndRestoreBase* aDBRepTool = nullptr;
+
+
+    while (restoreTool) 
+    {
+      Standard_CString toolName = restoreTool->Name();
+      if (!strcmp(typ, toolName)) 
+        break;
+      if (!strcmp("DBRep_DrawableShape", toolName))
+        aDBRepTool = restoreTool;
       Draw::SetProgressBar(progress);
-      tool = tool->Next();
+      restoreTool = restoreTool->Next();
     }
 
-    if (!tool)
+    if (!restoreTool)
     {
       //assume that this file stores a DBRep_DrawableShape variable
-      tool = aDBRepTool;
+      restoreTool = aDBRepTool;
       in.seekg(0, std::ios::beg);
     }
 
-    if (tool)
+    if (restoreTool)
     {
-      Handle(Draw_Drawable3D) D = tool->Restore(in);
-      Draw::Set(name,D,tool->Disp() && autodisp);
+      Handle(Draw_Drawable3D) D = restoreTool->Restore(in);
+      Draw::Set(name, D, restoreTool->Disp() && autodisp);
     }
-
     else {
       di << "Cannot restore a  " << typ;
       return 1;
     }
+
     Draw::SetProgressBar( 0 );
     progress->EndScope();
     progress->Show();

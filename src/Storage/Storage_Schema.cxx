@@ -391,7 +391,7 @@ void Storage_Schema::Write
       f.BeginWriteInfoSection();
       errorContext = "WriteInfo";
       f.WriteInfo(aData->NumberOfObjects(),
-                  aData->StorageVersion(),
+                  aData->StringStorageVersion(),
                   aData->CreationDate(),
                   aData->SchemaName(),
                   aData->SchemaVersion(),

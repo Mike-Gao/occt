@@ -27,6 +27,8 @@
 #include <TColStd_SequenceOfExtendedString.hxx>
 #include <Storage_Error.hxx>
 #include <Standard_Transient.hxx>
+#include <BinLDrivers_FormatVersion.hxx>
+#include <XmlLDrivers_FormatVersion.hxx>
 class Storage_Schema;
 class Storage_BaseDriver;
 class TCollection_AsciiString;
@@ -50,9 +52,15 @@ public:
   //! return the creation date
   Standard_EXPORT TCollection_AsciiString CreationDate() const;
   
-  //! return the Storage package version
-  Standard_EXPORT TCollection_AsciiString StorageVersion() const;
-  
+  //! return the Storage package version as string
+  Standard_EXPORT TCollection_AsciiString StringStorageVersion() const;
+
+  //! return the Storage package version as string
+  Standard_EXPORT BinLDrivers_FormatVersion BinStorageVersion() const;
+
+  //! return the Storage package version as string
+  Standard_EXPORT XmlLDrivers_FormatVersion XmlStorageVersion() const;
+
   //! get the version of the schema
   Standard_EXPORT TCollection_AsciiString SchemaVersion() const;
   
@@ -111,6 +119,10 @@ public:
   Standard_EXPORT void SetNumberOfObjects (const Standard_Integer anObjectNumber);
   
   Standard_EXPORT void SetStorageVersion (const TCollection_AsciiString& aVersion);
+
+  Standard_EXPORT void SetStorageVersion (const BinLDrivers_FormatVersion& aBinVersion);
+
+  Standard_EXPORT void SetStorageVersion (const XmlLDrivers_FormatVersion& aXmlVersion);
   
   Standard_EXPORT void SetCreationDate (const TCollection_AsciiString& aDate);
   

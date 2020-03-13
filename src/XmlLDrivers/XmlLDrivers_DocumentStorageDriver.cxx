@@ -264,10 +264,10 @@ Standard_Boolean XmlLDrivers_DocumentStorageDriver::WriteToDomDocument (const Ha
 //  anInfoElem.setAttribute("appv", anAppVersion.ToCString());
 
   // Document version
-  Standard_Integer aFormatVersion(XmlLDrivers::StorageVersion());// the last version of the format
-  if (theDocument->StorageFormatVersion() > 0) 
+  XmlLDrivers_FormatVersion aFormatVersion(XmlLDrivers::THE_CURRENT_VERSION); // the last version of the format
+  if (theDocument->StorageFormatVersion() >= XmlLDrivers_FormatVersion::VERSION_2) // the minimal supported version
   {
-    if (XmlLDrivers::StorageVersion() < theDocument->StorageFormatVersion())
+    if (theDocument->StorageFormatVersion() > XmlLDrivers::THE_CURRENT_VERSION)
     {
       TCollection_ExtendedString anErrorString("Unacceptable storage format version, the last verson is used");
       aMessageDriver->Send(anErrorString.ToExtString(), Message_Warning);     
@@ -275,7 +275,8 @@ Standard_Boolean XmlLDrivers_DocumentStorageDriver::WriteToDomDocument (const Ha
     else            
       aFormatVersion = theDocument->StorageFormatVersion();
   }
-  anInfoElem.setAttribute("DocVersion", aFormatVersion);
+  TCollection_AsciiString aStringFormatVersion(static_cast<Standard_Integer>(aFormatVersion));
+  anInfoElem.setAttribute("DocVersion", aStringFormatVersion.ToCString());
  
   // User info with Copyright
   TColStd_SequenceOfAsciiString aUserInfo;

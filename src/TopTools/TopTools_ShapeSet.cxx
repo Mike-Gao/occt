@@ -30,17 +30,20 @@
 #include <TopTools_LocationSet.hxx>
 #include <TopTools_ShapeSet.hxx>
 
+#include <BRep_TFace.hxx>
+
 #include <locale.h>
 #include <string.h>
-static const char* Version  = "CASCADE Topology V1, (c) Matra-Datavision";
-static const char* Version2 = "CASCADE Topology V2, (c) Matra-Datavision";
+Standard_CString TopTools_ShapeSet::Version_1 = "CASCADE Topology V1, (c) Matra-Datavision";
+Standard_CString TopTools_ShapeSet::Version_2 = "CASCADE Topology V2, (c) Matra-Datavision";
+Standard_CString TopTools_ShapeSet::Version_3 = "Open CASCADE Topology V3 (c)";
 
 //=======================================================================
 //function : TopTools_ShapeSet
 //purpose  : 
 //=======================================================================
 
-TopTools_ShapeSet::TopTools_ShapeSet() : myFormatNb(1)
+TopTools_ShapeSet::TopTools_ShapeSet() : myFormat(THE_CURRENT_VERSION)
 {
 }
 
@@ -51,18 +54,21 @@ TopTools_ShapeSet::~TopTools_ShapeSet()
 //function : SetFormatNb
 //purpose  : 
 //=======================================================================
-void TopTools_ShapeSet::SetFormatNb(const Standard_Integer theFormatNb)
+void TopTools_ShapeSet::SetFormat(const TopTools_FormatVersion theFormat)
 {
-  myFormatNb = theFormatNb;
+  if (theFormat >= TopTools_FormatVersion::VERSION_1 && theFormat <= THE_CURRENT_VERSION)
+    myFormat = theFormat;
+  else
+    myFormat = THE_CURRENT_VERSION;
 }
 
 //=======================================================================
 //function : FormatNb
 //purpose  : 
 //=======================================================================
-Standard_Integer TopTools_ShapeSet::FormatNb() const
+TopTools_FormatVersion TopTools_ShapeSet::Format() const
 {
-  return myFormatNb;
+  return myFormat;
 }
 
 //=======================================================================
@@ -452,10 +458,12 @@ void  TopTools_ShapeSet::Write(Standard_OStream& OS)
   std::streamsize prec = OS.precision(15);
 
   // write the copyright
-  if (myFormatNb == 2)
-    OS << "\n" << Version2 << "\n";
+  if (myFormat == TopTools_FormatVersion::VERSION_3)
+    OS << "\n" << Version_3 << "\n";
+  else if (myFormat == TopTools_FormatVersion::VERSION_2)
+    OS << "\n" << Version_2 << "\n";
   else
-    OS << "\n" << Version << "\n";
+    OS << "\n" << Version_1 << "\n";
 
   //-----------------------------------------
   // write the locations
@@ -620,14 +628,23 @@ void  TopTools_ShapeSet::Read(Standard_IStream& IS)
         vers[lv] = '\0';
     }
     
-  } while ( ! IS.fail() && strcmp(vers,Version) && strcmp(vers,Version2) );
-  if (IS.fail()) {
+  } 
+  while ( !IS.fail() && 
+          strcmp(vers, Version_1) && 
+          strcmp(vers, Version_2) &&
+          strcmp(vers, Version_3));
+  if (IS.fail()) 
+  {
     std::cout << "File was not written with this version of the topology"<<std::endl;
     IS.imbue (anOldLocale);
     return;
   }
-  if (strcmp(vers,Version2) == 0) SetFormatNb(2);
-  else SetFormatNb(1);
+  if (strcmp(vers, Version_3) == 0) 
+    SetFormat(TopTools_FormatVersion::VERSION_3);
+  else if (strcmp(vers, Version_2) == 0) 
+    SetFormat(TopTools_FormatVersion::VERSION_2);
+  else 
+    SetFormat(TopTools_FormatVersion::VERSION_1);
 
   //-----------------------------------------
   // read the locations
@@ -709,7 +726,7 @@ void  TopTools_ShapeSet::Read(Standard_IStream& IS)
     S.Free      (buffer[0] == '1');
     S.Modified  (buffer[1] == '1');
 
-    if (myFormatNb == 2)
+    if (myFormat >= TopTools_FormatVersion::VERSION_2)
       S.Checked   (buffer[2] == '1');
     else
       S.Checked   (Standard_False);     // force check at reading.. 
@@ -721,7 +738,7 @@ void  TopTools_ShapeSet::Read(Standard_IStream& IS)
 
     // check
 
-    if (myFormatNb == 1)
+    if (myFormat == TopTools_FormatVersion::VERSION_1)
       Check(T,S);
 
     myShapes.Add(S);

@@ -174,10 +174,10 @@ Standard_IStream& BinTools::GetBool(Standard_IStream& IS, Standard_Boolean& aVal
 //purpose  : 
 //=======================================================================
 
-void BinTools::Write (const TopoDS_Shape& theShape, Standard_OStream& theStream)
+void BinTools::Write (const TopoDS_Shape& theShape, Standard_OStream& theStream, BinTools_FormatVersion theVersion)
 {
   BinTools_ShapeSet aShapeSet(Standard_True);
-  aShapeSet.SetFormatNb (3);
+  aShapeSet.SetFormat (theVersion);
   aShapeSet.Add (theShape);
   aShapeSet.Write (theStream);
   aShapeSet.Write (theShape, theStream);
@@ -200,7 +200,7 @@ void BinTools::Read (TopoDS_Shape& theShape, Standard_IStream& theStream)
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean BinTools::Write (const TopoDS_Shape& theShape, const Standard_CString theFile)
+Standard_Boolean BinTools::Write (const TopoDS_Shape& theShape, const Standard_CString theFile, BinTools_FormatVersion theVersion)
 {
   std::ofstream aStream;
   aStream.precision (15);
@@ -208,7 +208,7 @@ Standard_Boolean BinTools::Write (const TopoDS_Shape& theShape, const Standard_C
   if (!aStream.good())
     return Standard_False;
 
-  Write (theShape, aStream);
+  Write (theShape, aStream, theVersion);
   aStream.close();
   return aStream.good();
 }

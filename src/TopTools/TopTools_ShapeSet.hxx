@@ -32,6 +32,10 @@ class TopoDS_Shape;
 class TopTools_LocationSet;
 class TCollection_AsciiString;
 
+enum class TopTools_FormatVersion : Standard_Integer
+{
+  DEFAULT_VERSION = 0, VERSION_1 = 1, VERSION_2 = 2, VERSION_3 = 3
+};
 
 //! A ShapeSets    contains  a  Shape    and all   its
 //! sub-shapes and locations.  It  can be dump,  write
@@ -50,14 +54,14 @@ public:
   
   Standard_EXPORT virtual ~TopTools_ShapeSet();
   
-  Standard_EXPORT void SetFormatNb (const Standard_Integer theFormatNb);
+  Standard_EXPORT void SetFormat (const TopTools_FormatVersion theFormat);
   
-  //! two formats available for the moment:
-  //! First: does not write CurveOnSurface UV Points into the file
-  //! on reading calls Check() method.
-  //! Second: stores CurveOnSurface UV Points.
-  //! On reading format is recognized from Version string.
-  Standard_EXPORT Standard_Integer FormatNb() const;
+  //! 3 formats available for the moment:
+  //! VERSION_1: does not write CurveOnSurface UV Points into the file on reading calls Check() method.
+  //! VERSION_2: stores CurveOnSurface UV Points. On reading format is recognized from Version string.
+  //! VERSION_3: same as VERSION_2 but also stores per-vertex normal information 
+  //! in case of triangulation-only Faces, because no analytical geometry to restore normals
+  Standard_EXPORT TopTools_FormatVersion Format() const;
   
   //! Clears the content of the set.  This method can be
   //! redefined.
@@ -182,7 +186,7 @@ public:
   Standard_EXPORT Handle(Message_ProgressIndicator) GetProgress() const;
 
 
-
+  static const TopTools_FormatVersion THE_CURRENT_VERSION = TopTools_FormatVersion::VERSION_3;
 
 protected:
 
@@ -200,9 +204,10 @@ private:
 
   TopTools_IndexedMapOfShape myShapes;
   TopTools_LocationSet myLocations;
-  Standard_Integer myFormatNb;
+  TopTools_FormatVersion myFormat;
   Handle(Message_ProgressIndicator) myProgress;
 
+  static Standard_CString Version_1, Version_2, Version_3;
 
 };
 
