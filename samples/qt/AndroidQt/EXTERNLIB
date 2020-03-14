@@ -10,6 +10,7 @@ TKShHealing
 TKService
 TKMesh
 TKHLR
+TKGraphic3d
 TKV3d
 TKOpenGl
 CSF_FreeImagePlus

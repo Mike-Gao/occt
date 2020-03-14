@@ -1,7 +1,7 @@
 TKernel
 TKService
 TKMath
-TKV3d
+TKGraphic3d
 CSF_TBB
 CSF_FREETYPE
 CSF_OpenGlLibs

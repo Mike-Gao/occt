@@ -28,7 +28,6 @@
 #include <Geom_Ellipse.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_Transformation.hxx>
 #include <GeomAPI_ExtremaCurveCurve.hxx>
 #include <gp_Circ.hxx>
 #include <gp_Lin.hxx>

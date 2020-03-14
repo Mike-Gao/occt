@@ -40,6 +40,7 @@
 #pragma comment(lib, "TKBRep.lib")
 #pragma comment(lib, "TKXSBase.lib")
 #pragma comment(lib, "TKService.lib")
+#pragma comment(lib, "TKGraphic3d.lib")
 #pragma comment(lib, "TKV3d.lib")
 #pragma comment(lib, "TKOpenGl.lib")
 #pragma comment(lib, "TKIGES.lib")

@@ -1,4 +1,3 @@
-StdPrs_BndBox.cxx
 StdPrs_BndBox.hxx
 StdPrs_Curve.cxx
 StdPrs_Curve.hxx
@@ -23,6 +22,8 @@ StdPrs_ShadedShape.cxx
 StdPrs_ShadedShape.hxx
 StdPrs_ShadedSurface.cxx
 StdPrs_ShadedSurface.hxx
+StdPrs_ShapeTool.cxx
+StdPrs_ShapeTool.hxx
 StdPrs_ToolPoint.cxx
 StdPrs_ToolPoint.hxx
 StdPrs_ToolRFace.cxx

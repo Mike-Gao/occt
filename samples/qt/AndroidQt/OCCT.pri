@@ -37,6 +37,7 @@ LIBS += -lTKernel \
         -lTKService \
         -lTKMesh \
         -lTKHLR \
+        -lTKGraphic3d \
         -lTKV3d \
         -lTKOpenGl
 
@@ -55,5 +56,6 @@ ANDROID_EXTRA_LIBS =  $$3rdparty_lib_path/libfreeimage.so \
                       $$occt_lib_path/libTKService.so \
                       $$occt_lib_path/libTKMesh.so \
                       $$occt_lib_path/libTKHLR.so \
+                      $$occt_lib_path/libTKGraphic3d.so \
                       $$occt_lib_path/libTKV3d.so \
                       $$occt_lib_path/libTKOpenGl.so

@@ -27,7 +27,6 @@
 #include <Geom_Circle.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_Transformation.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <gp_Lin.hxx>
@@ -251,9 +250,7 @@ void AIS_EqualDistanceRelation::ComputeSelection( const Handle( SelectMgr_Select
       Standard_Real FirstPar = ElCLib::Parameter(aCircle->Circ(), myAttachPoint1),
                     LastPar  = ElCLib::Parameter(aCircle->Circ(), myPoint1);
       if (LastPar < FirstPar ) LastPar+=M_PI*2;
-      //add sensetive arc
-      Handle(Select3D_SensitiveCircle) circ = 
-	new Select3D_SensitiveCircle( own, aCircle,  FirstPar, LastPar);
+      Handle(Select3D_SensitiveCircle) circ = new Select3D_SensitiveCircle( own, aCircle->Circ(),  FirstPar, LastPar);
       aSelection->Add( circ );
     }
   }
@@ -274,9 +271,7 @@ void AIS_EqualDistanceRelation::ComputeSelection( const Handle( SelectMgr_Select
       Standard_Real FirstPar = ElCLib::Parameter(aCircle->Circ(), myAttachPoint2),
       LastPar  = ElCLib::Parameter(aCircle->Circ(), myPoint2);
       if (LastPar < FirstPar ) LastPar+=M_PI*2;
-      //add sensetive arc
-      Handle(Select3D_SensitiveCircle) circ = 
-	new Select3D_SensitiveCircle( own,aCircle,  FirstPar, LastPar);
+      Handle(Select3D_SensitiveCircle) circ = new Select3D_SensitiveCircle (own, aCircle->Circ(), FirstPar, LastPar);
       aSelection->Add( circ );
     }
   }
@@ -297,8 +292,7 @@ void AIS_EqualDistanceRelation::ComputeSelection( const Handle( SelectMgr_Select
       Standard_Real FirstPar = ElCLib::Parameter(aCircle->Circ(), myAttachPoint3),
       LastPar  = ElCLib::Parameter(aCircle->Circ(), myPoint3);
       if (LastPar < FirstPar ) LastPar+=M_PI*2;
-      Handle(Select3D_SensitiveCircle) circ = 
-	new Select3D_SensitiveCircle( own, aCircle,  FirstPar, LastPar);
+      Handle(Select3D_SensitiveCircle) circ = new Select3D_SensitiveCircle (own, aCircle->Circ(), FirstPar, LastPar);
       aSelection->Add( circ );
     }
     else {
@@ -323,9 +317,7 @@ void AIS_EqualDistanceRelation::ComputeSelection( const Handle( SelectMgr_Select
       Standard_Real FirstPar = ElCLib::Parameter(aCircle->Circ(), myAttachPoint4),
       LastPar  = ElCLib::Parameter(aCircle->Circ(), myPoint4);
       if (LastPar < FirstPar ) LastPar+=M_PI*2;
-      //add sensetive arc
-      Handle(Select3D_SensitiveCircle) circ = 
-	new Select3D_SensitiveCircle( own,aCircle,  FirstPar, LastPar);
+      Handle(Select3D_SensitiveCircle) circ = new Select3D_SensitiveCircle (own, aCircle->Circ(), FirstPar, LastPar);
       aSelection->Add( circ );
     }
   }

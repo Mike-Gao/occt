@@ -11,6 +11,7 @@ TKHLR
 TKGeomBase
 TKMesh
 TKService
+TKGraphic3d
 TKV3d
 TKFillet
 TKPrim

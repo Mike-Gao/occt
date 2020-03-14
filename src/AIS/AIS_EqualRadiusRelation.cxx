@@ -22,7 +22,6 @@
 #include <ElCLib.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_Transformation.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <gp_Circ.hxx>
 #include <Precision.hxx>

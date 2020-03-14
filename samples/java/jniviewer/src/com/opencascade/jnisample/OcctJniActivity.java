@@ -149,6 +149,7 @@ public class OcctJniActivity extends Activity implements OnClickListener
         // OCCT Visualization
      || !loadLibVerbose ("TKService",    aLoaded, aFailed)
      || !loadLibVerbose ("TKHLR",        aLoaded, aFailed)
+     || !loadLibVerbose ("TKGraphic3d",  aLoaded, aFailed)
      || !loadLibVerbose ("TKV3d",        aLoaded, aFailed)
      || !loadLibVerbose ("TKOpenGl",     aLoaded, aFailed)
         // application code

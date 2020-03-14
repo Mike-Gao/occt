@@ -24,7 +24,6 @@
 #include <DsgPrs_Chamf2dPresentation.hxx>
 #include <ElCLib.hxx>
 #include <Geom_Line.hxx>
-#include <Geom_Transformation.hxx>
 #include <gp_Dir.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>

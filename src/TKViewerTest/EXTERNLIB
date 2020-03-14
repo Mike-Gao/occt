@@ -15,6 +15,7 @@ TKTopTest
 TKG3d
 TKOffset
 TKMesh
+TKGraphic3d
 TKV3d
 TKDraw
 TKOpenGl

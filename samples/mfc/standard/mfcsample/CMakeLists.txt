@@ -196,6 +196,7 @@ set (mfcsample_USED_LIBS  TKVRML
                           TKService
                           TKTopAlgo
                           TKMesh
+                          TKGraphic3d
                           TKV3d
                           ${CSF_OpenGlLibs})
 

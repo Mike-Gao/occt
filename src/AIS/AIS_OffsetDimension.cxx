@@ -24,7 +24,6 @@
 #include <ElCLib.hxx>
 #include <ElSLib.hxx>
 #include <gce_MakeLin.hxx>
-#include <Geom_Transformation.hxx>
 #include <GeomAbs_SurfaceType.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>
