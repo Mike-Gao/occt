@@ -38,6 +38,7 @@ endif()
 SET(OpenCASCADE_LIBS 
   TKernel
   TKService
+  TKGraphic3d
   TKV3d
   TKOpenGl
   TKBRep

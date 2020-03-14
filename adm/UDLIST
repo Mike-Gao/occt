@@ -226,6 +226,7 @@ t TKMeshVS
 t TKOpenGl
 t TKD3DHost
 t TKService
+t TKGraphic3d
 t TKV3d
 n BinTObjDrivers
 n LDOM

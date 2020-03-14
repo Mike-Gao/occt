@@ -4,6 +4,7 @@ TKernel
 TKService
 TKG2d
 TKDraw
+TKGraphic3d
 TKV3d
 TKGeomBase
 TKG3d

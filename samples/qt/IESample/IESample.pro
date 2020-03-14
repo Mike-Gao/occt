@@ -71,7 +71,7 @@ win32 {
     DEFINES += NO_COMMONSAMPLE_EXPORTS NO_IESAMPLE_EXPORTS
 }
 
-LIBS += -lTKernel -lTKMath -lTKService -lTKV3d -lTKOpenGl \
+LIBS += -lTKernel -lTKMath -lTKService -lTKGraphic3d -lTKV3d -lTKOpenGl \
         -lTKBRep -lTKIGES -lTKSTL -lTKVRML -lTKSTEP -lTKSTEPAttr -lTKSTEP209 \
         -lTKSTEPBase -lTKGeomBase -lTKGeomAlgo -lTKG3d -lTKG2d \
         -lTKXSBase -lTKShHealing -lTKHLR -lTKTopAlgo -lTKMesh -lTKPrim \

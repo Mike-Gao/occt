@@ -176,6 +176,11 @@ LOCAL_SRC_FILES := $(OCCT_LIBS)/$(TARGET_ARCH_ABI)/libTKHLR.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := OcctTKGraphic3d
+LOCAL_SRC_FILES := $(OCCT_LIBS)/$(TARGET_ARCH_ABI)/libTKGraphic3d.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := OcctTKV3d
 LOCAL_SRC_FILES := $(OCCT_LIBS)/$(TARGET_ARCH_ABI)/libTKV3d.so
 include $(PREBUILT_SHARED_LIBRARY)
@@ -196,7 +201,7 @@ LOCAL_CPP_FEATURES     := rtti exceptions
 LOCAL_SRC_FILES        := OcctJni_Viewer.cxx OcctJni_Window.cxx OcctJni_MsgPrinter.cxx
 LOCAL_SHARED_LIBRARIES := OcctTKernel OcctTKMath OcctTKG2d OcctTKG3d OcctTKGeomBase OcctTKBRep OcctTKGeomAlgo OcctTKTopAlgo OcctTKShHealing OcctTKMesh OcctTKPrim
 LOCAL_SHARED_LIBRARIES += OcctTKIGES OcctTKSTEP OcctTKXSBase
-LOCAL_SHARED_LIBRARIES += OcctTKService OcctTKHLR OcctTKV3d OcctTKOpenGl
+LOCAL_SHARED_LIBRARIES += OcctTKService OcctTKHLR OcctTKGraphic3d OcctTKV3d OcctTKOpenGl
 LOCAL_SHARED_LIBRARIES += SharedStl
 LOCAL_LDLIBS           := -llog -lGLESv2 -lEGL
 
