@@ -28,7 +28,6 @@
 #include <GC_MakeCircle.hxx>
 #include <Geom_Line.hxx>
 #include <GeomAdaptor_Curve.hxx>
-#include <Geom_Circle.hxx>
 #include <Geom_TrimmedCurve.hxx>
 #include <gce_MakeDir.hxx>
 #include <gce_MakeLin.hxx>
@@ -1405,10 +1404,7 @@ void AIS_Dimension::ComputeSelection (const Handle(SelectMgr_Selection)& theSele
     {
       gp_Circ aTextGeom (aTextAxes, mySelToleranceForText2d != 0.0 
                                       ? mySelToleranceForText2d : 1.0);
-
-      Handle(Geom_Circle) aSensGeom = new Geom_Circle (aTextGeom);
-
-      aTextSensitive = new Select3D_SensitiveCircle (aSensitiveOwner, aSensGeom, Standard_True);
+      aTextSensitive = new Select3D_SensitiveCircle (aSensitiveOwner, aTextGeom, Standard_True);
     }
 
     theSelection->Add (aTextSensitive);

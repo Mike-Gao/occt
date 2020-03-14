@@ -30,7 +30,6 @@
 #include <Geom_Surface.hxx>
 #include <Geom_SurfaceOfLinearExtrusion.hxx>
 #include <Geom_SurfaceOfRevolution.hxx>
-#include <Geom_Transformation.hxx>
 #include <Geom_TrimmedCurve.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Dir.hxx>

@@ -21,7 +21,6 @@
 #include <DsgPrs_ConcentricPresentation.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_Transformation.hxx>
 #include <GeomAbs_CurveType.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>
@@ -229,15 +228,12 @@ void AIS_ConcentricRelation::ComputeSelection(const Handle(SelectMgr_Selection)&
   //Creation of 2 sensitive circles
      // the greater
   gp_Ax2 ax(myCenter, myDir);
-  Handle(Geom_Circle) Circ = new Geom_Circle(ax, myRad) ;
-  Handle(Select3D_SensitiveCircle) 
-    sensit = new Select3D_SensitiveCircle (own,
-					   Circ);
+  gp_Circ aCirc (ax, myRad);
+  Handle(Select3D_SensitiveCircle) sensit = new Select3D_SensitiveCircle (own, aCirc);
   aSelection->Add(sensit);
      // the smaller
-  Circ->SetRadius(myRad/2);
-  sensit = new Select3D_SensitiveCircle (own,
-					 Circ);
+  aCirc.SetRadius(myRad/2);
+  sensit = new Select3D_SensitiveCircle (own, aCirc);
   aSelection->Add(sensit);
 
   //Creation of 2 segments sensitive for the cross
