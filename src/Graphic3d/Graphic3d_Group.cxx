@@ -458,7 +458,7 @@ void Graphic3d_Group::DumpJson (Standard_OStream& theOStream, Standard_Integer t
 
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this)
 
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myStructure)  
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myStructure)
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBounds)
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsClosed)
