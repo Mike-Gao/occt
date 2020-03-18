@@ -39,9 +39,6 @@ public:
   //! Destructor
   virtual ~VInspector_ItemContextProperties() Standard_OVERRIDE {};
 
-  //! Inits the item, fills internal containers
-  Standard_EXPORT virtual void Init() Standard_OVERRIDE;
-
 protected:
   //! Initializes the current item. It is empty because Reset() is also empty.
   virtual void initItem() const Standard_OVERRIDE;

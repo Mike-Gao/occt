@@ -19,15 +19,6 @@
 #include <inspector/VInspector_ItemV3dViewer.hxx>
 
 // =======================================================================
-// function : Init
-// purpose :
-// =======================================================================
-void VInspector_ItemContextProperties::Init()
-{
-  TreeModel_ItemBase::Init(); // to use getIO() without circling initialization
-}
-
-// =======================================================================
 // function : initValue
 // purpose :
 // =======================================================================

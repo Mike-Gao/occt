@@ -1119,15 +1119,10 @@ void Graphic3d_CView::DumpJson (Standard_OStream& theOStream, Standard_Integer t
     OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aStructToCompute.get())
   }
 
-  for (Graphic3d_SequenceOfStructure::Iterator anIter (myStructsToCompute); anIter.More(); anIter.Next())
+  for (Graphic3d_SequenceOfStructure::Iterator anIter (myStructsComputed); anIter.More(); anIter.Next())
   {
     Handle(Graphic3d_Structure) aStructComputed = anIter.Value();
     OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aStructComputed.get())
-  }
-
-  for (Graphic3d_MapOfStructure::Iterator anIter (myStructsDisplayed); anIter.More(); anIter.Next())
-  {
-    Handle(Graphic3d_Structure) aStructDisplayed = anIter.Value();
   }
 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsInComputedMode)

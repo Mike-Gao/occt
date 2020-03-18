@@ -150,7 +150,7 @@ public:
     myWorldViewState  = theOther.myWorldViewState;
   }
   
-  void DumpJson (Standard_OStream& theOStream, Standard_Integer /*theDepth*/) const
+  void DumpJson (Standard_OStream& theOStream, Standard_Integer) const
   {
     OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsValid)
     OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myCamera)

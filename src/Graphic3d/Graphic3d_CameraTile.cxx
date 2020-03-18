@@ -21,10 +21,10 @@
 //function : DumpJson
 //purpose  : 
 //=======================================================================
-void Graphic3d_CameraTile::DumpJson (Standard_OStream& theOStream, Standard_Integer /*theDepth*/) const
+void Graphic3d_CameraTile::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  OCCT_DUMP_VECTOR_CLASS (theOStream, "TotalSize", 2, TotalSize.x(), TotalSize.y())
-  OCCT_DUMP_VECTOR_CLASS (theOStream, "TileSize", 2, TileSize.x(), TileSize.y())
-  OCCT_DUMP_VECTOR_CLASS (theOStream, "Offset", 2, Offset.x(), Offset.y())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &TotalSize)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &TileSize)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &Offset)
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, IsTopDown)
 }

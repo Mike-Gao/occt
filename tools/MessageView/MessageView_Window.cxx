@@ -883,7 +883,6 @@ void MessageView_Window::updatePreviewPresentation()
 void MessageView_Window::updateVisibleColumns()
 {
   MessageModel_TreeModel* aViewModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
-  const NCollection_List<MessageModel_ReportInformation>& aReports = aViewModel->Reports();
 
   NCollection_Map<Message_MetricType> anActiveMetrics;
   for (NCollection_List<MessageModel_ReportInformation>::Iterator anIterator (aViewModel->Reports()); anIterator.More(); anIterator.Next())

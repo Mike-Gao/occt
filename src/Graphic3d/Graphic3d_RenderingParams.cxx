@@ -79,7 +79,7 @@ void Graphic3d_RenderingParams::DumpJson (Standard_OStream& theOStream, Standard
   
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, StatsPosition.get())
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, ChartPosition.get())
-  OCCT_DUMP_VECTOR_CLASS (theOStream, "ChartSize", 2, ChartSize.x(), ChartSize.y())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &ChartSize)
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, StatsTextAspect.get())
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, StatsUpdateInterval)
   

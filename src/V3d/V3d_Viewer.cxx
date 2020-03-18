@@ -584,7 +584,6 @@ void V3d_Viewer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDep
   
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDriver.get())
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myStructureManager.get())
-  //TColStd_MapOfInteger myLayerIds;
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myZLayerGenId)
   
   for (V3d_ListOfView::Iterator anIter (myDefinedViews); anIter.More(); anIter.Next())
@@ -610,6 +609,7 @@ void V3d_Viewer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDep
     Handle(Graphic3d_CLight) anActiveLight = anIter.Value();
     OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anActiveLight.get())
   }
+
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBackground)
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myGradientBackground)
 

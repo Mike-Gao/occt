@@ -1037,7 +1037,7 @@ void Graphic3d_Structure::SetZLayer (const Graphic3d_ZLayerId theLayerId)
 void Graphic3d_Structure::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
   OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
-  
+
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myStructureManager)
   OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCStructure.get())
 
