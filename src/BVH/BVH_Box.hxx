@@ -212,9 +212,9 @@ public:
   {
     Standard_Integer aPos = theStreamPos;
 
-    Standard_Integer isInited = 0;
-    OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, isInited);
-    myIsInited = isInited != 0;
+    Standard_Integer anIsInited = 0;
+    OCCT_INIT_FIELD_VALUE_INTEGER (theSStream, aPos, anIsInited);
+    myIsInited = anIsInited != 0;
 
     int n = Min (N, 3);
     if (n == 1)

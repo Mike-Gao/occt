@@ -322,11 +322,8 @@ void TreeModel_ModelBase::subItemsPresentations (const TreeModel_ItemBasePtr& th
                                                  NCollection_List<Handle(Standard_Transient)>& thePresentations)
 {
   theItem->Presentations (thePresentations);
-  if (!theItem->Properties().IsNull())
-    theItem->Properties()->Presentations (thePresentations);
 
   QList<TreeModel_ItemBasePtr> anItems;
-
   for (int aRowId = 0; aRowId < theItem->rowCount(); aRowId++)
   {
     subItemsPresentations (theItem->Child (aRowId, theItem->Column()), thePresentations);

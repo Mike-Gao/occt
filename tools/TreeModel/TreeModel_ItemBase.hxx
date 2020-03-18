@@ -152,7 +152,7 @@ public:
 
   //! Returns presentation of the attribute to be visualized in the view
   //! \thePresentations [out] container of presentation handles to be visualized
-  virtual void Presentations (NCollection_List<Handle(Standard_Transient)>& thePresentations) { (void)thePresentations; }
+  Standard_EXPORT virtual void Presentations (NCollection_List<Handle(Standard_Transient)>& thePresentations);
 
 protected:
 
