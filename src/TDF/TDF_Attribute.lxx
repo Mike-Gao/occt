@@ -59,3 +59,9 @@ inline Standard_Boolean TDF_Attribute::IsForgotten() const
 inline Standard_OStream& operator << (Standard_OStream& anOS,
                                       const Handle(TDF_Attribute)& anAtt)
 { return anAtt->Dump(anOS); }
+
+
+inline Handle(TDF_Attribute) TDF_Attribute::GetBackup() const
+{
+  return myBackup;
+}

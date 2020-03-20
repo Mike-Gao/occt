@@ -282,6 +282,10 @@ public:
   //! Backup() method.
     Standard_Boolean IsBackuped() const;
   
+  //! Returns Backup attribute for current state of attribute
+  Standard_EXPORT Handle(TDF_Attribute) GetBackup() const;
+  
+
   //! Copies  the attribute  contents into  a  new other
   //! attribute. It is used by Backup().
   Standard_EXPORT virtual Handle(TDF_Attribute) BackupCopy() const;
