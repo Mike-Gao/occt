@@ -33,12 +33,12 @@ class AIS_MidPointRelation : public AIS_Relation
 public:
 
   Standard_EXPORT AIS_MidPointRelation(const TopoDS_Shape& aSymmTool, const TopoDS_Shape& FirstShape, const TopoDS_Shape& SecondShape, const Handle(Geom_Plane)& aPlane);
-  
-    virtual Standard_Boolean IsMovable() const Standard_OVERRIDE;
-  
-    void SetTool (const TopoDS_Shape& aMidPointTool);
-  
-    const TopoDS_Shape& GetTool() const;
+
+  virtual Standard_Boolean IsMovable() const Standard_OVERRIDE { return Standard_True; }
+
+  void SetTool (const TopoDS_Shape& aMidPointTool) { myTool = aMidPointTool; }
+
+  const TopoDS_Shape& GetTool() const { return myTool; }
 
 private:
 

@@ -44,16 +44,16 @@ public:
   Standard_EXPORT AIS_SymmetricRelation(const TopoDS_Shape& aSymmTool, const TopoDS_Shape& FirstShape, const TopoDS_Shape& SecondShape, const Handle(Geom_Plane)& aPlane);
   
   //! Returns true if the symmetric constraint display is movable.
-    virtual Standard_Boolean IsMovable() const Standard_OVERRIDE;
-  
+  virtual Standard_Boolean IsMovable() const Standard_OVERRIDE { return Standard_True; }
+
   //! Sets the tool aSymmetricTool composed of a first
   //! shape, a second shape, and a plane.
   //! This tool is initially created at construction time.
-    void SetTool (const TopoDS_Shape& aSymmetricTool);
-  
+  void SetTool (const TopoDS_Shape& aSymmetricTool) { myTool = aSymmetricTool; }
+
   //! Returns the tool composed of a first shape, a second
   //! shape, and a plane. This tool is created at construction time.
-    const TopoDS_Shape& GetTool() const;
+  const TopoDS_Shape& GetTool() const { return myTool; }
 
 private:
 
@@ -67,6 +67,8 @@ private:
   
   Standard_EXPORT void ComputeTwoVerticesSymmetric (const Handle(Prs3d_Presentation)& aprs);
 
+private:
+
   TopoDS_Shape myTool;
   gp_Pnt myFAttach;
   gp_Pnt mySAttach;
@@ -74,7 +76,5 @@ private:
   gp_Dir myAxisDirAttach;
 
 };
-
-#include <AIS_SymmetricRelation.lxx>
 
 #endif // _AIS_SymmetricRelation_HeaderFile

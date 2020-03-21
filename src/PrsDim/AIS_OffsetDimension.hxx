@@ -38,14 +38,14 @@ public:
   Standard_EXPORT AIS_OffsetDimension(const TopoDS_Shape& FistShape, const TopoDS_Shape& SecondShape, const Standard_Real aVal, const TCollection_ExtendedString& aText);
 
   //! Indicates that the dimension we are concerned with is an offset.
-    virtual AIS_KindOfDimension KindOfDimension() const Standard_OVERRIDE;
-  
+  virtual AIS_KindOfDimension KindOfDimension() const Standard_OVERRIDE { return AIS_KOD_OFFSET; }
+
   //! Returns true if the offset datum is movable.
-    virtual Standard_Boolean IsMovable() const Standard_OVERRIDE;
-  
+  virtual Standard_Boolean IsMovable() const Standard_OVERRIDE { return Standard_True; }
+
   //! Sets a transformation aTrsf for presentation and
   //! selection to a relative position.
-    void SetRelativePos (const gp_Trsf& aTrsf);
+  void SetRelativePos (const gp_Trsf& aTrsf) { myRelativePos = aTrsf; }
 
 private:
 
@@ -59,6 +59,8 @@ private:
   
   Standard_EXPORT void ComputeAxeFaceOffset (const Handle(Prs3d_Presentation)& aPresentation, const gp_Trsf& aTrsf);
 
+private:
+
   gp_Pnt myFAttach;
   gp_Pnt mySAttach;
   gp_Dir myDirAttach;
@@ -66,7 +68,5 @@ private:
   gp_Trsf myRelativePos;
 
 };
-
-#include <AIS_OffsetDimension.lxx>
 
 #endif // _AIS_OffsetDimension_HeaderFile

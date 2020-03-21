@@ -45,22 +45,19 @@ public:
 
   //! Sets the shape aShape to be used as the shape
   //! aShape3 in the framework created at construction time.
-    void SetShape3 (const TopoDS_Shape& aShape);
-  
+  void SetShape3 (const TopoDS_Shape& aShape) { myShape3 = aShape; }
 
   //! Returns the shape aShape3 from the framework
   //! created at construction time.
-    const TopoDS_Shape& Shape3() const;
-  
+  const TopoDS_Shape& Shape3() const { return myShape3; }
 
   //! Sets the shape aShape to be used as the shape
   //! aShape4 in the framework created at construction time.
-    void SetShape4 (const TopoDS_Shape& aShape);
-  
+  void SetShape4 (const TopoDS_Shape& aShape) { myShape4 = aShape; }
 
   //! Returns the shape aShape4 from the framework
   //! created at construction time.
-    const TopoDS_Shape& Shape4() const;
+  const TopoDS_Shape& Shape4() const { return myShape4; }
 
   //! Computes the location of an intreval between
   //! between two edges. FirstAttach , SecondAttach
@@ -81,6 +78,8 @@ private:
   
   Standard_EXPORT void ComputeSelection (const Handle(SelectMgr_Selection)& aSelection, const Standard_Integer aMode) Standard_OVERRIDE;
 
+private:
+
   TopoDS_Shape myShape3;
   TopoDS_Shape myShape4;
   gp_Pnt myAttachPoint1;
@@ -93,7 +92,5 @@ private:
   gp_Pnt myPoint4;
 
 };
-
-#include <AIS_EqualDistanceRelation.lxx>
 
 #endif // _AIS_EqualDistanceRelation_HeaderFile

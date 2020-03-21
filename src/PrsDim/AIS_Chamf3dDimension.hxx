@@ -44,12 +44,12 @@ public:
   //! the chamfer aPosition, the type of arrow aSymbolPrs
   //! with the size anArrowSize.
   Standard_EXPORT AIS_Chamf3dDimension(const TopoDS_Shape& aFShape, const Standard_Real aVal, const TCollection_ExtendedString& aText, const gp_Pnt& aPosition, const DsgPrs_ArrowSide aSymbolPrs, const Standard_Real anArrowSize = 0.0);
-  
+
   //! Indicates that we are concerned with a 3d length.
-    virtual AIS_KindOfDimension KindOfDimension() const Standard_OVERRIDE;
-  
+  virtual AIS_KindOfDimension KindOfDimension() const Standard_OVERRIDE { return AIS_KOD_LENGTH; }
+
   //! Returns true if the 3d chamfer dimension is movable.
-    virtual Standard_Boolean IsMovable() const Standard_OVERRIDE;
+  virtual Standard_Boolean IsMovable() const Standard_OVERRIDE { return Standard_True; }
 
 private:
 
@@ -57,11 +57,11 @@ private:
   
   Standard_EXPORT virtual void ComputeSelection (const Handle(SelectMgr_Selection)& aSelection, const Standard_Integer aMode) Standard_OVERRIDE;
 
+private:
+
   gp_Pnt myPntAttach;
   gp_Dir myDir;
 
 };
-
-#include <AIS_Chamf3dDimension.lxx>
 
 #endif // _AIS_Chamf3dDimension_HeaderFile

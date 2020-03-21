@@ -44,7 +44,7 @@ public:
   Standard_EXPORT AIS_ParallelRelation(const TopoDS_Shape& aFShape, const TopoDS_Shape& aSShape, const Handle(Geom_Plane)& aPlane, const gp_Pnt& aPosition, const DsgPrs_ArrowSide aSymbolPrs, const Standard_Real anArrowSize = 0.01);
   
   //! Returns true if the parallelism is movable.
-    virtual Standard_Boolean IsMovable() const Standard_OVERRIDE;
+  virtual Standard_Boolean IsMovable() const Standard_OVERRIDE { return Standard_True; }
 
 private:
 
@@ -56,12 +56,12 @@ private:
   
   Standard_EXPORT void ComputeTwoEdgesParallel (const Handle(Prs3d_Presentation)& aPresentation);
 
+private:
+
   gp_Pnt myFAttach;
   gp_Pnt mySAttach;
   gp_Dir myDirAttach;
 
 };
-
-#include <AIS_ParallelRelation.lxx>
 
 #endif // _AIS_ParallelRelation_HeaderFile
