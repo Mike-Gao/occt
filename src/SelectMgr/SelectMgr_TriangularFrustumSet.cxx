@@ -33,7 +33,7 @@ void SelectMgr_TriangularFrustumSet::Build (const TColgp_Array1OfPnt2d& thePoint
 {
   myFrustums.Clear();
 
-  Handle(NCollection_IncAllocator) anAllocator = new NCollection_IncAllocator (MEMORY_BLOCK_SIZE);
+  /**Handle(NCollection_IncAllocator) anAllocator = new NCollection_IncAllocator (MEMORY_BLOCK_SIZE);
   Handle(BRepMesh_DataStructureOfDelaun) aMeshStructure = new BRepMesh_DataStructureOfDelaun(anAllocator);
   Standard_Integer aPtsLower = thePoints.Lower();
   Standard_Integer aPtsUpper = thePoints.Upper();
@@ -94,7 +94,7 @@ void SelectMgr_TriangularFrustumSet::Build (const TColgp_Array1OfPnt2d& thePoint
   }
 
   aMeshStructure.Nullify();
-  anAllocator.Nullify();
+  anAllocator.Nullify();*/
 }
 
 // =======================================================================

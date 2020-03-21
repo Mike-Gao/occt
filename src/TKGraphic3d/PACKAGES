@@ -1,5 +1,7 @@
 Graphic3d
-SelectBasics
 Prs3d
 V3d
 PrsMgr
+SelectBasics
+Select3D
+SelectMgr

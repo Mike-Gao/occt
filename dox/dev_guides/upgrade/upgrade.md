@@ -1900,6 +1900,7 @@ The following changes should be taken into account:
 * Visualization classes now use *TopLoc_Datum3D* (from *TKMath*) instead of *Geom_Transformation* (from *TKG3d*) as smart pointer to *gp_Trsf*.
   This is rather an internal change, but some applications might need to be updated.
 * *Select3D_SensitiveCircle* constructor now takes *gp_Circ* instead of *Geom_Circle*.
+* TODO: *Select3D_SensitiveCurve* constructor taking *Geom_Curve* has been removed.
 
 @subsection upgrade_750_hlrangle Prs3d_Drawer deviation angle
 
