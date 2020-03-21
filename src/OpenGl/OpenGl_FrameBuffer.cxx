@@ -692,6 +692,8 @@ void OpenGl_FrameBuffer::BindBuffer (const Handle(OpenGl_Context)& theGlCtx)
 {
   theGlCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, myGlFBufferId);
   theGlCtx->SetFrameBufferSRGB (true);
+  
+  theGlCtx->SetActiveFrameBuffer (this);
 }
 
 // =======================================================================
