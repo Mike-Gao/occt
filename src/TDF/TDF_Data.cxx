@@ -469,3 +469,32 @@ void TDF_Data::DumpJson (Standard_OStream& theOStream, Standard_Integer /*theDep
   }
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAllowModification)
 }
+
+//=======================================================================
+//function : HasModifications
+//purpose  : 
+//=======================================================================
+
+Standard_Boolean TDF_Data::HasModifications(const TDF_Label& theLabel) const
+{
+  if( theLabel.IsNull())
+    return Standard_False;
+  //check that attributes were modified
+  Standard_Integer aRootTransaction = Root().Data()->Transaction();
+  TDF_AttributeIterator itAttr(theLabel, Standard_False);
+  for ( ; itAttr.More(); itAttr.Next()) 
+  {
+     Handle(TDF_Attribute) aCurrentAtt = itAttr.Value();
+     if(aCurrentAtt->Transaction() == aRootTransaction)
+       return Standard_True;
+  }
+
+  //check that child labels has modified attributes
+  TDF_ChildIterator itChild(theLabel);
+  for ( ; itChild.More(); itChild.Next()) 
+  {
+    if(HasModifications(itChild.Value()))
+      return Standard_True;
+  }
+  return Standard_False;
+}

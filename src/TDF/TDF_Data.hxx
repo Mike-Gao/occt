@@ -137,6 +137,10 @@ Standard_OStream& operator<< (Standard_OStream& anOS) const
   //! Dumps the content of me into the stream
   Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
+  //! Returns true if data has modified attributes on the specified label theLabel and on the 
+  //! their child labels
+  Standard_EXPORT Standard_Boolean HasModifications(const TDF_Label& theLabel) const;
+
 friend class TDF_Transaction;
 friend class TDF_LabelNode;
 
@@ -189,6 +193,8 @@ private:
   //! committed from the previous transaction into the
   //! current one.
   Standard_EXPORT Standard_Integer CommitTransaction (const TDF_Label& aLabel, const Handle(TDF_Delta)& aDelta, const Standard_Boolean withDelta);
+
+ 
 
   TDF_LabelNodePtr myRoot;
   Standard_Integer myTransaction;

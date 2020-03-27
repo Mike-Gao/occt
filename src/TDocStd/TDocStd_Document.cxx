@@ -941,3 +941,12 @@ void TDocStd_Document::DumpJson (Standard_OStream& theOStream, Standard_Integer 
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOnlyTransactionModification)
   OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySaveEmptyLabels)
 }
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+Standard_Boolean TDocStd_Document::HasModifications() const
+{
+  return myData->HasModifications(Main());
+}
