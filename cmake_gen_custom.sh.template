@@ -1,0 +1,9 @@
+# Copy this file to cmake_gen_custom.sh and tune to your local needs
+
+OCCT3RDPARTY=`pwd`/../3rdparty
+INSTALL_DIR=$OCCT3RDPARTY/occt740
+BUILD_DIR=build
+FREETYPE_DIR=$OCCT3RDPARTY/freetype-2.7.1
+
+# This is to avoid cmake DEV warnings about TCL
+AUX_ARGS=-Wno-dev

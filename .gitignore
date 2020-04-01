@@ -46,7 +46,6 @@ Release
 /*.am
 /*.m4
 /*.ac
-/*.sh
 /codeblocks.bat
 /custom.bat
 /autom4te.cache
@@ -60,3 +59,6 @@ Release
 /build*
 /install
 env_custom.bat
+env_custom.sh
+cmake_gen_custom.bat
+cmake_gen_custom.sh

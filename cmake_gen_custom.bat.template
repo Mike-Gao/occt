@@ -1,0 +1,8 @@
+rem Copy this file to cmake_gen_custom.bat and tune to your local needs
+
+set "OCCT3RDPARTY=%~dp0..\3rdparty"
+set "INSTALL_DIR=%~dp0install"
+set BUILD_DIR=build
+set VS=14
+set VSDATA=2015
+set VSPLATFORM=Win64
