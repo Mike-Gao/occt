@@ -1,0 +1,7 @@
+exptocas.h
+expparse.h
+mkscanner
+mkparser
+ExpToCasExe.cxx
+expscan.cxx
+expparse.cxx
