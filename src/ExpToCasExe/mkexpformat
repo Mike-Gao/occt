@@ -1,0 +1,2 @@
+lex expformat.l
+cc lex.yy.c -o expformat

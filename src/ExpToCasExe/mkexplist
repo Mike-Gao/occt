@@ -1,0 +1,2 @@
+lex explist.l
+cc lex.yy.c -o explist

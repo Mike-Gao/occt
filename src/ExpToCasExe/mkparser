@@ -1,0 +1,5 @@
+rm -f yy.tab.c y.tab.h expparse.cxx expparse.h
+#yacc -v -d exptocas.y
+yacc -d exptocas.y
+mv y.tab.c expparse.cxx
+mv y.tab.h expparse.h

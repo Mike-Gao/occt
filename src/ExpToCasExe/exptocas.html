@@ -1,0 +1,51 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; SunOS 5.6 sun4u) [Netscape]">
+   <title>ExpToCas: Generator of STEP read/write classes from EXPRESS schema</title>
+</head>
+<body text="#000040" bgcolor="#C0C0C0" link="#0000EE" vlink="#551A8B" alink="#FF0000" background="http://info.nnov.matra-dtv.fr/~det/images/StandardBackground.gif" nosave>
+<!-- <body text="#000040" bgcolor="#C0C0FF" link="#0000EE" vlink="#551A8B" alink="#FF0000"> -->
+<h1>ExpToCas: Generator of STEP read/write classes from EXPRESS schema</h1>
+
+<hr>
+<h2>Abstract</h2>
+
+This document describes <b>ExpToCas</b>, a package defining several parsers of 
+EXPRESS schema aimed to analyse the schema and generate STEP read/write classes
+for Open CASCADE Data Exchange (XSTEP).
+
+<hr>
+<h2>Basic principles</h2>
+
+EXPRESS schema is parsed by tools based on 
+<a href="http://info.nnov.matra-dtv.fr/scriptsdet/man2html?flex">lex</a> 
+(scanner) and <a href="http://www.nnov.matra-dtv.fr/~det/bison/bison_toc.html">yacc</a>
+(parser).
+
+<p>
+
+
+<hr>
+<h2>Organisation</h2>
+
+<p>
+Physically ExpToCas is organised as two WOK units:
+
+<h4>CDL package ExpToCas</h4>
+
+Defines set of classes to represent structure of 
+EXPRESS file (more accurately to say, schema). It represents data contained 
+in EXPRESS schema as list of items (e.g. definition of ENTITY and SELECT
+types). Each item has methods to generate relevant CDL/CXX classes for 
+CASCADE.
+
+<h4>Executable ExpToCasExe</h4>
+
+Provides executable (named ExpToCas) allowing to load EXPRESS file to memory
+(to the structure of classes from ExpToCas package) and generate CDL/CXX classes
+for user-defined list of entities.
+
+</body>
+</html>

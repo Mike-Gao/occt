@@ -85,7 +85,7 @@ proc _get_used_files { pk theSrcDir {inc true} {src true} } {
   set index -1
   foreach line $FILES {
     incr index
-    if {$inc && ([regexp {([^:\s]*\.[hgl]xx)$} $line dummy name] || [regexp {([^:\s]*\.h)$} $line dummy name]) && [file exists $pk_path/$name]} {
+    if {$inc && ([regexp {([^:\s]*\.[hgl]xx)\r?$} $line dummy name] || [regexp {([^:\s]*\.h)\r?$} $line dummy name]) && [file exists $pk_path/$name]} {
       lappend lret "pubinclude $name $pk_path/$name"
       continue
     }
@@ -1228,28 +1228,31 @@ proc osutils:convertModules { theModules theSrcDir theSourceDirOther theProjects
       lappend aProjectsInModule($aModule) $aToolKit
       lappend aDependencies [LibToLink $aToolKit $theSrcDir $theSourceDirOther]
     }
-    # executables, assume one project per cxx file...
+    # executables, assume one project per unit...
     foreach aUnit [OS:executable ${aModule}] {
+      set aPrjName $aUnit
       set aUnitLoc $aUnit
-      set src_files [_get_used_files $aUnit $theSrcDir false]
-      set aSrcFiles {}
-      foreach s $src_files {
-        regexp {source ([^\s]+)} $s dummy name
-        lappend aSrcFiles $name
-      }
-      foreach aSrcFile $aSrcFiles {
-        set aFileExtension [file extension $aSrcFile]
-        if { $aFileExtension == ".cxx" } {
-          set aPrjName [file rootname $aSrcFile]
+#      set src_files [_get_used_files $aUnit $theSrcDir false]
+#      set aSrcFiles {}
+#      foreach s $src_files {
+#        regexp {source ([^\s]+)} $s dummy name
+#        lappend aSrcFiles $name
+#      }
+
+#      foreach aSrcFile $aSrcFiles {
+#        set aFileExtension [file extension $aSrcFile]
+#        if { $aFileExtension == ".cxx" } {
+#          set aPrjName [file rootname $aSrcFile]
           lappend aProjects $aPrjName
           lappend aProjectsInModule($aModule) $aPrjName
           if {[file isdirectory $path/$theSrcDir/$aUnitLoc]} {
-            lappend aDependencies [LibToLinkX $aUnitLoc [file rootname $aSrcFile] $theSrcDir $theSourceDirOther]
+            lappend aDependencies [LibToLinkX $aUnitLoc $aPrjName $theSrcDir $theSourceDirOther]
           } else {
+            puts "Error: cannot find executable unit $path/$theSrcDir/$aUnitLoc"
             lappend aDependencies {}
           }
-        }
-      }
+#        }
+#      }
     }
   }
 }
@@ -2082,10 +2085,11 @@ proc osutils:tk:execfiles { theFiles theOutDir theCommand thePrefix theExtension
 # Generate Visual Studio project file for executable
 proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap theSrcDir theSourceDirOther } {
   set aVcFiles {}
-  foreach f [osutils:tk:cxxfiles $theToolKit wnt $theSrcDir] {
+#  foreach f [osutils:tk:cxxfiles $theToolKit wnt $theSrcDir] {
     set aProjTmpl [osutils:vcproj:readtemplate $theVcVer $isUWP 1]
 
-    set aProjName [file rootname [file tail $f]]
+    set aProjName $theToolKit
+#    set aProjName [file rootname [file tail $f]]
     set l_compilable [osutils:compilable wnt]
     regsub -all -- {__XQTNAM__} $aProjTmpl $aProjName aProjTmpl
 
@@ -2111,25 +2115,31 @@ proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap theSrcDir
 
     set aFilesSection ""
     set aVcFilesCxx(units) ""
-	set aVcFilesHxx(units) ""
+    set aVcFilesHxx(units) ""
 
-    if { ![info exists written([file tail $f])] } {
-      set written([file tail $f]) 1
+#puts "$theToolKit -> [osutils:tk:cxxfiles $theToolKit wnt $theSrcDir]"
+
+#    if { ![info exists written([file tail $f])] } {
+#      set written([file tail $f]) 1
 
       if { "$theVcVer" != "vc7" && "$theVcVer" != "vc8" && "$theVcVer" != "vc9" } {
-        append aFilesSection [osutils:vcxproj:cxxfile $f "" 3]
         if { ! [info exists aVcFilesCxx($theToolKit)] } { lappend aVcFilesCxx(units) $theToolKit }
-        lappend aVcFilesCxx($theToolKit) $f
+        foreach f [osutils:tk:cxxfiles $theToolKit wnt $theSrcDir] {
+          append aFilesSection [osutils:vcxproj:cxxfile $f "" 3]
+          lappend aVcFilesCxx($theToolKit) $f
+        }
       } else {
         append aFilesSection "\t\t\t<Filter\n"
         append aFilesSection "\t\t\t\tName=\"$theToolKit\"\n"
         append aFilesSection "\t\t\t\t>\n"
-        append aFilesSection [osutils:vcproj:file $theVcVer $f ""]
+        foreach f [osutils:tk:cxxfiles $theToolKit wnt $theSrcDir] {
+          append aFilesSection [osutils:vcproj:file $theVcVer $f ""]
+        }
         append aFilesSection "\t\t\t</Filter>"
       }
-    } else {
-      puts "Warning : in vcproj there are more than one occurences for [file tail $f]"
-    }
+#    } else {
+#      puts "Warning : in vcproj there are more than one occurences for [file tail $f]"
+#    }
     #puts "$aProjTmpl $aFilesSection"
     set anIncPaths "..\\..\\..\\inc"
     regsub -all -- {__TKINC__}  $aProjTmpl $anIncPaths    aProjTmpl
@@ -2172,7 +2182,7 @@ proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap theSrcDir
 
       lappend aVcFiles "$aCommonSettingsFile"
     }
-  }
+#  }
   return $aVcFiles
 }
 
@@ -3574,7 +3584,7 @@ proc osutils:checksrcfiles { theUnit theSrcDir} {
 
   if {[file exists "${anUnitAbsPath}/FILES"]} {
     set aFilesFile [open "${anUnitAbsPath}/FILES" rb]
-    set aFilesFileList [split [read ${aFilesFile}] "\n"]
+    set aFilesFileList [split [regsub -all "\r" [read ${aFilesFile}] ""] "\n"]
     close ${aFilesFile}
 
     set aFilesFileList [lsearch -inline -all -not -exact ${aFilesFileList} ""]
