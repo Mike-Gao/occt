@@ -38,10 +38,7 @@ public:
   //! Returns name of aliased type
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns name of aliased type
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-  
-  //! Create CDL/CXX files from item
+  //! Create HXX/CXX files from item
   Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
 
 

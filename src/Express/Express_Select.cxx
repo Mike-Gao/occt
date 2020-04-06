@@ -22,6 +22,7 @@
 #include <TCollection_HAsciiString.hxx>
 #include <TColStd_HSequenceOfHAsciiString.hxx>
 
+#include <Express_ComplexType.hxx>
 #include <Express_Enum.hxx>
 #include <Express_Entity.hxx>
 #include <Express_Alias.hxx>
@@ -71,19 +72,18 @@ const Handle(Express_HSequenceOfItem) &Express_Select::Items () const
 Standard_Boolean Express_Select::GenerateClass () const
 {
   Handle(TCollection_HAsciiString) CPPname = CPPName();
-  Handle(TCollection_HAsciiString) CDLname = CDLName();
   
   Handle(TColStd_HSequenceOfInteger) seqMember = new TColStd_HSequenceOfInteger;
   Handle(TColStd_HSequenceOfInteger) seqEntities = new TColStd_HSequenceOfInteger;
   for ( Standard_Integer i=1; i <= myItems->Length(); i++ ) {
     Handle(Express_Item) item = myItems->Value(i);
-    if (item->IsKind(STANDARD_TYPE(Express_Entity)) || item->IsKind(STANDARD_TYPE(Express_Select))) 
+    if (item->IsKind(STANDARD_TYPE(Express_Entity)) || item->IsKind(STANDARD_TYPE(Express_Select))
+      || item->IsKind(STANDARD_TYPE(Express_Alias)) || item->IsKind(STANDARD_TYPE(Express_ComplexType)))
        seqEntities->Append(i);
     else seqMember->Append(i);
     
   }
-  //if(!seqEntities->IsEmpty())
-    std::cout << "Generating SELECT " << CPPname->ToCString() << std::endl;
+  std::cout << "Generating SELECT " << CPPname->ToCString() << std::endl;
   if(!seqMember->IsEmpty()) {
     std::cout << "Generating SELECTMember " << CPPname->ToCString() << "Member"<< std::endl;
     GenerateSelectMember(seqMember);
@@ -98,96 +98,112 @@ Standard_Boolean Express_Select::GenerateClass () const
   pack += CPPname->String();
   
   //===============================
-  // Step 1: generating CDL
+  // Step 1: generating HXX
   
-  // Open CDL file 
-  std::ofstream os ( pack.Cat ( ".cdl" ).ToCString() );
+  // Open HXX file 
+  std::ofstream os ( pack.Cat ( ".hxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, CPPname, Standard_True );
-
-  // write start of declaration (inheritance)
-  os << "class " << CDLname->ToCString() << std::endl << "inherits SelectType from StepData";
-  os << std::endl << std::endl;
+  Express::WriteFileStamp ( os );
   
-  os << "    ---Purpose: Representation of STEP SELECT type " << Name()->ToCString() << std::endl;
+  // write start define
+  os << "#ifndef _" << CPPname->ToCString() << "_HeaderFile" << std::endl;
+  os << "#define _" << CPPname->ToCString() << "_HeaderFile" << std::endl;
   os << std::endl;
-  
-  // write "uses" section (also creates all used types)
-  os << "uses" << std::endl;
-  os << "    SelectMember from StepData";
-  Standard_Integer jj =1;
-  for (Standard_Integer i=1; i <= myItems->Length(); i++ ) {
+
+  // write common includes
+  os << "#include <Standard.hxx>" << std::endl;
+  os << "#include <Standard_DefineAlloc.hxx>" << std::endl;
+  os << "#include <Standard_Handle.hxx>" << std::endl;
+  os << "#include <StepData_SelectType.hxx>" << std::endl;
+  os << "#include <Standard_Integer.hxx>" << std::endl;
+  os << std::endl;
+
+  os << "class Standard_Transient;" << std::endl;
+  if (!seqMember->IsEmpty())
+    os << "class StepData_SelectMember;" << std::endl;
+
+  Standard_Integer jj = 1;
+  for (Standard_Integer i = 1; i <= myItems->Length(); i++) {
     Handle(Express_Item) item = myItems->Value(i);
-    item->Use ( GetPackageName() );
-    if(item->IsKind(STANDARD_TYPE(Express_Alias))) {
-      Handle(Express_Type) type = Handle(Express_Alias)::DownCast(item )->Type();
+    item->Use(GetPackageName());
+    if (item->IsKind(STANDARD_TYPE(Express_Alias))) {
+      Handle(Express_Type) type = Handle(Express_Alias)::DownCast(item)->Type();
       TCollection_AsciiString ats = type->CPPName()->String();
-      if(type->IsStandard()) //(STANDARD_TYPE(Express_PredefinedType)))
-       continue;
-     }
-    os << "," << std::endl;
-    os << "    ";
-    os << item->CDLName()->ToCString();
+      if (type->IsStandard()) //(STANDARD_TYPE(Express_PredefinedType)))
+        continue;
+    }
+    os << "class " << item->CPPName()->ToCString() << ";" << std::endl;
     jj++;
   }
-  os << std::endl << std::endl;
-    
-  // write "is" section
-  os << "is" << std::endl;
-  os << "    Create returns " << CDLname->ToCString() << ";" << std::endl;
-  os << "	---Purpose: Empty constructor" << std::endl;
   os << std::endl;
-  os << "    CaseNum (me; ent: Transient) returns Integer;" << std::endl;
-  os << "	---Purpose: Recognizes a kind of " << Name()->ToCString() << " select type" << std::endl;
-  Standard_Integer j =1;
-  if(seqEntities->Length()) {
-    for( j =1; j <= seqEntities->Length(); j++) {
-      Standard_Integer ind = seqEntities->Value(j);
-      os << "	--          " << j << " -> " << myNames->Value(ind)->ToCString() << std::endl;
-    }
-    
-    os << "	--          0 else" << std::endl << std::endl;
-  }
-  else os << "	--          return 0 " << std::endl << std::endl;
+
+  // class declaration
+  os << "//! Representation of STEP SELECT type " << Name()->ToCString() << std::endl;
+  os << "class " << CPPname->ToCString() << " : public StepData_SelectType" << std::endl;
+  os << "{" << std::endl;
+  os << std::endl;
+  os << "public:" << std::endl;
+  os << std::endl;
+  os << "  DEFINE_STANDARD_ALLOC" << std::endl;
+  os << std::endl;
+
+  // default constructor
+  os << "  //! Empty constructor" << std::endl;
+  os << "  Standard_EXPORT " << CPPname->ToCString() << "();" << std::endl;
+  os << std::endl;
   
+  // write common methods section
+  os << "  //! Recognizes a kind of " << Name()->ToCString() << " select type" << std::endl;
+  for (Standard_Integer i = 1; i <= seqEntities->Length(); i++) {
+    Standard_Integer ind = seqEntities->Value(i);
+    os << "  //! -- " << i << " -> " << myNames->Value(ind)->ToCString() << std::endl;
+  }
+  os << "  Standard_EXPORT Standard_Integer CaseNum (const Handle(Standard_Transient)& ent) const Standard_OVERRIDE;" << std::endl;
+  os << std::endl;
+
   if(!seqMember->IsEmpty()) {
-    os << "    CaseMem (me; ent: SelectMember from StepData) returns Integer is redefined;" << std::endl;
-    os << "	---Purpose: Recognizes a items of select member " << Name()->ToCString()<<"Member" << std::endl;
-    for (Standard_Integer i=1; i <= seqMember->Length(); i++ ) {
+    os << "  //! Recognizes items of select member " << Name()->ToCString() << "Member" << std::endl;
+    for (Standard_Integer i = 1; i <= seqMember->Length(); i++) {
       Standard_Integer ind = seqMember->Value(i);
-      os << "	--          " << i << " -> " << myNames->Value(ind)->ToCString() << std::endl;
+      os << "  //! -- " << i << " -> " << myNames->Value(ind)->ToCString() << std::endl;
     }
-    os << "	--          0 else" << std::endl << std::endl;
+    os << "  //! -- 0 else" << std::endl;
+    os << "  Standard_EXPORT virtual Standard_Integer CaseMem (const Handle(StepData_SelectMember)& ent) const Standard_OVERRIDE;" << std::endl;
     os << std::endl;
-    os << "     NewMember(me) returns SelectMember from StepData is redefined;" << std::endl;
-    os << "	---Purpose: Returns a new select member the type " <<Name()->ToCString()<<"Member" << std::endl;
+
+    os << " //! Returns a new select member the type " << Name()->ToCString() << "Member" << std::endl;
+    os << "  Standard_EXPORT virtual Handle(StepData_SelectMember) NewMember() const Standard_OVERRIDE;" << std::endl;
     os << std::endl;
   }
-  //write method get for entities
-  for (Standard_Integer i=1; i <= seqEntities->Length(); i++ ) {
+
+  // write methods get for entities
+  for (Standard_Integer i = 1; i <= seqEntities->Length(); i++) {
     Standard_Integer ind = seqEntities->Value(i);
     Handle(Express_Item) item = myItems->Value(ind);
     Handle(TCollection_HAsciiString) name = item->Name();
-    os << "    " << name->ToCString() << " (me) returns " << item->CDLName()->ToCString() << ";" << std::endl;
-    os << "	---Purpose: Returns Value as " << name->ToCString() << " (or Null if another type)" << std::endl;
+    os << "  //! Returns Value as " << name->ToCString() << " (or Null if another type)" << std::endl;
+    os << "  Standard_EXPORT Handle(" << item->CPPName()->ToCString() << ") "  << name->ToCString() << "() const;" << std::endl;
     os << std::endl;
   }
-  //writes method set and get for enum , integer, real and string.
+
+  // writes method set and get for enum , integer, real and string.
   for (Standard_Integer i = 1; i <= seqMember->Length(); i++) {
     Standard_Integer ind = seqMember->Value(i);
     Handle(Express_Item) item = myItems->Value(ind);
     Handle(TCollection_HAsciiString) name = item->Name();
-    os << "    Set" << name->ToCString() << "(me: in out; aVal :" << item->CDLName()->ToCString()<<");"<< std::endl;
-    os << "	---Purpose: Set Value for " << name->ToCString() << std::endl;
+    os << "  //! Set Value for " << name->ToCString() << std::endl;
+    os << "  Standard_EXPORT void Set" << name->ToCString()
+       << " (const " << item->CPPName()->ToCString() << " theVal);"<< std::endl;
     os << std::endl;
-    os << "    " << name->ToCString() << " (me) returns " << item->CDLName()->ToCString() << ";" << std::endl;
-    os << "	---Purpose: Returns Value as " << name->ToCString() << " (or Null if another type)" << std::endl;
+    os << "  //! Returns Value as " << name->ToCString() << " (or Null if another type)" << std::endl;
+    os << "  " << item->CPPName()->ToCString() << " " << name->ToCString() << "() const;" << std::endl;
     os << std::endl;
   }
   
   // write end
-  os << "end " << Name()->ToCString() << ";" << std::endl;
+  os << "};" << std::endl;
+  os << "#endif // _" << CPPname->ToCString() << "_HeaderFile" << std::endl;
   os.close();
   
   //===============================
@@ -197,15 +213,20 @@ Standard_Boolean Express_Select::GenerateClass () const
   os.open ( pack.Cat ( ".cxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, CPPname, Standard_False );
+  Express::WriteFileStamp ( os );
 
   // write include section
-  os << "#include <" << CPPname->ToCString() << ".ixx>" << std::endl;
+  os << "#include <" << CPPname->ToCString() << ".hxx>" << std::endl;
   if(!seqMember->IsEmpty()) {
-    os << "#include <"<<CPPName()->ToCString()<<"Member.hxx>"<< std::endl;
+    os << "#include <" << CPPName()->ToCString() << "Member.hxx>"<< std::endl;
     os << "#include <TCollection_HAsciiString.hxx>"<< std::endl;
-    
   }
+  for (Standard_Integer i = 1; i <= seqEntities->Length(); i++)  {
+    Standard_Integer ind = seqEntities->Value(i);
+    os << "#include <" <<
+      myItems->Value(ind)->CPPName()->ToCString() << ".hxx>" << std::endl;
+  }
+
   // write constructor
   Express::WriteMethodStamp ( os, CPPname );
   os << CPPname->ToCString() << "::" << CPPname->ToCString() << " ()" << std::endl;
@@ -226,8 +247,8 @@ Standard_Boolean Express_Select::GenerateClass () const
     os << "  return 0;\n}" << std::endl;
   }
   else os << "  return 0;\n}" << std::endl;
+
   if(!seqMember->IsEmpty()) { //gka for AP209
-    
     //write CaseMem method
     Express::WriteMethodStamp ( os, new TCollection_HAsciiString ( "CaseMem" ) );
     os<<"Standard_Integer "<<CPPname->ToCString()<<"::CaseMem (const Handle(StepData_SelectMember)& ent) const"<< std::endl;
@@ -236,7 +257,7 @@ Standard_Boolean Express_Select::GenerateClass () const
     //os<<" Handle("<< CPPName()->ToCString()<<"Member sm = Handle("<<CPPName()->ToCString()<<"Member)::DownCast(ent);"<< std::endl; 
     //os<<" if(sm.IsNull()) return 0;"<< std::endl;
     //os<<" Handle(TCollection_HAsciiString) name;"<< std::endl;
-    for( j = 1; j<= seqMember->Length(); j++) {
+    for( int j = 1; j<= seqMember->Length(); j++) {
       Standard_Integer ind = seqMember->Value(j);
       //os<<"  name = new TCollection_HAsciiString(\""<<myNames->Value(ind)->ToCString()<<"\");"<< std::endl;
       if(j ==1)
@@ -375,10 +396,6 @@ Standard_Boolean Express_Select::GenerateClass () const
   Handle(TCollection_HAsciiString) MemberName = new TCollection_HAsciiString;
   MemberName->AssignCat(Name());
   MemberName->AssignCat("Member");
-  Handle(TCollection_HAsciiString) CDLname = new TCollection_HAsciiString;
-  CDLname->AssignCat(MemberName);
-  CDLname->AssignCat(" from ");
-  CDLname-> AssignCat(GetPackageName());
    // create a package directory (if not yet exist)
   OSD_Protection prot ( OSD_RX, OSD_RWX, OSD_RX, OSD_RX );
   TCollection_AsciiString pack = GetPackageName()->String();
@@ -387,44 +404,59 @@ Standard_Boolean Express_Select::GenerateClass () const
   dir.Build ( prot );
   pack += "/";
   pack += CPPname->String();
-  ///pack += "Member";
-  // Step 1: generating CDL
+  // Step 1: generating HXX
   
-  // Open CDL file 
-  std::ofstream os ( pack.Cat ( ".cdl" ).ToCString() );
+  // Open HXX file 
+  std::ofstream os ( pack.Cat ( ".hxx" ).ToCString() );
   // write header
-  Express::WriteFileStamp ( os, CPPname, Standard_True );
-  
+  Express::WriteFileStamp ( os );
+
+  // write start define
+  os << "#ifndef _" << CPPname->ToCString() << "_HeaderFile" << std::endl;
+  os << "#define _" << CPPname->ToCString() << "_HeaderFile" << std::endl;
+  os << std::endl;
+
+  // includes
+  os << "#include <Standard.hxx>" << std::endl;
+  os << "#include <Standard_Type.hxx>" << std::endl;
+  os << "#include <Standard_Boolean.hxx>" << std::endl;
+  os << "#include <Standard_CString.hxx>" << std::endl;
+  os << "#include <Standard_Integer.hxx>" << std::endl;
+  os << "#include <StepData_SelectNamed.hxx>" << std::endl;
+  os << std::endl;
+  os << "DEFINE_STANDARD_HANDLE(" << CPPname->ToCString() << ", StepData_SelectNamed)" << std::endl;
+  os << std::endl;
+
   // write start of declaration (inheritance)
-  os << "class " << CDLname->ToCString() << std::endl << "inherits SelectNamed from StepData";
-  os << std::endl << std::endl;
+  os << "  //! Representation of member for STEP SELECT type " << Name()->ToCString() << std::endl;
+  os << "class " << CPPname->ToCString() << " : public StepData_SelectNamed" << std::endl;
+  os << "{" << std::endl;
+  os << "public:" << std::endl;
   
-  os << "    ---Purpose: Representation of member for  STEP SELECT type " << Name()->ToCString() << std::endl;
-  os << std::endl;
-  
-   // write "is" section
-  os << "is" << std::endl;
-  os << "    Create returns " << CDLname->ToCString() << ";" << std::endl;
-  os << "	---Purpose: Empty constructor" << std::endl;
+   // write methods
+  os << "  //! Empty constructor" << std::endl;
+  os << "  Standard_EXPORT " << CPPname->ToCString() << "();" << std::endl;
   os << std::endl;
   
-  os << "    HasName (me) returns Boolean  is redefined;"<< std::endl;
-  os << "	---Purpose: Returns True if has name"<< std::endl;
+  os << "  //! Returns True if has name" << std::endl;
+  os << "  Standard_EXPORT virtual Standard_Boolean HasName() const Standard_OVERRIDE;" << std::endl;
   os << std::endl;
-  os << "    Name (me) returns CString  is redefined;"<< std::endl;
-  os << "	---Purpose: Returns set name "<< std::endl;
+  os << "  //! Returns set name" << std::endl;
+  os << "  Standard_EXPORT virtual Standard_CString Name() const Standard_OVERRIDE;" << std::endl;
   os << std::endl;
-  os << "    SetName (me : mutable; name : CString)  returns Boolean  is redefined;"<< std::endl;
-  os << "	---Purpose: Set name "<< std::endl;
+  os << "  //! Set name" << std::endl;
+  os << "  Standard_EXPORT virtual Standard_Boolean SetName(const Standard_CString name) Standard_OVERRIDE;" << std::endl;
   os << std::endl;
-  os << "    Matches (me; name : CString) returns Boolean  is redefined;"<< std::endl;
-  os << "	---Purpose : Tells if the name of a SelectMember matches a given one;"<< std::endl;
+  os << "  //! Tells if the name of a SelectMember matches a given one;" << std::endl;
+  os << "  Standard_EXPORT virtual Standard_Boolean Matches(const Standard_CString name) const Standard_OVERRIDE;" << std::endl;
   os << std::endl;
+
   //write fields
-  os<<"fields"<< std::endl<< std::endl;
-  os << "    mycase : Integer;"<< std::endl<< std::endl;
+  os <<"private:"<< std::endl;
+  os << "  Standard_Integer myCase;"<< std::endl<< std::endl;
   // write end
-  os << "end " << MemberName->ToCString()<< ";" << std::endl;
+  os << "};" << std::endl;
+  os << "#endif // _" << CPPname->ToCString() << "_HeaderFile" << std::endl;
   os.close();
 
   //===============================
@@ -433,21 +465,21 @@ Standard_Boolean Express_Select::GenerateClass () const
   os.open ( pack.Cat ( ".cxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, CPPname, Standard_False );
+  Express::WriteFileStamp ( os );
 
   // write include section
-  os << "#include <" << CPPname->ToCString() << ".ixx>" << std::endl;
-   os << "#include <TCollection_HAsciiString.hxx>"<< std::endl;
+  os << "#include <" << CPPname->ToCString() << ".hxx>" << std::endl;
+  os << "#include <TCollection_HAsciiString.hxx>"<< std::endl;
   // write constructor
   Express::WriteMethodStamp ( os, CPPname );
-  os << CPPname->ToCString() << "::" << CPPname->ToCString() << " () : mycase(0) " << std::endl;
+  os << CPPname->ToCString() << "::" << CPPname->ToCString() << " () : myCase(0) " << std::endl;
   os << "{" << std::endl << "}" << std::endl;
   
   //write method HasName
   Express::WriteMethodStamp ( os, new TCollection_HAsciiString ("HasName") );
   os<<"Standard_Boolean "<<CPPname->ToCString()<<"::HasName() const"<< std::endl;
   os << "{" << std::endl;
-  os<< " return mycase >0;"<< std::endl;
+  os<< " return myCase > 0;"<< std::endl;
   os<< "}" << std::endl;
   
   Standard_Boolean hasEnum = Standard_False;
@@ -455,19 +487,19 @@ Standard_Boolean Express_Select::GenerateClass () const
   Express::WriteMethodStamp ( os, new TCollection_HAsciiString ("Name") );
   os<<"Standard_CString "<<CPPname->ToCString()<<"::Name() const"<< std::endl;
   os << "{" << std::endl;
-  os << "  Handle(TCollection_HAsciiString) aname = new TCollection_HAsciiString;"<< std::endl;
-  os << "  switch(mycase)  {"<< std::endl;
+  os << "  Handle(TCollection_HAsciiString) aName = new TCollection_HAsciiString;"<< std::endl;
+  os << "  switch(myCase)  {"<< std::endl;
   Standard_Integer i = 1;
   for( i = 1; i <= seqMember->Length(); i++) {
     Standard_Integer ind = seqMember->Value(i);
     Handle(Express_Item) item = myItems->Value(ind);
     if(item->IsKind(STANDARD_TYPE(Express_Enum)))
       hasEnum = Standard_True;
-    os << "    case "<<i<<"  : aname->AssignCat(\""<<myNames->Value(ind)->ToCString()<<"\"); break;"<< std::endl;
+    os << "    case "<<i<<"  : aName->AssignCat(\""<<myNames->Value(ind)->ToCString()<<"\"); break;"<< std::endl;
   }
   os << "    default : break;"<< std::endl;
   os<<"  }"<< std::endl;
-  os<<"  return aname->ToCString();"<< std::endl;
+  os<<"  return aName->ToCString();"<< std::endl;
   os<< "}" << std::endl;
   
   //write static method for compare name
@@ -478,7 +510,7 @@ Standard_Boolean Express_Select::GenerateClass () const
   else
     os<<")"<< std::endl;
   os << "{" << std::endl;
-  os << "  Standard_Integer thecase =0;"<< std::endl;
+  os << "  Standard_Integer thecase = 0;"<< std::endl;
   os << "  if (!name || name[0] == \'/0\') thecase = 0;"<< std::endl;
   for( i = 1; i <= seqMember->Length(); i++) {
     Standard_Integer ind = seqMember->Value(i);
@@ -504,14 +536,14 @@ Standard_Boolean Express_Select::GenerateClass () const
   os<<"Standard_Boolean "<<CPPname->ToCString()<<"::SetName(const Standard_CString name) "<< std::endl;
   os << "{" << std::endl;
   if(hasEnum) {
-    os << "  Standard_Integer numit =0;"<< std::endl;
-    os << "  mycase = CompareNames(name,numit);"<< std::endl;
+    os << "  Standard_Integer numit = 0;"<< std::endl;
+    os << "  myCase = CompareNames(name,numit);"<< std::endl;
   
-    os << "  if(numit) SetInteger(numit);"<< std::endl;
+    os << "  if (numit) SetInteger(numit);"<< std::endl;
   }
   else
-    os << "  mycase = CompareNames(name);"<< std::endl;
-  os << "  return (mycase >0);"<< std::endl;
+    os << "  myCase = CompareNames(name);"<< std::endl;
+  os << "  return (myCase >0);"<< std::endl;
   
   os<< "}" << std::endl;
   //write method Matches
@@ -519,12 +551,12 @@ Standard_Boolean Express_Select::GenerateClass () const
   os<<"Standard_Boolean "<<CPPname->ToCString()<<"::Matches(const Standard_CString name) const"<< std::endl;
   os << "{" << std::endl;
   if(hasEnum) {
-    os << "  Standard_Integer numit =0;"<< std::endl;
-    os<< " Standard_Integer thecase =CompareNames(name,numit);"<< std::endl;
+    os << "  Standard_Integer numit = 0;"<< std::endl;
+    os<< " Standard_Integer thecase = CompareNames(name,numit);"<< std::endl;
   }
   else
-    os<< " Standard_Integer thecase =CompareNames(name);"<< std::endl;
-  os << "  return (thecase >0);"<< std::endl;
+    os<< " Standard_Integer thecase = CompareNames(name);"<< std::endl;
+  os << "  return (thecase > 0);"<< std::endl;
   os << "}" << std::endl;
   return Standard_True;
 }

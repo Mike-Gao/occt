@@ -72,11 +72,11 @@ private:
 
   typedef NCollection_DataMap<TCollection_AsciiString,Standard_Integer,TCollection_AsciiString> DataMapOfStringInteger;
   
-  //! Create CDL/CXX files from item
+  //! Create HXX/CXX files from item
   Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
   
-  //! Writes uses section of CDL
-  Standard_EXPORT   Standard_Boolean WriteUses (Standard_OStream& os, const Standard_Boolean start, DataMapOfStringInteger& dict)  const;
+  //! Writes includes section of HXX
+  Standard_EXPORT   Standard_Boolean WriteIncludes (Standard_OStream& os, DataMapOfStringInteger& dict)  const;
   
   //! Writes #include declarations for RW class
   Standard_EXPORT   void WriteRWInclude (Standard_OStream& os, DataMapOfStringInteger& dict)  const;
@@ -92,10 +92,11 @@ private:
   
   //! Writes arguments and code for method Init()
   //! Mode identifyes what code is being written:
-  //! 0 - CDL declaration
+  //! 0 - HXX declaration
   //! 1 - CXX declaration
   //! 2 - call (argument list)
   //! 3 - implementation
+  //! 4 - call (argument list for RW)
   Standard_EXPORT   Standard_Integer MakeInit (Standard_OStream& os, const Standard_Integer shift, const Standard_Integer own, const Standard_Integer mode)  const;
 
   Handle(TColStd_HSequenceOfHAsciiString) mySupers;

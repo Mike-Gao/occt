@@ -29,9 +29,6 @@ public:
   //! Returns CPP-style name of the type
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const = 0;
   
-  //! Returns CDL-style name of the type
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const = 0;
-  
   //! Return True if type is defined in package Standard (False by default)
   Standard_EXPORT virtual   Standard_Boolean IsStandard()  const;
   

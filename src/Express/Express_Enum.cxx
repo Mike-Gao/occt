@@ -59,18 +59,29 @@ Standard_Boolean Express_Enum::GenerateClass () const
   OSD_Directory dir ( path );
   dir.Build ( prot );
   pack += "/";
-  pack += GetPackageName()->String();
+  pack += CPPName()->String();
   
-  // Open CDL file 
-  std::ofstream os ( pack.Cat ( ".cdl" ).ToCString(), std::ios::out | std::ios::ate );
+  // Open HXX file 
+  std::ofstream os ( pack.Cat ( ".hxx" ).ToCString(), std::ios::out | std::ios::ate );
 
-  os << std::endl << "    enumeration " << Name()->ToCString() << " is " << std::endl;
+  // write header
+  Express::WriteFileStamp(os);
+
+  // write defines
+  os << "#ifndef _" << CPPName()->ToCString() << "_HeaderFile" << std::endl;
+  os << "#define _" << CPPName()->ToCString() << "_HeaderFile" << std::endl;
+
+  os << std::endl << "enum " << CPPName()->ToCString() << std::endl;
+  os << "{" << std::endl;
   Handle(TCollection_HAsciiString) prefix = Express::EnumPrefix(Name());
-  for ( Standard_Integer i=1; i <= myNames->Length(); i++ ) {
-    if ( i >1 ) os << "," << std::endl;
-    os << "	" << prefix->ToCString()<<myNames->Value(i)->ToCString();
+  for ( Standard_Integer i = 1; i <= myNames->Length(); i++ ) {
+    if ( i > 1 ) os << "," << std::endl;
+    os << "  " <<  GetPackageName()->ToCString() << "_" << prefix->ToCString()
+       << myNames->Value(i)->ToCString();
   }
-  os << std::endl << "    end;" << std::endl;
+
+  os << std::endl << "};" << std::endl;
+  os << "#endif // _" << CPPName()->ToCString() << "_HeaderFile" << std::endl;
   os.close();
   
   return Standard_False;

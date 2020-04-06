@@ -34,7 +34,7 @@ public:
   //! Returns names of enumeration variants
   Standard_EXPORT  const  Handle(TColStd_HSequenceOfHAsciiString)& Names()  const;
   
-  //! Create CDL/CXX files from item
+  //! Create HXX/CXX files from item
   Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
 
 

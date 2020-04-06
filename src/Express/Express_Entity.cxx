@@ -117,7 +117,7 @@ static void WriteGetMethod (Standard_OStream &os,
   Express::WriteMethodStamp ( os, method );
   os << ( isHandle ? "Handle(" : "" ) << type->ToCString() << ( isHandle ? ") " : " " ) <<
 	name->ToCString() << "::" << method->ToCString() << " () const" << std::endl;
-  os << "{" << std::endl << "  return the" << field->ToCString() << ";\n}" << std::endl;
+  os << "{" << std::endl << "  return my" << field->ToCString() << ";\n}" << std::endl;
 }
 
 //=======================================================================
@@ -137,8 +137,8 @@ static void WriteSetMethod (Standard_OStream &os,
   Express::WriteMethodStamp ( os, method );
   os << "void " << name->ToCString() << "::" << method->ToCString() << " (const " <<
         ( isHandle ? "Handle(" : "" ) << type->ToCString() << ( isHandle ? ")" : "" ) <<
-	" " << ( isSimple ? "" : "&" ) << "a" << field->ToCString() << ")" << std::endl;
-  os << "{" << std::endl << "  the" << field->ToCString() << " = a" << field->ToCString() << ";\n}" << std::endl;
+    ( isSimple ? "" : "&" ) << " the" << field->ToCString() << ")" << std::endl;
+  os << "{" << std::endl << "  my" << field->ToCString() << " = the" << field->ToCString() << ";\n}" << std::endl;
 }
 
 //=======================================================================
@@ -159,11 +159,10 @@ static inline void WriteSpaces (Standard_OStream &os, Standard_Integer num)
 Standard_Boolean Express_Entity::GenerateClass () const
 {
   Handle(TCollection_HAsciiString) CPPname = CPPName();
-  Handle(TCollection_HAsciiString) CDLname = CDLName();
   std::cout << "Generating ENTITY " << CPPname->ToCString() << std::endl;
   
   // create a package directory (if not yet exist)
-  OSD_Protection prot ( OSD_RX, OSD_RWX, OSD_RX, OSD_RX );
+  OSD_Protection prot(OSD_RWXD, OSD_RWXD, OSD_RWXD, OSD_RWXD);
   TCollection_AsciiString pack = GetPackageName()->String();
   OSD_Path path ( pack );
   OSD_Directory dir ( path );
@@ -172,47 +171,58 @@ Standard_Boolean Express_Entity::GenerateClass () const
   pack += CPPname->String();
   
   //===============================
-  // Step 1: generating CDL
+  // Step 1: generating HXX
   
-  // Open CDL file 
-  std::ofstream os ( pack.Cat ( ".cdl" ).ToCString() );
+  // Open HXX file 
+  std::ofstream os ( pack.Cat ( ".hxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, CPPname, Standard_True );
+  Express::WriteFileStamp ( os );
 
-  // write start of declaration (inheritance)
-  os << "class " << CDLname->ToCString() << std::endl << "inherits ";
-  if ( myInherit->Length() >0 ) { // first inherited class will be actually inherited
+  Handle(TCollection_HAsciiString) InheritName = new TCollection_HAsciiString("Standard_Transient");
+  if (myInherit->Length() > 0) { // first inherited class will be actually inherited
     Handle(Express_Entity) it = myInherit->Value(1);
-    it->Use ( GetPackageName() );
-    os << it->CDLName()->ToCString();
-    if ( myInherit->Length() >1 ) {
+    it->Use(GetPackageName());
+    InheritName = it->CPPName();
+    if (myInherit->Length() > 1) {
       std::cout << "Warning: ENTITY " << Name()->ToCString() << " defined with multiple inheritance;" << std::endl;
       std::cout << "Warning: only first base class is actually inherited, others are made fields" << std::endl;
     }
   }
-  else os << "TShared from MMgt";
-  os << std::endl << std::endl;
-  
-  os << "    ---Purpose: Representation of STEP entity " << Name()->ToCString() << std::endl;
+
+  os << "#ifndef _" << CPPname->ToCString() << "_HeaderFile_" << std::endl;
+  os << "#define _" << CPPname->ToCString() << "_HeaderFile_" << std::endl;
+  os << std::endl;
+  os << "#include <Standard.hxx>" << std::endl;
+  os << "#include <Standard_Type.hxx>" << std::endl;
+  os << "#include <" << InheritName->ToCString() << ".hxx>" << std::endl;
   os << std::endl;
   
-  // write "uses" section (also creates all used types)
+  // write includes section (also creates all used types)
   DataMapOfStringInteger dict;
-  if ( ! WriteUses ( os, Standard_True, dict ) ) os << std::endl << std::endl;
-    
-  // start 'is' section
-  os << "is" << std::endl;
-  os << "    Create returns " << CDLname->ToCString() << ";" << std::endl;
-  os << "	---Purpose: Empty constructor" << std::endl;
+  WriteIncludes(os, dict);
+  os << std::endl;
+
+  os << "DEFINE_STANDARD_HANDLE(" << CPPname->ToCString() << ", " << InheritName->ToCString() << ")" << std::endl;
+  os << std::endl;
+
+  // write start of declaration (inheritance)
+  os << "//! Representation of STEP entity " << Name()->ToCString() << std::endl;
+  os << "class " << CPPname->ToCString() << " : public " << InheritName->ToCString();
+  os << std::endl << "{" << std::endl;
+  os << "public :" << std::endl << std::endl;
+  
+  // write constructor
+  os << "  //! default constructor" << std::endl;
+  os << "  Standard_EXPORT " << CPPname->ToCString() << "();" << std::endl;
   os << std::endl;
   
   // write Init methods
-  if ( myInherit->Length() >1 || myFields->Length() >0 ) {
-    os << "    Init (me: mutable; ";
-    MakeInit ( os, 23, Standard_True, 0 );
+  if ( myInherit->Length() > 1 || myFields->Length() > 0 ) {
+    os << "  //! Initialize all fields (own and inherited)" << std::endl;
+    os << " Standard_EXPORT void Init(";
+    MakeInit ( os, 27, Standard_True, 0 );
     os << ");" << std::endl;
-    os << "	---Purpose: Initialize all fields (own and inherited)" << std::endl;
     os << std::endl;
   }
   
@@ -220,58 +230,70 @@ Standard_Boolean Express_Entity::GenerateClass () const
   for ( Standard_Integer i=2; i <= myInherit->Length(); i++ ) {
     Handle(Express_Entity) it = myInherit->Value(i);
     Handle(TCollection_HAsciiString) name = it->Name();
-    Handle(TCollection_HAsciiString) str = it->CDLName();
-    os << "    " << name->ToCString() << " (me) returns " << str->ToCString() << ";" << std::endl;
-    os << "	---Purpose: Returns data for supertype " << name->ToCString() << std::endl;
-    os << "    Set" << name->ToCString() << " (me: mutable; " << name->ToCString() << ": " << str->ToCString() << ");" << std::endl;
-    os << "	---Purpose: Set data for supertype " << name->ToCString() << std::endl;
+    os << "  //! Returns data for supertype " << name->ToCString() << std::endl;
+    os << "  Standard_EXPORT Handle(" << it->CPPName()->ToCString()
+       << ") " << name->ToCString() << "() const;" << std::endl;
+    os << "  //! Sets data for supertype " << name->ToCString() << std::endl;
+    os << "  Standard_EXPORT void Set" << name->ToCString() 
+       << " (const Handle(" << it->CPPName()->ToCString() << ")& the"<< name->ToCString() << ");" << std::endl;
     os << std::endl;
   }
-  for (Standard_Integer i=1; i <= myFields->Length(); i++ ) {
-    Handle(Express_Field) field = myFields->Value ( i );
-    Handle(TCollection_HAsciiString) str = field->Type()->CDLName();
-    os << "    " << field->Name()->ToCString() << " (me) returns " << str->ToCString() << ";" << std::endl;
-    os << "	---Purpose: Returns field " << field->Name()->ToCString() << std::endl;
-    os << "    Set" << field->Name()->ToCString() << " (me: mutable; " << 
-          field->Name()->ToCString() << ": " << str->ToCString() << ");" << std::endl;
-    os << "	---Purpose: Set field " << field->Name()->ToCString() << std::endl;
-    if ( field->IsOptional() ) {
-      os << "    Has" << field->Name()->ToCString() << " (me) returns Boolean;" << std::endl;
-      os << "	---Purpose: Returns True if optional field " << field->Name()->ToCString() << " is defined" << std::endl;
-//      os << "	---C++: return &" << std::endl;
+  for (Standard_Integer i = 1; i <= myFields->Length(); i++) {
+    Handle(Express_Field) field = myFields->Value(i);
+    os << "  //! Returns field " << field->Name()->ToCString() << std::endl;
+    if (field->Type()->IsHandle())
+      os << "  Standard_EXPORT Handle(" << field->Type()->CPPName()->ToCString() << ") "
+         << field->Name()->ToCString() << "() const;" << std::endl;
+    else
+      os << "  Standard_EXPORT " << field->Type()->CPPName()->ToCString() << " "
+         << field->Name()->ToCString() << "() const;" << std::endl;
+    os << "  //! Sets field " << field->Name()->ToCString() << std::endl;
+    if (field->Type()->IsHandle())
+      os << "  Standard_EXPORT void Set" << field->Name()->ToCString() << " (const Handle("
+        << field->Type()->CPPName()->ToCString() << ")& the" << field->Name()->ToCString() << ");" << std::endl;
+    else
+      os << "  Standard_EXPORT void Set" << field->Name()->ToCString() << " (const "
+         << field->Type()->CPPName()->ToCString() << " the" << field->Name()->ToCString() << ");" << std::endl;
+    if (field->IsOptional()) {
+      os << "  //! Returns True if optional field " << field->Name()->ToCString() << " is defined" << std::endl;
+      os << "  Standard_EXPORT Standard_Boolean Has" << field->Name()->ToCString() << "() const;" << std::endl;
+    }
+    os << std::endl;
+  }
+
+  os << "DEFINE_STANDARD_RTTIEXT(" << CPPname->ToCString() << ", " << InheritName->ToCString() << ")" << std::endl;
+  os << std::endl;
+
+  // write fields section
+  if ( myInherit->Length() >1 || myFields->Length() >0 ) {
+    os << "private:" << std::endl;
+    for (Standard_Integer i = 2; i <= myInherit->Length(); i++) {
+      Handle(Express_Entity) it = myInherit->Value(i);
+      Handle(TCollection_HAsciiString) name = it->Name();
+      os << "  Handle(" << it->CPPName()->ToCString() << ") my" << name->ToCString() << "; //!< supertype" << std::endl;
+    }
+    for (Standard_Integer i = 1; i <= myFields->Length(); i++) {
+      Handle(Express_Field) field = myFields->Value(i);
+      if (field->Type()->IsHandle())
+        os << "  Handle(" << field->Type()->CPPName()->ToCString() << ") my" << field->Name()->ToCString() << ";";
+      else
+        os << "  " << field->Type()->CPPName()->ToCString() << " my" << field->Name()->ToCString() << ";";
+      if (field->IsOptional()) os << " //!< optional";
+      os << std::endl;
+    }
+    // optional fields: flag 'is field set'
+    for (Standard_Integer i = 1; i <= myFields->Length(); i++) {
+      Handle(Express_Field) field = myFields->Value(i);
+      if (!field->IsOptional()) continue;
+      os << "  Standard_Boolean def" << field->Name()->ToCString() << "; //!< flag \"is " <<
+        field->Name()->ToCString() << " defined\"" << std::endl;
     }
     os << std::endl;
   }
   
-  // write fields section
-  if ( myInherit->Length() >1 || myFields->Length() >0 ) {
-    os << "fields" << std::endl;
-    for (Standard_Integer i=2; i <= myInherit->Length(); i++ ) {
-      Handle(Express_Entity) it = myInherit->Value(i);
-      Handle(TCollection_HAsciiString) name = it->Name();
-      Handle(TCollection_HAsciiString) str = it->CDLName();
-      os << "    the" << it->Name()->ToCString() << ": " <<
-	    it->CDLName()->ToCString() << "; -- supertype" << std::endl;
-    }
-    for (Standard_Integer i=1; i <= myFields->Length(); i++ ) {
-      Handle(Express_Field) field = myFields->Value ( i );
-      os << "    the" << field->Name()->ToCString() << ": " << 
-	    field->Type()->CDLName()->ToCString() << ";";
-      if ( field->IsOptional() ) os << " -- optional";
-      os << std::endl;
-    }
-    // optional fields: flag 'is field set'
-    for (Standard_Integer i=1; i <= myFields->Length(); i++ ) {
-      Handle(Express_Field) field = myFields->Value ( i );
-      if ( ! field->IsOptional() ) continue;
-      os << "    def" << field->Name()->ToCString() << ": Boolean; -- flag \"is " << 
-	    field->Name()->ToCString() << " defined\"" << std::endl;
-    }
-    os << std::endl;
-  }
-      
   // write end
-  os << "end " << Name()->ToCString() << ";" << std::endl;
+  os << "};" << std::endl;
+  os << "#endif // _" << CPPname->ToCString() << "_HeaderFile_" << std::endl;
   os.close();
   
   //===============================
@@ -281,10 +303,12 @@ Standard_Boolean Express_Entity::GenerateClass () const
   os.open ( pack.Cat ( ".cxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, CPPname, Standard_False );
+  Express::WriteFileStamp ( os );
 
   // write include section
-  os << "#include <" << CPPname->ToCString() << ".ixx>" << std::endl;
+  os << "#include <" << CPPname->ToCString() << ".hxx>" << std::endl;
+  os << std::endl;
+  os << "IMPLEMENT_STANDARD_RTTIEXT(" << CPPname->ToCString() << ", " << InheritName->ToCString() << ")" << std::endl;
   
   // write constructor
   Express::WriteMethodStamp ( os, CPPname );
@@ -329,17 +353,13 @@ Standard_Boolean Express_Entity::GenerateClass () const
   os.close();
   if(AbstractFlag()) return Standard_True;  
   //===============================
-  // Step 3: generating CDL for Reader/Writer class
+  // Step 3: generating HXX for Reader/Writer class
   
-  // Open CDL file 
+  // Open HXX file 
   Handle(TCollection_HAsciiString) RWCPPName = new TCollection_HAsciiString ( "RW" );
   RWCPPName->AssignCat ( GetPackageName() );
   RWCPPName->AssignCat ( "_RW" );
   RWCPPName->AssignCat ( Name() );
-  Handle(TCollection_HAsciiString) RWCDLName = new TCollection_HAsciiString ( "RW" );
-  RWCDLName->AssignCat ( Name() );
-  RWCDLName->AssignCat ( " from RW" );
-  RWCDLName->AssignCat ( GetPackageName() );
 
   pack = "RW";
   pack += GetPackageName()->String();
@@ -349,61 +369,52 @@ Standard_Boolean Express_Entity::GenerateClass () const
   pack += "/";
   pack += RWCPPName->String();
   
-  os.open ( pack.Cat ( ".cdl" ).ToCString() );
+  os.open ( pack.Cat ( ".hxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, RWCPPName, Standard_True );
+  Express::WriteFileStamp ( os );
+
+  os << "#ifndef _" << RWCPPName->ToCString() << "_HeaderFile_" << std::endl;
+  os << "#define _" << RWCPPName->ToCString() << "_HeaderFile_" << std::endl;
+  os << std::endl;
+
+  // write insludes
+  os << "#include <Standard.hxx>" << std::endl;
+  os << "#include <Standard_DefineAlloc.hxx>" << std::endl;
+  os << "#include <Standard_Handle.hxx>" << std::endl;
+  os << std::endl;
+  os << "class StepData_StepReaderData;" << std::endl;
+  os << "class Interface_Check;" << std::endl;
+  os << "class StepData_StepWriter;" << std::endl;
+  os << "class Interface_EntityIterator;" << std::endl;
+  os << "class " << CPPName()->ToCString() << ";" << std::endl;
+  os << std::endl;
 
   // write start of declaration (inheritance)
-  os << "class " << RWCDLName->ToCString() << "  inherits RWClass from StepData" << std::endl << std::endl;
-  
-  os << "    ---Purpose: Read & Write tool for " << Name()->ToCString() << std::endl;
-  os << std::endl;
-  
-  // write "uses" section
-  os << "uses" << std::endl;
-  os << "    Check from Interface," << std::endl;
-  os << "    StepWriter from StepData," << std::endl;
-  os << "    StepReaderData from StepData," << std::endl;
-  os << "    EntityIterator from Interface," << std::endl;
-  os << "    InterfaceModel from Interface," << std::endl;
-  os << "    ShareTool from Interface," << std::endl;
-  os << "    " << CDLname->ToCString() << std::endl;
-  os << std::endl;
+  os << "//! Read & Write tool for " << Name()->ToCString() << std::endl;
+  os << "class " << RWCPPName->ToCString() << std::endl;
+  os << "{" << std::endl;
+  os << "public:" << std::endl;
+  os << std::endl << "  DEFINE_STANDARD_ALLOC" << std::endl << std::endl;
 
-  // write "is" section
-  os << "is" << std::endl;
-  os << "    New(me) returns Transient;"<< std::endl; // << RWCDLName->ToCString() << ";" << std::endl;
-  os << "	---Purpose: Returns new entity " << RWCDLName->ToCString()<< std::endl;
-  os << std::endl;
-  os << "    ReadStep (me; data: StepReaderData from StepData; num: Integer;" << std::endl;
-  os << "                  ach : in out Check from Interface;" << std::endl;
-  os << "                  entt : Transient);" << std::endl;
-  os << "	---Purpose: Reads " << Name()->ToCString() << std::endl;
-  os << std::endl;
-  os << "    WriteStep (me; SW: in out StepWriter from StepData;" << std::endl;
-  os << "                   entt: Transient);" << std::endl;
-  os << "	---Purpose: Writes " << Name()->ToCString() << std::endl;
-  os << std::endl;
-  os << "    Share (me; entt : Transient;" << std::endl;
-  os << "               iter: in out EntityIterator from Interface);" << std::endl;
-  os << "	---Purpose: Fills data for graph (shared items)" << std::endl;
-  if(CheckFlag()) {
-     os << "    Check (me; entt : Transient;" << std::endl;
-     os << "               shares : ShareTool from Interface;" << std::endl;
-     os << "               ach : in out Check from Interface) is redefined;" << std::endl;
-     os << "	---Purpose: Check data for entity " << std::endl;
-    }
-  if(FillSharedFlag()) {
-     os << "    Share (me;   model : InterfaceModel from Interface;" << std::endl;
-     os << "               entt : Transient;" << std::endl;
-     os << "               iter: in out EntityIterator from Interface) is redefined;" << std::endl;
-     os << "	---Purpose: Shared data for entity " << std::endl;
-  }
-  os << std::endl;
+  // default constructor
+  os << "  Standard_EXPORT " << RWCPPName->ToCString() << "();" << std::endl << std::endl;
+
+  // read step
+  os << "  Standard_EXPORT void ReadStep(const Handle(StepData_StepReaderData)& data, const Standard_Integer num, Handle(Interface_Check)& ach, const Handle(" <<
+    CPPName()->ToCString() << ")& ent) const;" << std::endl << std::endl;
+
+  // write step
+  os << "  Standard_EXPORT void WriteStep(StepData_StepWriter& SW, const Handle(" <<
+    CPPName()->ToCString() << ")& ent) const;" << std::endl << std::endl;
+
+  // share
+  os << "  Standard_EXPORT void Share(const Handle(" <<
+    CPPName()->ToCString() << ")& ent, Interface_EntityIterator& iter) const;" << std::endl << std::endl;
 
   // write end
-  os << "end RW" << Name()->ToCString() << ";" << std::endl;
+  os << "};" << std::endl;
+  os << "#endif // _" << RWCPPName->ToCString() << "_HeaderFile_" << std::endl;
   os.close();
   
   //===============================
@@ -413,19 +424,20 @@ Standard_Boolean Express_Entity::GenerateClass () const
   os.open ( pack.Cat ( ".cxx" ).ToCString() );
 
   // write header
-  Express::WriteFileStamp ( os, RWCPPName, Standard_False );
+  Express::WriteFileStamp ( os );
 
   // write include section
-  os << "#include <" << RWCPPName->ToCString() << ".ixx>" << std::endl;
-  WriteRWInclude ( os, dict );
+  os << "#include <Interface_EntityIterator.hxx>" << std::endl;
+  os << "#include <StepData_StepReaderData.hxx>" << std::endl;
+  os << "#include <StepData_StepWriter.hxx>" << std::endl;
+  os << "#include <" << RWCPPName->ToCString() << ".hxx>" << std::endl;
+  dict.Clear();
   os << "#include <" << CPPname->ToCString() << ".hxx>" << std::endl;
-  // write method New
+  dict.Bind(CPPname->ToCString(), 1);
+  WriteRWInclude ( os, dict );
+  // write constructor
   Express::WriteMethodStamp ( os, RWCPPName );
-  os << "Handle(Standard_Transient) " << RWCPPName->ToCString() << "::" << "New () const" << std::endl;
-  os << "{" << std::endl;
-  os << "  Handle("<<RWCPPName->ToCString()<<") newRW = new " <<RWCPPName->ToCString()<<";"<< std::endl;
-  os << "  return newRW;"<< std::endl;
-  os << "}" << std::endl;
+  os << RWCPPName->ToCString() << "::" << RWCPPName->ToCString() << "() {}" << std::endl << std::endl;
 
   // write method ReadStep
   Express::WriteMethodStamp ( os, new TCollection_HAsciiString ( "ReadStep" ) );
@@ -433,13 +445,11 @@ Standard_Boolean Express_Entity::GenerateClass () const
   WriteSpaces ( os, 17 + RWCPPName->Length() );
   os << "const Standard_Integer num," << std::endl;
   WriteSpaces ( os, 17 + RWCPPName->Length() );
-  os << "Interface_Check& ach," << std::endl;
+  os << "Handle(Interface_Check)& ach," << std::endl;
   WriteSpaces ( os, 17 + RWCPPName->Length() );
-  os << "const Handle(Standard_Transient) &entt) const" << std::endl;
+  os << "const Handle(" << CPPname->ToCString() << ")& ent) const" << std::endl;
   os << "{" << std::endl;
   Standard_Integer nbFld = NbFields ( Standard_True );
-  //DownCast entity to it's type
-  os<<"  Handle("<<CPPname->ToCString() << ") ent = Handle("<<CPPname->ToCString() <<")::DownCast(entt);"<< std::endl;
   
   os << "  // Check number of parameters" << std::endl;
   os << "  if ( ! data->CheckNbParams(num," << nbFld << ",ach,\"" << 
@@ -448,33 +458,30 @@ Standard_Boolean Express_Entity::GenerateClass () const
   os << std::endl;
   os << "  // Initialize entity" << std::endl;
   os << "  ent->Init(";
-  MakeInit ( os, 12, Standard_True, 2 );
+  MakeInit ( os, 12, Standard_True, 4 );
   os << ");\n}" << std::endl;
 
   // write method WriteStep
   Express::WriteMethodStamp ( os, new TCollection_HAsciiString ( "WriteStep" ) );
   os << "void " << RWCPPName->ToCString() << "::WriteStep (StepData_StepWriter& SW," << std::endl;
   WriteSpaces ( os, 18 + RWCPPName->Length() );
-  os << "const Handle(Standard_Transient) &entt) const" << std::endl;
+  os << "const Handle(" << CPPname->ToCString() << ")& ent) const" << std::endl;
   os << "{" << std::endl;
-  //DownCast entity to it's type
-  os<<"  Handle("<<CPPname->ToCString() << ") ent = Handle("<<CPPname->ToCString() <<")::DownCast(entt);"<< std::endl;
   
   WriteRWWriteCode ( os, 0, Standard_True ); // write code for writing inherited and own fields
   os << "}" << std::endl;
 
   // write method Share
   Express::WriteMethodStamp ( os, new TCollection_HAsciiString ( "Share" ) );
-  os << "void " << RWCPPName->ToCString() << "::Share (const Handle(Standard_Transient) &entt," << std::endl;
+  os << "void " << RWCPPName->ToCString() << "::Share (const Handle(" << CPPname->ToCString() << ")& ent," << std::endl;
   WriteSpaces ( os, 14 + RWCPPName->Length() );
   os << "Interface_EntityIterator& iter) const" << std::endl;
   os << "{" << std::endl;
-  os<<"  Handle("<<CPPname->ToCString() << ") ent = Handle("<<CPPname->ToCString() <<")::DownCast(entt);"<< std::endl;
   WriteRWShareCode ( os, 1, Standard_True ); // write code for filling graph of references
   os << "}" << std::endl;
   if(CheckFlag()) {
     Express::WriteMethodStamp ( os, new TCollection_HAsciiString ( "Check" ) );
-    os << "void " << RWCPPName->ToCString() << "::Check(const Handle(Standard_Transient) &entt," << std::endl;
+    os << "void " << RWCPPName->ToCString() << "::Check(const Handle(Standard_Transient)& entt," << std::endl;
     WriteSpaces ( os, 18 + RWCPPName->Length() );
     os << "const Interface_ShareTool& shares,"<< std::endl;
     WriteSpaces ( os, 18 + RWCPPName->Length() );
@@ -488,7 +495,7 @@ Standard_Boolean Express_Entity::GenerateClass () const
     Express::WriteMethodStamp ( os, new TCollection_HAsciiString ( "FillShared" ) );
     os << "void " << RWCPPName->ToCString() << "::Share(const Handle(Interface_InterfaceModel)& model," << std::endl;
     WriteSpaces ( os, 18 + RWCPPName->Length() );
-    os << "const Handle(Standard_Transient) &entt,"<< std::endl;
+    os << "const Handle(Standard_Transient)& entt,"<< std::endl;
     WriteSpaces ( os, 18 + RWCPPName->Length() );
     os << "Interface_EntityIterator& iter) const"<< std::endl;
     os << "{" << std::endl;
@@ -499,77 +506,133 @@ Standard_Boolean Express_Entity::GenerateClass () const
   
   // close
   os.close();
-  //adding method for registartion of entities and include in the two files
+
+  //===============================
+  // Step 5: adding method for registartion of entities and include
   
-  TCollection_AsciiString packname = GetPackageName()->String();
-  OSD_Path path_reg ( packname );
-  OSD_Directory dir_reg ( packname );
+  Standard_Integer anIndex = Express_Item::Index();
+  TCollection_AsciiString regDir = "Registration";
+  OSD_Path path_reg(regDir);
+  OSD_Directory dir_reg(regDir);
   dir_reg.Build ( prot );
+  regDir += "/";
   
-  TCollection_AsciiString packname_inc = packname +".cxx_inc"; 
-  TCollection_AsciiString packname_rec = packname + ".cxx_reg";
-  packname += "/";
-  //write file with includes for registration
-  os.open(packname.Cat(packname_inc).ToCString(),std::ios::app);
-    os <<"#include <" << RWCPPName->ToCString() << ".hxx>" << std::endl;
-    os.close();
-  
-  //write file with registration
-  os.open(packname.Cat(packname_rec).ToCString(),std::ios::app);
-  os<<"  //Registration class "<<CPPname->ToCString()<< std::endl;
-  os<<"  stepname = "<<"\""<<CPPname->ToCString()<<"\""<<";"<< std::endl;
-  if(!ShortName().IsNull() && ShortName()->Length() >0) {
-    os<<"  shortname = "<<"\""<<ShortName()->ToCString()<<"\""<<";"<< std::endl;
-  }
-  if(!Category().IsNull() && Category()->Length() >0)
-    os<<"   category = "<<"Interface_Category::Number(\""<<Category()->ToCString()<<"\");"<< std::endl;
-  else 
-    os<<"   category = vcateg;"<< std::endl;
-//PDN modification of $ on handles
-//  os<<"  Handle(" << RWCPPName->ToCString()<<")& rwclass = new "<<RWCPPName->ToCString()<<";"<< std::endl;
-//  os<<"  Protocol->RegisterEntity(stepname,shortname,category,rwclass);"<< std::endl<< std::endl;
-  os<<"  Protocol->RegisterEntity(stepname,shortname,category,new "<<RWCPPName->ToCString()<<");"<< std::endl;
-  os<<"  shortname.Clear();"<< std::endl<< std::endl;
+  TCollection_AsciiString packname_inc = "inc.txt";
+  TCollection_AsciiString packname_rwinc = "rwinc.txt";
+  // write file with includes
+  os.open(regDir.Cat(packname_inc).ToCString(), std::ios::app);
+  os <<"#include <" << CPPName()->ToCString() << ".hxx>" << std::endl;
   os.close();
+  // write file with RW includes
+  os.open(regDir.Cat(packname_rwinc).ToCString(), std::ios::app);
+  os << "#include <" << RWCPPName->ToCString() << ".hxx>" << std::endl;
+  os.close();
+
+  // generate data for entity registration
+  if (anIndex > 0) {
+    // StepAP214_Protocol.cxx
+    TCollection_AsciiString packname_protocol = "protocol.txt";
+    os.open(regDir.Cat(packname_protocol).ToCString(), std::ios::app);
+    os << "types.Bind(STANDARD_TYPE(" << CPPName()->ToCString() << "), " << anIndex << ");" << std::endl;
+    os.close();
+    // RWStepAP214_GeneralModule.cxx
+    // FillSharedCase
+    TCollection_AsciiString packname_fillshared = "fillshared.txt";
+    os.open(regDir.Cat(packname_fillshared).ToCString(), std::ios::app);
+    os << "  case " << anIndex << ":" << std::endl;
+    os << "  {" << std::endl;
+    os << "    DeclareAndCast(" << CPPName()->ToCString() << ", anent, ent);" << std::endl;
+    os << "    " << RWCPPName->ToCString() << " tool;" << std::endl;
+    os << "    tool.Share(anent, iter);" << std::endl;
+    os << "  }" << std::endl;
+    os << "  break;" << std::endl;
+    os.close();
+    // NewVoid
+    TCollection_AsciiString packname_newvoid = "newvoid.txt";
+    os.open(regDir.Cat(packname_newvoid).ToCString(), std::ios::app);
+    os << "  case " << anIndex << ":" << std::endl;
+    os << "    ent = new " << CPPName()->ToCString() << ";" << std::endl;
+    os << "  break;" << std::endl;
+    os.close();
+    // CategoryNumber
+    TCollection_AsciiString packname_category = "category.txt";
+    os.open(regDir.Cat(packname_category).ToCString(), std::ios::app);
+    os << "  case " << anIndex << ": return " << Category()->ToCString() << ";" << std::endl;
+    os.close();
+    // RWStepAP214_ReadWriteModule.cxx
+    // Reco
+    Handle(TCollection_HAsciiString) recoName = Express::ToStepName(Name());
+    recoName->UpperCase();
+    TCollection_AsciiString packname_reco = "reco.txt";
+    os.open(regDir.Cat(packname_reco).ToCString(), std::ios::app);
+    os << "  static TCollection_AsciiString Reco_" << Name()->ToCString() << "(\""
+       << recoName->ToCString() << "\");" << std::endl;
+    os.close();
+    //type bind
+    TCollection_AsciiString packname_typebind = "typebind.txt";
+    os.open(regDir.Cat(packname_typebind).ToCString(), std::ios::app);
+    os << "  typenums.Bind(Reco_" << Name()->ToCString() << ", " << anIndex << ");" << std::endl;
+    os.close();
+    // StepType
+    TCollection_AsciiString packname_steptype = "steptype.txt";
+    os.open(regDir.Cat(packname_steptype).ToCString(), std::ios::app);
+    os << "  case " << anIndex << ": return Reco_" << Name()->ToCString() << ";" << std::endl;
+    os.close();
+    // ReadStep
+    TCollection_AsciiString packname_readstep = "readstep.txt";
+    os.open(regDir.Cat(packname_readstep).ToCString(), std::ios::app);
+    os << "  case " << anIndex << ":" << std::endl;
+    os << "  {" << std::endl;
+    os << "    DeclareAndCast(" << CPPName()->ToCString() << ", anent, ent);" << std::endl;
+    os << "    " << RWCPPName->ToCString() << " tool;" << std::endl;
+    os << "    tool.ReadStep(data, num, ach, anent);" << std::endl;
+    os << "  }" << std::endl;
+    os << "  break;" << std::endl;
+    os.close();
+    // WriteStep
+    TCollection_AsciiString packname_writestep = "writestep.txt";
+    os.open(regDir.Cat(packname_writestep).ToCString(), std::ios::app);
+    os << "  case " << anIndex << ":" << std::endl;
+    os << "  {" << std::endl;
+    os << "    DeclareAndCast(" << CPPName()->ToCString() << ", anent, ent);" << std::endl;
+    os << "    " << RWCPPName->ToCString() << " tool;" << std::endl;
+    os << "    tool.WriteStep(SW, anent);" << std::endl;
+    os << "  }" << std::endl;
+    os << "  break;" << std::endl;
+    os.close();
+    Express_Item::SetIndex(anIndex + 1);
+  }
   
   return Standard_True;
 }
 
 //=======================================================================
-//function : WriteUses
+//function : WriteIncludes
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean Express_Entity::WriteUses (Standard_OStream &os, 
-					     const Standard_Boolean start,
-                                             DataMapOfStringInteger &dict) const
+Standard_Boolean Express_Entity::WriteIncludes (Standard_OStream &os, 
+                                            DataMapOfStringInteger &dict) const
 {
-  Standard_Boolean st = start;
   for ( Standard_Integer i=1; i <= myInherit->Length(); i++ ) {
     Handle(Express_Entity) it = myInherit->Value(i);
-    st = it->WriteUses ( os, st, dict );
-    if ( i <=1 ) continue;
-      
-    if ( dict.IsBound ( it->CDLName()->String() ) ) continue; // avoid duplicating
-    dict.Bind ( it->CDLName()->String(), 1 );
+    it->WriteIncludes ( os, dict );
+    if ( i <= 1 ) continue;
+
+    if ( dict.IsBound ( it->CPPName()->String() ) ) continue; // avoid duplicating
+    dict.Bind ( it->CPPName()->String(), 1 );
     it->Use ( GetPackageName() );
-    os << ( st ? "uses" : "," ) << std::endl;
-    st = Standard_False;
-    os << "    ";
-    os << it->CDLName()->ToCString();
+    os << "#include <" << it->CPPName()->ToCString() << ".hxx>" << std::endl;
   }
   for (Standard_Integer i=1; i <= myFields->Length(); i++ ) {
     Handle(Express_Type) type = myFields->Value(i)->Type();
-    if ( dict.IsBound ( type->CDLName()->String() ) ) continue; // avoid duplicating
-    dict.Bind ( type->CDLName()->String(), 1 );
+    if ( dict.IsBound ( type->CPPName()->String() ) ) continue; // avoid duplicating
+    dict.Bind ( type->CPPName()->String(), 1 );
     type->Use ( GetPackageName() );
     if ( type->IsStandard() ) continue;
-    os << ( st ? "uses" : "," ) << std::endl;
-    st = Standard_False;
-    os << "    ";
-    os << type->CDLName()->ToCString();
+    os << "#include <" << type->CPPName()->ToCString() << ".hxx>" << std::endl;
   }
-  return st;
+  return Standard_True;
 }
 
 //=======================================================================
@@ -581,25 +644,21 @@ void Express_Entity::WriteRWInclude (Standard_OStream &os, DataMapOfStringIntege
 {
   for ( Standard_Integer i=1; i <= myInherit->Length(); i++ ) {
     Handle(Express_Entity) it = myInherit->Value(i);
-    if ( i >1 ) { // include hxx for base classes which are implemented as fields
+    if ( i >1 ) { // include HXX for base classes which are implemented as fields
       os << "#include <" << it->CPPName()->ToCString() << ".hxx>" << std::endl;
     }
     it->WriteRWInclude ( os, dict );
   }
   for (Standard_Integer i=1; i <= myFields->Length(); i++ ) {
     Handle(Express_Type) type = myFields->Value(i)->Type();
-    
     for ( Standard_Integer deep=0; deep < 10; deep++ ) {
       if ( dict.IsBound ( type->CPPName()->String() ) ) break; // avoid duplicating
-      dict.Bind ( type->CDLName()->String(), 1 );
-    
-      Standard_Boolean iscomplex = type->IsKind(STANDARD_TYPE(Express_ComplexType));
-      if ( ! deep && ! iscomplex ) break; // only complex types and their elements need #include
-    
+      dict.Bind ( type->CPPName()->String(), 1 );
       os << "#include <" << type->CPPName()->ToCString() << ".hxx>" << std::endl;
       
-      if ( ! iscomplex ) break;
       Handle(Express_ComplexType) complex = Handle(Express_ComplexType)::DownCast ( type );
+      if (complex.IsNull())
+        break;
       type = complex->Type();
     }
   }
@@ -619,12 +678,12 @@ static Handle(TCollection_HAsciiString) TypeToSTEPName (const Handle(Express_Typ
 }
 
 static void WriteRWReadField (Standard_OStream &os, 
-			      const Standard_CString index,
-			      const Standard_CString STEPName,
-			      const Standard_CString varname,
-			      const Handle(Express_Type) &vartype, 
-			      const Standard_Integer lev,
-			      const Standard_Boolean optional)
+                              const Standard_CString index,
+                              const Standard_CString STEPName,
+                              const Standard_CString varname,
+                              const Handle(Express_Type) &vartype, 
+                              const Standard_Integer lev,
+                              const Standard_Boolean optional)
 {
   // indent
   TCollection_AsciiString shift ( "  " );
@@ -686,10 +745,10 @@ static void WriteRWReadField (Standard_OStream &os,
 		       varname << " = " << enpack.ToCString() << "_" << prefix->ToCString()<<
 		       names->Value(i)->ToCString() << ";" << std::endl;
       }
-      os << shift << "  else ach.AddFail(\"Parameter #" << index << " (" <<
+      os << shift << "  else ach->AddFail(\"Parameter #" << index << " (" <<
 	             STEPName << ") has not allowed value\");" << std::endl;
       os << shift << "}" << std::endl;
-      os << shift << "else ach.AddFail(\"Parameter #" << index << " (" <<
+      os << shift << "else ach->AddFail(\"Parameter #" << index << " (" <<
 	             STEPName << ") is not enumeration\");" << std::endl;
 //      os << "!!! READING/WRITING ENUM NOT IMPLEMENTED !!!" << std::endl;
 //      std::cout << "Warning: Reading/Writing ENUMERATION not yet implemented (" << 
@@ -763,7 +822,14 @@ static void WriteRWReadField (Standard_OStream &os,
     os << shift << "}" << std::endl;
     os << shift << "else {" << std::endl;
     os << shift << "  has" << varname << " = Standard_False;" << std::endl;
-    if ( ! type->IsHandle() ) os << shift << "  a" << varname << " = 0;" << std::endl;
+    os << shift << "  a" << varname;
+    if (type->IsHandle())
+      os << ".Nullify();";
+    else if (type->IsStandard())
+      os << " = 0;";
+    else
+      os << " = " << type->CPPName()->ToCString() << "();";
+    os << std::endl;
     os << shift << "}" << std::endl;
   }
 }
@@ -774,8 +840,8 @@ static void WriteRWReadField (Standard_OStream &os,
 //=======================================================================
 
 Standard_Integer Express_Entity::WriteRWReadCode (Standard_OStream &os, 
-						   const Standard_Integer start,
-						   const Standard_Integer own) const
+                                                  const Standard_Integer start,
+                                                  const Standard_Integer own) const
 {
   Standard_Integer num = start;
   
@@ -789,16 +855,16 @@ Standard_Integer Express_Entity::WriteRWReadCode (Standard_OStream &os,
     os << "  // " << ( own ? "Own" : "Inherited" ) << " fields of " << Name()->ToCString() << std::endl;
   }
   
-  for (Standard_Integer i=1; i <= myFields->Length(); i++ ) {
+  for (Standard_Integer i = 1; i <= myFields->Length(); i++) {
     Handle(Express_Field) field = myFields->Value(i);
-    Handle(TCollection_HAsciiString) STEPName = Express::ToStepName ( field->Name() );
-    if ( ! own ) STEPName->Prepend ( Express::ToStepName ( Name()->Cat ( "." ) ) );
-    Handle(TCollection_HAsciiString) varName = new TCollection_HAsciiString ( field->Name() );
-    if ( ! own ) varName->Prepend ( Name()->Cat ( "_" ) );
-    
+    Handle(TCollection_HAsciiString) STEPName = Express::ToStepName(field->Name());
+    if (!own) STEPName->Prepend(Express::ToStepName(Name()->Cat(".")));
+    Handle(TCollection_HAsciiString) varName = new TCollection_HAsciiString(field->Name());
+    if (!own) varName->Prepend(Name()->Cat("_"));
+
     os << std::endl;
-    WriteRWReadField ( os, TCollection_AsciiString(num).ToCString(), STEPName->ToCString(), 
-		       varName->ToCString(), field->Type(), 0, field->IsOptional() );
+    WriteRWReadField(os, TCollection_AsciiString(num).ToCString(), STEPName->ToCString(),
+      varName->ToCString(), field->Type(), 0, field->IsOptional());
     num++;
   }
   return num;
@@ -985,7 +1051,7 @@ static Standard_Boolean WriteRWShareField (Standard_OStream &os,
     os << shift << ( type->IsHandle() ? "  Handle(" : "  " ) << type->CPPName()->ToCString() <<
                    ( type->IsHandle() ? ") " : " " ) << var.ToCString() << " = " <<
 		   varname << "->Value(i" << index << ");" << std::endl;
-    oos << '\0';
+
     os << oos.str();
     os << shift << "}" << std::endl;
     return Standard_True;
@@ -1046,7 +1112,7 @@ Standard_Integer Express_Entity::WriteRWShareCode (Standard_OStream &os,
       else if ( own ==-1 ) os << Name()->ToCString() << "()->";
       os << "Has" << field->Name()->ToCString() << "() ) {" << std::endl;
     }
-    oos << '\0';
+
     os << oos.str();
     if ( field->IsOptional() ) {
       os << "  }" << std::endl;
@@ -1061,30 +1127,30 @@ Standard_Integer Express_Entity::WriteRWShareCode (Standard_OStream &os,
 //=======================================================================
 
 Standard_Integer Express_Entity::MakeInit (Standard_OStream &os, 
-					    const Standard_Integer shift,
-					    const Standard_Integer own,
-					    const Standard_Integer mode) const
+                                           const Standard_Integer shift,
+                                           const Standard_Integer own,
+                                           const Standard_Integer mode) const
 {
   Standard_Integer sh = shift;
   
   // write code for inherited fields
-  for ( Standard_Integer i=1; i <= myInherit->Length(); i++ ) {
+  for (Standard_Integer i = 1; i <= myInherit->Length(); i++) {
     Handle(Express_Entity) ent = myInherit->Value(i);
-    if ( mode ==3 ) {
+    if (mode == 3) {
       Standard_Integer s = 0;
-      if ( i >1 ) {
-	os << "\n  the" << ent->Name()->ToCString() << " = new " << ent->CPPName()->ToCString() << ";";
-	os << "\n  the" << ent->Name()->ToCString() << "->Init(";
-	s = 12 + ent->Name()->Length();
+      if (i > 1) {
+        os << "\n  my" << ent->Name()->ToCString() << " = new " << ent->CPPName()->ToCString() << ";";
+        os << "\n  my" << ent->Name()->ToCString() << "->Init(";
+        s = 12 + ent->Name()->Length();
       }
       else {
-	os << "\n  " << ent->CPPName()->ToCString() << "::Init(";
-	s = 9 + ent->CPPName()->Length();
+        os << "\n  " << ent->CPPName()->ToCString() << "::Init(";
+        s = 9 + ent->CPPName()->Length();
       }
-      ent->MakeInit ( os, s, Standard_False, 2 );
+      ent->MakeInit(os, s, Standard_False, 2);
       os << ");";
     }
-    else sh = ent->MakeInit ( os, sh, ( i >1 ? -1 : Standard_False ), mode );
+    else sh = ent->MakeInit(os, sh, (i > 1 ? -1 : Standard_False), mode);
   }
 
   // write code for own fields
@@ -1097,37 +1163,49 @@ Standard_Integer Express_Entity::MakeInit (Standard_OStream &os,
     // make CR and indent
     TCollection_AsciiString space = "";
     for ( Standard_Integer sn=0; sn < abs(sh); sn++ ) space += " ";
-    Standard_Character delim = ( mode ==0 ? ';' : ( mode == 3 ? '\n' : ',' ) );
-    if ( sh <0 ) os << delim << "\n" << space;
+    Standard_Character delim = ( mode == 0 ? ',' : ( mode == 3 ? '\n' : ',' ) );
+    if ( sh < 0 ) os << delim << "\n" << space;
     else sh = -sh;
     
     if ( field->IsOptional() ) {
-      if ( mode ==0 ) os << "has" << varName->ToCString() << ": Boolean;\n" << space;
-      else if ( mode ==1 ) os << "const Standard_Boolean has" << varName->ToCString() << ",\n" << space;
-      else if ( mode ==2 ) os << "has" << varName->ToCString() << ",\n" << space;
+      if ( mode == 0 ) os << "const Standard_Boolean has" << varName->ToCString() << ",\n" << space;
+      else if ( mode == 1 ) os << "const Standard_Boolean has" << varName->ToCString() << ",\n" << space;
+      else if ( mode == 2 || mode == 4) os << "has" << varName->ToCString() << ",\n" << space;
     }
     
     // write field
-    if ( mode ==0 ) {
-      os << "a" << varName->ToCString() << ": " << field->Type()->CDLName()->ToCString();
+    if ( mode == 0 ) {
+      if (field->Type()->IsHandle())
+        os << "const Handle(" << field->Type()->CPPName()->ToCString() << ")& the" << varName->ToCString();
+      else
+        os << "const " << field->Type()->CPPName()->ToCString() << " the" << varName->ToCString();
     }
-    else if ( mode ==1 ) {
-      os << "const " << ( field->Type()->IsHandle() ? "Handle(" : "" ) <<
-	    field->Type()->CPPName()->ToCString() << ( field->Type()->IsHandle() ? ")" : "" ) <<
-	    ( field->Type()->IsSimple() ? " a" : " &a" ) << varName->ToCString();
+    else if (mode == 1) {
+      os << "const " << (field->Type()->IsHandle() ? "Handle(" : "") <<
+        field->Type()->CPPName()->ToCString() << (field->Type()->IsHandle() ? ")" : "") <<
+        (field->Type()->IsSimple() ? " the" : "& the") << varName->ToCString();
     }
-    else if ( mode ==2 ) {
+    else if ( mode == 2 ) {
+      os << "the" << varName->ToCString();
+    }
+    else if (mode == 4) {
       os << "a" << varName->ToCString();
     }
     else {
-      if ( field->IsOptional() ) {
-	os << "def" << field->Name()->ToCString() << " = has" << varName->ToCString() << ";" << std::endl;
-	os << "  if (def" << field->Name()->ToCString() << ") {\n    ";
+      if (field->IsOptional()) {
+        os << "def" << field->Name()->ToCString() << " = has" << varName->ToCString() << ";" << std::endl;
+        os << "  if (def" << field->Name()->ToCString() << ") {\n    ";
       }
-      os << "the" << field->Name()->ToCString() << " = a" << varName->ToCString() << ";";
-      if ( field->IsOptional() ) 
-	if ( field->Type()->IsHandle() ) os << "\n  }\n  else the" << field->Name()->ToCString() << ".Nullify();";
-	else os << "\n  }\n  else the" << field->Name()->ToCString() << " = 0;";
+      os << "my" << field->Name()->ToCString() << " = the" << varName->ToCString() << ";";
+      if (field->IsOptional()) {
+        os << "\n  }\n  else my" << field->Name()->ToCString();
+        if (field->Type()->IsHandle())
+          os << ".Nullify();";
+        else if (field->Type()->IsStandard())
+          os << " = 0;";
+        else
+          os << " = " << field->Type()->CPPName()->ToCString() << "();";
+      }
     }
     if ( sh >0 ) sh = -sh;
   }

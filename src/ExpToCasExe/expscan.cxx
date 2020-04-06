@@ -80,6 +80,11 @@ struct yysvf {
 struct yysvf *yyestate;
 extern struct yysvf yysvec[], *yybgin;
 
+#pragma warning(push)
+#pragma warning (disable:4244)
+#pragma warning (disable:4274)
+#pragma warning (disable:4706)
+#pragma warning (disable:4701)
 
 # line 4 "exptocas.l"
 /* File:	exptocas.l                     */
@@ -2910,3 +2915,5 @@ yyunput(c)
 {
 	unput(c);
 	}
+
+#pragma warning(pop)

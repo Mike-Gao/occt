@@ -36,13 +36,3 @@ Handle(TCollection_HAsciiString) Express_Integer::CPPName () const
 {
   return new TCollection_HAsciiString ( "Standard_Integer" );
 }
-
-//=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_Integer::CDLName () const
-{
-  return new TCollection_HAsciiString ( "Integer" );
-}

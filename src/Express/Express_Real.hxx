@@ -33,9 +33,6 @@ public:
   //! Returns "Standard_Real"
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns "Real"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-
 
 
 

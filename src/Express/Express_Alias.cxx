@@ -50,16 +50,6 @@ Handle(TCollection_HAsciiString) Express_Alias::CPPName () const
 }
 
 //=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_Alias::CDLName () const
-{
-  return myType->CDLName();
-}
-
-//=======================================================================
 //function : GenerateClass
 //purpose  : 
 //=======================================================================
@@ -67,6 +57,6 @@ Handle(TCollection_HAsciiString) Express_Alias::CDLName () const
 Standard_Boolean Express_Alias::GenerateClass () const
 {
 //  std::cout << "Warning: writing ALIAS is not yet implemented, cannot generate " << Name()->ToCString() << std::endl;
-  std::cout << "ALIAS " << Name()->ToCString() << " = " << Type()->CDLName()->ToCString() << " used; no generation is needed" << std::endl;
+  std::cout << "ALIAS " << Name()->ToCString() << " = " << Type()->CPPName()->ToCString() << " used; no generation is needed" << std::endl;
   return Standard_False;
 }

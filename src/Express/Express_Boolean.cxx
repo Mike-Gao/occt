@@ -36,13 +36,3 @@ Handle(TCollection_HAsciiString) Express_Boolean::CPPName () const
 {
   return new TCollection_HAsciiString ( "Standard_Boolean" );
 }
-
-//=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_Boolean::CDLName () const
-{
-  return new TCollection_HAsciiString ( "Boolean" );
-}

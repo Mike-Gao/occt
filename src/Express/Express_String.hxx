@@ -34,9 +34,6 @@ public:
   //! Returns "Handle(TCollection_HAsciiString)"
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns "HAsciiString from TCollection"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-  
   //! Returns False
   Standard_EXPORT virtual   Standard_Boolean IsStandard()  const;
 

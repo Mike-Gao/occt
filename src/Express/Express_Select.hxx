@@ -41,7 +41,7 @@ public:
   //! Returns sequence of items corresponding to typenames
   Standard_EXPORT  const  Handle(Express_HSequenceOfItem)& Items()  const;
   
-  //! Create CDL/CXX files from item
+  //! Create HXX/CXX files from item
   Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
 
 

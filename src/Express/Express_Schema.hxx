@@ -26,7 +26,7 @@ class Express_Type;
 
 
 //! Represents a schema as a list of items and provides general
-//! tools for generating CDL/CXX files (including dictionary of
+//! tools for generating HXX/CXX files (including dictionary of
 //! item names)
 class Express_Schema : public Standard_Transient
 {

@@ -37,17 +37,12 @@ Handle(Express_Schema) &Express::Schema ()
 //purpose  : 
 //=======================================================================
 
-// Write header of CDL or CXX file
-void Express::WriteFileStamp (Standard_OStream &os, 
-			       const Handle(TCollection_HAsciiString) &name,
-			       const Standard_Boolean isCDL)
+// Write header of HXX or CXX file
+void Express::WriteFileStamp (Standard_OStream &os)
 {
   static const char *EC_VERSION = "2.0";
 
-  Standard_CString comm = ( isCDL ? "--" : "//" );
-  os << comm << " File:	" << name->ToCString();
-  os << (isCDL ? ".cdl" : ".cxx" ) << std::endl;
-
+  Standard_CString comm = "//";
   TCollection_AsciiString timestring;
   if ( getenv ( "EXPTOCAS_TIME" ) ) timestring = getenv ( "EXPTOCAS_TIME" );
   else {
@@ -56,15 +51,23 @@ void Express::WriteFileStamp (Standard_OStream &os,
     timestring = ctime ( &curtime );
     timestring.ChangeAll ( '\n', ' ' );
   }
-  os << comm << " Created:	" << timestring << std::endl;
-  
+  os << comm << " Created on : " << timestring << std::endl;
+
   OSD_Process aProcess;
-  os << comm << " Author:	" << aProcess.UserName().ToCString() << std::endl;
-  
+  os << comm << " Created by: " << aProcess.UserName().ToCString() << std::endl;
   os << comm << " Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V" << EC_VERSION << std::endl;
-//  if ( ! Express::Schema().IsNull() )
-//    os << comm << " Schema used:	" << Express::Schema()->Name()->ToCString() << std::endl;
-  os << comm << " Copyright:	Open CASCADE 2020" << std::endl;
+  os << comm << " Copyright (c) Open CASCADE 2020" << std::endl;
+  os << comm << std::endl;
+  os << comm << " This file is part of Open CASCADE Technology software library." << std::endl;
+  os << comm << std::endl;
+  os << comm << " This library is free software; you can redistribute it and/or modify it under" << std::endl;
+  os << comm << " the terms of the GNU Lesser General Public License version 2.1 as published" << std::endl;
+  os << comm << " by the Free Software Foundation, with special exception defined in the file" << std::endl;
+  os << comm << " OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT" << std::endl;
+  os << comm << " distribution for complete text of the license and disclaimer of any warranty." << std::endl;
+  os << comm << std::endl;
+  os << comm << " Alternatively, this file may be used under the terms of Open CASCADE" << std::endl;
+  os << comm << " commercial license or contractual agreement." << std::endl;
   os << std::endl;
 }
 

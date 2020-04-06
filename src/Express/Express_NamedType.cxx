@@ -82,16 +82,6 @@ Handle(TCollection_HAsciiString) Express_NamedType::CPPName () const
 }
 
 //=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_NamedType::CDLName () const
-{
-  return myItem->CDLName();
-}
-
-//=======================================================================
 //function : IsStandard
 //purpose  : 
 //=======================================================================

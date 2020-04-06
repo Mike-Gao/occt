@@ -36,13 +36,3 @@ Handle(TCollection_HAsciiString) Express_Real::CPPName () const
 {
   return new TCollection_HAsciiString ( "Standard_Real" );
 }
-
-//=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_Real::CDLName () const
-{
-  return new TCollection_HAsciiString ( "Real" );
-}

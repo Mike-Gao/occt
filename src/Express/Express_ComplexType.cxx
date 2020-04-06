@@ -78,41 +78,6 @@ Handle(TCollection_HAsciiString) Express_ComplexType::CPPName () const
 }
 
 //=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_ComplexType::CDLName () const
-{
-  // check if array 2
-  Handle(TCollection_HAsciiString) name;
-  Handle(Express_Type) type = myType;
-  if ( type->IsKind ( STANDARD_TYPE(Express_ComplexType) ) ) {
-    Handle(Express_ComplexType) c2 = Handle(Express_ComplexType)::DownCast ( type );
-    type = c2->Type();
-    name = new TCollection_HAsciiString ( "HArray2Of" );
-  }
-  else 
-    name = new TCollection_HAsciiString ( "HArray1Of" );
-  
-  // generate name
-  name->AssignCat ( type->CDLName() );
-  Handle(TCollection_HAsciiString) str = new TCollection_HAsciiString("TCollection");
-  Standard_Integer ind =name->Location(str,1,name->Length());
-  if(ind) {
-    Handle(TCollection_HAsciiString) tmp = name->Split(ind-1);
-    name->AssignCat("Interface");
-  }
-  if ( type->IsStandard() ) 
-    name->AssignCat ( " from TColStd" );
-    
-  
- 
-  return name;
-}
-
-
-//=======================================================================
 //function : Use
 //purpose  : 
 //=======================================================================

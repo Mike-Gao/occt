@@ -34,9 +34,6 @@ public:
   //! Returns "StepData_Logical"
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns "Logical from StepData"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-  
   //! Return False
   Standard_EXPORT virtual   Standard_Boolean IsStandard()  const;
   

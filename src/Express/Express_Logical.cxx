@@ -38,16 +38,6 @@ Handle(TCollection_HAsciiString) Express_Logical::CPPName () const
 }
 
 //=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_Logical::CDLName () const
-{
-  return new TCollection_HAsciiString ( "Logical from StepData" );
-}
-
-//=======================================================================
 //function : IsStandard
 //purpose  : 
 //=======================================================================

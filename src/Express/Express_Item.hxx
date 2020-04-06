@@ -25,22 +25,19 @@ class TCollection_HAsciiString;
 
 //! Base class for items of the schema. Stores a name of the class,
 //! package name and flag used to mark items for generation.
-//! Provides interface for writing generated class definitions to CDL
+//! Provides interface for writing generated class definitions to HXX
 //! and CXX files.
 class Express_Item : public Standard_Transient
 {
-
 public:
 
-  
+  static Standard_Integer myIndex;
+
   //! Returns item name
   Standard_EXPORT  const  Handle(TCollection_HAsciiString)& Name()  const;
   
   //! Returns (generated) name for the item in CXX-style (Package_Class)
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
-  
-  //! Returns (generated) name for the item in CDL-style (Class from Package)
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
   
   //! Returns package name
   //! If not defined, returns NULL if auto is False (default)
@@ -56,7 +53,7 @@ public:
   //! Change generation mark flag
   Standard_EXPORT   void SetMark (const Standard_Boolean mark) ;
   
-  //! General interface for creating CDL/CXX files from item
+  //! General interface for creating HXX/CXX files from item
   Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const = 0;
   
   //! Checks that item is marked for generation and if yes,
@@ -95,6 +92,12 @@ public:
   //! Get flag resposible for  presence of method FillShared in the class
   Standard_EXPORT   Standard_Boolean FillSharedFlag()  const;
 
+  //! Set start entity index
+  Standard_EXPORT static void SetIndex(const Standard_Integer theIndex);
+
+  //! Get current entity index
+  Standard_EXPORT static Standard_Integer Index();
+
 
 
 
@@ -126,7 +129,6 @@ private:
 
 
 };
-
 
 
 

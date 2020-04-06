@@ -16,7 +16,9 @@
 #include <Express_Item.hxx>
 #include <TCollection_HAsciiString.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(Express_Item,Standard_Transient)
+IMPLEMENT_STANDARD_RTTIEXT(Express_Item, Standard_Transient)
+
+Standard_Integer Express_Item::myIndex = -1;
 
 //=======================================================================
 //function : Express_Item
@@ -67,18 +69,6 @@ Handle(TCollection_HAsciiString) Express_Item::CPPName () const
 {
   Handle(TCollection_HAsciiString) name = GetPackageName ( Standard_True )->Cat ( "_" );
   name->AssignCat ( myName );
-  return name;
-}
-
-//=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_Item::CDLName () const
-{
-  Handle(TCollection_HAsciiString) name = myName->Cat ( " from " );
-  name->AssignCat ( GetPackageName ( Standard_True ) );
   return name;
 }
 
@@ -250,4 +240,24 @@ Standard_Boolean Express_Item::Use (const Handle(TCollection_HAsciiString) &pack
 {
   return myhasFillShared;
 }
+
+ //=======================================================================
+ //function : SetIndex
+ //purpose  : 
+ //=======================================================================
+
+ void Express_Item::SetIndex(const Standard_Integer theIndex)
+ {
+   myIndex = theIndex;
+ }
+
+ //=======================================================================
+ //function : Index
+ //purpose  : 
+ //=======================================================================
+
+ Standard_Integer Express_Item::Index()
+ {
+   return myIndex;
+ }
 

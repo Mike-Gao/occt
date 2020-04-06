@@ -33,9 +33,6 @@ public:
   //! Returns "Standard_Boolean"
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns "Boolean"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-
 
 
 

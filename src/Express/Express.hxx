@@ -24,7 +24,7 @@ class TCollection_HAsciiString;
 
 //! Provides data structures for representation of EXPRESS schema
 //! (items, types, entities etc.)
-//! and tools for generating XSTEP classes (CDL and CXX) from
+//! and tools for generating XSTEP classes (HXX and CXX) from
 //! items of the schema
 class Express 
 {
@@ -37,8 +37,7 @@ public:
   Standard_EXPORT static   Handle(Express_Schema)& Schema() ;
   
   //! Writes standard copyright stamp (creation date/time, user, etc.)
-  //! in CDL (if isCDL) or CXX (if ! isCDL) style to the output stream.
-  Standard_EXPORT static   void WriteFileStamp (Standard_OStream& os, const Handle(TCollection_HAsciiString)& name, const Standard_Boolean isCDL) ;
+  Standard_EXPORT static   void WriteFileStamp (Standard_OStream& os) ;
   
   //! Writes standard comment for method in CXX file
   Standard_EXPORT static   void WriteMethodStamp (Standard_OStream& os, const Handle(TCollection_HAsciiString)& name) ;

@@ -38,16 +38,6 @@ Handle(TCollection_HAsciiString) Express_String::CPPName () const
 }
 
 //=======================================================================
-//function : CDLName
-//purpose  : 
-//=======================================================================
-
-Handle(TCollection_HAsciiString) Express_String::CDLName () const
-{
-  return new TCollection_HAsciiString ( "HAsciiString from TCollection" );
-}
-
-//=======================================================================
 //function : IsStandard
 //purpose  : 
 //=======================================================================

@@ -39,9 +39,6 @@ public:
   //! Returns CPP-style name of the type
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns CDL-style name of the type
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-  
   //! Declares type as used by some item being generated.
   //! Calls Use() for type of elements
   Standard_EXPORT virtual   Standard_Boolean Use (const Handle(TCollection_HAsciiString)& pack, const Standard_Boolean defer = Standard_False)  const;

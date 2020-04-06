@@ -13,6 +13,10 @@
 #include <Express_Schema.hxx>
 #include <Express_Item.hxx>
 
+#pragma warning(push)
+#pragma warning (disable:4267)
+#pragma warning (disable:4706)
+
 Handle(Express_Schema) ec_parse ( FILE *fin ); // interface to parser
 
 // Load list of (class name, package name) from the file
@@ -30,7 +34,7 @@ static Standard_Boolean LoadList (const char file[], const Handle(Express_Schema
   char string[200];
   while ( fgets ( string, 199, fd_pack ) ) {
     char *s = string, *name=0;
-    Standard_Integer ind;
+    Standard_Integer ind = 0;
     while ( *s && ! ( ind = strcspn ( s, " \t\r\n" ) ) ) s++;
     if ( ! *s ) continue;
     name = s;
@@ -127,7 +131,7 @@ Standard_Integer main ( const Standard_Integer argc, const char *argv[] )
 {
   if ( argc <2 ) {
     std::cout << "EXPRESS -> CASCADE/XSTEP classes generator 3.0" << std::endl;
-    std::cout << "Use: ExpToCas <schema.exp> [<create.lst> [<packaging.lst>]]" << std::endl;
+    std::cout << "Use: ExpToCas <schema.exp> [<create.lst> [<packaging.lst> [start_index]]]" << std::endl;
     std::cout << "Where: " << std::endl;
     std::cout << "- schema.exp is a file with EXPRESS schema " << std::endl;
     std::cout << "- create.lst is a file with list of types to generate (all if none)" << std::endl;
@@ -135,6 +139,8 @@ Standard_Integer main ( const Standard_Integer argc, const char *argv[] )
     std::cout << "- packaging.lst is a file with classes distribution per package" << std::endl;
     std::cout << "  in the form of the list (one item per line) \"<TypeName> <Package>\"" << std::endl;
     std::cout << "  If package not defined for some type, \"StepStep\" assumed" << std::endl;
+    std::cout << "- start_index - a first number for auxiliary generated files with data" << std::endl;
+    std::cout << "  to copy into StepAP214_Protocol.cxx, RWStepAP214_GeneralModule.cxx and RWStepAP214_ReadWriteModule.cxx" << std::endl;
     return 0;
   }
   
@@ -176,12 +182,17 @@ Standard_Integer main ( const Standard_Integer argc, const char *argv[] )
     else if ( ! LoadList ( argv[2], schema, Standard_True ) ) return 0;
   }
 
+  Standard_Integer anIndex = -1;
+  if (argc > 4)
+    anIndex = atoi(argv[4]);
+
   //=================================
   // Step 3: Iterate by items and generate classes
 
   std::cout << "Total " << schema->NbItems() << " items" << std::endl;
   Standard_Boolean done = Standard_False;
   Standard_Integer nbgen = 0;
+  Express_Item::SetIndex(anIndex);
   do {
     done = Standard_False;
     for ( Standard_Integer num=1; num <= schema->NbItems(); num++ ) {
@@ -194,3 +205,5 @@ Standard_Integer main ( const Standard_Integer argc, const char *argv[] )
 //  std::cout << "Finished; total " << nbgen << " classes generated" << std::endl;
   return 1;
 }
+
+#pragma warning(pop)

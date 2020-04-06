@@ -53,6 +53,11 @@ complex time or redefinition of inherited field are ignored.
 #include <Express_Reference.hxx>
 #include <Express.hxx>
 
+#pragma warning(push)
+#pragma warning(disable:4244)
+#pragma warning(disable:4274)
+#pragma warning(disable:4800)
+
 /************************************************/
 /* ERROR MESSAGE FUNCTION                       */
 
@@ -1314,3 +1319,4 @@ case 66:
 	goto yystack;		/* reset registers in driver code */
 }
 
+#pragma warning(pop)

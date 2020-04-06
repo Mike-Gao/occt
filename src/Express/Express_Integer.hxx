@@ -33,9 +33,6 @@ public:
   //! Returns "Standard_Integer"
   Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
   
-  //! Returns "Integer"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CDLName()  const;
-
 
 
 
