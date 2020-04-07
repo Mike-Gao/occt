@@ -1357,6 +1357,144 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepVisual_RWCameraModelD3MultiClippingUnion.hxx>
 #include <StepVisual_AnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem.hxx>
 #include <RWStepVisual_RWAnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem.hxx>
+// Added for kinematics implementation
+#include <StepRepr_RepresentationContextReference.hxx>
+#include <StepRepr_RepresentationReference.hxx>
+#include <StepKinematics_SuParameters.hxx>
+#include <StepKinematics_RotationAboutDirection.hxx>
+#include <StepKinematics_KinematicJoint.hxx>
+#include <StepKinematics_ActuatedKinematicPair.hxx>
+#include <StepKinematics_ContextDependentKinematicLinkRepresentation.hxx>
+#include <StepKinematics_CylindricalPair.hxx>
+#include <StepKinematics_CylindricalPairValue.hxx>
+#include <StepKinematics_CylindricalPairWithRange.hxx>
+#include <StepKinematics_FullyConstrainedPair.hxx>
+#include <StepKinematics_GearPair.hxx>
+#include <StepKinematics_GearPairValue.hxx>
+#include <StepKinematics_GearPairWithRange.hxx>
+#include <StepKinematics_HomokineticPair.hxx>
+#include <StepKinematics_KinematicLink.hxx>
+#include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
+#include <StepKinematics_KinematicPropertyMechanismRepresentation.hxx>
+#include <StepKinematics_KinematicTopologyStructure.hxx>
+#include <StepKinematics_LowOrderKinematicPair.hxx>
+#include <StepKinematics_LowOrderKinematicPairValue.hxx>
+#include <StepKinematics_LowOrderKinematicPairWithRange.hxx>
+#include <StepKinematics_MechanismRepresentation.hxx>
+#include <StepKinematics_OrientedJoint.hxx>
+#include <StepKinematics_PlanarCurvePair.hxx>
+#include <StepKinematics_PlanarCurvePairRange.hxx>
+#include <StepKinematics_PlanarPair.hxx>
+#include <StepKinematics_PlanarPairValue.hxx>
+#include <StepKinematics_PlanarPairWithRange.hxx>
+#include <StepKinematics_PointOnPlanarCurvePair.hxx>
+#include <StepKinematics_PointOnPlanarCurvePairValue.hxx>
+#include <StepKinematics_PointOnPlanarCurvePairWithRange.hxx>
+#include <StepKinematics_PointOnSurfacePair.hxx>
+#include <StepKinematics_PointOnSurfacePairValue.hxx>
+#include <StepKinematics_PointOnSurfacePairWithRange.hxx>
+#include <StepKinematics_PrismaticPair.hxx>
+#include <StepKinematics_PrismaticPairValue.hxx>
+#include <StepKinematics_PrismaticPairWithRange.hxx>
+#include <StepKinematics_ProductDefinitionKinematics.hxx>
+#include <StepKinematics_ProductDefinitionRelationshipKinematics.hxx>
+#include <StepKinematics_RackAndPinionPair.hxx>
+#include <StepKinematics_RackAndPinionPairValue.hxx>
+#include <StepKinematics_RackAndPinionPairWithRange.hxx>
+#include <StepKinematics_RevolutePair.hxx>
+#include <StepKinematics_RevolutePairValue.hxx>
+#include <StepKinematics_RevolutePairWithRange.hxx>
+#include <StepKinematics_RollingCurvePair.hxx>
+#include <StepKinematics_RollingCurvePairValue.hxx>
+#include <StepKinematics_RollingSurfacePair.hxx>
+#include <StepKinematics_RollingSurfacePairValue.hxx>
+#include <StepKinematics_ScrewPair.hxx>
+#include <StepKinematics_ScrewPairValue.hxx>
+#include <StepKinematics_ScrewPairWithRange.hxx>
+#include <StepKinematics_SlidingCurvePair.hxx>
+#include <StepKinematics_SlidingCurvePairValue.hxx>
+#include <StepKinematics_SlidingSurfacePair.hxx>
+#include <StepKinematics_SlidingSurfacePairValue.hxx>
+#include <StepKinematics_SphericalPair.hxx>
+#include <StepKinematics_SphericalPairValue.hxx>
+#include <StepKinematics_SphericalPairWithPin.hxx>
+#include <StepKinematics_SphericalPairWithPinAndRange.hxx>
+#include <StepKinematics_SphericalPairWithRange.hxx>
+#include <StepKinematics_SurfacePairWithRange.hxx>
+#include <StepKinematics_UnconstrainedPair.hxx>
+#include <StepKinematics_UnconstrainedPairValue.hxx>
+#include <StepKinematics_UniversalPair.hxx>
+#include <StepKinematics_UniversalPairValue.hxx>
+#include <StepKinematics_UniversalPairWithRange.hxx>
+
+#include <RWStepRepr_RWRepresentationContextReference.hxx>
+#include <RWStepRepr_RWRepresentationReference.hxx>
+#include <RWStepKinematics_RWSuParameters.hxx>
+#include <RWStepKinematics_RWRotationAboutDirection.hxx>
+#include <RWStepKinematics_RWKinematicJoint.hxx>
+#include <RWStepKinematics_RWActuatedKinematicPair.hxx>
+#include <RWStepKinematics_RWContextDependentKinematicLinkRepresentation.hxx>
+#include <RWStepKinematics_RWCylindricalPair.hxx>
+#include <RWStepKinematics_RWCylindricalPairValue.hxx>
+#include <RWStepKinematics_RWCylindricalPairWithRange.hxx>
+#include <RWStepKinematics_RWFullyConstrainedPair.hxx>
+#include <RWStepKinematics_RWGearPair.hxx>
+#include <RWStepKinematics_RWGearPairValue.hxx>
+#include <RWStepKinematics_RWGearPairWithRange.hxx>
+#include <RWStepKinematics_RWHomokineticPair.hxx>
+#include <RWStepKinematics_RWKinematicLink.hxx>
+#include <RWStepKinematics_RWKinematicLinkRepresentationAssociation.hxx>
+#include <RWStepKinematics_RWKinematicPropertyMechanismRepresentation.hxx>
+#include <RWStepKinematics_RWKinematicTopologyStructure.hxx>
+#include <RWStepKinematics_RWLowOrderKinematicPair.hxx>
+#include <RWStepKinematics_RWLowOrderKinematicPairValue.hxx>
+#include <RWStepKinematics_RWLowOrderKinematicPairWithRange.hxx>
+#include <RWStepKinematics_RWMechanismRepresentation.hxx>
+#include <RWStepKinematics_RWOrientedJoint.hxx>
+#include <RWStepKinematics_RWPlanarCurvePair.hxx>
+#include <RWStepKinematics_RWPlanarCurvePairRange.hxx>
+#include <RWStepKinematics_RWPlanarPair.hxx>
+#include <RWStepKinematics_RWPlanarPairValue.hxx>
+#include <RWStepKinematics_RWPlanarPairWithRange.hxx>
+#include <RWStepKinematics_RWPointOnPlanarCurvePair.hxx>
+#include <RWStepKinematics_RWPointOnPlanarCurvePairValue.hxx>
+#include <RWStepKinematics_RWPointOnPlanarCurvePairWithRange.hxx>
+#include <RWStepKinematics_RWPointOnSurfacePair.hxx>
+#include <RWStepKinematics_RWPointOnSurfacePairValue.hxx>
+#include <RWStepKinematics_RWPointOnSurfacePairWithRange.hxx>
+#include <RWStepKinematics_RWPrismaticPair.hxx>
+#include <RWStepKinematics_RWPrismaticPairValue.hxx>
+#include <RWStepKinematics_RWPrismaticPairWithRange.hxx>
+#include <RWStepKinematics_RWProductDefinitionKinematics.hxx>
+#include <RWStepKinematics_RWProductDefinitionRelationshipKinematics.hxx>
+#include <RWStepKinematics_RWRackAndPinionPair.hxx>
+#include <RWStepKinematics_RWRackAndPinionPairValue.hxx>
+#include <RWStepKinematics_RWRackAndPinionPairWithRange.hxx>
+#include <RWStepKinematics_RWRevolutePair.hxx>
+#include <RWStepKinematics_RWRevolutePairValue.hxx>
+#include <RWStepKinematics_RWRevolutePairWithRange.hxx>
+#include <RWStepKinematics_RWRollingCurvePair.hxx>
+#include <RWStepKinematics_RWRollingCurvePairValue.hxx>
+#include <RWStepKinematics_RWRollingSurfacePair.hxx>
+#include <RWStepKinematics_RWRollingSurfacePairValue.hxx>
+#include <RWStepKinematics_RWScrewPair.hxx>
+#include <RWStepKinematics_RWScrewPairValue.hxx>
+#include <RWStepKinematics_RWScrewPairWithRange.hxx>
+#include <RWStepKinematics_RWSlidingCurvePair.hxx>
+#include <RWStepKinematics_RWSlidingCurvePairValue.hxx>
+#include <RWStepKinematics_RWSlidingSurfacePair.hxx>
+#include <RWStepKinematics_RWSlidingSurfacePairValue.hxx>
+#include <RWStepKinematics_RWSphericalPair.hxx>
+#include <RWStepKinematics_RWSphericalPairValue.hxx>
+#include <RWStepKinematics_RWSphericalPairWithPin.hxx>
+#include <RWStepKinematics_RWSphericalPairWithPinAndRange.hxx>
+#include <RWStepKinematics_RWSphericalPairWithRange.hxx>
+#include <RWStepKinematics_RWSurfacePairWithRange.hxx>
+#include <RWStepKinematics_RWUnconstrainedPair.hxx>
+#include <RWStepKinematics_RWUnconstrainedPairValue.hxx>
+#include <RWStepKinematics_RWUniversalPair.hxx>
+#include <RWStepKinematics_RWUniversalPairValue.hxx>
+#include <RWStepKinematics_RWUniversalPairWithRange.hxx>
 
 static Standard_Integer catsh,catdr,catstr,catdsc,cataux;
 
@@ -5156,6 +5294,483 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
     RWStepVisual_RWAnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem tool;
     tool.Share(anent, iter);
   }
+    case 720:
+  {
+    DeclareAndCast(StepRepr_RepresentationContextReference, anent, ent);
+    RWStepRepr_RWRepresentationContextReference tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 721:
+  {
+    DeclareAndCast(StepRepr_RepresentationReference, anent, ent);
+    RWStepRepr_RWRepresentationReference tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 722:
+  {
+    DeclareAndCast(StepKinematics_SuParameters, anent, ent);
+    RWStepKinematics_RWSuParameters tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 723:
+  {
+    DeclareAndCast(StepKinematics_RotationAboutDirection, anent, ent);
+    RWStepKinematics_RWRotationAboutDirection tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 724:
+  {
+    DeclareAndCast(StepKinematics_KinematicJoint, anent, ent);
+    RWStepKinematics_RWKinematicJoint tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 725:
+  {
+    DeclareAndCast(StepKinematics_ActuatedKinematicPair, anent, ent);
+    RWStepKinematics_RWActuatedKinematicPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 726:
+  {
+    DeclareAndCast(StepKinematics_ContextDependentKinematicLinkRepresentation, anent, ent);
+    RWStepKinematics_RWContextDependentKinematicLinkRepresentation tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 727:
+  {
+    DeclareAndCast(StepKinematics_CylindricalPair, anent, ent);
+    RWStepKinematics_RWCylindricalPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 728:
+  {
+    DeclareAndCast(StepKinematics_CylindricalPairValue, anent, ent);
+    RWStepKinematics_RWCylindricalPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 729:
+  {
+    DeclareAndCast(StepKinematics_CylindricalPairWithRange, anent, ent);
+    RWStepKinematics_RWCylindricalPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 730:
+  {
+    DeclareAndCast(StepKinematics_FullyConstrainedPair, anent, ent);
+    RWStepKinematics_RWFullyConstrainedPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 731:
+  {
+    DeclareAndCast(StepKinematics_GearPair, anent, ent);
+    RWStepKinematics_RWGearPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 732:
+  {
+    DeclareAndCast(StepKinematics_GearPairValue, anent, ent);
+    RWStepKinematics_RWGearPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 733:
+  {
+    DeclareAndCast(StepKinematics_GearPairWithRange, anent, ent);
+    RWStepKinematics_RWGearPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 734:
+  {
+    DeclareAndCast(StepKinematics_HomokineticPair, anent, ent);
+    RWStepKinematics_RWHomokineticPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 735:
+  {
+    DeclareAndCast(StepKinematics_KinematicLink, anent, ent);
+    RWStepKinematics_RWKinematicLink tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 736:
+  {
+    DeclareAndCast(StepKinematics_KinematicLinkRepresentationAssociation, anent, ent);
+    RWStepKinematics_RWKinematicLinkRepresentationAssociation tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 737:
+  {
+    DeclareAndCast(StepKinematics_KinematicPropertyMechanismRepresentation, anent, ent);
+    RWStepKinematics_RWKinematicPropertyMechanismRepresentation tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 738:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyStructure tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 739:
+  {
+    DeclareAndCast(StepKinematics_LowOrderKinematicPair, anent, ent);
+    RWStepKinematics_RWLowOrderKinematicPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 740:
+  {
+    DeclareAndCast(StepKinematics_LowOrderKinematicPairValue, anent, ent);
+    RWStepKinematics_RWLowOrderKinematicPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 741:
+  {
+    DeclareAndCast(StepKinematics_LowOrderKinematicPairWithRange, anent, ent);
+    RWStepKinematics_RWLowOrderKinematicPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 742:
+  {
+    DeclareAndCast(StepKinematics_MechanismRepresentation, anent, ent);
+    RWStepKinematics_RWMechanismRepresentation tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 743:
+  {
+    DeclareAndCast(StepKinematics_OrientedJoint, anent, ent);
+    RWStepKinematics_RWOrientedJoint tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 744:
+  {
+    DeclareAndCast(StepKinematics_PlanarCurvePair, anent, ent);
+    RWStepKinematics_RWPlanarCurvePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 745:
+  {
+    DeclareAndCast(StepKinematics_PlanarCurvePairRange, anent, ent);
+    RWStepKinematics_RWPlanarCurvePairRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 746:
+  {
+    DeclareAndCast(StepKinematics_PlanarPair, anent, ent);
+    RWStepKinematics_RWPlanarPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 747:
+  {
+    DeclareAndCast(StepKinematics_PlanarPairValue, anent, ent);
+    RWStepKinematics_RWPlanarPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 748:
+  {
+    DeclareAndCast(StepKinematics_PlanarPairWithRange, anent, ent);
+    RWStepKinematics_RWPlanarPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 749:
+  {
+    DeclareAndCast(StepKinematics_PointOnPlanarCurvePair, anent, ent);
+    RWStepKinematics_RWPointOnPlanarCurvePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 750:
+  {
+    DeclareAndCast(StepKinematics_PointOnPlanarCurvePairValue, anent, ent);
+    RWStepKinematics_RWPointOnPlanarCurvePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 751:
+  {
+    DeclareAndCast(StepKinematics_PointOnPlanarCurvePairWithRange, anent, ent);
+    RWStepKinematics_RWPointOnPlanarCurvePairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 752:
+  {
+    DeclareAndCast(StepKinematics_PointOnSurfacePair, anent, ent);
+    RWStepKinematics_RWPointOnSurfacePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 753:
+  {
+    DeclareAndCast(StepKinematics_PointOnSurfacePairValue, anent, ent);
+    RWStepKinematics_RWPointOnSurfacePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 754:
+  {
+    DeclareAndCast(StepKinematics_PointOnSurfacePairWithRange, anent, ent);
+    RWStepKinematics_RWPointOnSurfacePairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 755:
+  {
+    DeclareAndCast(StepKinematics_PrismaticPair, anent, ent);
+    RWStepKinematics_RWPrismaticPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 756:
+  {
+    DeclareAndCast(StepKinematics_PrismaticPairValue, anent, ent);
+    RWStepKinematics_RWPrismaticPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 757:
+  {
+    DeclareAndCast(StepKinematics_PrismaticPairWithRange, anent, ent);
+    RWStepKinematics_RWPrismaticPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 758:
+  {
+    DeclareAndCast(StepKinematics_ProductDefinitionKinematics, anent, ent);
+    RWStepKinematics_RWProductDefinitionKinematics tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 759:
+  {
+    DeclareAndCast(StepKinematics_ProductDefinitionRelationshipKinematics, anent, ent);
+    RWStepKinematics_RWProductDefinitionRelationshipKinematics tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 760:
+  {
+    DeclareAndCast(StepKinematics_RackAndPinionPair, anent, ent);
+    RWStepKinematics_RWRackAndPinionPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 761:
+  {
+    DeclareAndCast(StepKinematics_RackAndPinionPairValue, anent, ent);
+    RWStepKinematics_RWRackAndPinionPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 762:
+  {
+    DeclareAndCast(StepKinematics_RackAndPinionPairWithRange, anent, ent);
+    RWStepKinematics_RWRackAndPinionPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 763:
+  {
+    DeclareAndCast(StepKinematics_RevolutePair, anent, ent);
+    RWStepKinematics_RWRevolutePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 764:
+  {
+    DeclareAndCast(StepKinematics_RevolutePairValue, anent, ent);
+    RWStepKinematics_RWRevolutePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 765:
+  {
+    DeclareAndCast(StepKinematics_RevolutePairWithRange, anent, ent);
+    RWStepKinematics_RWRevolutePairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 766:
+  {
+    DeclareAndCast(StepKinematics_RollingCurvePair, anent, ent);
+    RWStepKinematics_RWRollingCurvePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 767:
+  {
+    DeclareAndCast(StepKinematics_RollingCurvePairValue, anent, ent);
+    RWStepKinematics_RWRollingCurvePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 768:
+  {
+    DeclareAndCast(StepKinematics_RollingSurfacePair, anent, ent);
+    RWStepKinematics_RWRollingSurfacePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 769:
+  {
+    DeclareAndCast(StepKinematics_RollingSurfacePairValue, anent, ent);
+    RWStepKinematics_RWRollingSurfacePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 770:
+  {
+    DeclareAndCast(StepKinematics_ScrewPair, anent, ent);
+    RWStepKinematics_RWScrewPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 771:
+  {
+    DeclareAndCast(StepKinematics_ScrewPairValue, anent, ent);
+    RWStepKinematics_RWScrewPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 772:
+  {
+    DeclareAndCast(StepKinematics_ScrewPairWithRange, anent, ent);
+    RWStepKinematics_RWScrewPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 773:
+  {
+    DeclareAndCast(StepKinematics_SlidingCurvePair, anent, ent);
+    RWStepKinematics_RWSlidingCurvePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 774:
+  {
+    DeclareAndCast(StepKinematics_SlidingCurvePairValue, anent, ent);
+    RWStepKinematics_RWSlidingCurvePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 775:
+  {
+    DeclareAndCast(StepKinematics_SlidingSurfacePair, anent, ent);
+    RWStepKinematics_RWSlidingSurfacePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 776:
+  {
+    DeclareAndCast(StepKinematics_SlidingSurfacePairValue, anent, ent);
+    RWStepKinematics_RWSlidingSurfacePairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 777:
+  {
+    DeclareAndCast(StepKinematics_SphericalPair, anent, ent);
+    RWStepKinematics_RWSphericalPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 778:
+  {
+    DeclareAndCast(StepKinematics_SphericalPairValue, anent, ent);
+    RWStepKinematics_RWSphericalPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 779:
+  {
+    DeclareAndCast(StepKinematics_SphericalPairWithPin, anent, ent);
+    RWStepKinematics_RWSphericalPairWithPin tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 780:
+  {
+    DeclareAndCast(StepKinematics_SphericalPairWithPinAndRange, anent, ent);
+    RWStepKinematics_RWSphericalPairWithPinAndRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 781:
+  {
+    DeclareAndCast(StepKinematics_SphericalPairWithRange, anent, ent);
+    RWStepKinematics_RWSphericalPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 782:
+  {
+    DeclareAndCast(StepKinematics_SurfacePairWithRange, anent, ent);
+    RWStepKinematics_RWSurfacePairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 783:
+  {
+    DeclareAndCast(StepKinematics_UnconstrainedPair, anent, ent);
+    RWStepKinematics_RWUnconstrainedPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 784:
+  {
+    DeclareAndCast(StepKinematics_UnconstrainedPairValue, anent, ent);
+    RWStepKinematics_RWUnconstrainedPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 785:
+  {
+    DeclareAndCast(StepKinematics_UniversalPair, anent, ent);
+    RWStepKinematics_RWUniversalPair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 786:
+  {
+    DeclareAndCast(StepKinematics_UniversalPairValue, anent, ent);
+    RWStepKinematics_RWUniversalPairValue tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 787:
+  {
+    DeclareAndCast(StepKinematics_UniversalPairWithRange, anent, ent);
+    RWStepKinematics_RWUniversalPairWithRange tool;
+    tool.Share(anent, iter);
+  }
+  break;
+
   break;
     default : break;
     }
@@ -7169,6 +7784,210 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
    case 719:
      ent = new StepVisual_AnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem;
    break;
+   case 720:
+     ent = new StepRepr_RepresentationContextReference;
+     break;
+   case 721:
+     ent = new StepRepr_RepresentationReference;
+     break;
+   case 722:
+     ent = new StepKinematics_SuParameters;
+     break;
+   case 723:
+     ent = new StepKinematics_RotationAboutDirection;
+     break;
+   case 724:
+     ent = new StepKinematics_KinematicJoint;
+     break;
+   case 725:
+     ent = new StepKinematics_ActuatedKinematicPair;
+     break;
+   case 726:
+     ent = new StepKinematics_ContextDependentKinematicLinkRepresentation;
+     break;
+   case 727:
+     ent = new StepKinematics_CylindricalPair;
+     break;
+   case 728:
+     ent = new StepKinematics_CylindricalPairValue;
+     break;
+   case 729:
+     ent = new StepKinematics_CylindricalPairWithRange;
+     break;
+   case 730:
+     ent = new StepKinematics_FullyConstrainedPair;
+     break;
+   case 731:
+     ent = new StepKinematics_GearPair;
+     break;
+   case 732:
+     ent = new StepKinematics_GearPairValue;
+     break;
+   case 733:
+     ent = new StepKinematics_GearPairWithRange;
+     break;
+   case 734:
+     ent = new StepKinematics_HomokineticPair;
+     break;
+   case 735:
+     ent = new StepKinematics_KinematicLink;
+     break;
+   case 736:
+     ent = new StepKinematics_KinematicLinkRepresentationAssociation;
+     break;
+   case 737:
+     ent = new StepKinematics_KinematicPropertyMechanismRepresentation;
+     break;
+   case 738:
+     ent = new StepKinematics_KinematicTopologyStructure;
+     break;
+   case 739:
+     ent = new StepKinematics_LowOrderKinematicPair;
+     break;
+   case 740:
+     ent = new StepKinematics_LowOrderKinematicPairValue;
+     break;
+   case 741:
+     ent = new StepKinematics_LowOrderKinematicPairWithRange;
+     break;
+   case 742:
+     ent = new StepKinematics_MechanismRepresentation;
+     break;
+   case 743:
+     ent = new StepKinematics_OrientedJoint;
+     break;
+   case 744:
+     ent = new StepKinematics_PlanarCurvePair;
+     break;
+   case 745:
+     ent = new StepKinematics_PlanarCurvePairRange;
+     break;
+   case 746:
+     ent = new StepKinematics_PlanarPair;
+     break;
+   case 747:
+     ent = new StepKinematics_PlanarPairValue;
+     break;
+   case 748:
+     ent = new StepKinematics_PlanarPairWithRange;
+     break;
+   case 749:
+     ent = new StepKinematics_PointOnPlanarCurvePair;
+     break;
+   case 750:
+     ent = new StepKinematics_PointOnPlanarCurvePairValue;
+     break;
+   case 751:
+     ent = new StepKinematics_PointOnPlanarCurvePairWithRange;
+     break;
+   case 752:
+     ent = new StepKinematics_PointOnSurfacePair;
+     break;
+   case 753:
+     ent = new StepKinematics_PointOnSurfacePairValue;
+     break;
+   case 754:
+     ent = new StepKinematics_PointOnSurfacePairWithRange;
+     break;
+   case 755:
+     ent = new StepKinematics_PrismaticPair;
+     break;
+   case 756:
+     ent = new StepKinematics_PrismaticPairValue;
+     break;
+   case 757:
+     ent = new StepKinematics_PrismaticPairWithRange;
+     break;
+   case 758:
+     ent = new StepKinematics_ProductDefinitionKinematics;
+     break;
+   case 759:
+     ent = new StepKinematics_ProductDefinitionRelationshipKinematics;
+     break;
+   case 760:
+     ent = new StepKinematics_RackAndPinionPair;
+     break;
+   case 761:
+     ent = new StepKinematics_RackAndPinionPairValue;
+     break;
+   case 762:
+     ent = new StepKinematics_RackAndPinionPairWithRange;
+     break;
+   case 763:
+     ent = new StepKinematics_RevolutePair;
+     break;
+   case 764:
+     ent = new StepKinematics_RevolutePairValue;
+     break;
+   case 765:
+     ent = new StepKinematics_RevolutePairWithRange;
+     break;
+   case 766:
+     ent = new StepKinematics_RollingCurvePair;
+     break;
+   case 767:
+     ent = new StepKinematics_RollingCurvePairValue;
+     break;
+   case 768:
+     ent = new StepKinematics_RollingSurfacePair;
+     break;
+   case 769:
+     ent = new StepKinematics_RollingSurfacePairValue;
+     break;
+   case 770:
+     ent = new StepKinematics_ScrewPair;
+     break;
+   case 771:
+     ent = new StepKinematics_ScrewPairValue;
+     break;
+   case 772:
+     ent = new StepKinematics_ScrewPairWithRange;
+     break;
+   case 773:
+     ent = new StepKinematics_SlidingCurvePair;
+     break;
+   case 774:
+     ent = new StepKinematics_SlidingCurvePairValue;
+     break;
+   case 775:
+     ent = new StepKinematics_SlidingSurfacePair;
+     break;
+   case 776:
+     ent = new StepKinematics_SlidingSurfacePairValue;
+     break;
+   case 777:
+     ent = new StepKinematics_SphericalPair;
+     break;
+   case 778:
+     ent = new StepKinematics_SphericalPairValue;
+     break;
+   case 779:
+     ent = new StepKinematics_SphericalPairWithPin;
+     break;
+   case 780:
+     ent = new StepKinematics_SphericalPairWithPinAndRange;
+     break;
+   case 781:
+     ent = new StepKinematics_SphericalPairWithRange;
+     break;
+   case 782:
+     ent = new StepKinematics_SurfacePairWithRange;
+     break;
+   case 783:
+     ent = new StepKinematics_UnconstrainedPair;
+     break;
+   case 784:
+     ent = new StepKinematics_UnconstrainedPairValue;
+     break;
+   case 785:
+     ent = new StepKinematics_UniversalPair;
+     break;
+   case 786:
+     ent = new StepKinematics_UniversalPairValue;
+     break;
+   case 787:
+     ent = new StepKinematics_UniversalPairWithRange;
+     break;
 
     
   default: 
@@ -7769,6 +8588,75 @@ Standard_Integer  RWStepAP214_GeneralModule::CategoryNumber
   case 717:
   case 718: return cataux;
   case 719: return catdr;
+  case 720: return cataux;
+  case 721: return cataux;
+  case 722: return cataux;
+  case 723: return cataux;
+  case 724: return cataux;
+  case 725: return cataux;
+  case 726: return cataux;
+  case 727: return cataux;
+  case 728: return cataux;
+  case 729: return cataux;
+  case 730: return cataux;
+  case 731: return cataux;
+  case 732: return cataux;
+  case 733: return cataux;
+  case 734: return cataux;
+  case 735: return cataux;
+  case 736: return cataux;
+  case 737: return cataux;
+  case 738: return cataux;
+  case 739: return cataux;
+  case 740: return cataux;
+  case 741: return cataux;
+  case 742: return cataux;
+  case 743: return cataux;
+  case 744: return cataux;
+  case 745: return cataux;
+  case 746: return cataux;
+  case 747: return cataux;
+  case 748: return cataux;
+  case 749: return cataux;
+  case 750: return cataux;
+  case 751: return cataux;
+  case 752: return cataux;
+  case 753: return cataux;
+  case 754: return cataux;
+  case 755: return cataux;
+  case 756: return cataux;
+  case 757: return cataux;
+  case 758: return cataux;
+  case 759: return cataux;
+  case 760: return cataux;
+  case 761: return cataux;
+  case 762: return cataux;
+  case 763: return cataux;
+  case 764: return cataux;
+  case 765: return cataux;
+  case 766: return cataux;
+  case 767: return cataux;
+  case 768: return cataux;
+  case 769: return cataux;
+  case 770: return cataux;
+  case 771: return cataux;
+  case 772: return cataux;
+  case 773: return cataux;
+  case 774: return cataux;
+  case 775: return cataux;
+  case 776: return cataux;
+  case 777: return cataux;
+  case 778: return cataux;
+  case 779: return cataux;
+  case 780: return cataux;
+  case 781: return cataux;
+  case 782: return cataux;
+  case 783: return cataux;
+  case 784: return cataux;
+  case 785: return cataux;
+  case 786: return cataux;
+  case 787: return cataux;
+
     
   default : break;
   }
