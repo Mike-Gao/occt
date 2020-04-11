@@ -17,6 +17,7 @@
 
 #include <inspector/VInspector_ItemContext.hxx>
 #include <inspector/VInspector_ItemV3dViewer.hxx>
+#include <inspector/VInspector_ItemSelectMgrViewerSelector.hxx>
 
 // =======================================================================
 // function : initValue
@@ -40,7 +41,7 @@ QVariant VInspector_ItemContextProperties::initValue (int theItemRole) const
 // =======================================================================
 int VInspector_ItemContextProperties::initRowCount() const
 {
-  return 1; // V3d_Viewer
+  return 2; // V3d_Viewer, SelectMgr_ViewerSelector
 }
 
 // =======================================================================
@@ -49,7 +50,10 @@ int VInspector_ItemContextProperties::initRowCount() const
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemContextProperties::createChild (int theRow, int theColumn)
 {
-  return VInspector_ItemV3dViewer::CreateItem (currentItem(), theRow, theColumn);
+  if (theRow == 0)
+    return VInspector_ItemV3dViewer::CreateItem (currentItem(), theRow, theColumn);
+
+  return VInspector_ItemSelectMgrViewerSelector::CreateItem (currentItem(), theRow, theColumn);
 }
 
 // =======================================================================

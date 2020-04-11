@@ -21,6 +21,8 @@ VInspector_ItemHistoryType.hxx
 VInspector_ItemHistoryTypeInfo.hxx
 VInspector_ItemPresentableObject.cxx
 VInspector_ItemPresentableObject.hxx
+VInspector_ItemSelectMgrViewerSelector.cxx
+VInspector_ItemSelectMgrViewerSelector.hxx
 VInspector_ItemV3dViewer.cxx
 VInspector_ItemV3dViewer.hxx
 VInspector_ToolActionType.hxx
