@@ -32,7 +32,6 @@
 #include <inspector/ViewControl_TreeView.hxx>
 #include <inspector/Convert_Tools.hxx>
 
-#include <inspector/View_DisplayPreview.hxx>
 #include <inspector/View_Viewer.hxx>
 #include <inspector/View_Widget.hxx>
 
@@ -739,7 +738,7 @@ void MessageView_Window::onPreviewChildren()
   NCollection_List<Handle(Standard_Transient)> aPresentations;
   TreeModel_ModelBase::SubItemsPresentations (aSelectedIndices, aPresentations);
 
-  displayer()->DisplayPreview()->UpdatePreview (View_DisplayActionType_DisplayId, aPresentations, myViewWindow->ViewWidget()->DisplayMode());
+  displayer()->UpdatePreview (View_DisplayActionType_DisplayId, aPresentations);
 }
 
 // =======================================================================
@@ -871,20 +870,10 @@ void MessageView_Window::updatePreviewPresentation()
     if (!anItemBase)
       continue;
 
-    Handle(TreeModel_ItemProperties) anItemProperties = anItemBase->Properties();
-    if (anItemProperties)
-    {
-      anItemProperties->Presentations (aPresentations);
-    }
-
-    MessageModel_ItemAlertPtr anAlertItem = itemDynamicCast<MessageModel_ItemAlert>(anItemBase);
-    if (anAlertItem)
-    {
-      anAlertItem->Presentations (aPresentations);
-    }
+    anItemBase->Presentations (aPresentations);
   }
 
-  displayer()->DisplayPreview()->UpdatePreview (View_DisplayActionType_DisplayId, aPresentations, myViewWindow->ViewWidget()->DisplayMode());
+  displayer()->UpdatePreview (View_DisplayActionType_DisplayId, aPresentations);
 }
 
 // =======================================================================
@@ -894,7 +883,6 @@ void MessageView_Window::updatePreviewPresentation()
 void MessageView_Window::updateVisibleColumns()
 {
   MessageModel_TreeModel* aViewModel = dynamic_cast<MessageModel_TreeModel*> (myTreeView->model());
-  const NCollection_List<MessageModel_ReportInformation>& aReports = aViewModel->Reports();
 
   NCollection_Map<Message_MetricType> anActiveMetrics;
   for (NCollection_List<MessageModel_ReportInformation>::Iterator anIterator (aViewModel->Reports()); anIterator.More(); anIterator.Next())

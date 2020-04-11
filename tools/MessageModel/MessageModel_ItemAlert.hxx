@@ -92,7 +92,7 @@ public:
   //! \param theColumn a model index column
   //! \thePresentations [out] container of presentation handles to be visualized
   virtual void Presentations (NCollection_List<Handle(Standard_Transient)>& thePresentations) Standard_OVERRIDE
-  { thePresentations.Append (myPresentation); }
+  { TreeModel_ItemBase::Presentations (thePresentations); thePresentations.Append (myPresentation); }
 
 
   ////! Returns summ of children alert elapsed times. The method is recusive.
