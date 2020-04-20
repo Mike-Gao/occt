@@ -1382,6 +1382,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <StepKinematics_LowOrderKinematicPairWithRange.hxx>
 #include <StepKinematics_MechanismRepresentation.hxx>
 #include <StepKinematics_OrientedJoint.hxx>
+#include <StepKinematics_PairRepresentationRelationship.hxx>
 #include <StepKinematics_PlanarCurvePair.hxx>
 #include <StepKinematics_PlanarCurvePairRange.hxx>
 #include <StepKinematics_PlanarPair.hxx>
@@ -1451,6 +1452,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepKinematics_RWLowOrderKinematicPairWithRange.hxx>
 #include <RWStepKinematics_RWMechanismRepresentation.hxx>
 #include <RWStepKinematics_RWOrientedJoint.hxx>
+#include <RWStepKinematics_RWPairRepresentationRelationship.hxx>
 #include <RWStepKinematics_RWPlanarCurvePair.hxx>
 #include <RWStepKinematics_RWPlanarCurvePairRange.hxx>
 #include <RWStepKinematics_RWPlanarPair.hxx>
@@ -5770,6 +5772,13 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
     tool.Share(anent, iter);
   }
   break;
+  case 788:
+  {
+    DeclareAndCast(StepKinematics_PairRepresentationRelationship, anent, ent);
+    RWStepKinematics_RWPairRepresentationRelationship tool;
+    tool.Share(anent, iter);
+  }
+  break;
 
   break;
     default : break;
@@ -7988,6 +7997,9 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
    case 787:
      ent = new StepKinematics_UniversalPairWithRange;
      break;
+   case 788:
+     ent = new StepKinematics_PairRepresentationRelationship;
+     break;
 
     
   default: 
@@ -8656,6 +8668,7 @@ Standard_Integer  RWStepAP214_GeneralModule::CategoryNumber
   case 785: return cataux;
   case 786: return cataux;
   case 787: return cataux;
+  case 788: return cataux;
 
     
   default : break;

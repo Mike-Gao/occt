@@ -49,6 +49,8 @@ StepKinematics_MechanismRepresentation.cxx
 StepKinematics_MechanismRepresentation.hxx
 StepKinematics_OrientedJoint.cxx
 StepKinematics_OrientedJoint.hxx
+StepKinematics_PairRepresentationRelationship.cxx
+StepKinematics_PairRepresentationRelationship.hxx
 StepKinematics_PairValue.cxx
 StepKinematics_PairValue.hxx
 StepKinematics_PlanarCurvePair.cxx

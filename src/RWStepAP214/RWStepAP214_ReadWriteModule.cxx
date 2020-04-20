@@ -1429,6 +1429,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <StepKinematics_LowOrderKinematicPairWithRange.hxx>
 #include <StepKinematics_MechanismRepresentation.hxx>
 #include <StepKinematics_OrientedJoint.hxx>
+#include <StepKinematics_PairRepresentationRelationship.hxx>
 #include <StepKinematics_PlanarCurvePair.hxx>
 #include <StepKinematics_PlanarCurvePairRange.hxx>
 #include <StepKinematics_PlanarPair.hxx>
@@ -1497,6 +1498,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <RWStepKinematics_RWLowOrderKinematicPairWithRange.hxx>
 #include <RWStepKinematics_RWMechanismRepresentation.hxx>
 #include <RWStepKinematics_RWOrientedJoint.hxx>
+#include <RWStepKinematics_RWPairRepresentationRelationship.hxx>
 #include <RWStepKinematics_RWPlanarCurvePair.hxx>
 #include <RWStepKinematics_RWPlanarCurvePairRange.hxx>
 #include <RWStepKinematics_RWPlanarPair.hxx>
@@ -2208,6 +2210,7 @@ static TCollection_AsciiString Reco_LowOrderKinematicPairValue("LOW_ORDER_KINEMA
 static TCollection_AsciiString Reco_LowOrderKinematicPairWithRange("LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE");
 static TCollection_AsciiString Reco_MechanismRepresentation("MECHANISM_REPRESENTATION");
 static TCollection_AsciiString Reco_OrientedJoint("ORIENTED_JOINT");
+static TCollection_AsciiString Reco_PairRepresentationRelationship("PAIR_REPRESENTATION_RELATIONSHIP");
 static TCollection_AsciiString Reco_PlanarCurvePair("PLANAR_CURVE_PAIR");
 static TCollection_AsciiString Reco_PlanarCurvePairRange("PLANAR_CURVE_PAIR_RANGE");
 static TCollection_AsciiString Reco_PlanarPair("PLANAR_PAIR");
@@ -2978,7 +2981,7 @@ RWStepAP214_ReadWriteModule::RWStepAP214_ReadWriteModule ()
   typenums.Bind(Reco_UniversalPair, 785);
   typenums.Bind(Reco_UniversalPairValue, 786);
   typenums.Bind(Reco_UniversalPairWithRange, 787);
-
+  typenums.Bind(Reco_PairRepresentationRelationship, 788);
 
   
 //    SHORT NAMES
@@ -4903,6 +4906,7 @@ const TCollection_AsciiString& RWStepAP214_ReadWriteModule::StepType
   case 785: return Reco_UniversalPair;
   case 786: return Reco_UniversalPairValue;
   case 787: return Reco_UniversalPairWithRange;
+  case 788: return Reco_PairRepresentationRelationship;
 
 
   default : return PasReco;
@@ -10280,8 +10284,13 @@ void RWStepAP214_ReadWriteModule::ReadStep(const Standard_Integer CN,
     tool.ReadStep(data, num, ach, anent);
   }
   break;
-
-   
+  case 788:
+  {
+    DeclareAndCast(StepKinematics_PairRepresentationRelationship, anent, ent);
+    RWStepKinematics_RWPairRepresentationRelationship tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
 
   default: 
     ach->AddFail("Type Mismatch when reading - Entity");
@@ -15614,7 +15623,13 @@ void RWStepAP214_ReadWriteModule::WriteStep(const Standard_Integer CN,
     tool.WriteStep(SW, anent);
   }
   break;
-
+  case 788:
+  {
+    DeclareAndCast(StepKinematics_PairRepresentationRelationship, anent, ent);
+    RWStepKinematics_RWPairRepresentationRelationship tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
 
   default: 
     return;
