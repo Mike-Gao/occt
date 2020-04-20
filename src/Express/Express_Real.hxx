@@ -31,7 +31,7 @@ public:
   Standard_EXPORT Express_Real();
   
   //! Returns "Standard_Real"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
+  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const Standard_OVERRIDE;
   
 
 

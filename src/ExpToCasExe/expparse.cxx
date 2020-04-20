@@ -1,11 +1,20 @@
 
 # line 2 "Express.y"
 
-/* File:	Express.y                     */
-/* Created:	Thu Oct 28 12:21:16 1999       */
-/* Author:	Andrey BETENEV                 */
-/* 		<abv@doomox.nnov.matra-dtv.fr> */
-/* Copyright:	Matra Datavision 1999          */
+// Created:	Thu Oct 28 12:21:16 1999
+// Author:	Andrey BETENEV
+// Copyright (c) 1999-2020 OPEN CASCADE SAS
+//
+// This file is part of Open CASCADE Technology software library.
+//
+// This library is free software; you can redistribute it and/or modify it under
+// the terms of the GNU Lesser General Public License version 2.1 as published
+// by the Free Software Foundation, with special exception defined in the file
+// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
+// distribution for complete text of the license and disclaimer of any warranty.
+//
+// Alternatively, this file may be used under the terms of Open CASCADE
+// commercial license or contractual agreement.
 
 /*****************************************************************************\
 
@@ -53,10 +62,15 @@ complex time or redefinition of inherited field are ignored.
 #include <Express_Reference.hxx>
 #include <Express.hxx>
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4244)
 #pragma warning(disable:4274)
 #pragma warning(disable:4800)
+#endif
+#if defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#endif
 
 /************************************************/
 /* ERROR MESSAGE FUNCTION                       */
@@ -604,8 +618,6 @@ char * yyreds[] =
 /*
  * Copyright (c) 1993 by Sun Microsystems, Inc.
  */
-
-#pragma ident	"@(#)yaccpar	6.14	97/01/16 SMI"
 
 /*
 ** Skeleton parser driver for yacc output
@@ -1319,4 +1331,6 @@ case 66:
 	goto yystack;		/* reset registers in driver code */
 }
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif

@@ -32,16 +32,16 @@ public:
   Standard_EXPORT Express_Logical();
   
   //! Returns "StepData_Logical"
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
+  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const Standard_OVERRIDE;
   
   //! Return False
-  Standard_EXPORT virtual   Standard_Boolean IsStandard()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsStandard()  const Standard_OVERRIDE;
   
   //! Return False
-  Standard_EXPORT virtual   Standard_Boolean IsSimple()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsSimple()  const Standard_OVERRIDE;
   
   //! Return False
-  Standard_EXPORT virtual   Standard_Boolean IsHandle()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsHandle()  const Standard_OVERRIDE;
 
 
 

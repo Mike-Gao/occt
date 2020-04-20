@@ -42,7 +42,7 @@ public:
   Standard_EXPORT  const  Handle(Express_HSequenceOfItem)& Items()  const;
   
   //! Create HXX/CXX files from item
-  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
+  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const Standard_OVERRIDE;
 
 
 

@@ -1,7 +1,17 @@
-// File:	ExpToCasExe.cxx
 // Created:	Mon Nov  1 12:50:27 1999
 // Author:	Andrey BETENEV
-//		<abv@nordox.nnov.matra-dtv.fr>
+// Copyright (c) 1999-2020 OPEN CASCADE SAS
+//
+// This file is part of Open CASCADE Technology software library.
+//
+// This library is free software; you can redistribute it and/or modify it under
+// the terms of the GNU Lesser General Public License version 2.1 as published
+// by the Free Software Foundation, with special exception defined in the file
+// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
+// distribution for complete text of the license and disclaimer of any warranty.
+//
+// Alternatively, this file may be used under the terms of Open CASCADE
+// commercial license or contractual agreement.
 
 #include <string.h>
 #include <ctype.h>
@@ -13,9 +23,11 @@
 #include <Express_Schema.hxx>
 #include <Express_Item.hxx>
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning (disable:4267)
 #pragma warning (disable:4706)
+#endif
 
 Handle(Express_Schema) ec_parse ( FILE *fin ); // interface to parser
 
@@ -205,5 +217,6 @@ Standard_Integer main ( const Standard_Integer argc, const char *argv[] )
 //  std::cout << "Finished; total " << nbgen << " classes generated" << std::endl;
   return 1;
 }
-
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif

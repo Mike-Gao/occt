@@ -1174,13 +1174,7 @@ Standard_Integer Express_Entity::MakeInit (Standard_OStream &os,
     }
     
     // write field
-    if ( mode == 0 ) {
-      if (field->Type()->IsHandle())
-        os << "const Handle(" << field->Type()->CPPName()->ToCString() << ")& the" << varName->ToCString();
-      else
-        os << "const " << field->Type()->CPPName()->ToCString() << " the" << varName->ToCString();
-    }
-    else if (mode == 1) {
+    if ( mode == 0 || mode ==1) {
       os << "const " << (field->Type()->IsHandle() ? "Handle(" : "") <<
         field->Type()->CPPName()->ToCString() << (field->Type()->IsHandle() ? ")" : "") <<
         (field->Type()->IsSimple() ? " the" : "& the") << varName->ToCString();

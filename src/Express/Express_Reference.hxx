@@ -42,7 +42,7 @@ public:
   
   //! Redefined to empty (in order to be able to instantiate)
   //! Returna False
-  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
+  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const Standard_OVERRIDE;
 
 
 

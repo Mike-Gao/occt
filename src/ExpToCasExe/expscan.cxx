@@ -1,5 +1,25 @@
+// Created:	Mon Nov  1 12:50:27 1999
+// Author:	Andrey BETENEV
+// Copyright (c) 1999-2020 OPEN CASCADE SAS
+//
+// This file is part of Open CASCADE Technology software library.
+//
+// This library is free software; you can redistribute it and/or modify it under
+// the terms of the GNU Lesser General Public License version 2.1 as published
+// by the Free Software Foundation, with special exception defined in the file
+// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
+// distribution for complete text of the license and disclaimer of any warranty.
+//
+// Alternatively, this file may be used under the terms of Open CASCADE
+// commercial license or contractual agreement.
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#endif
+
 # define U(x) x
 # define NLSTATE yyprevious=YYNEWLINE
 # define BEGIN yybgin = yysvec + 1 +
@@ -80,11 +100,18 @@ struct yysvf {
 struct yysvf *yyestate;
 extern struct yysvf yysvec[], *yybgin;
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning (disable:4244)
 #pragma warning (disable:4274)
 #pragma warning (disable:4706)
 #pragma warning (disable:4701)
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
 
 # line 4 "exptocas.l"
 /* File:	exptocas.l                     */
@@ -2656,8 +2683,6 @@ char yyextra[] = {
 /*	The copyright notice above does not evidence any   	*/
 /*	actual or intended publication of such source code.	*/
 
-#pragma ident	"@(#)ncform	6.11	97/01/06 SMI"
-
 int yylineno =1;
 # define YYU(x) x
 # define NLSTATE yyprevious=YYNEWLINE
@@ -2916,4 +2941,6 @@ yyunput(c)
 	unput(c);
 	}
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif

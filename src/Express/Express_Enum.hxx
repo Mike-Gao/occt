@@ -35,7 +35,7 @@ public:
   Standard_EXPORT  const  Handle(TColStd_HSequenceOfHAsciiString)& Names()  const;
   
   //! Create HXX/CXX files from item
-  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
+  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const Standard_OVERRIDE;
 
 
 

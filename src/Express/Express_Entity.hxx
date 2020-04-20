@@ -73,7 +73,7 @@ private:
   typedef NCollection_DataMap<TCollection_AsciiString,Standard_Integer,TCollection_AsciiString> DataMapOfStringInteger;
   
   //! Create HXX/CXX files from item
-  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
+  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const Standard_OVERRIDE;
   
   //! Writes includes section of HXX
   Standard_EXPORT   Standard_Boolean WriteIncludes (Standard_OStream& os, DataMapOfStringInteger& dict)  const;

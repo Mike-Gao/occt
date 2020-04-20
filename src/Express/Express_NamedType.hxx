@@ -47,20 +47,20 @@ public:
   Standard_EXPORT   void SetItem (const Handle(Express_Item)& it) ;
   
   //! Returns CPP-style name of the type
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
+  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const Standard_OVERRIDE;
   
   //! Return True if type is defined in package Standard
-  Standard_EXPORT virtual   Standard_Boolean IsStandard()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsStandard()  const Standard_OVERRIDE;
   
   //! Return True if type is simple (not a class)
-  Standard_EXPORT virtual   Standard_Boolean IsSimple()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsSimple()  const Standard_OVERRIDE;
   
   //! Return True if type is inherited from Transient
-  Standard_EXPORT virtual   Standard_Boolean IsHandle()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsHandle()  const Standard_OVERRIDE;
   
   //! Declares type as used by some item being generated.
   //! Calls Use() for referred item (found by name).
-  Standard_EXPORT virtual   Standard_Boolean Use (const Handle(TCollection_HAsciiString)& pack, const Standard_Boolean defer = Standard_False)  const;
+  Standard_EXPORT virtual   Standard_Boolean Use(const Handle(TCollection_HAsciiString)& pack, const Standard_Boolean defer = Standard_False)  const Standard_OVERRIDE;
 
 
 

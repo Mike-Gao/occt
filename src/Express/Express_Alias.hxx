@@ -36,10 +36,10 @@ public:
   Standard_EXPORT  const  Handle(Express_Type)& Type()  const;
   
   //! Returns name of aliased type
-  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const;
+  Standard_EXPORT virtual   Handle(TCollection_HAsciiString) CPPName()  const Standard_OVERRIDE;
   
   //! Create HXX/CXX files from item
-  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const;
+  Standard_EXPORT virtual   Standard_Boolean GenerateClass()  const Standard_OVERRIDE;
 
 
 

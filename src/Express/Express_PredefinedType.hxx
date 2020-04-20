@@ -27,7 +27,7 @@ public:
 
   
   //! Returns True
-  Standard_EXPORT virtual   Standard_Boolean IsStandard()  const;
+  Standard_EXPORT virtual   Standard_Boolean IsStandard()  const Standard_OVERRIDE;
 
 
 
