@@ -24,7 +24,7 @@
 #include <OSD_Path.hxx>
 #include <OSD_ThreadPool.hxx>
 #include <Precision.hxx>
-#include <FSD_Base64Decoder.hxx>
+#include <FSD_Base64.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -700,7 +700,7 @@ bool RWGltf_GltfJsonParser::gltfParseTexture (Handle(Image_Texture)& theTexture,
         const char* aBase64Data = aDataIter + 8;
         const size_t aBase64Len = size_t(aBase64End - aBase64Data);
         //const TCollection_AsciiString aMime (aDataStart, aDataIter - aDataStart);
-        Handle(NCollection_Buffer) aData = FSD_Base64Decoder::Decode ((const Standard_Byte* )aBase64Data, aBase64Len);
+        Handle(NCollection_Buffer) aData = FSD_Base64::Decode (aBase64Data, aBase64Len);
         theTexture = new Image_Texture (aData, myFilePath + "@" + getKeyString (*aSrcVal));
         return true;
       }
@@ -1503,7 +1503,7 @@ bool RWGltf_GltfJsonParser::gltfParseBuffer (const Handle(RWGltf_GltfLatePrimiti
     if (!myDecodedBuffers.Find (theName, aData.StreamData))
     {
       // it is better decoding in multiple threads
-      aData.StreamData = FSD_Base64Decoder::Decode ((const Standard_Byte* )anUriData + 37, anUriVal->GetStringLength() - 37);
+      aData.StreamData = FSD_Base64::Decode (anUriData + 37, anUriVal->GetStringLength() - 37);
       myDecodedBuffers.Bind (theName, aData.StreamData);
     }
     return true;
