@@ -12,19 +12,24 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef _FSD_Base64Decoder_HeaderFile
-#define _FSD_Base64Decoder_HeaderFile
+#ifndef _FSD_Base64_HeaderFile
+#define _FSD_Base64_HeaderFile
 
 #include <NCollection_Buffer.hxx>
+#include <TCollection_AsciiString.hxx>
 
-//! Tool decoding base64 stream.
-class FSD_Base64Decoder
+//! Tool for encoding/decoding base64 stream.
+class FSD_Base64
 {
 public:
 
-  //! Function decoding base64 stream.
+  //! Function encoding a buffer to base64.
+  Standard_EXPORT static TCollection_AsciiString Encode (const Standard_Byte* theData,
+                                                         const Standard_Size  theLen);
+
+  //! Function decoding base64 string.
   Standard_EXPORT static Handle(NCollection_Buffer) Decode (const Standard_Byte* theStr,
                                                             const Standard_Size  theLen);
 };
 
-#endif // _FSD_Base64Decoder_HeaderFile
+#endif // _FSD_Base64_HeaderFile
