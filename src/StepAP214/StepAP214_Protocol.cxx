@@ -797,6 +797,7 @@ static Standard_CString schemaAP242DIS = "AP242_MANAGED_MODEL_BASED_3D_ENGINEERI
 #include <StepKinematics_RevolutePair.hxx>
 #include <StepKinematics_RevolutePairValue.hxx>
 #include <StepKinematics_RevolutePairWithRange.hxx>
+#include <StepKinematics_RigidLinkRepresentation.hxx>
 #include <StepKinematics_RollingCurvePair.hxx>
 #include <StepKinematics_RollingCurvePairValue.hxx>
 #include <StepKinematics_RollingSurfacePair.hxx>
@@ -1601,6 +1602,7 @@ StepAP214_Protocol::StepAP214_Protocol ()
   types.Bind(STANDARD_TYPE(StepKinematics_UniversalPairValue), 786);
   types.Bind(STANDARD_TYPE(StepKinematics_UniversalPairWithRange), 787);
   types.Bind(STANDARD_TYPE(StepKinematics_PairRepresentationRelationship), 788);
+  types.Bind(STANDARD_TYPE(StepKinematics_RigidLinkRepresentation), 789);
 
 }
 

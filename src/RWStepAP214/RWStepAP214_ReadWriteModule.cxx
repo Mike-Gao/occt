@@ -1452,6 +1452,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <StepKinematics_RevolutePair.hxx>
 #include <StepKinematics_RevolutePairValue.hxx>
 #include <StepKinematics_RevolutePairWithRange.hxx>
+#include <StepKinematics_RigidLinkRepresentation.hxx>
 #include <StepKinematics_RollingCurvePair.hxx>
 #include <StepKinematics_RollingCurvePairValue.hxx>
 #include <StepKinematics_RollingSurfacePair.hxx>
@@ -1521,6 +1522,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <RWStepKinematics_RWRevolutePair.hxx>
 #include <RWStepKinematics_RWRevolutePairValue.hxx>
 #include <RWStepKinematics_RWRevolutePairWithRange.hxx>
+#include <RWStepKinematics_RWRigidLinkRepresentation.hxx>
 #include <RWStepKinematics_RWRollingCurvePair.hxx>
 #include <RWStepKinematics_RWRollingCurvePairValue.hxx>
 #include <RWStepKinematics_RWRollingSurfacePair.hxx>
@@ -2233,6 +2235,7 @@ static TCollection_AsciiString Reco_RackAndPinionPairWithRange("RACK_AND_PINION_
 static TCollection_AsciiString Reco_RevolutePair("REVOLUTE_PAIR");
 static TCollection_AsciiString Reco_RevolutePairValue("REVOLUTE_PAIR_VALUE");
 static TCollection_AsciiString Reco_RevolutePairWithRange("REVOLUTE_PAIR_WITH_RANGE");
+static TCollection_AsciiString Reco_RigidLinkRepresentation("RIGID_LINK_REPRESENTATION");
 static TCollection_AsciiString Reco_RollingCurvePair("ROLLING_CURVE_PAIR");
 static TCollection_AsciiString Reco_RollingCurvePairValue("ROLLING_CURVE_PAIR_VALUE");
 static TCollection_AsciiString Reco_RollingSurfacePair("ROLLING_SURFACE_PAIR");
@@ -2982,6 +2985,7 @@ RWStepAP214_ReadWriteModule::RWStepAP214_ReadWriteModule ()
   typenums.Bind(Reco_UniversalPairValue, 786);
   typenums.Bind(Reco_UniversalPairWithRange, 787);
   typenums.Bind(Reco_PairRepresentationRelationship, 788);
+  typenums.Bind(Reco_RigidLinkRepresentation, 789);
 
   
 //    SHORT NAMES
@@ -4907,6 +4911,7 @@ const TCollection_AsciiString& RWStepAP214_ReadWriteModule::StepType
   case 786: return Reco_UniversalPairValue;
   case 787: return Reco_UniversalPairWithRange;
   case 788: return Reco_PairRepresentationRelationship;
+  case 789: return Reco_RigidLinkRepresentation;
 
 
   default : return PasReco;
@@ -10291,6 +10296,13 @@ void RWStepAP214_ReadWriteModule::ReadStep(const Standard_Integer CN,
     tool.ReadStep(data, num, ach, anent);
   }
   break;
+  case 789:
+  {
+    DeclareAndCast(StepKinematics_RigidLinkRepresentation, anent, ent);
+    RWStepKinematics_RWRigidLinkRepresentation tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
 
   default: 
     ach->AddFail("Type Mismatch when reading - Entity");
@@ -15627,6 +15639,13 @@ void RWStepAP214_ReadWriteModule::WriteStep(const Standard_Integer CN,
   {
     DeclareAndCast(StepKinematics_PairRepresentationRelationship, anent, ent);
     RWStepKinematics_RWPairRepresentationRelationship tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 789:
+  {
+    DeclareAndCast(StepKinematics_RigidLinkRepresentation, anent, ent);
+    RWStepKinematics_RWRigidLinkRepresentation tool;
     tool.WriteStep(SW, anent);
   }
   break;
