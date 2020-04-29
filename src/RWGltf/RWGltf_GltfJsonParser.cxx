@@ -806,6 +806,10 @@ bool RWGltf_GltfJsonParser::gltfParseTexture (Handle(Image_Texture)& theTexture,
         const size_t aBase64Len = size_t(aBase64End - aBase64Data);
         //const TCollection_AsciiString aMime (aDataStart, aDataIter - aDataStart);
         Handle(NCollection_Buffer) aData = FSD_Base64::Decode (aBase64Data, aBase64Len);
+        if (aData.IsNull())
+        {
+          Message::DefaultMessenger()->Send("Fail to allocate memory.", Message_Fail);
+        }
         theTexture = new Image_Texture (aData, myFilePath + "@" + getKeyString (*aSrcVal));
         return true;
       }
@@ -931,6 +935,10 @@ bool RWGltf_GltfJsonParser::gltfParseTextureInBufferView (Handle(Image_Texture)&
     if (!myDecodedBuffers.Find (aBufferId, aBaseBuffer))
     {
       aBaseBuffer = FSD_Base64::Decode (anUriData + 37, anUriVal->GetStringLength() - 37);
+      if (aBaseBuffer.IsNull())
+      {
+        Message::DefaultMessenger()->Send("Fail to allocate memory.", Message_Fail);
+      }
       myDecodedBuffers.Bind (aBufferId, aBaseBuffer);
     }
 
@@ -1773,6 +1781,10 @@ bool RWGltf_GltfJsonParser::gltfParseBuffer (const Handle(RWGltf_GltfLatePrimiti
     {
       // it is better decoding in multiple threads
       aData.StreamData = FSD_Base64::Decode (anUriData + 37, anUriVal->GetStringLength() - 37);
+      if (aData.StreamData.IsNull())
+      {
+        Message::DefaultMessenger()->Send("Fail to allocate memory.", Message_Fail);
+      }
       myDecodedBuffers.Bind (theName, aData.StreamData);
     }
     return true;

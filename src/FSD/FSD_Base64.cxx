@@ -15,17 +15,17 @@
 // in the discussion https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
 
 #include <FSD_Base64.hxx>
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
+#include <cstdint>
 
 // =======================================================================
 // function : Encode
 // =======================================================================
 Standard_Size FSD_Base64::Encode (char* theEncodedStr,
+                                  const Standard_Size theStrLen,
                                   const Standard_Byte* theData,
                                   const Standard_Size theDataLen)
 {
-  static const char* B64Map =
+  static const char* aBase64Chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
   if (theDataLen == 0)
@@ -39,25 +39,38 @@ Standard_Size FSD_Base64::Encode (char* theEncodedStr,
   {
     return aSize64;
   }
+  if (aSize64 > theStrLen)
+  {
+    return 0;
+  }
 
   Standard_Size iStr = 0;
   for (Standard_Size i = 0; i < theDataLen - aPad; i += 3)
   {
-    Standard_Integer aWord = (Standard_Integer (theData[i]) << 16) +
-                             (Standard_Integer (theData[i + 1]) << 8) +
-                             theData[i + 2];
-    theEncodedStr[iStr++] = B64Map[aWord >> 18];
-    theEncodedStr[iStr++] = B64Map[aWord >> 12 & 0x3F];
-    theEncodedStr[iStr++] = B64Map[aWord >> 6 & 0x3F];
-    theEncodedStr[iStr++] = B64Map[aWord & 0x3F];
+    uint32_t aWord = (uint32_t(theData[i]) << 16) +
+                     (uint32_t(theData[i + 1]) << 8) +
+                     theData[i + 2];
+    theEncodedStr[iStr++] = aBase64Chars[aWord >> 18];
+    theEncodedStr[iStr++] = aBase64Chars[aWord >> 12 & 0x3F];
+    theEncodedStr[iStr++] = aBase64Chars[aWord >> 6 & 0x3F];
+    theEncodedStr[iStr++] = aBase64Chars[aWord & 0x3F];
   }
   if (aPad--)
   {
-    int aWord = aPad ? int(theData[theDataLen - 2]) << 8 | theData[theDataLen - 1]
-                     : theData[theDataLen - 1];
-    theEncodedStr[iStr++] = aPad ? B64Map[aWord >> 10] : B64Map[aWord >> 2];
-    theEncodedStr[iStr++] = aPad ? B64Map[aWord >> 4 & 0x03F] : B64Map[(aWord & 3) << 4];
-    theEncodedStr[iStr++] = aPad ? B64Map[(aWord & 0xF) << 2] : '=';
+    if (aPad)
+    {
+      uint32_t aWord = uint32_t(theData[theDataLen - 2]) << 8 | theData[theDataLen - 1];
+      theEncodedStr[iStr++] = aBase64Chars[aWord >> 10];
+      theEncodedStr[iStr++] = aBase64Chars[aWord >> 4 & 0x03F];
+      theEncodedStr[iStr++] = aBase64Chars[(aWord & 0xF) << 2];
+    }
+    else
+    {
+      uint32_t aWord = theData[theDataLen - 1];
+      theEncodedStr[iStr++] = aBase64Chars[aWord >> 2];
+      theEncodedStr[iStr++] = aBase64Chars[(aWord & 3) << 4];
+      theEncodedStr[iStr++] = '=';
+    }
   }
   while (iStr < aSize64)
   {
@@ -67,13 +80,26 @@ Standard_Size FSD_Base64::Encode (char* theEncodedStr,
 }
 
 // =======================================================================
+// function : Encode
+// =======================================================================
+TCollection_AsciiString FSD_Base64::Encode(const Standard_Byte* theData,
+                                           const Standard_Size theDataLen)
+{
+  Standard_Size aStrLen = Encode (NULL, 0, theData, theDataLen);
+  TCollection_AsciiString aStr ((Standard_Integer)aStrLen, 0);
+  Encode (const_cast<char*>(aStr.ToCString()), aStrLen, theData, theDataLen);
+  return aStr;
+}
+
+// =======================================================================
 // function : Decode
 // =======================================================================
 Standard_Size FSD_Base64::Decode (Standard_Byte* theDecodedData,
+                                  const Standard_Size theDataLen,
                                   Standard_CString theEncodedStr,
                                   const Standard_Size theStrLen)
 {
-  static const Standard_Byte B64Codes[256] = {
+  static const Standard_Byte aBase64Codes[256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 62, 63, 62, 62, 63, 52, 53, 54, 55,
@@ -88,7 +114,7 @@ Standard_Size FSD_Base64::Decode (Standard_Byte* theDecodedData,
   }
 
   // Calculate pad bytes and number of bytes without pad
-  Standard_Integer aPad (theStrLen % 4 || theEncodedStr[theStrLen - 1] == '=');
+  uint32_t aPad (theStrLen % 4 || theEncodedStr[theStrLen - 1] == '=');
   const Standard_Size aNbIter = ((theStrLen + 3) / 4 - aPad) * 4;
   if (theStrLen > aNbIter + 2 && theEncodedStr[aNbIter + 2] != '=')
   {
@@ -101,14 +127,18 @@ Standard_Size FSD_Base64::Decode (Standard_Byte* theDecodedData,
   {
     return aDecodedSize;
   }
+  if (aDecodedSize > theDataLen)
+  {
+    return 0;
+  }
 
   // Decoding loop
   for (Standard_Size i = 0; i < aNbIter; i += 4)
   {
-    unsigned aWord = (B64Codes[unsigned (theEncodedStr[i])] << 18) +
-                     (B64Codes[unsigned (theEncodedStr[i + 1])] << 12) +
-                     (B64Codes[unsigned (theEncodedStr[i + 2])] << 6) +
-                     B64Codes[unsigned (theEncodedStr[i + 3])];
+    unsigned aWord = (aBase64Codes[unsigned (theEncodedStr[i])] << 18) +
+                     (aBase64Codes[unsigned (theEncodedStr[i + 1])] << 12) +
+                     (aBase64Codes[unsigned (theEncodedStr[i + 2])] << 6) +
+                     aBase64Codes[unsigned (theEncodedStr[i + 3])];
     *theDecodedData++ = static_cast<Standard_Byte> (aWord >> 16);
     *theDecodedData++ = static_cast<Standard_Byte> (aWord >> 8 & 0xFF);
     *theDecodedData++ = static_cast<Standard_Byte> (aWord & 0xFF);
@@ -117,13 +147,13 @@ Standard_Size FSD_Base64::Decode (Standard_Byte* theDecodedData,
   // Decoding pad bytes
   if (aPad > 0)
   {
-    unsigned aWord = (B64Codes[unsigned (theEncodedStr[aNbIter])] << 18) +
-                     (B64Codes[unsigned (theEncodedStr[aNbIter + 1])] << 12);
+    unsigned aWord = (aBase64Codes[unsigned (theEncodedStr[aNbIter])] << 18) +
+                     (aBase64Codes[unsigned (theEncodedStr[aNbIter + 1])] << 12);
     *theDecodedData++ = static_cast<Standard_Byte> (aWord >> 16);
 
     if (aPad > 1)
     {
-      aWord += (B64Codes[unsigned (theEncodedStr[aNbIter + 2])] << 6);
+      aWord += (aBase64Codes[unsigned (theEncodedStr[aNbIter + 2])] << 6);
       *theDecodedData++ = static_cast<Standard_Byte> (aWord >> 8 & 0xFF);
     }
   }
@@ -136,14 +166,13 @@ Standard_Size FSD_Base64::Decode (Standard_Byte* theDecodedData,
 Handle(NCollection_Buffer) FSD_Base64::Decode (Standard_CString theEncodedStr,
                                                const Standard_Size theStrLen)
 {
-  Standard_Size aDataSize = Decode (NULL, theEncodedStr, theStrLen);
+  Standard_Size aDataSize = Decode (NULL, 0, theEncodedStr, theStrLen);
   Handle(NCollection_Buffer) aBuf =
     new NCollection_Buffer (NCollection_BaseAllocator::CommonBaseAllocator());
   if (!aBuf->Allocate (aDataSize))
   {
-    Message::DefaultMessenger()->Send ("Fail to allocate memory.", Message_Fail);
     return NULL;
   }
-  Decode (aBuf->ChangeData(), theEncodedStr, theStrLen);
+  Decode (aBuf->ChangeData(), aDataSize, theEncodedStr, theStrLen);
   return aBuf;
 }
