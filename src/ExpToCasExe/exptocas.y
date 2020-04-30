@@ -33,34 +33,33 @@ complex time or redefinition of inherited field are ignored.
 
 \*****************************************************************************/
 
-#include <values.h>
 #include <TCollection_HAsciiString.hxx>
 #include <TColStd_HSequenceOfHAsciiString.hxx>
-#include <ExpToCas_HSequenceOfField.hxx>
-#include <ExpToCas_HSequenceOfItem.hxx>
-#include <ExpToCas_Field.hxx>
-#include <ExpToCas_Item.hxx>
-#include <ExpToCas_Enum.hxx>
-#include <ExpToCas_Alias.hxx>
-#include <ExpToCas_Select.hxx>
-#include <ExpToCas_Entity.hxx>
-#include <ExpToCas_Type.hxx>
-#include <ExpToCas_NamedType.hxx>
-#include <ExpToCas_PredefinedType.hxx>
-#include <ExpToCas_Number.hxx>
-#include <ExpToCas_Integer.hxx>
-#include <ExpToCas_Boolean.hxx>
-#include <ExpToCas_Logical.hxx>
-#include <ExpToCas_Real.hxx>
-#include <ExpToCas_String.hxx>
-#include <ExpToCas_ComplexType.hxx>
-#include <ExpToCas_Array.hxx>
-#include <ExpToCas_List.hxx>
-#include <ExpToCas_Set.hxx>
-#include <ExpToCas_Bag.hxx>
-#include <ExpToCas_Schema.hxx>
-#include <ExpToCas_Reference.hxx>
-#include <ExpToCas.hxx>
+#include <Express_HSequenceOfField.hxx>
+#include <Express_HSequenceOfItem.hxx>
+#include <Express_Field.hxx>
+#include <Express_Item.hxx>
+#include <Express_Enum.hxx>
+#include <Express_Alias.hxx>
+#include <Express_Select.hxx>
+#include <Express_Entity.hxx>
+#include <Express_Type.hxx>
+#include <Express_NamedType.hxx>
+#include <Express_PredefinedType.hxx>
+#include <Express_Number.hxx>
+#include <Express_Integer.hxx>
+#include <Express_Boolean.hxx>
+#include <Express_Logical.hxx>
+#include <Express_Real.hxx>
+#include <Express_String.hxx>
+#include <Express_ComplexType.hxx>
+#include <Express_Array.hxx>
+#include <Express_List.hxx>
+#include <Express_Set.hxx>
+#include <Express_Bag.hxx>
+#include <Express_Schema.hxx>
+#include <Express_Reference.hxx>
+#include <Express.hxx>
 
 /************************************************/
 /* ERROR MESSAGE FUNCTION                       */
@@ -78,21 +77,21 @@ int yyerror ( char *s )
 /************************************************/
 /* FUNCTIONS FOR CREATING SCHEMA REPRESENTATION */
 
-static ExpToCas_Schema *mkschema ( char *name, ExpToCas_HSequenceOfItem *ilist );
-static ExpToCas_HSequenceOfItem *mkilist ( ExpToCas_Item *item, ExpToCas_HSequenceOfItem *seq );
-static ExpToCas_Item *mkenum ( char *name, TColStd_HSequenceOfHAsciiString *tlist );
-static ExpToCas_Item *mkselect ( char *name, TColStd_HSequenceOfHAsciiString *tlist );
-static ExpToCas_Item *mkalias ( char *name, ExpToCas_Type *type );
-static ExpToCas_Item *mkentity ( char *name, TColStd_HSequenceOfHAsciiString *inherit,
-				 ExpToCas_HSequenceOfField *field, int isabstract );
-static ExpToCas_Reference *mkrefs ( char *name, TColStd_HSequenceOfHAsciiString *items);
+static Express_Schema *mkschema ( char *name, Express_HSequenceOfItem *ilist );
+static Express_HSequenceOfItem *mkilist ( Express_Item *item, Express_HSequenceOfItem *seq );
+static Express_Item *mkenum ( char *name, TColStd_HSequenceOfHAsciiString *tlist );
+static Express_Item *mkselect ( char *name, TColStd_HSequenceOfHAsciiString *tlist );
+static Express_Item *mkalias ( char *name, Express_Type *type );
+static Express_Item *mkentity ( char *name, TColStd_HSequenceOfHAsciiString *inherit,
+				 Express_HSequenceOfField *field, int isabstract );
+static Express_Reference *mkrefs ( char *name, TColStd_HSequenceOfHAsciiString *items);
 static TColStd_HSequenceOfHAsciiString *mktlist ( char *name, TColStd_HSequenceOfHAsciiString *tlist );
 static TColStd_HSequenceOfHAsciiString *mktlists ( TColStd_HSequenceOfHAsciiString *tlist1, TColStd_HSequenceOfHAsciiString *tlist2 );
-static ExpToCas_Type *mktstd ( int keyword );
-static ExpToCas_Type *mktname ( char *name );
-static ExpToCas_Type *mktset ( int keyword, int ilow, int ihigh, ExpToCas_Type *of );
-static ExpToCas_Field *mkfield ( char *name, ExpToCas_Type *type, int optional );
-static ExpToCas_HSequenceOfField *mkflist ( ExpToCas_Field *field, ExpToCas_HSequenceOfField *seq );
+static Express_Type *mktstd ( int keyword );
+static Express_Type *mktname ( char *name );
+static Express_Type *mktset ( int keyword, int ilow, int ihigh, Express_Type *of );
+static Express_Field *mkfield ( char *name, Express_Type *type, int optional );
+static Express_HSequenceOfField *mkflist ( Express_Field *field, Express_HSequenceOfField *seq );
 
 %}
 
@@ -101,13 +100,13 @@ static ExpToCas_HSequenceOfField *mkflist ( ExpToCas_Field *field, ExpToCas_HSeq
   int num;
   char *str;
   TColStd_HSequenceOfHAsciiString *tlist;
-  ExpToCas_HSequenceOfField *flist;
-  ExpToCas_HSequenceOfItem *ilist;
-  ExpToCas_Field *field;
-  ExpToCas_Item *item;
-  ExpToCas_Type *type;
-  ExpToCas_Schema *schema;
-  ExpToCas_Reference *ref;
+  Express_HSequenceOfField *flist;
+  Express_HSequenceOfItem *ilist;
+  Express_Field *field;
+  Express_Item *item;
+  Express_Type *type;
+  Express_Schema *schema;
+  Express_Reference *ref;
 }
 
   /* Definition of keywords */
@@ -241,7 +240,7 @@ SUPLST: NAME             { $$ = 0; /* simple list of supertypes */ }
 FLIST : FIELD            { $$ = mkflist ( $1, 0 ); /* list of fields of ENTITY item */ }
       | FIELD FLIST      { $$ = mkflist ( $1, $2 ); }
       | REDEF            { $$ = 0;  /* redefinition of inherited field, just skip */ }
-      | REDEF FLIST      { $$ = 0; }
+      | REDEF FLIST      { $$ = $2; /* ignore redefinition of inherited field, take trailing list */ }
       ;
 FLIST1: /* empty */      { $$ = NULL; /* empty list of fields */ }
       | FLIST            { $$ = $1;   /* or not empty.. just to fix reduce/reduce conflict */ }
@@ -277,49 +276,49 @@ SPCLST: KSELF '\\' SPECIF      { $$ = 0; /* list of specifications */ }
 /************************************************/
 /* FUNCTIONS FOR CREATING SCHEMA REPRESENTATION */
 
-static ExpToCas_Schema *mkschema ( char *name, ExpToCas_HSequenceOfItem *ilist )
+static Express_Schema *mkschema ( char *name, Express_HSequenceOfItem *ilist )
 {
-  ExpToCas_Schema *sch = new ExpToCas_Schema ( name, ilist );
-  ExpToCas::Schema() = sch;
+  Express_Schema *sch = new Express_Schema ( name, ilist );
+  Express::Schema() = sch;
   return sch;
 }
 
-static ExpToCas_HSequenceOfItem *mkilist ( ExpToCas_Item *item, ExpToCas_HSequenceOfItem *seq )
+static Express_HSequenceOfItem *mkilist ( Express_Item *item, Express_HSequenceOfItem *seq )
 {
   if ( ! seq ) { 
-    seq = new ExpToCas_HSequenceOfItem;
+    seq = new Express_HSequenceOfItem;
     seq->Append ( item );
   }
   else seq->Prepend ( item );
   return seq;
 }
 
-static ExpToCas_Item *mkenum ( char *name, TColStd_HSequenceOfHAsciiString *tlist )
+static Express_Item *mkenum ( char *name, TColStd_HSequenceOfHAsciiString *tlist )
 {
-  return new ExpToCas_Enum ( name, tlist );
+  return new Express_Enum ( name, tlist );
 }
 
-static ExpToCas_Item *mkselect ( char *name, TColStd_HSequenceOfHAsciiString *tlist )
+static Express_Item *mkselect ( char *name, TColStd_HSequenceOfHAsciiString *tlist )
 {
-  return new ExpToCas_Select ( name, tlist );
+  return new Express_Select ( name, tlist );
 }
 
-static ExpToCas_Item *mkalias ( char *name, ExpToCas_Type *type )
+static Express_Item *mkalias ( char *name, Express_Type *type )
 {
-  return new ExpToCas_Alias ( name, type );
+  return new Express_Alias ( name, type );
 }
 
-static ExpToCas_Item *mkentity ( char *name, TColStd_HSequenceOfHAsciiString *inherit,
-				 ExpToCas_HSequenceOfField *field, int isabstract )
+static Express_Item *mkentity ( char *name, TColStd_HSequenceOfHAsciiString *inherit,
+				 Express_HSequenceOfField *field, int isabstract )
 {
-  ExpToCas_Entity *ent = new ExpToCas_Entity ( name, inherit, field );
+  Express_Entity *ent = new Express_Entity ( name, inherit, field );
   if ( isabstract ) ent->SetAbstractFlag ( Standard_True );
   return ent;
 }
 
-static ExpToCas_Reference *mkrefs ( char *name, TColStd_HSequenceOfHAsciiString *items)
+static Express_Reference *mkrefs ( char *name, TColStd_HSequenceOfHAsciiString *items)
 {
-  return new ExpToCas_Reference ( name, items );
+  return new Express_Reference ( name, items );
 }
 
 static TColStd_HSequenceOfHAsciiString *mktlist ( char *name, TColStd_HSequenceOfHAsciiString *tlist )
@@ -343,47 +342,47 @@ static TColStd_HSequenceOfHAsciiString *mktlists ( TColStd_HSequenceOfHAsciiStri
   return tlist1;
 }
 
-static ExpToCas_Type *mktstd ( int keyword )
+static Express_Type *mktstd ( int keyword )
 {
   switch ( keyword ) {
-  case KINT : return new ExpToCas_Integer;
-  case KNUM : return new ExpToCas_Number;
-  case KDBL : return new ExpToCas_Real;
-  case KSTR : return new ExpToCas_String;
-  case KBOOL: return new ExpToCas_Boolean;
-  case KLOG : return new ExpToCas_Logical;
+  case KINT : return new Express_Integer;
+  case KNUM : return new Express_Number;
+  case KDBL : return new Express_Real;
+  case KSTR : return new Express_String;
+  case KBOOL: return new Express_Boolean;
+  case KLOG : return new Express_Logical;
   default   : ec_error ( "Predefined type not treated!", "" );
               return NULL;
   }
 }
 
-static ExpToCas_Type *mktname ( char *name )
+static Express_Type *mktname ( char *name )
 {
-  return new ExpToCas_NamedType ( name );
+  return new Express_NamedType ( name );
 }
 
-static ExpToCas_Type *mktset ( int keyword, int ilow, int ihigh, ExpToCas_Type *of )
+static Express_Type *mktset ( int keyword, int ilow, int ihigh, Express_Type *of )
 {
   switch ( keyword ) {
-  case KLIST: return new ExpToCas_List  ( ilow, ihigh, of );
-  case KARR : return new ExpToCas_Array ( ilow, ihigh, of );
-  case KBAG : return new ExpToCas_Bag   ( ilow, ihigh, of );
-  case KSET : return new ExpToCas_Set   ( ilow, ihigh, of );
+  case KLIST: return new Express_List  ( ilow, ihigh, of );
+  case KARR : return new Express_Array ( ilow, ihigh, of );
+  case KBAG : return new Express_Bag   ( ilow, ihigh, of );
+  case KSET : return new Express_Set   ( ilow, ihigh, of );
   default   : ec_error ( "Complex type not treated!", "" );
               return NULL;
   }
 }
 
-static ExpToCas_Field *mkfield ( char *name, ExpToCas_Type *type, int optional )
+static Express_Field *mkfield ( char *name, Express_Type *type, int optional )
 {
-  return new ExpToCas_Field ( name, type, optional );
+  return new Express_Field ( name, type, optional );
 }
 
-static ExpToCas_HSequenceOfField *mkflist ( ExpToCas_Field *field, ExpToCas_HSequenceOfField *seq )
+static Express_HSequenceOfField *mkflist ( Express_Field *field, Express_HSequenceOfField *seq )
 {
   if ( seq ) seq->Prepend ( field );
   else {
-    seq = new ExpToCas_HSequenceOfField;
+    seq = new Express_HSequenceOfField;
     seq->Append ( field );
   }
   return seq;
@@ -392,12 +391,12 @@ static ExpToCas_HSequenceOfField *mkflist ( ExpToCas_Field *field, ExpToCas_HSeq
 /*******************************************************************/
 /* External interface to result of parsing */
 
-Handle(ExpToCas_Schema) ec_parse ( FILE *fin )
+Handle(Express_Schema) ec_parse ( FILE *fin )
 {
   extern FILE *yyin;
   yyin = fin;
   yyparse();
-  return ExpToCas::Schema();
+  return Express::Schema();
 }
 
 /*******************************************************************/

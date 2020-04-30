@@ -1274,7 +1274,7 @@ case 48:
 { yyval.flist = 0;  /* redefinition of inherited field, just skip */ } break;
 case 49:
 # line 235 "Express.y"
-{ yyval.flist = 0; } break;
+{ yyval.flist = yypvt[-0].flist; /* ignore redefinition of inherited field, take trailing list */ } break;
 case 50:
 # line 237 "Express.y"
 { yyval.flist = NULL; /* empty list of fields */ } break;

@@ -39,13 +39,13 @@ Also, error processing and current line number tracking functions are defined
 #include <string.h>
 
 #include <TColStd_HSequenceOfHAsciiString.hxx>
-#include <ExpToCas_HSequenceOfField.hxx>
-#include <ExpToCas_HSequenceOfItem.hxx>
-#include <ExpToCas_Field.hxx>
-#include <ExpToCas_Item.hxx>
-#include <ExpToCas_Type.hxx>
-#include <ExpToCas_Schema.hxx>
-#include <ExpToCas_Reference.hxx>
+#include <Express_HSequenceOfField.hxx>
+#include <Express_HSequenceOfItem.hxx>
+#include <Express_Field.hxx>
+#include <Express_Item.hxx>
+#include <Express_Type.hxx>
+#include <Express_Schema.hxx>
+#include <Express_Reference.hxx>
 
 #include "expparse.h"       /* define tokens */
 
