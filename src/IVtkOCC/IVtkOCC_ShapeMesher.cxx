@@ -180,15 +180,19 @@ void IVtkOCC_ShapeMesher::addEdges()
                                  TopAbs_FACE,
                                  anEdgesMap);
 
+  TopTools_IndexedMapOfShape anEdgesList;
+  TopExp::MapShapes(GetShapeObj()->GetShape(), TopAbs_EDGE, anEdgesList);
+
   int aNbFaces;
   IVtk_MeshType aType;
   myEdgesTypes.Clear();
 
-  TopExp_Explorer anEdgeIter (GetShapeObj()->GetShape(), TopAbs_EDGE);
-  for (; anEdgeIter.More(); anEdgeIter.Next())
+  TopTools_IndexedMapOfShape::const_iterator aEdgeIt;
+  for (aEdgeIt = anEdgesList.cbegin(); aEdgeIt != anEdgesList.cend(); aEdgeIt++)
   {
-    const TopoDS_Edge& anOcctEdge = TopoDS::Edge (anEdgeIter.Current());
-    aNbFaces = anEdgesMap.FindFromKey (anOcctEdge).Extent();
+    const TopoDS_Edge& anOcctEdge = TopoDS::Edge (*aEdgeIt);
+    const TopTools_ListOfShape& aFaceList = anEdgesMap.FindFromKey(anOcctEdge);
+    aNbFaces = aFaceList.Extent();
     if (aNbFaces == 0)
     {
       aType = MT_FreeEdge;
@@ -199,7 +203,21 @@ void IVtkOCC_ShapeMesher::addEdges()
     }
     else
     {
-      aType = MT_SharedEdge;
+      bool isSame = false;
+      TopTools_ListOfShape::const_iterator aFaceIt;
+      for (aFaceIt = aFaceList.cbegin(); aFaceIt != aFaceList.cend(); aFaceIt++) {
+        TopExp_Explorer aIt((*aFaceIt), TopAbs_EDGE);
+        int aCount = 0;
+        for (; aIt.More(); aIt.Next()) {
+          if (aIt.Current().IsSame(anOcctEdge))
+            aCount++;
+        }
+        if (aCount == 2) {
+          isSame = true;
+          break;
+        }
+      }
+      aType = isSame? MT_SeamEdge : MT_SharedEdge;
     }
     addEdge (anOcctEdge, GetShapeObj()->GetSubShapeId (anOcctEdge), aType);
     myEdgesTypes.Bind (anOcctEdge, aType);
