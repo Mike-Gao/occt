@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -25,4 +25,39 @@ IMPLEMENT_STANDARD_RTTIEXT(StepKinematics_PrismaticPairValue, StepKinematics_Pai
 
 StepKinematics_PrismaticPairValue::StepKinematics_PrismaticPairValue ()
 {
+}
+
+//=======================================================================
+//function : Init
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_PrismaticPairValue::Init (const Handle(TCollection_HAsciiString)& theRepresentationItem_Name,
+                                              const Handle(StepKinematics_KinematicPair)& thePairValue_AppliesToPair,
+                                              const Standard_Real theActualTranslation)
+{
+  StepKinematics_PairValue::Init(theRepresentationItem_Name,
+                                 thePairValue_AppliesToPair);
+
+  myActualTranslation = theActualTranslation;
+}
+
+//=======================================================================
+//function : ActualTranslation
+//purpose  : 
+//=======================================================================
+
+Standard_Real StepKinematics_PrismaticPairValue::ActualTranslation () const
+{
+  return myActualTranslation;
+}
+
+//=======================================================================
+//function : SetActualTranslation
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_PrismaticPairValue::SetActualTranslation (const Standard_Real theActualTranslation)
+{
+  myActualTranslation = theActualTranslation;
 }

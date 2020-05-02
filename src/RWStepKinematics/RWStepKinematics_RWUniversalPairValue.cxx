@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:03 2020 
+// Created on : Sat May 02 12:41:16 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,7 @@
 #include <StepKinematics_UniversalPairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <Standard_Real.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWUniversalPairValue
@@ -41,7 +42,7 @@ void RWStepKinematics_RWUniversalPairValue::ReadStep (const Handle(StepData_Step
                                                       const Handle(StepKinematics_UniversalPairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"universal_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,4,ach,"universal_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +54,19 @@ void RWStepKinematics_RWUniversalPairValue::ReadStep (const Handle(StepData_Step
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of UniversalPairValue
+
+  Standard_Real aFirstRotationAngle;
+  data->ReadReal (num, 3, "first_rotation_angle", ach, aFirstRotationAngle);
+
+  Standard_Real aSecondRotationAngle;
+  data->ReadReal (num, 4, "second_rotation_angle", ach, aSecondRotationAngle);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aFirstRotationAngle,
+            aSecondRotationAngle);
 }
 
 //=======================================================================
@@ -74,6 +85,12 @@ void RWStepKinematics_RWUniversalPairValue::WriteStep (StepData_StepWriter& SW,
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of UniversalPairValue
+
+  SW.Send (ent->FirstRotationAngle());
+
+  SW.Send (ent->SecondRotationAngle());
 }
 
 //=======================================================================
@@ -90,4 +107,6 @@ void RWStepKinematics_RWUniversalPairValue::Share (const Handle(StepKinematics_U
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of UniversalPairValue
 }

@@ -768,6 +768,8 @@ static Standard_CString schemaAP242DIS = "AP242_MANAGED_MODEL_BASED_3D_ENGINEERI
 #include <StepKinematics_KinematicLink.hxx>
 #include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
 #include <StepKinematics_KinematicPropertyMechanismRepresentation.hxx>
+#include <StepKinematics_KinematicTopologyDirectedStructure.hxx>
+#include <StepKinematics_KinematicTopologyNetworkStructure.hxx>
 #include <StepKinematics_KinematicTopologyStructure.hxx>
 #include <StepKinematics_LowOrderKinematicPair.hxx>
 #include <StepKinematics_LowOrderKinematicPairValue.hxx>
@@ -1603,6 +1605,8 @@ StepAP214_Protocol::StepAP214_Protocol ()
   types.Bind(STANDARD_TYPE(StepKinematics_UniversalPairWithRange), 787);
   types.Bind(STANDARD_TYPE(StepKinematics_PairRepresentationRelationship), 788);
   types.Bind(STANDARD_TYPE(StepKinematics_RigidLinkRepresentation), 789);
+  types.Bind(STANDARD_TYPE(StepKinematics_KinematicTopologyDirectedStructure), 790);
+  types.Bind(STANDARD_TYPE(StepKinematics_KinematicTopologyNetworkStructure), 791);
 
 }
 

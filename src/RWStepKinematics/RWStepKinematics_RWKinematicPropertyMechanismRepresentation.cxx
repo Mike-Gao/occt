@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,7 @@
 #include <StepKinematics_KinematicPropertyMechanismRepresentation.hxx>
 #include <StepRepr_RepresentedDefinition.hxx>
 #include <StepRepr_Representation.hxx>
+#include <StepKinematics_KinematicLinkRepresentation.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWKinematicPropertyMechanismRepresentation
@@ -41,7 +42,7 @@ void RWStepKinematics_RWKinematicPropertyMechanismRepresentation::ReadStep (cons
                                                                             const Handle(StepKinematics_KinematicPropertyMechanismRepresentation)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"kinematic_property_mechanism_representation") ) return;
+  if ( ! data->CheckNbParams(num,3,ach,"kinematic_property_mechanism_representation") ) return;
 
   // Inherited fields of PropertyDefinitionRepresentation
 
@@ -51,9 +52,15 @@ void RWStepKinematics_RWKinematicPropertyMechanismRepresentation::ReadStep (cons
   Handle(StepRepr_Representation) aPropertyDefinitionRepresentation_UsedRepresentation;
   data->ReadEntity (num, 2, "property_definition_representation.used_representation", ach, STANDARD_TYPE(StepRepr_Representation), aPropertyDefinitionRepresentation_UsedRepresentation);
 
+  // Own fields of KinematicPropertyMechanismRepresentation
+
+  Handle(StepKinematics_KinematicLinkRepresentation) aBase;
+  data->ReadEntity (num, 3, "base", ach, STANDARD_TYPE(StepKinematics_KinematicLinkRepresentation), aBase);
+
   // Initialize entity
   ent->Init(aPropertyDefinitionRepresentation_Definition,
-            aPropertyDefinitionRepresentation_UsedRepresentation);
+            aPropertyDefinitionRepresentation_UsedRepresentation,
+            aBase);
 }
 
 //=======================================================================
@@ -70,6 +77,10 @@ void RWStepKinematics_RWKinematicPropertyMechanismRepresentation::WriteStep (Ste
   SW.Send (ent->Definition().Value());
 
   SW.Send (ent->UsedRepresentation());
+
+  // Own fields of KinematicPropertyMechanismRepresentation
+
+  SW.Send (ent->Base());
 }
 
 //=======================================================================
@@ -86,4 +97,8 @@ void RWStepKinematics_RWKinematicPropertyMechanismRepresentation::Share (const H
   iter.AddItem (ent->StepRepr_PropertyDefinitionRepresentation::Definition().Value());
 
   iter.AddItem (ent->StepRepr_PropertyDefinitionRepresentation::UsedRepresentation());
+
+  // Own fields of KinematicPropertyMechanismRepresentation
+
+  iter.AddItem (ent->Base());
 }

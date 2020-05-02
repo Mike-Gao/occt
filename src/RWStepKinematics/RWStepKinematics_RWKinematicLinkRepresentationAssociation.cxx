@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -20,8 +20,8 @@
 #include <RWStepKinematics_RWKinematicLinkRepresentationAssociation.hxx>
 #include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
 #include <TCollection_HAsciiString.hxx>
-#include <StepRepr_RepresentationOrRepresentationReference.hxx>
 #include <StepRepr_Representation.hxx>
+#include <StepRepr_RepresentationOrRepresentationReference.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWKinematicLinkRepresentationAssociation
@@ -66,8 +66,7 @@ void RWStepKinematics_RWKinematicLinkRepresentationAssociation::ReadStep (const 
   data->ReadEntity (num, 4, "representation_relationship.rep2", ach, aRepresentationRelationship_Rep2);
 
   // Process only one type (Representaion)
-  if (aRepresentationRelationship_Rep1.CaseNumber() != 1 ||
-      aRepresentationRelationship_Rep1.CaseNumber() != 1)
+  if (aRepresentationRelationship_Rep1.CaseNumber() != 1 || aRepresentationRelationship_Rep1.CaseNumber() != 1)
     return;
 
   // Initialize entity

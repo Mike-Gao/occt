@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -25,4 +25,39 @@ IMPLEMENT_STANDARD_RTTIEXT(StepKinematics_KinematicPropertyMechanismRepresentati
 
 StepKinematics_KinematicPropertyMechanismRepresentation::StepKinematics_KinematicPropertyMechanismRepresentation ()
 {
+}
+
+//=======================================================================
+//function : Init
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_KinematicPropertyMechanismRepresentation::Init (const StepRepr_RepresentedDefinition& thePropertyDefinitionRepresentation_Definition,
+                                                                    const Handle(StepRepr_Representation)& thePropertyDefinitionRepresentation_UsedRepresentation,
+                                                                    const Handle(StepKinematics_KinematicLinkRepresentation)& theBase)
+{
+  StepKinematics_KinematicPropertyDefinitionRepresentation::Init(thePropertyDefinitionRepresentation_Definition,
+                                                                 thePropertyDefinitionRepresentation_UsedRepresentation);
+
+  myBase = theBase;
+}
+
+//=======================================================================
+//function : Base
+//purpose  : 
+//=======================================================================
+
+Handle(StepKinematics_KinematicLinkRepresentation) StepKinematics_KinematicPropertyMechanismRepresentation::Base () const
+{
+  return myBase;
+}
+
+//=======================================================================
+//function : SetBase
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_KinematicPropertyMechanismRepresentation::SetBase (const Handle(StepKinematics_KinematicLinkRepresentation)& theBase)
+{
+  myBase = theBase;
 }

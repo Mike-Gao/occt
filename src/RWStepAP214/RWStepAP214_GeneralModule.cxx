@@ -1376,6 +1376,8 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <StepKinematics_KinematicLink.hxx>
 #include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
 #include <StepKinematics_KinematicPropertyMechanismRepresentation.hxx>
+#include <StepKinematics_KinematicTopologyDirectedStructure.hxx>
+#include <StepKinematics_KinematicTopologyNetworkStructure.hxx>
 #include <StepKinematics_KinematicTopologyStructure.hxx>
 #include <StepKinematics_LowOrderKinematicPair.hxx>
 #include <StepKinematics_LowOrderKinematicPairValue.hxx>
@@ -1447,6 +1449,8 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepKinematics_RWKinematicLink.hxx>
 #include <RWStepKinematics_RWKinematicLinkRepresentationAssociation.hxx>
 #include <RWStepKinematics_RWKinematicPropertyMechanismRepresentation.hxx>
+#include <RWStepKinematics_RWKinematicTopologyDirectedStructure.hxx>
+#include <RWStepKinematics_RWKinematicTopologyNetworkStructure.hxx>
 #include <RWStepKinematics_RWKinematicTopologyStructure.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPair.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPairValue.hxx>
@@ -5788,6 +5792,20 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
     tool.Share(anent, iter);
   }
   break;
+  case 790:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyDirectedStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyDirectedStructure tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 791:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyNetworkStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyNetworkStructure tool;
+    tool.Share(anent, iter);
+  }
+  break;
 
   break;
     default : break;
@@ -8012,6 +8030,12 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
    case 789:
      ent = new StepKinematics_RigidLinkRepresentation;
      break;
+   case 790:
+     ent = new StepKinematics_KinematicTopologyDirectedStructure;
+     break;
+   case 791:
+     ent = new StepKinematics_KinematicTopologyNetworkStructure;
+     break;
 
     
   default: 
@@ -8682,7 +8706,8 @@ Standard_Integer  RWStepAP214_GeneralModule::CategoryNumber
   case 787: return cataux;
   case 788: return cataux;
   case 789: return cataux;
-
+  case 790: return cataux;
+  case 791: return cataux;
     
   default : break;
   }

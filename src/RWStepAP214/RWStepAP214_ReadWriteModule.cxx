@@ -1423,6 +1423,8 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <StepKinematics_KinematicLink.hxx>
 #include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
 #include <StepKinematics_KinematicPropertyMechanismRepresentation.hxx>
+#include <StepKinematics_KinematicTopologyDirectedStructure.hxx>
+#include <StepKinematics_KinematicTopologyNetworkStructure.hxx>
 #include <StepKinematics_KinematicTopologyStructure.hxx>
 #include <StepKinematics_LowOrderKinematicPair.hxx>
 #include <StepKinematics_LowOrderKinematicPairValue.hxx>
@@ -1493,6 +1495,8 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <RWStepKinematics_RWKinematicLink.hxx>
 #include <RWStepKinematics_RWKinematicLinkRepresentationAssociation.hxx>
 #include <RWStepKinematics_RWKinematicPropertyMechanismRepresentation.hxx>
+#include <RWStepKinematics_RWKinematicTopologyDirectedStructure.hxx>
+#include <RWStepKinematics_RWKinematicTopologyNetworkStructure.hxx>
 #include <RWStepKinematics_RWKinematicTopologyStructure.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPair.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPairValue.hxx>
@@ -2206,6 +2210,8 @@ static TCollection_AsciiString Reco_HomokineticPair("HOMOKINETIC_PAIR");
 static TCollection_AsciiString Reco_KinematicLink("KINEMATIC_LINK");
 static TCollection_AsciiString Reco_KinematicLinkRepresentationAssociation("KINEMATIC_LINK_REPRESENTATION_ASSOCIATION");
 static TCollection_AsciiString Reco_KinematicPropertyMechanismRepresentation("KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION");
+static TCollection_AsciiString Reco_KinematicTopologyDirectedStructure("KINEMATIC_TOPOLOGY_DIRECTED_STRUCTURE");
+static TCollection_AsciiString Reco_KinematicTopologyNetworkStructure("KINEMATIC_TOPOLOGY_NETWORK_STRUCTURE");
 static TCollection_AsciiString Reco_KinematicTopologyStructure("KINEMATIC_TOPOLOGY_STRUCTURE");
 static TCollection_AsciiString Reco_LowOrderKinematicPair("LOW_ORDER_KINEMATIC_PAIR");
 static TCollection_AsciiString Reco_LowOrderKinematicPairValue("LOW_ORDER_KINEMATIC_PAIR_VALUE");
@@ -2986,6 +2992,8 @@ RWStepAP214_ReadWriteModule::RWStepAP214_ReadWriteModule ()
   typenums.Bind(Reco_UniversalPairWithRange, 787);
   typenums.Bind(Reco_PairRepresentationRelationship, 788);
   typenums.Bind(Reco_RigidLinkRepresentation, 789);
+  typenums.Bind(Reco_KinematicTopologyDirectedStructure, 790);
+  typenums.Bind(Reco_KinematicTopologyNetworkStructure, 791);
 
   
 //    SHORT NAMES
@@ -4912,6 +4920,8 @@ const TCollection_AsciiString& RWStepAP214_ReadWriteModule::StepType
   case 787: return Reco_UniversalPairWithRange;
   case 788: return Reco_PairRepresentationRelationship;
   case 789: return Reco_RigidLinkRepresentation;
+  case 790: return Reco_KinematicTopologyDirectedStructure;
+  case 791: return Reco_KinematicTopologyNetworkStructure;
 
 
   default : return PasReco;
@@ -10303,6 +10313,20 @@ void RWStepAP214_ReadWriteModule::ReadStep(const Standard_Integer CN,
     tool.ReadStep(data, num, ach, anent);
   }
   break;
+  case 790:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyDirectedStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyDirectedStructure tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
+  case 791:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyNetworkStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyNetworkStructure tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
 
   default: 
     ach->AddFail("Type Mismatch when reading - Entity");
@@ -15646,6 +15670,20 @@ void RWStepAP214_ReadWriteModule::WriteStep(const Standard_Integer CN,
   {
     DeclareAndCast(StepKinematics_RigidLinkRepresentation, anent, ent);
     RWStepKinematics_RWRigidLinkRepresentation tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 790:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyDirectedStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyDirectedStructure tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 791:
+  {
+    DeclareAndCast(StepKinematics_KinematicTopologyNetworkStructure, anent, ent);
+    RWStepKinematics_RWKinematicTopologyNetworkStructure tool;
     tool.WriteStep(SW, anent);
   }
   break;

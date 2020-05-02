@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -23,6 +23,7 @@
 #include <StepRepr_HArray1OfRepresentationItem.hxx>
 #include <StepRepr_RepresentationItem.hxx>
 #include <StepRepr_RepresentationContext.hxx>
+#include <StepKinematics_KinematicTopologyRepresentationSelect.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWMechanismRepresentation
@@ -43,7 +44,7 @@ void RWStepKinematics_RWMechanismRepresentation::ReadStep (const Handle(StepData
                                                            const Handle(StepKinematics_MechanismRepresentation)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,3,ach,"mechanism_representation") ) return;
+  if ( ! data->CheckNbParams(num,4,ach,"mechanism_representation") ) return;
 
   // Inherited fields of Representation
 
@@ -66,10 +67,16 @@ void RWStepKinematics_RWMechanismRepresentation::ReadStep (const Handle(StepData
   Handle(StepRepr_RepresentationContext) aRepresentation_ContextOfItems;
   data->ReadEntity (num, 3, "representation.context_of_items", ach, STANDARD_TYPE(StepRepr_RepresentationContext), aRepresentation_ContextOfItems);
 
+  // Own fields of MechanismRepresentation
+
+  StepKinematics_KinematicTopologyRepresentationSelect aRepresentedTopology;
+  data->ReadEntity (num, 4, "represented_topology", ach, aRepresentedTopology);
+
   // Initialize entity
   ent->Init(aRepresentation_Name,
             aRepresentation_Items,
-            aRepresentation_ContextOfItems);
+            aRepresentation_ContextOfItems,
+            aRepresentedTopology);
 }
 
 //=======================================================================
@@ -93,6 +100,10 @@ void RWStepKinematics_RWMechanismRepresentation::WriteStep (StepData_StepWriter&
   SW.CloseSub();
 
   SW.Send (ent->ContextOfItems());
+
+  // Own fields of MechanismRepresentation
+
+  SW.Send (ent->RepresentedTopology().Value());
 }
 
 //=======================================================================
@@ -112,4 +123,8 @@ void RWStepKinematics_RWMechanismRepresentation::Share (const Handle(StepKinemat
   }
 
   iter.AddItem (ent->StepRepr_Representation::ContextOfItems());
+
+  // Own fields of MechanismRepresentation
+
+  iter.AddItem (ent->RepresentedTopology().Value());
 }

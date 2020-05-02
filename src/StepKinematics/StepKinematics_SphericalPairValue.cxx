@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:03 2020 
+// Created on : Sat May 02 12:41:16 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -25,4 +25,39 @@ IMPLEMENT_STANDARD_RTTIEXT(StepKinematics_SphericalPairValue, StepKinematics_Pai
 
 StepKinematics_SphericalPairValue::StepKinematics_SphericalPairValue ()
 {
+}
+
+//=======================================================================
+//function : Init
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_SphericalPairValue::Init (const Handle(TCollection_HAsciiString)& theRepresentationItem_Name,
+                                              const Handle(StepKinematics_KinematicPair)& thePairValue_AppliesToPair,
+                                              const StepKinematics_SpatialRotation& theInputOrientation)
+{
+  StepKinematics_PairValue::Init(theRepresentationItem_Name,
+                                 thePairValue_AppliesToPair);
+
+  myInputOrientation = theInputOrientation;
+}
+
+//=======================================================================
+//function : InputOrientation
+//purpose  : 
+//=======================================================================
+
+StepKinematics_SpatialRotation StepKinematics_SphericalPairValue::InputOrientation () const
+{
+  return myInputOrientation;
+}
+
+//=======================================================================
+//function : SetInputOrientation
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_SphericalPairValue::SetInputOrientation (const StepKinematics_SpatialRotation& theInputOrientation)
+{
+  myInputOrientation = theInputOrientation;
 }

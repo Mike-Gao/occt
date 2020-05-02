@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -25,4 +25,39 @@ IMPLEMENT_STANDARD_RTTIEXT(StepKinematics_RackAndPinionPairValue, StepKinematics
 
 StepKinematics_RackAndPinionPairValue::StepKinematics_RackAndPinionPairValue ()
 {
+}
+
+//=======================================================================
+//function : Init
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_RackAndPinionPairValue::Init (const Handle(TCollection_HAsciiString)& theRepresentationItem_Name,
+                                                  const Handle(StepKinematics_KinematicPair)& thePairValue_AppliesToPair,
+                                                  const Standard_Real theActualDisplacement)
+{
+  StepKinematics_PairValue::Init(theRepresentationItem_Name,
+                                 thePairValue_AppliesToPair);
+
+  myActualDisplacement = theActualDisplacement;
+}
+
+//=======================================================================
+//function : ActualDisplacement
+//purpose  : 
+//=======================================================================
+
+Standard_Real StepKinematics_RackAndPinionPairValue::ActualDisplacement () const
+{
+  return myActualDisplacement;
+}
+
+//=======================================================================
+//function : SetActualDisplacement
+//purpose  : 
+//=======================================================================
+
+void StepKinematics_RackAndPinionPairValue::SetActualDisplacement (const Standard_Real theActualDisplacement)
+{
+  myActualDisplacement = theActualDisplacement;
 }

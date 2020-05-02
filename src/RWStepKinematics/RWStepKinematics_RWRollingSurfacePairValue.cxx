@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:03 2020 
+// Created on : Sat May 02 12:41:16 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,8 @@
 #include <StepKinematics_RollingSurfacePairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <StepGeom_PointOnSurface.hxx>
+#include <Standard_Real.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWRollingSurfacePairValue
@@ -41,7 +43,7 @@ void RWStepKinematics_RWRollingSurfacePairValue::ReadStep (const Handle(StepData
                                                            const Handle(StepKinematics_RollingSurfacePairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"rolling_surface_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,4,ach,"rolling_surface_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +55,19 @@ void RWStepKinematics_RWRollingSurfacePairValue::ReadStep (const Handle(StepData
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of RollingSurfacePairValue
+
+  Handle(StepGeom_PointOnSurface) aActualPointOnSurface;
+  data->ReadEntity (num, 3, "actual_point_on_surface", ach, STANDARD_TYPE(StepGeom_PointOnSurface), aActualPointOnSurface);
+
+  Standard_Real aActualRotation;
+  data->ReadReal (num, 4, "actual_rotation", ach, aActualRotation);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aActualPointOnSurface,
+            aActualRotation);
 }
 
 //=======================================================================
@@ -74,6 +86,12 @@ void RWStepKinematics_RWRollingSurfacePairValue::WriteStep (StepData_StepWriter&
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of RollingSurfacePairValue
+
+  SW.Send (ent->ActualPointOnSurface());
+
+  SW.Send (ent->ActualRotation());
 }
 
 //=======================================================================
@@ -90,4 +108,8 @@ void RWStepKinematics_RWRollingSurfacePairValue::Share (const Handle(StepKinemat
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of RollingSurfacePairValue
+
+  iter.AddItem (ent->ActualPointOnSurface());
 }

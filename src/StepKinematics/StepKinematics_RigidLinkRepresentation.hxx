@@ -1,6 +1,6 @@
-// Created on : Wed Apr 22 18:51:50 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -24,6 +24,7 @@
 #include <TCollection_HAsciiString.hxx>
 #include <StepRepr_HArray1OfRepresentationItem.hxx>
 #include <StepRepr_RepresentationContext.hxx>
+#include <StepKinematics_KinematicLink.hxx>
 
 DEFINE_STANDARD_HANDLE(StepKinematics_RigidLinkRepresentation, StepKinematics_KinematicLinkRepresentation)
 

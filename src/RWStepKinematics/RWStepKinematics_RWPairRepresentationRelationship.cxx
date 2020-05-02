@@ -1,6 +1,6 @@
-// Created on : Mon Apr 20 13:08:26 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -20,10 +20,10 @@
 #include <RWStepKinematics_RWPairRepresentationRelationship.hxx>
 #include <StepKinematics_PairRepresentationRelationship.hxx>
 #include <TCollection_HAsciiString.hxx>
+#include <StepRepr_Representation.hxx>
 #include <StepRepr_RepresentationRelationshipWithTransformation.hxx>
 #include <StepRepr_RepresentationOrRepresentationReference.hxx>
 #include <StepRepr_Transformation.hxx>
-#include <StepRepr_Representation.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWPairRepresentationRelationship
@@ -104,14 +104,14 @@ void RWStepKinematics_RWPairRepresentationRelationship::WriteStep (StepData_Step
 
   SW.Send (ent->Name());
 
-  if ( ent->RepresentationRelationshipWithTransformation()->HasDescription() ) {
-    SW.Send(ent->RepresentationRelationshipWithTransformation()->Description());
-  }
+
+  if (ent->RepresentationRelationshipWithTransformation()->HasDescription())
+    SW.Send (ent->RepresentationRelationshipWithTransformation()->Description());
   else SW.SendUndef();
 
-  SW.Send(ent->RepresentationRelationshipWithTransformation()->Rep1());
+  SW.Send (ent->RepresentationRelationshipWithTransformation()->Rep1());
 
-  SW.Send(ent->RepresentationRelationshipWithTransformation()->Rep2());
+  SW.Send (ent->RepresentationRelationshipWithTransformation()->Rep2());
 
   // Inherited fields of RepresentationRelationshipWithTransformation
 
@@ -131,9 +131,9 @@ void RWStepKinematics_RWPairRepresentationRelationship::Share (const Handle(Step
 
   // Inherited fields of RepresentationRelationship
 
-  iter.AddItem(ent->RepresentationRelationshipWithTransformation()->Rep1());
+  iter.AddItem (ent->RepresentationRelationshipWithTransformation()->Rep1());
 
-  iter.AddItem(ent->RepresentationRelationshipWithTransformation()->Rep2());
+  iter.AddItem (ent->RepresentationRelationshipWithTransformation()->Rep2());
 
   // Inherited fields of RepresentationRelationshipWithTransformation
 

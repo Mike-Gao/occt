@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -34,7 +34,20 @@ public :
   //! default constructor
   Standard_EXPORT StepKinematics_RevolutePairValue();
 
+  //! Initialize all fields (own and inherited)
+ Standard_EXPORT void Init(const Handle(TCollection_HAsciiString)& theRepresentationItem_Name,
+                           const Handle(StepKinematics_KinematicPair)& thePairValue_AppliesToPair,
+                           const Standard_Real theActualRotation);
+
+  //! Returns field ActualRotation
+  Standard_EXPORT Standard_Real ActualRotation() const;
+  //! Sets field ActualRotation
+  Standard_EXPORT void SetActualRotation (const Standard_Real theActualRotation);
+
 DEFINE_STANDARD_RTTIEXT(StepKinematics_RevolutePairValue, StepKinematics_PairValue)
+
+private:
+  Standard_Real myActualRotation;
 
 };
 #endif // _StepKinematics_RevolutePairValue_HeaderFile_

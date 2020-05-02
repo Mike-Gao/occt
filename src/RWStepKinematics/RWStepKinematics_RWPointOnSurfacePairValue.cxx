@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,8 @@
 #include <StepKinematics_PointOnSurfacePairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <StepGeom_PointOnSurface.hxx>
+#include <StepKinematics_SpatialRotation.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWPointOnSurfacePairValue
@@ -41,7 +43,7 @@ void RWStepKinematics_RWPointOnSurfacePairValue::ReadStep (const Handle(StepData
                                                            const Handle(StepKinematics_PointOnSurfacePairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"point_on_surface_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,4,ach,"point_on_surface_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +55,19 @@ void RWStepKinematics_RWPointOnSurfacePairValue::ReadStep (const Handle(StepData
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of PointOnSurfacePairValue
+
+  Handle(StepGeom_PointOnSurface) aActualPointOnSurface;
+  data->ReadEntity (num, 3, "actual_point_on_surface", ach, STANDARD_TYPE(StepGeom_PointOnSurface), aActualPointOnSurface);
+
+  StepKinematics_SpatialRotation aInputOrientation;
+  data->ReadEntity (num, 4, "input_orientation", ach, aInputOrientation);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aActualPointOnSurface,
+            aInputOrientation);
 }
 
 //=======================================================================
@@ -74,6 +86,12 @@ void RWStepKinematics_RWPointOnSurfacePairValue::WriteStep (StepData_StepWriter&
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of PointOnSurfacePairValue
+
+  SW.Send (ent->ActualPointOnSurface());
+
+  SW.Send (ent->InputOrientation().Value());
 }
 
 //=======================================================================
@@ -90,4 +108,10 @@ void RWStepKinematics_RWPointOnSurfacePairValue::Share (const Handle(StepKinemat
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of PointOnSurfacePairValue
+
+  iter.AddItem (ent->ActualPointOnSurface());
+
+  iter.AddItem (ent->InputOrientation().Value());
 }

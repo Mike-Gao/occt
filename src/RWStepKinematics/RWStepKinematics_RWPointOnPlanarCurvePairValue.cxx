@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,8 @@
 #include <StepKinematics_PointOnPlanarCurvePairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <StepGeom_PointOnCurve.hxx>
+#include <StepKinematics_SpatialRotation.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWPointOnPlanarCurvePairValue
@@ -41,7 +43,7 @@ void RWStepKinematics_RWPointOnPlanarCurvePairValue::ReadStep (const Handle(Step
                                                                const Handle(StepKinematics_PointOnPlanarCurvePairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"point_on_planar_curve_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,4,ach,"point_on_planar_curve_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +55,19 @@ void RWStepKinematics_RWPointOnPlanarCurvePairValue::ReadStep (const Handle(Step
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of PointOnPlanarCurvePairValue
+
+  Handle(StepGeom_PointOnCurve) aActualPointOnCurve;
+  data->ReadEntity (num, 3, "actual_point_on_curve", ach, STANDARD_TYPE(StepGeom_PointOnCurve), aActualPointOnCurve);
+
+  StepKinematics_SpatialRotation aInputOrientation;
+  data->ReadEntity (num, 4, "input_orientation", ach, aInputOrientation);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aActualPointOnCurve,
+            aInputOrientation);
 }
 
 //=======================================================================
@@ -74,6 +86,12 @@ void RWStepKinematics_RWPointOnPlanarCurvePairValue::WriteStep (StepData_StepWri
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of PointOnPlanarCurvePairValue
+
+  SW.Send (ent->ActualPointOnCurve());
+
+  SW.Send (ent->InputOrientation().Value());
 }
 
 //=======================================================================
@@ -90,4 +108,10 @@ void RWStepKinematics_RWPointOnPlanarCurvePairValue::Share (const Handle(StepKin
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of PointOnPlanarCurvePairValue
+
+  iter.AddItem (ent->ActualPointOnCurve());
+
+  iter.AddItem (ent->InputOrientation().Value());
 }

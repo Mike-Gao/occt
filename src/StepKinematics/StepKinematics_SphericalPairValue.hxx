@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:03 2020 
+// Created on : Sat May 02 12:41:16 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -23,6 +23,7 @@
 
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <StepKinematics_SpatialRotation.hxx>
 
 DEFINE_STANDARD_HANDLE(StepKinematics_SphericalPairValue, StepKinematics_PairValue)
 
@@ -34,7 +35,20 @@ public :
   //! default constructor
   Standard_EXPORT StepKinematics_SphericalPairValue();
 
+  //! Initialize all fields (own and inherited)
+ Standard_EXPORT void Init(const Handle(TCollection_HAsciiString)& theRepresentationItem_Name,
+                           const Handle(StepKinematics_KinematicPair)& thePairValue_AppliesToPair,
+                           const StepKinematics_SpatialRotation& theInputOrientation);
+
+  //! Returns field InputOrientation
+  Standard_EXPORT StepKinematics_SpatialRotation InputOrientation() const;
+  //! Sets field InputOrientation
+  Standard_EXPORT void SetInputOrientation (const StepKinematics_SpatialRotation& theInputOrientation);
+
 DEFINE_STANDARD_RTTIEXT(StepKinematics_SphericalPairValue, StepKinematics_PairValue)
+
+private:
+  StepKinematics_SpatialRotation myInputOrientation;
 
 };
 #endif // _StepKinematics_SphericalPairValue_HeaderFile_

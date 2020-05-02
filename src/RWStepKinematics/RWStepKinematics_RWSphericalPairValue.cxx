@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:03 2020 
+// Created on : Sat May 02 12:41:16 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,7 @@
 #include <StepKinematics_SphericalPairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <StepKinematics_SpatialRotation.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWSphericalPairValue
@@ -41,7 +42,7 @@ void RWStepKinematics_RWSphericalPairValue::ReadStep (const Handle(StepData_Step
                                                       const Handle(StepKinematics_SphericalPairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"spherical_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,3,ach,"spherical_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +54,15 @@ void RWStepKinematics_RWSphericalPairValue::ReadStep (const Handle(StepData_Step
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of SphericalPairValue
+
+  StepKinematics_SpatialRotation aInputOrientation;
+  data->ReadEntity (num, 3, "input_orientation", ach, aInputOrientation);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aInputOrientation);
 }
 
 //=======================================================================
@@ -74,6 +81,10 @@ void RWStepKinematics_RWSphericalPairValue::WriteStep (StepData_StepWriter& SW,
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of SphericalPairValue
+
+  SW.Send (ent->InputOrientation().Value());
 }
 
 //=======================================================================
@@ -90,4 +101,8 @@ void RWStepKinematics_RWSphericalPairValue::Share (const Handle(StepKinematics_S
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of SphericalPairValue
+
+  iter.AddItem (ent->InputOrientation().Value());
 }

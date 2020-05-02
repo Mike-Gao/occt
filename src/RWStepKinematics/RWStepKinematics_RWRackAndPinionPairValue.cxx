@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:02 2020 
+// Created on : Sat May 02 12:41:15 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,7 @@
 #include <StepKinematics_RackAndPinionPairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <Standard_Real.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWRackAndPinionPairValue
@@ -41,7 +42,7 @@ void RWStepKinematics_RWRackAndPinionPairValue::ReadStep (const Handle(StepData_
                                                           const Handle(StepKinematics_RackAndPinionPairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"rack_and_pinion_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,3,ach,"rack_and_pinion_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +54,15 @@ void RWStepKinematics_RWRackAndPinionPairValue::ReadStep (const Handle(StepData_
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of RackAndPinionPairValue
+
+  Standard_Real aActualDisplacement;
+  data->ReadReal (num, 3, "actual_displacement", ach, aActualDisplacement);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aActualDisplacement);
 }
 
 //=======================================================================
@@ -74,6 +81,10 @@ void RWStepKinematics_RWRackAndPinionPairValue::WriteStep (StepData_StepWriter& 
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of RackAndPinionPairValue
+
+  SW.Send (ent->ActualDisplacement());
 }
 
 //=======================================================================
@@ -90,4 +101,6 @@ void RWStepKinematics_RWRackAndPinionPairValue::Share (const Handle(StepKinemati
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of RackAndPinionPairValue
 }

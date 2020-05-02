@@ -1,6 +1,6 @@
-// Created on : Mon Apr 13 15:22:03 2020 
+// Created on : Sat May 02 12:41:16 2020 
 // Created by: Irina KRYLOVA
-// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V2.0
+// Generator:	Express (EXPRESS -> CASCADE/XSTEP Translator) V3.0
 // Copyright (c) Open CASCADE 2020
 //
 // This file is part of Open CASCADE Technology software library.
@@ -21,6 +21,7 @@
 #include <StepKinematics_SlidingCurvePairValue.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <StepKinematics_KinematicPair.hxx>
+#include <StepGeom_PointOnCurve.hxx>
 
 //=======================================================================
 //function : RWStepKinematics_RWSlidingCurvePairValue
@@ -41,7 +42,7 @@ void RWStepKinematics_RWSlidingCurvePairValue::ReadStep (const Handle(StepData_S
                                                          const Handle(StepKinematics_SlidingCurvePairValue)& ent) const
 {
   // Check number of parameters
-  if ( ! data->CheckNbParams(num,2,ach,"sliding_curve_pair_value") ) return;
+  if ( ! data->CheckNbParams(num,4,ach,"sliding_curve_pair_value") ) return;
 
   // Inherited fields of RepresentationItem
 
@@ -53,9 +54,19 @@ void RWStepKinematics_RWSlidingCurvePairValue::ReadStep (const Handle(StepData_S
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
+  // Own fields of SlidingCurvePairValue
+
+  Handle(StepGeom_PointOnCurve) aActualPointOnCurve1;
+  data->ReadEntity (num, 3, "actual_point_on_curve1", ach, STANDARD_TYPE(StepGeom_PointOnCurve), aActualPointOnCurve1);
+
+  Handle(StepGeom_PointOnCurve) aActualPointOnCurve2;
+  data->ReadEntity (num, 4, "actual_point_on_curve2", ach, STANDARD_TYPE(StepGeom_PointOnCurve), aActualPointOnCurve2);
+
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
-            aPairValue_AppliesToPair);
+            aPairValue_AppliesToPair,
+            aActualPointOnCurve1,
+            aActualPointOnCurve2);
 }
 
 //=======================================================================
@@ -74,6 +85,12 @@ void RWStepKinematics_RWSlidingCurvePairValue::WriteStep (StepData_StepWriter& S
   // Own fields of PairValue
 
   SW.Send (ent->AppliesToPair());
+
+  // Own fields of SlidingCurvePairValue
+
+  SW.Send (ent->ActualPointOnCurve1());
+
+  SW.Send (ent->ActualPointOnCurve2());
 }
 
 //=======================================================================
@@ -90,4 +107,10 @@ void RWStepKinematics_RWSlidingCurvePairValue::Share (const Handle(StepKinematic
   // Inherited fields of PairValue
 
   iter.AddItem (ent->StepKinematics_PairValue::AppliesToPair());
+
+  // Own fields of SlidingCurvePairValue
+
+  iter.AddItem (ent->ActualPointOnCurve1());
+
+  iter.AddItem (ent->ActualPointOnCurve2());
 }
