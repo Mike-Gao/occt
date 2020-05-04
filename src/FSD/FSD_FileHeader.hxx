@@ -13,6 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <Standard_PrimitiveTypes.hxx>
+
 #ifndef _FSD_FileHeader_HeaderFile
 #define _FSD_FileHeader_HeaderFile
 
