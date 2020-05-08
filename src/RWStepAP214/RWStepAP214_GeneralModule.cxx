@@ -1379,6 +1379,9 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <StepKinematics_KinematicTopologyDirectedStructure.hxx>
 #include <StepKinematics_KinematicTopologyNetworkStructure.hxx>
 #include <StepKinematics_KinematicTopologyStructure.hxx>
+#include <StepKinematics_LinearFlexibleAndPinionPair.hxx>
+#include <StepKinematics_LinearFlexibleAndPlanarCurvePair.hxx>
+#include <StepKinematics_LinearFlexibleLinkRepresentation.hxx>
 #include <StepKinematics_LowOrderKinematicPair.hxx>
 #include <StepKinematics_LowOrderKinematicPairValue.hxx>
 #include <StepKinematics_LowOrderKinematicPairWithRange.hxx>
@@ -1452,6 +1455,9 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepKinematics_RWKinematicTopologyDirectedStructure.hxx>
 #include <RWStepKinematics_RWKinematicTopologyNetworkStructure.hxx>
 #include <RWStepKinematics_RWKinematicTopologyStructure.hxx>
+#include <RWStepKinematics_RWLinearFlexibleAndPinionPair.hxx>
+#include <RWStepKinematics_RWLinearFlexibleAndPlanarCurvePair.hxx>
+#include <RWStepKinematics_RWLinearFlexibleLinkRepresentation.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPair.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPairValue.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPairWithRange.hxx>
@@ -5806,8 +5812,28 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
     tool.Share(anent, iter);
   }
   break;
-
+  case 792:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleAndPinionPair, anent, ent);
+    RWStepKinematics_RWLinearFlexibleAndPinionPair tool;
+    tool.Share(anent, iter);
+  }
   break;
+  case 793:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleAndPlanarCurvePair, anent, ent);
+    RWStepKinematics_RWLinearFlexibleAndPlanarCurvePair tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 794:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleLinkRepresentation, anent, ent);
+    RWStepKinematics_RWLinearFlexibleLinkRepresentation tool;
+    tool.Share(anent, iter);
+  }
+  break;
+
     default : break;
     }
 }
@@ -8036,6 +8062,15 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
    case 791:
      ent = new StepKinematics_KinematicTopologyNetworkStructure;
      break;
+   case 792:
+     ent = new StepKinematics_LinearFlexibleAndPinionPair;
+     break;
+   case 793:
+     ent = new StepKinematics_LinearFlexibleAndPlanarCurvePair;
+     break;
+   case 794:
+     ent = new StepKinematics_LinearFlexibleLinkRepresentation;
+     break;
 
     
   default: 
@@ -8708,6 +8743,9 @@ Standard_Integer  RWStepAP214_GeneralModule::CategoryNumber
   case 789: return cataux;
   case 790: return cataux;
   case 791: return cataux;
+  case 792: return cataux;
+  case 793: return cataux;
+  case 794: return cataux;
     
   default : break;
   }

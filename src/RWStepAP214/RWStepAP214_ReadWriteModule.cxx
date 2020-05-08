@@ -1426,6 +1426,9 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <StepKinematics_KinematicTopologyDirectedStructure.hxx>
 #include <StepKinematics_KinematicTopologyNetworkStructure.hxx>
 #include <StepKinematics_KinematicTopologyStructure.hxx>
+#include <StepKinematics_LinearFlexibleAndPinionPair.hxx>
+#include <StepKinematics_LinearFlexibleAndPlanarCurvePair.hxx>
+#include <StepKinematics_LinearFlexibleLinkRepresentation.hxx>
 #include <StepKinematics_LowOrderKinematicPair.hxx>
 #include <StepKinematics_LowOrderKinematicPairValue.hxx>
 #include <StepKinematics_LowOrderKinematicPairWithRange.hxx>
@@ -1498,6 +1501,9 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <RWStepKinematics_RWKinematicTopologyDirectedStructure.hxx>
 #include <RWStepKinematics_RWKinematicTopologyNetworkStructure.hxx>
 #include <RWStepKinematics_RWKinematicTopologyStructure.hxx>
+#include <RWStepKinematics_RWLinearFlexibleAndPinionPair.hxx>
+#include <RWStepKinematics_RWLinearFlexibleAndPlanarCurvePair.hxx>
+#include <RWStepKinematics_RWLinearFlexibleLinkRepresentation.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPair.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPairValue.hxx>
 #include <RWStepKinematics_RWLowOrderKinematicPairWithRange.hxx>
@@ -2213,6 +2219,9 @@ static TCollection_AsciiString Reco_KinematicPropertyMechanismRepresentation("KI
 static TCollection_AsciiString Reco_KinematicTopologyDirectedStructure("KINEMATIC_TOPOLOGY_DIRECTED_STRUCTURE");
 static TCollection_AsciiString Reco_KinematicTopologyNetworkStructure("KINEMATIC_TOPOLOGY_NETWORK_STRUCTURE");
 static TCollection_AsciiString Reco_KinematicTopologyStructure("KINEMATIC_TOPOLOGY_STRUCTURE");
+static TCollection_AsciiString Reco_LinearFlexibleAndPinionPair("LINEAR_FLEXIBLE_AND_PINION_PAIR");
+static TCollection_AsciiString Reco_LinearFlexibleAndPlanarCurvePair("LINEAR_FLEXIBLE_AND_PLANAR_CURVE_PAIR");
+static TCollection_AsciiString Reco_LinearFlexibleLinkRepresentation("LINEAR_FLEXIBLE_LINK_REPRESENTATION");
 static TCollection_AsciiString Reco_LowOrderKinematicPair("LOW_ORDER_KINEMATIC_PAIR");
 static TCollection_AsciiString Reco_LowOrderKinematicPairValue("LOW_ORDER_KINEMATIC_PAIR_VALUE");
 static TCollection_AsciiString Reco_LowOrderKinematicPairWithRange("LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE");
@@ -2994,6 +3003,9 @@ RWStepAP214_ReadWriteModule::RWStepAP214_ReadWriteModule ()
   typenums.Bind(Reco_RigidLinkRepresentation, 789);
   typenums.Bind(Reco_KinematicTopologyDirectedStructure, 790);
   typenums.Bind(Reco_KinematicTopologyNetworkStructure, 791);
+  typenums.Bind(Reco_LinearFlexibleAndPinionPair, 792);
+  typenums.Bind(Reco_LinearFlexibleAndPlanarCurvePair, 793);
+  typenums.Bind(Reco_LinearFlexibleLinkRepresentation, 794);
 
   
 //    SHORT NAMES
@@ -4922,6 +4934,9 @@ const TCollection_AsciiString& RWStepAP214_ReadWriteModule::StepType
   case 789: return Reco_RigidLinkRepresentation;
   case 790: return Reco_KinematicTopologyDirectedStructure;
   case 791: return Reco_KinematicTopologyNetworkStructure;
+  case 792: return Reco_LinearFlexibleAndPinionPair;
+  case 793: return Reco_LinearFlexibleAndPlanarCurvePair;
+  case 794: return Reco_LinearFlexibleLinkRepresentation;
 
 
   default : return PasReco;
@@ -10327,6 +10342,27 @@ void RWStepAP214_ReadWriteModule::ReadStep(const Standard_Integer CN,
     tool.ReadStep(data, num, ach, anent);
   }
   break;
+  case 792:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleAndPinionPair, anent, ent);
+    RWStepKinematics_RWLinearFlexibleAndPinionPair tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
+  case 793:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleAndPlanarCurvePair, anent, ent);
+    RWStepKinematics_RWLinearFlexibleAndPlanarCurvePair tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
+  case 794:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleLinkRepresentation, anent, ent);
+    RWStepKinematics_RWLinearFlexibleLinkRepresentation tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
 
   default: 
     ach->AddFail("Type Mismatch when reading - Entity");
@@ -15684,6 +15720,27 @@ void RWStepAP214_ReadWriteModule::WriteStep(const Standard_Integer CN,
   {
     DeclareAndCast(StepKinematics_KinematicTopologyNetworkStructure, anent, ent);
     RWStepKinematics_RWKinematicTopologyNetworkStructure tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 792:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleAndPinionPair, anent, ent);
+    RWStepKinematics_RWLinearFlexibleAndPinionPair tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 793:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleAndPlanarCurvePair, anent, ent);
+    RWStepKinematics_RWLinearFlexibleAndPlanarCurvePair tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 794:
+  {
+    DeclareAndCast(StepKinematics_LinearFlexibleLinkRepresentation, anent, ent);
+    RWStepKinematics_RWLinearFlexibleLinkRepresentation tool;
     tool.WriteStep(SW, anent);
   }
   break;
