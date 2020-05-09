@@ -227,17 +227,7 @@ TDF_Label XCAFDoc_DocumentTool::NotesLabel(const TDF_Label& acces)
   TDataStd_Name::Set(L, "Notes");
   return L;
 }
-//=======================================================================
-//function : AnimationsLabel
-//purpose  : 
-//=======================================================================
 
-TDF_Label XCAFDoc_DocumentTool::AnimationsLabel(const TDF_Label& acces)
-{
-  TDF_Label L = DocLabel(acces).FindChild(10, Standard_True);
-  TDataStd_Name::Set(L, "Animations");
-  return L;
-}
 //=======================================================================
 //function : VisMaterialLabel
 //purpose  :
@@ -247,6 +237,18 @@ TDF_Label XCAFDoc_DocumentTool::VisMaterialLabel (const TDF_Label& theLabel)
   TDF_Label aLabel = DocLabel (theLabel).FindChild (10, Standard_True);
   TDataStd_Name::Set (aLabel, "VisMaterials");
   return aLabel;
+}
+
+//=======================================================================
+//function : AnimationsLabel
+//purpose  : 
+//=======================================================================
+
+TDF_Label XCAFDoc_DocumentTool::AnimationsLabel(const TDF_Label& acces)
+{
+  TDF_Label L = DocLabel(acces).FindChild(11, Standard_True);
+  TDataStd_Name::Set(L, "Animations");
+  return L;
 }
 
 //=======================================================================

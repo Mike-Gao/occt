@@ -91,10 +91,10 @@ public:
   Standard_EXPORT static TDF_Label NotesLabel(const TDF_Label& acces);
   
   //! Returns sub-label of DocLabel() with tag 10.
-  Standard_EXPORT static TDF_Label AnimationsLabel(const TDF_Label& acces);
-
-  //! Returns sub-label of DocLabel() with tag 10.
   Standard_EXPORT static TDF_Label VisMaterialLabel (const TDF_Label& theLabel);
+
+  //! Returns sub-label of DocLabel() with tag 11.
+  Standard_EXPORT static TDF_Label AnimationsLabel(const TDF_Label& acces);
 
   //! Creates (if it does not exist) ShapeTool attribute on ShapesLabel().
   Standard_EXPORT static Handle(XCAFDoc_ShapeTool) ShapeTool (const TDF_Label& acces);
