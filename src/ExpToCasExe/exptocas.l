@@ -62,7 +62,7 @@ int ec_curline ( void )
   return ec_linenum;
 }
 
-int ec_error ( char *s, char *text )
+int ec_error ( char const *s, char const *text )
 {
   printf ( "\nError at line %d: %s \"%s\"\n", ec_curline(), s, text );
   return 0;

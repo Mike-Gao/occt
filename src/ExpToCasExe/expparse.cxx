@@ -373,7 +373,7 @@ int main ( void )
     printf ( "\nTotal %d", num );
   }
 
-/*  tlistfree ( yylval.tlist ); * /
+//  tlistfree ( yylval.tlist );
   return num;
 }
 */
