@@ -48,7 +48,10 @@
 #include <BRepAdaptor_Surface.hxx>
 #include <Adaptor3d_Surface.hxx>
 //
-static void Correct2dPoint(const Adaptor3d_Surface& theS, gp_Pnt2d& theP2d);
+static void Correct2dPoint(const TopoDS_Face& theF, gp_Pnt2d& theP2d);
+//
+static Standard_Real IntermediatePoint(const Standard_Real aFirst,
+  const Standard_Real aLast);
 //
 static BRepOffset_Type DefineConnectType(const TopoDS_Edge&         E,
 			                                   const TopoDS_Face&         F1,
@@ -173,7 +176,7 @@ void BRepOffset_Analyse::Perform (const TopoDS_Shape& S,
   myShape = S;
 
   angle                = Angle;
-  Standard_Real SinTol = Sin(Angle);
+  Standard_Real SinTol = Abs(Sin(Angle));
 
   // Build ancestors.
   BuildAncestors (S,ancestors);
@@ -486,42 +489,60 @@ void BRepOffset_Analyse::AddFaces (const TopoDS_Face&    Face,
 //function : Correct2dPoint
 //purpose  : 
 //=======================================================================
-void Correct2dPoint(const Adaptor3d_Surface& theS, gp_Pnt2d& theP2d)
+void Correct2dPoint(const TopoDS_Face& theF, gp_Pnt2d& theP2d)
 {
+  BRepAdaptor_Surface aBAS(theF, Standard_False);
+  if (aBAS.GetType() < GeomAbs_BezierSurface) {
+    return;
+  }
+  //
   const Standard_Real coeff = 0.01;
   Standard_Real eps;
   Standard_Real u1, u2, v1, v2;
-  if(theS.GetType() >= GeomAbs_BezierSurface)
+  //
+  aBAS.Initialize(theF, Standard_True);
+  u1 = aBAS.FirstUParameter();
+  u2 = aBAS.LastUParameter();
+  v1 = aBAS.FirstVParameter();
+  v2 = aBAS.LastVParameter();
+  if (!(Precision::IsInfinite(u1) || Precision::IsInfinite(u2)))
   {
-    u1 = theS.FirstUParameter();
-    u2 = theS.LastUParameter();
-    v1 = theS.FirstVParameter();
-    v2 = theS.LastVParameter();
-    if(!(Precision::IsInfinite(u1) || Precision::IsInfinite(u2)))
+    eps = Max(coeff*(u2 - u1), Precision::PConfusion());
+    if (Abs(theP2d.X() - u1) < eps)
     {
-      eps = Max(coeff*(u2-u1), Precision::PConfusion());
-      if(Abs(theP2d.X()-u1) < eps)
-      {
-        theP2d.SetX(u1 + eps);
-      }
-      if(Abs(theP2d.X()-u2) < eps)
-      {
-        theP2d.SetX(u2 - eps);
-      }
+      theP2d.SetX(u1 + eps);
     }
-    if(!(Precision::IsInfinite(v1) || Precision::IsInfinite(v2)))
+    if (Abs(theP2d.X() - u2) < eps)
     {
-      eps = Max(coeff*(v2-v1), Precision::PConfusion());
-      if(Abs(theP2d.Y()-v1) < eps)
-      {
-        theP2d.SetY(v1 + eps);
-      }
-      if(Abs(theP2d.Y()-v2) < eps)
-      {
-        theP2d.SetY(v2 - eps);
-      }
+      theP2d.SetX(u2 - eps);
     }
   }
+  if (!(Precision::IsInfinite(v1) || Precision::IsInfinite(v2)))
+  {
+    eps = Max(coeff*(v2 - v1), Precision::PConfusion());
+    if (Abs(theP2d.Y() - v1) < eps)
+    {
+      theP2d.SetY(v1 + eps);
+    }
+    if (Abs(theP2d.Y() - v2) < eps)
+    {
+      theP2d.SetY(v2 - eps);
+    }
+  }
+}
+
+//=======================================================================
+//function : IntermediatePoint
+//purpose  : 
+//=======================================================================
+Standard_Real IntermediatePoint(const Standard_Real aFirst,
+  const Standard_Real aLast)
+{
+  //define parameter division number as 10*e^(-M_PI) = 0.43213918
+  const Standard_Real PAR_T = 0.43213918;
+  Standard_Real aParm;
+  aParm = (1. - PAR_T)*aFirst + PAR_T*aLast;
+  return aParm;
 }
 
 //=======================================================================
@@ -534,75 +555,86 @@ BRepOffset_Type DefineConnectType(const TopoDS_Edge&         E,
 			                            const Standard_Real        SinTol,
                                   const Standard_Boolean     CorrectPoint)
 {
-  TopLoc_Location L;
-  Standard_Real   f,l;
-  
-  BRepAdaptor_Surface S1(F1), S2(F2);
-  Handle (Geom2d_Curve) C1 = BRep_Tool::CurveOnSurface(E,F1,f,l);
-  Handle (Geom2d_Curve) C2 = BRep_Tool::CurveOnSurface(E,F2,f,l);
+  const Handle(Geom_Surface)& S1 = BRep_Tool::Surface(F1);
+  const Handle(Geom_Surface)& S2 = BRep_Tool::Surface(F2);
+  //
+  Standard_Real   f, l;
+  Handle(Geom2d_Curve) C1 = BRep_Tool::CurveOnSurface(E, F1, f, l);
+  //For the case of seam edge
+  TopoDS_Edge EE = E;
+  if (F1.IsSame(F2))
+    EE.Reverse();
+  Handle(Geom2d_Curve) C2 = BRep_Tool::CurveOnSurface(EE, F2, f, l);
+  if (C1.IsNull() || C2.IsNull())
+    return BRepOffset_Other;
 
   BRepAdaptor_Curve C(E);
   f = C.FirstParameter();
   l = C.LastParameter();
-//
-  Standard_Real ParOnC = 0.5*(f+l);
-  gp_Vec T1 = C.DN(ParOnC,1).Transformed(L.Transformation());
+  //
+  Standard_Real ParOnC = 0.5*(f + l);
+  gp_Vec T1 = C.DN(ParOnC, 1);
+  if (T1.SquareMagnitude() <= gp::Resolution())
+  {
+    ParOnC = IntermediatePoint(f, l);
+    T1 = C.DN(ParOnC, 1);
+  }
   if (T1.SquareMagnitude() > gp::Resolution()) {
     T1.Normalize();
   }
-  
-  if (BRepOffset_Tool::OriEdgeInFace(E,F1) == TopAbs_REVERSED) {
+
+  if (BRepOffset_Tool::OriEdgeInFace(E, F1) == TopAbs_REVERSED) {
     T1.Reverse();
   }
   if (F1.Orientation() == TopAbs_REVERSED) T1.Reverse();
 
-  gp_Pnt2d P  = C1->Value(ParOnC);
+  gp_Pnt2d P = C1->Value(ParOnC);
   gp_Pnt   P3;
-  gp_Vec   D1U,D1V;
-  
-  if(CorrectPoint) 
-    Correct2dPoint(S1, P);
+  gp_Vec   D1U, D1V;
+
+  if (CorrectPoint)
+    Correct2dPoint(F1, P);
   //
-  S1.D1(P.X(),P.Y(),P3,D1U,D1V);
+  S1->D1(P.X(), P.Y(), P3, D1U, D1V);
   gp_Vec DN1(D1U^D1V);
   if (F1.Orientation() == TopAbs_REVERSED) DN1.Reverse();
-  
+
   P = C2->Value(ParOnC);
-  if(CorrectPoint) 
-    Correct2dPoint(S2, P);
-  S2.D1(P.X(),P.Y(),P3,D1U,D1V);
+  if (CorrectPoint)
+    Correct2dPoint(F2, P);
+  S2->D1(P.X(), P.Y(), P3, D1U, D1V);
   gp_Vec DN2(D1U^D1V);
   if (F2.Orientation() == TopAbs_REVERSED) DN2.Reverse();
 
   DN1.Normalize();
   DN2.Normalize();
 
-  gp_Vec        ProVec     = DN1^DN2;
-  Standard_Real NormProVec = ProVec.Magnitude(); 
+  gp_Vec        ProVec = DN1^DN2;
+  Standard_Real NormProVec = ProVec.Magnitude();
 
-  if (Abs(NormProVec) < SinTol) {
+  if (NormProVec < SinTol) {
     // plane
-    if (DN1.Dot(DN2) > 0) {   
+    if (DN1.Dot(DN2) > 0) {
       //Tangent
       return BRepOffset_Tangent;
     }
-    else  {                   
+    else  {
       //Mixed not finished!
 #ifdef OCCT_DEBUG
-      cout <<" faces locally mixed"<<endl;
+      std::cout << " faces locally mixed" << std::endl;
 #endif
       return BRepOffset_Convex;
     }
   }
-  else {  
+  else {
     if (NormProVec > gp::Resolution())
-      ProVec.Normalize();
-    Standard_Real Prod  = T1.Dot(DN1^DN2);
-    if (Prod > 0.) {       
+      ProVec /= NormProVec;
+    Standard_Real Prod = T1.Dot(ProVec);
+    if (Prod > 0.) {
       //
       return BRepOffset_Convex;
     }
-    else {                       
+    else {
       //reenters
       return BRepOffset_Concave;
     }
