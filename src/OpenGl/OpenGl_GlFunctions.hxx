@@ -152,6 +152,17 @@
   #define GL_TRIANGLES_ADJACENCY        0x000C
   #define GL_TRIANGLE_STRIP_ADJACENCY   0x000D
   #define GL_PATCHES                    0x000E
+
+  // GL_EXT_texture_compression_s3tc extension
+  #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT  0x83F0
+  #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83F1
+  #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT 0x83F2
+  #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 0x83F3
+  //
+  #define GL_COMPRESSED_SRGB_S3TC_DXT1_EXT  0x8C4C
+  #define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT 0x8C4D
+  #define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT 0x8C4E
+  #define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT 0x8C4F
 #endif
 
 #if !defined(HAVE_EGL) && (defined(__ANDROID__) || defined(__QNX__) || defined(__EMSCRIPTEN__) || defined(HAVE_GLES2) || defined(OCCT_UWP))
