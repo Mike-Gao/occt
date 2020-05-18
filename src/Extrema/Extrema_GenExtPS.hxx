@@ -23,6 +23,7 @@
 
 #include <Adaptor3d_SurfacePtr.hxx>
 #include <BVH_BoxSet.hxx>
+#include <BVH_IndexedBoxSet.hxx>
 #include <BVH_Traverse.hxx>
 #include <Extrema_HArray2OfPOnSurfParams.hxx>
 #include <Extrema_FuncPSNorm.hxx>
@@ -40,6 +41,22 @@ class gp_Pnt;
 class Adaptor3d_Surface;
 class Extrema_POnSurf;
 class Extrema_POnSurfParams;
+
+
+//! Grid cell defined by (U, V) indices of the minimal
+//! corner of the cell
+struct GridCell
+{
+  Standard_Integer UIndex; //!< U index of the minimal corner
+  Standard_Integer VIndex; //!< V index of the minimal corner
+
+  GridCell (Standard_Integer theUInd = -1, Standard_Integer theVInd = -1)
+    : UIndex (theUInd), VIndex (theVInd)
+  {}
+};
+
+//! typedef to BVH tree of the grid cells
+typedef BVH_BoxSet <Standard_Real, 3, GridCell> Extrema_GenExtPS_GridCellBoxSet;
 
 
 //! It calculates the extreme distances between a point and a surface.
@@ -68,27 +85,13 @@ class Extrema_POnSurfParams;
 //! The class is BVH enhanced - the grid cells are stored into BVH-organized
 //! structure. Depending on the Extrema target the traverse of the BVH tree
 //! is different.
-class Extrema_GenExtPS: protected BVH_Traverse <Standard_Real, 3>,
-                        public Standard_Transient
+class Extrema_GenExtPS:
+  protected BVH_Traverse <Standard_Real, 3, Extrema_GenExtPS_GridCellBoxSet>,
+  public Standard_Transient
 {
 public:
 
   DEFINE_STANDARD_RTTIEXT (Extrema_GenExtPS, Standard_Transient)
-
-public: //! @name public types
-
-  //! Grid cell is defined just by (U, V) indices of the minimal
-  //! corner of the cell.
-  struct GridCell
-  {
-    GridCell (Standard_Integer theUInd = -1, Standard_Integer theVInd = -1)
-      : myUInd (theUInd), myVInd (theVInd)
-    {}
-
-    Standard_Integer myUInd; //!< U index of the minimal corner
-    Standard_Integer myVInd; //!< V index of the minimal corner
-  };
-
 
 public: //! @name Constructors computing the distances
   
@@ -188,7 +191,7 @@ public: //! @name Specifying the search options
   //! Specifies what solutions are necessary:
   //! - *Extrema_ExtFlag_MIN* - only minimal solutions
   //! - *Extrema_ExtFlag_MAX* - only maximal solutions
-  //! - *Extrema_ExtFlag_MINMAX - all solutions.
+  //! - *Extrema_ExtFlag_MINMAX - all solutions (default value).
   void SetTarget (const Extrema_ExtFlag theTarget)
   {
     myTarget = theTarget;
@@ -217,52 +220,29 @@ public: //! @name Performing projection
   Standard_EXPORT void Perform (const gp_Pnt& theP);
 
 
-public: //! @name Rules for BVH traverse
-
-  //! Rejection of the node by bounding box.
-  //! Metric is computed to choose the best branch.
-  //! Returns true if the node should be rejected, false otherwise.
-  Standard_EXPORT virtual Standard_Boolean
-    RejectNode (const BVH_Vec3d& theCornerMin,
-                const BVH_Vec3d& theCornerMax,
-                Standard_Real& theMetric) const Standard_OVERRIDE;
-
-  //! Rejects the node by the metric
-  Standard_EXPORT virtual Standard_Boolean
-    RejectMetric (const Standard_Real& theMetric) const Standard_OVERRIDE;
-
-  //! Compares the two metrics and chooses the best one.
-  //! Returns true if the first metric is better than the second,
-  //! false otherwise.
-  Standard_EXPORT virtual Standard_Boolean
-    IsMetricBetter (const Standard_Real& theLeft,
-                    const Standard_Real& theRight) const Standard_OVERRIDE;
-
-  //! Leaf element acceptance.
-  //! Metric of the parent leaf-node is passed to avoid the check on the
-  //! element and accept it unconditionally.
-  //! Returns true if the element has been accepted, false otherwise.
-  Standard_EXPORT virtual Standard_Boolean
-    Accept (const Standard_Integer theIndex,
-            const Standard_Real& theMetric) Standard_OVERRIDE;
-
-
 public: //! @name Getting the results
 
   //! Returns True if the distances are found.
   Standard_Boolean IsDone() const { return myIsDone; }
 
   //! Returns the number of extrema distances found.
+  //! @throws StdFail_NotDone if extrema search has failed.
   Standard_EXPORT Standard_Integer NbExt() const;
 
   //! Returns the value of the Nth resulting square distance.
+  //! @throws StdFail_NotDone if extrema search has failed.
+  //! @throws Standard_OutOfRange if given index is out of range of found
+  //!                             solutions ((N < 1) || (N > NbExt()).
   Standard_EXPORT Standard_Real SquareDistance (const Standard_Integer theN) const;
 
   //! Returns the point of the Nth resulting distance.
+  //! @throws StdFail_NotDone if extrema search has failed.
+  //! @throws Standard_OutOfRange if given index is out of range of found
+  //!                             solutions ((N < 1) || (N > NbExt()).
   Standard_EXPORT const Extrema_POnSurf& Point (const Standard_Integer theN) const;
 
 
-private: //! @name Private methods performing the job
+protected: //! @name Protected methods performing the job
 
   //! Creation of grid of parametric points (sampling of the surface)
   Standard_EXPORT void BuildGrid();
@@ -291,39 +271,72 @@ private: //! @name Private methods performing the job
                            const Standard_Real theDiffTol);
 
   //! Looks for the Min or Max Solution (depending on the given target).
-  Standard_EXPORT Standard_Boolean FindSolution (const Standard_Integer theIndex,
-                                                 const Standard_Real& theMetric,
+  Standard_EXPORT Standard_Boolean FindSolution (const Standard_Integer theUIndex,
+                                                 const Standard_Integer theVIndex,
                                                  const Extrema_ExtFlag theTarget);
 
-  //! structure to keep the results
+
+protected: //! @name Rules for BVH traverse
+
+  //! Rejection of the node by bounding box.
+  //! Metric is computed to choose the best branch.
+  //! Returns true if the node should be rejected, false otherwise.
+  Standard_EXPORT virtual Standard_Boolean
+    RejectNode (const BVH_Vec3d& theCornerMin,
+                const BVH_Vec3d& theCornerMax,
+                Standard_Real& theMetric) const Standard_OVERRIDE;
+
+  //! Rejects the node by the metric
+  Standard_EXPORT virtual Standard_Boolean
+    RejectMetric (const Standard_Real& theMetric) const Standard_OVERRIDE;
+
+  //! Compares the two metrics and chooses the best one.
+  //! Returns true if the first metric is better than the second,
+  //! false otherwise.
+  Standard_EXPORT virtual Standard_Boolean
+    IsMetricBetter (const Standard_Real& theLeft,
+                    const Standard_Real& theRight) const Standard_OVERRIDE;
+
+  //! Leaf element acceptance.
+  //! Metric of the parent leaf-node is passed to avoid the check on the
+  //! element and accept it unconditionally.
+  //! Returns true if the element has been accepted, false otherwise.
+  Standard_EXPORT virtual Standard_Boolean
+    Accept (const Standard_Integer theIndex,
+            const Standard_Real& theMetric) Standard_OVERRIDE;
+
+protected: //! @name Auxiliary types
+
+  //! Structure to keep and sort the results
   struct ExtPSResult
   {
-    ExtPSResult ()
-      : mySqDistance (-1)
+    Extrema_POnSurf UV;       //! UV coordinates of extrema solution
+    Standard_Real SqDistance; //! Square distance to target point
+
+    ExtPSResult()
+      : SqDistance (-1)
     {}
 
     ExtPSResult (const Extrema_POnSurf& theUV,
                  const Standard_Real theSqDist)
-      : myUV (theUV),
-        mySqDistance (theSqDist)
+      : UV (theUV),
+        SqDistance (theSqDist)
     {}
 
+    //! IsLess operator
     Standard_Boolean operator< (const ExtPSResult& Other) const
     {
-      if (mySqDistance != Other.mySqDistance)
-        return mySqDistance < Other.mySqDistance;
+      if (SqDistance != Other.SqDistance)
+        return SqDistance < Other.SqDistance;
 
       Standard_Real U1, U2, V1, V2;
-      myUV.Parameter (U1, V1);
-      Other.myUV.Parameter (U2, V2);
+      UV.Parameter (U1, V1);
+      Other.UV.Parameter (U2, V2);
       return (U1 < U2 || (U1 == U2 && V1 < V2));
     }
-
-    Extrema_POnSurf myUV;
-    Standard_Real mySqDistance;
   };
 
-private: //! @name Fields
+protected: //! @name Fields
 
   // Inputs
   NCollection_Vec3<Standard_Real> myPoint; //!< Point
@@ -354,11 +367,13 @@ private: //! @name Fields
   Handle(Extrema_HArray2OfPOnSurfParams) myVEdgePntParams;
 
   Standard_Real mySqDistance; //!< Min/Max found square distance used in BVH tree traverse
-  opencascade::handle <BVH_BoxSet <Standard_Real, 3, GridCell>> myGridBoxSet; //!< BVH-organized grid
+  opencascade::handle 
+    <BVH_IndexedBoxSet<Standard_Real, 3, Handle(Extrema_GenExtPS_GridCellBoxSet)> > myGridBoxSet; //!< High-level BVH of BVH organized grid cells
 
   // Results
-  std::vector <ExtPSResult> mySolutions;
-  Standard_Boolean myIsDone; //!< IsDone flag
+  std::vector <ExtPSResult> mySolutions; //!< Found solutions (sorted first by distance to target point,
+                                         //!  second by the ascending U,V coordinates)
+  Standard_Boolean myIsDone;             //!< Done/Not done flag
 };
 
 DEFINE_STANDARD_HANDLE (Extrema_GenExtPS, Standard_Transient)
