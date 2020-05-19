@@ -42,6 +42,36 @@ const Handle(Message_Report)& Message_PrinterToReport::Report() const
 
 //=======================================================================
 //function : Send
+//purpose  :
+//=======================================================================
+void Message_PrinterToReport::Send (const Standard_SStream& theStream,
+                                    const Message_Gravity   theGravity) const
+{
+  const Handle(Message_Report)& aReport = Report();
+  if (!aReport->ActiveMetrics().IsEmpty())
+  {
+    sendMetricAlert (theStream.str().c_str(), theGravity);
+    return;
+  }
+  if (Standard_Dump::HasChildKey(Standard_Dump::Text (theStream)))
+  {
+    Message_AlertExtended::AddAlert (aReport, new Message_AttributeStream (theStream, myName), theGravity);
+    myName.Clear();
+  }
+  else
+  {
+    if (!myName.IsEmpty())
+    {
+      TCollection_AsciiString aName = myName;
+      myName.Clear();
+      send (aName, theGravity);
+    }
+    myName = Standard_Dump::Text (theStream);
+  }
+}
+
+//=======================================================================
+//function : Send
 //purpose  : 
 //=======================================================================
 void Message_PrinterToReport::Send (const Handle(Standard_Transient)& /*theObject*/,
@@ -64,6 +94,12 @@ void Message_PrinterToReport::Send (const Handle(Standard_Transient)& /*theObjec
 void Message_PrinterToReport::send (const TCollection_AsciiString& theString,
                                     const Message_Gravity theGravity) const
 {
+  if (!myName.IsEmpty())
+  {
+    send (myName, theGravity);
+    myName.Clear();
+  }
+
   const Handle(Message_Report)& aReport = Report();
   if (!aReport->ActiveMetrics().IsEmpty())
   {

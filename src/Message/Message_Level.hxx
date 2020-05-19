@@ -42,7 +42,7 @@ public:
   //! Constructor. Append
   //! One string key is used for all alert meters. The perf meter is not started automatically, it will be done in
   //! AddAlert method
-  Standard_EXPORT Message_Level();
+  Standard_EXPORT Message_Level (const TCollection_AsciiString& theName = TCollection_AsciiString());
 
   //! Assures stopping upon destruction
   Standard_EXPORT ~Message_Level();
@@ -53,7 +53,8 @@ public:
 
   //! Sets the root alert. Starts collects alert metrics if active.
   //! @param theAlert an alert  
-  Standard_EXPORT void SetRootAlert (const Handle(Message_AlertExtended)& theAlert);
+  Standard_EXPORT void SetRootAlert (const Handle(Message_AlertExtended)& theAlert,
+                                     const Standard_Boolean isRequiredToStart);
 
   //! Adds new alert on the level. Stops the last alert metric, appends the alert and starts the alert metrics collecting.
   //! Sets root alert beforehead this method using, if the root is NULL, it does nothing.
@@ -63,31 +64,9 @@ public:
   Standard_EXPORT Standard_Boolean AddAlert (const Message_Gravity theGravity,
                                              const Handle(Message_Alert)& theAlert);
 
-  //! Add new alert as a child of the last alert if exists or as a child of the root alert.
-  //! @param theGravity an alert gravity
-  //! @param theAlert an alert  
-  //! @return true if alert is added
-  Standard_EXPORT Standard_Boolean AddLevelAlert (const Message_Gravity theGravity,
-                                                  const Handle(Message_Alert)& theAlert);
-
-  //! Remove the current level from the report. It stops metric collecting for the last and the root alerts.
-  Standard_EXPORT void Remove();
-
 protected:
-  //! Sets start values of default report metrics into the alert
-  //! @param theAlert an alert  
-  void startAlert (const Handle(Message_AlertExtended)& theAlert) { setAlertMetrics (theAlert, Standard_True); }
-
-  //! Sets stop values of default report metrics into the alert
-  //! @param theAlert an alert  
-  void stopAlert (const Handle(Message_AlertExtended)& theAlert) { setAlertMetrics (theAlert, Standard_True); }
-
-  //! Sets current values of default report metrics into the alert.
-  //! Processed oly alert with Message_AttributeMeter attribute
-  //! @param theAlert an alert  
-  //! @param theStartValue flag, if true, the start value is collected otherwise stop
-  Standard_EXPORT void setAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
-                                        const Standard_Boolean theStartValue);
+  //! Remove the current level from the report. It stops metric collecting for the last and the root alerts.
+  Standard_EXPORT void remove();
 
 protected:
   Handle(Message_AlertExtended) myRootAlert; //!< root alert
@@ -97,7 +76,6 @@ protected:
 //! @def MESSAGE_NEW_LEVEL
 //! Creates a new level instance of Sentry. This row should be inserted before messages using in the method.
 #define OCCT_ADD_MESSAGE_LEVEL_SENTRY(theMessage) \
-  Message_Level aLevel; \
-  Message::SendInfo() << theMessage << std::endl;
+  Message_Level aLevel(theMessage);
 
 #endif // _Message_Level_HeaderFile

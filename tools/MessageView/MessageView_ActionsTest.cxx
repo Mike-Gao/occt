@@ -28,7 +28,11 @@
 #include <Message_Messenger.hxx>
 #include <Message_PrinterToReport.hxx>
 
+#include <gp_Ax1.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Ax3.hxx>
 #include <Bnd_Box.hxx>
+#include <Bnd_OBB.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <OSD_Chronometer.hxx>
 #include <Quantity_Color.hxx>
@@ -45,10 +49,9 @@
 #include <QWidget>
 #include <Standard_WarningsRestore.hxx>
 
-//#define DEBUG_ALERTS
+#define DEBUG_ALERTS
 
 #ifdef DEBUG_ALERTS
-#include <Message_Alerts.hxx>
 #include <Message_Level.hxx>
 #endif
 
@@ -71,6 +74,8 @@ MessageView_ActionsTest::MessageView_ActionsTest (QWidget* theParent,
                     ViewControl_Tools::CreateAction ("Test <Message_Messenger>", SLOT (OnTestMessenger()), parent(), this));
   myActions.insert (MessageModel_ActionType_TestReportTree,
                     ViewControl_Tools::CreateAction ("Test <Tree of messages>", SLOT (OnTestReportTree()), parent(), this));
+  myActions.insert (MessageModel_ActionType_TestReportTree2,
+                    ViewControl_Tools::CreateAction ("Test <Tree of messages> 2", SLOT (OnTestReportTree2()), parent(), this));
 }
 
 // =======================================================================
@@ -111,6 +116,7 @@ void MessageView_ActionsTest::AddMenuActions (const QModelIndexList& theSelected
     theMenu->addAction (myActions[MessageModel_ActionType_TestProperties]);
     theMenu->addAction (myActions[MessageModel_ActionType_TestMessenger]);
     theMenu->addAction (myActions[MessageModel_ActionType_TestReportTree]);
+    theMenu->addAction (myActions[MessageModel_ActionType_TestReportTree2]);
 
     bool isReportEnabled = aReportItem->GetReport()->IsActiveInMessenger();
 
@@ -118,6 +124,7 @@ void MessageView_ActionsTest::AddMenuActions (const QModelIndexList& theSelected
     myActions[MessageModel_ActionType_TestProperties]->setEnabled (isReportEnabled);
     myActions[MessageModel_ActionType_TestMessenger]->setEnabled (isReportEnabled);
     myActions[MessageModel_ActionType_TestReportTree]->setEnabled (isReportEnabled);
+    myActions[MessageModel_ActionType_TestReportTree2]->setEnabled (isReportEnabled);
   }
   theMenu->addSeparator();
 }
@@ -174,7 +181,7 @@ void MessageView_ActionsTest::OnTestMetric()
   double* aMemValue;
   for (int aTopIt = 0; aTopIt < 4; aTopIt++)
   {
-    MESSAGE_INFO ("Calculate");
+    Message::SendInfo() << "Calculate";
     for (int j = 0; j < aCounter; j++)
     {
       for (int i = 0; i < aCounter; i++)
@@ -219,45 +226,32 @@ void MessageView_ActionsTest::OnTestPropertyPanel()
 
   OCCT_ADD_MESSAGE_LEVEL_SENTRY ("MessageModel_Actions::OnTestPropertyPanel()");
 
+  OCCT_SEND_MESSAGE ("Values")
+  OCCT_SEND_MESSAGE ("Values2")
   // gp_XYZ
   {
     gp_XYZ aCoords (1.3, 2.3, 3.4);
-    aCoords.DumpJson (sout);
-    //Standard_SStream aStream;
-    //aCoords.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "gp_XYZ");
+    OCCT_SEND_DUMPJSON (&aCoords, "gp_XYZ")
   }
   // gp_Dir
   {
     gp_Dir aDir (0.3, 0.3, 0.4);
-    //Standard_SStream aStream;
-    aDir.DumpJson (sout);
-    //aDir.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "gp_Dir");
+    OCCT_SEND_DUMPJSON (&aDir, "gp_Dir")
   }
   // gp_Ax1
   {
     gp_Ax1 aCoords (gp_Pnt (1.3, 2.3, 3.4), gp_Dir (0.3, 0.3, 0.4));
-    //Standard_SStream aStream;
-    aCoords.DumpJson (sout);
-    //aCoords.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "gp_Ax1");
+    OCCT_SEND_DUMPJSON (&aCoords, "gp_Ax1")
   }
   // gp_Ax2
   {
     gp_Ax2 aCoords (gp_Pnt (10.3, 20.3, 30.4), gp_Dir (0.3, 0.3, 0.4));
-    //Standard_SStream aStream;
-    aCoords.DumpJson (sout);
-    //aCoords.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "gp_Ax2");
+    OCCT_SEND_DUMPJSON (&aCoords, "gp_Ax2")
   }
   // gp_Ax3
   {
     gp_Ax3 aPln (gp_Pnt (10., 20., 15.), gp_Dir (0., 0., 1.), gp_Dir (1., 0., 0.));
-    //Standard_SStream aStream;
-    aPln.DumpJson (sout);
-    //aPln.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "gp_Ax3");
+    OCCT_SEND_DUMPJSON (&aPln, "gp_Ax3")
   }
   // gp_Trsf
   {
@@ -266,43 +260,28 @@ void MessageView_ActionsTest::OnTestPropertyPanel()
     aTrsf.SetTranslationPart (gp_Vec (15., 15., 15.));
     aTrsf.SetScaleFactor (3.);
 
-    aTrsf.DumpJson (sout);
-    //Standard_SStream aStream;
-    //aTrsf.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "gp_Trsf");
+    OCCT_SEND_DUMPJSON (&aTrsf, "gp_Trsf")
   }
   // Bnd_Box
   {
     Bnd_Box aBox (gp_Pnt (20., 15., 10.), gp_Pnt (25., 20., 15.));
-    aBox.DumpJson (sout);
-    //Standard_SStream aStream;
-    //aBox.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "Bnd_Box");
+    OCCT_SEND_DUMPJSON (&aBox, "Bnd_Box")
   }
   // Bnd_OBB
   {
     Bnd_OBB anOBB (gp_Pnt (-10., -15., -10.), gp_Dir (1., 0., 0.), gp_Dir (0., 1., 0.), gp_Dir (0., 0., 1.),
                   5., 10., 5.);
-    aBox.DumpJson (sout);
-    //Standard_SStream aStream;
-    //anOBB.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "Bnd_OBB");
+    OCCT_SEND_DUMPJSON (&anOBB, "Bnd_OBB");
   }
   // Quantity_ColorRGBA
   {
     Quantity_ColorRGBA aColor (0.2f, 0.8f, 0.8f, 0.2f);
-    aColor.DumpJson (sout);
-    //Standard_SStream aStream;
-    //aColor.DumpJson (aStream);
-    //MESSAGE_INFO_STREAM(aStream, "Quantity_ColorRGBA");
+    OCCT_SEND_DUMPJSON (&aColor, "Quantity_ColorRGBA");
   }
   // Quantity_Color
   {
     Quantity_Color aColor (0.8, 0.8, 0.8, Quantity_TOC_RGB);
-    aColor.DumpJson (sout);
-    //Standard_SStream aStream;
-    //aColor.DumpJson (aStream);
-    ///MESSAGE_INFO_STREAM(aStream, "Quantity_Color");
+    OCCT_SEND_DUMPJSON (&aColor, "Quantity_Color");
   }
 
   // stream of some table values
@@ -310,8 +289,7 @@ void MessageView_ActionsTest::OnTestPropertyPanel()
     Standard_SStream aStream;
     OCCT_DUMP_FIELD_VALUES_NUMERICAL (aStream, "value_1", 1, 100);
     OCCT_DUMP_FIELD_VALUES_STRING (aStream, "value_2", 2, "value_1", "value_2");
-
-    MESSAGE_INFO_STREAM(aStream, "Table: Name to value");
+    OCCT_SEND_STREAM (aStream, "Table: Name to value");
   }
 
   // SHAPE messages
@@ -429,13 +407,13 @@ void levelAlerts (const int theCurrentLevel, const int theTopLevel)
   OCCT_ADD_MESSAGE_LEVEL_SENTRY (TCollection_AsciiString ("Level: " ) + theCurrentLevel)
 
   Message_Messenger::StreamBuffer sout = Message::SendInfo();
-  sout << "Alert: " << 1 << ", " << 2 << std::endl;
-  sout << "Alert: " << 3 << ", " << 4 << std::endl;
+  sout << "Alert(" << theCurrentLevel << "): " << 1 << ", " << 2 << std::endl;
+  sout << "Alert(" << theCurrentLevel << "): " << 3 << ", " << 4 << std::endl;
 
-  for (int i = 0; i < 2; i++)
+  //for (int i = 0; i < 2; i++)
     levelAlerts (theCurrentLevel + 1, theTopLevel);
 
-  sout << "Alert: " << 4 << ", " << 5 << std::endl;
+  sout << "Alert(" << theCurrentLevel << "): " << 4 << ", " << 5 << std::endl;
 }
 
 // =======================================================================
@@ -452,12 +430,12 @@ void levelAlert (const int theCurrentLevel, const int theTopLevel)
   Message_Messenger::StreamBuffer sout = Message::SendInfo();
   sout << "Level: " << theCurrentLevel << "(Single, no alerts on the level)" << std::endl;
 
-  for (int i = 0; i < 2; i++)
+  //for (int i = 0; i < 2; i++)
     levelAlerts (theCurrentLevel + 1, theTopLevel);
 }
 
 // =======================================================================
-// function : OnTestMessenger
+// function : OnTestReportTree
 // purpose :
 // =======================================================================
 void MessageView_ActionsTest::OnTestReportTree()
@@ -481,3 +459,27 @@ void MessageView_ActionsTest::OnTestReportTree()
   myTreeModel->UpdateTreeModel();
 }
 
+// =======================================================================
+// function : OnTestReportTree2
+// purpose :
+// =======================================================================
+void MessageView_ActionsTest::OnTestReportTree2()
+{
+  OCCT_ADD_MESSAGE_LEVEL_SENTRY ("MessageModel_Actions::OnTestReportTree()")
+  Message_Messenger::StreamBuffer sout = Message::SendInfo();
+
+  // string messages
+  //sout << "Alert: " << 1 << std::endl;
+  //sout << "Alert: " << 2 << std::endl;
+
+  int aTopLevel = 3;
+  levelAlerts (1, aTopLevel);
+
+  //sout << "Alert: " << 3 << std::endl;
+  //levelAlerts (1, aTopLevel);
+
+  //sout << "Alert: " << 4 << std::endl;
+  //levelAlert (1, aTopLevel);
+
+  myTreeModel->UpdateTreeModel();
+}

@@ -20,6 +20,7 @@
 #include <NCollection_DataMap.hxx>
 
 class Message_Alert;
+class Message_AlertExtended;
 
 //! Alert object storing alert metrics values.
 //! Start and stop values for each metric.
@@ -63,6 +64,21 @@ public:
   //! Sets stop values for the metric
   //! @param theMetric [in] metric type
   Standard_EXPORT void SetStopValue (const Message_MetricType& theMetric, const Standard_Real theValue);
+
+  //! Sets start values of default report metrics into the alert
+  //! @param theAlert an alert  
+  static void StartAlert (const Handle(Message_AlertExtended)& theAlert) { SetAlertMetrics (theAlert, Standard_True); }
+
+  //! Sets stop values of default report metrics into the alert
+  //! @param theAlert an alert  
+  static void StopAlert (const Handle(Message_AlertExtended)& theAlert) { SetAlertMetrics (theAlert, Standard_False); }
+
+  //! Sets current values of default report metrics into the alert.
+  //! Processed oly alert with Message_AttributeMeter attribute
+  //! @param theAlert an alert  
+  //! @param theStartValue flag, if true, the start value is collected otherwise stop
+  static Standard_EXPORT void SetAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
+                                               const Standard_Boolean theStartValue);
 
   DEFINE_STANDARD_RTTIEXT(Message_AttributeMeter, Message_Attribute)
 

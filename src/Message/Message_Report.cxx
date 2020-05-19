@@ -17,6 +17,8 @@
 
 #include <Message.hxx>
 #include <Message_AlertExtended.hxx>
+#include <Message_AttributeMeter.hxx>
+#include <Message_Attribute.hxx>
 #include <Message_CompositeAlerts.hxx>
 #include <Message_Msg.hxx>
 #include <Message_Messenger.hxx>
@@ -66,33 +68,9 @@ void Message_Report::AddAlert (Message_Gravity theGravity, const Handle(Message_
     return;
   }
 
-  // if there are some levels of alerts
-  // iterate by already recorded alerts and try to merge new one with one of those
-  Message_Level* aLevel = myAlertLevels.Last();
+  // if there are some levels of alerts, the new alert will be placed below the root
+  myAlertLevels.Last()->AddAlert (theGravity, theAlert);
 
-  // level has root alert, the new alert will be placed below the root
-  if (!aLevel->RootAlert().IsNull())
-  {
-    aLevel->AddAlert (theGravity, theAlert);
-    writeReport();
-    return;
-  }
-
-  Handle(Message_AlertExtended) anAlert = Handle(Message_AlertExtended)::DownCast (theAlert);
-  if (anAlert.IsNull())
-    return;
-  // place new alert as a root of the level, after place the level alert below the report or
-  // below the previous level
-  aLevel->SetRootAlert (anAlert);
-
-  if (myAlertLevels.Size() == 1) // this is the first level, so root alert should be pushed in the report composite of alerts
-    compositeAlerts (Standard_True)->AddAlert (theGravity, theAlert);
-  else
-  {
-    // root alert of next levels should be pushed under the previous level
-    Message_Level* aPrevLevel = myAlertLevels.Value (myAlertLevels.Size() - 1); // previous level
-    aPrevLevel->AddLevelAlert (theGravity, theAlert);
-  }
   writeReport();
 }
 
@@ -194,10 +172,32 @@ void Message_Report::ActivateInMessenger (const Standard_Boolean toActivate,
 //function : AddLevel
 //purpose  :
 //=======================================================================
-
-void Message_Report::AddLevel (Message_Level* theLevel)
+void Message_Report::AddLevel (Message_Level* theLevel, const TCollection_AsciiString& theName)
 {
   myAlertLevels.Append (theLevel);
+
+  Handle(Message_AlertExtended) aLevelRootAlert = new Message_AlertExtended();
+
+  Handle(Message_Attribute) anAttribute;
+  if (!ActiveMetrics().IsEmpty())
+  {
+    anAttribute =  new Message_AttributeMeter (theName);
+  }
+  else
+    anAttribute = new Message_Attribute (theName);
+  aLevelRootAlert->SetAttribute (anAttribute);
+  theLevel->SetRootAlert (aLevelRootAlert, myAlertLevels.Size() == 1);
+
+  if (myAlertLevels.Size() == 1) // this is the first level, so root alert should be pushed in the report composite of alerts
+  {
+    compositeAlerts (Standard_True)->AddAlert (Message_Info, theLevel->RootAlert());
+  }
+  if (myAlertLevels.Size() > 1) // this is the first level, so root alert should be pushed in the report composite of alerts
+  {
+    // root alert of next levels should be pushed under the previous level
+    Message_Level* aPrevLevel = myAlertLevels.Value (myAlertLevels.Size() - 1); // previous level
+    aPrevLevel->AddAlert (Message_Info, aLevelRootAlert);
+  }
 }
 
 //=======================================================================
@@ -210,6 +210,10 @@ void Message_Report::RemoveLevel (Message_Level* theLevel)
   for (int aLevelIndex = myAlertLevels.Size(); aLevelIndex >= 1; aLevelIndex--)
   {
     Message_Level* aLevel = myAlertLevels.Value (aLevelIndex);
+    if (myAlertLevels.Size() == 1) // the last level, the root item should be stopped
+    {
+      Message_AttributeMeter::StopAlert (aLevel->RootAlert());
+    }
     myAlertLevels.Remove (aLevelIndex);
 
     if (aLevel == theLevel)

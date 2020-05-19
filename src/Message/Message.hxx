@@ -136,13 +136,12 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 //! Append into messenger  result of DumpJson for the field
 //! It computes Dump of the fields. The expected field is a pointer.
 //! Use this macro for fields of the dumped class which has own DumpJson implementation.
-#define OCCT_SEND_DUMPJSON(theField) \
+#define OCCT_SEND_DUMPJSON(theField, theMessage) \
 { \
   if ((void*)(theField) != NULL) \
   { \
-    Standard_SStream aFieldStream; \
-    (theField)->DumpJson (aFieldStream, Message::DefaultMessenger()->TraceLevel()); \
-    Message::DefaultMessenger() << aFieldStream; \
+     Message::SendInfo() << theMessage; \
+     (theField)->DumpJson (Message::SendInfo()); \
   } \
 }
 
@@ -152,7 +151,17 @@ inline const Handle(Message_Messenger)& operator<< (const Handle(Message_Messeng
 //! Use this macro for fields of the dumped class which has own DumpJson implementation.
 #define OCCT_SEND_MESSAGE(theMessage) \
 { \
-  Message::DefaultMessenger() << theMessage << "" << std::endl; \
+  Message::SendInfo() << theMessage; \
+}
+
+//! @def OCCT_SEND_DUMPJSON
+//! Append into messenger  result of DumpJson for the field
+//! It computes Dump of the fields. The expected field is a pointer.
+//! Use this macro for fields of the dumped class which has own DumpJson implementation.
+#define OCCT_SEND_STREAM(theStream, theMessage) \
+{ \
+   Message::SendInfo() << theMessage; \
+   Message::SendInfo() << theStream.str().c_str(); \
 }
 
 #endif // _Message_HeaderFile

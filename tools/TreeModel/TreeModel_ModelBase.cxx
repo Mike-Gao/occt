@@ -47,9 +47,9 @@ TreeModel_ModelBase::TreeModel_ModelBase (QObject* theParent)
 // =======================================================================
 void TreeModel_ModelBase::InitColumns()
 {
-  SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
-  SetHeaderItem (1, TreeModel_HeaderSection ("Visibility", TreeModel_ModelBase::ColumnVisibilityWidth()));
-  SetHeaderItem (2, TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
+  SetHeaderItem (TreeModel_ColumnType_Name,       TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
+  SetHeaderItem (TreeModel_ColumnType_Visibility, TreeModel_HeaderSection ("Visibility", TreeModel_ModelBase::ColumnVisibilityWidth()));
+  SetHeaderItem (TreeModel_ColumnType_Row,        TreeModel_HeaderSection ("Row", COLUMN_SIZE_WIDTH));
 }
 
 // =======================================================================

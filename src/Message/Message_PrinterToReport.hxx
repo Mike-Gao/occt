@@ -45,11 +45,17 @@ public:
   Standard_EXPORT void SetReport (const Handle(Message_Report)& theReport) { myReport = theReport; }
 
   //! Send a string message with specified trace level.
+  //! Stream is converted to string value.
+  //! Default implementation calls first method Send().
+  Standard_EXPORT virtual void Send (const Standard_SStream& theStream, const Message_Gravity theGravity) const;
+
+  //! Send a string message with specified trace level.
   //! The object is converted to string in format: <object kind> : <object pointer>.
   //! The parameter theToPutEol specified whether end-of-line should be added to the end of the message.
   //! Default implementation calls first method Send().
   Standard_EXPORT virtual void Send (const Handle(Standard_Transient)& theObject,
                                      const Message_Gravity theGravity) const Standard_OVERRIDE;
+
   //! Dumps the content of me into the stream
   Standard_EXPORT virtual void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const Standard_OVERRIDE;
 
@@ -65,6 +71,7 @@ protected:
                                         const Message_Gravity theGravity) const;
 
 private:
+  mutable TCollection_AsciiString myName;
   Handle(Message_Report) myReport; //!< the report for sending alerts
 };
 

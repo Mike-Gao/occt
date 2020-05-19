@@ -152,6 +152,28 @@ void Message_Messenger::Send (const Standard_CString theString,
 //purpose  : 
 //=======================================================================
 
+void Message_Messenger::Send (const Standard_SStream& theStream,
+                              const Message_Gravity theGravity) const
+{
+  if (TraceLevel() == 0)
+    return;
+
+  for (Message_SequenceOfPrinters::Iterator aPrinterIter (myPrinters); aPrinterIter.More(); aPrinterIter.Next())
+  {
+    const Handle(Message_Printer)& aPrinter = aPrinterIter.Value();
+    if (!aPrinter.IsNull())
+    {
+      aPrinter->Send (theStream, theGravity);
+    }
+  }
+}
+
+
+//=======================================================================
+//function : Send
+//purpose  : 
+//=======================================================================
+
 void Message_Messenger::Send (const TCollection_AsciiString& theString,
                               const Message_Gravity theGravity) const
 {

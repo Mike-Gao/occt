@@ -27,11 +27,11 @@
 //function : Message_Level
 //purpose  :
 //=======================================================================
-Message_Level::Message_Level()
+Message_Level::Message_Level (const TCollection_AsciiString& theName)
 {
   const Handle(Message_Report)& aDefaultReport = Message::DefaultReport();
   if (!aDefaultReport.IsNull() && aDefaultReport->IsActiveInMessenger())
-    aDefaultReport->AddLevel (this);
+    aDefaultReport->AddLevel (this, theName);
 }
 
 //=======================================================================
@@ -40,17 +40,19 @@ Message_Level::Message_Level()
 //=======================================================================
 Message_Level::~Message_Level()
 {
-  Remove();
+  remove();
 }
 
 //=======================================================================
 //function : SetRootAlert
 //purpose  :
 //=======================================================================
-void Message_Level::SetRootAlert (const Handle(Message_AlertExtended)& theAlert)
+void Message_Level::SetRootAlert (const Handle(Message_AlertExtended)& theAlert,
+                                  const Standard_Boolean isRequiredToStart)
 {
   myRootAlert = theAlert;
-  startAlert (myRootAlert);
+  if (isRequiredToStart)
+    Message_AttributeMeter::StartAlert (myRootAlert);
 }
 
 //=======================================================================
@@ -64,20 +66,16 @@ Standard_Boolean Message_Level::AddAlert (const Message_Gravity theGravity,
   if (anAlertExtended.IsNull())
     return Standard_False;
 
-  if (myRootAlert.IsNull())
-    return Standard_False;
-
   // looking for the parent of the parameter alert to release the previous alert
   Handle(Message_AlertExtended) aRootAlert = myRootAlert;
   Handle(Message_CompositeAlerts) aCompositeAlert = aRootAlert->CompositeAlerts (Standard_True);
 
   // update metrics of the previous alert
-  stopAlert (myLastAlert);
+  Message_AttributeMeter::StopAlert (myLastAlert);
 
   myLastAlert = anAlertExtended;
-
   // set start metrics of the new alert
-  startAlert (myLastAlert);
+  Message_AttributeMeter::StartAlert (myLastAlert);
 
   // add child alert
   aCompositeAlert->AddAlert (theGravity, theAlert);
@@ -86,104 +84,17 @@ Standard_Boolean Message_Level::AddAlert (const Message_Gravity theGravity,
 }
 
 //=======================================================================
-//function : AddLevelAlert
+//function : remove()
 //purpose  :
 //=======================================================================
-Standard_Boolean Message_Level::AddLevelAlert (const Message_Gravity theGravity,
-                                               const Handle(Message_Alert)& theAlert)
-{
-  Handle(Message_AlertExtended) aRootAlert = /*!myLastAlert.IsNull() ? myLastAlert :*/ myRootAlert;
-  if (aRootAlert.IsNull())
-    return Standard_False;
-
-  Handle(Message_CompositeAlerts) aCompositeAlert = aRootAlert->CompositeAlerts (Standard_True);
-  // add child alert
-  aCompositeAlert->AddAlert (theGravity, theAlert);
-
-  return Standard_True;
-}
-
-//=======================================================================
-//function : Remove()
-//purpose  :
-//=======================================================================
-void Message_Level::Remove()
+void Message_Level::remove()
 {
   const Handle(Message_Report)& aDefaultReport = Message::DefaultReport();
   if (aDefaultReport.IsNull() || !aDefaultReport->IsActiveInMessenger())
     return;
 
-  stopAlert (myLastAlert);
-  stopAlert (myRootAlert);
+  Message_AttributeMeter::StopAlert (myLastAlert);
 
   if (!Message::DefaultReport().IsNull())
     Message::DefaultReport()->RemoveLevel (this);
-}
-
-//=======================================================================
-//function : setAlertMetrics
-//purpose  :
-//=======================================================================
-void Message_Level::setAlertMetrics (const Handle(Message_AlertExtended)& theAlert,
-                                                 const Standard_Boolean theStartValue)
-{
-  if (theAlert.IsNull())
-    return;
-
-  Handle(Message_AttributeMeter) aMeterAttribute = Handle(Message_AttributeMeter)::DownCast (theAlert->Attribute());
-  if (aMeterAttribute.IsNull())
-    return;
-
-  Handle(Message_Report) aReport = Message::DefaultReport (Standard_True);
-  const NCollection_Map<Message_MetricType>& anActiveMetrics = aReport->ActiveMetrics();
-
-  // time metrics
-  if (anActiveMetrics.Contains (Message_MetricType_UserTimeCPU) ||
-      anActiveMetrics.Contains (Message_MetricType_SystemTimeInfo))
-  {
-    Standard_Real aUserSeconds, aSystemSeconds;
-    OSD_Chronometer::GetThreadCPU (aUserSeconds, aSystemSeconds);
-
-    if (anActiveMetrics.Contains (Message_MetricType_UserTimeCPU))
-    {
-      if (theStartValue)
-        aMeterAttribute->SetStartValue (Message_MetricType_UserTimeCPU, aUserSeconds);
-      else
-        aMeterAttribute->SetStopValue (Message_MetricType_UserTimeCPU, aUserSeconds);
-    }
-    if (anActiveMetrics.Contains (Message_MetricType_SystemTimeInfo))
-    {
-      if (theStartValue)
-        aMeterAttribute->SetStartValue (Message_MetricType_SystemTimeInfo, aSystemSeconds);
-      else
-        aMeterAttribute->SetStopValue (Message_MetricType_SystemTimeInfo, aSystemSeconds);
-    }
-  }
-  // memory metrics
-  NCollection_Map<OSD_MemInfo::Counter> aCounters;
-  for (NCollection_Map<Message_MetricType>::Iterator anIterator (anActiveMetrics); anIterator.More(); anIterator.Next())
-  {
-    OSD_MemInfo::Counter aMemInfo;
-    if (!Message::ToOSDMetric (anIterator.Value(), aMemInfo))
-      continue;
-
-    aCounters.Add (aMemInfo);
-  }
-  if (aCounters.IsEmpty())
-    return;
-
-  OSD_MemInfo aMemInfo (Standard_False);
-  //aMemInfo.SetActiveCounters (aCounters);
-  aMemInfo.Update ();
-  Message_MetricType aMetricType;
-  for (NCollection_Map<OSD_MemInfo::Counter>::Iterator anIterator (aCounters); anIterator.More(); anIterator.Next())
-  {
-    if (!Message::ToMessageMetric (anIterator.Value(), aMetricType))
-      continue;
-
-    if (theStartValue)
-      aMeterAttribute->SetStartValue (aMetricType, (Standard_Real)aMemInfo.ValuePreciseMiB (anIterator.Value()));
-    else
-      aMeterAttribute->SetStopValue (aMetricType, (Standard_Real)aMemInfo.ValuePreciseMiB (anIterator.Value()));
-  }
 }

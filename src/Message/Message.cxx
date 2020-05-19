@@ -105,15 +105,15 @@ Standard_Boolean Message::ToOSDMetric (const Message_MetricType theMetric, OSD_M
 {
   switch (theMetric)
   {
-    case Message_MetricType_MemPrivate:        theMemInfo = OSD_MemInfo::MemPrivate; break;
-    case Message_MetricType_MemVirtual:        theMemInfo = OSD_MemInfo::MemVirtual; break;
-    case Message_MetricType_MemWorkingSet:     theMemInfo = OSD_MemInfo::MemWorkingSet; break;
-    case Message_MetricType_MemWorkingSetPeak: theMemInfo = OSD_MemInfo::MemWorkingSetPeak; break;
-    case Message_MetricType_MemSwapUsage:      theMemInfo = OSD_MemInfo::MemSwapUsage; break;
-    case Message_MetricType_MemSwapUsagePeak:  theMemInfo = OSD_MemInfo::MemSwapUsagePeak; break;
-    case Message_MetricType_MemHeapUsage:      theMemInfo = OSD_MemInfo::MemHeapUsage; break;
+    case Message_MetricType_MemPrivate:        theMemInfo = OSD_MemInfo::MemPrivate; return Standard_True;
+    case Message_MetricType_MemVirtual:        theMemInfo = OSD_MemInfo::MemVirtual; return Standard_True;
+    case Message_MetricType_MemWorkingSet:     theMemInfo = OSD_MemInfo::MemWorkingSet; return Standard_True;
+    case Message_MetricType_MemWorkingSetPeak: theMemInfo = OSD_MemInfo::MemWorkingSetPeak; return Standard_True;
+    case Message_MetricType_MemSwapUsage:      theMemInfo = OSD_MemInfo::MemSwapUsage; return Standard_True;
+    case Message_MetricType_MemSwapUsagePeak:  theMemInfo = OSD_MemInfo::MemSwapUsagePeak; return Standard_True;
+    case Message_MetricType_MemHeapUsage:      theMemInfo = OSD_MemInfo::MemHeapUsage; return Standard_True;
   }
-  return Standard_True;
+  return Standard_False;
 }
 
 // =======================================================================

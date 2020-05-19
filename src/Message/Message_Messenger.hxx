@@ -77,7 +77,7 @@ public:
       {
         if (myMessenger)
         {
-          myMessenger->Send(myStream.str().c_str(), myGravity);
+          myMessenger->Send(myStream, myGravity);
         }
         myStream.str(std::string()); // empty the buffer for possible reuse
       }
@@ -189,6 +189,10 @@ public:
   //! Three versions of string representations are accepted for
   //! convenience, by default all are converted to ExtendedString.
   Standard_EXPORT void Send (const Standard_CString theString,
+                             const Message_Gravity theGravity = Message_Warning) const;
+  
+  //! See above
+  Standard_EXPORT void Send (const Standard_SStream& theStream,
                              const Message_Gravity theGravity = Message_Warning) const;
   
   //! See above

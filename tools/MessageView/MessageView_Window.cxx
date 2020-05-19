@@ -155,6 +155,7 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
   connect (aVisibilityState, SIGNAL (itemClicked (const QModelIndex&)), this, SLOT(onTreeViewVisibilityClicked(const QModelIndex&)));
 
   TreeModel_Tools::UseVisibilityColumn (myTreeView);
+  TreeModel_Tools::SetDefaultHeaderSections (myTreeView);
 
   QItemSelectionModel* aSelectionModel = new QItemSelectionModel (aModel);
   myTreeView->setSelectionMode (QAbstractItemView::ExtendedSelection);
@@ -267,12 +268,6 @@ void MessageView_Window::GetPreferences (TInspectorAPI_PreferencesDataMap& theIt
 // =======================================================================
 void MessageView_Window::SetPreferences (const TInspectorAPI_PreferencesDataMap& theItem)
 {
-  if (theItem.IsEmpty())
-  {
-    TreeModel_Tools::SetDefaultHeaderSections (myTreeView);
-    return;
-  }
-
   for (TInspectorAPI_IteratorOfPreferencesDataMap anItemIt (theItem); anItemIt.More(); anItemIt.Next())
   {
     if (anItemIt.Key().IsEqual ("geometry"))

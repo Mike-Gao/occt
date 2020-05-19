@@ -116,21 +116,38 @@ QVariant MessageModel_ItemAlert::initValue (const int theRole) const
       return QVariant();
 
     Handle(Message_AttributeMeter) anAttribute = Handle(Message_AttributeMeter)::DownCast (anExtendedAlert->Attribute());
-    if (anAttribute.IsNull())
+    if (anAttribute.IsNull() || !anAttribute->HasMetric (aMetricType))
       return QVariant();
 
-    Standard_Real aCumulativeMetric = anAttribute->StopValue (aMetricType) - anAttribute->StartValue (aMetricType);
-    if (fabs (aCumulativeMetric) < Precision::Confusion())
-      return QVariant();
-
-    if (aPosition == 0) return aCumulativeMetric;
-    else if (aPosition == 1)
+    if (aMetricType == Message_MetricType_UserTimeCPU ||
+        aMetricType == Message_MetricType_SystemTimeInfo)
     {
-      Standard_Real aReportCumulativeMetric = MessageModel_ItemReport::CumulativeMetric (aReport, aMetricType);
-      if (fabs (aReportCumulativeMetric) > Precision::Confusion())
-        return 100. * aCumulativeMetric / aReportCumulativeMetric;
-      else
+      Standard_Real aCumulativeMetric = anAttribute->StopValue (aMetricType) - anAttribute->StartValue (aMetricType);
+      if (fabs (aCumulativeMetric) < Precision::Confusion())
         return QVariant();
+
+      if (aPosition == 0) return aCumulativeMetric;
+      else if (aPosition == 1)
+      {
+        Standard_Real aReportCumulativeMetric = MessageModel_ItemReport::CumulativeMetric (aReport, aMetricType);
+        if (fabs (aReportCumulativeMetric) > Precision::Confusion())
+          return 100. * aCumulativeMetric / aReportCumulativeMetric;
+        else
+          return QVariant();
+      }
+    }
+    else
+    {
+      if (aPosition == 0) return anAttribute->StopValue (aMetricType);
+      else if (aPosition == 1)
+      {
+        Standard_Real aCumulativeMetric = anAttribute->StopValue (aMetricType) - anAttribute->StartValue (aMetricType);
+        if (fabs (aCumulativeMetric) < Precision::Confusion())
+          return QVariant();
+        else
+          return aCumulativeMetric;
+      }
+
     }
   }
   return QVariant();

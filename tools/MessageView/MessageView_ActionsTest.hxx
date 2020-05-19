@@ -67,6 +67,9 @@ public slots:
   //! Check tree of alerts
   void OnTestReportTree();
 
+  //! Check tree of alerts
+  void OnTestReportTree2();
+
 protected:
   //! Returns report of selected tree view item if a report item is selected
   //! \param theReportIndex tree model index of the found report

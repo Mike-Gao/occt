@@ -66,7 +66,8 @@ QVariant MessageModel_ItemReport::initValue (const int theRole) const
 
   Message_MetricType aMetricType;
   int aPosition;
-  if (MessageModel_TreeModel::IsMetricColumn (Column(), aMetricType, aPosition))
+  if (MessageModel_TreeModel::IsMetricColumn (Column(), aMetricType, aPosition) &&
+      (aMetricType == Message_MetricType_UserTimeCPU || aMetricType == Message_MetricType_SystemTimeInfo))
   {
     if (aPosition == 0) return CumulativeMetric (aReport, aMetricType);
     else if (aPosition == 1) return "100";
@@ -202,26 +203,29 @@ Standard_Real MessageModel_ItemReport::CumulativeMetric (const Handle(Message_Re
   for (int iGravity = Message_Trace; iGravity <= Message_Fail; ++iGravity)
   {
     const Message_ListOfAlert& anAlerts = theReport->GetAlerts ((Message_Gravity)iGravity);
-    Handle(Message_AttributeMeter) aFirstAttribute, aLastAttribute;
+    Handle(Message_AttributeMeter) aFirstAttribute/*, aLastAttribute*/;
     for (Message_ListOfAlert::Iterator anAlertsIterator (anAlerts); anAlertsIterator.More(); anAlertsIterator.Next())
     {
       Handle(Message_AlertExtended) anAlert = Handle(Message_AlertExtended)::DownCast (anAlertsIterator.Value());
       if (anAlert.IsNull())
         continue;
       Handle(Message_AttributeMeter) anAttribute = Handle(Message_AttributeMeter)::DownCast (anAlert->Attribute());
-      if (anAttribute.IsNull())
+      if (anAttribute.IsNull() || !anAttribute->HasMetric(theMetricType))
         continue;
-      if (aFirstAttribute.IsNull())
-        aFirstAttribute = anAttribute;
-      else
-        aLastAttribute = anAttribute;
+      //if (aFirstAttribute.IsNull())
+      //  aFirstAttribute = anAttribute;
+      //else
+      //{
+        //aLastAttribute = anAttribute;
+      //}
+      aMetric += anAttribute->StopValue (theMetricType) - anAttribute->StartValue (theMetricType);
     }
-    if (aFirstAttribute.IsNull())
-      continue;
-    if (aLastAttribute.IsNull())
-      aLastAttribute = aFirstAttribute;
+    //if (aFirstAttribute.IsNull())
+    //  continue;
+    //if (aLastAttribute.IsNull())
+    //  aLastAttribute = aFirstAttribute;
 
-    aMetric += aLastAttribute->StopValue (theMetricType) - aFirstAttribute->StartValue (theMetricType);
+    //aMetric += aLastAttribute->StopValue (theMetricType) - aFirstAttribute->StartValue (theMetricType);
   }
   return aMetric;
 }

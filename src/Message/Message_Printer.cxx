@@ -73,13 +73,12 @@ void Message_Printer::Send (const TCollection_AsciiString& theString,
 //function : Send
 //purpose  :
 //=======================================================================
-
 void Message_Printer::Send (const Standard_SStream& theStream,
                             const Message_Gravity   theGravity) const
 {
   if (theGravity >= myTraceLevel)
   {
-    Send (TCollection_ExtendedString (theStream.str().c_str()), theGravity);
+    Send (theStream.str().c_str(), theGravity);
   }
 }
 
