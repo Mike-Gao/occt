@@ -254,7 +254,7 @@ protected: //! @name Protected methods performing the job
   Standard_EXPORT void BuildTree();
 
   //! Looks for the solution starting at given point
-  Standard_EXPORT void FindSolution (const Extrema_POnSurfParams& theParams);
+  Standard_EXPORT Standard_Boolean FindSolution (const Extrema_POnSurfParams& theParams);
 
   //! Compute new edge parameters.
   Standard_EXPORT const Extrema_POnSurfParams&

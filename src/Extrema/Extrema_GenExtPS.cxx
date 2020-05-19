@@ -381,7 +381,10 @@ void Extrema_GenExtPS::BuildGrid()
 //=======================================================================
 void Extrema_GenExtPS::BuildTree()
 {
-  // The tree is not required for MINMAX mode,
+  // The tree is not required for MINMAX mode
+  if (myTarget == Extrema_ExtFlag_MINMAX)
+    return;
+
   // so fill the tree with elements with empty boxes
   if (myGridBoxSet.IsNull())
   {
@@ -392,7 +395,7 @@ void Extrema_GenExtPS::BuildTree()
       new BVH_LinearBuilder<Standard_Real, 3> (BVH_Constants_LeafNodeSizeSingle));
 
     // create hierarchy of BVH trees
-    const Standard_Integer aCoeff = static_cast<Standard_Integer>(Ceiling (Sqrt (Min (myNbUSamples, myNbVSamples))));
+    const Standard_Integer aCoeff = static_cast<Standard_Integer>(Sqrt (Min (myNbUSamples, myNbVSamples)));
     const Standard_Integer aNbUT = myNbUSamples / aCoeff;
     const Standard_Integer aNbVT = myNbVSamples / aCoeff;
     const Standard_Integer aNbU = myNbUSamples / aNbUT;
@@ -427,7 +430,7 @@ void Extrema_GenExtPS::BuildTree()
     }
   }
 
-  if (myGridBoxSet->IsDirty() && myTarget != Extrema_ExtFlag_MINMAX)
+  if (myGridBoxSet->IsDirty())
   {
     // Fill the tree with the real boxes
     const Standard_Integer aNbSets = myGridBoxSet->Size();
@@ -448,10 +451,9 @@ void Extrema_GenExtPS::BuildTree()
 
         // Build box for the cell
         Bnd_Box aGridBox;
-        aGridBox.Add (myPoints->Value (iU, iV).Value());
-        aGridBox.Add (myPoints->Value (iU + 1, iV).Value());
-        aGridBox.Add (myPoints->Value (iU, iV + 1).Value());
-        aGridBox.Add (myPoints->Value (iU + 1, iV + 1).Value());
+        for (int i = 0; i < 2; ++i)
+          for (int j = 0; j < 2; ++j)
+            aGridBox.Add (myPoints->Value (iU + i * aUCoeff, iV + j * aVCoeff).Value());
         aGridBox.Enlarge (Precision::Confusion());
 
         const Extrema_POnSurf& aPMin = myPoints->Value (iU, iV);
@@ -668,6 +670,7 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
   fillSqDist (aParam10, aPoint);
   fillSqDist (aParam11, aPoint);
 
+  Standard_Boolean isFound = Standard_False;
   if (theNU != myNbUSamples && theNV != myNbVSamples &&
     (theTarget == Extrema_ExtFlag_MIN || theTarget == Extrema_ExtFlag_MINMAX))
   {
@@ -761,7 +764,8 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
 
     if (isMin)
     {
-      FindSolution (aParam);
+      if (FindSolution (aParam))
+        isFound = Standard_True;
     }
   }
 
@@ -795,18 +799,19 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
         (aParam8.GetSqrDistance() <= aDist))
     {
       // Find maximum.
-      FindSolution (aParam00);
+      if (FindSolution (aParam00))
+        isFound = Standard_True;
     }
   }
 
-  return Standard_False;
+  return isFound;
 }
 
 //=======================================================================
 //function : FindSolution
 //purpose  : 
 //=======================================================================
-void Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &theParams)
+Standard_Boolean Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &theParams)
 {
   math_Vector Tol (1, 2);
   Tol (1) = myTolU;
@@ -828,6 +833,7 @@ void Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &theParams)
 
   myIsDone = Standard_True;
 
+  Standard_Boolean isFound = Standard_False;
   if (myTarget != Extrema_ExtFlag_MINMAX)
   {
     for (Standard_Integer i = aNbFuncSol + 1; i <= myF.NbExt(); ++i)
@@ -836,6 +842,7 @@ void Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &theParams)
       if ((myTarget == Extrema_ExtFlag_MIN && aDist <= mySqDistance) ||
         (myTarget == Extrema_ExtFlag_MAX && aDist >= mySqDistance))
       {
+        isFound = Standard_True;
         if (aDist != mySqDistance)
           mySolutions.clear();
         mySolutions.push_back (Extrema_GenExtPS::ExtPSResult (myF.Point (i), aDist));
@@ -843,6 +850,11 @@ void Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &theParams)
       }
     }
   }
+  else
+  {
+    isFound = myF.NbExt() > aNbFuncSol;
+  }
+  return isFound;
 }
 
 //=======================================================================
