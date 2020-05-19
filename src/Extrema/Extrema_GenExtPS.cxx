@@ -307,9 +307,9 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
     for (Standard_Integer iTarget = 0; iTarget < 2; ++iTarget)
     {
       const Extrema_ExtFlag aTarget = static_cast<Extrema_ExtFlag> (iTarget);
-      for (int iU = 1; iU <= myNbUSamples; iU++)
+      for (Standard_Integer iU = 1; iU <= myNbUSamples; iU++)
       {
-        for (int iV = 1; iV <= myNbVSamples; iV++)
+        for (Standard_Integer iV = 1; iV <= myNbVSamples; iV++)
         {
           FindSolution (iU, iV, aTarget);
         }
@@ -324,6 +324,8 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
   }
   else
   {
+    // Indicator for high-level BVH traverse
+    SetBVHSet (NULL);
     Select (myGridBoxSet->BVH());
   }
 
@@ -390,7 +392,7 @@ void Extrema_GenExtPS::BuildTree()
       new BVH_LinearBuilder<Standard_Real, 3> (BVH_Constants_LeafNodeSizeSingle));
 
     // create hierarchy of BVH trees
-    const Standard_Integer aCoeff = static_cast<Standard_Integer> (Sqrt (Min (myNbUSamples, myNbVSamples)));
+    const Standard_Integer aCoeff = static_cast<Standard_Integer>(Ceiling (Sqrt (Min (myNbUSamples, myNbVSamples))));
     const Standard_Integer aNbUT = myNbUSamples / aCoeff;
     const Standard_Integer aNbVT = myNbVSamples / aCoeff;
     const Standard_Integer aNbU = myNbUSamples / aNbUT;
@@ -855,10 +857,11 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
                          const gp_Pnt          &thePoint,
                          const Standard_Real    theDiffTol)
 {
-  const Handle (Extrema_HArray2OfPOnSurfParams)& anEdgeParams = IsUEdge ? myUEdgePntParams : myVEdgePntParams;
+  const Handle (Extrema_HArray2OfPOnSurfParams)& anEdgeParamsArr = IsUEdge ? myUEdgePntParams : myVEdgePntParams;
   Standard_Integer iU, iV;
   theParam0.GetIndices (iU, iV);
-  if (anEdgeParams->Value (iU, iV).GetSqrDistance() < 0)
+  Extrema_POnSurfParams& anEdgeParams = anEdgeParamsArr->ChangeValue (iU, iV);
+  if (anEdgeParams.GetSqrDistance() < 0.0)
   {
     fillSqDist (theParam0, thePoint);
     fillSqDist (theParam1, thePoint);
@@ -869,7 +872,7 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
     if (aSqrDist01 <= theDiffTol)
     {
       // The points are confused. Get the first point and change its type.
-      anEdgeParams->SetValue (iU, iV, theParam0);
+      anEdgeParams = theParam0;
     }
     else
     {
@@ -882,12 +885,12 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
         if (theParam0.GetSqrDistance() > theParam1.GetSqrDistance())
         {
           // The shortest distance is the point 1.
-          anEdgeParams->SetValue (iU, iV, theParam1);
+          anEdgeParams = theParam1;
         }
         else
         {
           // The shortest distance is the point 0.
-          anEdgeParams->SetValue (iU, iV, theParam0);
+          anEdgeParams = theParam0;
         }
       }
       else
@@ -914,18 +917,15 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
           aVPar += aRatio*(aV[1] - aV[0]);
         }
 
-        Extrema_POnSurfParams aParams;
-        aParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
-
-        aParams.SetElementType (IsUEdge ? Extrema_UIsoEdge : Extrema_VIsoEdge);
-        aParams.SetSqrDistance (thePoint.SquareDistance (aParams.Value()));
-        aParams.SetIndices (iU, iV);
-        anEdgeParams->SetValue (iU, iV, aParams);
+        anEdgeParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
+        anEdgeParams.SetElementType (IsUEdge ? Extrema_UIsoEdge : Extrema_VIsoEdge);
+        anEdgeParams.SetSqrDistance (thePoint.SquareDistance (anEdgeParams.Value()));
+        anEdgeParams.SetIndices (iU, iV);
       }
     }
   }
 
-  return anEdgeParams->Value (iU, iV);
+  return anEdgeParams;
 }
 
 //=======================================================================
@@ -937,7 +937,8 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
                          const Standard_Integer theV,
                          const gp_Pnt& thePoint)
 {
-  if (myFacePntParams->Value (theU, theV).GetSqrDistance() < 0)
+  Extrema_POnSurfParams& aFaceParams = myFacePntParams->ChangeValue (theU, theV);
+  if (aFaceParams.GetSqrDistance() < 0.0)
   {
     // This is the tolerance of difference of squared values.
     // No need to set it too small.
@@ -989,7 +990,7 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
       const Extrema_POnSurfParams &aEMin =
         aUEMin.GetSqrDistance() < aVEMin.GetSqrDistance() ? aUEMin : aVEMin;
 
-      myFacePntParams->SetValue (theU, theV, aEMin);
+      aFaceParams = aEMin;
     }
     else
     {
@@ -1008,16 +1009,14 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
       aVE1.Parameter (aU[1], aV[1]);
       aVPar = 0.5*(aV[0] + aV[1]);
 
-      Extrema_POnSurfParams aParam (aUPar, aVPar, myS->Value (aUPar, aVPar));
-
-      aParam.SetElementType (Extrema_Face);
-      aParam.SetSqrDistance (thePoint.SquareDistance (aParam.Value()));
-      aParam.SetIndices (theU, theV);
-      myFacePntParams->SetValue (theU, theV, aParam);
+      aFaceParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
+      aFaceParams.SetElementType (Extrema_Face);
+      aFaceParams.SetSqrDistance (thePoint.SquareDistance (aFaceParams.Value()));
+      aFaceParams.SetIndices (theU, theV);
     }
   }
 
-  return myFacePntParams->Value (theU, theV);
+  return aFaceParams;
 }
 
 //=======================================================================
