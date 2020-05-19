@@ -215,6 +215,8 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
   myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
   myPBRSpecIBLMapTexUnit   (Graphic3d_TextureUnit_PbrIblSpecular),
+  myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_0),
+  myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_0),
   myFrameStats (new OpenGl_FrameStats()),
   myActiveMockTextures (0),
 #if !defined(GL_ES_VERSION_2_0)
@@ -3067,6 +3069,14 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
     myPBREnvLUTTexUnit       = static_cast<Graphic3d_TextureUnit>(myMaxTexCombined + Graphic3d_TextureUnit_PbrEnvironmentLUT);
     myPBRDiffIBLMapSHTexUnit = static_cast<Graphic3d_TextureUnit>(myMaxTexCombined + Graphic3d_TextureUnit_PbrIblDiffuseSH);
     myPBRSpecIBLMapTexUnit   = static_cast<Graphic3d_TextureUnit>(myMaxTexCombined + Graphic3d_TextureUnit_PbrIblSpecular);
+
+    myDepthPeelingDepthTexUnit      = static_cast<Graphic3d_TextureUnit>(myPBREnvLUTTexUnit - 1);
+    myDepthPeelingFrontColorTexUnit = static_cast<Graphic3d_TextureUnit>(myPBREnvLUTTexUnit - 2);
+  }
+  else
+  {
+    myDepthPeelingDepthTexUnit      = static_cast<Graphic3d_TextureUnit>(myMaxTexCombined - 1);
+    myDepthPeelingFrontColorTexUnit = static_cast<Graphic3d_TextureUnit>(myMaxTexCombined - 2);
   }
 }
 
