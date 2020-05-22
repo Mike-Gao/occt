@@ -21,15 +21,13 @@
 //! - ASPECT_LINE: aspect for line primitives;
 //! - ASPECT_TEXT: aspect for text primitives;
 //! - ASPECT_MARKER: aspect for marker primitives;
-//! - ASPECT_FILL_AREA: aspect for face primitives;
-//! - Graphic3d_ASPECT_FILL_CAPPING: aspect for filling clipping sections.
+//! - ASPECT_FILL_AREA: aspect for face primitives.
 enum Graphic3d_GroupAspect
 {
 Graphic3d_ASPECT_LINE,
 Graphic3d_ASPECT_TEXT,
 Graphic3d_ASPECT_MARKER,
-Graphic3d_ASPECT_FILL_AREA,
-Graphic3d_ASPECT_FILL_CAPPING
+Graphic3d_ASPECT_FILL_AREA
 };
 
 #endif // _Graphic3d_GroupAspect_HeaderFile

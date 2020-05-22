@@ -18,7 +18,6 @@
 
 #include <AIS_InteractiveContext.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
-#include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectText3d.hxx>
@@ -167,4 +166,5 @@ void AIS_InteractiveObject::DumpJson (Standard_OStream& theOStream, const Standa
   OCCT_DUMP_BASE_CLASS (theOStream, theDepth, SelectMgr_SelectableObject);
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myCTXPtr);
   OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOwner);
+  DUMP_VALUES (OS, "CappingStyle", TCollection::GetPointerInfo (myCappingStyle));
 }

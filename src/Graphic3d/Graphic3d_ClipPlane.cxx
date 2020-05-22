@@ -24,6 +24,19 @@ IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_ClipPlane,Standard_Transient)
 namespace
 {
   static volatile Standard_Integer THE_CLIP_PLANE_COUNTER = 0;
+
+  static Handle(Graphic3d_AspectFillArea3d) defaultAspect()
+  {
+    const Graphic3d_MaterialAspect aMaterial (Graphic3d_NOM_DEFAULT);
+    Handle(Graphic3d_AspectFillArea3d) anAspect = new Graphic3d_AspectFillArea3d();
+    anAspect->SetDistinguishOff();
+    anAspect->SetFrontMaterial (aMaterial);
+    anAspect->SetHatchStyle (Aspect_HS_HORIZONTAL);
+    anAspect->SetInteriorStyle (Aspect_IS_SOLID);
+    anAspect->SetInteriorColor (aMaterial.Color());
+    anAspect->SetSuppressBackFaces (false);
+    return anAspect;
+  }
 }
 
 // =======================================================================
@@ -31,8 +44,19 @@ namespace
 // purpose  :
 // =======================================================================
 Graphic3d_ClipPlane::Graphic3d_ClipPlane()
+: myAspect     (defaultAspect()),
+  myPrevInChain(NULL),
+  myPlane      (0.0, 0.0, 1.0, 0.0),
+  myEquation   (0.0, 0.0, 1.0, 0.0),
+  myEquationRev(0.0, 0.0,-1.0, 0.0),
+  myChainLenFwd(1),
+  myFlags      (Graphic3d_CappingFlags_None),
+  myEquationMod(0),
+  myAspectMod  (0),
+  myIsOn       (Standard_True),
+  myIsCapping  (Standard_False)
 {
-  init();
+  makeId();
 }
 
 // =======================================================================
@@ -40,8 +64,19 @@ Graphic3d_ClipPlane::Graphic3d_ClipPlane()
 // purpose  :
 // =======================================================================
 Graphic3d_ClipPlane::Graphic3d_ClipPlane (const Graphic3d_Vec4d& theEquation)
+: myAspect     (defaultAspect()),
+  myPrevInChain(NULL),
+  myPlane      (theEquation.x(), theEquation.y(), theEquation.z(), theEquation.w()),
+  myEquation   (theEquation),
+  myEquationRev(0.0, 0.0,-1.0, 0.0),
+  myChainLenFwd(1),
+  myFlags      (Graphic3d_CappingFlags_None),
+  myEquationMod(0),
+  myAspectMod  (0),
+  myIsOn       (Standard_True),
+  myIsCapping  (Standard_False)
 {
-  init (gp_Pln (theEquation.x(), theEquation.y(), theEquation.z(), theEquation.a()));
+  makeId();
   updateInversedPlane();
 }
 
@@ -49,27 +84,42 @@ Graphic3d_ClipPlane::Graphic3d_ClipPlane (const Graphic3d_Vec4d& theEquation)
 // function : Graphic3d_ClipPlane
 // purpose  :
 // =======================================================================
-Graphic3d_ClipPlane::Graphic3d_ClipPlane (const Graphic3d_ClipPlane& theOther)
-: Standard_Transient (theOther)
+Graphic3d_ClipPlane::Graphic3d_ClipPlane(const Graphic3d_ClipPlane& theOther)
+: Standard_Transient(theOther),
+  myAspect     (defaultAspect()),
+  myPrevInChain(NULL),
+  myPlane      (theOther.myPlane),
+  myEquation   (theOther.myEquation),
+  myEquationRev(theOther.myEquationRev),
+  myChainLenFwd(1),
+  myFlags      (theOther.myFlags),
+  myEquationMod(0),
+  myAspectMod  (0),
+  myIsOn       (theOther.myIsOn),
+  myIsCapping  (theOther.myIsCapping)
 {
-  *mySectionStyle = *theOther.CappingSectionStyle();
-  init (theOther.myPlane,
-        theOther.myEquationRev,
-        theOther.myIsOn,
-        theOther.myIsCapping,
-        theOther.ToOverrideCappingAspect(),
-        theOther.CappingSectionStyle());
-  updateInversedPlane();
+  makeId();
+  *myAspect = *theOther.CappingAspect();
 }
 
 // =======================================================================
 // function : Graphic3d_ClipPlane
 // purpose  :
 // =======================================================================
-Graphic3d_ClipPlane::Graphic3d_ClipPlane (const gp_Pln& thePlane)
+Graphic3d_ClipPlane::Graphic3d_ClipPlane(const gp_Pln& thePlane)
+: myAspect     (defaultAspect()),
+  myPrevInChain(NULL),
+  myPlane      (thePlane),
+  myChainLenFwd(1),
+  myFlags      (Graphic3d_CappingFlags_None),
+  myEquationMod(0),
+  myAspectMod  (0),
+  myIsOn       (Standard_True),
+  myIsCapping  (Standard_False)
 {
-  init (thePlane);
+  thePlane.Coefficients (myEquation[0], myEquation[1], myEquation[2], myEquation[3]);
   updateInversedPlane();
+  makeId();
 }
 
 // =======================================================================
@@ -81,7 +131,7 @@ void Graphic3d_ClipPlane::SetEquation (const Graphic3d_Vec4d& theEquation)
   myPlane = gp_Pln (theEquation.x(), theEquation.y(), theEquation.z(), theEquation.w());
   myEquation = theEquation;
   updateInversedPlane();
-  myOrientationDirty = Standard_True;
+  myEquationMod++;
 }
 
 // =======================================================================
@@ -93,7 +143,7 @@ void Graphic3d_ClipPlane::SetEquation (const gp_Pln& thePlane)
   myPlane = thePlane;
   thePlane.Coefficients (myEquation[0], myEquation[1], myEquation[2], myEquation[3]);
   updateInversedPlane();
-  myOrientationDirty = Standard_True;
+  myEquationMod++;
 }
 
 // =======================================================================
@@ -128,106 +178,119 @@ Handle(Graphic3d_ClipPlane) Graphic3d_ClipPlane::Clone() const
 }
 
 // =======================================================================
-// function : SetCappingSectionStyle
+// function : SetCappingMaterial
 // purpose  :
 // =======================================================================
-void Graphic3d_ClipPlane::SetCappingSectionStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle)
+void Graphic3d_ClipPlane::SetCappingMaterial (const Graphic3d_MaterialAspect& theMat)
 {
-  mySectionStyle = theStyle;
+  myAspect->SetFrontMaterial (theMat);
+  myAspect->SetInteriorColor (theMat.Color());
+  ++myAspectMod;
 }
 
 // =======================================================================
-// function : OrientationMatrix
+// function : SetCappingTexture
 // purpose  :
 // =======================================================================
-const Graphic3d_Mat4& Graphic3d_ClipPlane::OrientationMatrix() const
+void Graphic3d_ClipPlane::SetCappingTexture (const Handle(Graphic3d_TextureMap)& theTexture)
 {
-  if (myOrientationDirty)
+  if (!theTexture.IsNull())
   {
-    const Standard_ShortReal aDirection[] = {
-      static_cast<Standard_ShortReal> (myEquation[0]),
-      static_cast<Standard_ShortReal> (myEquation[1]),
-      static_cast<Standard_ShortReal> (myEquation[2])
-     };
-
-    const Standard_ShortReal aTranslate[] = {
-      static_cast<Standard_ShortReal> (myEquation[0] * -myEquation[3]),
-      static_cast<Standard_ShortReal> (myEquation[1] * -myEquation[3]),
-      static_cast<Standard_ShortReal> (myEquation[2] * -myEquation[3])
-    };
-
-    Standard_ShortReal aSide1[] = { 0.0f, 0.0f, 0.0f };
-    Standard_ShortReal aSide2[] = { 0.0f, 0.0f, 0.0f };
-
-    const Standard_ShortReal aMagintude = static_cast<Standard_ShortReal> (Sqrt (myEquation[0] * myEquation[0] + myEquation[2] * myEquation[2]));
-
-    if (aMagintude < ShortRealSmall())
+    myAspect->SetTextureMapOn();
+    Handle(Graphic3d_TextureSet) aTextureSet = myAspect->TextureSet();
+    if (aTextureSet.IsNull() || aTextureSet->Size() != 1)
     {
-      aSide1[0] = 1.0f;
+      aTextureSet = new Graphic3d_TextureSet (theTexture);
     }
     else
     {
-      aSide1[0] =  aDirection[2] / aMagintude;
-      aSide1[2] = -aDirection[0] / aMagintude;
+      aTextureSet->SetFirst (theTexture);
     }
-
-    aSide2[0] = (-aSide1[1] * aDirection[2]) - (-aSide1[2] * aDirection[1]);
-    aSide2[1] = (-aSide1[2] * aDirection[0]) - (-aSide1[0] * aDirection[2]);
-    aSide2[2] = (-aSide1[0] * aDirection[1]) - (-aSide1[1] * aDirection[0]);
-
-    myOrientationMat.SetValue (0, 0, aSide1[0]);
-    myOrientationMat.SetValue (1, 0, aSide1[1]);
-    myOrientationMat.SetValue (2, 0, aSide1[2]);
-    myOrientationMat.SetValue (3, 0, 0.0F);
-
-    myOrientationMat.SetValue (0, 1, aDirection[0]);
-    myOrientationMat.SetValue (1, 1, aDirection[1]);
-    myOrientationMat.SetValue (2, 1, aDirection[2]);
-    myOrientationMat.SetValue (3, 1, 0.0F);
-
-    myOrientationMat.SetValue (0, 2, aSide2[0]);
-    myOrientationMat.SetValue (1, 2, aSide2[1]);
-    myOrientationMat.SetValue (2, 2, aSide2[2]);
-    myOrientationMat.SetValue (3, 2, 0.0F);
-
-    myOrientationMat.SetValue (0, 3, aTranslate[0]);
-    myOrientationMat.SetValue (1, 3, aTranslate[1]);
-    myOrientationMat.SetValue (2, 3, aTranslate[2]);
-    myOrientationMat.SetValue (3, 3, 1.0F);
-
-    myOrientationDirty = Standard_False;
+    myAspect->SetTextureSet (aTextureSet);
   }
-
-  return myOrientationMat;
+  else
+  {
+    myAspect->SetTextureMapOff();
+    myAspect->SetTextureSet (Handle(Graphic3d_TextureSet)());
+  }
+  ++myAspectMod;
 }
 
 // =======================================================================
-// function : init
+// function : SetCappingHatch
 // purpose  :
 // =======================================================================
-void Graphic3d_ClipPlane::init (const gp_Pln& thePlane,
-                                const Graphic3d_Vec4d& theEquationRev,
-                                const Standard_Boolean theIsOn,
-                                const Standard_Boolean theIsCapping,
-                                const Standard_Boolean theOverrideStyle,
-                                const Handle(Graphic3d_AspectFillCapping)& theStyle)
+void Graphic3d_ClipPlane::SetCappingHatch (const Aspect_HatchStyle theStyle)
 {
-  if (myEntityUID.IsEmpty())
-  {
-    myEntityUID = TCollection_AsciiString ("Graphic3d_ClipPlane_") //DynamicType()->Name()
-                + TCollection_AsciiString (Standard_Atomic_Increment (&THE_CLIP_PLANE_COUNTER));
-  }
+  myAspect->SetHatchStyle (theStyle);
+  ++myAspectMod;
+}
 
-  myPrevInChain         = NULL;
-  myEquationRev         = theEquationRev;
-  myChainLenFwd         = 1;
-  myPlane               = thePlane;
-  myPlane.Coefficients (myEquation[0], myEquation[1], myEquation[2], myEquation[3]);
-  myIsOn                = theIsOn;
-  myIsCapping           = theIsCapping;
-  myOverrideObjectStyle = theOverrideStyle;
-  mySectionStyle        = theStyle.IsNull() ? new Graphic3d_AspectFillCapping() : theStyle;
-  myOrientationDirty    = Standard_True;
+// =======================================================================
+// function : SetCappingCustomHatch
+// purpose  :
+// =======================================================================
+void Graphic3d_ClipPlane::SetCappingCustomHatch (const Handle(Graphic3d_HatchStyle)& theStyle)
+{
+  myAspect->SetHatchStyle (theStyle);
+  ++myAspectMod;
+}
+
+// =======================================================================
+// function : SetCappingHatchOn
+// purpose  :
+// =======================================================================
+void Graphic3d_ClipPlane::SetCappingHatchOn()
+{
+  myAspect->SetInteriorStyle (Aspect_IS_HATCH);
+  ++myAspectMod;
+}
+
+// =======================================================================
+// function : SetCappingHatchOff
+// purpose  :
+// =======================================================================
+void Graphic3d_ClipPlane::SetCappingHatchOff()
+{
+  myAspect->SetInteriorStyle (Aspect_IS_SOLID);
+  ++myAspectMod;
+}
+
+// =======================================================================
+// function : SetCappingAspect
+// purpose  :
+// =======================================================================
+void Graphic3d_ClipPlane::SetCappingAspect (const Handle(Graphic3d_AspectFillArea3d)& theAspect)
+{
+  myAspect = theAspect;
+  ++myAspectMod;
+}
+
+// =======================================================================
+// function : setCappingFlag
+// purpose  :
+// =======================================================================
+void Graphic3d_ClipPlane::setCappingFlag (bool theToUse, int theFlag)
+{
+  if (theToUse)
+  {
+    myFlags |= theFlag;
+  }
+  else
+  {
+    myFlags &= ~(theFlag);
+  }
+  ++myAspectMod;
+}
+
+// =======================================================================
+// function : makeId
+// purpose  :
+// =======================================================================
+void Graphic3d_ClipPlane::makeId()
+{
+  myId = TCollection_AsciiString ("Graphic3d_ClipPlane_") //DynamicType()->Name()
+       + TCollection_AsciiString (Standard_Atomic_Increment (&THE_CLIP_PLANE_COUNTER));
 }
 
 // =======================================================================
@@ -249,7 +312,7 @@ void Graphic3d_ClipPlane::updateChainLen()
 // =======================================================================
 void Graphic3d_ClipPlane::SetChainNextPlane (const Handle(Graphic3d_ClipPlane)& thePlane)
 {
-  myOrientationDirty = Standard_True;
+  ++myEquationMod;
   if (!myNextInChain.IsNull())
   {
     myNextInChain->myPrevInChain = NULL;
