@@ -101,11 +101,38 @@ OpenGl_PrimitiveArray* OpenGl_CappingPlaneResource::BuildInfinitPlaneVertices()
 // function : OpenGl_CappingPlaneResource
 // purpose  :
 // =======================================================================
-OpenGl_CappingPlaneResource::OpenGl_CappingPlaneResource (const Handle(Graphic3d_AspectFillCapping)& theAspect)
-: myCappingAspect(),//defaultMaterial()),
+OpenGl_CappingPlaneResource::OpenGl_CappingPlaneResource (const Handle(Graphic3d_ClipPlane)& thePlane,
+                                                          const Handle(Graphic3d_AspectFillCapping)& theAspect)
+: myPrimitives  (NULL),
+  myPrimitivesUsed (Standard_False),
+  myOrientation (OpenGl_IdentityMatrix),
+  myAspect      (NULL),
+  myPlaneRoot   (thePlane),
+  myEquationMod ((unsigned int )-1),
+  myAspectMod   ((unsigned int )-1),
+  myCappingAspect(),//defaultMaterial()),
   myHatchingAspect(),//defaultMaterial()),
   myHatchingState (0)
 {
+  if (theAspect.IsNull() || !theAspect->ToDrawHatch())
+  {
+    // Fill primitive array
+    Handle(NCollection_AlignedAllocator) anAlloc = new NCollection_AlignedAllocator (16);
+    Handle(Graphic3d_Buffer) anAttribs = new Graphic3d_Buffer (anAlloc);
+    Graphic3d_Attribute anAttribInfo[] =
+    {
+      { Graphic3d_TOA_POS,  Graphic3d_TOD_VEC4 },
+      { Graphic3d_TOA_NORM, Graphic3d_TOD_VEC4 },
+      { Graphic3d_TOA_UV,   Graphic3d_TOD_VEC4 }
+    };
+    if (anAttribs->Init (12, anAttribInfo, 3))
+    {
+      memcpy (anAttribs->ChangeData(), THE_CAPPING_PLN_VERTS, sizeof(THE_CAPPING_PLN_VERTS));
+      myPrimitives.InitBuffers (NULL, Graphic3d_TOPA_TRIANGLES, NULL, anAttribs, NULL);
+      myPrimitivesUsed = Standard_True;
+    }
+  }
+
   myCappingAspect.SetAspect (defaultMaterial());
   myHatchingAspect.SetAspect (defaultMaterial());
 
@@ -118,6 +145,10 @@ OpenGl_CappingPlaneResource::OpenGl_CappingPlaneResource (const Handle(Graphic3d
 // =======================================================================
 OpenGl_CappingPlaneResource::~OpenGl_CappingPlaneResource()
 {
+  if (myPrimitivesUsed)
+  {
+    Release (NULL);
+  }
 }
 
 // =======================================================================
@@ -126,12 +157,15 @@ OpenGl_CappingPlaneResource::~OpenGl_CappingPlaneResource()
 // =======================================================================
 void OpenGl_CappingPlaneResource::SetAspect (const Handle(Graphic3d_AspectFillCapping)& theAspect)
 {
-  myAspect = theAspect;
+  myGraphicAspect = theAspect;
 
   if (theAspect.IsNull())
   {
     return;
   }
+
+  if (!theAspect->ToDrawHatch())
+    return;
 
   if (!theAspect->ToUseObjectMaterial()
    || !theAspect->ToUseObjectTexture()
@@ -198,11 +232,32 @@ void OpenGl_CappingPlaneResource::SetAspect (const Handle(Graphic3d_AspectFillCa
 }
 
 // =======================================================================
+// function : Update
+// purpose  :
+// =======================================================================
+void OpenGl_CappingPlaneResource::Update (const Handle(OpenGl_Context)& theCtx,
+                                          const Handle(Graphic3d_Aspects)& theObjAspect)
+{
+  if (!myPrimitivesUsed)
+    return;
+
+  updateTransform (theCtx);
+  updateAspect (theObjAspect);
+}
+
+// =======================================================================
 // function : Release
 // purpose  :
 // =======================================================================
 void OpenGl_CappingPlaneResource::Release (OpenGl_Context* theContext)
 {
+  if (myPrimitivesUsed)
+  {
+    OpenGl_Element::Destroy (theContext, myAspect);
+    myPrimitives.Release (theContext);
+    myEquationMod = (unsigned int )-1;
+    myAspectMod   = (unsigned int )-1;
+  }
   myCappingAspect .Release (theContext);
   myHatchingAspect.Release (theContext);
 }
@@ -213,14 +268,14 @@ void OpenGl_CappingPlaneResource::Release (OpenGl_Context* theContext)
 // =======================================================================
 const OpenGl_Aspects* OpenGl_CappingPlaneResource::CappingFaceAspect (const OpenGl_Aspects* theObjectAspect) const
 {
-  if (myAspect.IsNull())
+  if (myGraphicAspect.IsNull())
   {
     return NULL;
   }
 
   Handle(Graphic3d_Aspects) aFillAspect = myCappingAspect.Aspect();
 
-  if (myAspect->ToUseObjectMaterial() && theObjectAspect != NULL)
+  if (myGraphicAspect->ToUseObjectMaterial() && theObjectAspect != NULL)
   {
     // only front material currently supported by capping rendering
     aFillAspect->SetFrontMaterial (theObjectAspect->Aspect()->FrontMaterial());
@@ -228,11 +283,11 @@ const OpenGl_Aspects* OpenGl_CappingPlaneResource::CappingFaceAspect (const Open
   }
   else
   {
-    aFillAspect->SetFrontMaterial (myAspect->Material());
-    aFillAspect->SetInteriorColor (myAspect->Material().Color());
+    aFillAspect->SetFrontMaterial (myGraphicAspect->Material());
+    aFillAspect->SetInteriorColor (myGraphicAspect->Material().Color());
   }
 
-  if (myAspect->ToUseObjectTexture() && theObjectAspect != NULL)
+  if (myGraphicAspect->ToUseObjectTexture() && theObjectAspect != NULL)
   {
     if (theObjectAspect->Aspect()->ToMapTexture())
     {
@@ -246,8 +301,8 @@ const OpenGl_Aspects* OpenGl_CappingPlaneResource::CappingFaceAspect (const Open
   }
   else
   {
-    aFillAspect->SetTextureMap (myAspect->Texture());
-    if (!myAspect->Texture().IsNull())
+    aFillAspect->SetTextureMap (myGraphicAspect->Texture());
+    if (!myGraphicAspect->Texture().IsNull())
     {
       aFillAspect->SetTextureMapOn();
     }
@@ -257,13 +312,13 @@ const OpenGl_Aspects* OpenGl_CappingPlaneResource::CappingFaceAspect (const Open
     }
   }
 
-  if (myAspect->ToUseObjectShader() && theObjectAspect != NULL)
+  if (myGraphicAspect->ToUseObjectShader() && theObjectAspect != NULL)
   {
     aFillAspect->SetShaderProgram (theObjectAspect->Aspect()->ShaderProgram());
   }
   else
   {
-    aFillAspect->SetShaderProgram (myAspect->Shader());
+    aFillAspect->SetShaderProgram (myGraphicAspect->Shader());
   }
 
   myCappingAspect.SetAspect (aFillAspect);
@@ -277,24 +332,24 @@ const OpenGl_Aspects* OpenGl_CappingPlaneResource::CappingFaceAspect (const Open
 // =======================================================================
 const OpenGl_Aspects* OpenGl_CappingPlaneResource::HatchingFaceAspect() const
 {
-  if (myAspect.IsNull())
+  if (myGraphicAspect.IsNull())
   {
     return NULL;
   }
 
-  const Standard_Size aHatchingState = myAspect->HatchingState();
+  const Standard_Size aHatchingState = myGraphicAspect->HatchingState();
   if (myHatchingState != aHatchingState)
   {
-    if (myAspect->ToDrawHatch())
+    if (myGraphicAspect->ToDrawHatch())
     {
       Handle(Graphic3d_Aspects) aFillAspect = myHatchingAspect.Aspect();
 
-      aFillAspect->SetInteriorStyle (myAspect->IsStippleHatch() ? Aspect_IS_HATCH : Aspect_IS_SOLID);
-      aFillAspect->SetHatchStyle    (myAspect->IsStippleHatch() ? myAspect->StippleHatch() : Handle(Graphic3d_HatchStyle)());
-      aFillAspect->SetTextureMap    (myAspect->IsTextureHatch() ? myAspect->TextureHatch() : Handle(Graphic3d_TextureMap)());
-      aFillAspect->SetFrontMaterial (myAspect->HatchMaterial());
-      aFillAspect->SetInteriorColor (myAspect->HatchMaterial().Color());
-      if (myAspect->IsTextureHatch())
+      aFillAspect->SetInteriorStyle (myGraphicAspect->IsStippleHatch() ? Aspect_IS_HATCH : Aspect_IS_SOLID);
+      aFillAspect->SetHatchStyle    (myGraphicAspect->IsStippleHatch() ? myGraphicAspect->StippleHatch() : Handle(Graphic3d_HatchStyle)());
+      aFillAspect->SetTextureMap    (myGraphicAspect->IsTextureHatch() ? myGraphicAspect->TextureHatch() : Handle(Graphic3d_TextureMap)());
+      aFillAspect->SetFrontMaterial (myGraphicAspect->HatchMaterial());
+      aFillAspect->SetInteriorColor (myGraphicAspect->HatchMaterial().Color());
+      if (myGraphicAspect->IsTextureHatch())
       {
         aFillAspect->SetTextureMapOn();
       }
@@ -308,4 +363,125 @@ const OpenGl_Aspects* OpenGl_CappingPlaneResource::HatchingFaceAspect() const
   }
 
   return &myHatchingAspect;
+}
+
+// =======================================================================
+// function : updateAspect
+// purpose  :
+// =======================================================================
+void OpenGl_CappingPlaneResource::updateAspect (const Handle(Graphic3d_Aspects)& theObjAspect)
+{
+  if (myPlaneRoot.IsNull())
+    return;
+
+  if (myAspect == NULL)
+  {
+    myAspect = new OpenGl_Aspects();
+    myAspectMod = myPlaneRoot->MCountAspect() - 1; // mark out of sync
+  }
+
+  if (theObjAspect.IsNull())
+  {
+    if (myAspectMod != myPlaneRoot->MCountAspect())
+    {
+      myAspect->SetAspect (myPlaneRoot->CappingAspect());
+      myAspectMod = myPlaneRoot->MCountAspect();
+    }
+    return;
+  }
+
+  if (myFillAreaAspect.IsNull())
+  {
+    myFillAreaAspect = new Graphic3d_AspectFillArea3d();
+  }
+  if (myAspectMod != myPlaneRoot->MCountAspect()) 
+  {
+    *myFillAreaAspect = *myPlaneRoot->CappingAspect();
+  }
+
+  if (myPlaneRoot->ToUseObjectMaterial())
+  {
+    // only front material currently supported by capping rendering
+    myFillAreaAspect->SetFrontMaterial (theObjAspect->FrontMaterial());
+    myFillAreaAspect->SetInteriorColor (theObjAspect->InteriorColor());
+  }
+  if (myPlaneRoot->ToUseObjectTexture())
+  {
+    myFillAreaAspect->SetTextureSet (theObjAspect->TextureSet());
+    if (theObjAspect->ToMapTexture())
+    {
+      myFillAreaAspect->SetTextureMapOn();
+    }
+    else
+    {
+      myFillAreaAspect->SetTextureMapOff();
+    }
+  }
+  if (myPlaneRoot->ToUseObjectShader())
+  {
+    myFillAreaAspect->SetShaderProgram (theObjAspect->ShaderProgram());
+  }
+
+  myAspect->SetAspect (myFillAreaAspect);
+}
+
+// =======================================================================
+// function : updateTransform
+// purpose  :
+// =======================================================================
+void OpenGl_CappingPlaneResource::updateTransform (const Handle(OpenGl_Context)& theCtx)
+{
+  if (myPlaneRoot.IsNull())
+    return;
+
+  if (myEquationMod == myPlaneRoot->MCountEquation()
+   && myLocalOrigin.IsEqual (theCtx->ShaderManager()->LocalOrigin(), gp::Resolution()))
+  {
+    return; // nothing to update
+  }
+
+  myEquationMod = myPlaneRoot->MCountEquation();
+  myLocalOrigin = theCtx->ShaderManager()->LocalOrigin();
+
+  const Graphic3d_ClipPlane::Equation& anEq = myPlaneRoot->GetEquation();
+  const Standard_Real anEqW = theCtx->ShaderManager()->LocalClippingPlaneW (*myPlaneRoot);
+
+  // re-evaluate infinite plane transformation matrix
+  const Graphic3d_Vec3 aNorm (anEq.xyz());
+  const Graphic3d_Vec3 T (anEq.xyz() * -anEqW);
+
+  // project plane normal onto OX to find left vector
+  const Standard_ShortReal aProjLen = sqrt ((Standard_ShortReal)anEq.xz().SquareModulus());
+  Graphic3d_Vec3 aLeft;
+  if (aProjLen < ShortRealSmall())
+  {
+    aLeft[0] = 1.0f;
+  }
+  else
+  {
+    aLeft[0] =  aNorm[2] / aProjLen;
+    aLeft[2] = -aNorm[0] / aProjLen;
+  }
+
+  const Graphic3d_Vec3 F = Graphic3d_Vec3::Cross (-aLeft, aNorm);
+
+  myOrientation.mat[0][0] = aLeft[0];
+  myOrientation.mat[0][1] = aLeft[1];
+  myOrientation.mat[0][2] = aLeft[2];
+  myOrientation.mat[0][3] = 0.0f;
+
+  myOrientation.mat[1][0] = aNorm[0];
+  myOrientation.mat[1][1] = aNorm[1];
+  myOrientation.mat[1][2] = aNorm[2];
+  myOrientation.mat[1][3] = 0.0f;
+
+  myOrientation.mat[2][0] = F[0];
+  myOrientation.mat[2][1] = F[1];
+  myOrientation.mat[2][2] = F[2];
+  myOrientation.mat[2][3] = 0.0f;
+
+  myOrientation.mat[3][0] = T[0];
+  myOrientation.mat[3][1] = T[1];
+  myOrientation.mat[3][2] = T[2];
+  myOrientation.mat[3][3] = 1.0f;
 }

@@ -27,7 +27,7 @@
 
 namespace
 {
-  static const OpenGl_CappingPlaneResource* THE_DEFAULT_ASPECT = new OpenGl_CappingPlaneResource (new Graphic3d_AspectFillCapping);
+  static const OpenGl_CappingPlaneResource* THE_DEFAULT_ASPECT = new OpenGl_CappingPlaneResource (NULL, new Graphic3d_AspectFillCapping);
   static const TCollection_AsciiString THE_QUAD_PARRAY = "OpenGl_CappingAlgo_Quad";
   static const TCollection_AsciiString THE_PLANE_STYLE = "OpenGl_CappingAlgo_CappingStyle_";
 
@@ -177,6 +177,28 @@ namespace
     theWorkspace->SetAllowFaceCulling (wasCullAllowed);
   }
 
+  //! Render infinite capping plane.
+  //! @param theWorkspace [in] the GL workspace, context state.
+  //! @param thePlane [in] the graphical plane, for which the capping surface is rendered.
+  static void renderPlane (const Handle(OpenGl_Workspace)& theWorkspace,
+                           const Handle(OpenGl_CappingPlaneResource)& thePlane)
+  {
+    const Handle(OpenGl_Context)& aContext = theWorkspace->GetGlContext();
+    const bool wasCullAllowed = theWorkspace->SetAllowFaceCulling (true);
+
+    // set identity model matrix
+    aContext->ModelWorldState.Push();
+    aContext->ModelWorldState.SetCurrent (OpenGl_Mat4::Map (*thePlane->Orientation()->mat));
+    aContext->ApplyModelViewMatrix();
+
+    thePlane->Primitives().Render (theWorkspace);
+
+    aContext->ModelWorldState.Pop();
+    aContext->ApplyModelViewMatrix();
+
+    theWorkspace->SetAllowFaceCulling (wasCullAllowed);
+  }
+
   //! Render capping for specific structure.
   static void renderCappingForStructure (StencilTestSentry& theStencilSentry,
                                          const Handle(OpenGl_Workspace)& theWorkspace,
@@ -192,6 +214,7 @@ namespace
     const Handle(Graphic3d_ClipPlane)& aPlane = theClipChain;
 
     const Handle(OpenGl_Context)&      aContext     = theWorkspace->GetGlContext();
+    const Handle(Graphic3d_ClipPlane)& aRenderPlane = thePlane->Plane();
     const Handle(Graphic3d_Camera) aCamera    = theWorkspace->View() != NULL
                                               ? theWorkspace->View()->Camera()
                                               : Handle(Graphic3d_Camera)();
@@ -210,6 +233,35 @@ namespace
       // clear stencil only if something has been actually drawn
       theStencilSentry.Init();
 
+      const OpenGl_Aspects*              aGroupAspectFace    = aGroupIter.Value()->GlAspects();
+      const OpenGl_CappingPlaneResource* aGroupAspectCapping = aGroupIter.Value()->AspectFillCapping();
+      const OpenGl_CappingPlaneResource* anAspectCapping =
+          thePlane && (!aGroupAspectCapping || aGroupAspectCapping->Aspect().IsNull() || aPlane->ToOverrideCappingAspect())
+        ? thePlane.get()
+        : aGroupAspectCapping;
+
+      if (anAspectCapping == NULL)
+      {
+        anAspectCapping = THE_DEFAULT_ASPECT;
+      }
+
+      const OpenGl_Aspects*  anAspectFace     = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
+      const Standard_Boolean hasHatch         = anAspectCapping->Aspect()->ToDrawHatch();
+
+      if (!hasHatch)
+      {
+        // check if capping plane should be rendered within current pass (only opaque / only transparent)
+        const OpenGl_Aspects* anObjAspectFace = aRenderPlane->ToUseObjectProperties() ? aGroupIter.Value()->GlAspects() : NULL;
+        //const OpenGl_Aspects* anObjAspectFace = aRenderPlane->CappingSectionStyle()->ToUseObjectProperties() ? aGroupIter.Value()->GlAspects() : NULL;
+        thePlane->Update (aContext, anObjAspectFace != NULL ? anObjAspectFace->Aspect() : Handle(Graphic3d_Aspects)());
+        theWorkspace->SetAspects (thePlane->AspectFace());
+        theWorkspace->SetRenderFilter (aPrevFilter);
+        if (!theWorkspace->ShouldRender (&thePlane->Primitives()))
+        {
+          continue;
+        }
+      }
+
       // suppress only opaque/transparent filter since for filling stencil the whole geometry should be drawn
       theWorkspace->SetRenderFilter (anAnyFilter);
 
@@ -218,7 +270,7 @@ namespace
       aContext->ShaderManager()->UpdateClippingState();
 
       glClear (GL_STENCIL_BUFFER_BIT);
-      glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+      const bool aColorMaskBack = aContext->SetColorMask (false);
 
       // override aspects, disable culling
       theWorkspace->SetAspects (&theWorkspace->NoneCulling());
@@ -237,7 +289,28 @@ namespace
       glStencilOp (GL_KEEP, GL_INVERT, GL_INVERT);
 
       // render closed primitives
-      aGroupIter.Value()->Render (theWorkspace);
+      if (hasHatch)
+      {
+        aGroupIter.Value()->Render (theWorkspace);
+      }
+      else
+      {
+        // render closed primitives
+        if (aRenderPlane->ToUseObjectProperties())
+        {
+         aGroupIter.Value()->Render (theWorkspace);
+        }
+        else
+        {
+          for (; aGroupIter.More(); aGroupIter.Next())
+          {
+            if (aGroupIter.Value()->IsClosed())
+            {
+              aGroupIter.Value()->Render (theWorkspace);
+            }
+          }
+        }
+      }
 
       // override material, cull back faces
       theWorkspace->SetAspects (&theWorkspace->FrontCulling());
@@ -248,7 +321,7 @@ namespace
       aContext->ShaderManager()->UpdateClippingState();
 
       // render capping plane using the generated stencil mask
-      glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      aContext->SetColorMask (aColorMaskBack);
       if (theWorkspace->UseDepthWrite())
       {
         glDepthMask (GL_TRUE);
@@ -260,69 +333,63 @@ namespace
         glEnable (GL_DEPTH_TEST);
       }
 
-      const OpenGl_Aspects*              aGroupAspectFace    = aGroupIter.Value()->GlAspects();
-      const OpenGl_CappingPlaneResource* aGroupAspectCapping = aGroupIter.Value()->AspectFillCapping();
-      const OpenGl_CappingPlaneResource* anAspectCapping =
-          thePlane && (!aGroupAspectCapping || aGroupAspectCapping->Aspect().IsNull() || aPlane->ToOverrideCappingAspect())
-        ? thePlane.get()
-        : aGroupAspectCapping;
-
-      if (anAspectCapping == NULL)
+      if (!hasHatch)
       {
-        anAspectCapping = THE_DEFAULT_ASPECT;
+        theWorkspace->SetAspects (thePlane->AspectFace());
+        renderPlane (theWorkspace, thePlane);
       }
-
-      const OpenGl_Aspects*  anAspectFace     = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
-      const Standard_Boolean hasHatch         = anAspectCapping->Aspect()->ToDrawHatch();
-      const OpenGl_Aspects*  anAspectHatching = hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL;
-      const Standard_Boolean hasTextureHatch  = hasHatch && !anAspectCapping->Aspect()->TextureHatch().IsNull();
-      const Standard_Boolean isRotatePers     = hasTextureHatch && !aCamera.IsNull() && anAspectCapping->Aspect()->IsHatchRotationPersistent();
-      const Standard_Boolean isZoomPers       = hasTextureHatch && !aCamera.IsNull() && anAspectCapping->Aspect()->IsHatchZoomPersistent();
-
-      Standard_ShortReal aHatchScale = 1.0;
-      Standard_ShortReal aHatchAngle = 0.0;
-
-      if (isRotatePers || isZoomPers)
+      else
       {
+        const OpenGl_Aspects*  anAspectHatching = hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL;
+        const Standard_Boolean hasTextureHatch  = hasHatch && !anAspectCapping->Aspect()->TextureHatch().IsNull();
+        const Standard_Boolean isRotatePers     = hasTextureHatch && !aCamera.IsNull() && anAspectCapping->Aspect()->IsHatchRotationPersistent();
+        const Standard_Boolean isZoomPers       = hasTextureHatch && !aCamera.IsNull() && anAspectCapping->Aspect()->IsHatchZoomPersistent();
 
-        if (isRotatePers)
+        Standard_ShortReal aHatchScale = 1.0;
+        Standard_ShortReal aHatchAngle = 0.0;
+
+        if (isRotatePers || isZoomPers)
         {
-          if (aRotateAngle == 0.0)
+
+          if (isRotatePers)
           {
-            const gp_Dir aPlaneSide (aPlaneMat.GetValue (0, 0), aPlaneMat.GetValue (1, 0), aPlaneMat.GetValue (2, 0));
-            const gp_Dir aPlaneUp   (aPlaneMat.GetValue (0, 2), aPlaneMat.GetValue (1, 2), aPlaneMat.GetValue (2, 2));
-            const gp_Dir& aCameraUp  = aCamera->Up();
-            const gp_Vec  aCameraPln = aPlaneSide.Dot (aCameraUp) * aPlaneSide + aPlaneUp.Dot (aCameraUp) * aPlaneUp;
-            if (aCameraPln.Magnitude() > Precision::Confusion())
+            if (aRotateAngle == 0.0)
             {
-              const gp_Dir& aCameraDir   = aCamera->Direction();
-              aRotateAngle = static_cast<Standard_ShortReal> (aCameraPln.AngleWithRef (aPlaneUp, aCameraDir) / M_PI * 180.0);
+              const gp_Dir aPlaneSide (aPlaneMat.GetValue (0, 0), aPlaneMat.GetValue (1, 0), aPlaneMat.GetValue (2, 0));
+              const gp_Dir aPlaneUp   (aPlaneMat.GetValue (0, 2), aPlaneMat.GetValue (1, 2), aPlaneMat.GetValue (2, 2));
+              const gp_Dir& aCameraUp  = aCamera->Up();
+              const gp_Vec  aCameraPln = aPlaneSide.Dot (aCameraUp) * aPlaneSide + aPlaneUp.Dot (aCameraUp) * aPlaneUp;
+              if (aCameraPln.Magnitude() > Precision::Confusion())
+              {
+                const gp_Dir& aCameraDir   = aCamera->Direction();
+                aRotateAngle = static_cast<Standard_ShortReal> (aCameraPln.AngleWithRef (aPlaneUp, aCameraDir) / M_PI * 180.0);
+              }
             }
+
+            aHatchAngle = aRotateAngle;
           }
 
-          aHatchAngle = aRotateAngle;
-        }
-
-        if (isZoomPers)
-        {
-          if (aViewScale == ShortRealLast())
+          if (isZoomPers)
           {
-            const Standard_Real aFocus = aCamera->IsOrthographic()
-                                        ? aCamera->Distance()
-                                        : (aCamera->ZFocusType() == Graphic3d_Camera::FocusType_Relative
-                                        ? Standard_Real(aCamera->ZFocus() * aCamera->Distance())
-                                        : Standard_Real(aCamera->ZFocus()));
+            if (aViewScale == ShortRealLast())
+            {
+              const Standard_Real aFocus = aCamera->IsOrthographic()
+                                          ? aCamera->Distance()
+                                          : (aCamera->ZFocusType() == Graphic3d_Camera::FocusType_Relative
+                                          ? Standard_Real(aCamera->ZFocus() * aCamera->Distance())
+                                          : Standard_Real(aCamera->ZFocus()));
 
-            const gp_XYZ aViewDim = aCamera->ViewDimensions (aFocus);
-            aViewScale = static_cast<Standard_ShortReal> (aViewDim.Y() / aContext->Viewport()[3]);
+              const gp_XYZ aViewDim = aCamera->ViewDimensions (aFocus);
+              aViewScale = static_cast<Standard_ShortReal> (aViewDim.Y() / aContext->Viewport()[3]);
+            }
+
+            if (!anAspectHatching->TextureSet(aContext)->IsEmpty())
+              aHatchScale = 1.0f / (aViewScale * anAspectHatching->TextureSet(aContext)->First()->SizeY());
           }
-
-          if (!anAspectHatching->TextureSet(aContext)->IsEmpty())
-            aHatchScale = 1.0f / (aViewScale * anAspectHatching->TextureSet(aContext)->First()->SizeY());
         }
-      }
     
-      renderSection (theWorkspace, theQuad, anAspectFace, hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL, aPlaneMat, aHatchScale, aHatchAngle);
+        renderSection (theWorkspace, theQuad, anAspectFace, hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL, aPlaneMat, aHatchScale, aHatchAngle);
+      }
 
       // turn on the current plane to restore initial state
       aContext->ChangeClipping().ResetCappingFilter();
@@ -341,14 +408,9 @@ namespace
 // function : RenderCapping
 // purpose  :
 // =======================================================================
-#include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
 void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorkspace,
                                         const OpenGl_Structure&         theStructure)
 {
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("RenderCapping", "", &aPerfMeter, NULL);
-
   const Handle(OpenGl_Context)& aContext = theWorkspace->GetGlContext();
   if (!aContext->Clipping().IsCappingOn())
   {
@@ -392,10 +454,6 @@ void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorks
       continue;
     }
 
-    Standard_SStream aStream;
-    aClipChain->DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "ClipChain", "", &aPerfMeter, NULL);
-
     Standard_Integer aSubPlaneIndex = 1;
     for (const Graphic3d_ClipPlane* aSubPlaneIter = aClipChain.get(); aSubPlaneIter != NULL; aSubPlaneIter = aSubPlaneIter->ChainNextPlane().get(), ++aSubPlaneIndex)
     {
@@ -405,7 +463,7 @@ void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorks
       if (!aContext->GetResource (aResId, aPlaneRes))
       {
         // share and register for release once the resource is no longer used
-        aPlaneRes = new OpenGl_CappingPlaneResource (aSubPlaneIter->CappingSectionStyle());
+        aPlaneRes = new OpenGl_CappingPlaneResource (aSubPlaneIter, aSubPlaneIter->CappingSectionStyle());
         aContext->ShareResource (aResId, aPlaneRes);
       }
 

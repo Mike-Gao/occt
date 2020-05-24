@@ -96,7 +96,7 @@ void OpenGl_Group::SetGroupPrimitivesAspect (const Handle(Graphic3d_Aspects)& th
     Handle(Graphic3d_AspectFillCapping) aFillCappingAspect = Handle(Graphic3d_AspectFillCapping)::DownCast (theAspect);
     if (myAspectFillCapping == NULL)
     {
-      myAspectFillCapping = new OpenGl_CappingPlaneResource (aFillCappingAspect);
+      myAspectFillCapping = new OpenGl_CappingPlaneResource (NULL, aFillCappingAspect);
     }
     else
     {
