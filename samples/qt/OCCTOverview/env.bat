@@ -4,9 +4,9 @@ if exist "%~dp0custom.bat" (
   call "%~dp0custom.bat" %1 %2 %3
 )
 
-call "@INSTALL_DIR_ABSOLUTE@\@INSTALL_DIR_SCRIPT@\env.bat" %1 %2 %3
+call "%CASROOT%\env.bat" %1 %2 %3
+
 if /I ["%1"] == ["vc141"] set "VCVER=vc141"
-if /I ["%1"] == ["vc142"] set "VCVER=vc142"
 set "BIN_DIR=win%ARCH%\%VCVER%\bind"
 set "LIB_DIR=win%ARCH%\%VCVER%\libd"
 
