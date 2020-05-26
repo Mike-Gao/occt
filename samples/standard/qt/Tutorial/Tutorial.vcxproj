@@ -1,0 +1,845 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{41D82730-D788-3842-9069-B4C658EFAD03}</ProjectGuid>
+    <RootNamespace>Tutorial</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+    <OutputDirectory>win64\vc14\bind\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>win64\vc14\objd\</IntermediateDirectory>
+    <PrimaryOutput>Tutorial</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+    <OutputDirectory>win64\vc14\bin\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>win64\vc14\obj\</IntermediateDirectory>
+    <PrimaryOutput>Tutorial</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\bind\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\objd\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Tutorial</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\obj\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Tutorial</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\Common\src;..\Interface\src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>win64\vc14\objd\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>win64\vc14\objd\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmaind.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgetsd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Guid.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Cored.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGLd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)\Tutorial.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\Common\src;..\Interface\src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\moc;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>win64\vc14\obj\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>win64\vc14\obj\</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmain.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgets.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Gui.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Core.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGL.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OutputFile>$(OutDir)\Tutorial.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Interface\src\Application.cxx" />
+    <ClCompile Include="..\Common\src\ApplicationCommon.cxx" />
+    <ClCompile Include="src\ApplicationTut.cxx" />
+    <ClCompile Include="..\..\samples_src\BaseSample.cxx" />
+    <ClCompile Include="..\..\samples_src\ComcreteSample.cxx" />
+    <ClCompile Include="..\Common\src\DocumentCommon.cxx" />
+    <ClCompile Include="src\DocumentTut.cxx" />
+    <ClCompile Include="..\Common\src\MDIWindow.cxx" />
+    <ClCompile Include="src\Main.cxx" />
+    <ClCompile Include="src\MakeBottle.cxx" />
+    <ClCompile Include="..\Common\src\Material.cxx" />
+    <ClCompile Include="..\Common\src\OcctWindow.cxx" />
+    <ClCompile Include="..\Interface\src\Translate.cxx" />
+    <ClCompile Include="..\Common\src\Transparency.cxx" />
+    <ClCompile Include="..\Common\src\View.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Interface\src\Application.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Interface\src\Application.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Interface\src\Application.h -o win64\vc14\mocd\moc_Application.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Interface/src/Application.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_Application.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Interface\src\Application.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Interface\src\Application.h -o win64\vc14\moc\moc_Application.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Interface/src/Application.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Application.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\src\ApplicationCommon.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\ApplicationCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\ApplicationCommon.h -o win64\vc14\mocd\moc_ApplicationCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Common/src/ApplicationCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_ApplicationCommon.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\ApplicationCommon.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\ApplicationCommon.h -o win64\vc14\moc\moc_ApplicationCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/ApplicationCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_ApplicationCommon.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="src\ApplicationTut.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\ApplicationTut.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\ApplicationTut.h -o win64\vc14\mocd\moc_ApplicationTut.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/ApplicationTut.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_ApplicationTut.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\ApplicationTut.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\ApplicationTut.h -o win64\vc14\moc\moc_ApplicationTut.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/ApplicationTut.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_ApplicationTut.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <ClInclude Include="..\..\samples_src\BaseSample.hxx" />
+    <ClInclude Include="..\..\samples_src\ComcreteSample.hxx" />
+    <CustomBuild Include="..\Common\src\DocumentCommon.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\DocumentCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\DocumentCommon.h -o win64\vc14\mocd\moc_DocumentCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Common/src/DocumentCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_DocumentCommon.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\DocumentCommon.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\DocumentCommon.h -o win64\vc14\moc\moc_DocumentCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/DocumentCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_DocumentCommon.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="src\DocumentTut.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\DocumentTut.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\DocumentTut.h -o win64\vc14\mocd\moc_DocumentTut.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/DocumentTut.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_DocumentTut.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\DocumentTut.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\DocumentTut.h -o win64\vc14\moc\moc_DocumentTut.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/DocumentTut.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_DocumentTut.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <ClInclude Include="..\Interface\src\IESample.h" />
+    <CustomBuild Include="..\Common\src\MDIWindow.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\MDIWindow.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\MDIWindow.h -o win64\vc14\mocd\moc_MDIWindow.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Common/src/MDIWindow.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_MDIWindow.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\MDIWindow.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\MDIWindow.h -o win64\vc14\moc\moc_MDIWindow.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/MDIWindow.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_MDIWindow.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\src\Material.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\Material.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\Material.h -o win64\vc14\mocd\moc_Material.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Common/src/Material.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_Material.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\Material.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\Material.h -o win64\vc14\moc\moc_Material.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/Material.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Material.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <ClInclude Include="..\Common\src\OcctWindow.h" />
+    <CustomBuild Include="..\Interface\src\Translate.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Interface\src\Translate.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Interface\src\Translate.h -o win64\vc14\mocd\moc_Translate.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Interface/src/Translate.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_Translate.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Interface\src\Translate.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Interface\src\Translate.h -o win64\vc14\moc\moc_Translate.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Interface/src/Translate.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Translate.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\src\Transparency.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\Transparency.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\Transparency.h -o win64\vc14\mocd\moc_Transparency.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Common/src/Transparency.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_Transparency.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\Transparency.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\Transparency.h -o win64\vc14\moc\moc_Transparency.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/Transparency.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Transparency.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\src\View.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\View.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\View.h -o win64\vc14\mocd\moc_View.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../Common/src/View.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_View.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\View.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\View.h -o win64\vc14\moc\moc_View.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/View.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_View.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="win64\vc14\moc\moc_Application.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_Application.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_ApplicationCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_ApplicationCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_ApplicationTut.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_ApplicationTut.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_DocumentCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_DocumentCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_DocumentTut.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_DocumentTut.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_MDIWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_MDIWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_Material.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_Material.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_Translate.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_Translate.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_Transparency.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_Transparency.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_View.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_View.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <CustomBuild Include="win64\vc14\moc\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -BxC:\Work\3d_party\qt5.11.2-vc14-64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -O2 -MD -E C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;win64\vc14\moc\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="win64\vc14\mocd\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -BxC:\Work\3d_party\qt5.11.2-vc14-64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zi -MDd -E C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;win64\vc14\mocd\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Common\src\Common-icon.ts">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\Common-icon.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lrelease ..\Common\src\Common-icon.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Common-icon.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LRELEASE ../Common/src/Common-icon.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Common-icon.qm;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\Common-icon.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lrelease ..\Common\src\Common-icon.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Common-icon.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LRELEASE ../Common/src/Common-icon.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Common-icon.qm;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\src\Common-string.ts">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\Common-string.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lrelease ..\Common\src\Common-string.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Common-string.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LRELEASE ../Common/src/Common-string.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Common-string.qm;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\src\Common-string.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lrelease ..\Common\src\Common-string.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Common-string.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LRELEASE ../Common/src/Common-string.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Common-string.qm;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="src\Tutorial-icon.ts">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\Tutorial-icon.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lrelease src\Tutorial-icon.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Tutorial-icon.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LRELEASE src/Tutorial-icon.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Tutorial-icon.qm;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\Tutorial-icon.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lrelease src\Tutorial-icon.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Tutorial-icon.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LRELEASE src/Tutorial-icon.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Tutorial-icon.qm;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="src\Tutorial-string.ts">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\Tutorial-string.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lrelease src\Tutorial-string.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Tutorial-string.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LRELEASE src/Tutorial-string.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Tutorial-string.qm;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\Tutorial-string.ts;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lrelease src\Tutorial-string.ts -qm C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Tutorial-string.qm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LRELEASE src/Tutorial-string.ts</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Tutorial-string.qm;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\Bottle.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res\Bottle.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type res\Bottle.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Bottle.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource res/Bottle.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Bottle.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res\Bottle.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type res\Bottle.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/Bottle.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource res/Bottle.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Bottle.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="res\SampleImportExport.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res\SampleImportExport.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type res\SampleImportExport.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/SampleImportExport.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource res/SampleImportExport.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SampleImportExport.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res\SampleImportExport.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type res\SampleImportExport.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/SampleImportExport.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource res/SampleImportExport.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SampleImportExport.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\antialiasing.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\antialiasing.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\antialiasing.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/antialiasing.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/antialiasing.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">antialiasing.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\antialiasing.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\antialiasing.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/antialiasing.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/antialiasing.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">antialiasing.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\cascade.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\cascade.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\cascade.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/cascade.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/cascade.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cascade.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\cascade.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\cascade.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/cascade.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/cascade.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cascade.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\close.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\close.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\close.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/close.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/close.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">close.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\close.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\close.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/close.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/close.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">close.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\cursor_rotate.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\cursor_rotate.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\cursor_rotate.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/cursor_rotate.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/cursor_rotate.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cursor_rotate.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\cursor_rotate.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\cursor_rotate.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/cursor_rotate.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/cursor_rotate.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cursor_rotate.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\cursor_zoom.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\cursor_zoom.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\cursor_zoom.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/cursor_zoom.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/cursor_zoom.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cursor_zoom.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\cursor_zoom.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\cursor_zoom.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/cursor_zoom.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/cursor_zoom.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cursor_zoom.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\document.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\document.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\document.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/document.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/document.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">document.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\document.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\document.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/document.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/document.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">document.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\help.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\help.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\help.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/help.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/help.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\help.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\help.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/help.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/help.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\lamp.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\lamp.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\lamp.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/lamp.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/lamp.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lamp.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\lamp.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\lamp.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/lamp.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/lamp.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lamp.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\new.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\new.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\new.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/new.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/new.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">new.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\new.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\new.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/new.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/new.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">new.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\raytracing.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\raytracing.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\raytracing.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/raytracing.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/raytracing.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">raytracing.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\raytracing.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\raytracing.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/raytracing.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/raytracing.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">raytracing.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\reflections.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\reflections.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\reflections.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/reflections.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/reflections.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">reflections.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\reflections.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\reflections.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/reflections.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/reflections.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">reflections.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\shadows.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\shadows.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\shadows.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/shadows.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/shadows.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">shadows.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\shadows.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\shadows.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/shadows.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/shadows.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">shadows.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tile.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tile.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tile.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tile.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tile.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tile.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tile.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tile.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tile.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tile.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tile.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool-shading.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool-shading.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool-shading.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool-shading.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool-shading.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool-shading.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool-shading.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool-shading.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool-shading.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool-shading.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool-shading.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool_color.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool_color.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool_color.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_color.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool_color.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool_color.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool_color.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool_color.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_color.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool_color.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool_color.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool_delete.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool_delete.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool_delete.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_delete.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool_delete.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool_delete.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool_delete.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool_delete.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_delete.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool_delete.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool_delete.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool_material.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool_material.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool_material.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_material.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool_material.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool_material.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool_material.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool_material.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_material.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool_material.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool_material.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool_shading.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool_shading.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool_shading.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_shading.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool_shading.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool_shading.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool_shading.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool_shading.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_shading.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool_shading.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool_shading.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool_transparency.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool_transparency.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool_transparency.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_transparency.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool_transparency.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool_transparency.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool_transparency.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool_transparency.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_transparency.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool_transparency.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool_transparency.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\tool_wireframe.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\tool_wireframe.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\tool_wireframe.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_wireframe.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/tool_wireframe.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tool_wireframe.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\tool_wireframe.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\tool_wireframe.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/tool_wireframe.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/tool_wireframe.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tool_wireframe.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_axo.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_axo.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_axo.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_axo.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_axo.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_axo.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_axo.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_axo.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_axo.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_axo.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_axo.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_back.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_back.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_back.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_back.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_back.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_back.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_back.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_back.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_back.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_back.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_back.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_bottom.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_bottom.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_bottom.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_bottom.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_bottom.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_bottom.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_bottom.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_bottom.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_bottom.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_bottom.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_bottom.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_comp_off.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_comp_off.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_comp_off.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_comp_off.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_comp_off.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_comp_off.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_comp_off.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_comp_off.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_comp_off.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_comp_off.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_comp_off.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_comp_on.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_comp_on.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_comp_on.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_comp_on.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_comp_on.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_comp_on.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_comp_on.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_comp_on.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_comp_on.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_comp_on.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_comp_on.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_fitall.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_fitall.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_fitall.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_fitall.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_fitall.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_fitall.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_fitall.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_fitall.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_fitall.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_fitall.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_fitall.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_fitarea.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_fitarea.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_fitarea.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_fitarea.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_fitarea.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_fitarea.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_fitarea.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_fitarea.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_fitarea.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_fitarea.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_fitarea.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_front.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_front.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_front.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_front.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_front.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_front.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_front.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_front.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_front.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_front.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_front.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_glpan.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_glpan.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_glpan.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_glpan.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_glpan.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_glpan.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_glpan.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_glpan.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_glpan.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_glpan.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_glpan.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_left.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_left.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_left.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_left.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_left.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_left.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_left.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_left.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_left.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_left.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_left.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_pan.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_pan.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_pan.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_pan.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_pan.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_pan.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_pan.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_pan.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_pan.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_pan.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_pan.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_reset.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_reset.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_reset.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_reset.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_reset.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_reset.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_reset.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_reset.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_reset.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_reset.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_reset.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_right.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_right.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_right.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_right.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_right.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_right.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_right.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_right.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_right.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_right.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_right.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_rotate.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_rotate.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_rotate.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_rotate.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_rotate.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_rotate.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_rotate.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_rotate.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_rotate.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_rotate.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_rotate.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_top.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_top.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_top.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_top.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_top.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_top.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_top.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_top.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_top.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_top.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_top.png;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\Common\res\view_zoom.png">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\res\view_zoom.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">type ..\Common\res\view_zoom.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_zoom.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copy resource ../Common/res/view_zoom.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">view_zoom.png;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Common\res\view_zoom.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">type ..\Common\res\view_zoom.png &gt; C:\Work\occt-CR31570\samples\standard\qt\Tutorial\win64\vc14\res/view_zoom.png</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copy resource ../Common/res/view_zoom.png</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">view_zoom.png;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
