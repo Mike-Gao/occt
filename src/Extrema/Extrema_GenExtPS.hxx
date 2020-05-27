@@ -45,18 +45,18 @@ class Extrema_POnSurfParams;
 
 //! Grid cell defined by (U, V) indices of the minimal
 //! corner of the cell
-struct GridCell
+struct Extrema_GenExtPS_GridCell
 {
   Standard_Integer UIndex; //!< U index of the minimal corner
   Standard_Integer VIndex; //!< V index of the minimal corner
 
-  GridCell (Standard_Integer theUInd = -1, Standard_Integer theVInd = -1)
+  Extrema_GenExtPS_GridCell (Standard_Integer theUInd = -1, Standard_Integer theVInd = -1)
     : UIndex (theUInd), VIndex (theVInd)
   {}
 };
 
 //! typedef to BVH tree of the grid cells
-typedef BVH_BoxSet <Standard_Real, 3, GridCell> Extrema_GenExtPS_GridCellBoxSet;
+typedef BVH_BoxSet <Standard_Real, 3, Extrema_GenExtPS_GridCell> Extrema_GenExtPS_GridCellBoxSet;
 
 
 //! It calculates the extreme distances between a point and a surface.
@@ -219,7 +219,15 @@ public: //! @name Performing projection
   //! Allows multiple points be projected on the same surface.
   Standard_EXPORT void Perform (const gp_Pnt& theP);
 
-
+  //! Performs localized extrema search.
+  //! The localized boundaries are required to be inside the
+  //! main (initialized) surface parametric space.
+  Standard_EXPORT void Perform (const gp_Pnt& theP,
+                                const Standard_Real theUMin,
+                                const Standard_Real theUMax,
+                                const Standard_Real theVMin,
+                                const Standard_Real theVMax);
+  
 public: //! @name Getting the results
 
   //! Returns True if the distances are found.
@@ -308,23 +316,23 @@ protected: //! @name Rules for BVH traverse
 protected: //! @name Auxiliary types
 
   //! Structure to keep and sort the results
-  struct ExtPSResult
+  struct Extrema_GenExtPS_ExtPSResult
   {
     Extrema_POnSurf UV;       //! UV coordinates of extrema solution
     Standard_Real SqDistance; //! Square distance to target point
 
-    ExtPSResult()
+    Extrema_GenExtPS_ExtPSResult()
       : SqDistance (-1)
     {}
 
-    ExtPSResult (const Extrema_POnSurf& theUV,
-                 const Standard_Real theSqDist)
+    Extrema_GenExtPS_ExtPSResult (const Extrema_POnSurf& theUV,
+                                  const Standard_Real theSqDist)
       : UV (theUV),
         SqDistance (theSqDist)
     {}
 
     //! IsLess operator
-    Standard_Boolean operator< (const ExtPSResult& Other) const
+    Standard_Boolean operator< (const Extrema_GenExtPS_ExtPSResult& Other) const
     {
       if (SqDistance != Other.SqDistance)
         return SqDistance < Other.SqDistance;
@@ -334,6 +342,29 @@ protected: //! @name Auxiliary types
       Other.UV.Parameter (U2, V2);
       return (U1 < U2 || (U1 == U2 && V1 < V2));
     }
+  };
+
+  //! Localized parametric space of surface on which the single
+  //! BVH tree is built
+  struct Extrema_GenExtPS_LocalizedSurf
+  {
+    Standard_Real UMin;
+    Standard_Real UMax;
+    Standard_Real VMin;
+    Standard_Real VMax;
+    Handle(Extrema_GenExtPS_GridCellBoxSet) CellBoxSet;
+
+    Extrema_GenExtPS_LocalizedSurf ()
+      : UMin (0.0), UMax (0.0), VMin (0.0), VMax (0.0), CellBoxSet (NULL)
+    {}
+
+    Extrema_GenExtPS_LocalizedSurf (const Standard_Real theUMin,
+                                    const Standard_Real theUMax,
+                                    const Standard_Real theVMin,
+                                    const Standard_Real theVMax,
+                                    const Handle(Extrema_GenExtPS_GridCellBoxSet)& theCellBoxSet)
+      : UMin (theUMin), UMax (theUMax), VMin (theVMin), VMax (theVMax), CellBoxSet (theCellBoxSet)
+    {}
   };
 
 protected: //! @name Fields
@@ -354,6 +385,11 @@ protected: //! @name Fields
   Standard_Real myTolU;     //!< U parametric tolerance
   Standard_Real myTolV;     //!< V parametric tolerance
 
+  Standard_Real myLocUMin; //!< Localized surface parametric range: UMin
+  Standard_Real myLocUMax; //!< Localized surface parametric range: UMax
+  Standard_Real myLocVMin; //!< Localized surface parametric range: VMin
+  Standard_Real myLocVMax; //!< Localized surface parametric range: VMax
+
   Extrema_ExtFlag myTarget; //!< Extrema objective
 
   // Intermediate data
@@ -368,11 +404,11 @@ protected: //! @name Fields
 
   Standard_Real mySqDistance; //!< Min/Max found square distance used in BVH tree traverse
   opencascade::handle 
-    <BVH_IndexedBoxSet<Standard_Real, 3, Handle(Extrema_GenExtPS_GridCellBoxSet)> > myBVHBoxSet; //!< High-level BVH of BVH organized grid cells
+    <BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedSurf> > myBVHBoxSet; //!< High-level BVH of BVH organized grid cells
 
   // Results
-  std::vector <ExtPSResult> mySolutions; //!< Found solutions (sorted first by distance to target point,
-                                         //!  second by the ascending U,V coordinates)
+  std::vector <Extrema_GenExtPS_ExtPSResult> mySolutions; //!< Found solutions (sorted first by distance to target point,
+                                                          //!  second by the ascending U,V coordinates)
   Standard_Boolean myIsDone;             //!< Done/Not done flag
 };
 

@@ -108,6 +108,10 @@ Extrema_GenExtPS::Extrema_GenExtPS()
   myNbVSamples (0),
   myTolU (Precision::PConfusion()),
   myTolV (Precision::PConfusion()),
+  myLocUMin (RealLast()),
+  myLocUMax (RealFirst()),
+  myLocVMin (RealLast()),
+  myLocVMax (RealFirst()),
   myTarget (Extrema_ExtFlag_MINMAX),
   mySqDistance (-1),
   myIsDone (Standard_False)
@@ -211,6 +215,11 @@ void Extrema_GenExtPS::Initialize (const Adaptor3d_Surface& theS,
   myTolU = theTolU;
   myTolV = theTolV;
 
+  myLocUMin = myUMin;
+  myLocUMax = myUMax;
+  myLocVMin = myVMin;
+  myLocVMax = myVMax;
+
   if (myNbUSamples < 2 || myNbVSamples < 2)
   {
     throw Standard_OutOfRange ("Extrema_GenExtPS::Initialize - number of samples is too small");
@@ -229,10 +238,28 @@ void Extrema_GenExtPS::Initialize (const Adaptor3d_Surface& theS,
 //=======================================================================
 void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
 {
+  Perform (thePoint, myUMin, myUMax, myVMin, myVMax);
+}
+
+//=======================================================================
+//function : Perform
+//purpose  : 
+//=======================================================================
+void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
+                                const Standard_Real theUMin,
+                                const Standard_Real theUMax,
+                                const Standard_Real theVMin,
+                                const Standard_Real theVMax)
+{
   myIsDone = Standard_False;
   myPoint = BVH_Vec3d (thePoint.X(), thePoint.Y(), thePoint.Z());
   myF.SetPoint (thePoint, myTarget);
   mySolutions.clear();
+
+  myLocUMin = Max (theUMin, myUMin);
+  myLocUMax = Min (theUMax, myUMax);
+  myLocVMin = Max (theVMin, myVMin);
+  myLocVMax = Min (theVMax, myVMax);
 
   if (myUParams.IsNull() || myVParams.IsNull())
   {
@@ -318,7 +345,7 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
     // Copy solutions
     for (Standard_Integer i = 1; i <= myF.NbExt(); ++i)
     {
-      mySolutions.push_back (Extrema_GenExtPS::ExtPSResult (myF.Point (i), myF.SquareDistance (i)));
+      mySolutions.push_back (Extrema_GenExtPS_ExtPSResult (myF.Point (i), myF.SquareDistance (i)));
     }
   }
   else
@@ -331,7 +358,7 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint)
     for (Standard_Integer i = 1; i <= myF.NbExt(); ++i)
     {
       if (Abs (mySqDistance - myF.SquareDistance (i)) < Precision::SquareConfusion())
-        mySolutions.push_back (Extrema_GenExtPS::ExtPSResult (myF.Point (i), myF.SquareDistance (i)));
+        mySolutions.push_back (Extrema_GenExtPS_ExtPSResult (myF.Point (i), myF.SquareDistance (i)));
     }
   }
 
@@ -406,7 +433,7 @@ void Extrema_GenExtPS::BuildTree()
     // Builder for low-level BVH sets
     opencascade::handle<BVH_LinearBuilder<Standard_Real, 3> > aLBuilder = new BVH_LinearBuilder<Standard_Real, 3>();
 
-    myBVHBoxSet = new BVH_IndexedBoxSet<Standard_Real, 3, Handle (Extrema_GenExtPS_GridCellBoxSet)> (
+    myBVHBoxSet = new BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedSurf> (
       new BVH_LinearBuilder<Standard_Real, 3> (BVH_Constants_LeafNodeSizeSingle));
 
     // create hierarchy of BVH trees
@@ -433,12 +460,27 @@ void Extrema_GenExtPS::BuildTree()
         {
           for (Standard_Integer iV = V1; iV <= V2; ++iV)
           {
-            aGridSet->Add (GridCell (iU, iV), BVH_Box<Standard_Real, 3>());
+            aGridSet->Add (Extrema_GenExtPS_GridCell (iU, iV), BVH_Box<Standard_Real, 3>());
           }
         }
         V1 = V2 + 1;
 
-        myBVHBoxSet->Add (aGridSet, BVH_Box<Standard_Real, 3>());
+        Extrema_GenExtPS_GridCell aMinCell = aGridSet->Element (0);
+        Extrema_GenExtPS_GridCell aMaxCell = aGridSet->Element (aGridSet->Size() - 1);
+
+        Standard_Integer aUCoeff = (aMaxCell.UIndex < myNbUSamples) ? 1 : 0;
+        Standard_Integer aVCoeff = (aMaxCell.VIndex < myNbVSamples) ? 1 : 0;
+
+        const Extrema_POnSurf& aPMin = myPoints->Value (aMinCell.UIndex, aMinCell.VIndex);
+        const Extrema_POnSurf& aPMax = myPoints->Value (aMaxCell.UIndex + aUCoeff, aMaxCell.VIndex + aVCoeff);
+
+        Standard_Real aUMin, aUMax, aVMin, aVMax;
+        aPMin.Parameter (aUMin, aVMin);
+        aPMax.Parameter (aUMax, aVMax);
+
+        myBVHBoxSet->Add (
+          Extrema_GenExtPS_LocalizedSurf (aUMin, aUMax, aVMin, aVMax, aGridSet),
+          BVH_Box<Standard_Real, 3>());
       }
       U1 = U2 + 1;
       V1 = 1;
@@ -451,14 +493,14 @@ void Extrema_GenExtPS::BuildTree()
     const Standard_Integer aNbSets = myBVHBoxSet->Size();
     for (Standard_Integer iSet = 0; iSet < aNbSets; ++iSet)
     {
-      Handle (Extrema_GenExtPS_GridCellBoxSet) aGridSet = myBVHBoxSet->Element (iSet);
+      Extrema_GenExtPS_LocalizedSurf aGridSet = myBVHBoxSet->Element (iSet);
 
       // Box of the set
       Bnd_Box aSetBox;
-      const Standard_Integer aNbCells = aGridSet->Size();
+      const Standard_Integer aNbCells = aGridSet.CellBoxSet->Size();
       for (Standard_Integer iCell = 0; iCell < aNbCells; ++iCell)
       {
-        const GridCell& aCell = aGridSet->Element (iCell);
+        const Extrema_GenExtPS_GridCell& aCell = aGridSet.CellBoxSet->Element (iCell);
         Standard_Integer iU = aCell.UIndex, iV = aCell.VIndex;
 
         Standard_Integer aUCoeff = (iU < myNbUSamples) ? 1 : 0;
@@ -496,7 +538,7 @@ void Extrema_GenExtPS::BuildTree()
           //Standard_Real anAvSqExt = aSetBox.SquareExtent() / (aGridSet->Size() - 1);
           //aGridBox.Enlarge (Sqrt (anAvSqExt));
         }
-        aGridSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aGridBox));
+        aGridSet.CellBoxSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aGridBox));
 
         aSetBox.Add (aGridBox);
       }
@@ -653,10 +695,14 @@ Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
 {
   if (myBVHSet == NULL)
   {
-    Handle (Extrema_GenExtPS_GridCellBoxSet) aGridSet = myBVHBoxSet->Element (theIndex);
-    aGridSet->Build();
+    Extrema_GenExtPS_LocalizedSurf aGridSet = myBVHBoxSet->Element (theIndex);
+    if ((aGridSet.UMax < myLocUMin || aGridSet.UMin > myLocUMax) &&
+        (aGridSet.VMax < myLocVMin || aGridSet.VMin > myLocVMax))
+      return 0;
+
+    aGridSet.CellBoxSet->Build();
     // Set low-level BVH set for inner selection
-    SetBVHSet (aGridSet.get());
+    SetBVHSet (aGridSet.CellBoxSet.get());
     Standard_Integer aNb = Select();
     // Unset the inner set and continue with high level BVH traverse
     SetBVHSet (NULL);
@@ -664,7 +710,7 @@ Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
   }
   else
   {
-    GridCell aCell = myBVHSet->Element (theIndex);
+    Extrema_GenExtPS_GridCell aCell = myBVHSet->Element (theIndex);
     return FindSolution (aCell.UIndex, aCell.VIndex, myTarget);
   }
 }
@@ -677,12 +723,20 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
                                                  const Standard_Integer theNV,
                                                  const Extrema_ExtFlag theTarget)
 {
-
   // Fill corner points with square distance to myPoint
   Extrema_POnSurfParams& aParam00 = myPoints->ChangeValue (theNU, theNV);
   Extrema_POnSurfParams& aParam01 = myPoints->ChangeValue (theNU, theNV + 1);
   Extrema_POnSurfParams& aParam10 = myPoints->ChangeValue (theNU + 1, theNV);
   Extrema_POnSurfParams& aParam11 = myPoints->ChangeValue (theNU + 1, theNV + 1);
+
+  {
+    Standard_Real U1, U2, V1, V2;
+    aParam00.Parameter (U1, V1);
+    aParam11.Parameter (U2, V2);
+    if ((U2 < myLocUMin || U1 > myLocUMax) &&
+        (V2 < myLocVMin || V1 > myLocVMax))
+      return Standard_False;
+  }
 
   gp_Pnt aPoint (myPoint.x(), myPoint.y(), myPoint.z());
 

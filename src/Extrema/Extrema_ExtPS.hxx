@@ -100,6 +100,15 @@ public:
   //! initialized.
   Standard_EXPORT void Perform (const gp_Pnt& P);
   
+  //! Performs localized extrema search.
+  //! The solution to be found in the given parametric space, which
+  //! is required to be inside the initialized parametric space.
+  Standard_EXPORT void Perform (const gp_Pnt& P,
+                                const Standard_Real theLocUMin,
+                                const Standard_Real theLocUMax,
+                                const Standard_Real theLocVMin,
+                                const Standard_Real theLocVMax);
+
   //! Returns True if the distances are found.
   Standard_EXPORT Standard_Boolean IsDone() const;
   
@@ -152,6 +161,10 @@ private:
   Standard_Real myvsup;
   Standard_Real mytolu;
   Standard_Real mytolv;
+  Standard_Real myLocUMin; //!< Localized parametric space boundary (required to be inside the main parametric space)
+  Standard_Real myLocUMax; //!< Localized parametric space boundary (required to be inside the main parametric space)
+  Standard_Real myLocVMin; //!< Localized parametric space boundary (required to be inside the main parametric space)
+  Standard_Real myLocVMax; //!< Localized parametric space boundary (required to be inside the main parametric space)
   Standard_Real d11;
   Standard_Real d12;
   Standard_Real d21;

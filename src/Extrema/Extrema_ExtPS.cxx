@@ -112,25 +112,25 @@ void Extrema_ExtPS::TreatSolution (const Extrema_POnSurf& PS,
   Standard_Real U, V;
   PS.Parameter(U, V);
   if (myS->IsUPeriodic()) {
-    U = ElCLib::InPeriod(U, myuinf, myuinf + myS->UPeriod());
+    U = ElCLib::InPeriod(U, myLocUMin, myLocUMin + myS->UPeriod());
     
     // Handle trimmed surfaces.
-    if (U > myusup + mytolu)
+    if (U > myLocUMax + mytolu)
       U -= myS->UPeriod();
-    if (U < myuinf - mytolu)
+    if (U < myLocUMin - mytolu)
       U += myS->UPeriod();
   }
   if (myS->IsVPeriodic()) {
-    V = ElCLib::InPeriod(V, myvinf, myvinf + myS->VPeriod());
+    V = ElCLib::InPeriod(V, myLocVMin, myLocVMin + myS->VPeriod());
 
     // Handle trimmed surfaces.
-    if (V > myvsup + mytolv)
+    if (V > myLocVMax + mytolv)
       V -= myS->VPeriod();
-    if (V < myvinf - mytolv)
+    if (V < myLocVMin - mytolv)
       V += myS->VPeriod();
   }
-  if ((myuinf-U) <= mytolu && (U-myusup) <= mytolu &&
-      (myvinf-V) <= mytolv && (V-myvsup) <= mytolv) {
+  if ((myLocUMin-U) <= mytolu && (U-myLocUMax) <= mytolu &&
+      (myLocVMin-V) <= mytolv && (V-myLocVMax) <= mytolv) {
     myPoints.Append(Extrema_POnSurf (U, V, PS.Value()));
     mySqDist.Append(Val);
   }
@@ -237,6 +237,11 @@ void Extrema_ExtPS::Initialize (const Adaptor3d_Surface& theS,
   if (Precision::IsNegativeInfinite(myvinf)) myvinf = -1e10;
   if (Precision::IsPositiveInfinite(myvsup)) myvsup = 1e10;
 
+  myLocUMin = myuinf;
+  myLocUMax = myusup;
+  myLocVMin = myvinf;
+  myLocVMax = myvsup;
+
   mytolu = theTolU;
   mytolv = theTolV;
   mytype = myS->GetType();
@@ -272,11 +277,28 @@ void Extrema_ExtPS::Initialize (const Adaptor3d_Surface& theS,
 //function : Perform
 //purpose  : 
 //=======================================================================
+void Extrema_ExtPS::Perform (const gp_Pnt& thePoint)
+{
+  Perform (thePoint, myuinf, myusup, myvinf, myvsup);
+}
 
-void Extrema_ExtPS::Perform(const gp_Pnt& thePoint)
+//=======================================================================
+//function : Perform
+//purpose  : 
+//=======================================================================
+void Extrema_ExtPS::Perform (const gp_Pnt& thePoint,
+                             const Standard_Real theLocUMin,
+                             const Standard_Real theLocUMax,
+                             const Standard_Real theLocVMin,
+                             const Standard_Real theLocVMax)
 {
   myPoints.Clear();
   mySqDist.Clear();
+
+  myLocUMin = Max (theLocUMin, myuinf);
+  myLocUMax = Min (theLocUMax, myusup);
+  myLocVMin = Max (theLocVMin, myvinf);
+  myLocVMax = Min (theLocVMax, myvsup);
 
   switch (mytype)
   {
@@ -350,7 +372,7 @@ void Extrema_ExtPS::Perform(const gp_Pnt& thePoint)
 
     default:
     {
-      myExtPS->Perform (thePoint);
+      myExtPS->Perform (thePoint, myLocUMin, myLocUMax, myLocVMin, myLocVMax);
       myDone = myExtPS->IsDone();
       if (myDone)
       {

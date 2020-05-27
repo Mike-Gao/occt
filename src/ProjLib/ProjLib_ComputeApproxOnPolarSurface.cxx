@@ -95,6 +95,7 @@ struct aFuncStruct
   Handle(Adaptor3d_HSurface) mySurf; // Surface where to project.
   Handle(Adaptor3d_HCurve)   myCurve; // Curve to project.
   Handle(Adaptor2d_HCurve2d) myInitCurve2d; // Initial 2dcurve projection.
+  mutable Extrema_ExtPS myGlobExtPS; // Extrema initialized on whole parameter space of the surface
   Standard_Real mySqProjOrtTol; // Used to filter non-orthogonal projected point.
   Standard_Real myTolU;
   Standard_Real myTolV;
@@ -189,6 +190,73 @@ static Standard_Real anOrthogSqValue(const gp_Pnt& aBasePnt,
   Standard_Real aSecondPart = aSv.Dot(aBaseVec);
   return (aFirstPart * aFirstPart + aSecondPart * aSecondPart);
 }
+
+//=======================================================================
+//function : checkSolution
+//purpose  : checks if the current solution is better than initial point
+//=======================================================================
+static Standard_Boolean checkSolution (const Extrema_POnSurf& theSol,
+                                       const Standard_Real theProjSqDist,
+                                       const Handle(Adaptor3d_HSurface)& theSurf,
+                                       const Standard_Real theUPeriod,
+                                       const Standard_Real theVPeriod,
+                                       const Standard_Integer theNbU,
+                                       const Standard_Integer theNbV,
+                                       const gp_Pnt& thePoint,
+                                       const Standard_Real theProjTol,
+                                       const Standard_Real theDist,
+                                       gp_Pnt2d& thePOnSurf)
+{
+  Standard_Real U, V;
+  theSol.Parameter (U, V);
+  Standard_Real Dist2Min = anOrthogSqValue (thePoint, theSurf, U, V);
+  if (Dist2Min < theProjTol && // Point is projection.
+      theProjSqDist < theDist + Precision::SquareConfusion()) // Point better than initial.
+  {
+    thePOnSurf.SetXY (gp_XY (U - theNbU * theUPeriod, V - theNbV * theVPeriod));
+    return Standard_True;
+  }
+  return Standard_False;
+}
+
+//=======================================================================
+//function : checkSolution
+//purpose  : checks solutions found by extrema
+//=======================================================================
+static Standard_Boolean checkSolution (const Extrema_ExtPS& theExtrema,
+                                       const Handle(Adaptor3d_HSurface)& theSurf,
+                                       const Standard_Real theUPeriod,
+                                       const Standard_Real theVPeriod,
+                                       const Standard_Integer theNbU,
+                                       const Standard_Integer theNbV,
+                                       const gp_Pnt& thePoint,
+                                       const Standard_Real theProjTol,
+                                       const Standard_Real theDist,
+                                       gp_Pnt2d& theSolution)
+{
+  if (!theExtrema.IsDone() || !theExtrema.NbExt())
+    return Standard_False;
+
+  Standard_Real aDist2Min = RealLast();
+  Standard_Integer iGoodValue = -1;
+
+  for (Standard_Integer i = 1; i <= theExtrema.NbExt(); i++)
+  {
+    if (aDist2Min > theExtrema.SquareDistance(i))
+    {
+      aDist2Min = theExtrema.SquareDistance(i);
+      iGoodValue = i;
+    }
+  }
+
+  if (iGoodValue < 1)
+    return Standard_False;
+
+  return checkSolution (theExtrema.Point (iGoodValue), theExtrema.SquareDistance (iGoodValue),
+                        theSurf, theUPeriod, theVPeriod, theNbU, theNbV,
+                        thePoint, theProjTol, theDist, theSolution);
+}
+
 
 //=======================================================================
 //function : Value
@@ -298,10 +366,8 @@ static gp_Pnt2d Function_Value(const Standard_Real theU,
   }
 
   // Non-analytical case.
-  Standard_Real Dist2Min = RealLast();
   Standard_Real uperiod = theData.myPeriod[0],
-                vperiod = theData.myPeriod[1],
-                u, v;
+                vperiod = theData.myPeriod[1];
 
   // U0 and V0 are the points within the initialized period.
   if(U0 < Uinf)
@@ -379,36 +445,31 @@ static gp_Pnt2d Function_Value(const Standard_Real theU,
   locext.Perform(p, U0, V0);
   if (locext.IsDone()) 
   {
-    locext.Point().Parameter(u, v);
-    Dist2Min = anOrthogSqValue(p, theData.mySurf, u, v);
-    if (Dist2Min < theData.mySqProjOrtTol && // Point is projection.
-        locext.SquareDistance() < aSurfPntDist + Precision::SquareConfusion()) // Point better than initial.
+    gp_Pnt2d pnt;
+    if (checkSolution (locext.Point(), locext.SquareDistance(),
+                       theData.mySurf, uperiod, vperiod, decalU, decalV,
+                       p, theData.mySqProjOrtTol, aSurfPntDist, pnt))
     {
-      gp_Pnt2d pnt(u - decalU*uperiod,v - decalV*vperiod);
       return pnt;
     }
   }
 
-  // Perform whole param space search.
-  Extrema_ExtPS  ext(p, SurfLittle, theData.myTolU, theData.myTolV);
+  // Perform search on the whole parametric space using preinitialized extrema.
+  theData.myGlobExtPS.Perform (p, uInfLi, uSupLi, vInfLi, vSupLi);
+  gp_Pnt2d pnt;
+  if (checkSolution (theData.myGlobExtPS, theData.mySurf, uperiod, vperiod, decalU, decalV,
+                     p, theData.mySqProjOrtTol, aSurfPntDist, pnt))
+  {
+    return pnt;
+  }
+
+  // Perform search on the decreased parametric space.
+  Extrema_ExtPS  ext(p, SurfLittle, theData.myTolU, theData.myTolV, Extrema_ExtFlag_MIN);
   if (ext.IsDone() && ext.NbExt() >= 1)
   {
-    Dist2Min = ext.SquareDistance(1);
-    Standard_Integer GoodValue = 1;
-    for (Standard_Integer i = 2 ; i <= ext.NbExt() ; i++ )
+    if (checkSolution (ext, theData.mySurf, uperiod, vperiod, decalU, decalV,
+                       p, theData.mySqProjOrtTol, aSurfPntDist, pnt))
     {
-      if( Dist2Min > ext.SquareDistance(i))
-      {
-        Dist2Min = ext.SquareDistance(i);
-        GoodValue = i;
-      }
-    }
-    ext.Point(GoodValue).Parameter(u, v);
-    Dist2Min = anOrthogSqValue(p, theData.mySurf, u, v);
-    if (Dist2Min < theData.mySqProjOrtTol && // Point is projection.
-        ext.SquareDistance(GoodValue) < aSurfPntDist + Precision::SquareConfusion()) // Point better than initial.
-    {
-      gp_Pnt2d pnt(u - decalU*uperiod,v - decalV*vperiod);
       return pnt;
     }
   }
@@ -445,6 +506,14 @@ class ProjLib_PolarFunction : public AppCont_Function
     myStruct.mySqProjOrtTol = 10000.0 * Tol3d * Tol3d;
     myStruct.myTolU = Surf->UResolution(Tol3d);
     myStruct.myTolV = Surf->VResolution(Tol3d);
+
+    Standard_Real Uinf, Usup, Vinf, Vsup;
+    Uinf = Surf->Surface().FirstUParameter();
+    Usup = Surf->Surface().LastUParameter();
+    Vinf = Surf->Surface().FirstVParameter();
+    Vsup = Surf->Surface().LastVParameter();
+    myStruct.myGlobExtPS.Initialize (Surf->Surface(), Uinf, Usup, Vinf, Vsup, myStruct.myTolU, myStruct.myTolV);
+    myStruct.myGlobExtPS.SetFlag (Extrema_ExtFlag_MIN);
   }
 
   ~ProjLib_PolarFunction() {}
