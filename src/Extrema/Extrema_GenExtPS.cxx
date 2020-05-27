@@ -493,8 +493,8 @@ void Extrema_GenExtPS::BuildTree()
         else
         {
           // grid of a single point (myNbUSamples, myNbVSamples)
-          Standard_Real anAvSqExt = aSetBox.SquareExtent() / (aGridSet->Size() - 1);
-          aGridBox.Enlarge (Sqrt (anAvSqExt));
+          //Standard_Real anAvSqExt = aSetBox.SquareExtent() / (aGridSet->Size() - 1);
+          //aGridBox.Enlarge (Sqrt (anAvSqExt));
         }
         aGridSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aGridBox));
 
