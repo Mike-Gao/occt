@@ -19,9 +19,12 @@
 #include <Aspect_HatchStyle.hxx>
 #include <gp_Pln.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
+#include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_BndBox3d.hxx>
 #include <Graphic3d_CappingFlags.hxx>
+#include <Graphic3d_Mat4.hxx>
 #include <Graphic3d_TextureMap.hxx>
+#include <NCollection_Handle.hxx>
 #include <NCollection_Vec4.hxx>
 #include <Standard_Macro.hxx>
 #include <Standard_TypeDef.hxx>
@@ -222,7 +225,7 @@ public:
   //! Return capping aspect.
   //! @return capping surface rendering aspect.
   const Handle(Graphic3d_AspectFillArea3d)& CappingAspect() const { return myAspect; }
-
+ 
   //! Assign capping aspect.
   Standard_EXPORT void SetCappingAspect (const Handle(Graphic3d_AspectFillArea3d)& theAspect);
 
@@ -243,12 +246,22 @@ public:
   //! Flag indicating whether shader program for capping plane should be taken from object.
   //! Default value: FALSE.
   bool ToUseObjectShader() const { return (myFlags & Graphic3d_CappingFlags_ObjectShader) != 0; }
-
+ 
   //! Set flag for controlling the source of capping plane shader program.
   void SetUseObjectShader(bool theToUse) { setCappingFlag (theToUse, Graphic3d_CappingFlags_ObjectShader); }
-
+ 
   //! Return true if some fill area aspect properties should be taken from object.
   bool ToUseObjectProperties() const { return myFlags != Graphic3d_CappingFlags_None; }
+
+public:
+
+  //! Returns style used for drawing capping section.
+  //! @return capping surface rendering aspect.
+  const Handle(Graphic3d_AspectFillCapping)& CappingSectionStyle() const { return mySectionStyle; }
+
+  //! Sets clipping section filling aspect.
+  Standard_EXPORT void SetCappingSectionStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle);
+
 
 public:
 
@@ -389,12 +402,34 @@ public: // @name modification counters
   }
 
 private:
-
+ 
   //! Generate unique object id for OpenGL graphic resource manager.
   void makeId();
-
+ 
   //! Set capping flag.
   Standard_EXPORT void setCappingFlag (bool theToUse, int theFlag);
+
+public:
+
+  //! Flag indicating whether section style of the plane should overrides similar property of object presentation.
+  //! Default value: FALSE (use dedicated presentation aspect style).
+  bool ToOverrideCappingAspect() const { return myOverrideObjectStyle; }
+
+  //! Sets flag for controlling the preference of using section style between clip plane and object.
+  void SetToOverrideCappingAspect (const bool theToOverride) { myOverrideObjectStyle = theToOverride; }
+
+  //! Returns plane's orientation matrix.
+  Standard_EXPORT const Graphic3d_Mat4& OrientationMatrix() const;
+
+private:
+
+  //! Initializes plane and makes unique identifier (UID) to differentiate clipping plane entities.
+  void init (const gp_Pln& thePlane = gp_Pln(),
+             const Graphic3d_Vec4d& theEquationRev = Graphic3d_Vec4d(0.0, 0.0,-1.0, 0.0),
+             const Standard_Boolean theIsOn = Standard_True,
+             const Standard_Boolean theIsCapping = Standard_False,
+             const Standard_Boolean theOverrideStyle = Standard_False,
+             const Handle(Graphic3d_AspectFillCapping)& theStyle = Handle(Graphic3d_AspectFillCapping)());
 
   //! Update chain length in backward direction.
   void updateChainLen();
@@ -410,6 +445,7 @@ private:
 private:
 
   Handle(Graphic3d_AspectFillArea3d) myAspect;    //!< fill area aspect
+  Handle(Graphic3d_AspectFillCapping) mySectionStyle; //!< Style set for drawing capped solid section.
   Handle(Graphic3d_ClipPlane)   myNextInChain;    //!< next     plane in a chain of planes defining logical AND operation
   Graphic3d_ClipPlane*          myPrevInChain;    //!< previous plane in a chain of planes defining logical AND operation
   TCollection_AsciiString myId;                   //!< resource id
@@ -422,6 +458,9 @@ private:
   unsigned int            myAspectMod;            //!< modification counter of aspect
   Standard_Boolean        myIsOn;                 //!< state of the clipping plane
   Standard_Boolean        myIsCapping;            //!< state of graphic driver capping
+  Standard_Boolean        myOverrideObjectStyle;  //!< Flag forcing to use plane's section style rather than section style defined for object
+  mutable Standard_Boolean myOrientationDirty;     //!< Boolean flag indicating whether orientation matrix is dirty or not.
+  mutable Graphic3d_Mat4  myOrientationMat;       //!< Plane orientation matrix (for visualization purposes).
 
 };
 
