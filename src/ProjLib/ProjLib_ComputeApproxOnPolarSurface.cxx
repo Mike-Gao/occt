@@ -454,9 +454,9 @@ static gp_Pnt2d Function_Value(const Standard_Real theU,
     }
   }
 
+  gp_Pnt2d pnt;
   // Perform search on the whole parametric space using preinitialized extrema.
   theData.myGlobExtPS.Perform (p, uInfLi, uSupLi, vInfLi, vSupLi);
-  gp_Pnt2d pnt;
   if (checkSolution (theData.myGlobExtPS, theData.mySurf, uperiod, vperiod, decalU, decalV,
                      p, theData.mySqProjOrtTol, aSurfPntDist, pnt))
   {

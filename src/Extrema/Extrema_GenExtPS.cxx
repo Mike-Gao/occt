@@ -85,12 +85,12 @@ namespace
   //function : fillSqDist
   //purpose  : 
   //=======================================================================
-  static void fillSqDist (Extrema_POnSurfParams& theParams,
-                          const gp_Pnt& thePoint)
-  {
-    if (theParams.GetSqrDistance() < -0.5)
-      theParams.SetSqrDistance (theParams.Value().SquareDistance (thePoint));
-  }
+  //static void fillSqDist (Extrema_POnSurfParams& theParams,
+  //                        const gp_Pnt& thePoint)
+  //{
+  //  if (theParams.GetSqrDistance() < -0.5)
+  //    theParams.SetSqrDistance (theParams.Value().SquareDistance (thePoint));
+  //}
 
 }
 
@@ -282,8 +282,6 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
   {
     for (int iV = 0; iV <= myNbVSamples + 1; ++iV)
     {
-      myPoints->ChangeValue (iU, iV).SetSqrDistance (-1.);
-
       if (iU <= myNbUSamples && iV <= myNbVSamples)
         myFacePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
 
@@ -386,6 +384,7 @@ void Extrema_GenExtPS::BuildGrid()
   }
 
   myPoints = new Extrema_HArray2OfPOnSurfParams (0, myNbUSamples + 1, 0, myNbVSamples + 1);
+  gp_Pnt aPoint (myPoint.x(), myPoint.y(), myPoint.z());
 
   for (int iU = 1; iU <= myNbUSamples; iU++)
 : myumin(0.0),
@@ -406,7 +405,7 @@ void Extrema_GenExtPS::BuildGrid()
       Extrema_POnSurfParams aParam (U, V, aP);
       aParam.SetElementType (Extrema_Node);
       aParam.SetIndices (iU, iV);
-      aParam.SetSqrDistance (-1.);
+      aParam.SetSqrDistance (aP.SquareDistance (aPoint));
       myPoints->SetValue (iU, iV, aParam);
     }
   }
@@ -531,12 +530,6 @@ void Extrema_GenExtPS::BuildTree()
           {
             aGridBox.Enlarge (gp_Lin (aPMin.Value(), aDir).Distance (aPMid));
           }
-        }
-        else
-        {
-          // grid of a single point (myNbUSamples, myNbVSamples)
-          //Standard_Real anAvSqExt = aSetBox.SquareExtent() / (aGridSet->Size() - 1);
-          //aGridBox.Enlarge (Sqrt (anAvSqExt));
         }
         aGridSet.CellBoxSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aGridBox));
 
@@ -725,8 +718,6 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
 {
   // Fill corner points with square distance to myPoint
   Extrema_POnSurfParams& aParam00 = myPoints->ChangeValue (theNU, theNV);
-  Extrema_POnSurfParams& aParam01 = myPoints->ChangeValue (theNU, theNV + 1);
-  Extrema_POnSurfParams& aParam10 = myPoints->ChangeValue (theNU + 1, theNV);
   Extrema_POnSurfParams& aParam11 = myPoints->ChangeValue (theNU + 1, theNV + 1);
 
   {
@@ -740,14 +731,9 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
 
   gp_Pnt aPoint (myPoint.x(), myPoint.y(), myPoint.z());
 
-  fillSqDist (aParam00, aPoint);
-  fillSqDist (aParam01, aPoint);
-  fillSqDist (aParam10, aPoint);
-  fillSqDist (aParam11, aPoint);
-
   Standard_Boolean isFound = Standard_False;
-  if (theNU != myNbUSamples && theNV != myNbVSamples &&
-    (theTarget == Extrema_ExtFlag_MIN || theTarget == Extrema_ExtFlag_MINMAX))
+  if (theTarget == Extrema_ExtFlag_MIN && 
+      theNU != myNbUSamples && theNV != myNbVSamples)
   {
     // Find minimum
 
@@ -844,7 +830,7 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
     }
   }
 
-  if (theTarget == Extrema_ExtFlag_MAX || theTarget == Extrema_ExtFlag_MINMAX)
+  if (theTarget == Extrema_ExtFlag_MAX)
   {
     // Find maximum
     Extrema_POnSurfParams &aParam1 = myPoints->ChangeValue (theNU - 1, theNV - 1);
@@ -856,11 +842,17 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
     Extrema_POnSurfParams &aParam7 = myPoints->ChangeValue (theNU + 1, theNV);
     Extrema_POnSurfParams &aParam8 = myPoints->ChangeValue (theNU + 1, theNV + 1);
 
-    fillSqDist (aParam1, aPoint);
-    fillSqDist (aParam2, aPoint);
-    fillSqDist (aParam3, aPoint);
-    fillSqDist (aParam4, aPoint);
-    fillSqDist (aParam6, aPoint);
+    //if (myTarget != Extrema_ExtFlag_MINMAX)
+    //{
+    //  fillSqDist (aParam1, aPoint);
+    //  fillSqDist (aParam2, aPoint);
+    //  fillSqDist (aParam3, aPoint);
+    //  fillSqDist (aParam4, aPoint);
+    //  fillSqDist (aParam5, aPoint);
+    //  fillSqDist (aParam6, aPoint);
+    //  fillSqDist (aParam7, aPoint);
+    //  fillSqDist (aParam8, aPoint);
+    //}
 
     Standard_Real aDist = aParam00.GetSqrDistance();
 
@@ -939,8 +931,8 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
   Extrema_POnSurfParams& anEdgeParams = anEdgeParamsArr->ChangeValue (iU, iV);
   if (anEdgeParams.GetSqrDistance() < 0.0)
   {
-    fillSqDist (theParam0, thePoint);
-    fillSqDist (theParam1, thePoint);
+    //fillSqDist (theParam0, thePoint);
+    //fillSqDist (theParam1, thePoint);
 
     const Standard_Real aSqrDist01 =
       theParam0.Value().SquareDistance (theParam1.Value());
@@ -1024,6 +1016,14 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
     Extrema_POnSurfParams& aParam01 = myPoints->ChangeValue (theU, theV + 1);
     Extrema_POnSurfParams& aParam10 = myPoints->ChangeValue (theU + 1, theV);
     Extrema_POnSurfParams& aParam11 = myPoints->ChangeValue (theU + 1, theV + 1);
+
+    //if (myTarget != Extrema_ExtFlag_MINMAX)
+    //{
+    //  fillSqDist (aParam00, thePoint);
+    //  fillSqDist (aParam01, thePoint);
+    //  fillSqDist (aParam10, thePoint);
+    //  fillSqDist (aParam11, thePoint);
+    //}
 
     const Extrema_POnSurfParams &aUE0 =
       ComputeEdgeParameters (Standard_True, aParam00, aParam10, thePoint, aDiffTol);

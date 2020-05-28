@@ -57,8 +57,8 @@ void Extrema_FuncPSNorm::Initialize(const Adaptor3d_Surface& S)
 {
   myS = (Adaptor3d_SurfacePtr)&S;
   mySinit = Standard_True;
-  myPoint.Clear();
-  mySqDist.Clear();
+  myPoints.Clear();
+  mySqDistances.Clear();
   myTarget = Extrema_ExtFlag_MINMAX;
   myBestSqDistance = -1;
 }
@@ -72,8 +72,8 @@ void Extrema_FuncPSNorm::SetPoint (const gp_Pnt& P,
   myPinit = Standard_True;
   myTarget = theTarget;
   myBestSqDistance = (myTarget == Extrema_ExtFlag_MIN ? RealLast() : RealFirst());
-  myPoint.Clear();
-  mySqDist.Clear();
+  myPoints.Clear();
+  mySqDistances.Clear();
 }
 
 //=============================================================================
@@ -149,51 +149,52 @@ Standard_Integer Extrema_FuncPSNorm::GetStateNumber()
 
   // Comparison of solution with previous solutions
   Standard_Real tol2d = Precision::SquarePConfusion();
-  Standard_Integer i = 1, nbSol = mySqDist.Length();
-  for (; i <= nbSol; i++)
+  Standard_Integer i = 0, nbSol = mySqDistances.Length();
+  for (; i < nbSol; i++)
   {
     Standard_Real aU, aV;
-    myPoint (i).Parameter (aU, aV);
+    Extrema_POnSurf& aPOnSurf = myPoints (i);
+    aPOnSurf.Parameter (aU, aV);
     if (((myU - aU) * (myU - aU) + (myV - aV) * (myV - aV)) <= tol2d)
     {
       // The points are almost the same in the parametric space.
       if (myTarget != Extrema_ExtFlag_MINMAX)
       {
         // Check if new solution gives better distance than the existing solution.
-        Standard_Real& anOldSqDist = mySqDist (i);
+        Standard_Real& anOldSqDist = mySqDistances (i);
         if ((myTarget == Extrema_ExtFlag_MIN && aNewSqDist < anOldSqDist) ||
             (myTarget == Extrema_ExtFlag_MAX && aNewSqDist > anOldSqDist))
         {
-          myPoint (i) = Extrema_POnSurf (myU, myV, myPs);
+          aPOnSurf.SetParameters (myU, myV, myPs);
           anOldSqDist = aNewSqDist;
         }
       }
       break;
     }
   }
-  if (i <= nbSol)
+  if (i < nbSol)
     return 0;
-  mySqDist.Append (aNewSqDist);
-  myPoint.Append (Extrema_POnSurf (myU, myV, myPs));
+  mySqDistances.Append (aNewSqDist);
+  myPoints.Append (Extrema_POnSurf (myU, myV, myPs));
   return 0;
 }
 //=============================================================================
 
 Standard_Integer Extrema_FuncPSNorm::NbExt () const
 {
-  return mySqDist.Length();
+  return mySqDistances.Length();
 }
 //=============================================================================
 
 Standard_Real Extrema_FuncPSNorm::SquareDistance (const Standard_Integer N) const
 {
   if (!myPinit || !mySinit) throw Standard_TypeMismatch();
-  return mySqDist.Value(N);
+  return mySqDistances (N - 1);
 }
 //=============================================================================
 
 const Extrema_POnSurf& Extrema_FuncPSNorm::Point (const Standard_Integer N) const
 {
   if (!myPinit || !mySinit) throw Standard_TypeMismatch();
-  return myPoint.Value(N);
+  return myPoints (N - 1);
 }

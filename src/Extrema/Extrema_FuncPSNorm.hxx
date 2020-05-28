@@ -30,6 +30,7 @@
 #include <math_FunctionSetWithDerivatives.hxx>
 #include <Standard_Integer.hxx>
 #include <math_Vector.hxx>
+#include <NCollection_Vector.hxx>
 class Standard_OutOfRange;
 class gp_Pnt;
 class Adaptor3d_Surface;
@@ -122,8 +123,8 @@ private:
   Standard_Real myU;
   Standard_Real myV;
   gp_Pnt myPs;
-  TColStd_SequenceOfReal mySqDist;
-  Extrema_SequenceOfPOnSurf myPoint;
+  NCollection_Vector<Standard_Real> mySqDistances;
+  NCollection_Vector<Extrema_POnSurf> myPoints;
   Standard_Boolean myPinit;
   Standard_Boolean mySinit;
   Extrema_ExtFlag myTarget;
