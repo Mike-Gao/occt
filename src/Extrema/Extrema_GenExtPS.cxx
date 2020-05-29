@@ -80,18 +80,6 @@ namespace
     for (int NoU = 1; NoU <= theNbSamples; NoU++, U += PasU)
       theParams->SetValue (NoU, U);
   }
-
-  //=======================================================================
-  //function : fillSqDist
-  //purpose  : 
-  //=======================================================================
-  //static void fillSqDist (Extrema_POnSurfParams& theParams,
-  //                        const gp_Pnt& thePoint)
-  //{
-  //  if (theParams.GetSqrDistance() < -0.5)
-  //    theParams.SetSqrDistance (theParams.Value().SquareDistance (thePoint));
-  //}
-
 }
 
 //=======================================================================
@@ -252,7 +240,7 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
                                 const Standard_Real theVMax)
 {
   myIsDone = Standard_False;
-  myPoint = BVH_Vec3d (thePoint.X(), thePoint.Y(), thePoint.Z());
+  myPoint = thePoint;
   myF.SetPoint (thePoint, myTarget);
   mySolutions.clear();
 
@@ -282,6 +270,8 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
   {
     for (int iV = 0; iV <= myNbVSamples + 1; ++iV)
     {
+      myPoints->ChangeValue (iU, iV).SetSqrDistance (-1.);
+
       if (iU <= myNbUSamples && iV <= myNbVSamples)
         myFacePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
 
@@ -292,21 +282,6 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
         if (iV < myNbVSamples)
           myVEdgePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
       }
-    }
-  }
-
-  if (myTarget == Extrema_ExtFlag_MAX || myTarget == Extrema_ExtFlag_MINMAX)
-  {
-    for (int iV = 0; iV <= myNbVSamples + 1; ++iV)
-    {
-      myPoints->ChangeValue (0, iV).SetSqrDistance (-0.1);
-      myPoints->ChangeValue (myNbUSamples + 1, iV).SetSqrDistance (-0.1);
-    }
-
-    for (int iU = 1; iU <= myNbUSamples; ++iU)
-    {
-      myPoints->ChangeValue (iU, 0).SetSqrDistance (-0.1);
-      myPoints->ChangeValue (iU, myNbVSamples + 1).SetSqrDistance (-0.1);
     }
   }
 
@@ -328,6 +303,15 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
 
   if (myTarget == Extrema_ExtFlag_MINMAX)
   {
+    for (int iU = 1; iU <= myNbUSamples; ++iU)
+    {
+      for (int iV = 1; iV <= myNbVSamples; ++iV)
+      {
+        Extrema_POnSurfParams& aParam = myPoints->ChangeValue (iU, iV);
+        aParam.SetSqrDistance (aParam.Value().SquareDistance (thePoint));
+      }
+    }
+
     // Perform standard solution search (no tree)
     for (Standard_Integer iTarget = 0; iTarget < 2; ++iTarget)
     {
@@ -384,8 +368,6 @@ void Extrema_GenExtPS::BuildGrid()
   }
 
   myPoints = new Extrema_HArray2OfPOnSurfParams (0, myNbUSamples + 1, 0, myNbVSamples + 1);
-  gp_Pnt aPoint (myPoint.x(), myPoint.y(), myPoint.z());
-
   for (int iU = 1; iU <= myNbUSamples; iU++)
 : myumin(0.0),
   myusup(0.0),
@@ -405,7 +387,6 @@ void Extrema_GenExtPS::BuildGrid()
       Extrema_POnSurfParams aParam (U, V, aP);
       aParam.SetElementType (Extrema_Node);
       aParam.SetIndices (iU, iV);
-      aParam.SetSqrDistance (aP.SquareDistance (aPoint));
       myPoints->SetValue (iU, iV, aParam);
     }
   }
@@ -432,7 +413,7 @@ void Extrema_GenExtPS::BuildTree()
     // Builder for low-level BVH sets
     opencascade::handle<BVH_LinearBuilder<Standard_Real, 3> > aLBuilder = new BVH_LinearBuilder<Standard_Real, 3>();
 
-    myBVHBoxSet = new BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedSurf> (
+    myBVHBoxSet = new BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedGrid> (
       new BVH_LinearBuilder<Standard_Real, 3> (BVH_Constants_LeafNodeSizeSingle));
 
     // create hierarchy of BVH trees
@@ -462,24 +443,8 @@ void Extrema_GenExtPS::BuildTree()
             aGridSet->Add (Extrema_GenExtPS_GridCell (iU, iV), BVH_Box<Standard_Real, 3>());
           }
         }
+        myBVHBoxSet->Add (Extrema_GenExtPS_LocalizedGrid (U1, U2, V1, V2, aGridSet), BVH_Box<Standard_Real, 3>());
         V1 = V2 + 1;
-
-        Extrema_GenExtPS_GridCell aMinCell = aGridSet->Element (0);
-        Extrema_GenExtPS_GridCell aMaxCell = aGridSet->Element (aGridSet->Size() - 1);
-
-        Standard_Integer aUCoeff = (aMaxCell.UIndex < myNbUSamples) ? 1 : 0;
-        Standard_Integer aVCoeff = (aMaxCell.VIndex < myNbVSamples) ? 1 : 0;
-
-        const Extrema_POnSurf& aPMin = myPoints->Value (aMinCell.UIndex, aMinCell.VIndex);
-        const Extrema_POnSurf& aPMax = myPoints->Value (aMaxCell.UIndex + aUCoeff, aMaxCell.VIndex + aVCoeff);
-
-        Standard_Real aUMin, aUMax, aVMin, aVMax;
-        aPMin.Parameter (aUMin, aVMin);
-        aPMax.Parameter (aUMax, aVMax);
-
-        myBVHBoxSet->Add (
-          Extrema_GenExtPS_LocalizedSurf (aUMin, aUMax, aVMin, aVMax, aGridSet),
-          BVH_Box<Standard_Real, 3>());
       }
       U1 = U2 + 1;
       V1 = 1;
@@ -492,7 +457,7 @@ void Extrema_GenExtPS::BuildTree()
     const Standard_Integer aNbSets = myBVHBoxSet->Size();
     for (Standard_Integer iSet = 0; iSet < aNbSets; ++iSet)
     {
-      Extrema_GenExtPS_LocalizedSurf aGridSet = myBVHBoxSet->Element (iSet);
+      Extrema_GenExtPS_LocalizedGrid aGridSet = myBVHBoxSet->Element (iSet);
 
       // Box of the set
       Bnd_Box aSetBox;
@@ -638,8 +603,8 @@ Standard_Boolean Extrema_GenExtPS::RejectNode (const BVH_Vec3d& theCMin,
     return Standard_False;
 
   theDistance = (myTarget == Extrema_ExtFlag_MIN) ?
-    BVH_Tools<Standard_Real, 3>::PointBoxSquareDistance (myPoint, theCMin, theCMax) :
-    BVH_Tools<Standard_Real, 3>::PointBoxMaxSquareDistance (myPoint, theCMin, theCMax);
+    BVH_Tools<Standard_Real, 3>::PointBoxSquareDistance (BVH_Vec3d (myPoint.X(), myPoint.Y(), myPoint.Z()), theCMin, theCMax) :
+    BVH_Tools<Standard_Real, 3>::PointBoxMaxSquareDistance (BVH_Vec3d (myPoint.X(), myPoint.Y(), myPoint.Z()), theCMin, theCMax);
 
   return RejectMetric (theDistance);
 }
@@ -688,10 +653,32 @@ Standard_Boolean Extrema_GenExtPS::Accept (const Standard_Integer theIndex,
 {
   if (myBVHSet == NULL)
   {
-    Extrema_GenExtPS_LocalizedSurf aGridSet = myBVHBoxSet->Element (theIndex);
-    if ((aGridSet.UMax < myLocUMin || aGridSet.UMin > myLocUMax) &&
-        (aGridSet.VMax < myLocVMin || aGridSet.VMin > myLocVMax))
+    Extrema_GenExtPS_LocalizedGrid aGridSet = myBVHBoxSet->Element (theIndex);
+
+    Standard_Integer aUCoeff = (aGridSet.IdUMax < myNbUSamples) ? 1 : 0;
+    Standard_Integer aVCoeff = (aGridSet.IdVMax < myNbVSamples) ? 1 : 0;
+
+    const Extrema_POnSurf& aPMin = myPoints->Value (aGridSet.IdUMin, aGridSet.IdVMin);
+    const Extrema_POnSurf& aPMax = myPoints->Value (aGridSet.IdUMax + aUCoeff, aGridSet.IdVMax + aVCoeff);
+
+    Standard_Real aUMin, aUMax, aVMin, aVMax;
+    aPMin.Parameter (aUMin, aVMin);
+    aPMax.Parameter (aUMax, aVMax);
+
+    if ((aUMax < myLocUMin || aUMin > myLocUMax) &&
+        (aVMax < myLocVMin || aVMin > myLocVMax))
       return 0;
+
+    Standard_Integer idUMin = Max (1, aGridSet.IdUMin - 1), idUMax = Min (myNbUSamples, aGridSet.IdUMax + 1);
+    Standard_Integer idVMin = Max (1, aGridSet.IdVMin - 1), idVMax = Min (myNbVSamples, aGridSet.IdVMax + 1);
+    for (Standard_Integer iU = idUMin; iU <= idUMax; ++iU)
+    {
+      for (Standard_Integer iV = idVMin; iV <= idVMax; ++iV)
+      {
+        Extrema_POnSurfParams& aParam = myPoints->ChangeValue (iU, iV);
+        aParam.SetSqrDistance (aParam.Value().SquareDistance (myPoint));
+      }
+    }
 
     aGridSet.CellBoxSet->Build();
     // Set low-level BVH set for inner selection
@@ -717,8 +704,8 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
                                                  const Extrema_ExtFlag theTarget)
 {
   // Fill corner points with square distance to myPoint
-  Extrema_POnSurfParams& aParam00 = myPoints->ChangeValue (theNU, theNV);
-  Extrema_POnSurfParams& aParam11 = myPoints->ChangeValue (theNU + 1, theNV + 1);
+  const Extrema_POnSurfParams& aParam00 = myPoints->Value (theNU, theNV);
+  const Extrema_POnSurfParams& aParam11 = myPoints->Value (theNU + 1, theNV + 1);
 
   {
     Standard_Real U1, U2, V1, V2;
@@ -729,15 +716,13 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
       return Standard_False;
   }
 
-  gp_Pnt aPoint (myPoint.x(), myPoint.y(), myPoint.z());
-
   Standard_Boolean isFound = Standard_False;
   if (theTarget == Extrema_ExtFlag_MIN && 
       theNU != myNbUSamples && theNV != myNbVSamples)
   {
     // Find minimum
 
-    const Extrema_POnSurfParams& aParam = ComputeFaceParameters (theNU, theNV, aPoint);
+    const Extrema_POnSurfParams& aParam = ComputeFaceParameters (theNU, theNV);
 
     Standard_Boolean isMin = Standard_False;
     Extrema_ElementType anElemType = aParam.GetElementType();
@@ -773,7 +758,7 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
           (anElemType == Extrema_Node && (iU == 1 || iU == myNbUSamples)))
         {
           // Check the down face.
-          const Extrema_POnSurfParams &aDownParam = ComputeFaceParameters (theNU, theNV - 1, aPoint);
+          const Extrema_POnSurfParams &aDownParam = ComputeFaceParameters (theNU, theNV - 1);
 
           if (aDownParam.GetElementType() == anElemType)
           {
@@ -786,7 +771,7 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
           (anElemType == Extrema_Node && (iV == 1 || iV == myNbVSamples)))
         {
           // Check the right face.
-          const Extrema_POnSurfParams &aRightParam = ComputeFaceParameters (theNU - 1, theNV, aPoint);
+          const Extrema_POnSurfParams &aRightParam = ComputeFaceParameters (theNU - 1, theNV);
 
           if (aRightParam.GetElementType() == anElemType)
           {
@@ -802,9 +787,9 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
           isMin = Standard_True;
 
           const Extrema_POnSurfParams *anOtherParam[3] = {
-            &ComputeFaceParameters (theNU,     theNV - 1, aPoint),     // Down
-            &ComputeFaceParameters (theNU - 1, theNV - 1, aPoint),     // Lower-left
-            &ComputeFaceParameters (theNU - 1, theNV,     aPoint) };   // Left
+            &ComputeFaceParameters (theNU,     theNV - 1), // Down
+            &ComputeFaceParameters (theNU - 1, theNV - 1), // Lower-left
+            &ComputeFaceParameters (theNU - 1, theNV) };   // Left
 
           for (int i = 0; i < 3 && isMin; i++)
           {
@@ -833,26 +818,14 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Standard_Integer theNU,
   if (theTarget == Extrema_ExtFlag_MAX)
   {
     // Find maximum
-    Extrema_POnSurfParams &aParam1 = myPoints->ChangeValue (theNU - 1, theNV - 1);
-    Extrema_POnSurfParams &aParam2 = myPoints->ChangeValue (theNU - 1, theNV);
-    Extrema_POnSurfParams &aParam3 = myPoints->ChangeValue (theNU - 1, theNV + 1);
-    Extrema_POnSurfParams &aParam4 = myPoints->ChangeValue (theNU, theNV - 1);
-    Extrema_POnSurfParams &aParam5 = myPoints->ChangeValue (theNU, theNV + 1);
-    Extrema_POnSurfParams &aParam6 = myPoints->ChangeValue (theNU + 1, theNV - 1);
-    Extrema_POnSurfParams &aParam7 = myPoints->ChangeValue (theNU + 1, theNV);
-    Extrema_POnSurfParams &aParam8 = myPoints->ChangeValue (theNU + 1, theNV + 1);
-
-    //if (myTarget != Extrema_ExtFlag_MINMAX)
-    //{
-    //  fillSqDist (aParam1, aPoint);
-    //  fillSqDist (aParam2, aPoint);
-    //  fillSqDist (aParam3, aPoint);
-    //  fillSqDist (aParam4, aPoint);
-    //  fillSqDist (aParam5, aPoint);
-    //  fillSqDist (aParam6, aPoint);
-    //  fillSqDist (aParam7, aPoint);
-    //  fillSqDist (aParam8, aPoint);
-    //}
+    const Extrema_POnSurfParams &aParam1 = myPoints->Value (theNU - 1, theNV - 1);
+    const Extrema_POnSurfParams &aParam2 = myPoints->Value (theNU - 1, theNV);
+    const Extrema_POnSurfParams &aParam3 = myPoints->Value (theNU - 1, theNV + 1);
+    const Extrema_POnSurfParams &aParam4 = myPoints->Value (theNU, theNV - 1);
+    const Extrema_POnSurfParams &aParam5 = myPoints->Value (theNU, theNV + 1);
+    const Extrema_POnSurfParams &aParam6 = myPoints->Value (theNU + 1, theNV - 1);
+    const Extrema_POnSurfParams &aParam7 = myPoints->Value (theNU + 1, theNV);
+    const Extrema_POnSurfParams &aParam8 = myPoints->Value (theNU + 1, theNV + 1);
 
     Standard_Real aDist = aParam00.GetSqrDistance();
 
@@ -920,10 +893,9 @@ Standard_Boolean Extrema_GenExtPS::FindSolution (const Extrema_POnSurfParams &th
 //=======================================================================
 const Extrema_POnSurfParams& Extrema_GenExtPS::
   ComputeEdgeParameters (const Standard_Boolean IsUEdge,
-                         Extrema_POnSurfParams &theParam0,
-                         Extrema_POnSurfParams &theParam1,
-                         const gp_Pnt          &thePoint,
-                         const Standard_Real    theDiffTol)
+                         const Extrema_POnSurfParams& theParam0,
+                         const Extrema_POnSurfParams& theParam1,
+                         const Standard_Real theDiffTol)
 {
   const Handle (Extrema_HArray2OfPOnSurfParams)& anEdgeParamsArr = IsUEdge ? myUEdgePntParams : myVEdgePntParams;
   Standard_Integer iU, iV;
@@ -931,9 +903,6 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
   Extrema_POnSurfParams& anEdgeParams = anEdgeParamsArr->ChangeValue (iU, iV);
   if (anEdgeParams.GetSqrDistance() < 0.0)
   {
-    //fillSqDist (theParam0, thePoint);
-    //fillSqDist (theParam1, thePoint);
-
     const Standard_Real aSqrDist01 =
       theParam0.Value().SquareDistance (theParam1.Value());
 
@@ -964,7 +933,7 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
       else
       {
         // The shortest distance is inside the edge.
-        gp_XYZ aPoP (thePoint.XYZ().Subtracted (theParam0.Value().XYZ()));
+        gp_XYZ aPoP (myPoint.XYZ().Subtracted (theParam0.Value().XYZ()));
         gp_XYZ aPoP1 (theParam1.Value().XYZ().Subtracted (theParam0.Value().XYZ()));
         Standard_Real aRatio = aPoP.Dot (aPoP1) / aSqrDist01;
         Standard_Real aU[2];
@@ -987,7 +956,7 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
 
         anEdgeParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
         anEdgeParams.SetElementType (IsUEdge ? Extrema_UIsoEdge : Extrema_VIsoEdge);
-        anEdgeParams.SetSqrDistance (thePoint.SquareDistance (anEdgeParams.Value()));
+        anEdgeParams.SetSqrDistance (anEdgeParams.Value().SquareDistance (myPoint));
         anEdgeParams.SetIndices (iU, iV);
       }
     }
@@ -1002,8 +971,7 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
 //=======================================================================
 const Extrema_POnSurfParams& Extrema_GenExtPS::
   ComputeFaceParameters (const Standard_Integer theU,
-                         const Standard_Integer theV,
-                         const gp_Pnt& thePoint)
+                         const Standard_Integer theV)
 {
   Extrema_POnSurfParams& aFaceParams = myFacePntParams->ChangeValue (theU, theV);
   if (aFaceParams.GetSqrDistance() < 0.0)
@@ -1012,28 +980,20 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
     // No need to set it too small.
     const Standard_Real aDiffTol = myTolU + myTolV;
 
-    Extrema_POnSurfParams& aParam00 = myPoints->ChangeValue (theU, theV);
-    Extrema_POnSurfParams& aParam01 = myPoints->ChangeValue (theU, theV + 1);
-    Extrema_POnSurfParams& aParam10 = myPoints->ChangeValue (theU + 1, theV);
-    Extrema_POnSurfParams& aParam11 = myPoints->ChangeValue (theU + 1, theV + 1);
-
-    //if (myTarget != Extrema_ExtFlag_MINMAX)
-    //{
-    //  fillSqDist (aParam00, thePoint);
-    //  fillSqDist (aParam01, thePoint);
-    //  fillSqDist (aParam10, thePoint);
-    //  fillSqDist (aParam11, thePoint);
-    //}
+    const Extrema_POnSurfParams& aParam00 = myPoints->Value (theU, theV);
+    const Extrema_POnSurfParams& aParam01 = myPoints->Value (theU, theV + 1);
+    const Extrema_POnSurfParams& aParam10 = myPoints->Value (theU + 1, theV);
+    const Extrema_POnSurfParams& aParam11 = myPoints->Value (theU + 1, theV + 1);
 
     const Extrema_POnSurfParams &aUE0 =
-      ComputeEdgeParameters (Standard_True, aParam00, aParam10, thePoint, aDiffTol);
+      ComputeEdgeParameters (Standard_True, aParam00, aParam10, aDiffTol);
     const Extrema_POnSurfParams &aUE1 =
-      ComputeEdgeParameters (Standard_True, aParam01, aParam11, thePoint, aDiffTol);
+      ComputeEdgeParameters (Standard_True, aParam01, aParam11, aDiffTol);
 
     const Extrema_POnSurfParams &aVE0 =
-      ComputeEdgeParameters (Standard_False, aParam00, aParam01, thePoint, aDiffTol);
+      ComputeEdgeParameters (Standard_False, aParam00, aParam01, aDiffTol);
     const Extrema_POnSurfParams &aVE1 =
-      ComputeEdgeParameters (Standard_False, aParam10, aParam11, thePoint, aDiffTol);
+      ComputeEdgeParameters (Standard_False, aParam10, aParam11, aDiffTol);
 
     Standard_Real aSqrDist01 = aUE0.Value().SquareDistance (aUE1.Value());
     Standard_Real aDiffDist = Abs (aUE0.GetSqrDistance() - aUE1.GetSqrDistance());
@@ -1087,7 +1047,7 @@ const Extrema_POnSurfParams& Extrema_GenExtPS::
 
       aFaceParams.SetParameters (aUPar, aVPar, myS->Value (aUPar, aVPar));
       aFaceParams.SetElementType (Extrema_Face);
-      aFaceParams.SetSqrDistance (thePoint.SquareDistance (aFaceParams.Value()));
+      aFaceParams.SetSqrDistance (aFaceParams.Value().SquareDistance (myPoint));
       aFaceParams.SetIndices (theU, theV);
     }
   }

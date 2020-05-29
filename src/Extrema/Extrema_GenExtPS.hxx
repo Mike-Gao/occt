@@ -267,15 +267,13 @@ protected: //! @name Protected methods performing the job
   //! Compute new edge parameters.
   Standard_EXPORT const Extrema_POnSurfParams&
     ComputeFaceParameters (const Standard_Integer theU,
-                           const Standard_Integer theV,
-                           const gp_Pnt& thePoint);
+                           const Standard_Integer theV);
 
   //! Compute new edge parameters.
   Standard_EXPORT const Extrema_POnSurfParams&
     ComputeEdgeParameters (const Standard_Boolean IsUEdge,
-                           Extrema_POnSurfParams& theParam0,
-                           Extrema_POnSurfParams& theParam1,
-                           const gp_Pnt& thePoint,
+                           const Extrema_POnSurfParams& theParam0,
+                           const Extrema_POnSurfParams& theParam1,
                            const Standard_Real theDiffTol);
 
   //! Looks for the Min or Max Solution (depending on the given target).
@@ -346,31 +344,33 @@ protected: //! @name Auxiliary types
 
   //! Localized parametric space of surface on which the single
   //! BVH tree is built
-  struct Extrema_GenExtPS_LocalizedSurf
+  struct Extrema_GenExtPS_LocalizedGrid
   {
-    Standard_Real UMin;
-    Standard_Real UMax;
-    Standard_Real VMin;
-    Standard_Real VMax;
+    Standard_Integer IdUMin;
+    Standard_Integer IdUMax;
+    Standard_Integer IdVMin;
+    Standard_Integer IdVMax;
     Handle(Extrema_GenExtPS_GridCellBoxSet) CellBoxSet;
 
-    Extrema_GenExtPS_LocalizedSurf ()
-      : UMin (0.0), UMax (0.0), VMin (0.0), VMax (0.0), CellBoxSet (NULL)
+    Extrema_GenExtPS_LocalizedGrid ()
+      : IdUMin (0), IdUMax (0), IdVMin (0), IdVMax (0), CellBoxSet (NULL)
     {}
 
-    Extrema_GenExtPS_LocalizedSurf (const Standard_Real theUMin,
-                                    const Standard_Real theUMax,
-                                    const Standard_Real theVMin,
-                                    const Standard_Real theVMax,
+    Extrema_GenExtPS_LocalizedGrid (const Standard_Integer theUMin,
+                                    const Standard_Integer theUMax,
+                                    const Standard_Integer theVMin,
+                                    const Standard_Integer theVMax,
                                     const Handle(Extrema_GenExtPS_GridCellBoxSet)& theCellBoxSet)
-      : UMin (theUMin), UMax (theUMax), VMin (theVMin), VMax (theVMax), CellBoxSet (theCellBoxSet)
+      : IdUMin (theUMin), IdUMax (theUMax),
+        IdVMin (theVMin), IdVMax (theVMax),
+        CellBoxSet (theCellBoxSet)
     {}
   };
 
 protected: //! @name Fields
 
   // Inputs
-  NCollection_Vec3<Standard_Real> myPoint; //!< Point
+  gp_Pnt myPoint; //!< Point
   Adaptor3d_SurfacePtr myS; //!< Surface
   Extrema_FuncPSNorm myF;   //!< Function
 
@@ -404,7 +404,7 @@ protected: //! @name Fields
 
   Standard_Real mySqDistance; //!< Min/Max found square distance used in BVH tree traverse
   opencascade::handle 
-    <BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedSurf> > myBVHBoxSet; //!< High-level BVH of BVH organized grid cells
+    <BVH_IndexedBoxSet<Standard_Real, 3, Extrema_GenExtPS_LocalizedGrid> > myBVHBoxSet; //!< High-level BVH of BVH organized grid cells
 
   // Results
   std::vector <Extrema_GenExtPS_ExtPSResult> mySolutions; //!< Found solutions (sorted first by distance to target point,
