@@ -3,17 +3,28 @@
 #include "DocumentCommon.h"
 #include "View.h"
 
-#include <Standard_WarningsDisable.hxx>
+#include <QtGlobal>
+#include <QApplication>
 #include <QFrame>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QSplitter>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMessageBox>
-#include <QApplication>
-#include <QSignalMapper>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDir>
+#include <QFile>
+
+
+#include <Standard_WarningsDisable.hxx>
 #include <Standard_WarningsRestore.hxx>
+
 
 #include <Graphic3d_GraphicDriver.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -26,26 +37,66 @@ static QMdiArea* stWs = 0;
 
 ApplicationCommonWindow::ApplicationCommonWindow()
 : QMainWindow( 0 ),
+mySampleMapper(new QSignalMapper(this)),
 myNbDocuments( 0 ),
 myIsDocuments(false),
 myStdToolBar( 0 ),
 myCasCadeBar( 0 ),
 myFilePopup( 0 ),
 myWindowPopup( 0 ),
-myFileSeparator(NULL)
+myFileSeparator(nullptr)
 {
   stApp = this;
 
+  connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+          this, &ApplicationCommonWindow::onProcessSample);
+  
+  TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
+  mySamples.SetCodePach(aSampleSourcePach);
+
   // create and define the central widget
-  QFrame* vb = new QFrame( this );
+//  QFrame* aFrame = new QFrame( this );
 
-  QVBoxLayout *layout = new QVBoxLayout( vb );
-  layout->setMargin( 0 );
+  QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
+  QTextEdit* a3dView = new QTextEdit;
+  aGeomTextSplitter->addWidget(a3dView);
 
-  vb->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-  stWs = new QMdiArea( vb );
-  layout->addWidget( stWs );
-  setCentralWidget( vb );
+  QSplitter* aCodeResultSplitter = new QSplitter(Qt::Vertical);
+  aGeomTextSplitter->addWidget(aCodeResultSplitter);
+
+  myCodeView = new QTextEdit;
+  myCodeView->setReadOnly(true);
+  aCodeResultSplitter->addWidget(myCodeView);
+
+  myResultView = new QTextEdit;
+  myCodeView->setReadOnly(true);
+  aCodeResultSplitter->addWidget(myResultView);
+
+  setCentralWidget(aGeomTextSplitter);
+  aGeomTextSplitter->resize(900, 600);
+  aGeomTextSplitter->show();
+
+  Q_INIT_RESOURCE(Samples);
+  QFile aJsonFile(":/menus/Geometry.json");
+  bool b1 = aJsonFile.exists();
+  aJsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+  bool b2 = aJsonFile.exists();
+  QString aJsonString = aJsonFile.readAll();
+  aJsonFile.close();  
+
+  QJsonDocument aJsonDoc = QJsonDocument::fromJson(aJsonString.toUtf8());
+  if (aJsonDoc.isObject())
+  {
+    QJsonObject aJsonObj = aJsonDoc.object();
+    foreach(const QString& aKey, aJsonObj.keys()) 
+    {
+      QJsonValue aJsonValue = aJsonObj.value(aKey);
+      if (aJsonValue.isObject())
+      {
+        mySamplePopups.push_back(MenuFromJsonObject(aJsonValue.toObject(), aKey, this));
+      }
+    }
+  }
 
   createStandardOperations();
   createCasCadeOperations();
@@ -60,68 +111,32 @@ ApplicationCommonWindow::~ApplicationCommonWindow()
 
 void ApplicationCommonWindow::createStandardOperations()
 {
-  QPixmap newIcon, helpIcon, closeIcon;
+  QAction* fileNewAction = CreateAction(&ApplicationCommonWindow::onNewDoc, "new", "CTRL+N", "new.png");
+  myStdActions.insert(FileNewId, fileNewAction);
 
-  QString dir = getResourceDir() + QString( "/" );
+  QAction* fileCloseAction = CreateAction(&ApplicationCommonWindow::onCloseWindow, "close", "CTRL+W", "close.png");
+  myStdActions.insert(FileCloseId, fileCloseAction);
 
-  newIcon = QPixmap( dir + QObject::tr("ICON_NEW") );
-  helpIcon = QPixmap( dir + QObject::tr("ICON_HELP") );
-  closeIcon = QPixmap( dir + QObject::tr("ICON_CLOSE") );
-
-  QAction * fileNewAction, * fileCloseAction, * filePrefUseVBOAction,
-          * fileQuitAction, * viewToolAction, * viewStatusAction, * helpAboutAction;
-
-  fileNewAction = new QAction( newIcon, QObject::tr("MNU_NEW"), this );
-  fileNewAction->setToolTip( QObject::tr("TBR_NEW") );
-  fileNewAction->setStatusTip( QObject::tr("TBR_NEW") );
-  fileNewAction->setShortcut( QObject::tr("CTRL+N") );
-  connect( fileNewAction, SIGNAL( triggered() ) , this, SLOT( onNewDoc() ) );
-  myStdActions.insert( FileNewId, fileNewAction );
-
-  fileCloseAction = new QAction( closeIcon, QObject::tr("MNU_CLOSE"), this );
-  fileCloseAction->setToolTip( QObject::tr("TBR_CLOSE") );
-  fileCloseAction->setStatusTip( QObject::tr("TBR_CLOSE") );
-  fileCloseAction->setShortcut( QObject::tr("CTRL+W") );
-  connect( fileCloseAction, SIGNAL( triggered() ) , this, SLOT( onCloseWindow() ) );
-  myStdActions.insert( FileCloseId, fileCloseAction );
-
-  filePrefUseVBOAction = new QAction( QObject::tr("MNU_USE_VBO"), this );
-  filePrefUseVBOAction->setToolTip( QObject::tr("TBR_USE_VBO") );
-  filePrefUseVBOAction->setStatusTip( QObject::tr("TBR_USE_VBO") );
+  QAction* filePrefUseVBOAction = CreateAction(&ApplicationCommonWindow::onUseVBO, "Use VBO");
   filePrefUseVBOAction->setCheckable( true );
   filePrefUseVBOAction->setChecked( true );
-  connect( filePrefUseVBOAction, SIGNAL( triggered() ) , this, SLOT( onUseVBO() ) );
   myStdActions.insert( FilePrefUseVBOId, filePrefUseVBOAction );
 
-  fileQuitAction = new QAction( QObject::tr("MNU_QUIT"), this );
-  fileQuitAction->setToolTip( QObject::tr("TBR_QUIT") );
-  fileQuitAction->setStatusTip( QObject::tr("TBR_QUIT") );
-  fileQuitAction->setShortcut( QObject::tr("CTRL+Q") );
-  connect( fileQuitAction, SIGNAL( triggered() ) , qApp, SLOT( closeAllWindows() ) );
+  QAction* fileQuitAction = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "quit", "CTRL+Q", "quit.png");
   myStdActions.insert( FileQuitId, fileQuitAction );
 
-  viewToolAction = new QAction( QObject::tr("MNU_TOOL_BAR"), this );
-  viewToolAction->setToolTip( QObject::tr("TBR_TOOL_BAR") );
-  viewToolAction->setStatusTip( QObject::tr("TBR_TOOL_BAR") );
-  connect( viewToolAction, SIGNAL( triggered() ) , this, SLOT( onViewToolBar() ));
+  QAction* viewToolAction = CreateAction(&ApplicationCommonWindow::onViewToolBar, "Toolbar");
   viewToolAction->setCheckable( true );
   viewToolAction->setChecked( true );
   myStdActions.insert( ViewToolId, viewToolAction );
 
-  viewStatusAction = new QAction( QObject::tr("MNU_STATUS_BAR"), this );
-  viewStatusAction->setToolTip( QObject::tr("TBR_STATUS_BAR") );
-  viewStatusAction->setStatusTip( QObject::tr("TBR_STATUS_BAR") );
-  connect( viewStatusAction, SIGNAL( triggered() ), this, SLOT( onViewStatusBar() ));
+  QAction* viewStatusAction = CreateAction(&ApplicationCommonWindow::onViewStatusBar, "Statusbar");
   viewStatusAction->setCheckable( true );
   viewStatusAction->setChecked( true );
   myStdActions.insert( ViewStatusId, viewStatusAction );
 
-  helpAboutAction = new QAction( helpIcon, QObject::tr("MNU_ABOUT"), this );
-  helpAboutAction->setToolTip( QObject::tr( "TBR_ABOUT" ) );
-  helpAboutAction->setStatusTip( QObject::tr( "TBR_ABOUT" ) );
-  helpAboutAction->setShortcut( QObject::tr( "F1" ) );
-  connect( helpAboutAction, SIGNAL( triggered() ) , this, SLOT( onAbout() ) );
-  myStdActions.insert( HelpAboutId, helpAboutAction );
+  QAction* helpAboutAction = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", "help.png");
+  myStdActions.insert(HelpAboutId, helpAboutAction);
 
   // create preferences menu
   QMenu* aPrefMenu = new QMenu( QObject::tr("MNU_PREFERENCES") );
@@ -143,6 +158,11 @@ void ApplicationCommonWindow::createStandardOperations()
   view = menuBar()->addMenu( QObject::tr("MNU_VIEW") );
   view->addAction( viewToolAction );
   view->addAction( viewStatusAction );
+
+  foreach(QMenu* aSampleMenu, mySamplePopups)
+  {
+    menuBar()->addMenu(aSampleMenu);
+  }
 
   // add a help menu
   QMenu * help = new QMenu( this );
@@ -170,40 +190,22 @@ void ApplicationCommonWindow::createCasCadeOperations()
   QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
   QAction* a;
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_WIRE") ), QObject::tr("MNU_TOOL_WIRE"), this );
-  a->setToolTip( QObject::tr("TBR_TOOL_WIRE") );
-  a->setStatusTip( QObject::tr("TBR_TOOL_WIRE") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onToolAction() ) );
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Wireframe", "", "tool_wireframe.png");
   myToolActions.insert( ToolWireframeId, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_SHAD") ), QObject::tr("MNU_TOOL_SHAD"), this );
-  a->setToolTip( QObject::tr("TBR_TOOL_SHAD") );
-  a->setStatusTip( QObject::tr("TBR_TOOL_SHAD") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onToolAction() ) );
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Shading", "", "tool_shading.png");
   myToolActions.insert( ToolShadingId, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_COLOR") ), QObject::tr("MNU_TOOL_COLOR"), this );
-  a->setToolTip( QObject::tr("TBR_TOOL_COLOR") );
-  a->setStatusTip( QObject::tr("TBR_TOOL_COLOR") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onToolAction() ) );
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Color", "", "tool_color.png");
   myToolActions.insert( ToolColorId, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_MATER") ), QObject::tr("MNU_TOOL_MATER"), this );
-  a->setToolTip( QObject::tr("TBR_TOOL_MATER") );
-  a->setStatusTip( QObject::tr("TBR_TOOL_MATER") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onToolAction() ) );
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Material", "", "tool_material.png");
   myToolActions.insert( ToolMaterialId, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_TRANS") ), QObject::tr("MNU_TOOL_TRANS"), this );
-  a->setToolTip( QObject::tr("TBR_TOOL_TRANS") );
-  a->setStatusTip( QObject::tr("TBR_TOOL_TRANS") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onToolAction() ) );
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Transparency", "", "tool_transparency.png");
   myToolActions.insert( ToolTransparencyId, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_DEL") ), QObject::tr("MNU_TOOL_DEL"), this );
-  a->setToolTip( QObject::tr("TBR_TOOL_DEL") );
-  a->setStatusTip( QObject::tr("TBR_TOOL_DEL") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onToolAction() ) );
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Delete", "", "tool_delete.png");
   myToolActions.insert( ToolDeleteId, a );
 
   QSignalMapper* sm = new QSignalMapper( this );
@@ -593,23 +595,44 @@ QString ApplicationCommonWindow::getResourceDir()
   return aResourceDir;
 }
 
-QAction* ApplicationCommonWindow::CreateAction(const char* theHandlerMethod, 
+TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
+{
+  TCollection_AsciiString aSampleSourceDir = OSD_Environment ("CSF_SampleSources").Value();
+  return aSampleSourceDir;
+}
+
+
+template <typename PointerToMemberFunction>
+QAction* ApplicationCommonWindow::CreateAction(PointerToMemberFunction theHandlerMethod,
                                                const char* theActionName, 
                                                const char* theShortcut, 
                                                const char* theIconName)
 {
-  QString dir = getResourceDir() + QString("/");
-
-  QPixmap aIcon = QPixmap(getResourceDir() + "" + theIconName);
-  QAction* aAction = new QAction(aIcon, QObject::tr(theActionName), this);
+  QAction* aAction(NULL);
+  if (theIconName)
+  {
+    QPixmap aIcon = QPixmap(getResourceDir() + QString("/") + theIconName);
+    aAction = new QAction(aIcon, QObject::tr(theActionName), this);
+  }
+  else
+  {
+    aAction = new QAction(QObject::tr(theActionName), this);
+  }
   aAction->setToolTip(QObject::tr(theActionName));
   aAction->setStatusTip(QObject::tr(theActionName));
-  aAction->setShortcut(QObject::tr(theShortcut));
-  connect(aAction, SIGNAL(triggered()), this, SLOT(theHandlerMethod));
+  aAction->setShortcut(QString(theShortcut));
+  connect(aAction, &QAction::triggered, this, theHandlerMethod);
   return aAction;
 }
 
-
+template <typename PointerToMemberFunction>
+QAction* ApplicationCommonWindow::CreateSample(PointerToMemberFunction theHandlerMethod,
+                                                     const char* theActionName)
+{
+  QAction* aAction = new QAction(QObject::tr(theActionName), this);
+  connect(aAction, &QAction::triggered, this, theHandlerMethod);
+  return aAction;
+}
 
 void ApplicationCommonWindow::resizeEvent( QResizeEvent* e )
 {
@@ -635,4 +658,53 @@ QAction* ApplicationCommonWindow::getFileSeparator()
 QToolBar* ApplicationCommonWindow::getCasCadeBar()
 {
   return myCasCadeBar;
+}
+
+void ApplicationCommonWindow::SimpleAction()
+{
+  QMessageBox msgBox;
+  msgBox.setText("Test.");
+  msgBox.exec();
+}
+
+void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
+{
+  mySamples.Process(theSampleName.toUtf8().data());
+  if (mySamples.IsProcessed())
+  {
+    myCodeView->setPlainText(mySamples.GetCode().ToCString());
+    myResultView->setPlainText(mySamples.GetResult().ToCString());
+  }
+}
+
+QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent)
+{
+    QMenu* aMenu = new QMenu(theKey, theParent);
+    if (theJsonValue.isObject())
+    {
+      QJsonObject aBranchObject = theJsonValue.toObject();
+      foreach(const QString& aBranchKey, aBranchObject.keys())
+      {        
+        aMenu->addMenu(MenuFromJsonObject(aBranchObject.value(aBranchKey), aBranchKey, aMenu));
+      }
+
+    }
+    else if (theJsonValue.isArray())
+    {
+      QJsonArray aDataArray = theJsonValue.toArray();
+      for(const QJsonValue& aDataValue: aDataArray)
+      {
+        if (aDataValue.isObject())
+        {
+          QJsonObject aDataObject = aDataValue.toObject();
+          QString aSampleName = aDataObject["class"].toString();
+          QAction* aAction = aMenu->addAction(aSampleName);
+
+          mySampleMapper->setMapping(aAction, aSampleName);
+          connect(aAction, &QAction::triggered, mySampleMapper, 
+                  static_cast<void (QSignalMapper::*)()>(&QSignalMapper::map));
+         }
+      }
+    }
+    return aMenu;
 }
