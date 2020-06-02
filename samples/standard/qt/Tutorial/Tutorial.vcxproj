@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\Common\src;..\Interface\src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\Common\src;..\Interface\src;..\..\samples_src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>win64\vc14\objd\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -209,6 +209,7 @@ C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORT
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\BaseSample.hxx" />
     <ClInclude Include="..\..\samples_src\ComcreteSample.hxx" />
+    <ClInclude Include="..\Common\src\CommonSample.h" />
     <CustomBuild Include="..\Common\src\DocumentCommon.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\DocumentCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
@@ -414,6 +415,26 @@ C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORT
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_predefs.h;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <ClCompile Include="debug\qrc_Samples.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\qrc_Samples.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\samples_src\Geometry.json" />
+    <CustomBuild Include="..\..\samples_src\Samples.qrc">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Geometry.json;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o debug\qrc_Samples.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RCC ../../samples_src/Samples.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\qrc_Samples.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Geometry.json;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o release\qrc_Samples.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RCC ../../samples_src/Samples.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\qrc_Samples.cpp;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

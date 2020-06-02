@@ -3,15 +3,21 @@
 
 #include "DocumentCommon.h"
 
-#include <Standard_WarningsDisable.hxx>
+#include "BaseSample.hxx"
+
+
+#include <QApplication>
 #include <QMainWindow>
 #include <QAction>
 #include <QToolBar>
 #include <QMenu>
 #include <QMdiArea>
+#include <QTextEdit>
 #include <QList>
-#include <Standard_WarningsRestore.hxx>
+#include <QSignalMapper>
 
+#include <Standard_WarningsRestore.hxx>
+#include <Standard_WarningsDisable.hxx>
 
 class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
 {
@@ -24,55 +30,70 @@ public:
   ApplicationCommonWindow();
   ~ApplicationCommonWindow();
 
-	static QMdiArea*              getWorkspace();
+	static QMdiArea*                getWorkspace();
 	static ApplicationCommonWindow* getApplication();
 	static QString                  getResourceDir();
+  static TCollection_AsciiString  getSampleSourceDir();
 
-	virtual void                     updateFileActions();
-  QList<QAction*>*                 getToolActions();
-  QList<QAction*>*                 getMaterialActions();
+	virtual void     updateFileActions();
+  QList<QAction*>* getToolActions();
+  QList<QAction*>* getMaterialActions();
 	
 protected:
-  virtual DocumentCommon*          createNewDocument();
-  int&                             getNbDocument();
+  virtual DocumentCommon* createNewDocument();
+  int&                    getNbDocument();
 
 public slots:
 	
-  DocumentCommon*                 onNewDoc();
-  void                            onCloseWindow();
-  void                            onUseVBO();
-	virtual void                    onCloseDocument( DocumentCommon* theDoc );
-  virtual void                    onSelectionChanged();
-  virtual void                    onAbout();
-  void                            onViewToolBar();
-	void                            onViewStatusBar();
-  void                            onToolAction();
-	void                            onCreateNewView();
-  void                            onWindowActivated ( QWidget * w );
-	void                            windowsMenuAboutToShow();
-  void                            windowsMenuActivated( bool checked/*int id*/ );
-	void                            onSetMaterial( int theMaterial );
+  DocumentCommon* onNewDoc();
+  void            onCloseWindow();
+  void            onUseVBO();
+	virtual void    onCloseDocument( DocumentCommon* theDoc );
+  virtual void    onSelectionChanged();
+  virtual void    onAbout();
+  void            onViewToolBar();
+	void            onViewStatusBar();
+  void            onToolAction();
+	void            onCreateNewView();
+  void            onWindowActivated ( QWidget * w );
+	void            windowsMenuAboutToShow();
+  void            windowsMenuActivated( bool checked/*int id*/ );
+	void            onSetMaterial( int theMaterial );
 
 protected:
-  QAction*                        CreateAction(const char* theHandlerMethod,
-                                               const char* theActionName,
-                                               const char* theShortcut,
-                                               const char* theIconName);
+  template <typename PointerToMemberFunction>
+  QAction* CreateAction(PointerToMemberFunction theHandlerMethod,
+                        const char* theActionName,
+                        const char* theShortcut = NULL,
+                        const char* theIconName = NULL);
 
-  virtual void                    resizeEvent( QResizeEvent* );
-  bool                            isDocument();
-  QMenu*                          getFilePopup();
-  QAction*                        getFileSeparator();
-  QToolBar*                       getCasCadeBar();
+  template <typename PointerToMemberFunction>
+  QAction* CreateSample(PointerToMemberFunction theHandlerMethod,
+                        const char* theActionName);
 
+  virtual void  resizeEvent( QResizeEvent* );
+  bool          isDocument();
+  QMenu*        getFilePopup();
+  QAction*      getFileSeparator();
+  QToolBar*     getCasCadeBar();
+
+  QMenu* MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent);
+
+private slots:
+  void onCloseAllWindows() { qApp->closeAllWindows(); }
+
+  void onProcessSample(const QString& theSampleName);
+  void SimpleAction();
 private:
-	void                            createStandardOperations();
-	void                            createCasCadeOperations();
-	void                            createWindowPopup();
+	void createStandardOperations();
+	void createCasCadeOperations();
+	void createWindowPopup();
 
 private:
   int                             myNbDocuments;
 	bool                            myIsDocuments;
+
+  BaseSample mySamples;
 
 	QList<QAction*>                 myStdActions;
   QList<QAction*>                 myToolActions;
@@ -83,6 +104,12 @@ private:
 	QToolBar*                       myCasCadeBar;
 	QMenu*                          myFilePopup;
 	QMenu*                          myWindowPopup;
+
+  QList<QMenu*> mySamplePopups;
+  QSignalMapper* mySampleMapper;
+  QTextEdit* myCodeView;
+  QTextEdit* myResultView;
+
   QAction*                        myFileSeparator;
 
 protected:

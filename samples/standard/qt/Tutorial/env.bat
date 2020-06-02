@@ -9,4 +9,6 @@ set "RES_DIR=%~dp0win%ARCH%\%VCVER%\res"
 set "CSF_ResourcesDefaults=%RES_DIR%"
 set "CSF_TutorialResourcesDefaults=%RES_DIR%"
 
+set "CSF_SampleSources=%~dp0..\..\samples_src"
+
 set "PATH=%QTDIR%/bin;%PATH%"

@@ -15,6 +15,8 @@ SOURCES   = src/*.cxx \
             $${SAMPLESROOT}/../samples_src/*.cxx \
             $${SAMPLESROOT}/Common/src/*.cxx \
             $${SAMPLESROOT}/Interface/src/*.cxx
+			
+RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc
 
 TS_FILES  = $${SAMPLESROOT}/Common/src/Common-icon.ts \
             $${SAMPLESROOT}/Common/src/Common-string.ts \

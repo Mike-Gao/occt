@@ -30,7 +30,7 @@ public:
 	void                           fitAll();
 	
 protected:
-  virtual MDIWindow*                   createNewMDIWindow();
+  virtual MDIWindow*             createNewMDIWindow();
 
 signals:
   void                           selectionChanged();

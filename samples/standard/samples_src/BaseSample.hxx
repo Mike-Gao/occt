@@ -6,25 +6,40 @@
 #include <Standard_Transient.hxx>
 #include <NCollection_Vector.hxx>
 #include <AIS_InteractiveObject.hxx>
-#include <NCollection_String.hxx>
+#include <TCollection_AsciiString.hxx>
 #include <Standard_Handle.hxx>
 
 
-class BaseSample : public Standard_Transient 
+class BaseSample 
 {
 public:
-	virtual void Process() = 0;
-	Standard_Boolean IsProcessed();
-	NCollection_Vector<Handle(AIS_InteractiveObject) > Get2dObject();
-	NCollection_Vector<Handle(AIS_InteractiveObject) > Get3dObject();
-	NCollection_Vector<NCollection_String> GetResult();
-	NCollection_Vector<NCollection_String> GetCode();
-protected:
-	int mySampleName;
-	NCollection_Vector<Handle(AIS_InteractiveObject) > myObject2d;
-	NCollection_Vector<Handle(AIS_InteractiveObject) > myObject3d;
-	NCollection_Vector<NCollection_String> myResult;
-	static NCollection_String CODE_PATH;
+
+
+	Standard_Boolean                                  IsProcessed();
+  NCollection_Vector<Handle(AIS_InteractiveObject)> Get2dObject();
+  NCollection_Vector<Handle(AIS_InteractiveObject)> Get3dObject();
+  TCollection_AsciiString                           GetResult();
+  TCollection_AsciiString                           GetCode();
+
+  void Process(TCollection_AsciiString theSampleName);
+  void SetCodePach(TCollection_AsciiString theSampleSourcePach);
+
+private:
+  void TraceError(TCollection_AsciiString theErrorMessage);
+  void FindSourceCode(TCollection_AsciiString theSampleName);
+
+  // One function for every sample
+  void ZeroDimensionObjects3dSample();
+  void Vectors3dSample();
+
+
+private:
+  Standard_Boolean                                  myIsProcessed;
+	NCollection_Vector<Handle(AIS_InteractiveObject)> myObject2d;
+  NCollection_Vector<Handle(AIS_InteractiveObject)> myObject3d;
+  TCollection_AsciiString                           myResult;
+  TCollection_AsciiString                           myCode;
+	TCollection_AsciiString                           myCodePath;
 };
 
 #endif  //BASESAMPLE_H
