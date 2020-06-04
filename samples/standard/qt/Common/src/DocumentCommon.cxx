@@ -83,42 +83,42 @@ MDIWindow* DocumentCommon::createNewMDIWindow()
 
 void DocumentCommon::onCreateNewView()
 {
-  QMdiArea* ws = myApp->getWorkspace();
-  MDIWindow* w = createNewMDIWindow();
-  
-  if (!w)
-    return;
+  //QMdiArea* ws = myApp->getWorkspace();
+  //MDIWindow* w = createNewMDIWindow();
+  //
+  //if (!w)
+  //  return;
 
-  ws->addSubWindow (w);
-  myViews.append (w);
+  //ws->addSubWindow (w);
+  //myViews.append (w);
 
-  connect( w,    SIGNAL( selectionChanged() ),
-           this, SIGNAL( selectionChanged() ) );
-  connect( w, SIGNAL( message( const QString&, int ) ),
-           myApp->statusBar(), SLOT( showMessage( const QString&, int ) ) );
-  connect( w, SIGNAL( sendCloseView( MDIWindow* ) ),
-           this, SLOT( onCloseView( MDIWindow* ) ) );
+  //connect( w,    SIGNAL( selectionChanged() ),
+  //         this, SIGNAL( selectionChanged() ) );
+  //connect( w, SIGNAL( message( const QString&, int ) ),
+  //         myApp->statusBar(), SLOT( showMessage( const QString&, int ) ) );
+  //connect( w, SIGNAL( sendCloseView( MDIWindow* ) ),
+  //         this, SLOT( onCloseView( MDIWindow* ) ) );
 
-  QString aName;
-  w->setWindowTitle( aName.sprintf( "Document %d:%d", myIndex, ++myNbViews ) );
-  QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
-  
-  w->setWindowIcon( QPixmap( dir + QObject::tr("ICON_DOC") ) );
+  //QString aName;
+  //w->setWindowTitle( aName.sprintf( "Document %d:%d", myIndex, ++myNbViews ) );
+  //QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
+  //
+  //w->setWindowIcon( QPixmap( dir + QObject::tr("ICON_DOC") ) );
 
-  if ( ws->subWindowList().isEmpty() )
-  {
-    // Due to strange Qt4.2.3 feature the child window icon is not drawn
-    // in the main menu if showMaximized() is called for a non-visible child window
-    // Therefore calling show() first...
-    w->show();
-    w->showMaximized();
-  }
-  else
-    w->show();
+  //if ( ws->subWindowList().isEmpty() )
+  //{
+  //  // Due to strange Qt4.2.3 feature the child window icon is not drawn
+  //  // in the main menu if showMaximized() is called for a non-visible child window
+  //  // Therefore calling show() first...
+  //  w->show();
+  //  w->showMaximized();
+  //}
+  //else
+  //  w->show();
 
-  w->setFocus();
+  //w->setFocus();
 
-  getApplication()->onSelectionChanged();
+  //getApplication()->onSelectionChanged();
 }
 
 void DocumentCommon::onCloseView(MDIWindow* theView)

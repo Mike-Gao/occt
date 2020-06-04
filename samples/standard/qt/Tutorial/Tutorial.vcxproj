@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\Common\src;..\Interface\src;..\..\samples_src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\src;..\Common\src;..\Interface\src;..\..\samples_src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>win64\vc14\objd\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -147,6 +147,7 @@
     <ClCompile Include="src\Main.cxx" />
     <ClCompile Include="src\MakeBottle.cxx" />
     <ClCompile Include="..\Common\src\Material.cxx" />
+    <ClCompile Include="src\OcctHighlighter.cxx" />
     <ClCompile Include="..\Common\src\OcctWindow.cxx" />
     <ClCompile Include="..\Interface\src\Translate.cxx" />
     <ClCompile Include="..\Common\src\Transparency.cxx" />
@@ -207,8 +208,8 @@ C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORT
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/ApplicationTut.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_ApplicationTut.cpp;%(Outputs)</Outputs>
     </CustomBuild>
-    <ClInclude Include="..\..\samples_src\BaseSample.hxx" />
-    <ClInclude Include="..\..\samples_src\ComcreteSample.hxx" />
+    <ClInclude Include="..\..\samples_src\BaseSample.h" />
+    <ClInclude Include="..\..\samples_src\ComcreteSample.h" />
     <ClInclude Include="..\Common\src\CommonSample.h" />
     <CustomBuild Include="..\Common\src\DocumentCommon.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Common\src\DocumentCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
@@ -282,6 +283,24 @@ if errorlevel 1 goto VCEnd
 C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\Common\src\Material.h -o win64\vc14\moc\moc_Material.cpp</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../Common/src/Material.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Material.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="src\OcctHighlighter.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\OcctHighlighter.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\OcctHighlighter.h -o win64\vc14\mocd\moc_OcctHighlighter.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/OcctHighlighter.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\OcctHighlighter.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\OcctHighlighter.h -o win64\vc14\moc\moc_OcctHighlighter.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/OcctHighlighter.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\Common\src\OcctWindow.h" />
     <CustomBuild Include="..\Interface\src\Translate.h">
@@ -380,6 +399,12 @@ C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORT
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_Material.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\moc\moc_OcctHighlighter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win64\vc14\mocd\moc_OcctHighlighter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_Translate.cpp">

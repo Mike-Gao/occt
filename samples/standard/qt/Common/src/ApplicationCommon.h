@@ -3,8 +3,8 @@
 
 #include "DocumentCommon.h"
 
-#include "BaseSample.hxx"
-
+#include "BaseSample.h"
+#include "OcctHighlighter.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -48,7 +48,7 @@ public slots:
   DocumentCommon* onNewDoc();
   void            onCloseWindow();
   void            onUseVBO();
-	virtual void    onCloseDocument( DocumentCommon* theDoc );
+//	virtual void    onCloseDocument( DocumentCommon* theDoc );
   virtual void    onSelectionChanged();
   virtual void    onAbout();
   void            onViewToolBar();
@@ -109,11 +109,14 @@ private:
   QSignalMapper* mySampleMapper;
   QTextEdit* myCodeView;
   QTextEdit* myResultView;
+  OcctHighlighter* myCodeViewHighlighter;
+
+  View*                      myView;
 
   QAction*                        myFileSeparator;
 
 protected:
-  QList<DocumentCommon*>          myDocuments;
+  DocumentCommon*          myDocument;
 };
 
 #endif
