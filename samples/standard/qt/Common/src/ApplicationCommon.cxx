@@ -55,17 +55,55 @@ myFileSeparator(nullptr)
   mySamples.SetCodePach(aSampleSourcePach);
 
   // create and define the central widget
-//  QFrame* aFrame = new QFrame( this );
+
 
   QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
   QTextEdit* a3dView = new QTextEdit;
-  aGeomTextSplitter->addWidget(a3dView);
+
+
+  //QFrame *vb = new QFrame(this);
+
+  //QVBoxLayout *layout = new QVBoxLayout(vb);
+  //layout->setMargin(0);
+
+  //vb->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+
+//  setCentralWidget(vb);
+
+  myDocument = onNewDoc();
+  myView = new View(myDocument->getContext(), aGeomTextSplitter);
+//  layout->addWidget(myView);
+
+  //connect(myView, SIGNAL(selectionChanged()),
+  //  this, SIGNAL(selectionChanged()));
+
+  //createViewActions();
+  //createRaytraceActions();
+
+  resize(sizeHint());
+
+  setFocusPolicy(Qt::StrongFocus);
+
+
+  aGeomTextSplitter->addWidget(myView);
 
   QSplitter* aCodeResultSplitter = new QSplitter(Qt::Vertical);
   aGeomTextSplitter->addWidget(aCodeResultSplitter);
 
   myCodeView = new QTextEdit;
   myCodeView->setReadOnly(true);
+
+  QFont aCodeViewFonf;
+  aCodeViewFonf.setFamily("Courier");
+  aCodeViewFonf.setFixedPitch(true);
+  aCodeViewFonf.setPointSize(10);
+  myCodeView->setFont(aCodeViewFonf);
+
+  myCodeViewHighlighter = new OcctHighlighter(myCodeView->document());
+
+
+
+
   aCodeResultSplitter->addWidget(myCodeView);
 
   myResultView = new QTextEdit;
@@ -175,9 +213,9 @@ void ApplicationCommonWindow::createStandardOperations()
   myStdToolBar->addAction( fileNewAction );
   myStdToolBar->addAction( helpAboutAction );
 
-  myStdActions.at(FileCloseId)->setEnabled(myDocuments.count() > 0);
+//  myStdActions.at(FileCloseId)->setEnabled(myDocuments.count() > 0);
 
-  myStdActions.at(FilePrefUseVBOId)->setEnabled( true );
+//  myStdActions.at(FilePrefUseVBOId)->setEnabled( true );
 }
 
 void ApplicationCommonWindow::createCasCadeOperations()
@@ -352,52 +390,47 @@ ApplicationCommonWindow* ApplicationCommonWindow::getApplication()
 
 void ApplicationCommonWindow::updateFileActions()
 {
-  if (!myDocuments.isEmpty())
-  {
-    return;
-  }
+  //if ( !myIsDocuments )
+  //{
+  //  QAction* fileQuitAction = NULL;
+  //  QAction* windowAction = NULL;
+  //  QList<QAction *> aListActions = myFilePopup->actions();
+  //  for ( int i = 0; i < aListActions.size(); i++ )
+  //  {
+  //    if( aListActions.at( i )->text() == QObject::tr("MNU_QUIT") )
+  //    {
+  //      fileQuitAction = aListActions.at( i );
+  //      break;
+  //    }
+  //  }
+  //      
+  //  if( !fileQuitAction )
+  //    return;
+  //    
+  //  myIsDocuments = true;
+  //  myCasCadeBar->show();
 
-  if ( !myIsDocuments )
-  {
-    QAction* fileQuitAction = NULL;
-    QAction* windowAction = NULL;
-    QList<QAction *> aListActions = myFilePopup->actions();
-    for ( int i = 0; i < aListActions.size(); i++ )
-    {
-      if( aListActions.at( i )->text() == QObject::tr("MNU_QUIT") )
-      {
-        fileQuitAction = aListActions.at( i );
-        break;
-      }
-    }
-        
-    if( !fileQuitAction )
-      return;
-      
-    myIsDocuments = true;
-    myCasCadeBar->show();
+  //  QList<QAction *> aListMenuActions = menuBar()->actions();
+  //  for ( int i = 0; i < aListMenuActions.size(); i++ )
+  //  {
+  //    if( aListMenuActions.at( i )->text() == QObject::tr("MNU_HELP") )
+  //    {
+  //        windowAction= aListMenuActions.at( i );
+  //        break;
+  //    }
+  //  }
 
-    QList<QAction *> aListMenuActions = menuBar()->actions();
-    for ( int i = 0; i < aListMenuActions.size(); i++ )
-    {
-      if( aListMenuActions.at( i )->text() == QObject::tr("MNU_HELP") )
-      {
-          windowAction= aListMenuActions.at( i );
-          break;
-      }
-    }
+  //  if( !windowAction )
+  //    return;
 
-    if( !windowAction )
-      return;
-
-    menuBar()->insertMenu( windowAction, myWindowPopup );
-  }
-  else
-  {
-    myIsDocuments = false;
-    myCasCadeBar->hide();
-    menuBar()->removeAction( myWindowPopup->menuAction() );
-  }
+  //  menuBar()->insertMenu( windowAction, myWindowPopup );
+  //}
+  //else
+  //{
+  //  myIsDocuments = false;
+  //  myCasCadeBar->hide();
+  //  menuBar()->removeAction( myWindowPopup->menuAction() );
+  //}
 }
 
 DocumentCommon* ApplicationCommonWindow::createNewDocument()
@@ -425,8 +458,8 @@ DocumentCommon* ApplicationCommonWindow::onNewDoc()
   connect (aDoc, SIGNAL (selectionChanged()),
            this, SLOT (onSelectionChanged()));
   
-  myDocuments.append (aDoc);
-  myStdActions.at (FileCloseId)->setEnabled (myDocuments.count() > 0);
+//  myDocuments.append (aDoc);
+//  myStdActions.at (FileCloseId)->setEnabled (myDocuments.count() > 0);
   
   return aDoc;
 }
@@ -457,14 +490,14 @@ void ApplicationCommonWindow::onUseVBO()
   }
 }
 
-void ApplicationCommonWindow::onCloseDocument(DocumentCommon* theDoc)
-{
-  myDocuments.removeAll( theDoc );
-  theDoc->removeViews();
-  delete theDoc;
-  updateFileActions();
-  myStdActions.at(FileCloseId)->setEnabled(myDocuments.count() > 0);
-}
+//void ApplicationCommonWindow::onCloseDocument(DocumentCommon* theDoc)
+//{
+//  myDocuments.removeAll( theDoc );
+//  theDoc->removeViews();
+//  delete theDoc;
+//  updateFileActions();
+//  myStdActions.at(FileCloseId)->setEnabled(myDocuments.count() > 0);
+//}
 
 void ApplicationCommonWindow::onViewToolBar()
 {
@@ -539,43 +572,43 @@ void ApplicationCommonWindow::onToolAction()
 
 void ApplicationCommonWindow::onSelectionChanged()
 {
-  QMdiArea* ws = ApplicationCommonWindow::getWorkspace();
-    DocumentCommon* doc;
+  //QMdiArea* ws = ApplicationCommonWindow::getWorkspace();
+  //DocumentCommon* doc;
 
-  if( !qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() ) )
-    return;
+  //if( !qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() ) )
+  //  return;
 
-  doc = ( qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() ) )->getDocument();
-  Handle(AIS_InteractiveContext) context = doc->getContext();
+  //doc = ( qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() ) )->getDocument();
+  //Handle(AIS_InteractiveContext) context = doc->getContext();
 
-  bool OneOrMoreInShading = false;
-  bool OneOrMoreInWireframe = false;
-  int numSel = context->NbSelected();
-  if ( numSel )
-  {
-    for ( context->InitSelected(); context->MoreSelected(); context->NextSelected() )
-    {
-      if ( context->IsDisplayed( context->SelectedInteractive(), 1 ) )
-        OneOrMoreInShading = true;
-      if ( context->IsDisplayed( context->SelectedInteractive(), 0 ) )
-        OneOrMoreInWireframe = true;
-    }
-    myToolActions.at( ToolWireframeId )->setEnabled( OneOrMoreInShading );
-    myToolActions.at( ToolShadingId )->setEnabled( OneOrMoreInWireframe );
-    myToolActions.at( ToolColorId )->setEnabled( true );
-    myToolActions.at( ToolMaterialId )->setEnabled( true );
-    myToolActions.at( ToolTransparencyId )->setEnabled( OneOrMoreInShading );
-    myToolActions.at( ToolDeleteId )->setEnabled( true );
-  }
-  else
-  {
-    myToolActions.at( ToolWireframeId )->setEnabled( false );
-    myToolActions.at( ToolShadingId )->setEnabled( false );
-    myToolActions.at( ToolColorId )->setEnabled( false );
-    myToolActions.at( ToolMaterialId )->setEnabled( false );
-    myToolActions.at( ToolTransparencyId )->setEnabled( false );
-    myToolActions.at( ToolDeleteId )->setEnabled( false );
-  }
+  //bool OneOrMoreInShading = false;
+  //bool OneOrMoreInWireframe = false;
+  //int numSel = context->NbSelected();
+  //if ( numSel )
+  //{
+  //  for ( context->InitSelected(); context->MoreSelected(); context->NextSelected() )
+  //  {
+  //    if ( context->IsDisplayed( context->SelectedInteractive(), 1 ) )
+  //      OneOrMoreInShading = true;
+  //    if ( context->IsDisplayed( context->SelectedInteractive(), 0 ) )
+  //      OneOrMoreInWireframe = true;
+  //  }
+  //  myToolActions.at( ToolWireframeId )->setEnabled( OneOrMoreInShading );
+  //  myToolActions.at( ToolShadingId )->setEnabled( OneOrMoreInWireframe );
+  //  myToolActions.at( ToolColorId )->setEnabled( true );
+  //  myToolActions.at( ToolMaterialId )->setEnabled( true );
+  //  myToolActions.at( ToolTransparencyId )->setEnabled( OneOrMoreInShading );
+  //  myToolActions.at( ToolDeleteId )->setEnabled( true );
+  //}
+  //else
+  //{
+  //  myToolActions.at( ToolWireframeId )->setEnabled( false );
+  //  myToolActions.at( ToolShadingId )->setEnabled( false );
+  //  myToolActions.at( ToolColorId )->setEnabled( false );
+  //  myToolActions.at( ToolMaterialId )->setEnabled( false );
+  //  myToolActions.at( ToolTransparencyId )->setEnabled( false );
+  //  myToolActions.at( ToolDeleteId )->setEnabled( false );
+  //}
 }
 
 void ApplicationCommonWindow::onSetMaterial( int theMaterial )
@@ -674,6 +707,10 @@ void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
   {
     myCodeView->setPlainText(mySamples.GetCode().ToCString());
     myResultView->setPlainText(mySamples.GetResult().ToCString());
+    for (const Handle(AIS_InteractiveObject) aObject : mySamples.Get3dObject())
+    {
+      myDocument->getContext()->Display(aObject, Standard_False);
+    }
   }
 }
 

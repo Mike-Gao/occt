@@ -90,22 +90,22 @@ void ApplicationWindow::createTranslatePopups()
 
 void ApplicationWindow::updateFileActions()
 {
-  if ( myDocuments.isEmpty() )
-  {
-    if ( !isDocument() )
-    {
-      getFilePopup()->insertMenu( getFileSeparator(), myExportPopup );
-	    getFilePopup()->insertMenu( myExportPopup->menuAction(), myImportPopup );
-      mySeparator = getFilePopup()->insertSeparator( myImportPopup->menuAction() );
-	  }
-    else
-    {
-	    getFilePopup()->removeAction( myImportPopup->menuAction() );
-	    getFilePopup()->removeAction( myExportPopup->menuAction() );
-	    getFilePopup()->removeAction( mySeparator );
-	  }
-  }
-  ApplicationCommonWindow::updateFileActions();
+  //if ( myDocuments.isEmpty() )
+  //{
+  //  if ( !isDocument() )
+  //  {
+  //    getFilePopup()->insertMenu( getFileSeparator(), myExportPopup );
+	 //   getFilePopup()->insertMenu( myExportPopup->menuAction(), myImportPopup );
+  //    mySeparator = getFilePopup()->insertSeparator( myImportPopup->menuAction() );
+	 // }
+  //  else
+  //  {
+	 //   getFilePopup()->removeAction( myImportPopup->menuAction() );
+	 //   getFilePopup()->removeAction( myExportPopup->menuAction() );
+	 //   getFilePopup()->removeAction( mySeparator );
+	 // }
+  //}
+  //ApplicationCommonWindow::updateFileActions();
 }
 
 void ApplicationWindow::onImport()

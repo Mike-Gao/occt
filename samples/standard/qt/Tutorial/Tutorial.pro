@@ -7,7 +7,7 @@ TARGET = Tutorial
 SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
 
 HEADERS   = src/*.h \
-            $${SAMPLESROOT}/../samples_src/*.hxx \
+            $${SAMPLESROOT}/../samples_src/*.h \
             $${SAMPLESROOT}/Common/src/*.h \
             $${SAMPLESROOT}/Interface/src/*.h
 

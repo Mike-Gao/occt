@@ -1,7 +1,7 @@
 
 
 
-#include "ComcreteSample.hxx"
+#include "ComcreteSample.h"
 
 void ComcreteSample::Process() 
 {
