@@ -22,13 +22,21 @@
 #include "CommonSample.h"
 #include "View.h"
 
+enum class StdActions
+{
+  FileNewId, FilePrefUseVBOId, FileCloseId, FilePreferencesId, FileQuitId, ViewToolId, ViewStatusId, HelpAboutId
+};
+enum class ToolActions
+{
+  ToolWireframeId, ToolShadingId, ToolColorId, ToolMaterialId, ToolTransparencyId, ToolDeleteId
+};
+
 class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
 {
     Q_OBJECT
 
 public:
-	enum { FileNewId, FilePrefUseVBOId, FileCloseId, FilePreferencesId, FileQuitId, ViewToolId, ViewStatusId, HelpAboutId };
-  enum { ToolWireframeId, ToolShadingId, ToolColorId, ToolMaterialId, ToolTransparencyId, ToolDeleteId };
+
 
   ApplicationCommonWindow();
   ~ApplicationCommonWindow();
@@ -37,8 +45,8 @@ public:
 	static QString                  getResourceDir();
   static TCollection_AsciiString  getSampleSourceDir();
 
-  QList<QAction*>* getToolActions();
-  QList<QAction*>* getMaterialActions();
+  QAction* getToolAction(ToolActions theActionId);
+  QList<QAction*> getMaterialActions();
 	
 protected:
   virtual DocumentCommon* createNewDocument();
@@ -80,12 +88,13 @@ private:
 private:
   BaseSample mySamples;
 
-	QList<QAction*>  myStdActions;
-  QList<QAction*>  myToolActions;
-  QList<QAction*>  myMaterialActions;
+	QMap<StdActions,               QAction*>  myStdActions;
+  QMap<ToolActions,              QAction*>  myToolActions;
+  QMap<Graphic3d_NameOfMaterial, QAction*>  myMaterialActions;
 
 	QToolBar*        myStdToolBar;
 	QToolBar*        myCasCadeBar;
+	QToolBar*        myViewBar;
 	QMenu*           myFilePopup;
 
   QList<QMenu*>    mySamplePopups;

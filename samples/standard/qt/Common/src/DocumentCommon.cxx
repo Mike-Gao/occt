@@ -106,7 +106,9 @@ void DocumentCommon::onColor()
 {
     QColor aColor ;
     myContext->InitSelected();
-    Handle(AIS_InteractiveObject) Current = myContext->SelectedInteractive() ;
+    Handle(AIS_InteractiveObject) Current = myContext->SelectedInteractive();
+    if (!Current)
+      return;
     if ( Current->HasColor () )
     {
         Quantity_Color aShapeColor;
