@@ -50,10 +50,9 @@ Handle(V3d_Viewer) DocumentCommon::Viewer (const Standard_ExtString ,
   return aViewer;
 }
 
-DocumentCommon::DocumentCommon( const int theIndex, ApplicationCommonWindow* app )
+DocumentCommon::DocumentCommon(ApplicationCommonWindow* app )
 : QObject( app ),
 myApp( app ),
-myIndex( theIndex ),
 myNbViews( 0 )
 {
   TCollection_ExtendedString a3DName ("Visu3D");
@@ -75,90 +74,14 @@ ApplicationCommonWindow* DocumentCommon::getApplication()
   return myApp;
 }
 
-MDIWindow* DocumentCommon::createNewMDIWindow()
-{
-  QMdiArea* ws = myApp->getWorkspace();
-  return new MDIWindow (this, ws, 0);
-}
-
-void DocumentCommon::onCreateNewView()
-{
-  //QMdiArea* ws = myApp->getWorkspace();
-  //MDIWindow* w = createNewMDIWindow();
-  //
-  //if (!w)
-  //  return;
-
-  //ws->addSubWindow (w);
-  //myViews.append (w);
-
-  //connect( w,    SIGNAL( selectionChanged() ),
-  //         this, SIGNAL( selectionChanged() ) );
-  //connect( w, SIGNAL( message( const QString&, int ) ),
-  //         myApp->statusBar(), SLOT( showMessage( const QString&, int ) ) );
-  //connect( w, SIGNAL( sendCloseView( MDIWindow* ) ),
-  //         this, SLOT( onCloseView( MDIWindow* ) ) );
-
-  //QString aName;
-  //w->setWindowTitle( aName.sprintf( "Document %d:%d", myIndex, ++myNbViews ) );
-  //QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
-  //
-  //w->setWindowIcon( QPixmap( dir + QObject::tr("ICON_DOC") ) );
-
-  //if ( ws->subWindowList().isEmpty() )
-  //{
-  //  // Due to strange Qt4.2.3 feature the child window icon is not drawn
-  //  // in the main menu if showMaximized() is called for a non-visible child window
-  //  // Therefore calling show() first...
-  //  w->show();
-  //  w->showMaximized();
-  //}
-  //else
-  //  w->show();
-
-  //w->setFocus();
-
-  //getApplication()->onSelectionChanged();
-}
-
-void DocumentCommon::onCloseView(MDIWindow* theView)
-{
-    removeView(theView);
-    if( countOfWindow() == 0 )
-        emit sendCloseDocument( this );
-}
-
-void DocumentCommon::removeView(MDIWindow* theView)
-{
-    if ( myViews.count( theView ) )
-    {
-    myViews.removeAll(theView);
-    delete theView;
-  }
-}
-void DocumentCommon::removeViews()
-{
-  while( myViews.count() )
-  {
-    removeView( myViews.first() );
-  }
-}
-
-int DocumentCommon::countOfWindow()
-{
-  return myViews.count();
-}
-
 Handle(AIS_InteractiveContext) DocumentCommon::getContext()
 {
   return myContext;
 }
 
-void DocumentCommon::fitAll()
+void DocumentCommon::ClearContext()
 {
-  QList<MDIWindow*>::iterator i;
-  for ( i = myViews.begin(); i != myViews.end(); i++ )
-    (*i)->fitAll();
+  myContext->EraseAll(Standard_True);
 }
 
 void DocumentCommon::onWireframe()
@@ -167,7 +90,6 @@ void DocumentCommon::onWireframe()
     for( myContext->InitSelected(); myContext->MoreSelected(); myContext->NextSelected() )
         myContext->SetDisplayMode( myContext->SelectedInteractive(), 0, false );
     myContext->UpdateCurrentViewer();
-    getApplication()->onSelectionChanged();
     QApplication::restoreOverrideCursor();
 }
 
@@ -177,7 +99,6 @@ void DocumentCommon::onShading()
     for( myContext->InitSelected(); myContext->MoreSelected(); myContext->NextSelected() )
         myContext->SetDisplayMode( myContext->SelectedInteractive(), 1, false );
     myContext->UpdateCurrentViewer();
-    getApplication()->onSelectionChanged();
     QApplication::restoreOverrideCursor();
 }
 
@@ -240,5 +161,4 @@ void DocumentCommon::onDelete()
     myContext->EraseSelected (Standard_False);
     myContext->ClearSelected (Standard_False);
     myContext->UpdateCurrentViewer();
-    getApplication()->onSelectionChanged();
 }

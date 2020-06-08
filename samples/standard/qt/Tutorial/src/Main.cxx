@@ -39,8 +39,6 @@ int main ( int argc, char* argv[] )
     if( isOK )
       a.installTranslator( &iconTutTrans );
 
-    QObject::connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
-
     ApplicationTut* mw = new ApplicationTut();
     mw->setWindowTitle( QObject::tr( "TIT_SAMPLE" ) );
     QString aResName( resDir + QString( "/" ) + QObject::tr( "ICON_SAMPLE" ) );

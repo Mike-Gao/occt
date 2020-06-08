@@ -12,7 +12,7 @@ class DocumentTut : public DocumentCommon
 	Q_OBJECT
 
 public:
-   DocumentTut( const int, ApplicationCommonWindow* );
+   DocumentTut(ApplicationCommonWindow* );
 	~DocumentTut();
 
 	void                           onMakeBottle();

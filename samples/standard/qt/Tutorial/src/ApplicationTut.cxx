@@ -28,37 +28,11 @@ void ApplicationTut::createMakeBottleOperation(){
   MakeBottleAction->setToolTip( QObject::tr( "TBR_MAKEBOT" ) );
   MakeBottleAction->setStatusTip( QObject::tr("TBR_MAKEBOT") );
   MakeBottleAction->setShortcut( QObject::tr( "CTRL+M" ) );
-	connect( MakeBottleAction, SIGNAL( triggered() ) , this, SLOT( onMakeBottleAction() ) );
 	
 	myMakeBottleBar = addToolBar( tr( "Make Bottle" ) );
   insertToolBar( getCasCadeBar(), myMakeBottleBar );
   myMakeBottleBar->addAction( MakeBottleAction );
 	myMakeBottleBar->hide();
-}
-
-void ApplicationTut::updateFileActions()
-{
-  if ( getWorkspace()->subWindowList().isEmpty() )
-  {
-	  if ( !isDocument() )
-		{
-      myMakeBottleBar->show();
-    }
-    else
-    {
-      myMakeBottleBar->hide();
-    }
-  }
-  ApplicationCommonWindow::updateFileActions();
-}
-
-void ApplicationTut::onMakeBottleAction()
-{
-	QMdiArea* ws = ApplicationCommonWindow::getWorkspace();
-  DocumentTut* doc = (DocumentTut*)( qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() )->getDocument() );
-	statusBar()->showMessage( QObject::tr("INF_MAKE_BOTTLE"), 5000 );
-	doc->onMakeBottle();
-	statusBar()->showMessage(QObject::tr("INF_DONE"));
 }
 
 QString ApplicationTut::getTutResourceDir()

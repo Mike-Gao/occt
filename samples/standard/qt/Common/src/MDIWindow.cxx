@@ -102,7 +102,7 @@ void MDIWindow::createRaytraceActions()
 
 void MDIWindow::onWindowActivated ()
 {
-  getDocument()->getApplication()->onSelectionChanged();
+
 }
 
 void MDIWindow::dump()

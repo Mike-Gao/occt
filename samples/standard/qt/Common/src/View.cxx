@@ -727,7 +727,6 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
             break;
     }
     activateCursor( myCurrentMode );
-    ApplicationCommonWindow::getApplication()->onSelectionChanged();
 }
 
 void View::onMButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint /*point*/ )
@@ -874,8 +873,6 @@ void View::MultiInputEvent( const int /*x*/, const int /*y*/ )
 void View::Popup( const int /*x*/, const int /*y*/ )
 {
   ApplicationCommonWindow* stApp = ApplicationCommonWindow::getApplication();
-  QMdiArea* ws = ApplicationCommonWindow::getWorkspace();
-  QMdiSubWindow* w = ws->activeSubWindow();
   if ( myContext->NbSelected() )
   {
     QList<QAction*>* aList = stApp->getToolActions();
@@ -922,8 +919,6 @@ void View::Popup( const int /*x*/, const int /*y*/ )
 
     myBackMenu->exec( QCursor::pos() );
   }
-  if ( w )
-    w->setFocus();
 }
 
 void View::addItemInPopup( QMenu* /*theMenu*/)
