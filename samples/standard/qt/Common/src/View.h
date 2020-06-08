@@ -13,29 +13,28 @@
 class TopoDS_Shape;
 class QRubberBand;
 
+enum class CurrentAction3d { CurAction3d_Nothing, CurAction3d_DynamicZooming,
+                             CurAction3d_WindowZooming, CurAction3d_DynamicPanning,
+                             CurAction3d_GlobalPanning, CurAction3d_DynamicRotation };
+enum class ViewActionId { ViewFitAllId, ViewFitAreaId, ViewZoomId, ViewPanId, ViewGlobalPanId,
+                        ViewFrontId, ViewBackId, ViewTopId, ViewBottomId, ViewLeftId, ViewRightId,
+                        ViewAxoId, ViewRotationId, ViewResetId, ViewHlrOffId, ViewHlrOnId };
+enum class RaytraceActionId { ToolRaytracingId, ToolShadowsId, ToolReflectionsId, ToolAntialiasingId };
+
 //class COMMONSAMPLE_EXPORT View: public QWidget
 class View: public QWidget
 {
     Q_OBJECT
-protected:
-    enum CurrentAction3d { CurAction3d_Nothing, CurAction3d_DynamicZooming,
-                           CurAction3d_WindowZooming, CurAction3d_DynamicPanning,
-                           CurAction3d_GlobalPanning, CurAction3d_DynamicRotation };
-
 public:
-    enum ViewAction { ViewFitAllId, ViewFitAreaId, ViewZoomId, ViewPanId, ViewGlobalPanId,
-                      ViewFrontId, ViewBackId, ViewTopId, ViewBottomId, ViewLeftId, ViewRightId,
-                      ViewAxoId, ViewRotationId, ViewResetId, ViewHlrOffId, ViewHlrOnId };
-    enum RaytraceAction { ToolRaytracingId, ToolShadowsId, ToolReflectionsId, ToolAntialiasingId };
-
     View( Handle(AIS_InteractiveContext) theContext, QWidget* parent );
 
     ~View();
 
     virtual void                  init();
     bool                          dump( Standard_CString theFile );
-    QList<QAction*>*              getViewActions();
-    QList<QAction*>*              getRaytraceActions();
+    QAction*              getViewAction(ViewActionId theAction);
+    QList<QAction*>       getViewActions();
+    QAction*              getRaytraceAction(RaytraceActionId theAction);
     void                          noActiveActions();
     bool                          isShadingMode();
 
@@ -141,8 +140,8 @@ private:
     Standard_Integer                myYmax;
     Standard_Real                   myCurZoom;
     Standard_Boolean                myHlrModeIsOn;
-    QList<QAction*>*                myViewActions;
-    QList<QAction*>*                myRaytraceActions;
+    QMap<ViewActionId, QAction*>      myViewActions;
+    QMap<RaytraceActionId, QAction*>  myRaytraceActions;
     QMenu*                          myBackMenu;
     QRubberBand*                    myRectBand; //!< selection rectangle rubber band
 };

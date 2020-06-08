@@ -38,11 +38,12 @@ static ApplicationCommonWindow* stApp = 0;
 static QMdiArea* stWs = 0;
 
 ApplicationCommonWindow::ApplicationCommonWindow()
-: QMainWindow( 0 ),
-mySampleMapper(new QSignalMapper(this)),
-myStdToolBar( 0 ),
-myCasCadeBar( 0 ),
-myFilePopup( 0 )
+  : QMainWindow(nullptr),
+  mySampleMapper(new QSignalMapper(this)),
+  myStdToolBar(nullptr),
+  myCasCadeBar(nullptr),
+  myViewBar(nullptr),
+myFilePopup(nullptr)
 {
   stApp = this;
 
@@ -124,18 +125,18 @@ void ApplicationCommonWindow::createStandardOperations()
   QAction* filePrefUseVBOAction = CreateAction(&ApplicationCommonWindow::onUseVBO, "Use VBO");
   filePrefUseVBOAction->setCheckable( true );
   filePrefUseVBOAction->setChecked( true );
-  myStdActions.insert( FilePrefUseVBOId, filePrefUseVBOAction );
+  myStdActions.insert(StdActions::FilePrefUseVBOId, filePrefUseVBOAction );
 
   QAction* fileQuitAction = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "Quit", "CTRL+Q", "quit.png");
-  myStdActions.insert( FileQuitId, fileQuitAction );
+  myStdActions.insert(StdActions::FileQuitId, fileQuitAction );
 
   QAction* viewToolAction = CreateAction(&ApplicationCommonWindow::onViewToolBar, "Toolbar");
   viewToolAction->setCheckable( true );
   viewToolAction->setChecked( true );
-  myStdActions.insert( ViewToolId, viewToolAction );
+  myStdActions.insert(StdActions::ViewToolId, viewToolAction );
 
   QAction* helpAboutAction = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", "help.png");
-  myStdActions.insert(HelpAboutId, helpAboutAction);
+  myStdActions.insert(StdActions::HelpAboutId, helpAboutAction);
 
   // create preferences menu
   QMenu* aPrefMenu = new QMenu( QObject::tr("MNU_PREFERENCES") );
@@ -178,22 +179,22 @@ void ApplicationCommonWindow::createCasCadeOperations()
   QAction* a;
 
   a = CreateAction(&ApplicationCommonWindow::onToolAction, "Wireframe", "", "tool_wireframe.png");
-  myToolActions.insert( ToolWireframeId, a );
+  myToolActions.insert(ToolActions::ToolWireframeId, a );
 
   a = CreateAction(&ApplicationCommonWindow::onToolAction, "Shading", "", "tool_shading.png");
-  myToolActions.insert( ToolShadingId, a );
+  myToolActions.insert(ToolActions::ToolShadingId, a );
 
   a = CreateAction(&ApplicationCommonWindow::onToolAction, "Color", "", "tool_color.png");
-  myToolActions.insert( ToolColorId, a );
+  myToolActions.insert(ToolActions::ToolColorId, a );
 
   a = CreateAction(&ApplicationCommonWindow::onToolAction, "Material", "", "tool_material.png");
-  myToolActions.insert( ToolMaterialId, a );
+  myToolActions.insert(ToolActions::ToolMaterialId, a );
 
   a = CreateAction(&ApplicationCommonWindow::onToolAction, "Transparency", "", "tool_transparency.png");
-  myToolActions.insert( ToolTransparencyId, a );
+  myToolActions.insert(ToolActions::ToolTransparencyId, a );
 
   a = CreateAction(&ApplicationCommonWindow::onToolAction, "Delete", "", "tool_delete.png");
-  myToolActions.insert( ToolDeleteId, a );
+  myToolActions.insert(ToolActions::ToolDeleteId, a );
 
   QSignalMapper* sm = new QSignalMapper( this );
   connect( sm, SIGNAL( mapped( int ) ), this, SLOT( onSetMaterial( int ) ) );
@@ -254,19 +255,22 @@ void ApplicationCommonWindow::createCasCadeOperations()
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_SILVER, a );
 
-  for ( int i = 0; i < myToolActions.size(); i++ )
-    myCasCadeBar->addAction( myToolActions.at( i ) );
-  myCasCadeBar->hide();
+  for (QAction* anAction: myToolActions)
+    myCasCadeBar->addAction(anAction);
+//  myCasCadeBar->hide();
+
+  myViewBar = addToolBar(tr("View Operations"));
+  myViewBar->addActions(myView->getViewActions());
 }
 
-QList<QAction*>* ApplicationCommonWindow::getToolActions()
+QAction*  ApplicationCommonWindow::getToolAction(ToolActions theActionId)
 {
-    return &myToolActions;
+    return myToolActions.value(theActionId);
 }
 
-QList<QAction*>* ApplicationCommonWindow::getMaterialActions()
+QList<QAction*> ApplicationCommonWindow::getMaterialActions()
 {
-    return &myMaterialActions;
+    return myMaterialActions.values();
 }
 
 
@@ -308,7 +312,7 @@ void ApplicationCommonWindow::onUseVBO()
 
 void ApplicationCommonWindow::onViewToolBar()
 {
-  bool show = myStdActions.at( ViewToolId )->isChecked();
+  bool show = myStdActions.value(StdActions::ViewToolId )->isChecked();
   if ( show == myStdToolBar->isVisible() )
     return;
   if ( show )
@@ -327,22 +331,22 @@ void ApplicationCommonWindow::onAbout()
 void ApplicationCommonWindow::onToolAction()
 {
   QAction* sentBy = (QAction*)sender();
-  if( sentBy == myToolActions.at( ToolWireframeId ) )
+  if( sentBy == myToolActions.value(ToolActions::ToolWireframeId ) )
     myDocument->onWireframe();
 
-  if( sentBy == myToolActions.at( ToolShadingId ) )
+  if( sentBy == myToolActions.value(ToolActions::ToolShadingId ) )
     myDocument->onShading();
 
-  if( sentBy == myToolActions.at( ToolColorId ) )
+  if( sentBy == myToolActions.value(ToolActions::ToolColorId ) )
     myDocument->onColor();
 
-  if( sentBy == myToolActions.at( ToolMaterialId ) )
+  if( sentBy == myToolActions.value(ToolActions::ToolMaterialId ) )
     myDocument->onMaterial();
 
-  if( sentBy == myToolActions.at( ToolTransparencyId ) )
+  if( sentBy == myToolActions.value(ToolActions::ToolTransparencyId ) )
     myDocument->onTransparency();
 
-  if( sentBy == myToolActions.at( ToolDeleteId ) )
+  if( sentBy == myToolActions.value(ToolActions::ToolDeleteId ) )
     myDocument->onDelete();
 }
 
