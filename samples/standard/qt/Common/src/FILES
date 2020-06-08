@@ -7,8 +7,8 @@ DocumentCommon.cxx
 DocumentCommon.h
 Material.cxx
 Material.h
-MDIWindow.cxx
-MDIWindow.h
+OcctHighlighter.cxx
+OcctHighlighter.h
 OcctWindow.cxx
 OcctWindow.h
 Transparency.cxx
