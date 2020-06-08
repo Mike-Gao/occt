@@ -19,6 +19,9 @@
 #include <Standard_WarningsRestore.hxx>
 #include <Standard_WarningsDisable.hxx>
 
+#include "CommonSample.h"
+#include "View.h"
+
 class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
 {
     Q_OBJECT
@@ -30,33 +33,21 @@ public:
   ApplicationCommonWindow();
   ~ApplicationCommonWindow();
 
-	static QMdiArea*                getWorkspace();
 	static ApplicationCommonWindow* getApplication();
 	static QString                  getResourceDir();
   static TCollection_AsciiString  getSampleSourceDir();
 
-	virtual void     updateFileActions();
   QList<QAction*>* getToolActions();
   QList<QAction*>* getMaterialActions();
 	
 protected:
   virtual DocumentCommon* createNewDocument();
-  int&                    getNbDocument();
 
 public slots:
-	
-  DocumentCommon* onNewDoc();
-  void            onCloseWindow();
   void            onUseVBO();
-//	virtual void    onCloseDocument( DocumentCommon* theDoc );
-  virtual void    onSelectionChanged();
   virtual void    onAbout();
   void            onViewToolBar();
-	void            onViewStatusBar();
   void            onToolAction();
-	void            onCreateNewView();
-  void            onWindowActivated ( QWidget * w );
-	void            windowsMenuAboutToShow();
   void            windowsMenuActivated( bool checked/*int id*/ );
 	void            onSetMaterial( int theMaterial );
 
@@ -72,9 +63,7 @@ protected:
                         const char* theActionName);
 
   virtual void  resizeEvent( QResizeEvent* );
-  bool          isDocument();
   QMenu*        getFilePopup();
-  QAction*      getFileSeparator();
   QToolBar*     getCasCadeBar();
 
   QMenu* MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent);
@@ -83,40 +72,32 @@ private slots:
   void onCloseAllWindows() { qApp->closeAllWindows(); }
 
   void onProcessSample(const QString& theSampleName);
-  void SimpleAction();
+
 private:
 	void createStandardOperations();
 	void createCasCadeOperations();
-	void createWindowPopup();
 
 private:
-  int                             myNbDocuments;
-	bool                            myIsDocuments;
-
   BaseSample mySamples;
 
-	QList<QAction*>                 myStdActions;
-  QList<QAction*>                 myToolActions;
-  QList<QAction*>                 myMaterialActions;
-  //QList<DocumentCommon*>          myDocuments;
+	QList<QAction*>  myStdActions;
+  QList<QAction*>  myToolActions;
+  QList<QAction*>  myMaterialActions;
 
-	QToolBar*                       myStdToolBar;
-	QToolBar*                       myCasCadeBar;
-	QMenu*                          myFilePopup;
-	QMenu*                          myWindowPopup;
+	QToolBar*        myStdToolBar;
+	QToolBar*        myCasCadeBar;
+	QMenu*           myFilePopup;
 
-  QList<QMenu*> mySamplePopups;
-  QSignalMapper* mySampleMapper;
-  QTextEdit* myCodeView;
-  QTextEdit* myResultView;
+  QList<QMenu*>    mySamplePopups;
+  QSignalMapper*   mySampleMapper;
+  QTextEdit*       myCodeView;
+  QTextEdit*       myResultView;
   OcctHighlighter* myCodeViewHighlighter;
 
-  View*                      myView;
-
-  QAction*                        myFileSeparator;
+  View*            myView;
 
 protected:
-  DocumentCommon*          myDocument;
+  DocumentCommon*  myDocument;
 };
 
 #endif

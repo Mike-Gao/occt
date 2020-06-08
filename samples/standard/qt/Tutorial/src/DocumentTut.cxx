@@ -12,8 +12,8 @@
 TopoDS_Shape
 MakeBottle(const Standard_Real myWidth , const Standard_Real myHeight , const Standard_Real myThickness);
 
-DocumentTut::DocumentTut( const int theIndex, ApplicationCommonWindow* app )
-: DocumentCommon( theIndex, app )
+DocumentTut::DocumentTut(ApplicationCommonWindow* app)
+: DocumentCommon(app)
 {
 }
 
@@ -32,7 +32,6 @@ void DocumentTut::onMakeBottle()
     const Handle(AIS_InteractiveObject)& anIOAISBottle = AISBottle;
     getContext()->SetSelected(anIOAISBottle,Standard_False);
     emit selectionChanged();
-    fitAll();
     QApplication::restoreOverrideCursor();
 }
 

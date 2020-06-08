@@ -88,26 +88,6 @@ void ApplicationWindow::createTranslatePopups()
 	myExportPopup->addAction( a );
 }
 
-void ApplicationWindow::updateFileActions()
-{
-  //if ( myDocuments.isEmpty() )
-  //{
-  //  if ( !isDocument() )
-  //  {
-  //    getFilePopup()->insertMenu( getFileSeparator(), myExportPopup );
-	 //   getFilePopup()->insertMenu( myExportPopup->menuAction(), myImportPopup );
-  //    mySeparator = getFilePopup()->insertSeparator( myImportPopup->menuAction() );
-	 // }
-  //  else
-  //  {
-	 //   getFilePopup()->removeAction( myImportPopup->menuAction() );
-	 //   getFilePopup()->removeAction( myExportPopup->menuAction() );
-	 //   getFilePopup()->removeAction( mySeparator );
-	 // }
-  //}
-  //ApplicationCommonWindow::updateFileActions();
-}
-
 void ApplicationWindow::onImport()
 {
     QAction* a = (QAction*)sender();
@@ -116,11 +96,6 @@ void ApplicationWindow::onImport()
         return;
 
     bool stat = translate( type, true );
-    if ( stat )
-    {
-        DocumentCommon* doc = qobject_cast<MDIWindow*>( getWorkspace()->activeSubWindow()->widget() )->getDocument();
-        doc->fitAll();
-    }
 }
 
 void ApplicationWindow::onExport()
@@ -171,8 +146,7 @@ int ApplicationWindow::translationFormat( const QAction* a )
 bool ApplicationWindow::translate( const int format, const bool import )
 {
     static Translate* anTrans = createTranslator();
-    DocumentCommon* doc = qobject_cast<MDIWindow*>( getWorkspace()->activeSubWindow()->widget() )->getDocument();
-    Handle(AIS_InteractiveContext) context = doc->getContext();
+    Handle(AIS_InteractiveContext) context = myDocument->getContext();
     bool status;
     if ( import )
         status = anTrans->importModel( format, context );
@@ -198,11 +172,7 @@ Translate* ApplicationWindow::createTranslator()
 
 void ApplicationWindow::onSelectionChanged()
 {
-  ApplicationCommonWindow::onSelectionChanged();
-
-  QMdiArea* ws = getWorkspace();
-  DocumentCommon* doc = qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() )->getDocument();
-  Handle(AIS_InteractiveContext) context = doc->getContext();
+  Handle(AIS_InteractiveContext) context = myDocument->getContext();
   bool anEnabled = (context->NbSelected() > 0);
 
   myCasCadeTranslateActions.at( FileExportBREPId )->setEnabled( anEnabled );
@@ -222,11 +192,5 @@ QString ApplicationWindow::getIEResourceDir()
   return aResourceDir;
 }
 
-void ApplicationWindow::onExportImage()
-{
-    MDIWindow* w = qobject_cast<MDIWindow*>( getWorkspace()->activeSubWindow()->widget() );
-    if ( w )
-        w->dump();
-}
 
 

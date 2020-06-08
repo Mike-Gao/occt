@@ -20,13 +20,10 @@ public:
   ~ApplicationWindow();
 
   static QString                  getIEResourceDir();
-
-  virtual void                    updateFileActions();
   
 public slots:
   void                            onImport();
   void                            onExport();
-  void                            onExportImage();
   virtual void                    onSelectionChanged();
   
 protected:

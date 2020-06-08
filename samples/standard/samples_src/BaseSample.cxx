@@ -64,7 +64,7 @@ void BaseSample::Process(TCollection_AsciiString theSampleName)
     {
       myResult += TCollection_AsciiString("No function found: ") + theSampleName;
       myCode += TCollection_AsciiString("No function found: ") + theSampleName;
-//      anIsSamplePresent = Standard_False;
+      anIsSamplePresent = Standard_False;
     }
     myIsProcessed = anIsSamplePresent;
   }

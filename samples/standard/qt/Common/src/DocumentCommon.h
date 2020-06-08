@@ -1,8 +1,8 @@
 #ifndef DOCUMENTCOMMON_H
 #define DOCUMENTCOMMON_H
 
-#include "MDIWindow.h"
-//#include "IESample.h"
+#include "IESample.h"
+#include "CommonSample.h"
 
 #include <Standard_WarningsDisable.hxx>
 #include <QObject>
@@ -19,26 +19,20 @@ class COMMONSAMPLE_EXPORT DocumentCommon : public QObject
 	Q_OBJECT
 
 public:
-	DocumentCommon( const int, ApplicationCommonWindow* );
+	DocumentCommon(ApplicationCommonWindow* );
 	~DocumentCommon();
 
 	ApplicationCommonWindow*       getApplication();
 	Handle(AIS_InteractiveContext) getContext();
-	void                           removeView( MDIWindow* );
-  void                           removeViews();
-	int                            countOfWindow();
-	void                           fitAll();
+  void                           ClearContext();
 	
 protected:
-  virtual MDIWindow*             createNewMDIWindow();
 
 signals:
   void                           selectionChanged();
 	void                           sendCloseDocument( DocumentCommon* );
 
 public slots:
-	virtual void                   onCloseView( MDIWindow* );
-	virtual void                   onCreateNewView();
 	virtual void                   onMaterial();
   virtual void                   onMaterial( int );
 	virtual void                   onDelete();
@@ -59,10 +53,8 @@ private:
 
 protected:
 	ApplicationCommonWindow*       myApp;
-	QList<MDIWindow*>              myViews;
 	Handle(V3d_Viewer)             myViewer;
 	Handle(AIS_InteractiveContext) myContext;
-	int                            myIndex;
   int                            myNbViews;
 };
 

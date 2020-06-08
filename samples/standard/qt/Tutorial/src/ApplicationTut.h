@@ -14,11 +14,8 @@ public:
   ~ApplicationTut();
 
   static QString    getTutResourceDir();
-  virtual void      updateFileActions();
 
 public slots:
-	
-	void							onMakeBottleAction();
 
 private:
 	void              createMakeBottleOperation();

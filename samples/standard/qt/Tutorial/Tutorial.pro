@@ -28,9 +28,12 @@ RES_FILES = $${SAMPLESROOT}/Common/res/* \
 
 RES_DIR   = $$quote($$(RES_DIR))
 
+INCLUDEPATH += $$quote(./src)
+INCLUDEPATH += $$quote($$(CSF_SampleSources))
 INCLUDEPATH += $$quote($${SAMPLESROOT}/Common/src)
 INCLUDEPATH += $$quote($${SAMPLESROOT}/Interface/src)
 INCLUDEPATH += $$quote($$(CSF_OCCTIncludePath))
+
 
 OCCT_DEFINES = $$(CSF_DEFINES)
 
