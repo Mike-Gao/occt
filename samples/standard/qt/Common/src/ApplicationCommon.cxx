@@ -433,6 +433,7 @@ void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
       myDocument->getContext()->Display(aObject, Standard_True);
     }
   }
+  myView->fitAll();
 }
 
 QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent)
