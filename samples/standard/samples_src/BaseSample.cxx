@@ -7,17 +7,13 @@
 #include <exception>
 #include <stack>
 
-#include <gp_Pnt.hxx>
-#include <gp_XYZ.hxx>
-#include <Geom_CartesianPoint.hxx>
-#include <AIS_Point.hxx>
-#include <AIS_TextLabel.hxx>
 
 #include <OSD_Path.hxx>
 #include <OSD_File.hxx>
 #include <OSD_Protection.hxx>
 
 const TCollection_AsciiString BaseSample::FILE_EXTENSION = "cxx";
+
 
 
 Standard_Boolean BaseSample::IsProcessed()
@@ -37,7 +33,9 @@ NCollection_Vector<Handle(AIS_InteractiveObject) > BaseSample::Get3dObject()
 
 TCollection_AsciiString BaseSample::GetResult()
 {
-  return myResult;
+  TCollection_AsciiString aResult(myResult.str().c_str());
+  myResult.str("");
+  return aResult;
 }
 
 TCollection_AsciiString BaseSample::GetCode() 
@@ -49,24 +47,11 @@ void BaseSample::Process(TCollection_AsciiString theSampleName)
 {
   myObject3d.Clear();
   myObject2d.Clear();
-  myResult.Clear();
   myCode.Clear();
   myIsProcessed = Standard_False;
   try
   {
-    Standard_Boolean anIsSamplePresent = Standard_True;
-    FindSourceCode(theSampleName);
-    if (theSampleName == "ZeroDimensionObjects3dSample")
-      ZeroDimensionObjects3dSample();
-    else if (theSampleName == "ZeroDimensionObjects3dSample")
-      Vectors3dSample();
-    else
-    {
-      myResult += TCollection_AsciiString("No function found: ") + theSampleName;
-      myCode += TCollection_AsciiString("No function found: ") + theSampleName;
-      anIsSamplePresent = Standard_False;
-    }
-    myIsProcessed = anIsSamplePresent;
+    ExecuteSample(theSampleName);
   }
   catch (...)
   {
@@ -83,7 +68,7 @@ void BaseSample::SetCodePach(TCollection_AsciiString theSampleSourcePach)
 void BaseSample::TraceError(TCollection_AsciiString theErrorMessage)
 {
   std::cerr << std::endl << "ERROR: " << theErrorMessage.ToCString();
-  myResult += TCollection_AsciiString("\nERROR: ") + theErrorMessage;
+  myResult << "\nERROR: " << theErrorMessage;
 }
 
 void BaseSample::FindSourceCode(TCollection_AsciiString theSampleName)
@@ -185,46 +170,8 @@ Standard_Integer BaseSample::FindClosingBracket(TCollection_AsciiString theText,
   return aClosingBracketIndex;
 }
 
-void BaseSample::ZeroDimensionObjects3dSample()
-{
-  // gp_Pnt describes a point in 3D space.A Geom_CartesianPoint is defined by 
-  // a gp_Pnt point, with its three Cartesian coordinates X, Y and Z.
-  gp_Pnt aCoordPnt(10, 20, 30);
-  Handle(Geom_CartesianPoint) aCoordGeomPoint = new Geom_CartesianPoint(aCoordPnt);
-  Handle(AIS_Point) aCoordAisPoint = new AIS_Point(aCoordGeomPoint);
-  myObject3d.Append(aCoordAisPoint);
 
-  Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
-  aPntLabel->SetText ("gp_Pnt");
-  aPntLabel->SetPosition(gp_Pnt (aCoordPnt.X(), aCoordPnt.Y(), aCoordPnt.Z() + 5));
-  myObject3d.Append(aPntLabel);
 
-  // gp_XYZ class describes a cartesian coordinate entity in 3D space (X,Y,Z).
-  // This entity is used for algebraic calculation.
-  // This entity can be transformed with a "Trsf" or a "GTrsf" from package "gp".
-  // It is used in vectorial computations or for holding this type of information in data structures.
-  gp_XYZ aXyz1(10, 20, 30);
-  gp_XYZ aXyz2(20, 10, 30);
-  gp_XYZ aXyzSum = aXyz1 + aXyz2;
-  gp_Pnt aSumPnt(aXyzSum);
-  Handle(Geom_CartesianPoint) aXyzGeomPoint = new Geom_CartesianPoint(aSumPnt);
-  Handle(AIS_Point) aSumAisPoint = new AIS_Point(aXyzGeomPoint);
-  myObject3d.Append(aSumAisPoint);
 
-  Handle(AIS_TextLabel) aXyzLabel = new AIS_TextLabel();
-  aXyzLabel->SetText("gp_Pnt");
-  aXyzLabel->SetPosition(gp_Pnt(aXyzSum.X(), aXyzSum.Y(), aXyzSum.Z() + 5));
-  myObject3d.Append(aXyzLabel);
 
-  myResult += "ZeroDimensionObjects3dSample result";
-
-}
-
-void BaseSample::Vectors3dSample()
-{
-  myResult += "Vectors3dSample result";
-
-}
-
-// 
 

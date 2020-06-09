@@ -142,6 +142,7 @@
     <ClCompile Include="..\..\samples_src\ComcreteSample.cxx" />
     <ClCompile Include="..\Common\src\DocumentCommon.cxx" />
     <ClCompile Include="src\DocumentTut.cxx" />
+    <ClCompile Include="..\..\samples_src\GeometrySamples.cxx" />
     <ClCompile Include="src\Main.cxx" />
     <ClCompile Include="src\MakeBottle.cxx" />
     <ClCompile Include="..\Common\src\Material.cxx" />
@@ -205,6 +206,7 @@
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/DocumentTut.h</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_DocumentTut.cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include="..\..\samples_src\GeometrySamples.h" />
     <ClInclude Include="..\Interface\src\IESample.h" />
     <CustomBuild Include="..\Common\src\Material.h">
       <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\Common\src\Material.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
