@@ -43,19 +43,21 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   myStdToolBar(nullptr),
   myCasCadeBar(nullptr),
   myViewBar(nullptr),
-myFilePopup(nullptr)
+  myFilePopup(nullptr)
 {
   stApp = this;
+
+  if (true)
+    mySamples = new GeometrySamples();
 
   connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessSample);
   
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
-  mySamples.SetCodePach(aSampleSourcePach);
+  mySamples->SetCodePach(aSampleSourcePach);
 
   // create and define the central widget
   QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
-  QTextEdit* a3dView = new QTextEdit;
 
   myDocument = createNewDocument();
   myView = new View(myDocument->getContext(), aGeomTextSplitter);
@@ -79,7 +81,9 @@ myFilePopup(nullptr)
   aCodeResultSplitter->addWidget(myCodeView);
 
   myResultView = new QTextEdit;
-  myCodeView->setReadOnly(true);
+  myResultView->setReadOnly(true);
+  myResultView->setFont(aCodeViewFonf);
+
   aCodeResultSplitter->addWidget(myResultView);
 
   setCentralWidget(aGeomTextSplitter);
@@ -99,7 +103,7 @@ myFilePopup(nullptr)
   if (aJsonDoc.isObject())
   {
     QJsonObject aJsonObj = aJsonDoc.object();
-    foreach(const QString& aKey, aJsonObj.keys()) 
+    for(const QString& aKey: aJsonObj.keys()) 
     {
       QJsonValue aJsonValue = aJsonObj.value(aKey);
       if (aJsonValue.isObject())
@@ -114,10 +118,6 @@ myFilePopup(nullptr)
 
   statusBar()->showMessage( QObject::tr("INF_READY"), 5000 );
   resize( 1000, 700 );
-}
-
-ApplicationCommonWindow::~ApplicationCommonWindow()
-{
 }
 
 void ApplicationCommonWindow::createStandardOperations()
@@ -422,13 +422,13 @@ QToolBar* ApplicationCommonWindow::getCasCadeBar()
 
 void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 {
-  mySamples.Process(theSampleName.toUtf8().data());
+  mySamples->Process(theSampleName.toUtf8().data());
   myDocument->ClearContext();
-  myCodeView->setPlainText(mySamples.GetCode().ToCString());
-  myResultView->setPlainText(mySamples.GetResult().ToCString());
-  if (mySamples.IsProcessed())
+  myCodeView->setPlainText(mySamples->GetCode().ToCString());
+  myResultView->setPlainText(mySamples->GetResult().ToCString());
+  if (mySamples->IsProcessed())
   {
-    for (const Handle(AIS_InteractiveObject) aObject : mySamples.Get3dObject())
+    for (const Handle(AIS_InteractiveObject) aObject : mySamples->Get3dObject())
     {
       myDocument->getContext()->Display(aObject, Standard_True);
     }

@@ -3,7 +3,8 @@
 
 #include "DocumentCommon.h"
 
-#include "BaseSample.h"
+#include "GeometrySamples.h"
+
 #include "OcctHighlighter.h"
 
 #include <QApplication>
@@ -39,7 +40,6 @@ public:
 
 
   ApplicationCommonWindow();
-  ~ApplicationCommonWindow();
 
 	static ApplicationCommonWindow* getApplication();
 	static QString                  getResourceDir();
@@ -86,7 +86,7 @@ private:
 	void createCasCadeOperations();
 
 private:
-  BaseSample mySamples;
+  Handle(BaseSample) mySamples;
 
 	QMap<StdActions,               QAction*>  myStdActions;
   QMap<ToolActions,              QAction*>  myToolActions;
