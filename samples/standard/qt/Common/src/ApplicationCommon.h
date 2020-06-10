@@ -4,6 +4,7 @@
 #include "DocumentCommon.h"
 
 #include "GeometrySamples.h"
+#include "TopologySamples.h"
 
 #include "OcctHighlighter.h"
 
@@ -37,8 +38,6 @@ class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
     Q_OBJECT
 
 public:
-
-
   ApplicationCommonWindow();
 
 	static ApplicationCommonWindow* getApplication();
@@ -75,6 +74,7 @@ protected:
   QToolBar*     getCasCadeBar();
 
   QMenu* MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent);
+  void MenuFormJson(const QString& thePath);
 
 private slots:
   void onCloseAllWindows() { qApp->closeAllWindows(); }
@@ -82,6 +82,9 @@ private slots:
   void onProcessSample(const QString& theSampleName);
 
 private:
+  enum class ApplicationType { Geometry, Topology, Triangulation, Ocaf, Viewer2d, Viewer3d };
+  static const ApplicationType APP_TYPE = ApplicationType::Geometry;
+
 	void createStandardOperations();
 	void createCasCadeOperations();
 
