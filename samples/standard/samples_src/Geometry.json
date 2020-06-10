@@ -184,11 +184,6 @@
 	"Parametric": {
 		"Free creating": {
 			"3D": [{
-					"text": "Second order curves",
-					"function": "ParamSecondOrderCurves3dSample",
-					"description": ""
-				},
-				{
 					"text": "Free style curves",
 					"function": "FreeStyleCurves3dSample",
 					"description": ""
