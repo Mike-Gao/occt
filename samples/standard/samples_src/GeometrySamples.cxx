@@ -12,6 +12,10 @@
 #include <gp_Elips.hxx>
 #include <gp_Parab.hxx>
 #include <gp_Hypr.hxx>
+#include <gp_Cylinder.hxx>
+#include <gp_Cone.hxx>
+#include <gp_Sphere.hxx>
+#include <gp_Torus.hxx>
 
 
 
@@ -26,13 +30,26 @@
 #include <Geom_Ellipse.hxx>
 #include <Geom_Parabola.hxx>
 #include <Geom_Hyperbola.hxx>
+#include <Geom_BSplineCurve.hxx>
+#include <Geom_BezierCurve.hxx>
+#include <Geom_BSplineSurface.hxx>
+#include <Geom_BezierSurface.hxx>
+#include <Geom_Plane.hxx>
+#include <Geom_CylindricalSurface.hxx>
+#include <Geom_ConicalSurface.hxx>
+#include <Geom_SphericalSurface.hxx>
+#include <Geom_ToroidalSurface.hxx>
+
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 
 #include <AIS_Point.hxx>
 #include <AIS_TextLabel.hxx>
 #include <AIS_Axis.hxx>
 #include <AIS_Circle.hxx>
-
-
+#include <AIS_Plane.hxx>
+#include <AIS_Shape.hxx>
+#include <AIS_ColoredShape.hxx>
 
 //#include <AIS_Ellipse.hxx>
 //#include <AIS_Parabola.hxx>
@@ -148,7 +165,7 @@ void GeometrySamples::ExecuteSample(TCollection_AsciiString theSampleName)
 
 void GeometrySamples::ZeroDimensionObjects3dSample()
 {
-  // gp_Pnt describes a point in 3D space.A Geom_CartesianPoint is defined by 
+  // gp_Pnt describes a point in 3D space. A Geom_CartesianPoint is defined by 
   // a gp_Pnt point, with its three Cartesian coordinates X, Y and Z.
   gp_Pnt aCoordPnt(10.0, 20.0, 30.0);
   Handle(Geom_CartesianPoint) aCoordGeomPoint = new Geom_CartesianPoint(aCoordPnt);
@@ -430,17 +447,223 @@ void GeometrySamples::ParamSecondOrderCurves3dSample()
 
 void GeometrySamples::FreeStyleCurves3dSample()
 {
+  // Define points.
+  gp_Pnt aPnt1(0.0,  0.0, 0.0);
+  gp_Pnt aPnt2(5.0,  5.0, 0.0);
+  gp_Pnt aPnt3(10.0, 5.0, 0.0);
+  gp_Pnt aPnt4(15.0, 0.0, 0.0);
 
+  // Add points to the curve poles array.
+  TColgp_Array1OfPnt aPoles(1, 4);
+  aPoles.SetValue(1, aPnt1);
+  aPoles.SetValue(2, aPnt2);
+  aPoles.SetValue(3, aPnt3);
+  aPoles.SetValue(4, aPnt4);
+
+  // Define BSpline weights.
+  TColStd_Array1OfReal aBSplineWeights(1, 4);
+  aBSplineWeights.SetValue(1, 1.0);
+  aBSplineWeights.SetValue(2, 0.5);
+  aBSplineWeights.SetValue(3, 0.5);
+  aBSplineWeights.SetValue(4, 1.0);
+
+  // Define knots.
+  TColStd_Array1OfReal aKnots(1, 2);
+  aKnots.SetValue(1, 0.0);
+  aKnots.SetValue(2, 1.0);
+
+  // Define multiplicities.
+  TColStd_Array1OfInteger aMults(1, 2);
+  aMults.SetValue(1, 4);
+  aMults.SetValue(2, 4);
+
+  // Define BSpline degree and periodicity.
+  Standard_Integer aDegree = 3;
+  Standard_Boolean aPeriodic = Standard_False;
+
+  // Create a BSpline curve.
+  Handle(Geom_BSplineCurve) aBSplineCurve = new Geom_BSplineCurve(aPoles, aBSplineWeights, aKnots, aMults, aDegree, aPeriodic);
+  myResult << "Geom_BSplineCurve was created in red" << std::endl;
+
+  // Define Bezier weights.
+  TColStd_Array1OfReal aBezierWeights(1, 4);
+  aBezierWeights.SetValue(1, 0.5);
+  aBezierWeights.SetValue(2, 1.5);
+  aBezierWeights.SetValue(3, 1.5);
+  aBezierWeights.SetValue(4, 0.5);
+
+  // Create Bezier curve.
+  Handle(Geom_BezierCurve) aBezierCurve = new Geom_BezierCurve(aPoles, aBezierWeights);
+  myResult << "Geom_BezierCurve was created in green" << std::endl;
+
+  Handle(AIS_ColoredShape) anAisBSplineCurve = new AIS_ColoredShape(BRepBuilderAPI_MakeEdge(aBSplineCurve).Shape());
+  Handle(AIS_ColoredShape) anAisBezierCurve = new AIS_ColoredShape(BRepBuilderAPI_MakeEdge(aBezierCurve).Shape());
+  anAisBSplineCurve->SetColor(Quantity_Color(Quantity_NOC_RED));
+  anAisBezierCurve->SetColor(Quantity_Color(Quantity_NOC_GREEN));
+  myObject3d.Append(anAisBSplineCurve);
+  myObject3d.Append(anAisBezierCurve);
+  myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(aPnt1)));
+  myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(aPnt2)));
+  myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(aPnt3)));
+  myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(aPnt4)));
 }
 
 void GeometrySamples::AnalyticalSurfaces3dSample()
 {
+  // Define a XY plane.
+  gp_Pln aPln(gp::Origin(), gp::DZ());
+  // Create plane geometry.
+  Handle(Geom_Plane) aPlaneSurf = new Geom_Plane(aPln);
+  myResult << "Geom_Plane was created in red" << std::endl;
 
+  // Define a cylinder.
+  gp_Cylinder aCyl(gp::XOY(), 2.5);
+  // Create cylindrical surface.
+  Handle(Geom_CylindricalSurface) aCylSurf = new Geom_CylindricalSurface(aCyl);
+  myResult << "Geom_CylindricalSurface was created in green" << std::endl;
+
+  // Define a cone.
+  gp_Cone aCone(gp::XOY(), M_PI_4, 2.5);
+  // Create conical surface.
+  Handle(Geom_ConicalSurface) aConeSurf = new Geom_ConicalSurface(aCone);
+  myResult << "Geom_ConicalSurface was created in blue" << std::endl;
+
+  // Define a sphere.
+  gp_Pnt aSphereCenter(15.0, 15.0, 15.0);
+  gp_Sphere aSphere(gp_Ax3(aSphereCenter, gp::DZ()), 8.0);
+  // Create conical surface.
+  Handle(Geom_SphericalSurface) aSphereSurf = new Geom_SphericalSurface(aSphere);
+  myResult << "Geom_SphericalSurface was created in cyan" << std::endl;
+
+  // Define a sphere.
+  gp_Pnt aTorusCenter(-15.0, -15.0, 25.0);
+  gp_Torus aTorus(gp_Ax3(aTorusCenter, gp::DZ()), 15.0, 5.0);
+  // Create toroidal surface.
+  Handle(Geom_ToroidalSurface) aTorusSurf = new Geom_ToroidalSurface(aTorus);
+  myResult << "Geom_ToroidalSurface was created in yellow" << std::endl;
+
+  Handle(AIS_ColoredShape) anAisPlane = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aPlaneSurf, 0.0, 20.0, 0.0, 20.0, 0.001).Shape());
+  Handle(AIS_ColoredShape) anAisCylinder = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aCylSurf, 0.0, 2.0 * M_PI, 5.0, 15.0, 0.001).Shape());
+  Handle(AIS_ColoredShape) anAisCone = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aConeSurf, 0.0, 2.0 * M_PI, 0.0, 15.0, 0.001).Shape());
+  Handle(AIS_ColoredShape) anAisSphere = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aSphereSurf, 0.001).Shape());
+  Handle(AIS_ColoredShape) anAisTorus = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aTorusSurf, 0.001).Shape());
+  anAisPlane->SetColor(Quantity_Color(Quantity_NOC_RED));
+  anAisCylinder->SetColor(Quantity_Color(Quantity_NOC_GREEN));
+  anAisCone->SetColor(Quantity_Color(Quantity_NOC_BLUE1));
+  anAisSphere->SetColor(Quantity_Color(Quantity_NOC_CYAN1));
+  anAisTorus->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
+  myObject3d.Append(anAisPlane);
+  myObject3d.Append(anAisCylinder);
+  myObject3d.Append(anAisCone);
+  myObject3d.Append(anAisSphere);
+  myObject3d.Append(anAisTorus);
 }
 
 void GeometrySamples::FreeStyleSurfaces3dSample()
 {
+  // Define a 4x4 grid of points for BSpline surface.
+  TColgp_Array2OfPnt aBSplinePnts(1, 4, 1, 4);
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    gp_Pnt aPnt;
+    aPnt.SetX(5.0 * i);
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
+      aPnt.SetY(5.0 * j);
+      if (1 < i && i < 4 && 1 < j && j < 4)
+        aPnt.SetZ(5.0);
+      else
+        aPnt.SetZ(0.0);
+      aBSplinePnts.SetValue(i, j, aPnt);
+    }
+  }
 
+  // Define a 4x4 grid of points for Bezier surface.
+  TColgp_Array2OfPnt aBezierPnts(1, 4, 1, 4);
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    gp_Pnt aPnt;
+    aPnt.SetX(20.0 + 5.0 * i);
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
+      aPnt.SetY(20.0 + 5.0 * j);
+      if (1 < i && i < 4 && 1 < j && j < 4)
+        aPnt.SetZ(5.0);
+      else
+        aPnt.SetZ(0.0);
+      aBezierPnts.SetValue(i, j, aPnt);
+    }
+  }
+
+  // Define BSpline weights.
+  TColStd_Array2OfReal aBSplineWeights(1, 4, 1, 4);
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
+      if (1 < i && i < 4 && 1 < j && j < 4)
+        aBSplineWeights.SetValue(i, j, 0.5);
+      else
+        aBSplineWeights.SetValue(i, j, 1.0);
+    }
+  }
+
+  // Define knots.
+  TColStd_Array1OfReal aUKnots(1, 2), aVKnots(1, 2);
+  aUKnots.SetValue(1, 0.0);
+  aUKnots.SetValue(2, 1.0);
+  aVKnots.SetValue(1, 0.0);
+  aVKnots.SetValue(2, 1.0);
+
+  // Define multiplicities.
+  TColStd_Array1OfInteger aUMults(1, 2), aVMults(1, 2);
+  aUMults.SetValue(1, 4);
+  aUMults.SetValue(2, 4);
+  aVMults.SetValue(1, 4);
+  aVMults.SetValue(2, 4);
+
+  // Define BSpline degree and periodicity.
+  Standard_Integer aUDegree = 3;
+  Standard_Integer aVDegree = 3;
+  Standard_Boolean aUPeriodic = Standard_False;
+  Standard_Boolean aVPeriodic = Standard_False;
+
+  // Create a BSpline surface.
+  Handle(Geom_BSplineSurface) aBSplineSurf = new Geom_BSplineSurface(aBSplinePnts, aBSplineWeights, aUKnots, aVKnots,
+    aUMults, aVMults, aUDegree, aVDegree, aUPeriodic, aVPeriodic);
+  myResult << "Geom_BSplineSurface was created: red" << std::endl;
+
+  // Define BSpline weights.
+  TColStd_Array2OfReal aBezierWeights(1, 4, 1, 4);
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
+      if (1 < i && i < 4 && 1 < j && j < 4)
+        aBezierWeights.SetValue(i, j, 1.5);
+      else
+        aBezierWeights.SetValue(i, j, 0.5);
+    }
+  }
+
+  // Create a Bezier surface.
+  Handle(Geom_BezierSurface) aBezierSurf = new Geom_BezierSurface(aBezierPnts, aBezierWeights);
+  myResult << "Geom_BezierSurface was created: green" << std::endl;
+
+  Handle(AIS_ColoredShape) anAisBSplineSurf = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aBSplineSurf, 0.001).Shape());
+  Handle(AIS_ColoredShape) anAisBezierSurf = new AIS_ColoredShape(BRepBuilderAPI_MakeFace(aBezierSurf, 0.001).Shape());
+  anAisBSplineSurf->SetColor(Quantity_Color(Quantity_NOC_RED));
+  anAisBezierSurf->SetColor(Quantity_Color(Quantity_NOC_GREEN));
+  myObject3d.Append(anAisBSplineSurf);
+  myObject3d.Append(anAisBezierSurf);
+  for (TColgp_Array2OfPnt::Iterator anIt(aBSplinePnts); anIt.More(); anIt.Next())
+  {
+    myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
+  }
+  for (TColgp_Array2OfPnt::Iterator anIt(aBezierPnts); anIt.More(); anIt.Next())
+  {
+    myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
+  }
 }
 
 void GeometrySamples::ParamSecondOrderCurves2dSample()
