@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/menus">
+        <file>Geometry.json</file>
+    </qresource>
+</RCC>
