@@ -1,12 +1,14 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include <Standard_WarningsDisable.hxx>
+
 #include <QWidget>
 #include <QAction>
+#include <QToolBar>
 #include <QList>
-#include <Standard_WarningsRestore.hxx>
 
+#include <Standard_WarningsRestore.hxx>
+#include <Standard_WarningsDisable.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_View.hxx>
 
@@ -16,10 +18,10 @@ class QRubberBand;
 enum class CurrentAction3d { CurAction3d_Nothing, CurAction3d_DynamicZooming,
                              CurAction3d_WindowZooming, CurAction3d_DynamicPanning,
                              CurAction3d_GlobalPanning, CurAction3d_DynamicRotation };
-enum class ViewActionId { ViewFitAllId, ViewFitAreaId, ViewZoomId, ViewPanId, ViewGlobalPanId,
-                        ViewFrontId, ViewBackId, ViewTopId, ViewBottomId, ViewLeftId, ViewRightId,
-                        ViewAxoId, ViewRotationId, ViewResetId, ViewHlrOffId, ViewHlrOnId };
-enum class RaytraceActionId { ToolRaytracingId, ToolShadowsId, ToolReflectionsId, ToolAntialiasingId };
+enum class ViewAction { ViewFitAll, ViewFitArea, ViewZoom, ViewPan, ViewGlobalPan,
+                        ViewFront, ViewBack, ViewTop, ViewBottom, ViewLeft, ViewRight,
+                        ViewAxo, ViewRotation, ViewReset, ViewHlrOff, ViewHlrOn };
+enum class RaytraceActionId { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
 //class COMMONSAMPLE_EXPORT View: public QWidget
 class View: public QWidget
@@ -32,7 +34,7 @@ public:
 
     virtual void                  init();
     bool                          dump( Standard_CString theFile );
-    QAction*              getViewAction(ViewActionId theAction);
+    QAction*              getViewAction(ViewAction theAction);
     QList<QAction*>       getViewActions();
     QAction*              getRaytraceAction(RaytraceActionId theAction);
     void                          noActiveActions();
@@ -140,9 +142,10 @@ private:
     Standard_Integer                myYmax;
     Standard_Real                   myCurZoom;
     Standard_Boolean                myHlrModeIsOn;
-    QMap<ViewActionId, QAction*>      myViewActions;
+    QMap<ViewAction, QAction*>      myViewActions;
     QMap<RaytraceActionId, QAction*>  myRaytraceActions;
     QMenu*                          myBackMenu;
+    QToolBar*        myViewBar;
     QRubberBand*                    myRectBand; //!< selection rectangle rubber band
 };
 
