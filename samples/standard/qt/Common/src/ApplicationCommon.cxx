@@ -43,12 +43,31 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   myStdToolBar(nullptr),
   myCasCadeBar(nullptr),
   myViewBar(nullptr),
-  myFilePopup(nullptr)
+  myFilePopup(nullptr),
+  mySamples(nullptr)
 {
   stApp = this;
 
-  if (true)
+  switch (APP_TYPE)
+  {
+  case ApplicationType::Geometry:
     mySamples = new GeometrySamples();
+    break;
+  case ApplicationType::Topology:
+    mySamples = new TopologySamples();
+    break;
+  case ApplicationType::Triangulation:
+    break;
+  case ApplicationType::Ocaf:
+    break;
+  case ApplicationType::Viewer3d:
+    break;
+  case ApplicationType::Viewer2d:
+    break;
+  default:
+    break;
+  }
+
 
   connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessSample);
@@ -92,25 +111,24 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   aGeomTextSplitter->show();
 
   Q_INIT_RESOURCE(Samples);
-  QFile aJsonFile(":/menus/Geometry.json");
-  bool b1 = aJsonFile.exists();
-  aJsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
-  bool b2 = aJsonFile.exists();
-  QString aJsonString = aJsonFile.readAll();
-  aJsonFile.close();  
-
-  QJsonDocument aJsonDoc = QJsonDocument::fromJson(aJsonString.toUtf8());
-  if (aJsonDoc.isObject())
+  switch (APP_TYPE)
   {
-    QJsonObject aJsonObj = aJsonDoc.object();
-    for(const QString& aKey: aJsonObj.keys()) 
-    {
-      QJsonValue aJsonValue = aJsonObj.value(aKey);
-      if (aJsonValue.isObject())
-      {
-        mySamplePopups.push_back(MenuFromJsonObject(aJsonValue.toObject(), aKey, this));
-      }
-    }
+  case ApplicationType::Geometry:
+    MenuFormJson(":/menus/Geometry.json");
+    break;
+  case ApplicationType::Topology:
+    MenuFormJson(":/menus/Topology.json");
+    break;
+  case ApplicationType::Triangulation:
+    break;
+  case ApplicationType::Ocaf:
+    break;
+  case ApplicationType::Viewer3d:
+    break;
+  case ApplicationType::Viewer2d:
+    break;
+  default:
+    break;
   }
 
   createStandardOperations();
@@ -480,4 +498,26 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
       }
     }
     return aMenu;
+}
+
+void ApplicationCommonWindow::MenuFormJson(const QString & thePath)
+{
+  QFile aJsonFile(thePath);
+  aJsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+  QString aJsonString = aJsonFile.readAll();
+  aJsonFile.close();
+
+  QJsonDocument aJsonDoc = QJsonDocument::fromJson(aJsonString.toUtf8());
+  if (aJsonDoc.isObject())
+  {
+    QJsonObject aJsonObj = aJsonDoc.object();
+    for (const QString& aKey : aJsonObj.keys())
+    {
+      QJsonValue aJsonValue = aJsonObj.value(aKey);
+      if (aJsonValue.isObject())
+      {
+        mySamplePopups.push_back(MenuFromJsonObject(aJsonValue.toObject(), aKey, this));
+      }
+    }
+  }
 }
