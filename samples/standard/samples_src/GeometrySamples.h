@@ -66,12 +66,11 @@ private:
   void ExtrusionSurface3dSample();
   void RevolutionSurface3dSample();
   void TrimmedCurve2dSample();
-  void ParamOffsetCurve3dSample();
   void BoundingBoxOfSurface3dSample();
   void BoundingBoxOfCurves3dSample();
   void BoundingBoxOfCurves2dSample();
-  void JsonWithCircleRadiusSample();
-  void JsonWithBSplineCurveInfoSample();
+  void DumpCircleInfoSample();
+  void DumpBSplineCurveInfoSample();
 
 };
 
