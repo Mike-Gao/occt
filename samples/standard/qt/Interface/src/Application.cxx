@@ -146,7 +146,7 @@ int ApplicationWindow::translationFormat( const QAction* a )
 bool ApplicationWindow::translate( const int format, const bool import )
 {
     static Translate* anTrans = createTranslator();
-    Handle(AIS_InteractiveContext) context = myDocument->getContext();
+    Handle(AIS_InteractiveContext) context = myDocument3d->getContext();
     bool status;
     if ( import )
         status = anTrans->importModel( format, context );
@@ -172,7 +172,7 @@ Translate* ApplicationWindow::createTranslator()
 
 void ApplicationWindow::onSelectionChanged()
 {
-  Handle(AIS_InteractiveContext) context = myDocument->getContext();
+  Handle(AIS_InteractiveContext) context = myDocument3d->getContext();
   bool anEnabled = (context->NbSelected() > 0);
 
   myCasCadeTranslateActions.at( FileExportBREPId )->setEnabled( anEnabled );

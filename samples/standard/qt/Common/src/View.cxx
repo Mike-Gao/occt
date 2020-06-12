@@ -92,42 +92,42 @@ View::~View()
 
 void View::init()
 {
-  if ( myView.IsNull() )
-    myView = myContext->CurrentViewer()->CreateView();
+  if ( myV3dView.IsNull() )
+    myV3dView = myContext->CurrentViewer()->CreateView();
 
   Handle(OcctWindow) hWnd = new OcctWindow ( this );
-  myView->SetWindow (hWnd);
+  myV3dView->SetWindow (hWnd);
   if ( !hWnd->IsMapped() )
   {
     hWnd->Map();
   }
-  myView->SetBackgroundColor (Quantity_NOC_BLACK);
-  myView->MustBeResized();
+  myV3dView->SetBackgroundColor (Quantity_NOC_BLACK);
+  myV3dView->MustBeResized();
 
   if (myIsRaytracing)
-    myView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
+    myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
 }
 
 void View::paintEvent( QPaintEvent *  )
 {
 //  QApplication::syncX();
-  myView->Redraw();
+  myV3dView->Redraw();
 }
 
 void View::resizeEvent( QResizeEvent * )
 {
 //  QApplication::syncX();
-  if( !myView.IsNull() )
+  if( !myV3dView.IsNull() )
   {
-    myView->MustBeResized();
+    myV3dView->MustBeResized();
   }
 }
 
 void View::fitAll()
 {
-  myView->FitAll();
-  myView->ZFitAll();
-  myView->Redraw();
+  myV3dView->FitAll();
+  myV3dView->ZFitAll();
+  myV3dView->Redraw();
 }
 
 void View::fitArea()
@@ -153,59 +153,59 @@ void View::rotation()
 void View::globalPan()
 {
   // save the current zoom value
-  myCurZoom = myView->Scale();
+  myCurZoom = myV3dView->Scale();
   // Do a Global Zoom
-  myView->FitAll();
+  myV3dView->FitAll();
   // Set the mode
   myCurrentMode = CurrentAction3d::CurAction3d_GlobalPanning;
 }
 
 void View::front()
 {
-  myView->SetProj( V3d_Yneg );
+  myV3dView->SetProj( V3d_Yneg );
 }
 
 void View::back()
 {
-  myView->SetProj( V3d_Ypos );
+  myV3dView->SetProj( V3d_Ypos );
 }
 
 void View::top()
 {
-  myView->SetProj( V3d_Zpos );
+  myV3dView->SetProj( V3d_Zpos );
 }
 
 void View::bottom()
 {
-  myView->SetProj( V3d_Zneg );
+  myV3dView->SetProj( V3d_Zneg );
 }
 
 void View::left()
 {
-  myView->SetProj( V3d_Xneg );
+  myV3dView->SetProj( V3d_Xneg );
 }
 
 void View::right()
 {
-  myView->SetProj( V3d_Xpos );
+  myV3dView->SetProj( V3d_Xpos );
 }
 
 void View::axo()
 {
-  myView->SetProj( V3d_XposYnegZpos );
+  myV3dView->SetProj( V3d_XposYnegZpos );
 }
 
 void View::reset()
 {
-  myView->Reset();
+  myV3dView->Reset();
 }
 
 void View::hlrOff()
 {
   QApplication::setOverrideCursor( Qt::WaitCursor );
   myHlrModeIsOn = Standard_False;
-  myView->SetComputedMode (myHlrModeIsOn);
-  myView->Redraw();
+  myV3dView->SetComputedMode (myHlrModeIsOn);
+  myV3dView->Redraw();
   QApplication::restoreOverrideCursor();
 }
 
@@ -213,14 +213,14 @@ void View::hlrOn()
 {
   QApplication::setOverrideCursor( Qt::WaitCursor );
   myHlrModeIsOn = Standard_True;
-  myView->SetComputedMode (myHlrModeIsOn);
-  myView->Redraw();
+  myV3dView->SetComputedMode (myHlrModeIsOn);
+  myV3dView->Redraw();
   QApplication::restoreOverrideCursor();
 }
 
 void View::SetRaytracedShadows (bool theState)
 {
-  myView->ChangeRenderingParams().IsShadowEnabled = theState;
+  myV3dView->ChangeRenderingParams().IsShadowEnabled = theState;
 
   myIsShadowsEnabled = theState;
 
@@ -229,7 +229,7 @@ void View::SetRaytracedShadows (bool theState)
 
 void View::SetRaytracedReflections (bool theState)
 {
-  myView->ChangeRenderingParams().IsReflectionEnabled = theState;
+  myV3dView->ChangeRenderingParams().IsReflectionEnabled = theState;
 
   myIsReflectionsEnabled = theState;
 
@@ -273,7 +273,7 @@ void View::onRaytraceAction()
 
 void View::SetRaytracedAntialiasing (bool theState)
 {
-  myView->ChangeRenderingParams().IsAntialiasingEnabled = theState;
+  myV3dView->ChangeRenderingParams().IsAntialiasingEnabled = theState;
 
   myIsAntialiasingEnabled = theState;
 
@@ -283,7 +283,7 @@ void View::SetRaytracedAntialiasing (bool theState)
 void View::EnableRaytracing()
 {
   if (!myIsRaytracing)
-    myView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
+    myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
 
   myIsRaytracing = true;
 
@@ -293,7 +293,7 @@ void View::EnableRaytracing()
 void View::DisableRaytracing()
 {
   if (myIsRaytracing)
-    myView->ChangeRenderingParams().Method = Graphic3d_RM_RASTERIZATION;
+    myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RASTERIZATION;
 
   myIsRaytracing = false;
 
@@ -629,9 +629,9 @@ void View::onLButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
   //    case CurAction3d_DynamicRotation:
   //         if (myHlrModeIsOn)
   //         {
-  //           myView->SetComputedMode (Standard_False);
+  //           myV3dView->SetComputedMode (Standard_False);
   //         }
-  //         myView->StartRotation( point.x(), point.y() );
+  //         myV3dView->StartRotation( point.x(), point.y() );
   //         break;
   //    default:
   //         throw Standard_Failure( "incompatible Current Mode" );
@@ -654,10 +654,10 @@ void View::onRButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
   //{
   //  if (myHlrModeIsOn)
   //  {
-  //    myView->SetComputedMode (Standard_False);
+  //    myV3dView->SetComputedMode (Standard_False);
   //  }
   //  myCurrentMode = CurAction3d_DynamicRotation;
-  //  myView->StartRotation( point.x(), point.y() );
+  //  myV3dView->StartRotation( point.x(), point.y() );
   //}
   //else
   //{
@@ -666,11 +666,11 @@ void View::onRButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
 
   //if (myHlrModeIsOn)
   //{
-  //  myView->SetComputedMode(Standard_False);
+  //  myV3dView->SetComputedMode(Standard_False);
   //}
 
   myCurrentMode = CurrentAction3d::CurAction3d_DynamicRotation;
-  myView->StartRotation(point.x(), point.y());
+  myV3dView->StartRotation(point.x(), point.y());
 
   activateCursor( myCurrentMode );
 }
@@ -711,7 +711,7 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
             myYmax = point.y();
             if ( (abs( myXmin - myXmax ) > ValZWMin ) ||
                  (abs( myYmin - myYmax ) > ValZWMin ) )
-              myView->WindowFitAll( myXmin, myYmin, myXmax, myYmax );
+              myV3dView->WindowFitAll( myXmin, myYmin, myXmax, myYmax );
             myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
             noActiveActions();
             break;
@@ -720,7 +720,7 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
             noActiveActions();
             break;
         case CurrentAction3d::CurAction3d_GlobalPanning :
-            myView->Place( point.x(), point.y(), myCurZoom );
+            myV3dView->Place( point.x(), point.y(), myCurZoom );
             myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
             noActiveActions();
             break;
@@ -752,8 +752,8 @@ void View::onRButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint point )
         //   --> dynamic rotation may have change it
         if (myHlrModeIsOn)
         {
-          myView->SetComputedMode (myHlrModeIsOn);
-          myView->Redraw();
+          myV3dView->SetComputedMode (myHlrModeIsOn);
+          myV3dView->Redraw();
         }
         QApplication::restoreOverrideCursor();
         myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
@@ -778,7 +778,7 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
             DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_True );
             break;
         case CurrentAction3d::CurAction3d_DynamicZooming:
-          myView->Zoom( myXmax, myYmax, point.x(), point.y() );
+          myV3dView->Zoom( myXmax, myYmax, point.x(), point.y() );
           myXmax = point.x();
           myYmax = point.y();
           break;
@@ -789,15 +789,15 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
           DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_True );
           break;
         case CurrentAction3d::CurAction3d_DynamicPanning:
-          myView->Pan( point.x() - myXmax, myYmax - point.y() );
+          myV3dView->Pan( point.x() - myXmax, myYmax - point.y() );
           myXmax = point.x();
           myYmax = point.y();
           break;
         case CurrentAction3d::CurAction3d_GlobalPanning:
           break;
         case CurrentAction3d::CurAction3d_DynamicRotation:
-          myView->Rotation( point.x(), point.y() );
-          myView->Redraw();
+          myV3dView->Rotation( point.x(), point.y() );
+          myV3dView->Redraw();
           break;
         default:
           throw Standard_Failure( "incompatible Current Mode" );
@@ -832,7 +832,7 @@ void View::DragEvent( const int x, const int y, const int TheState )
 
     if ( TheState == 1 )
     {
-        myContext->Select( theButtonDownX, theButtonDownY, x, y, myView, Standard_True );
+        myContext->Select( theButtonDownX, theButtonDownY, x, y, myV3dView, Standard_True );
         emit selectionChanged();
     }
 }
@@ -845,12 +845,12 @@ void View::InputEvent( const int /*x*/, const int /*y*/ )
 
 void View::MoveEvent( const int x, const int y )
 {
-  myContext->MoveTo( x, y, myView, Standard_True );
+  myContext->MoveTo( x, y, myV3dView, Standard_True );
 }
 
 void View::MultiMoveEvent( const int x, const int y )
 {
-  myContext->MoveTo( x, y, myView, Standard_True );
+  myContext->MoveTo( x, y, myV3dView, Standard_True );
 }
 
 void View::MultiDragEvent( const int x, const int y, const int TheState )
@@ -865,7 +865,7 @@ void View::MultiDragEvent( const int x, const int y, const int TheState )
     }
     if ( TheState == 0 )
     {
-        myContext->ShiftSelect( theButtonDownX, theButtonDownY, x, y, myView, Standard_True );
+        myContext->ShiftSelect( theButtonDownX, theButtonDownY, x, y, myV3dView, Standard_True );
         emit selectionChanged();
     }
 }
@@ -989,7 +989,7 @@ void View::onBackground()
     Standard_Real R1;
     Standard_Real G1;
     Standard_Real B1;
-    myView->BackgroundColor(Quantity_TOC_RGB,R1,G1,B1);
+    myV3dView->BackgroundColor(Quantity_TOC_RGB,R1,G1,B1);
     aColor.setRgb((Standard_Integer)(R1 * 255), (Standard_Integer)(G1 * 255), (Standard_Integer)(B1 * 255));
 
     QColor aRetColor = QColorDialog::getColor(aColor);
@@ -999,9 +999,9 @@ void View::onBackground()
         R1 = aRetColor.red()/255.;
         G1 = aRetColor.green()/255.;
         B1 = aRetColor.blue()/255.;
-        myView->SetBackgroundColor(Quantity_TOC_RGB,R1,G1,B1);
+        myV3dView->SetBackgroundColor(Quantity_TOC_RGB,R1,G1,B1);
     }
-    myView->Redraw();
+    myV3dView->Redraw();
 }
 
 void View::onEnvironmentMap()
@@ -1015,25 +1015,25 @@ void View::onEnvironmentMap()
     
     Handle(Graphic3d_TextureEnv) aTexture = new Graphic3d_TextureEnv( anUtf8Path );
 
-    myView->SetTextureEnv (aTexture);
+    myV3dView->SetTextureEnv (aTexture);
   }
   else
   {
-    myView->SetTextureEnv (Handle(Graphic3d_TextureEnv)());
+    myV3dView->SetTextureEnv (Handle(Graphic3d_TextureEnv)());
   }
   
-  myView->Redraw();
+  myV3dView->Redraw();
 }
 
 bool View::dump(Standard_CString theFile)
 {
-  return myView->Dump(theFile);
+  return myV3dView->Dump(theFile);
 }
 
-Handle(V3d_View)& View::getView()
-{
-  return myView;
-}
+//Handle(V3d_View)& View::getView()
+//{
+//  return myV3dView;
+//}
 
 Handle(AIS_InteractiveContext)& View::getContext()
 {

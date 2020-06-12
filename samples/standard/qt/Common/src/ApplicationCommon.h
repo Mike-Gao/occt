@@ -5,6 +5,7 @@
 
 #include "GeometrySamples.h"
 #include "TopologySamples.h"
+#include "GeomWidget.h"
 
 #include "OcctHighlighter.h"
 
@@ -106,10 +107,12 @@ private:
   QTextEdit*       myResultView;
   OcctHighlighter* myCodeViewHighlighter;
 
-  View*            myView;
+//  View*            myView;
+  GeomWidget*  myGeomWidget;
 
 protected:
-  DocumentCommon*  myDocument;
+  DocumentCommon*  myDocument3d;
+  DocumentCommon*  myDocument2d;
 };
 
 #endif

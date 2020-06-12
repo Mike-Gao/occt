@@ -52,8 +52,7 @@ Handle(V3d_Viewer) DocumentCommon::Viewer (const Standard_ExtString ,
 
 DocumentCommon::DocumentCommon(ApplicationCommonWindow* app )
 : QObject( app ),
-myApp( app ),
-myNbViews( 0 )
+myApp( app )
 {
   TCollection_ExtendedString a3DName ("Visu3D");
 

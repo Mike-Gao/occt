@@ -75,40 +75,34 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
   mySamples->SetCodePach(aSampleSourcePach);
 
-  // create and define the central widget
-  QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
-
-  myDocument = createNewDocument();
-  myView = new View(myDocument->getContext(), aGeomTextSplitter);
-  resize(sizeHint());
   setFocusPolicy(Qt::StrongFocus);
-
-
-  aGeomTextSplitter->addWidget(myView);
-  QSplitter* aCodeResultSplitter = new QSplitter(Qt::Vertical);
-  aGeomTextSplitter->addWidget(aCodeResultSplitter);
-
-  myCodeView = new QTextEdit;
-  myCodeView->setReadOnly(true);
 
   QFont aCodeViewFonf;
   aCodeViewFonf.setFamily("Courier");
   aCodeViewFonf.setFixedPitch(true);
   aCodeViewFonf.setPointSize(10);
+
+  myCodeView = new QTextEdit;
+  myCodeView->setReadOnly(true);
   myCodeView->setFont(aCodeViewFonf);
   myCodeViewHighlighter = new OcctHighlighter(myCodeView->document());
-  aCodeResultSplitter->addWidget(myCodeView);
 
   myResultView = new QTextEdit;
   myResultView->setReadOnly(true);
   myResultView->setFont(aCodeViewFonf);
 
+  QSplitter* aCodeResultSplitter = new QSplitter(Qt::Vertical);
+  aCodeResultSplitter->addWidget(myCodeView);
   aCodeResultSplitter->addWidget(myResultView);
 
+  myDocument3d = createNewDocument();
+  myGeomWidget = new GeomWidget(myDocument3d->getContext());
+  myGeomWidget->setContentsMargins(0, 0, 0, 0);
+  QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
+
+  aGeomTextSplitter->addWidget(myGeomWidget);
+  aGeomTextSplitter->addWidget(aCodeResultSplitter);
   setCentralWidget(aGeomTextSplitter);
-  aGeomTextSplitter->setStretchFactor(0, 3);
-  aGeomTextSplitter->setStretchFactor(1, 1);
-  aGeomTextSplitter->show();
 
   Q_INIT_RESOURCE(Samples);
   switch (APP_TYPE)
@@ -134,8 +128,8 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   createStandardOperations();
   createCasCadeOperations();
 
-  statusBar()->showMessage( QObject::tr("INF_READY"), 5000 );
-  resize( 1000, 700 );
+  //statusBar()->showMessage( QObject::tr("INF_READY"), 5000 );
+  resize(1280, 720);
 }
 
 void ApplicationCommonWindow::createStandardOperations()
@@ -278,7 +272,7 @@ void ApplicationCommonWindow::createCasCadeOperations()
 //  myCasCadeBar->hide();
 
   myViewBar = addToolBar(tr("View Operations"));
-  myViewBar->addActions(myView->getViewActions());
+//  myViewBar->addActions(myView->getViewActions());
 }
 
 QAction*  ApplicationCommonWindow::getToolAction(ToolActions theActionId)
@@ -314,7 +308,7 @@ DocumentCommon* ApplicationCommonWindow::createNewDocument()
 
 void ApplicationCommonWindow::onUseVBO()
 {
-  Handle(AIS_InteractiveContext) aContextAIS = myDocument->getContext();
+  Handle(AIS_InteractiveContext) aContextAIS = myDocument3d->getContext();
 
   if (aContextAIS.IsNull())
     return;
@@ -350,27 +344,27 @@ void ApplicationCommonWindow::onToolAction()
 {
   QAction* sentBy = (QAction*)sender();
   if( sentBy == myToolActions.value(ToolActions::ToolWireframeId ) )
-    myDocument->onWireframe();
+    myDocument3d->onWireframe();
 
   if( sentBy == myToolActions.value(ToolActions::ToolShadingId ) )
-    myDocument->onShading();
+    myDocument3d->onShading();
 
   if( sentBy == myToolActions.value(ToolActions::ToolColorId ) )
-    myDocument->onColor();
+    myDocument3d->onColor();
 
   if( sentBy == myToolActions.value(ToolActions::ToolMaterialId ) )
-    myDocument->onMaterial();
+    myDocument3d->onMaterial();
 
   if( sentBy == myToolActions.value(ToolActions::ToolTransparencyId ) )
-    myDocument->onTransparency();
+    myDocument3d->onTransparency();
 
   if( sentBy == myToolActions.value(ToolActions::ToolDeleteId ) )
-    myDocument->onDelete();
+    myDocument3d->onDelete();
 }
 
 void ApplicationCommonWindow::onSetMaterial( int theMaterial )
 {
-    myDocument->onMaterial( theMaterial );
+    myDocument3d->onMaterial( theMaterial );
 }
 
 QString ApplicationCommonWindow::getResourceDir()
@@ -441,17 +435,17 @@ QToolBar* ApplicationCommonWindow::getCasCadeBar()
 void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 {
   mySamples->Process(theSampleName.toUtf8().data());
-  myDocument->ClearContext();
+  myDocument3d->ClearContext();
   myCodeView->setPlainText(mySamples->GetCode().ToCString());
   myResultView->setPlainText(mySamples->GetResult().ToCString());
   if (mySamples->IsProcessed())
   {
     for (const Handle(AIS_InteractiveObject) aObject : mySamples->Get3dObject())
     {
-      myDocument->getContext()->Display(aObject, Standard_True);
+      myDocument3d->getContext()->Display(aObject, Standard_True);
     }
   }
-  myView->fitAll();
+  myGeomWidget->FitAll();
 }
 
 QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent)
