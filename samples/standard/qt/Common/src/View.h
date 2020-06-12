@@ -69,61 +69,61 @@ signals:
     void                          selectionChanged();
 
 public slots:
-    void                          fitAll();
-    void                          fitArea();
-    void                          zoom();
-    void                          pan();
-    void                          globalPan();
-    void                          front();
-    void                          back();
-    void                          top();
-    void                          bottom();
-    void                          left();
-    void                          right();
-    void                          axo();
-    void                          rotation();
-    void                          reset();
-    void                          hlrOn();
-    void                          hlrOff();
-    void                          updateToggled( bool );
-    void                          onBackground();
-    void                          onEnvironmentMap();
-    void                          onRaytraceAction();
+    void fitAll();
+    void fitArea();
+    void zoom();
+    void pan();
+    void globalPan();
+    void front();
+    void back();
+    void top();
+    void bottom();
+    void left();
+    void right();
+    void axo();
+    void rotation();
+    void reset();
+    void hlrOn();
+    void hlrOff();
+    void updateToggled( bool );
+    void onBackground();
+    void onEnvironmentMap();
+    void onRaytraceAction();
 
 protected:
-    virtual void                  paintEvent( QPaintEvent* );
-    virtual void                  resizeEvent( QResizeEvent* );
-    virtual void                  mousePressEvent( QMouseEvent* );
-    virtual void                  mouseReleaseEvent(QMouseEvent* );
-    virtual void                  mouseMoveEvent( QMouseEvent* );
+    virtual void paintEvent( QPaintEvent* ) override;
+    virtual void resizeEvent( QResizeEvent* ) override;
+    virtual void mousePressEvent( QMouseEvent* ) override;
+    virtual void mouseReleaseEvent(QMouseEvent* ) override;
+    virtual void mouseMoveEvent( QMouseEvent* ) override;
 
     virtual void                  addItemInPopup( QMenu* );
 
-    Handle(V3d_View)&                     getView();
+//    Handle(V3d_View)&                     getView();
     Handle(AIS_InteractiveContext)&       getContext();
     void                                  activateCursor( const CurrentAction3d );
     void                                  Popup( const int x, const int y );
     CurrentAction3d                       getCurrentMode();
 
-    virtual void                          onLButtonDown( const int nFlags, const QPoint point );
-    virtual void                          onMButtonDown( const int nFlags, const QPoint point );
-    virtual void                          onRButtonDown( const int nFlags, const QPoint point );
-    virtual void                          onLButtonUp( Qt::MouseButtons nFlags, const QPoint point );
-    virtual void                          onMButtonUp( Qt::MouseButtons nFlags, const QPoint point );
-    virtual void                          onRButtonUp( Qt::MouseButtons nFlags, const QPoint point );
-    virtual void                          onMouseMove( Qt::MouseButtons nFlags, const QPoint point );
+    virtual void onLButtonDown( const int nFlags, const QPoint point );
+    virtual void onMButtonDown( const int nFlags, const QPoint point );
+    virtual void onRButtonDown( const int nFlags, const QPoint point );
+    virtual void onLButtonUp( Qt::MouseButtons nFlags, const QPoint point );
+    virtual void onMButtonUp( Qt::MouseButtons nFlags, const QPoint point );
+    virtual void onRButtonUp( Qt::MouseButtons nFlags, const QPoint point );
+    virtual void onMouseMove( Qt::MouseButtons nFlags, const QPoint point );
 
 private:
-    void                          initCursors();
-    void                          initViewActions();
-    void                          initRaytraceActions();
-    void                          DragEvent( const int x, const int y, const int TheState );
-    void                          InputEvent( const int x, const int y );
-    void                          MoveEvent( const int x, const int y );
-    void                          MultiMoveEvent( const int x, const int y );
-    void                          MultiDragEvent( const int x, const int y, const int TheState );
-    void                          MultiInputEvent( const int x, const int y );
-    void                          DrawRectangle( const int MinX, const int MinY,
+    void initCursors();
+    void initViewActions();
+    void initRaytraceActions();
+    void DragEvent( const int x, const int y, const int TheState );
+    void InputEvent( const int x, const int y );
+    void MoveEvent( const int x, const int y );
+    void MultiMoveEvent( const int x, const int y );
+    void MultiDragEvent( const int x, const int y, const int TheState );
+    void MultiInputEvent( const int x, const int y );
+    void DrawRectangle( const int MinX, const int MinY,
                                                  const int MaxX, const int MaxY, const bool Draw );
 
 private:
@@ -133,7 +133,7 @@ private:
     bool                            myIsAntialiasingEnabled;
 
     bool                            myDrawRect;           // set when a rect is used for selection or magnify 
-    Handle(V3d_View)                myView;
+    Handle(V3d_View)                myV3dView;
     Handle(AIS_InteractiveContext)  myContext;
     CurrentAction3d                 myCurrentMode;
     Standard_Integer                myXmin;

@@ -55,7 +55,6 @@ protected:
 	ApplicationCommonWindow*       myApp;
 	Handle(V3d_Viewer)             myViewer;
 	Handle(AIS_InteractiveContext) myContext;
-  int                            myNbViews;
 };
 
 #endif

@@ -17,6 +17,8 @@
 #include <gp_Sphere.hxx>
 #include <gp_Torus.hxx>
 
+#include <gp_Pnt2d.hxx>
+#include <gp_XY.hxx>
 
 
 
@@ -24,8 +26,6 @@
 #include <Geom_VectorWithMagnitude.hxx>
 #include <Geom_Axis1Placement.hxx>
 #include <Geom_Axis2Placement.hxx>
-
-
 #include <Geom_Circle.hxx>
 #include <Geom_Ellipse.hxx>
 #include <Geom_Parabola.hxx>
@@ -39,6 +39,11 @@
 #include <Geom_ConicalSurface.hxx>
 #include <Geom_SphericalSurface.hxx>
 #include <Geom_ToroidalSurface.hxx>
+
+#include "AdaptorPnt2d_AIS.h"
+
+#include <Geom2d_CartesianPoint.hxx>
+
 
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
@@ -307,7 +312,35 @@ void GeometrySamples::SecondOrderSurfaces3dSample()
 
 void GeometrySamples::ZeroDimensionObjects2dSample()
 {
+  // Defines a non-persistent 2D cartesian point.
+  gp_Pnt2d aCoordPnt(10.0, 20.0);
+  Handle(Geom2d_CartesianPoint) aCoordGeomPoint = new Geom2d_CartesianPoint(aCoordPnt);
+  Handle(AdaptorPnt2d_AIS) aCoordAisPoint = new AdaptorPnt2d_AIS(aCoordGeomPoint);
+  myObject3d.Append(aCoordAisPoint);
 
+  Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
+  aPntLabel->SetText("gp_Pnt2d");
+  aPntLabel->SetPosition(gp_Pnt(aCoordPnt.X(), aCoordPnt.Y(), 0.0));
+  myObject3d.Append(aPntLabel);
+  myResult << "gp_Pnt was created" << std::endl;
+
+  //// gp_XYZ class describes a cartesian coordinate entity in 3D space (X,Y,Z).
+  //// This entity is used for algebraic calculation.
+  //// This entity can be transformed with a "Trsf" or a "GTrsf" from package "gp".
+  //// It is used in vectorial computations or for holding this type of information in data structures.
+  //gp_XYZ aXyz1(10.0, 20.0, 30.0);
+  //gp_XYZ aXyz2(20.0, 10.0, 30.0);
+  //gp_XYZ aXyzSum = aXyz1 + aXyz2;
+  //gp_Pnt aSumPnt(aXyzSum);
+  //Handle(Geom_CartesianPoint) aXyzGeomPoint = new Geom_CartesianPoint(aSumPnt);
+  //Handle(AIS_Point) aSumAisPoint = new AIS_Point(aXyzGeomPoint);
+  //myObject3d.Append(aSumAisPoint);
+
+  //Handle(AIS_TextLabel) aXyzLabel = new AIS_TextLabel();
+  //aXyzLabel->SetText("gp_XYZ");
+  //aXyzLabel->SetPosition(gp_Pnt(aXyzSum.X(), aXyzSum.Y(), aXyzSum.Z() + 5));
+  //myObject3d.Append(aXyzLabel);
+  //myResult << "gp_XYZ was created" << std::endl;
 }
 
 void GeometrySamples::Vectors2dSample()
