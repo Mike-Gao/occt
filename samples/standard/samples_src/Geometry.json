@@ -219,7 +219,7 @@
 				},
 				{
 					"text": "Offset curve",
-					"function": "ParamOffsetCurve3dSample",
+					"function": "OffsetCurve3dSample",
 					"description": ""
 				},
 				{
@@ -255,7 +255,7 @@
 				},
 				{
 					"text": "Offset curve",
-					"function": "OffsetCurve3dSample",
+					"function": "OffsetCurve2dSample",
 					"description": ""
 				}
 			]
@@ -277,13 +277,13 @@
 			}
 		],
 		"Data extraction": [{
-				"text": "JSON with circle radius",
-				"function": "JsonWithCircleRadiusSample",
+				"text": "Dump circle info",
+				"function": "DumpCircleInfoSample",
 				"description": ""
 			},
 			{
-				"text": "JSON with BSpline curve info",
-				"function": "JsonWithBSplineCurveInfoSample",
+				"text": "Dump BSpline curve info",
+				"function": "DumpBSplineCurveInfoSample",
 				"description": ""
 			}
 		]
