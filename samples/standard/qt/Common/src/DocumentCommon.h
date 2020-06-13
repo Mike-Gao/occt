@@ -24,7 +24,9 @@ public:
 
 	ApplicationCommonWindow*       getApplication();
 	Handle(AIS_InteractiveContext) getContext();
-  void                           ClearContext();
+
+  void SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects);
+  bool IsEmpty() const { return myContextIsEmpty; } 
 	
 protected:
 
@@ -55,6 +57,7 @@ protected:
 	ApplicationCommonWindow*       myApp;
 	Handle(V3d_Viewer)             myViewer;
 	Handle(AIS_InteractiveContext) myContext;
+  bool myContextIsEmpty;
 };
 
 #endif

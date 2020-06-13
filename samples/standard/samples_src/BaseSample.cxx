@@ -21,12 +21,12 @@ Standard_Boolean BaseSample::IsProcessed()
   return myIsProcessed;
 }
 
-NCollection_Vector<Handle(AIS_InteractiveObject) > BaseSample::Get2dObject()
+const NCollection_Vector<Handle(AIS_InteractiveObject)>& BaseSample::Get2dObjects()
 {
   return myObject2d;
 }
 
-NCollection_Vector<Handle(AIS_InteractiveObject) > BaseSample::Get3dObject()
+const NCollection_Vector<Handle(AIS_InteractiveObject)>& BaseSample::Get3dObjects()
 {
   return myObject3d;
 }

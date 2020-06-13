@@ -96,12 +96,15 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   aCodeResultSplitter->addWidget(myResultView);
 
   myDocument3d = createNewDocument();
-  myGeomWidget = new GeomWidget(myDocument3d->getContext());
+  myDocument2d = createNewDocument();
+  myGeomWidget = new GeomWidget(myDocument3d, myDocument2d);
   myGeomWidget->setContentsMargins(0, 0, 0, 0);
   QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
 
   aGeomTextSplitter->addWidget(myGeomWidget);
   aGeomTextSplitter->addWidget(aCodeResultSplitter);
+  aGeomTextSplitter->setStretchFactor(0, 1);
+  aGeomTextSplitter->setStretchFactor(1, 1);
   setCentralWidget(aGeomTextSplitter);
 
   Q_INIT_RESOURCE(Samples);
@@ -128,7 +131,6 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   createStandardOperations();
   createCasCadeOperations();
 
-  //statusBar()->showMessage( QObject::tr("INF_READY"), 5000 );
   resize(1280, 720);
 }
 
@@ -269,10 +271,8 @@ void ApplicationCommonWindow::createCasCadeOperations()
 
   for (QAction* anAction: myToolActions)
     myCasCadeBar->addAction(anAction);
-//  myCasCadeBar->hide();
 
   myViewBar = addToolBar(tr("View Operations"));
-//  myViewBar->addActions(myView->getViewActions());
 }
 
 QAction*  ApplicationCommonWindow::getToolAction(ToolActions theActionId)
@@ -435,16 +435,10 @@ QToolBar* ApplicationCommonWindow::getCasCadeBar()
 void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 {
   mySamples->Process(theSampleName.toUtf8().data());
-  myDocument3d->ClearContext();
+  myDocument3d->SetObjects(mySamples->Get3dObjects());
+  myDocument2d->SetObjects(mySamples->Get2dObjects());
   myCodeView->setPlainText(mySamples->GetCode().ToCString());
   myResultView->setPlainText(mySamples->GetResult().ToCString());
-  if (mySamples->IsProcessed())
-  {
-    for (const Handle(AIS_InteractiveObject) aObject : mySamples->Get3dObject())
-    {
-      myDocument3d->getContext()->Display(aObject, Standard_True);
-    }
-  }
   myGeomWidget->FitAll();
 }
 

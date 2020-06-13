@@ -50,9 +50,10 @@ Handle(V3d_Viewer) DocumentCommon::Viewer (const Standard_ExtString ,
   return aViewer;
 }
 
-DocumentCommon::DocumentCommon(ApplicationCommonWindow* app )
-: QObject( app ),
-myApp( app )
+DocumentCommon::DocumentCommon(ApplicationCommonWindow* app ): 
+  QObject( app ),
+  myApp( app ),
+  myContextIsEmpty(true)
 {
   TCollection_ExtendedString a3DName ("Visu3D");
 
@@ -78,9 +79,17 @@ Handle(AIS_InteractiveContext) DocumentCommon::getContext()
   return myContext;
 }
 
-void DocumentCommon::ClearContext()
+void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects)
 {
-  myContext->EraseAll(Standard_True);
+  myContext->RemoveAll(Standard_True);
+  if (theObjects.IsEmpty())
+    myContextIsEmpty = true;
+  else 
+    myContextIsEmpty = false;
+  for (const Handle(AIS_InteractiveObject) aObject : theObjects)
+  {
+    myContext->Display(aObject, Standard_True);
+  }
 }
 
 void DocumentCommon::onWireframe()
