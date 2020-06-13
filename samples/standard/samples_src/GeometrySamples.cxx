@@ -331,16 +331,24 @@ void GeometrySamples::SecondOrderSurfaces3dSample()
 void GeometrySamples::ZeroDimensionObjects2dSample()
 {
   // Defines a non-persistent 2D cartesian point.
+  gp_Pnt2d aCoordPnt3(10.0, 20.0);
+  Handle(Geom2d_CartesianPoint) aCoordGeomPoint3 = new Geom2d_CartesianPoint(aCoordPnt3);
+  Handle(AdaptorPnt2d_AIS) aCoordAisPoint3 = new AdaptorPnt2d_AIS(aCoordGeomPoint3);
+  myObject3d.Append(aCoordAisPoint3);
+
   gp_Pnt2d aCoordPnt(10.0, 20.0);
   Handle(Geom2d_CartesianPoint) aCoordGeomPoint = new Geom2d_CartesianPoint(aCoordPnt);
   Handle(AdaptorPnt2d_AIS) aCoordAisPoint = new AdaptorPnt2d_AIS(aCoordGeomPoint);
-  myObject3d.Append(aCoordAisPoint);
+  myObject2d.Append(aCoordAisPoint);
 
   Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
   aPntLabel->SetText("gp_Pnt2d");
   aPntLabel->SetPosition(gp_Pnt(aCoordPnt.X(), aCoordPnt.Y(), 0.0));
-  myObject3d.Append(aPntLabel);
+  myObject2d.Append(aPntLabel);
   myResult << "gp_Pnt was created" << std::endl;
+
+
+
 
   //// gp_XYZ class describes a cartesian coordinate entity in 3D space (X,Y,Z).
   //// This entity is used for algebraic calculation.

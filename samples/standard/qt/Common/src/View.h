@@ -15,20 +15,18 @@
 class TopoDS_Shape;
 class QRubberBand;
 
-enum class CurrentAction3d { CurAction3d_Nothing, CurAction3d_DynamicZooming,
-                             CurAction3d_WindowZooming, CurAction3d_DynamicPanning,
-                             CurAction3d_GlobalPanning, CurAction3d_DynamicRotation };
-enum class ViewAction { ViewFitAll, ViewFitArea, ViewZoom, ViewPan, ViewGlobalPan,
-                        ViewFront, ViewBack, ViewTop, ViewBottom, ViewLeft, ViewRight,
-                        ViewAxo, ViewRotation, ViewReset, ViewHlrOff, ViewHlrOn };
-enum class RaytraceActionId { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
+enum class CurrentAction3d { Nothing, DynamicZooming, WindowZooming, 
+                             DynamicPanning, GlobalPanning, DynamicRotation };
+enum class ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top, Bottom, 
+                        Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn };
+enum class RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
 //class COMMONSAMPLE_EXPORT View: public QWidget
 class View: public QWidget
 {
     Q_OBJECT
 public:
-    View( Handle(AIS_InteractiveContext) theContext, QWidget* parent );
+    View( Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* parent );
 
     ~View();
 
@@ -36,7 +34,7 @@ public:
     bool                          dump( Standard_CString theFile );
     QAction*              getViewAction(ViewAction theAction);
     QList<QAction*>       getViewActions();
-    QAction*              getRaytraceAction(RaytraceActionId theAction);
+    QAction*              getRaytraceAction(RaytraceAction theAction);
     void                          noActiveActions();
     bool                          isShadingMode();
 
@@ -132,6 +130,8 @@ private:
     bool                            myIsReflectionsEnabled;
     bool                            myIsAntialiasingEnabled;
 
+    bool myIis3dView;
+
     bool                            myDrawRect;           // set when a rect is used for selection or magnify 
     Handle(V3d_View)                myV3dView;
     Handle(AIS_InteractiveContext)  myContext;
@@ -143,7 +143,7 @@ private:
     Standard_Real                   myCurZoom;
     Standard_Boolean                myHlrModeIsOn;
     QMap<ViewAction, QAction*>      myViewActions;
-    QMap<RaytraceActionId, QAction*>  myRaytraceActions;
+    QMap<RaytraceAction, QAction*>  myRaytraceActions;
     QMenu*                          myBackMenu;
     QToolBar*        myViewBar;
     QRubberBand*                    myRectBand; //!< selection rectangle rubber band

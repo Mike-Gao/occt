@@ -18,8 +18,8 @@ class BaseSample: public Standard_Transient
 {
 public:
 	Standard_Boolean                                  IsProcessed();
-  NCollection_Vector<Handle(AIS_InteractiveObject)> Get2dObject();
-  NCollection_Vector<Handle(AIS_InteractiveObject)> Get3dObject();
+  const NCollection_Vector<Handle(AIS_InteractiveObject)>& Get2dObjects();
+  const NCollection_Vector<Handle(AIS_InteractiveObject)>& Get3dObjects();
   TCollection_AsciiString                           GetResult();
   TCollection_AsciiString                           GetCode();
 

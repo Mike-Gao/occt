@@ -26,11 +26,11 @@ void DocumentTut::onMakeBottle()
     QApplication::setOverrideCursor( Qt::WaitCursor );
     TopoDS_Shape aBottle=MakeBottle(50,70,30);
     Handle(AIS_Shape) AISBottle=new AIS_Shape(aBottle);
-    getContext()->SetMaterial (AISBottle, Graphic3d_NOM_GOLD, Standard_False);
-    getContext()->SetDisplayMode(AISBottle, 1, Standard_False);
-    getContext()->Display(AISBottle, Standard_False);	
+    myContext->SetMaterial (AISBottle, Graphic3d_NOM_GOLD, Standard_False);
+    myContext->SetDisplayMode(AISBottle, 1, Standard_False);
+    myContext->Display(AISBottle, Standard_False);
     const Handle(AIS_InteractiveObject)& anIOAISBottle = AISBottle;
-    getContext()->SetSelected(anIOAISBottle,Standard_False);
+    myContext->SetSelected(anIOAISBottle,Standard_False);
     emit selectionChanged();
     QApplication::restoreOverrideCursor();
 }

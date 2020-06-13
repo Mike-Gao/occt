@@ -107,7 +107,6 @@ private:
   QTextEdit*       myResultView;
   OcctHighlighter* myCodeViewHighlighter;
 
-//  View*            myView;
   GeomWidget*  myGeomWidget;
 
 protected:

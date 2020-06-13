@@ -47,12 +47,13 @@ static QCursor* globPanCursor = NULL;
 static QCursor* zoomCursor    = NULL;
 static QCursor* rotCursor     = NULL;
 
-View::View( Handle(AIS_InteractiveContext) theContext, QWidget* parent )
+View::View( Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* parent )
 : QWidget( parent ),
   myIsRaytracing( false ),
   myIsShadowsEnabled (true),
   myIsReflectionsEnabled (false),
   myIsAntialiasingEnabled (false),
+  myIis3dView(is3dView),
   myBackMenu( NULL )
 {
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
@@ -70,7 +71,7 @@ View::View( Handle(AIS_InteractiveContext) theContext, QWidget* parent )
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_NoSystemBackground);
 
-  myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+  myCurrentMode = CurrentAction3d::Nothing;
   myHlrModeIsOn = Standard_False;
   setMouseTracking( true );
 
@@ -101,7 +102,10 @@ void View::init()
   {
     hWnd->Map();
   }
-  myV3dView->SetBackgroundColor (Quantity_NOC_BLACK);
+  if(myIis3dView)
+    myV3dView->SetBackgroundColor (Quantity_NOC_BLUE4);
+  else
+    myV3dView->SetBackgroundColor (Quantity_NOC_GREEN4);
   myV3dView->MustBeResized();
 
   if (myIsRaytracing)
@@ -132,22 +136,25 @@ void View::fitAll()
 
 void View::fitArea()
 {
-  myCurrentMode = CurrentAction3d::CurAction3d_WindowZooming;
+  myCurrentMode = CurrentAction3d::WindowZooming;
 }
 
 void View::zoom()
 {
-  myCurrentMode = CurrentAction3d::CurAction3d_DynamicZooming;
+  myCurrentMode = CurrentAction3d::DynamicZooming;
 }
 
 void View::pan()
 {
-  myCurrentMode = CurrentAction3d::CurAction3d_DynamicPanning;
+  myCurrentMode = CurrentAction3d::DynamicPanning;
 }
 
 void View::rotation()
 {
-  myCurrentMode = CurrentAction3d::CurAction3d_DynamicRotation;
+  if(myIis3dView)
+    myCurrentMode = CurrentAction3d::DynamicRotation;
+  else 
+    myCurrentMode = CurrentAction3d::Nothing;
 }
 
 void View::globalPan()
@@ -157,17 +164,19 @@ void View::globalPan()
   // Do a Global Zoom
   myV3dView->FitAll();
   // Set the mode
-  myCurrentMode = CurrentAction3d::CurAction3d_GlobalPanning;
+  myCurrentMode = CurrentAction3d::GlobalPanning;
 }
 
 void View::front()
 {
-  myV3dView->SetProj( V3d_Yneg );
+  if (myIis3dView)
+    myV3dView->SetProj( V3d_Yneg );
 }
 
 void View::back()
 {
-  myV3dView->SetProj( V3d_Ypos );
+  if (myIis3dView)
+    myV3dView->SetProj( V3d_Ypos );
 }
 
 void View::top()
@@ -177,22 +186,26 @@ void View::top()
 
 void View::bottom()
 {
-  myV3dView->SetProj( V3d_Zneg );
+  if (myIis3dView)
+    myV3dView->SetProj( V3d_Zneg );
 }
 
 void View::left()
 {
-  myV3dView->SetProj( V3d_Xneg );
+  if (myIis3dView)
+    myV3dView->SetProj( V3d_Xneg );
 }
 
 void View::right()
 {
-  myV3dView->SetProj( V3d_Xpos );
+  if (myIis3dView)
+    myV3dView->SetProj( V3d_Xpos );
 }
 
 void View::axo()
 {
-  myV3dView->SetProj( V3d_XposYnegZpos );
+  if (myIis3dView)
+    myV3dView->SetProj( V3d_XposYnegZpos );
 }
 
 void View::reset()
@@ -240,9 +253,9 @@ void View::onRaytraceAction()
 {
   QAction* aSentBy = (QAction*)sender();
   
-  if (aSentBy == myRaytraceActions.value(RaytraceActionId::ToolRaytracing))
+  if (aSentBy == myRaytraceActions.value(RaytraceAction::ToolRaytracing))
   {
-    bool aState = myRaytraceActions.value(RaytraceActionId::ToolRaytracing)->isChecked();
+    bool aState = myRaytraceActions.value(RaytraceAction::ToolRaytracing)->isChecked();
 
     QApplication::setOverrideCursor (Qt::WaitCursor);
     if (aState)
@@ -252,21 +265,21 @@ void View::onRaytraceAction()
     QApplication::restoreOverrideCursor();
   }
 
-  if (aSentBy == myRaytraceActions.value(RaytraceActionId::ToolShadows))
+  if (aSentBy == myRaytraceActions.value(RaytraceAction::ToolShadows))
   {
-    bool aState = myRaytraceActions.value(RaytraceActionId::ToolShadows)->isChecked();
+    bool aState = myRaytraceActions.value(RaytraceAction::ToolShadows)->isChecked();
     SetRaytracedShadows (aState);
   }
 
-  if (aSentBy == myRaytraceActions.value(RaytraceActionId::ToolReflections))
+  if (aSentBy == myRaytraceActions.value(RaytraceAction::ToolReflections))
   {
-    bool aState = myRaytraceActions.value(RaytraceActionId::ToolReflections)->isChecked();
+    bool aState = myRaytraceActions.value(RaytraceAction::ToolReflections)->isChecked();
     SetRaytracedReflections (aState);
   }
 
-  if (aSentBy == myRaytraceActions.value(RaytraceActionId::ToolAntialiasing))
+  if (aSentBy == myRaytraceActions.value(RaytraceAction::ToolAntialiasing))
   {
-    bool aState = myRaytraceActions.value(RaytraceActionId::ToolAntialiasing)->isChecked();
+    bool aState = myRaytraceActions.value(RaytraceAction::ToolAntialiasing)->isChecked();
     SetRaytracedAntialiasing (aState);
   }
 }
@@ -316,15 +329,15 @@ void View::updateToggled( bool isOn )
     }
     else
     {
-      if ( sentBy == myViewActions.value(ViewAction::ViewFitArea ) )
+      if ( sentBy == myViewActions.value(ViewAction::FitArea ) )
         setCursor( *handCursor );
-      else if ( sentBy == myViewActions.value(ViewAction::ViewZoom ) )
+      else if ( sentBy == myViewActions.value(ViewAction::Zoom ) )
         setCursor( *zoomCursor );
-      else if ( sentBy == myViewActions.value(ViewAction::ViewPan ) )
+      else if ( sentBy == myViewActions.value(ViewAction::Pan ) )
         setCursor( *panCursor );
-      else if ( sentBy == myViewActions.value(ViewAction::ViewGlobalPan ) )
+      else if ( sentBy == myViewActions.value(ViewAction::GlobalPan ) )
         setCursor( *globPanCursor );
-      else if ( sentBy == myViewActions.value(ViewAction::ViewRotation ) )
+      else if ( sentBy == myViewActions.value(ViewAction::Rotation ) )
         setCursor( *rotCursor );
       else
         setCursor( *defCursor );
@@ -362,7 +375,7 @@ QList<QAction*>   View::getViewActions()
   return myViewActions.values();
 }
 
-QAction* View::getRaytraceAction(RaytraceActionId theAction)
+QAction* View::getRaytraceAction(RaytraceAction theAction)
 {
   initRaytraceActions();
   return myRaytraceActions.value(theAction);
@@ -388,7 +401,7 @@ void View::initViewActions()
   a->setToolTip( QObject::tr("TBR_FITALL") );
   a->setStatusTip( QObject::tr("TBR_FITALL") );
   connect( a, SIGNAL( triggered() ) , this, SLOT( fitAll() ) );
-  myViewActions.insert(ViewAction::ViewFitAll, a);
+  myViewActions.insert(ViewAction::FitAll, a);
 
   //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_FITAREA") ), QObject::tr("MNU_FITAREA"), this );
   //a->setToolTip( QObject::tr("TBR_FITAREA") );
@@ -424,49 +437,53 @@ void View::initViewActions()
 
   a->setCheckable( true );
   connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
-  myViewActions.insert(ViewAction::ViewGlobalPan, a );
+  myViewActions.insert(ViewAction::GlobalPan, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_FRONT") ), QObject::tr("MNU_FRONT"), this );
-  a->setToolTip( QObject::tr("TBR_FRONT") );
-  a->setStatusTip( QObject::tr("TBR_FRONT") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( front() ) );
-  myViewActions.insert(ViewAction::ViewFront, a );
+  if (myIis3dView)
+  {
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_FRONT") ), QObject::tr("MNU_FRONT"), this );
+    a->setToolTip( QObject::tr("TBR_FRONT") );
+    a->setStatusTip( QObject::tr("TBR_FRONT") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( front() ) );
+    myViewActions.insert(ViewAction::Front, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_BACK") ), QObject::tr("MNU_BACK"), this );
-  a->setToolTip( QObject::tr("TBR_BACK") );
-  a->setStatusTip( QObject::tr("TBR_BACK") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( back() ) );
-  myViewActions.insert(ViewAction::ViewBack, a);
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_BACK") ), QObject::tr("MNU_BACK"), this );
+    a->setToolTip( QObject::tr("TBR_BACK") );
+    a->setStatusTip( QObject::tr("TBR_BACK") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( back() ) );
+    myViewActions.insert(ViewAction::Back, a);
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_TOP") ), QObject::tr("MNU_TOP"), this );
-  a->setToolTip( QObject::tr("TBR_TOP") );
-  a->setStatusTip( QObject::tr("TBR_TOP") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( top() ) );
-  myViewActions.insert(ViewAction::ViewTop, a );
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_TOP") ), QObject::tr("MNU_TOP"), this );
+    a->setToolTip( QObject::tr("TBR_TOP") );
+    a->setStatusTip( QObject::tr("TBR_TOP") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( top() ) );
+    myViewActions.insert(ViewAction::Top, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_BOTTOM") ), QObject::tr("MNU_BOTTOM"), this );
-  a->setToolTip( QObject::tr("TBR_BOTTOM") );
-  a->setStatusTip( QObject::tr("TBR_BOTTOM") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( bottom() ) );
-  myViewActions.insert(ViewAction::ViewBottom, a );
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_BOTTOM") ), QObject::tr("MNU_BOTTOM"), this );
+    a->setToolTip( QObject::tr("TBR_BOTTOM") );
+    a->setStatusTip( QObject::tr("TBR_BOTTOM") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( bottom() ) );
+    myViewActions.insert(ViewAction::Bottom, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_LEFT") ), QObject::tr("MNU_LEFT"), this );
-  a->setToolTip( QObject::tr("TBR_LEFT") );
-  a->setStatusTip( QObject::tr("TBR_LEFT") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( left() ) );
-  myViewActions.insert(ViewAction::ViewLeft, a );
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_LEFT") ), QObject::tr("MNU_LEFT"), this );
+    a->setToolTip( QObject::tr("TBR_LEFT") );
+    a->setStatusTip( QObject::tr("TBR_LEFT") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( left() ) );
+    myViewActions.insert(ViewAction::Left, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_RIGHT") ), QObject::tr("MNU_RIGHT"), this );
-  a->setToolTip( QObject::tr("TBR_RIGHT") );
-  a->setStatusTip( QObject::tr("TBR_RIGHT") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( right() ) );
-  myViewActions.insert(ViewAction::ViewRight, a );
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_RIGHT") ), QObject::tr("MNU_RIGHT"), this );
+    a->setToolTip( QObject::tr("TBR_RIGHT") );
+    a->setStatusTip( QObject::tr("TBR_RIGHT") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( right() ) );
+    myViewActions.insert(ViewAction::Right, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_AXO") ), QObject::tr("MNU_AXO"), this );
-  a->setToolTip( QObject::tr("TBR_AXO") );
-  a->setStatusTip( QObject::tr("TBR_AXO") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( axo() ) );
-  myViewActions.insert(ViewAction::ViewAxo, a );
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_AXO") ), QObject::tr("MNU_AXO"), this );
+    a->setToolTip( QObject::tr("TBR_AXO") );
+    a->setStatusTip( QObject::tr("TBR_AXO") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( axo() ) );
+    myViewActions.insert(ViewAction::Axo, a );
+  }
+
 
   //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_ROTATION") ), QObject::tr("MNU_ROTATION"), this );
   //a->setToolTip( QObject::tr("TBR_ROTATION") );
@@ -475,31 +492,33 @@ void View::initViewActions()
   //a->setCheckable( true );
   //connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
   //myViewActions.insert(ViewAction::ViewRotationId, a );
+  if (myIis3dView)
+  {
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_RESET") ), QObject::tr("MNU_RESET"), this );
+    a->setToolTip( QObject::tr("TBR_RESET") );
+    a->setStatusTip( QObject::tr("TBR_RESET") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( reset() ) );
+    myViewActions.insert(ViewAction::Reset, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_RESET") ), QObject::tr("MNU_RESET"), this );
-  a->setToolTip( QObject::tr("TBR_RESET") );
-  a->setStatusTip( QObject::tr("TBR_RESET") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( reset() ) );
-  myViewActions.insert(ViewAction::ViewReset, a );
+    QActionGroup* ag = new QActionGroup( this );
 
-  QActionGroup* ag = new QActionGroup( this );
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_HLROFF") ), QObject::tr("MNU_HLROFF"), this );
+    a->setToolTip( QObject::tr("TBR_HLROFF") );
+    a->setStatusTip( QObject::tr("TBR_HLROFF") );
+    connect( a, SIGNAL( triggered() ) , this, SLOT( hlrOff() ) );
+    a->setCheckable( true );
+    ag->addAction(a);
+    myViewActions.insert(ViewAction::HlrOff, a);
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_HLROFF") ), QObject::tr("MNU_HLROFF"), this );
-  a->setToolTip( QObject::tr("TBR_HLROFF") );
-  a->setStatusTip( QObject::tr("TBR_HLROFF") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( hlrOff() ) );
-  a->setCheckable( true );
-  ag->addAction(a);
-  myViewActions.insert(ViewAction::ViewHlrOff, a);
+    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_HLRON") ), QObject::tr("MNU_HLRON"), this );
+    a->setToolTip( QObject::tr("TBR_HLRON") );
+    a->setStatusTip( QObject::tr("TBR_HLRON") );
+    connect( a, SIGNAL( triggered() ) ,this, SLOT( hlrOn() ) );  
+    a->setCheckable( true );
+    ag->addAction(a);
+    myViewActions.insert(ViewAction::HlrOn, a );
+  }
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_HLRON") ), QObject::tr("MNU_HLRON"), this );
-  a->setToolTip( QObject::tr("TBR_HLRON") );
-  a->setStatusTip( QObject::tr("TBR_HLRON") );
-  connect( a, SIGNAL( triggered() ) ,this, SLOT( hlrOn() ) );
-  
-  a->setCheckable( true );
-  ag->addAction(a);
-  myViewActions.insert(ViewAction::ViewHlrOn, a );
 }
 
 void View::initRaytraceActions()
@@ -516,7 +535,7 @@ void View::initRaytraceActions()
   a->setCheckable( true );
   a->setChecked( false );
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceActionId::ToolRaytracing, a );
+  myRaytraceActions.insert(RaytraceAction::ToolRaytracing, a );
 
   a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_SHADOWS") ), QObject::tr("MNU_TOOL_SHADOWS"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_SHADOWS") );
@@ -524,7 +543,7 @@ void View::initRaytraceActions()
   a->setCheckable( true );
   a->setChecked( true );
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceActionId::ToolShadows, a );
+  myRaytraceActions.insert(RaytraceAction::ToolShadows, a );
 
   a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_REFLECTIONS") ), QObject::tr("MNU_TOOL_REFLECTIONS"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_REFLECTIONS") );
@@ -532,7 +551,7 @@ void View::initRaytraceActions()
   a->setCheckable( true );
   a->setChecked( false );
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceActionId::ToolReflections, a );
+  myRaytraceActions.insert(RaytraceAction::ToolReflections, a );
 
   a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_ANTIALIASING") ), QObject::tr("MNU_TOOL_ANTIALIASING"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_ANTIALIASING") );
@@ -540,7 +559,7 @@ void View::initRaytraceActions()
   a->setCheckable( true );
   a->setChecked( false );
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceActionId::ToolAntialiasing, a );
+  myRaytraceActions.insert(RaytraceAction::ToolAntialiasing, a );
 }
 
 void View::mousePressEvent( QMouseEvent* e )
@@ -572,22 +591,22 @@ void View::activateCursor( const CurrentAction3d mode )
 {
   switch( mode )
   {
-  case CurrentAction3d::CurAction3d_DynamicPanning:
+  case CurrentAction3d::DynamicPanning:
       setCursor( *panCursor );
       break;
-    case CurrentAction3d::CurAction3d_DynamicZooming:
+    case CurrentAction3d::DynamicZooming:
       setCursor( *zoomCursor );
       break;
-    case CurrentAction3d::CurAction3d_DynamicRotation:
+    case CurrentAction3d::DynamicRotation:
       setCursor( *rotCursor );
       break;
-    case CurrentAction3d::CurAction3d_GlobalPanning:
+    case CurrentAction3d::GlobalPanning:
       setCursor( *globPanCursor );
       break;
-    case CurrentAction3d::CurAction3d_WindowZooming:
+    case CurrentAction3d::WindowZooming:
       setCursor( *handCursor );
       break;
-    case CurrentAction3d::CurAction3d_Nothing:
+    case CurrentAction3d::Nothing:
     default:
       setCursor( *defCursor );
       break;
@@ -602,7 +621,7 @@ void View::onLButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
   myXmax = point.x();
   myYmax = point.y();
 
-  myCurrentMode = CurrentAction3d::CurAction3d_DynamicZooming;
+  myCurrentMode = CurrentAction3d::DynamicZooming;
 
   //if ( nFlags & CASCADESHORTCUTKEY )
   //{
@@ -644,7 +663,7 @@ void View::onLButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
 void View::onMButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint /*point*/ )
 {
 //  if ( nFlags & CASCADESHORTCUTKEY )
-    myCurrentMode = CurrentAction3d::CurAction3d_DynamicPanning;
+    myCurrentMode = CurrentAction3d::DynamicPanning;
   activateCursor( myCurrentMode );
 }
 
@@ -668,18 +687,19 @@ void View::onRButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
   //{
   //  myV3dView->SetComputedMode(Standard_False);
   //}
-
-  myCurrentMode = CurrentAction3d::CurAction3d_DynamicRotation;
-  myV3dView->StartRotation(point.x(), point.y());
-
-  activateCursor( myCurrentMode );
+  if (myIis3dView)
+  { 
+    myCurrentMode = CurrentAction3d::DynamicRotation;
+    myV3dView->StartRotation(point.x(), point.y());
+    activateCursor( myCurrentMode );
+  }
 }
 
 void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
 {
     switch( myCurrentMode )
     {
-        case CurrentAction3d::CurAction3d_Nothing:
+    case CurrentAction3d::Nothing:
             if ( point.x() == myXmin && point.y() == myYmin )
             {
               // no offset between down and up --> selectEvent
@@ -701,31 +721,31 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
                   DragEvent( point.x(), point.y(), 1 );
             }
             break;
-        case CurrentAction3d::CurAction3d_DynamicZooming:
-            myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+        case CurrentAction3d::DynamicZooming:
+            myCurrentMode = CurrentAction3d::Nothing;
             noActiveActions();
             break;
-        case CurrentAction3d::CurAction3d_WindowZooming:
+        case CurrentAction3d::WindowZooming:
             DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );//,LongDash);
             myXmax = point.x();
             myYmax = point.y();
             if ( (abs( myXmin - myXmax ) > ValZWMin ) ||
                  (abs( myYmin - myYmax ) > ValZWMin ) )
               myV3dView->WindowFitAll( myXmin, myYmin, myXmax, myYmax );
-            myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+            myCurrentMode = CurrentAction3d::Nothing;
             noActiveActions();
             break;
-        case CurrentAction3d::CurAction3d_DynamicPanning:
-            myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+        case CurrentAction3d::DynamicPanning:
+            myCurrentMode = CurrentAction3d::Nothing;
             noActiveActions();
             break;
-        case CurrentAction3d::CurAction3d_GlobalPanning :
+        case CurrentAction3d::GlobalPanning :
             myV3dView->Place( point.x(), point.y(), myCurZoom );
-            myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+            myCurrentMode = CurrentAction3d::Nothing;
             noActiveActions();
             break;
-        case CurrentAction3d::CurAction3d_DynamicRotation:
-            myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+        case CurrentAction3d::DynamicRotation:
+            myCurrentMode = CurrentAction3d::Nothing;
             noActiveActions();
             break;
         default:
@@ -737,13 +757,13 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
 
 void View::onMButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint /*point*/ )
 {
-    myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+    myCurrentMode = CurrentAction3d::Nothing;
     activateCursor( myCurrentMode );
 }
 
 void View::onRButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint point )
 {
-    if ( myCurrentMode == CurrentAction3d::CurAction3d_Nothing )
+    if ( myCurrentMode == CurrentAction3d::Nothing )
         Popup( point.x(), point.y() );
     else
     {
@@ -756,7 +776,7 @@ void View::onRButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint point )
           myV3dView->Redraw();
         }
         QApplication::restoreOverrideCursor();
-        myCurrentMode = CurrentAction3d::CurAction3d_Nothing;
+        myCurrentMode = CurrentAction3d::Nothing;
     }
     activateCursor( myCurrentMode );
 }
@@ -767,7 +787,7 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
     {
     switch ( myCurrentMode )
     {
-        case CurrentAction3d::CurAction3d_Nothing:
+        case CurrentAction3d::Nothing:
           myXmax = point.x();
           myYmax = point.y();
           DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );
@@ -777,25 +797,25 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
             DragEvent( myXmax, myYmax, 0 );
             DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_True );
             break;
-        case CurrentAction3d::CurAction3d_DynamicZooming:
+        case CurrentAction3d::DynamicZooming:
           myV3dView->Zoom( myXmax, myYmax, point.x(), point.y() );
           myXmax = point.x();
           myYmax = point.y();
           break;
-        case CurrentAction3d::CurAction3d_WindowZooming:
+        case CurrentAction3d::WindowZooming:
           myXmax = point.x();
           myYmax = point.y();
           DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );
           DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_True );
           break;
-        case CurrentAction3d::CurAction3d_DynamicPanning:
+        case CurrentAction3d::DynamicPanning:
           myV3dView->Pan( point.x() - myXmax, myYmax - point.y() );
           myXmax = point.x();
           myYmax = point.y();
           break;
-        case CurrentAction3d::CurAction3d_GlobalPanning:
+        case CurrentAction3d::GlobalPanning:
           break;
-        case CurrentAction3d::CurAction3d_DynamicRotation:
+        case CurrentAction3d::DynamicRotation:
           myV3dView->Rotation( point.x(), point.y() );
           myV3dView->Redraw();
           break;

@@ -1,16 +1,9 @@
 #ifndef GEOMWIDGET_H
 #define GEOMWIDGET_H
-
 #include "View.h"
 #include "DocumentCommon.h"
-//#include "ApplicationCommon.h"
 
 #include <QWidget>
-#include <QAction>
-#include <QToolBar>
-#include <QList>
-
-#include <AIS_InteractiveContext.hxx>
 
 class ApplicationCommon;
 
@@ -18,15 +11,22 @@ class GeomWidget : public QWidget
 {
   Q_OBJECT
 public:
-  GeomWidget(Handle(AIS_InteractiveContext) theContext, QWidget* parent = nullptr);
+  GeomWidget(DocumentCommon* theDocument3d, 
+             DocumentCommon* theDocument2d,
+             QWidget* parent = nullptr);
 
   void FitAll();
 
 
 private:
-  View*           myView;
-  QToolBar*       myToolBarBar;
-//  DocumentCommon* myDocument;
+  View*           myView3d;
+  View*           myView2d;
+
+  QWidget* my3dVidget;
+  QWidget* my2dVidget;
+
+  DocumentCommon* myDocument3d;
+  DocumentCommon* myDocument2d;
 };
 
 #endif //GEOMWIDGET_H
