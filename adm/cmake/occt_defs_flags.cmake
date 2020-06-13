@@ -112,7 +112,7 @@ elseif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMP
 endif()
 
 if ("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
-  if (APPLE OR ANDROID)
+  if (APPLE)
     # CLang can be used with both libstdc++ and libc++, however on OS X libstdc++ is outdated.
     set (CMAKE_CXX_FLAGS "-std=c++0x -stdlib=libc++ ${CMAKE_CXX_FLAGS}")
   elseif(NOT WIN32)
