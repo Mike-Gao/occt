@@ -155,8 +155,10 @@ Standard_Boolean BRepLib_MakeWire::BRepLib_BndBoxVertexSelector::
   Standard_Real aTolV = BRep_Tool::Tolerance(aV);
 
   Standard_Real aL = myP.SquareDistance(aVPnt);
+  Standard_Real aTol = aTolV + mySTol;
+  aTol *= aTol;
 
-  if (aL < Max(aTolV*aTolV, mySTol)) 
+  if (aL <= aTol) 
   {
     myResultInd.Append(theObj);
     return Standard_True;
@@ -176,7 +178,7 @@ void BRepLib_MakeWire::BRepLib_BndBoxVertexSelector::
   myP = theP;
   myVBox.Add(myP);
   myVBox.Enlarge(theTol);
-  mySTol = theTol*theTol;
+  mySTol = theTol;
   myVInd = theVInd;
 }
 
