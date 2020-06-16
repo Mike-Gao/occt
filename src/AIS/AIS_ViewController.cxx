@@ -150,6 +150,15 @@ AIS_ViewController::~AIS_ViewController()
 }
 
 // =======================================================================
+// function : ActivatePolygonalSelection
+// purpose  :
+// =======================================================================
+void AIS_ViewController::ActivatePolygonalSelection()
+{
+  myMouseActiveGesture = AIS_MouseGesture_SelectPolygonal;
+}
+
+// =======================================================================
 // function : ResetViewInput
 // purpose  :
 // =======================================================================

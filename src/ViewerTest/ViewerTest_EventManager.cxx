@@ -45,7 +45,8 @@ ViewerTest_EventManager::ViewerTest_EventManager (const Handle(V3d_View)&       
                                                   const Handle(AIS_InteractiveContext)& theCtx)
 : myCtx  (theCtx),
   myView (theView),
-  myToPickPnt (Standard_False)
+  myToPickPnt (Standard_False),
+  myToSelectPolygon (Standard_False)
 {
   myViewAnimation = GlobalViewAnimation();
 }
@@ -65,29 +66,62 @@ ViewerTest_EventManager::~ViewerTest_EventManager()
 }
 
 //=======================================================================
+//function : PolygonalSelection
+//purpose  :
+//=======================================================================
+void ViewerTest_EventManager::SelectPolygon()
+{
+  ActivatePolygonalSelection();
+  myToSelectPolygon = Standard_True;
+}
+
+
+//=======================================================================
 //function : UpdateMouseButtons
 //purpose  :
 //=======================================================================
-bool ViewerTest_EventManager::UpdateMouseButtons (const Graphic3d_Vec2i& thePoint,
-                                                  Aspect_VKeyMouse theButtons,
-                                                  Aspect_VKeyFlags theModifiers,
-                                                  bool theIsEmulated)
+bool ViewerTest_EventManager::UpdateMouseButtons(const Graphic3d_Vec2i& thePoint,
+  Aspect_VKeyMouse theButtons,
+  Aspect_VKeyFlags theModifiers,
+  bool theIsEmulated)
 {
-  SetAllowRotation (!ViewerTest_V3dView::IsCurrentViewIn2DMode());
+  SetAllowRotation(!ViewerTest_V3dView::IsCurrentViewIn2DMode());
 
   if (theButtons == Aspect_VKeyMouse_LeftButton)
   {
     if (myToPickPnt && (theModifiers & Aspect_VKeyFlags_CTRL) != 0)
     {
       Graphic3d_Vec3d anXYZ;
-      myView->Convert (thePoint.x(), thePoint.y(), anXYZ.x(), anXYZ.y(), anXYZ.z());
-      Draw::Set (myPickPntArgVec[0].ToCString(), anXYZ.x());
-      Draw::Set (myPickPntArgVec[1].ToCString(), anXYZ.y());
-      Draw::Set (myPickPntArgVec[2].ToCString(), anXYZ.z());
+      myView->Convert(thePoint.x(), thePoint.y(), anXYZ.x(), anXYZ.y(), anXYZ.z());
+      Draw::Set(myPickPntArgVec[0].ToCString(), anXYZ.x());
+      Draw::Set(myPickPntArgVec[1].ToCString(), anXYZ.y());
+      Draw::Set(myPickPntArgVec[2].ToCString(), anXYZ.z());
       myToPickPnt = false;
     }
   }
 
+  if (myToSelectPolygon)
+  {
+    if ((theButtons & Aspect_VKeyMouse_LeftButton) == Aspect_VKeyMouse_LeftButton)
+    {
+      if (!myUI.Selection.Points.IsEmpty())
+      {
+        if (myUI.Selection.Points.First() == thePoint)
+        {
+          myUI.Selection.ToApplyTool = true;
+          myToSelectPolygon = Standard_False;
+        }
+      }
+      UpdatePolySelection(thePoint, true);
+      FlushViewEvents(myCtx, myView, true);
+      return true;
+    }
+    else if (((theButtons & Aspect_VKeyMouse_RightButton) == Aspect_VKeyMouse_RightButton) 
+           && (!myUI.Selection.Points.IsEmpty()))
+    {
+      myUI.Selection.Points.Remove(myUI.Selection.Points.Size());
+    }
+  }
   return AIS_ViewController::UpdateMouseButtons (thePoint, theButtons, theModifiers, theIsEmulated);
 }
 
@@ -337,6 +371,13 @@ void ViewerTest_EventManager::ProcessKeyPress (Aspect_VKey theKey)
         && ViewerTest_EventManager::ToCloseViewOnEscape())
       {
         Draw_Interprete (ViewerTest_EventManager::ToExitOnCloseView() ? "exit" : "vclose");
+      }
+      if (myToSelectPolygon)
+      {
+        myToSelectPolygon = false;
+        myUI.Selection.Points.Clear();
+        myView->Redraw();
+        myView->Invalidate();
       }
     }
   }

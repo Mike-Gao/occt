@@ -94,6 +94,8 @@ public:
   //! Handle KeyPress event.
   Standard_EXPORT void ProcessKeyPress (Aspect_VKey theKey);
 
+  Standard_EXPORT void SelectPolygon ();
+
 private:
 
   Handle(AIS_InteractiveContext) myCtx;
@@ -101,7 +103,7 @@ private:
 
   TCollection_AsciiString myPickPntArgVec[3];
   Standard_Boolean myToPickPnt;
-
+  Standard_Boolean myToSelectPolygon;
 };
 
 #endif // _ViewerTest_EventManager_HeaderFile

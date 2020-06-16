@@ -25,6 +25,8 @@ enum AIS_MouseGesture
                                     //!  press button to start, move mouse to define rectangle, release to finish
   AIS_MouseGesture_SelectLasso,     //!< polygonal selection;
                                     //!  press button to start, move mouse to define polygonal path, release to finish
+  AIS_MouseGesture_SelectPolygonal, //!< polygonal selection;
+                                    //!  press buttons to define the vertices of the polygon, click on the first vertex or Esc to finish
   //
   AIS_MouseGesture_Zoom,            //!< view zoom gesture;
                                     //!  move mouse left to zoom-out, and to the right to zoom-in

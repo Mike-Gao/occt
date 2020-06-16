@@ -7615,7 +7615,7 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
   }
 
   NCollection_Sequence<Graphic3d_Vec2i> aPnts;
-  bool isShiftSelection = false, toAllowOverlap = false;
+  bool isShiftSelection = false, toAllowOverlap = false, toSelectPolygon = false;
   for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
   {
     TCollection_AsciiString anArg (theArgVec[anArgIter]);
@@ -7628,6 +7628,11 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
       {
         ++anArgIter;
       }
+    }
+    else if (anArg == "-polygonal")
+    {
+      std::cout << "Polygonal Selection is activated" << std::endl;
+      toSelectPolygon = true;
     }
     else if (anArgIter + 1 < theNbArgs
           && anArg.IsIntegerValue()
@@ -7654,6 +7659,10 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
   }
 
   Handle(ViewerTest_EventManager) aCurrentEventManager = ViewerTest::CurrentEventManager();
+  if (toSelectPolygon)
+  {
+    aCurrentEventManager->SelectPolygon();
+  }
   if (aPnts.IsEmpty())
   {
     if (isShiftSelection)

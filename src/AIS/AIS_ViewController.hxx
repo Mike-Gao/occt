@@ -598,6 +598,8 @@ public:
                                                            const Handle(V3d_View)& theView,
                                                            const gp_Trsf& thePose,
                                                            const Standard_Boolean theToHighlight);
+  //! Activate polygonal selection mode.
+  Standard_EXPORT void ActivatePolygonalSelection();
 
 protected:
 
