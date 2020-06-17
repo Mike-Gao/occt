@@ -125,11 +125,6 @@
 				"description": ""
 			},
 			{
-				"text": "Sweep",
-				"function": "Sweep3dSample",
-				"description": ""
-			},
-			{
 				"text": "Evolved",
 				"function": "Evolved3dSample",
 				"description": ""

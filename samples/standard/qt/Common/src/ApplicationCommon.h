@@ -84,7 +84,7 @@ private slots:
 
 private:
   enum class ApplicationType { Geometry, Topology, Triangulation, Ocaf, Viewer2d, Viewer3d };
-  static const ApplicationType APP_TYPE = ApplicationType::Geometry;
+  static const ApplicationType APP_TYPE = ApplicationType::Topology;
 
 	void createStandardOperations();
 	void createCasCadeOperations();
