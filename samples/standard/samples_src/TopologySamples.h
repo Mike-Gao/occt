@@ -30,6 +30,7 @@ private:
   void Cylinder3dSample();
   void Revolution3dSample();
   void TopologyIterator3dSample();
+  void TopologyExplorer3dSample();
   void AssessToCurve3dSample();
   void AssessToCompositeCurve3dSample();
   void AssessToSurface3dSample();
@@ -42,7 +43,6 @@ private:
   void Fillet3dSample();
   void Chamfer3dSample();
   void Offset3dSample();
-  void Sweep3dSample();
   void Evolved3dSample();
   void Copy3dSample();
   void Transform3dSample();
