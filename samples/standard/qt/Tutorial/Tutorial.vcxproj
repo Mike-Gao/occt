@@ -135,7 +135,10 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\samples_src\AdaptorCurve2d_AIS.cxx" />
+    <ClCompile Include="..\..\samples_src\AdaptorCurve_AIS.cxx" />
     <ClCompile Include="..\..\samples_src\AdaptorPnt2d_AIS.cxx" />
+    <ClCompile Include="..\..\samples_src\AdaptorVec_AIS.cxx" />
     <ClCompile Include="..\Interface\src\Application.cxx" />
     <ClCompile Include="..\Common\src\ApplicationCommon.cxx" />
     <ClCompile Include="src\ApplicationTut.cxx" />
@@ -155,7 +158,10 @@
     <ClCompile Include="..\Common\src\View.cxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\samples_src\AdaptorCurve2d_AIS.h" />
+    <ClInclude Include="..\..\samples_src\AdaptorCurve_AIS.h" />
     <ClInclude Include="..\..\samples_src\AdaptorPnt2d_AIS.h" />
+    <ClInclude Include="..\..\samples_src\AdaptorVec_AIS.h" />
     <CustomBuild Include="..\Interface\src\Application.h">
       <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\Interface\src\Application.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; ..\Interface\src\Application.h -o win64\vc14\mocd\moc_Application.cpp</Command>

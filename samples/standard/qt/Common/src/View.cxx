@@ -102,10 +102,17 @@ void View::init()
   {
     hWnd->Map();
   }
-  if(myIis3dView)
+
+  if (myIis3dView)
+  {
     myV3dView->SetBackgroundColor (Quantity_NOC_BLUE4);
+  }
   else
+  {
     myV3dView->SetBackgroundColor (Quantity_NOC_GREEN4);
+    myV3dView->SetProj(V3d_Zpos);
+  }
+
   myV3dView->MustBeResized();
 
   if (myIsRaytracing)
