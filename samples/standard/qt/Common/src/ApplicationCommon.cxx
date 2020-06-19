@@ -77,19 +77,19 @@ ApplicationCommonWindow::ApplicationCommonWindow()
 
   setFocusPolicy(Qt::StrongFocus);
 
-  QFont aCodeViewFonf;
-  aCodeViewFonf.setFamily("Courier");
-  aCodeViewFonf.setFixedPitch(true);
-  aCodeViewFonf.setPointSize(10);
+  QFont aCodeViewFont;
+  aCodeViewFont.setFamily("Courier");
+  aCodeViewFont.setFixedPitch(true);
+  aCodeViewFont.setPointSize(10);
 
   myCodeView = new QTextEdit;
   myCodeView->setReadOnly(true);
-  myCodeView->setFont(aCodeViewFonf);
+  myCodeView->setFont(aCodeViewFont);
   myCodeViewHighlighter = new OcctHighlighter(myCodeView->document());
 
   myResultView = new QTextEdit;
   myResultView->setReadOnly(true);
-  myResultView->setFont(aCodeViewFonf);
+  myResultView->setFont(aCodeViewFont);
 
   QSplitter* aCodeResultSplitter = new QSplitter(Qt::Vertical);
   aCodeResultSplitter->addWidget(myCodeView);

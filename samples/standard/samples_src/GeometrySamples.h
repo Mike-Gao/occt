@@ -18,6 +18,11 @@ protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 
 private:
+  void DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText,
+                  Aspect_TypeOfMarker theMarker = Aspect_TOM_PLUS);
+  void DisplayPnt(gp_Pnt2d thePnt2d, TCollection_AsciiString theText,
+                  Aspect_TypeOfMarker theMarker = Aspect_TOM_PLUS);
+
   // One function for every sample
   void ZeroDimensionObjects3dSample();
   void Vectors3dSample();
@@ -36,7 +41,6 @@ private:
   void TransformedCylinder3dSample();
   void TranslatedTorus3dSample();
   void ConjugateObjects3dSample();
-  void TangentAndNormal3dSample();
   void ProjectionOfPoint3dSample();
   void MinimalDistance3dSample();
   void Intersection3dSample();
@@ -44,7 +48,8 @@ private:
   void RotatedDirection2dSample();
   void MirroredAxis2dSample();
   void TransformedEllipse2dSample();
-  void TangentAndNormal2dSample();
+  void ConjugateObjects2dSample();
+  void Tangent2dSample();
   void ProjectionOfPoint2dSample();
   void MinimalDistance2dSample();
   void Intersection2dSample();

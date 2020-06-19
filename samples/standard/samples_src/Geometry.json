@@ -93,11 +93,6 @@
 					"description": ""
 				},
 				{
-					"text": "Tangent and normal",
-					"function": "TangentAndNormal3dSample",
-					"description": ""
-				},
-				{
 					"text": "Projection of point",
 					"function": "ProjectionOfPoint3dSample",
 					"description": ""
@@ -128,14 +123,19 @@
 					"function": "MirroredAxis2dSample",
 					"description": ""
 				},
+        {
+          "text": "Transformed ellipse",
+          "function": "TransformedEllipse2dSample",
+          "description": ""
+        },
+        {
+          "text": "Conjugate objects",
+          "function": "ConjugateObjects2dSample",
+          "description": ""
+        },
 				{
-					"text": "Transformed ellipse",
-					"function": "TransformedEllipse2dSample",
-					"description": ""
-				},
-				{
-					"text": "Tangent and normal",
-					"function": "TangentAndNormal2dSample",
+					"text": "Tangent to 2 cilcles",
+					"function": "Tangent2dSample",
 					"description": ""
 				},
 				{
