@@ -17,6 +17,7 @@
 
 #include <Message.hxx>
 #include <Message_AlertExtended.hxx>
+#include <Message_AttributeMeter.hxx>
 #include <Message_AttributeObject.hxx>
 #include <Message_AttributeStream.hxx>
 #include <Message_CompositeAlerts.hxx>
@@ -32,6 +33,8 @@
 #include <TDataStd_Real.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_ExtStringArray.hxx>
+#include <TDataStd_IntegerArray.hxx>
+#include <TDataStd_RealArray.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
@@ -106,6 +109,8 @@ Standard_Boolean XmlDrivers_MessageReportStorage::ExportReport (const Handle(Mes
 // =======================================================================
 Standard_Boolean XmlDrivers_MessageReportStorage::ImportReport (const Handle(Message_Report)& theReport)
 {
+  theReport->SetLimit(1000);
+
   Handle(TDocStd_Application) anApplication = GetApplication();
   Standard_Integer aDocumentId = anApplication->IsInSession (FileName());
   if (aDocumentId > 0)
@@ -235,8 +240,15 @@ void XmlDrivers_MessageReportStorage::importAlert (const TDF_Label& theAlertLabe
     theReport->AddAlert (theGravity, anAlert);
   else
   {
-    OCCT_ADD_MESSAGE_LEVEL_SENTRY ("importAlert")
-    theReport->AddAlert (theGravity, anAlert);
+    Handle(Message_AlertExtended) anExtendedAlert = Handle(Message_AlertExtended)::DownCast (theParentAlert);
+    if (anExtendedAlert.IsNull())
+    {
+      theReport->AddAlert (theGravity, anAlert);
+    }
+    else
+    {
+      anExtendedAlert->CompositeAlerts (Standard_True)->AddAlert (theGravity, anAlert);
+    }
   }
 }
 
@@ -253,21 +265,46 @@ void XmlDrivers_MessageReportStorage::exportAlertParameters (const Handle(Messag
   // store attribute time
   Handle(Message_Attribute) anAttribute = anAlertExtended->Attribute();
 
-  TDataStd_Name::Set (theAlertLabel, anAttribute->DynamicType()->Name());
+  Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
+  TDataStd_Name::Set (theAlertLabel, aDynamicTypeName);
   //TDataStd_Real::Set (theAlertLabel, anAlertExtended->CumulativeMetric());
 
   TDataStd_AsciiString::Set (theAlertLabel, anAttribute->GetName());
 
-  if (Gravity() == Message_Trace)
-    return;
-
-
-  Standard_CString aDynamicTypeName = anAttribute->DynamicType()->Name();
   TCollection_AsciiString aStreamText;
   if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeStream)->Name())
   {
     Handle(Message_AttributeStream) aValuesArrayAlert = Handle(Message_AttributeStream)::DownCast (anAttribute);
     aStreamText = Standard_Dump::Text (aValuesArrayAlert->Stream());
+  }
+  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeMeter)->Name())
+  {
+    Handle(Message_AttributeMeter) aMeterAttribute = Handle(Message_AttributeMeter)::DownCast (anAttribute);
+
+    Standard_Integer aMetricsCount = 0;
+    for (Standard_Integer aMetricId = (Standard_Integer)Message_MetricType_None; aMetricId <= (Standard_Integer)Message_MetricType_MemHeapUsage; aMetricId++)
+    {
+      if (aMeterAttribute->HasMetric ((Message_MetricType)aMetricId))
+        aMetricsCount++;
+    }
+    if (aMetricsCount > 0)
+    {
+      Handle(TDataStd_IntegerArray) anActiveMetrics = TDataStd_IntegerArray::Set (theAlertLabel, 0, aMetricsCount - 1);
+      Handle(TDataStd_RealArray) aMetricValues = TDataStd_RealArray::Set (theAlertLabel, 0, aMetricsCount * 2 - 1);
+
+      Standard_Integer aCurIndex = 0;
+      for (Standard_Integer aMetricId = (Standard_Integer)Message_MetricType_None; aMetricId <= (Standard_Integer)Message_MetricType_MemHeapUsage; aMetricId++)
+      {
+        Message_MetricType aMetricType = (Message_MetricType)aMetricId;
+        if (!aMeterAttribute->HasMetric (aMetricType))
+          continue;
+
+        anActiveMetrics->SetValue (aCurIndex, aMetricId);
+        aMetricValues->SetValue (2 * aCurIndex,     aMeterAttribute->StartValue (aMetricType));
+        aMetricValues->SetValue (2 * aCurIndex + 1, aMeterAttribute->StopValue (aMetricType));
+        aCurIndex++;
+      }
+    }
   }
   else if (aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertAttribute)->Name())
   {
@@ -306,7 +343,6 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
            aDynamicTypeName == STANDARD_TYPE (TopoDS_AlertAttribute)->Name())
   {
     // values
-    NCollection_Vector<TCollection_AsciiString> anArrayValues;
     if (!aParametersLabel.FindAttribute (TDataStd_ExtStringArray::GetID(), anAttribute))
       return Handle(Message_Alert)();
 
@@ -331,6 +367,29 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
       aMessageAttribute = new TopoDS_AlertAttribute (aShape);
     }
   }
+  else if (aDynamicTypeName == STANDARD_TYPE (Message_AttributeMeter)->Name())
+  {
+    Handle (Message_AttributeMeter) aMetricAttribute = new Message_AttributeMeter();
+    // values
+    Handle(TDataStd_IntegerArray) anActiveMetrics;
+    Handle(TDataStd_RealArray) aMetricValues;
+    if (aParametersLabel.FindAttribute (TDataStd_IntegerArray::GetID(), anActiveMetrics) &&
+        aParametersLabel.FindAttribute (TDataStd_RealArray::GetID(), aMetricValues))
+    {
+      for (int aValueId = anActiveMetrics->Lower(); aValueId <= anActiveMetrics->Upper(); aValueId++)
+      {
+        Message_MetricType aMetricType = (Message_MetricType)anActiveMetrics->Value (aValueId);
+
+        Standard_Real aStartValue = aMetricValues->Value (2 * aValueId);
+        Standard_Real aStopValue = aMetricValues->Value (2 * aValueId + 1);
+
+        aMetricAttribute->SetStartValue (aMetricType, aStartValue);
+        aMetricAttribute->SetStopValue (aMetricType, aStopValue);
+      }
+    }
+    aMessageAttribute = aMetricAttribute;
+  }
+
 
   if (!aMessageAttribute.IsNull())
   {
@@ -344,13 +403,5 @@ Handle(Message_Alert) XmlDrivers_MessageReportStorage::importAlertParameters (co
     aMessageAttribute->SetName (aNameAttribute->Get());
     anAlert->SetAttribute (aMessageAttribute);
   }
-
-  // time
-  //Standard_Real aTime = -1;
-  //Handle(TDataStd_Real) aTimeAttribute;
-  //if (aParametersLabel.FindAttribute (TDataStd_Real::GetID(), aTimeAttribute))
-  //  aTime = aTimeAttribute->Get();
-
-  //anAlert->SetCumulativeMetric (aTime);
   return anAlert;
 }
