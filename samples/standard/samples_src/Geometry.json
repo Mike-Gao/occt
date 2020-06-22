@@ -200,11 +200,6 @@
 				}
 			],
 			"2D": [{
-					"text": "Second order curves",
-					"function": "ParamSecondOrderCurves2dSample",
-					"description": ""
-				},
-				{
 					"text": "Free style curves",
 					"function": "FreeStyleCurves2dSample",
 					"description": ""
