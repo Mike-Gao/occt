@@ -52,8 +52,11 @@ if {$param != "Pinion Radius = 3"} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -translation 12
-set values [XGetPairValues D $joint -translation]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -translation 12
+set values [XGetPairValues D $value -translation]
 if {$values != "12"} {
   puts "Error: wrong parameter"
 }

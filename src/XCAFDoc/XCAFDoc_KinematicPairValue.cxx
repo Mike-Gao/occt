@@ -21,6 +21,7 @@
 #include <TDataStd_Name.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_RealArray.hxx>
+#include <TDataStd_TreeNode.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <XCAFDoc.hxx>
 #include <XCAFDoc_KinematicPair.hxx>
@@ -31,7 +32,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_KinematicPairValue, TDF_Attribute)
 // Gor first children are reserved for kinematic pair parameters
 enum ValueLab
 {
-  ValueLab_Values = 5
+  ValueLab_Values = 3
 };
 
 //=======================================================================
@@ -57,12 +58,35 @@ const Standard_GUID& XCAFDoc_KinematicPairValue::GetID()
 //function : Set
 //purpose  : 
 //=======================================================================
-Handle(XCAFDoc_KinematicPairValue) XCAFDoc_KinematicPairValue::Set(const TDF_Label& theLabel)
+Handle(XCAFDoc_KinematicPairValue) XCAFDoc_KinematicPairValue::Set(const TDF_Label& theValue,
+                                                                   const TDF_Label& theJoint)
 {
   Handle(XCAFDoc_KinematicPairValue) anAttr;
-  if (!theLabel.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), anAttr)) {
+  if (!theValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), anAttr)) {
     anAttr = new XCAFDoc_KinematicPairValue();
-    theLabel.AddAttribute(anAttr);
+    theValue.AddAttribute(anAttr);
+  }
+
+  Handle(TDataStd_TreeNode) aJointNode, aValueNode;
+  // Add reference to Joint
+  aValueNode = TDataStd_TreeNode::Set(theJoint, XCAFDoc::KinematicRefJointGUID());
+  aJointNode = TDataStd_TreeNode::Set(theValue, XCAFDoc::KinematicRefJointGUID());
+
+  aValueNode->Append(aJointNode);
+
+  return anAttr;
+}
+
+//=======================================================================
+//function : Set
+//purpose  : 
+//=======================================================================
+Handle(XCAFDoc_KinematicPairValue) XCAFDoc_KinematicPairValue::Set(const TDF_Label& theValue)
+{
+  Handle(XCAFDoc_KinematicPairValue) anAttr;
+  if (!theValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), anAttr)) {
+    anAttr = new XCAFDoc_KinematicPairValue();
+    theValue.AddAttribute(anAttr);
   }
   return anAttr;
 }
@@ -75,29 +99,17 @@ void XCAFDoc_KinematicPairValue::SetObject(const Handle(XCAFKinematics_PairValue
 {
   Backup();
 
-  Label().FindChild(ValueLab_Values).ForgetAllAttributes();
-
-  // Check if kinematic pair and pair value on the given label are consistent
-  Handle(XCAFDoc_KinematicPair) aPairAttr;
-  if (!Label().FindAttribute(XCAFDoc_KinematicPair::GetID(), aPairAttr))
-    return;
-  Handle(TDataStd_Integer) aMainTypeAttr;
-  if (Label().FindAttribute(TDataStd_Integer::GetID(), aMainTypeAttr))
-  {
-    int aType = aMainTypeAttr->Get();
-    if (aType != theObject->Type())
-      return;
-  }
-
   // Check validity of object
   if (theObject->GetAllValues()->Length() == 0)
     return;
+  TCollection_AsciiString aName = "Value ";
+  aName.AssignCat(TCollection_AsciiString(Label().Tag()));
+  TDataStd_Name::Set(Label(), aName);
 
-  TDataStd_Name::Set(Label().FindChild(ValueLab_Values), "Value");
-  TDataStd_Integer::Set(Label().FindChild(ValueLab_Values), theObject->Type());
+  TDataStd_Integer::Set(Label(), theObject->Type());
 
   Handle(TDataStd_RealArray) aValuesAttr;
-  aValuesAttr = TDataStd_RealArray::Set(Label().FindChild(ValueLab_Values), 1, theObject->GetAllValues()->Length());
+  aValuesAttr = TDataStd_RealArray::Set(Label(), 1, theObject->GetAllValues()->Length());
   aValuesAttr->ChangeArray(theObject->GetAllValues());
 }
 
@@ -110,7 +122,7 @@ Handle(XCAFKinematics_PairValueObject) XCAFDoc_KinematicPairValue::GetObject()  
   // Type
   Handle(TDataStd_Integer) aTypeAttr;
   Handle(XCAFKinematics_PairValueObject) anObject = new XCAFKinematics_PairValueObject();
-  if (Label().FindChild(ValueLab_Values).FindAttribute(TDataStd_Integer::GetID(), aTypeAttr))
+  if (Label().FindAttribute(TDataStd_Integer::GetID(), aTypeAttr))
   {
     int aType = aTypeAttr->Get();
     anObject->SetType((XCAFKinematics_PairType)aType);
@@ -118,7 +130,7 @@ Handle(XCAFKinematics_PairValueObject) XCAFDoc_KinematicPairValue::GetObject()  
 
   // Values
   Handle(TDataStd_RealArray) aValuesAttr;
-  if (Label().FindChild(ValueLab_Values).FindAttribute(TDataStd_RealArray::GetID(), aValuesAttr)) {
+  if (Label().FindAttribute(TDataStd_RealArray::GetID(), aValuesAttr)) {
     Handle(TColStd_HArray1OfReal) aValuesArray = aValuesAttr->Array();
     anObject->SetAllValues(aValuesArray);
   }

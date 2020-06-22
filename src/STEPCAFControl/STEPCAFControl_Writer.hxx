@@ -150,6 +150,11 @@ public:
   
   Standard_EXPORT Standard_Boolean GetMaterialMode() const;
 
+  //! Set dimtolmode for indicate write D&GTs or not.
+  Standard_EXPORT void SetKinematicsMode(const Standard_Boolean kinematicsmod);
+
+  Standard_EXPORT Standard_Boolean GetKinematicsMode() const;
+
 
 
 
@@ -198,6 +203,8 @@ protected:
   //! Write SHUO assigned to specified component, to STEP model
   Standard_EXPORT Standard_Boolean WriteSHUOs (const Handle(XSControl_WorkSession)& WS, const TDF_LabelSequence& labels);
 
+  //! Write Kinematic Pairs assigned to specified component, to STEP model
+  Standard_EXPORT Standard_Boolean WriteKinematics(const Handle(XSControl_WorkSession)& WS, const TDF_LabelSequence& labels);
   
 
 private:
@@ -230,6 +237,7 @@ private:
   Standard_Boolean myLayerMode;
   Standard_Boolean myPropsMode;
   Standard_Boolean mySHUOMode;
+  Standard_Boolean myKPairMode;
   MoniTool_DataMapOfShapeTransient myMapCompMDGPR;
   Standard_Boolean myGDTMode;
   Standard_Boolean myMatMode;

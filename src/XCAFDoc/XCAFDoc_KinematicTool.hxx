@@ -73,6 +73,28 @@ public:
   Standard_EXPORT TDF_Label AddLink(const TDF_Label& theMechanism,
                                     const TDF_LabelSequence& theShapes);
 
+  //! Adds new empty label for link.
+  //! \replace first link  into the end, if it exist
+  //! \param[in] theMechanism parent mechanism
+  //! \return created link label
+  Standard_EXPORT TDF_Label AddBaseLink(const TDF_Label& theMechanism);
+
+  //! Adds new label with link.
+  //! \replace first link  into the end, if it exist
+  //! \param[in] theMechanism parent mechanism
+  //! \param[in] theShape singular detail of link
+  //! \return created link label
+  Standard_EXPORT TDF_Label AddBaseLink(const TDF_Label& theMechanism,
+                                        const TDF_Label& theShapes);
+
+  //! Adds new label with link.
+  //! \replace first link  into the end, if it exist
+  //! param[in] theMechanism parent mechanism
+  //! param[in] theShapes all details of link
+  //! \return created link label
+  Standard_EXPORT TDF_Label AddBaseLink(const TDF_Label& theMechanism,
+                                        const TDF_LabelSequence& theShapes);
+
   //! Adds new label with link.
   //! \param[in] theMechanism parent mechanism
   //! \param[in] theShape singular detail of link
@@ -133,6 +155,34 @@ public:
   //! \param[in] thejoint joint to remove
   Standard_EXPORT void RemoveJoint(const TDF_Label& theJoint);
 
+  //! Checks is the given label a Value
+  //! \return the result of check
+  Standard_EXPORT Standard_Boolean IsValue(const TDF_Label& theValue) const;
+
+  //! Adds new empty label for State.
+  //! \param[in] theMechanism parent mechanism
+  //! \return created state label
+  Standard_EXPORT TDF_Label AddState(const TDF_Label& theMechanism);
+
+  // Retrieves all States labels of the given mechanism
+  //! \param[in] theMechanism parent mechanism
+  //! \return state set
+  Standard_EXPORT TDF_LabelSequence GetStates(const TDF_Label& theMechanism) const;
+
+  // Retrieves all values labels of the given state
+  //! \param[in] theState parent state
+  //! \return value set
+  Standard_EXPORT TDF_LabelSequence GetValuesOfState(const TDF_Label& theState) const;
+
+  //! Gets references to joints of the given value.
+  //! \param[in] theValue value to get
+  //! \return a joint
+  Standard_EXPORT TDF_Label GetJointOfValue(const TDF_Label& theValue) const;
+
+  //! Removes the given state
+  //! \param[in] theState state to remove
+  Standard_EXPORT void RemoveState(const TDF_Label& theState);
+  
   //! Retrieves all mechanisms labels
   //! \return mechanisms set
   Standard_EXPORT TDF_LabelSequence GetMechanisms() const;
@@ -181,6 +231,8 @@ public:
   Standard_EXPORT TDF_Label getRootOfLinks(const TDF_Label& theMechanism) const;
   
   Standard_EXPORT TDF_Label getRootOfJoints(const TDF_Label& theMechanism) const;
+
+  Standard_EXPORT TDF_Label getRootOfStates(const TDF_Label& theMechanism) const;
 
   DEFINE_STANDARD_RTTIEXT(XCAFDoc_KinematicTool, TDF_Attribute)
 

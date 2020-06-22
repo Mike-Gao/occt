@@ -17,9 +17,9 @@ set name [XGetPairName D $joint]
 if {$name != "sliding surface"} {
   puts "Error: wrong parameter"
 }
-XSetPairType D $joint 15
+XSetPairType D $joint 16
 set type [XGetPairType D $joint]
-if {$type != "15"} {
+if {$type != "16"} {
   puts "Error: wrong parameter"
 }
 
@@ -69,16 +69,19 @@ if {$ori != 0} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -point_on_surface 1 2 -second_point_on_surface 2 1 -rotation 30
-set values [XGetPairValues D $joint -first_point_on_surface]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -point_on_surface 1 2 -second_point_on_surface 2 1 -rotation 30
+set values [XGetPairValues D $value -first_point_on_surface]
 if {$values != "1 2"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -second_point_on_surface]
+set values [XGetPairValues D $value -second_point_on_surface]
 if {$values != "2 1"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -rotation]
+set values [XGetPairValues D $value -rotation]
 if {$values != "30"} {
   puts "Error: wrong parameter"
 }

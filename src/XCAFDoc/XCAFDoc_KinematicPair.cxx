@@ -127,7 +127,8 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
   }
 
   // Common attributes
-  TDataStd_Name::Set(Label(), theObject->Name());
+  if (!theObject->Name().IsEmpty())
+    TDataStd_Name::Set(Label(), theObject->Name());
   TDataStd_Integer::Set(Label(), theObject->Type());
   TDataXtd_Plane::Set(Label().FindChild(ChildLab_FirstTrsf), gp_Pln(theObject->FirstTransformation()));
   TDataXtd_Plane::Set(Label().FindChild(ChildLab_SecondTrsf), gp_Pln(theObject->SecondTransformation()));

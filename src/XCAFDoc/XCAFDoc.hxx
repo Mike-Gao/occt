@@ -143,6 +143,9 @@ public:
   //! Return GUIDs for TreeNode representing specified types of Kinematics
   Standard_EXPORT static const Standard_GUID& KinematicRefLink2GUID();
 
+  //! Return GUIDs for TreeNode representing specified types of Kinematics
+  Standard_EXPORT static const Standard_GUID& KinematicRefJointGUID();
+
 };
 
 #endif // _XCAFDoc_HeaderFile

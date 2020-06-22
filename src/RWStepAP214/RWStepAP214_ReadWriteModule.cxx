@@ -1486,6 +1486,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <StepKinematics_UniversalPairWithRange.hxx>
 #include <StepKinematics_KinematicPair.hxx>
 #include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
+#include <StepKinematics_MechanismStateRepresentation.hxx>
 #include <RWStepRepr_RWRepresentationContextReference.hxx>
 #include <RWStepRepr_RWRepresentationReference.hxx>
 #include <RWStepKinematics_RWSuParameters.hxx>
@@ -1562,6 +1563,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_ReadWriteModule,StepData_ReadWriteModule)
 #include <RWStepKinematics_RWUniversalPairValue.hxx>
 #include <RWStepKinematics_RWUniversalPairWithRange.hxx>
 #include <RWStepKinematics_RWActuatedKinPairAndOrderKinPair.hxx>
+#include <RWStepKinematics_RWMechanismStateRepresentation.hxx>
 
 #include <RWStepVisual_RWSurfaceStyleTransparent.hxx>
 #include <RWStepVisual_RWSurfaceStyleReflectanceAmbient.hxx>
@@ -2290,6 +2292,7 @@ static TCollection_AsciiString Reco_UniversalPair("UNIVERSAL_PAIR");
 static TCollection_AsciiString Reco_UniversalPairValue("UNIVERSAL_PAIR_VALUE");
 static TCollection_AsciiString Reco_UniversalPairWithRange("UNIVERSAL_PAIR_WITH_RANGE");
 static TCollection_AsciiString Reco_KinematicPair("KINEMATIC_PAIR");
+static TCollection_AsciiString Reco_MechanismStateRepresentation("MECHANISM_STATE_REPRESENTATION");
 
 // -- Definition of the libraries --
 
@@ -3029,6 +3032,8 @@ RWStepAP214_ReadWriteModule::RWStepAP214_ReadWriteModule ()
   typenums.Bind(Reco_LinearFlexibleAndPlanarCurvePair, 797);
   typenums.Bind(Reco_LinearFlexibleLinkRepresentation, 798);
   typenums.Bind(Reco_KinematicPair, 799);
+  typenums.Bind(Reco_MechanismStateRepresentation, 801);
+
   
 //    SHORT NAMES
 //    NB : la liste est celle de AP203
@@ -4981,7 +4986,7 @@ const TCollection_AsciiString& RWStepAP214_ReadWriteModule::StepType
   case 797: return Reco_LinearFlexibleAndPlanarCurvePair;
   case 798: return Reco_LinearFlexibleLinkRepresentation;
   case 799: return Reco_KinematicPair;
-
+  case 801: return Reco_MechanismStateRepresentation;
 
   default : return PasReco;
   }
@@ -10453,6 +10458,13 @@ void RWStepAP214_ReadWriteModule::ReadStep(const Standard_Integer CN,
     tool.ReadStep(data, num, ach, anent);
   }
   break;
+  case 801:
+  {
+    DeclareAndCast(StepKinematics_MechanismStateRepresentation, anent, ent);
+    RWStepKinematics_RWMechanismStateRepresentation tool;
+    tool.ReadStep(data, num, ach, anent);
+  }
+  break;
 
   default: 
     ach->AddFail("Type Mismatch when reading - Entity");
@@ -15866,6 +15878,13 @@ void RWStepAP214_ReadWriteModule::WriteStep(const Standard_Integer CN,
   {
     DeclareAndCast(StepKinematics_ActuatedKinPairAndOrderKinPair, anent, ent);
     RWStepKinematics_RWActuatedKinPairAndOrderKinPair tool;
+    tool.WriteStep(SW, anent);
+  }
+  break;
+  case 801:
+  {
+    DeclareAndCast(StepKinematics_MechanismStateRepresentation, anent, ent);
+    RWStepKinematics_RWMechanismStateRepresentation tool;
     tool.WriteStep(SW, anent);
   }
   break;

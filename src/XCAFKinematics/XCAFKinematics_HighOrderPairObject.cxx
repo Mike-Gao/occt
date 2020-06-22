@@ -117,6 +117,18 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
 }
 
 //=======================================================================
+//function : SetAllLimits
+//purpose  : 
+//=======================================================================
+Standard_Boolean XCAFKinematics_HighOrderPairObject::HasLimits() const
+{
+  Standard_Boolean IsConstraint = Standard_False;
+  for (Standard_Integer anInd = 1; anInd < myLimits->Length() && !IsConstraint; ++anInd)
+    IsConstraint = myLimits->Value(anInd) != NULL;
+  return IsConstraint;
+}
+
+//=======================================================================
 //function : SetRotationLowLimit
 //purpose  : 
 //=======================================================================

@@ -26,6 +26,7 @@
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_GraphNode.hxx>
 #include <XCAFDoc_KinematicPair.hxx>
+#include <XCAFDoc_KinematicPairValue.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_KinematicTool, TDF_Attribute)
@@ -101,7 +102,7 @@ Standard_Boolean XCAFDoc_KinematicTool::IsMechanism(const TDF_Label& theLabel) c
   if (!Label().IsEqual(theLabel.Father()))
     return Standard_False;
 
-  return (theLabel.NbChildren() == 2);
+  return (theLabel.NbChildren() == 2 || theLabel.NbChildren() == 3);
 }
 
 //=======================================================================
@@ -129,9 +130,12 @@ TDF_Label XCAFDoc_KinematicTool::AddLink(const TDF_Label& theMechanism)
 {
   if (!IsMechanism(theMechanism))
     return TDF_Label();
-
   TDF_TagSource aTag;
-  return aTag.NewChild(getRootOfLinks(theMechanism));
+  TDF_Label aLink = aTag.NewChild(getRootOfLinks(theMechanism));
+  TCollection_AsciiString aName = "Link ";
+  aName.AssignCat(TCollection_AsciiString(aLink.Tag()));
+  TDataStd_Name::Set(aLink, aName);
+  return aLink;
 }
 
 //=======================================================================
@@ -142,6 +146,87 @@ TDF_Label XCAFDoc_KinematicTool::AddLink(const TDF_Label& theMechanism,
                                          const TDF_LabelSequence& theShapes)
 {
   TDF_Label aNewLink = AddLink(theMechanism);
+  if (aNewLink.IsNull() || theShapes.Length() == 0)
+    return aNewLink;
+
+  SetLink(aNewLink, theShapes);
+  return aNewLink;
+}
+
+TDF_Label XCAFDoc_KinematicTool::AddBaseLink(const TDF_Label& theMechanism)
+{
+  if (!IsMechanism(theMechanism))
+    return TDF_Label();
+  TDF_Label aRootOfLink = getRootOfLinks(theMechanism);
+  if (aRootOfLink.HasChild())
+  {
+    TDF_Label aFirstLink = aRootOfLink.FindChild(1, Standard_False);
+    TDF_Label aResLink;
+    Handle(TDataStd_Name) aNameOfFirst;
+    aFirstLink.FindAttribute(TDataStd_Name::GetID(), aNameOfFirst);
+    if (!aNameOfFirst.IsNull() && !aNameOfFirst->Get().IsEqual("Base") && !aNameOfFirst->Get().IsEqual("Link 1"))
+    {
+      TDF_TagSource aTag;
+      TDF_Label aResLink = aTag.NewChild(aRootOfLink);
+      aResLink.AddAttribute(aNameOfFirst);
+    }
+    else
+      aResLink = AddLink(theMechanism);
+
+    TDF_LabelSequence theShapes = GetRefShapes(aFirstLink);
+    SetLink(aResLink, theShapes);
+
+    Handle(TDataStd_TreeNode) aJointNode, aLinkNode, aNewLinkNode, aNewJointNode;
+    if (aFirstLink.FindAttribute(XCAFDoc::KinematicRefLink1GUID(), aJointNode))
+    {
+      aJointNode = aJointNode->First();
+      while (!aJointNode.IsNull())
+      {
+        TDF_Label aJoint = aJointNode->Label();
+        aNewJointNode = TDataStd_TreeNode::Set(aJoint, XCAFDoc::KinematicRefLink1GUID()); 
+        aNewLinkNode = TDataStd_TreeNode::Set(aResLink, XCAFDoc::KinematicRefLink1GUID()); 
+        aNewJointNode->Remove(); // fix against bug in TreeNode::Append()
+        aNewLinkNode->Append(aNewJointNode);
+
+        aJointNode = aJointNode->Next();
+      }
+    }
+    if (aFirstLink.FindAttribute(XCAFDoc::KinematicRefLink2GUID(), aJointNode))
+    {
+      aJointNode = aJointNode->First();
+      while (!aJointNode.IsNull())
+      {
+        TDF_Label aJoint = aJointNode->Label();
+        aNewJointNode = TDataStd_TreeNode::Set(aJoint, XCAFDoc::KinematicRefLink2GUID());
+        aNewLinkNode = TDataStd_TreeNode::Set(aResLink, XCAFDoc::KinematicRefLink2GUID());
+        aNewJointNode->Remove(); // fix against bug in TreeNode::Append()
+        aNewLinkNode->Append(aNewJointNode);
+
+        aJointNode = aJointNode->Next();
+      }
+    }
+  }
+  TDF_Label aBaseLink = aRootOfLink.FindChild(1);
+  aBaseLink.ForgetAllAttributes(Standard_False);
+  TCollection_AsciiString aName = "Base";
+  TDataStd_Name::Set(aBaseLink, aName);
+  return aBaseLink;
+}
+
+TDF_Label XCAFDoc_KinematicTool::AddBaseLink(const TDF_Label& theMechanism, const TDF_Label& theShape)
+{
+  TDF_LabelSequence anAuxSequence;
+  anAuxSequence.Append(theShape);
+  return AddBaseLink(theMechanism, anAuxSequence);
+}
+
+//=======================================================================
+//function : AddBaseLink
+//purpose  : 
+//=======================================================================
+TDF_Label XCAFDoc_KinematicTool::AddBaseLink(const TDF_Label& theMechanism, const TDF_LabelSequence& theShapes)
+{
+  TDF_Label aNewLink = AddBaseLink(theMechanism);
   if (aNewLink.IsNull() || theShapes.Length() == 0)
     return aNewLink;
 
@@ -207,12 +292,12 @@ Standard_Boolean XCAFDoc_KinematicTool::SetLink(const TDF_Label& theLink,
 //function : SetLink
 //purpose  : 
 //=======================================================================
-Standard_Boolean XCAFDoc_KinematicTool::SetLink(const TDF_Label& theMechanism,
+Standard_Boolean XCAFDoc_KinematicTool::SetLink(const TDF_Label& theLink,
                                                 const TDF_Label& theShape)
 {
   TDF_LabelSequence anAuxSequence;
   anAuxSequence.Append(theShape);
-  return SetLink(theMechanism, anAuxSequence);
+  return SetLink(theLink, anAuxSequence);
 }
 
 //=======================================================================
@@ -266,6 +351,9 @@ TDF_Label XCAFDoc_KinematicTool::AddJoint(const TDF_Label& theMechanism)
   TDF_TagSource aTag;
   TDF_Label aJoint = aTag.NewChild(getRootOfJoints(theMechanism));
   Handle(XCAFDoc_KinematicPair) aPair = XCAFDoc_KinematicPair::Set(aJoint);
+  TCollection_AsciiString aName = "Joint ";
+  aName.AssignCat(TCollection_AsciiString(aJoint.Tag()));
+  TDataStd_Name::Set(aJoint, aName);
   return aJoint;
 }
 
@@ -307,6 +395,7 @@ Standard_Boolean XCAFDoc_KinematicTool::SetJoint(const TDF_Label& theJoint,
   if (!IsLink(theLink1) || !IsLink(theLink2))
     return Standard_False;
 
+
   Handle(TDataStd_TreeNode) aJointNode, aLinkNode;
   // Add reference to first link
   aJointNode = TDataStd_TreeNode::Set(theJoint, XCAFDoc::KinematicRefLink1GUID());
@@ -319,6 +408,10 @@ Standard_Boolean XCAFDoc_KinematicTool::SetJoint(const TDF_Label& theJoint,
   aLinkNode = TDataStd_TreeNode::Set(theLink2, XCAFDoc::KinematicRefLink2GUID());
   aJointNode->Remove(); // fix against bug in TreeNode::Append()
   aLinkNode->Append(aJointNode);
+
+  TCollection_AsciiString aName = "Joint ";
+  aName.AssignCat(TCollection_AsciiString(theJoint.Tag()));
+  TDataStd_Name::Set(theJoint, aName);
   return Standard_True;
 }
 
@@ -339,6 +432,12 @@ void XCAFDoc_KinematicTool::RemoveJoint(const TDF_Label& theJoint)
 
   theJoint.ForgetAllAttributes();
 
+}
+
+Standard_EXPORT Standard_Boolean XCAFDoc_KinematicTool::IsValue(const TDF_Label& theValue) const
+{
+  Handle(XCAFDoc_KinematicPairValue) anAttr;
+  return theValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), anAttr);
 }
 
 //=======================================================================
@@ -447,6 +546,99 @@ TDF_LabelSequence XCAFDoc_KinematicTool::GetJointsOfLink(const TDF_Label& theLin
 }
 
 //=======================================================================
+//function : AddState
+//purpose  : 
+//=======================================================================
+Standard_EXPORT TDF_Label XCAFDoc_KinematicTool::AddState(const TDF_Label& theMechanism)
+{
+  if (!IsMechanism(theMechanism))
+    return TDF_Label();
+
+  TDF_Label aRootOfState= getRootOfStates(theMechanism);
+  if (aRootOfState.IsNull())
+  {
+    aRootOfState = theMechanism.FindChild(3);;
+    TDataStd_Name::Set(aRootOfState, "States");
+  }
+  TDF_TagSource aTag;
+  TDF_Label aState = aTag.NewChild(aRootOfState);
+  TCollection_AsciiString aName = "State ";
+  aName.AssignCat(TCollection_AsciiString(aState.Tag()));
+  TDataStd_Name::Set(aState, aName);
+  return aState;
+}
+
+//=======================================================================
+//function : GetStates
+//purpose  : 
+//=======================================================================
+Standard_EXPORT TDF_LabelSequence XCAFDoc_KinematicTool::GetStates(const TDF_Label& theMechanism) const
+{
+  TDF_Label aRootOfState = getRootOfStates(theMechanism);
+  TDF_LabelSequence aStatesArray;
+  if (!IsMechanism(theMechanism) || aRootOfState.IsNull())
+    return aStatesArray;
+
+  for (TDF_ChildIterator anIt(aRootOfState); anIt.More(); anIt.Next()) {
+    TDF_Label aState = anIt.Value();
+    aStatesArray.Append(aState);
+  }
+  return aStatesArray;
+}
+
+Standard_EXPORT TDF_LabelSequence XCAFDoc_KinematicTool::GetValuesOfState(const TDF_Label& theState) const
+{
+  TDF_LabelSequence aValueArray;
+  if (!IsMechanism(theState.Father().Father()) || theState.Father().Tag() != 3)
+    return aValueArray;
+
+  for (TDF_ChildIterator anIt(theState); anIt.More(); anIt.Next()) {
+    TDF_Label aValue = anIt.Value();
+    if (IsValue(aValue))
+      aValueArray.Append(aValue);
+  }
+
+  return aValueArray;
+}
+
+//=======================================================================
+//function : GetJointOfValue
+//purpose  : 
+//=======================================================================
+Standard_EXPORT TDF_Label XCAFDoc_KinematicTool::GetJointOfValue(const TDF_Label& theValue) const
+{
+  TDF_Label aJoint;
+  if (!IsValue(theValue))
+    return aJoint;
+
+  Handle(TDataStd_TreeNode) aNode, aChildNode;
+
+  if (theValue.FindAttribute(XCAFDoc::KinematicRefJointGUID(), aNode))
+    aJoint = aNode->Father()->Label();
+  return aJoint;
+}
+
+//=======================================================================
+//function : RemoveState
+//purpose  : 
+//=======================================================================
+Standard_EXPORT void XCAFDoc_KinematicTool::RemoveState(const TDF_Label& theState)
+{
+  TDF_Label aMechanism = theState.Father().Father();
+  if (!IsMechanism(aMechanism) || theState.Father().Tag() != 3)
+    return;
+
+  Handle(TDataStd_TreeNode) aNode;
+  theState.FindAttribute(XCAFDoc::KinematicRefLink1GUID(), aNode);
+  aNode->Remove();
+
+  theState.ForgetAllAttributes();
+  TDF_Label theStates = theState.Father();
+  if (!theStates.HasChild())
+    theStates.ForgetAllAttributes();
+}
+
+//=======================================================================
 //function : GetRefShapes
 //purpose  : 
 //=======================================================================
@@ -477,6 +669,15 @@ TDF_Label XCAFDoc_KinematicTool::getRootOfLinks(const TDF_Label& theMechanism) c
 TDF_Label XCAFDoc_KinematicTool::getRootOfJoints(const TDF_Label& theMechanism) const
 {
   return theMechanism.FindChild(2, Standard_False);
+}
+
+//=======================================================================
+//function : getRootOfStates
+//purpose  : 
+//=======================================================================
+Standard_EXPORT TDF_Label XCAFDoc_KinematicTool::getRootOfStates(const TDF_Label& theMechanism) const
+{
+  return theMechanism.FindChild(3, Standard_False);
 }
 
 //=======================================================================

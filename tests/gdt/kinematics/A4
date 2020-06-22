@@ -46,14 +46,19 @@ if {$limits != "0 45 0 0 0 0 0 0 0 10 0 0 "} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -rotation 15 -translation 3
-set values [XGetPairValues D $joint -translation]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value  $joint -rotation 15 -translation 3
+
+set values [XGetPairValues D $value -translation]
 if {$values != "3"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -rotation]
+
+set values [XGetPairValues D $value -rotation]
 if {$values != "15"} {
   puts "Error: wrong parameter"
 }
-
 Close D
+

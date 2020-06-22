@@ -162,7 +162,7 @@ static Standard_Integer removeMechanism(Draw_Interpretor& di, Standard_Integer a
 static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
   if (argc < 3) {
-    di << "Use: XAddLink Doc ParentMechanism [shapeLabel1 .. shapeLabelN]\n";
+    di << "Use: XAddLink Doc ParentMechanism [-Base] [shapeLabel1 .. shapeLabelN]\n";
     return 1;
   }
 
@@ -173,9 +173,9 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
   TDF_Label aMechanism;
   if (!getLabel(di, aDoc, argv[2], aMechanism))
     return 1;
-
+  Standard_Boolean IsBase = argc >= 4 && TCollection_AsciiString(argv[3]).IsEqual("-Base");
   TDF_LabelSequence aShapeArray;
-  for (Standard_Integer i = 3; i < argc; i++) {
+  for (Standard_Integer i = (IsBase) ? 4 : 3; i < argc; i++) {
     TDF_Label aLabel;
     if (!getLabel(di, aDoc, argv[i], aLabel))
       continue;
@@ -183,8 +183,10 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
   }
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
-  di << getEntry(aTool->AddLink(aMechanism, aShapeArray));
-
+  if(IsBase)
+    di << getEntry(aTool->AddBaseLink(aMechanism, aShapeArray));
+  else 
+    di << getEntry(aTool->AddLink(aMechanism, aShapeArray));
   return 0;
 }
 
@@ -649,10 +651,10 @@ static Standard_Integer setType(Draw_Interpretor& di, Standard_Integer argc, con
         aType <= XCAFKinematics_PairType_Unconstrained)
       anObject = new XCAFKinematics_LowOrderPairObject();
     else if (aType >= XCAFKinematics_PairType_Screw &&
-             aType <= XCAFKinematics_PairType_Gear)
+             aType <= XCAFKinematics_PairType_LinearFlexibleAndPinion)
       anObject = new XCAFKinematics_LowOrderPairObjectWithCoupling();
     else if (aType >= XCAFKinematics_PairType_PointOnSurface &&
-             aType <= XCAFKinematics_PairType_RollingCurve)
+             aType <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
       anObject = new XCAFKinematics_HighOrderPairObject();
     anObject->SetType((XCAFKinematics_PairType)aType);
     aPair->SetObject(anObject);
@@ -1194,13 +1196,37 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
 }
 
 //=======================================================================
-//function : setValues
+//function : addMechanismState
 //purpose  : 
 //=======================================================================
-static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+static Standard_Integer addMechanismState(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  if (argc < 5) {
-    di << "Use: XSetPairValues Doc Joint -Key1 Values1... -KeyN ValuesN\n";
+  if (argc < 3) {
+    di << "Use: XAddMechanismState Doc ParentMechanism\n";
+    return 1;
+  }
+
+  Handle(TDocStd_Document) aDoc;
+  if (!getDocument(di, argv[1], aDoc))
+    return 1;
+
+  TDF_Label aMechanism;
+  if (!getLabel(di, aDoc, argv[2], aMechanism))
+    return 1;
+
+  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
+  di << getEntry(aTool->AddState(aMechanism));
+  return 0;
+}
+
+//=======================================================================
+//function : addValues
+//purpose  : 
+//=======================================================================
+static Standard_Integer addValues(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 3) {
+    di << "Use: XAddPairValues Doc State [Joint -Key1 Values1... -KeyN ValuesN]\n";
     return 1;
   }
 
@@ -1208,15 +1234,25 @@ static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, c
   if (!getDocument(di, argv[1], aDoc))
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
-  TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  TDF_Label aState;
+  if (!getLabel(di, aDoc, argv[2], aState))
     return 1;
+  TDF_Label aMechanism = aState.Father().Father();
 
-  Handle(XCAFKinematics_PairValueObject) anObject;
-  Handle(XCAFDoc_KinematicPairValue) aPairValue;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue))
-    anObject = aPairValue->GetObject();
+  TDF_TagSource aTag;
+  TDF_Label aValue = aTag.NewChild(aState);
+  if (argc == 3)
+  {
+    Handle(XCAFDoc_KinematicPairValue) aPairValue;
+    XCAFDoc_KinematicPairValue::Set(aValue);
+  }
   else {
+    TDF_Label aJoint;
+    if (!getLabel(di, aDoc, argv[3], aJoint) || !aTool->IsJoint(aJoint))
+      return 1;
+
+    Handle(XCAFKinematics_PairValueObject) anObject;
+    Handle(XCAFDoc_KinematicPairValue) aPairValue;
     Handle(XCAFDoc_KinematicPair) aPair;
     if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
       di << "Invalid kinematic pair object\n";
@@ -1225,11 +1261,117 @@ static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, c
     Handle(XCAFKinematics_PairObject) aPairObject = aPair->GetObject();
     anObject = new XCAFKinematics_PairValueObject();
     anObject->SetType(aPairObject->Type());
-    aPairValue = XCAFDoc_KinematicPairValue::Set(aJoint);
+    aPairValue = XCAFDoc_KinematicPairValue::Set(aValue, aJoint);
+
+    try {
+      Standard_Integer anIt = 4;
+      while (anIt < argc) {
+        TCollection_AsciiString aKey = argv[anIt];
+        if (aKey.IsEqual("-rotation"))
+          anObject->SetRotation(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-first_rotation"))
+          anObject->SetFirstRotation(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-second_rotation"))
+          anObject->SetSecondRotation(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-translation"))
+          anObject->SetTranslation(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-first_translation"))
+          anObject->SetFirstTranslation(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-second_translation"))
+          anObject->SetSecondTranslation(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-point_on_surface")) {
+          anObject->SetPointOnSurface(Atof(argv[anIt + 1]), Atof(argv[anIt + 2]));
+          anIt += 2;
+        }
+        else if (aKey.IsEqual("-first_point_on_surface")) {
+          anObject->SetFirstPointOnSurface(Atof(argv[anIt + 1]), Atof(argv[anIt + 2]));
+          anIt += 2;
+        }
+        else if (aKey.IsEqual("-second_point_on_surface")) {
+          anObject->SetSecondPointOnSurface(Atof(argv[anIt + 1]), Atof(argv[anIt + 2]));
+          anIt += 2;
+        }
+        else if (aKey.IsEqual("-point_on_curve"))
+          anObject->SetPointOnCurve(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-first_point_on_curve"))
+          anObject->SetFirstPointOnCurve(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-second_point_on_curve"))
+          anObject->SetSecondPointOnCurve(Atof(argv[++anIt]));
+        else if (aKey.IsEqual("-ypr")) {
+          anObject->SetYPR(Atof(argv[anIt + 1]), Atof(argv[anIt + 2]), Atof(argv[anIt + 3]));
+          anIt += 3;
+        }
+        else if (aKey.IsEqual("-trsf")) {
+          gp_Pnt aLoc(Atof(argv[anIt + 1]), Atof(argv[anIt + 2]), Atof(argv[anIt + 3]));
+          gp_Dir aDir(Atof(argv[anIt + 4]), Atof(argv[anIt + 5]), Atof(argv[anIt + 6]));
+          gp_Dir aXDir(Atof(argv[anIt + 7]), Atof(argv[anIt + 8]), Atof(argv[anIt + 9]));
+          anIt += 9;
+          gp_Ax2 aResult = gp_Ax2(aLoc, aDir, aXDir);
+          anObject->SetTransformation(aResult);
+        }
+        anIt++;
+      }
+    }
+    catch (...) {
+      di << "Invalid number of parameters";
+      return 1;
+    }
+
+    aPairValue->SetObject(anObject);
+  }
+
+  di << getEntry(aValue);
+  return 0;
+}
+
+//=======================================================================
+//function : setValues
+//purpose  : 
+//=======================================================================
+static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 6) {
+    di << "Use: XSetPairValues Doc Value Joint -Key1 Values1... -KeyN ValuesN\n";
+    return 1;
+  }
+
+  Handle(TDocStd_Document) aDoc;
+  if (!getDocument(di, argv[1], aDoc))
+    return 1;
+  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
+  TDF_Label aJoint;
+  if (!getLabel(di, aDoc, argv[3], aJoint) || !aTool->IsJoint(aJoint))
+    return 1;
+  TDF_Label aMechanism = aJoint.Father().Father();
+  TDF_Label aValue;
+  if (!getLabel(di, aDoc, argv[2], aValue) || !aTool->IsValue(aValue))
+    return 1;
+
+  Handle(XCAFKinematics_PairValueObject) anObject;
+  Handle(XCAFDoc_KinematicPairValue) aPairValue;
+  Handle(XCAFDoc_KinematicPair) aPair;
+
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
+  }
+  Handle(XCAFKinematics_PairObject) aPairObject = aPair->GetObject();
+
+  if (aValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue))
+  {
+    aPairValue = XCAFDoc_KinematicPairValue::Set(aValue, aJoint);
+    anObject = aPairValue->GetObject();
+    if (anObject->GetAllValues().IsNull())
+      anObject->SetType(aPairObject->Type());
+  }
+  else {
+    anObject = new XCAFKinematics_PairValueObject();
+    aPairValue = XCAFDoc_KinematicPairValue::Set(aValue,aJoint);
+    anObject->SetType(aPairObject->Type());
   }
 
   try {
-    Standard_Integer anIt = 3;
+    Standard_Integer anIt = 4;
     while (anIt < argc) {
       TCollection_AsciiString aKey = argv[anIt];
       if (aKey.IsEqual("-rotation"))
@@ -1294,7 +1436,7 @@ static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, c
 static Standard_Integer getValues(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
   if (argc < 4) {
-    di << "Use: XGetPairValues Doc Joint -Key\n";
+    di << "Use: XGetPairValues Doc Value -Key\n";
     return 1;
   }
 
@@ -1302,13 +1444,14 @@ static Standard_Integer getValues(Draw_Interpretor& di, Standard_Integer argc, c
   if (!getDocument(di, argv[1], aDoc))
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
-  TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  TDF_Label aValue;
+  if (!getLabel(di, aDoc, argv[2], aValue) || !aTool->IsValue(aValue))
     return 1;
+
 
   Handle(XCAFKinematics_PairValueObject) anObject;
   Handle(XCAFDoc_KinematicPairValue) aPairValue;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue))
+  if (aValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue))
     anObject = aPairValue->GetObject();
   if (anObject.IsNull()) {
     di << "Invalid value object";
@@ -1389,7 +1532,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XRemoveMechanism", "XRemoveMechanism Doc Label",
     __FILE__, removeMechanism, g);
 
-  di.Add("XAddLink", "XAddLink Doc ParentMechanism [shapeLabel1 .. shapeLabelN]",
+  di.Add("XAddLink", "XAddLink Doc ParentMechanism [-Base] [shapeLabel1 .. shapeLabelN]",
     __FILE__, addLink, g);
 
   di.Add("XSetLink", "XSetLink Doc Link shapeLabel1 .. shapeLabelN",
@@ -1453,12 +1596,13 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\t 11 Screw\n"
     "\t 12 RackAndPinion\n"
     "\t 13 Gear\n"
-    "\t 14 PointOnSurface\n"
-    "\t 15 SlidingSurface\n"
-    "\t 16 RollingSurface\n"
-    "\t 17 PointOnPlanarCurve\n"
-    "\t 18 SlidingCurve\n"
-    "\t 19 RollingCurve\n"
+    "\t 14 LinearFlexibleAndPinion\n"
+    "\t 15 PointOnSurface\n"
+    "\t 16 SlidingSurface\n"
+    "\t 17 RollingSurface\n"
+    "\t 18 PointOnPlanarCurve\n"
+    "\t 19 SlidingCurve\n"
+    "\t 20 RollingCurve\n"
     __FILE__, setType, g);
 
   di.Add("XGetPairType", "XGetPairType Doc Joint",
@@ -1501,7 +1645,19 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XGetPairGeomParam", "XGetPairGeomParam Doc Joint Number[1/2] Name",
     __FILE__, getGeomParam, g);
 
-  di.Add("XSetPairValues", "XSetPairValues Doc Joint -Key1 Values1 -KeyN ValuesN"
+  di.Add("XAddMechanismState", "XAddMechanismState Doc Mechanism",
+    __FILE__, addMechanismState, g);
+
+  di.Add("XAddPairValues", "XAddPairValues Doc State [Joint -Key1 Values1 -KeyN ValuesN]"
+    "\t-[first_/second_]rotation - current rotation - 1 number"
+    "\t-[first_/second_]translation - current translation - 1 number"
+    "\t-[first_/second_]point_on_surface - current (u,v) - 2 numbers"
+    "\t-[first_/second_]point_on_curve - current (t) - 1 number"
+    "\t-ypr - current yaw pitch roll angles - 3 numbers"
+    "\t-trsf - for unconstrained only current location direction xdirection - 9 numbers",
+    __FILE__, addValues, g);
+
+  di.Add("XSetPairValues", "XSetPairValues Doc Value Joint -Key1 Values1 -KeyN ValuesN"
     "\t-[first_/second_]rotation - current rotation - 1 number"
     "\t-[first_/second_]translation - current translation - 1 number"
     "\t-[first_/second_]point_on_surface - current (u,v) - 2 numbers"
@@ -1510,7 +1666,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\t-trsf - for unconstrained only current location direction xdirection - 9 numbers",
     __FILE__, setValues, g);
 
-  di.Add("XGetPairValues", "XGetPairValues Doc Joint -Key"
+  di.Add("XGetPairValues", "XGetPairValues Doc Value -Key"
     "\t-[first_/second_]rotation - current rotation - 1 number"
     "\t-[first_/second_]translation - current translation - 1 number"
     "\t-[first_/second_]point_on_surface - current (u,v) - 2 numbers"

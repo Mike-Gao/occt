@@ -79,6 +79,11 @@ public:
 
   Standard_EXPORT virtual void SetAllLimits(const Handle(TColStd_HArray1OfReal)& /*theLimits*/) {};
 
+  Standard_EXPORT virtual Standard_Boolean HasLimits() const 
+  {
+    return Standard_False;
+  };
+
   Standard_EXPORT virtual Handle(TColStd_HArray1OfReal) GetAllLimits() const
   {
     return new TColStd_HArray1OfReal();

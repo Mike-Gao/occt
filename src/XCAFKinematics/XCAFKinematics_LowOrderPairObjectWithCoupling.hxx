@@ -128,6 +128,8 @@ public:
     return myParams;
   }
 
+  Standard_EXPORT Standard_Boolean HasLimits() const Standard_OVERRIDE;
+
   Standard_EXPORT void SetAllLimits(const Handle(TColStd_HArray1OfReal)& theLimits) Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTIEXT(XCAFKinematics_LowOrderPairObjectWithCoupling, XCAFKinematics_PairObject)

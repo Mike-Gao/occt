@@ -58,6 +58,8 @@ public:
 
   Standard_EXPORT void SetAllLimits(const Handle(TColStd_HArray1OfReal)& theLimits) Standard_OVERRIDE;
 
+  Standard_EXPORT Standard_Boolean HasLimits() const Standard_OVERRIDE;
+
   Handle(TColStd_HArray1OfReal) GetAllLimits() const Standard_OVERRIDE
   {
     return myLimits;

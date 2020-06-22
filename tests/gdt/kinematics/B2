@@ -52,8 +52,11 @@ if {$param != "Pitch = 14"} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -rotation 20
-set values [XGetPairValues D $joint -rotation]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -rotation 20
+set values [XGetPairValues D $value -rotation]
 if {$values != "20"} {
   puts "Error: wrong parameter"
 }

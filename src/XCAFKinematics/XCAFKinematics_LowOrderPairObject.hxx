@@ -196,6 +196,8 @@ public:
   //! \return created array
   Standard_EXPORT Handle(TColStd_HArray1OfReal) GetAllLimits() const Standard_OVERRIDE;
 
+  Standard_EXPORT virtual Standard_Boolean HasLimits() const Standard_OVERRIDE;
+
   Standard_EXPORT void SetAllLimits(const Handle(TColStd_HArray1OfReal)& theLimits) Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTIEXT(XCAFKinematics_LowOrderPairObject, XCAFKinematics_PairObject)

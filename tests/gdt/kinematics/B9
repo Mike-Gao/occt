@@ -17,9 +17,9 @@ set name [XGetPairName D $joint]
 if {$name != "sliding curve"} {
   puts "Error: wrong parameter"
 }
-XSetPairType D $joint 18
+XSetPairType D $joint 19
 set type [XGetPairType D $joint]
-if {$type != "18"} {
+if {$type != "19"} {
   puts "Error: wrong parameter"
 }
 
@@ -63,12 +63,15 @@ if {$ori != 0} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -point_on_curve 1.5 -second_point_on_curve 7
-set values [XGetPairValues D $joint -first_point_on_curve]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -point_on_curve 1.5 -second_point_on_curve 7
+set values [XGetPairValues D $value -first_point_on_curve]
 if {$values != "1.5"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -second_point_on_curve]
+set values [XGetPairValues D $value -second_point_on_curve]
 if {$values != "7"} {
   puts "Error: wrong parameter"
 }

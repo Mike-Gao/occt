@@ -1442,6 +1442,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <StepKinematics_UniversalPairValue.hxx>
 #include <StepKinematics_UniversalPairWithRange.hxx>
 #include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
+#include <StepKinematics_MechanismStateRepresentation.hxx>
 
 #include <RWStepRepr_RWRepresentationContextReference.hxx>
 #include <RWStepRepr_RWRepresentationReference.hxx>
@@ -1519,6 +1520,7 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepKinematics_RWUniversalPairValue.hxx>
 #include <RWStepKinematics_RWUniversalPairWithRange.hxx>
 #include <RWStepKinematics_RWActuatedKinPairAndOrderKinPair.hxx>
+#include <RWStepKinematics_RWMechanismStateRepresentation.hxx>
 
 static Standard_Integer catsh,catdr,catstr,catdsc,cataux;
 
@@ -5879,6 +5881,13 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
     tool.Share(anent, iter);
   }
   break;
+  case 801:
+  {
+    DeclareAndCast(StepKinematics_MechanismStateRepresentation, anent, ent);
+    RWStepKinematics_RWMechanismStateRepresentation tool;
+    tool.Share(anent, iter);
+  }
+  break;
 
     default : break;
     }
@@ -8132,6 +8141,9 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
    case 800:
      ent = new StepKinematics_ActuatedKinPairAndOrderKinPair;
      break;
+   case 801:
+     ent = new StepKinematics_MechanismStateRepresentation;
+     break;
     
   default: 
     return Standard_False;
@@ -8811,6 +8823,7 @@ Standard_Integer  RWStepAP214_GeneralModule::CategoryNumber
   case 797: return cataux;
   case 798: return cataux;
   case 800: return catsh;
+  case 801: return cataux;
   default : break;
   }
   return 0;

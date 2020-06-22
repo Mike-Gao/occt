@@ -86,6 +86,28 @@ Handle(TColStd_HArray1OfReal) XCAFKinematics_LowOrderPairObject::GetAllLimits() 
 }
 
 //=======================================================================
+//function : HasLimits
+//purpose  : 
+//=======================================================================
+Standard_Boolean XCAFKinematics_LowOrderPairObject::HasLimits() const
+{
+  return 
+  (  myMinRotationX != -Precision::Infinite() ||
+      myMaxRotationX != Precision::Infinite() ||
+     myMinRotationY != -Precision::Infinite() ||
+      myMaxRotationY != Precision::Infinite() ||
+     myMinRotationZ != -Precision::Infinite() ||
+      myMaxRotationZ != Precision::Infinite() ||
+  myMinTranslationX != -Precision::Infinite() ||
+   myMaxTranslationX != Precision::Infinite() ||
+  myMinTranslationY != -Precision::Infinite() ||
+   myMaxTranslationY != Precision::Infinite() ||
+  myMinTranslationZ != -Precision::Infinite() ||
+   myMaxTranslationZ != Precision::Infinite()
+  );
+}
+
+//=======================================================================
 //function : GetAllLimits
 //purpose  : 
 //=======================================================================

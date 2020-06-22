@@ -17,9 +17,9 @@ set name [XGetPairName D $joint]
 if {$name != "point on surface"} {
   puts "Error: wrong parameter"
 }
-XSetPairType D $joint 14
+XSetPairType D $joint 15
 set type [XGetPairType D $joint]
-if {$type != "14"} {
+if {$type != "15"} {
   puts "Error: wrong parameter"
 }
 
@@ -61,12 +61,15 @@ if {$ori != 1} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -point_on_surface 1 2 -ypr 12 13 14
-set values [XGetPairValues D $joint -point_on_surface]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -point_on_surface 1 2 -ypr 12 13 14
+set values [XGetPairValues D $value -point_on_surface]
 if {$values != "1 2"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -ypr]
+set values [XGetPairValues D $value -ypr]
 if {$values != "12 13 14"} {
   puts "Error: wrong parameter"
 }

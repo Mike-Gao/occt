@@ -182,6 +182,100 @@
 #include <StepVisual_SurfaceStyleUsage.hxx>
 #include <StepVisual_TessellatedAnnotationOccurrence.hxx>
 #include <StepVisual_TessellatedGeometricSet.hxx>
+//
+//
+//
+#include <StepKinematics_KinematicJoint.hxx>
+#include <StepKinematics_KinematicLink.hxx>
+#include <StepKinematics_PairValue.hxx>
+#include <StepKinematics_KinematicPropertyMechanismRepresentation.hxx>
+#include <StepKinematics_MechanismRepresentation.hxx>
+#include <StepKinematics_PairRepresentationRelationship.hxx>
+#include <StepKinematics_KinematicPair.hxx>
+#include <StepKinematics_KinematicJoint.hxx>
+#include <StepKinematics_PairValue.hxx>
+#include <XCAFDoc_KinematicPairValue.hxx>
+#include <StepKinematics_KinematicLink.hxx>
+#include <XCAFDoc_KinematicTool.hxx>
+#include <XCAFKinematics_PairObject.hxx>
+#include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
+#include <StepKinematics_ActuatedKinematicPair.hxx>
+#include <StepKinematics_RigidLinkRepresentation.hxx>
+#include <StepKinematics_KinematicTopologyStructure.hxx>
+#include <StepShape_Vertex.hxx>
+#include <XCAFKinematics_PairValueObject.hxx>
+#include <StepKinematics_KinematicLinkRepresentation.hxx>
+#include <StepKinematics_ProductDefinitionKinematics.hxx>
+#include <StepKinematics_SuParameters.hxx>
+#include <NCollection_Vector.hxx>
+#include <StepKinematics_ContextDependentKinematicLinkRepresentation.hxx>
+#include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
+#include <StepKinematics_ProductDefinitionRelationshipKinematics.hxx>
+
+#include <StepKinematics_CylindricalPair.hxx>
+#include <StepKinematics_CylindricalPairWithRange.hxx>
+#include <StepKinematics_FullyConstrainedPair.hxx>
+#include <StepKinematics_GearPair.hxx>
+#include <StepKinematics_GearPairWithRange.hxx>
+#include <StepKinematics_HomokineticPair.hxx>
+#include <StepKinematics_KinematicTopologyStructure.hxx>
+#include <StepKinematics_LowOrderKinematicPair.hxx>
+#include <StepKinematics_LowOrderKinematicPairWithRange.hxx>
+#include <StepKinematics_PlanarCurvePair.hxx>
+#include <StepKinematics_PlanarCurvePairRange.hxx>
+#include <StepKinematics_PlanarPair.hxx>
+#include <StepKinematics_PlanarPairWithRange.hxx>
+#include <StepKinematics_PointOnPlanarCurvePair.hxx>
+#include <StepKinematics_PointOnPlanarCurvePairWithRange.hxx>
+#include <StepKinematics_PointOnSurfacePair.hxx>
+#include <StepKinematics_PointOnSurfacePairWithRange.hxx>
+#include <StepKinematics_PrismaticPair.hxx>
+#include <StepKinematics_PrismaticPairWithRange.hxx>
+#include <StepKinematics_ProductDefinitionKinematics.hxx>
+#include <StepKinematics_RackAndPinionPair.hxx>
+#include <StepKinematics_RackAndPinionPairWithRange.hxx>
+#include <StepKinematics_RevolutePair.hxx>
+#include <StepKinematics_RevolutePairWithRange.hxx>
+#include <StepKinematics_RollingCurvePair.hxx>
+#include <StepKinematics_RollingSurfacePair.hxx>
+#include <StepKinematics_ScrewPair.hxx>
+#include <StepKinematics_ScrewPairWithRange.hxx>
+#include <StepKinematics_SlidingCurvePair.hxx>
+#include <StepKinematics_SlidingSurfacePair.hxx>
+#include <StepKinematics_SphericalPair.hxx>
+#include <StepKinematics_SphericalPairWithPin.hxx>
+#include <StepKinematics_SphericalPairWithPinAndRange.hxx>
+#include <StepKinematics_SphericalPairWithRange.hxx>
+#include <StepKinematics_SurfacePairWithRange.hxx>
+#include <StepKinematics_UnconstrainedPair.hxx>
+#include <StepKinematics_UnconstrainedPairValue.hxx>
+#include <StepKinematics_UniversalPair.hxx>
+#include <StepKinematics_UniversalPairWithRange.hxx>
+#include <XCAFKinematics_LowOrderPairObject.hxx>
+#include <XCAFKinematics_LowOrderPairObjectWithCoupling.hxx>
+#include <XCAFKinematics_HighOrderPairObject.hxx>
+
+#include <StepKinematics_SlidingSurfacePairValue.hxx>
+#include <StepKinematics_RollingSurfacePairValue.hxx>
+#include <StepKinematics_RevolutePairValue.hxx>
+#include <StepKinematics_PrismaticPairValue.hxx>
+#include <StepKinematics_ScrewPairValue.hxx>
+#include <StepKinematics_CylindricalPairValue.hxx>
+#include <StepKinematics_SphericalPairValue.hxx>
+#include <StepKinematics_SlidingCurvePairValue.hxx>
+#include <StepKinematics_RollingCurvePairValue.hxx>
+#include <StepKinematics_GearPairValue.hxx>
+#include <StepKinematics_RackAndPinionPairValue.hxx>
+#include <StepKinematics_UniversalPairValue.hxx>
+#include <StepKinematics_PlanarPairValue.hxx>
+#include <StepKinematics_UnconstrainedPairValue.hxx>
+#include <StepKinematics_PointOnSurfacePairValue.hxx>
+#include <StepKinematics_PointOnPlanarCurvePairValue.hxx>
+#include <StepKinematics_LinearFlexibleAndPinionPair.hxx>
+#include <StepKinematics_LinearFlexibleAndPlanarCurvePair.hxx>
+#include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
+#include <StepKinematics_MechanismStateRepresentation.hxx>
+
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_HAsciiString.hxx>
 #include <TColStd_HArray1OfReal.hxx>
@@ -202,6 +296,9 @@
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopTools_MapOfShape.hxx>
+#include <GeomToStep_MakeSurface.hxx>
+#include <GeomToStep_MakeCurve.hxx>
+#include <GeomToStep_MakeRectangularTrimmedSurface.hxx>
 #include <TopTools_SequenceOfShape.hxx>
 #include <Transfer_ActorOfFinderProcess.hxx>
 #include <Transfer_Binder.hxx>
@@ -210,6 +307,15 @@
 #include <TransferBRep.hxx>
 #include <TransferBRep_ShapeMapper.hxx>
 #include <XCAFDimTolObjects_DatumObject.hxx>
+#include <XCAFKinematics_PairObject.hxx>
+#include <XCAFKinematics_PairValueObject.hxx>
+#include <XCAFKinematics_PairType.hxx>
+#include <XCAFKinematics_HighOrderPairObject.hxx>
+#include <XCAFKinematics_LowOrderPairObject.hxx>
+#include <XCAFKinematics_LowOrderPairObjectWithCoupling.hxx>
+#include <XCAFDoc_KinematicTool.hxx>
+#include <XCAFDoc_KinematicPairValue.hxx>
+#include <XCAFDoc_KinematicPair.hxx>
 #include <XCAFDimTolObjects_DimensionFormVariance.hxx>
 #include <XCAFDimTolObjects_DimensionGrade.hxx>
 #include <XCAFDimTolObjects_DimensionObject.hxx>
@@ -280,7 +386,8 @@ STEPCAFControl_Writer::STEPCAFControl_Writer () :
        myPropsMode( Standard_True ),
        mySHUOMode ( Standard_True ),
        myGDTMode  ( Standard_True ),
-       myMatMode  ( Standard_True )
+       myMatMode  ( Standard_True ),
+       myKPairMode( Standard_True )
 {
   STEPCAFControl_Controller::Init();
   Handle(XSControl_WorkSession) WS = new XSControl_WorkSession;
@@ -301,7 +408,8 @@ STEPCAFControl_Writer::STEPCAFControl_Writer (const Handle(XSControl_WorkSession
   myPropsMode(Standard_True),
   mySHUOMode(Standard_True),
   myGDTMode(Standard_True),
-  myMatMode(Standard_True)
+  myMatMode(Standard_True),
+  myKPairMode(Standard_True)
 {
   STEPCAFControl_Controller::Init();
   Init ( WS, scratch );
@@ -640,6 +748,10 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
         WriteDGTs(writer.WS(), sublabels);
       }
     }
+
+    // write Kinematic Pair
+    if (GetKinematicsMode())
+      WriteKinematics(writer.WS(), sublabels);
 
     // write Materials
     if(GetMaterialMode())
@@ -1756,6 +1868,33 @@ static Standard_Boolean getProDefinitionOfNAUO(const Handle(XSControl_WorkSessio
   return Standard_True;
 }
 
+//=======================================================================
+//function : getProDefinitionOfNAUO
+//purpose  : auxilary
+//=======================================================================
+static Standard_Boolean getProDefi(const Handle(XSControl_WorkSession)& WS,
+  const TopoDS_Shape& theShape,
+  Handle(StepRepr_ProductDefinitionShape)& PD)
+{
+  if (theShape.IsNull())
+    return Standard_False;
+  // get CDSR
+  const Handle(XSControl_TransferWriter)& TW = WS->TransferWriter();
+  const Handle(Transfer_FinderProcess)& FP = TW->FinderProcess();
+  Handle(StepShape_ContextDependentShapeRepresentation) CDSR;
+  Handle(TransferBRep_ShapeMapper) mapper = TransferBRep::ShapeMapper(FP, theShape);
+  if (!FP->FindTypedTransient(mapper,
+    STANDARD_TYPE(StepShape_ContextDependentShapeRepresentation),
+    CDSR))
+    return Standard_False;
+  // get PDS of NAUO
+  Handle(StepRepr_ProductDefinitionShape) PDS = CDSR->RepresentedProductRelation();
+  if (PDS.IsNull())
+    return Standard_False;
+  PD = PDS;
+  return Standard_True;
+}
+
 
 //=======================================================================
 //function : writeSHUO
@@ -2084,6 +2223,1047 @@ Standard_Boolean STEPCAFControl_Writer::WriteSHUOs (const Handle(XSControl_WorkS
   return Standard_True;
 }
 
+//=======================================================================
+//function : createKinematicLink
+//purpose  : auxilary
+//=======================================================================
+static Standard_Boolean createKinematicLink(const Handle(Transfer_FinderProcess)& FP,
+  const Handle(XCAFDoc_KinematicTool)& aKTool,
+  Handle(StepKinematics_KinematicLink)& theLink,
+  const Interface_Graph& aGraph,
+  const TDF_Label& theLabelLink,
+  Handle(StepShape_ShapeRepresentation)& aShapeRepr,
+  Handle(StepRepr_NextAssemblyUsageOccurrence)& NAUO)
+{
+  theLink = new StepKinematics_KinematicLink;
+
+  Handle(TDataStd_Name) aNameLinkStart;
+  theLabelLink.FindAttribute(TDataStd_Name::GetID(), aNameLinkStart);
+  Handle(TCollection_HAsciiString) aHNameLinkStart = new TCollection_HAsciiString(aNameLinkStart->Get()); 
+  theLink->Init(aHNameLinkStart);
+
+  // find ref shapes
+  TDF_LabelSequence aShapesStartL = aKTool->GetRefShapes(theLabelLink);
+  if (aShapesStartL.IsEmpty()) return Standard_False;
+  TopoDS_Shape aTopoShapeStart = XCAFDoc_ShapeTool::GetShape(aShapesStartL.Value(1));
+  TopLoc_Location aLocStart;
+  TColStd_SequenceOfTransient seqRI;
+  FindEntities(FP, aTopoShapeStart, aLocStart, seqRI);
+  if (seqRI.Length() <= 0) {
+    FP->Messenger()->SendInfo() << "Warning: Cannot find RI for " << aTopoShapeStart.TShape()->DynamicType()->Name() << std::endl;
+    return Standard_False;
+  }
+  Interface_EntityIterator anIter = aGraph.Sharings(seqRI.Value(1));
+  for (anIter.Start(); anIter.More() && aShapeRepr.IsNull(); anIter.Next())
+  {
+    aShapeRepr = Handle(StepShape_ShapeRepresentation)::DownCast(anIter.Value());
+  }
+  Handle(StepShape_ContextDependentShapeRepresentation) CDSR;
+  Handle(TransferBRep_ShapeMapper) mapper = TransferBRep::ShapeMapper(FP, aTopoShapeStart);
+  if (!FP->FindTypedTransient(mapper,
+    STANDARD_TYPE(StepShape_ContextDependentShapeRepresentation),
+    CDSR))
+    return Standard_False;
+  // get PDS of NAUO
+  Handle(StepRepr_ProductDefinitionShape) PDS = CDSR->RepresentedProductRelation();
+  if (PDS.IsNull())
+    return Standard_False;
+  // get the NAUO entity
+  Interface_EntityIterator subs = aGraph.Shareds(PDS);
+  for (subs.Start(); subs.More(); subs.Next()) {
+    if (!subs.Value()->IsKind(STANDARD_TYPE(StepRepr_NextAssemblyUsageOccurrence)))
+      continue;
+    NAUO = Handle(StepRepr_NextAssemblyUsageOccurrence)::DownCast(subs.Value());
+    break;
+  }
+  if (NAUO.IsNull())
+    return Standard_False;
+  return Standard_True;
+}
+
+//=======================================================================
+//function : createKinematicJoint
+//purpose  : auxilary
+//=======================================================================
+static Standard_Boolean createKinematicJoint(const Handle(Transfer_FinderProcess)& FP,
+  const Handle(XCAFDoc_KinematicTool)& aKTool,
+  const Interface_Graph& aGraph,
+  const TDF_Label& theLabelJoint,
+  const Handle(XCAFKinematics_PairObject)& aKinPairObj,
+  TDF_LabelSequence& aSeqOfLinskL,
+  Handle(StepKinematics_RigidLinkRepresentation)& aRigLinkRepr1,
+  Handle(StepKinematics_RigidLinkRepresentation)& aRigLinkRepr2,
+  Handle(TColStd_HArray1OfTransient)& aArrayOfRigidLinks,
+  Handle(StepKinematics_KinematicJoint)& theJoint)
+{
+  TDF_Label aLinkStartL, aLinkEndL;
+  theJoint = new StepKinematics_KinematicJoint;
+  aKTool->GetLinksOfJoint(theLabelJoint, aLinkStartL, aLinkEndL);
+  Handle(TCollection_HAsciiString) aNameJoint = new TCollection_HAsciiString(aKinPairObj->Name());
+
+  Handle(TDataStd_Name) aNameLinkStart;
+  aLinkStartL.FindAttribute(TDataStd_Name::GetID(), aNameLinkStart);
+
+  Handle(TDataStd_Name) aNameLinkEnd;
+  aLinkEndL.FindAttribute(TDataStd_Name::GetID(), aNameLinkEnd);
+  Handle(StepShape_Vertex) aEdgeStart;
+  Handle(StepShape_Vertex) aEdgeEnd;
+
+  //find represent of link in the containers
+  //link and their label has single index
+  Standard_Integer aLinkInd;
+  for (aLinkInd = 1; (aLinkInd <= aArrayOfRigidLinks->Length()) && (aEdgeStart.IsNull() || aEdgeEnd.IsNull()); ++aLinkInd)
+  {
+    if (aSeqOfLinskL(aLinkInd) == aLinkStartL)
+    {
+      aRigLinkRepr1 = Handle(StepKinematics_RigidLinkRepresentation)::DownCast(aArrayOfRigidLinks->Value(aLinkInd));
+      aEdgeStart = aRigLinkRepr1->RepresentedLink();
+    }
+    else if (aSeqOfLinskL(aLinkInd) == aLinkEndL)
+    {
+      aRigLinkRepr2 = Handle(StepKinematics_RigidLinkRepresentation)::DownCast(aArrayOfRigidLinks->Value(aLinkInd));
+      aEdgeEnd = aRigLinkRepr2->RepresentedLink();
+    }
+  }
+  if (aEdgeEnd.IsNull() || aEdgeStart.IsNull())
+    return Standard_False;
+  theJoint->Init(aNameJoint, aEdgeStart, aEdgeEnd);
+
+
+  return Standard_True;
+}
+
+//=======================================================================
+//function : createKinematicPair
+//purpose  : auxilary
+//=======================================================================
+static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObject)& aKinPairObj,
+  Handle(StepKinematics_KinematicPair)& aKinematicPair,
+  const Handle(StepKinematics_KinematicJoint)& theJoint,
+  const TDF_LabelSequence& aSeqOfLinskL,
+  Handle(StepKinematics_RigidLinkRepresentation)& aRigLinkRepr1,
+  Handle(StepKinematics_RigidLinkRepresentation)& aRigLinkRepr2,
+  const Handle(TColStd_HArray1OfTransient)& aArrayOfRigidLinks)
+{
+  if (aKinPairObj->Type() == XCAFKinematics_PairType_NoType)
+    return Standard_False;
+  Handle(StepRepr_RepresentationItem) theTransformItem1 = GeomToStep_MakeAxis2Placement3d(aKinPairObj->FirstTransformation()).Value();
+  Handle(StepRepr_RepresentationItem) theTransformItem2 = GeomToStep_MakeAxis2Placement3d(aKinPairObj->SecondTransformation()).Value();
+
+  aRigLinkRepr1->Items()->Resize(aRigLinkRepr1->Items()->Lower(), aRigLinkRepr1->Items()->Upper() + 1, Standard_True);
+  aRigLinkRepr1->Items()->ChangeLast() = theTransformItem1;
+
+  aRigLinkRepr2->Items()->Resize(aRigLinkRepr2->Items()->Lower(), aRigLinkRepr2->Items()->Upper() + 1, Standard_True);
+  aRigLinkRepr2->Items()->ChangeLast() = theTransformItem1;
+
+  Standard_Boolean hasDescription = Standard_False;
+  Handle(TCollection_HAsciiString) aPairName = new TCollection_HAsciiString(aKinPairObj->Name());
+  Handle(TCollection_HAsciiString) aDescription;
+  Standard_Boolean HasRange = aKinPairObj->HasLimits();
+  if (aKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_LowOrderPairObject)))
+  {
+    Handle(XCAFKinematics_LowOrderPairObject) aLowOrderPairObj = Handle(XCAFKinematics_LowOrderPairObject)::DownCast(aKinPairObj);
+    Standard_Boolean aTX = Standard_True;
+    Standard_Boolean aTY = Standard_True;
+    Standard_Boolean aTZ = Standard_True;
+    Standard_Boolean aRX = Standard_True;
+    Standard_Boolean aRY = Standard_True;
+    Standard_Boolean aRZ = Standard_True;
+    switch (aKinPairObj->Type())
+    {
+    case(XCAFKinematics_PairType_Revolute):
+    {
+      aTX = Standard_False;
+      aTY = Standard_False;
+      aTZ = Standard_False;
+      aRX = Standard_False;
+      aRY = Standard_False;
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_RevolutePairWithRange;
+        Standard_Real aLowerLimitActualRotation = aLowOrderPairObj->MinRotationZ();
+        Standard_Real aUpperLimitActualRotation = aLowOrderPairObj->MaxRotationZ();
+        aRZ = Standard_True;
+        Handle(StepKinematics_RevolutePairWithRange) aRevolutePairWithRange = Handle(StepKinematics_RevolutePairWithRange)::DownCast(aKinematicPair);
+        aRevolutePairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualRotation, Standard_True, aUpperLimitActualRotation);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_RevolutePair;
+        Handle(StepKinematics_RevolutePair) aRevolutePair = Handle(StepKinematics_RevolutePair)::DownCast(aKinematicPair);
+        aRevolutePair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_Prismatic):
+    {
+      aTY = Standard_False;
+      aTZ = Standard_False;
+      aRX = Standard_False;
+      aRY = Standard_False;
+      aRZ = Standard_False;
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_PrismaticPairWithRange;
+        Handle(StepKinematics_PrismaticPairWithRange) aPrismaticPairWithRange = Handle(StepKinematics_PrismaticPairWithRange)::DownCast(aKinematicPair);
+        Standard_Real aUpperLimitActualTranslation = aLowOrderPairObj->MaxTranslationX();
+        Standard_Real aLowerLimitActualTranslation = aLowOrderPairObj->MinTranslationX();
+        aPrismaticPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslation, Standard_True, aUpperLimitActualTranslation);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_PrismaticPair;
+        Handle(StepKinematics_PrismaticPair) aPrismaticPair = Handle(StepKinematics_PrismaticPair)::DownCast(aKinematicPair);
+        aPrismaticPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_Cylindrical):
+    {
+      aTX = Standard_False;
+      aTY = Standard_False;
+      aRX = Standard_False;
+      aRY = Standard_False;
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_CylindricalPairWithRange;
+        Handle(StepKinematics_CylindricalPairWithRange) aCylindricalPairWithRange = Handle(StepKinematics_CylindricalPairWithRange)::DownCast(aKinematicPair);
+        Standard_Real aUpperLimitActualTranslation = aLowOrderPairObj->MaxTranslationZ();
+        Standard_Real aLowerLimitActualTranslation = aLowOrderPairObj->MinTranslationZ();
+        Standard_Real aLowerLimitActualRotation = aLowOrderPairObj->MinRotationZ();
+        Standard_Real aUpperLimitActualRotation = aLowOrderPairObj->MaxRotationZ();
+        aCylindricalPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslation, Standard_True,
+          aUpperLimitActualTranslation, Standard_True, aLowerLimitActualRotation, Standard_True, aUpperLimitActualRotation);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_CylindricalPair;
+        Handle(StepKinematics_CylindricalPair) aCylindricalPair = Handle(StepKinematics_CylindricalPair)::DownCast(aKinematicPair);
+        aCylindricalPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_Universal):
+    {
+      aTX = Standard_False;
+      aTY = Standard_False;
+      aTZ = Standard_False;
+      aRY = Standard_False;
+      Standard_Real theUniversalPair_InputSkewAngle = aLowOrderPairObj->SkewAngle();
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_UniversalPairWithRange;
+        Handle(StepKinematics_UniversalPairWithRange) anUniversalPairWithRange = Handle(StepKinematics_UniversalPairWithRange)::DownCast(aKinematicPair);
+        Standard_Real aUpperLimitActualTranslationX = aLowOrderPairObj->MaxTranslationX();
+        Standard_Real aLowerLimitActualTranslationX = aLowOrderPairObj->MinTranslationX();
+        Standard_Real aUpperLimitActualTranslationZ = aLowOrderPairObj->MaxTranslationZ();
+        Standard_Real aLowerLimitActualTranslationZ = aLowOrderPairObj->MinTranslationZ();
+        anUniversalPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, theUniversalPair_InputSkewAngle, Standard_True, aLowerLimitActualTranslationX, Standard_True,
+          aUpperLimitActualTranslationX, Standard_True, aLowerLimitActualTranslationZ, Standard_True, aUpperLimitActualTranslationZ);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_UniversalPair;
+        Handle(StepKinematics_UniversalPair) anUniversalPair = Handle(StepKinematics_UniversalPair)::DownCast(aKinematicPair);
+        anUniversalPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, theUniversalPair_InputSkewAngle);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_SphericalWithPin):
+    {
+      aTX = Standard_False;
+      aTY = Standard_False;
+      aTZ = Standard_False;
+      aRX = Standard_False;
+      aRY = Standard_False;
+      if (HasRange)
+      {
+        Standard_Real aUpperLimitYaw = aLowOrderPairObj->MaxRotationZ();
+        Standard_Real aLowerLimitYaw = aLowOrderPairObj->MinRotationZ();
+        Standard_Real aUpperLimitRoll = aLowOrderPairObj->MaxRotationX();
+        Standard_Real aLowerLimitRoll = aLowOrderPairObj->MinRotationX();
+        aKinematicPair = new StepKinematics_SphericalPairWithPinAndRange;
+        Handle(StepKinematics_SphericalPairWithPinAndRange) aSphericalPairWithPinAndRange = Handle(StepKinematics_SphericalPairWithPinAndRange)::DownCast(aKinematicPair);
+        aSphericalPairWithPinAndRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitYaw, Standard_True,
+          aUpperLimitYaw, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_SphericalPairWithPin;
+        Handle(StepKinematics_SphericalPairWithPin) aSphericalPairWithPin = Handle(StepKinematics_SphericalPairWithPin)::DownCast(aKinematicPair);
+        aSphericalPairWithPin->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_Spherical):
+    {
+      aTX = Standard_False;
+      aTY = Standard_False;
+      aTZ = Standard_False;
+      if (HasRange)
+      {
+        Standard_Real aUpperLimitYaw = aLowOrderPairObj->MaxRotationZ();
+        Standard_Real aLowerLimitYaw = aLowOrderPairObj->MinRotationZ();
+        Standard_Real aUpperLimitRoll = aLowOrderPairObj->MaxRotationX();
+        Standard_Real aLowerLimitRoll = aLowOrderPairObj->MinRotationX();
+        Standard_Real aUpperLimitPitch = aLowOrderPairObj->MaxRotationY();
+        Standard_Real aLowerLimitPitch= aLowOrderPairObj->MinRotationY();
+        aKinematicPair = new StepKinematics_SphericalPairWithRange;
+        Handle(StepKinematics_SphericalPairWithRange) aSphericalPairWithRange = Handle(StepKinematics_SphericalPairWithRange)::DownCast(aKinematicPair);
+        aSphericalPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitYaw, Standard_True,
+          aUpperLimitYaw, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll, Standard_True, aLowerLimitPitch, Standard_True, aUpperLimitPitch);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_SphericalPair;
+        Handle(StepKinematics_SphericalPair) aSphericalPair = Handle(StepKinematics_SphericalPair)::DownCast(aKinematicPair);
+        aSphericalPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_Planar):
+    {
+      if (HasRange)
+        aKinematicPair = new StepKinematics_PlanarPairWithRange;
+      else
+        aKinematicPair = new StepKinematics_PlanarPair;
+
+      aTZ = Standard_False;
+      aRX = Standard_False;
+      aRY = Standard_False;
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_PlanarPairWithRange;
+        Handle(StepKinematics_PlanarPairWithRange) aPlanarPairWithRange = Handle(StepKinematics_PlanarPairWithRange)::DownCast(aKinematicPair);
+        Standard_Real aUpperLimitActualTranslationX = aLowOrderPairObj->MaxTranslationX();
+        Standard_Real aLowerLimitActualTranslationX = aLowOrderPairObj->MinTranslationX();
+        Standard_Real aUpperLimitActualTranslationY = aLowOrderPairObj->MaxTranslationY();
+        Standard_Real aLowerLimitActualTranslationY = aLowOrderPairObj->MinTranslationY();
+        Standard_Real aLowerLimitActualRotation = aLowOrderPairObj->MinRotationZ();
+        Standard_Real aUpperLimitActualRotation = aLowOrderPairObj->MaxRotationZ();
+        aPlanarPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslationX, Standard_True, aUpperLimitActualTranslationX, 
+          Standard_True, aLowerLimitActualTranslationY, Standard_True, aUpperLimitActualTranslationY,
+          Standard_True, aLowerLimitActualRotation, Standard_True, aUpperLimitActualRotation);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_PlanarPair;
+        Handle(StepKinematics_PlanarPair) aPlanarPair = Handle(StepKinematics_PlanarPair)::DownCast(aKinematicPair);
+        aPlanarPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aTX, aTY, aTZ, aRX, aRY, aRZ);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_Unconstrained):
+    {
+      aKinematicPair = new StepKinematics_LowOrderKinematicPairWithRange;
+
+      Standard_Real aUpperLimitActualTranslationX = aLowOrderPairObj->MaxTranslationX();
+      Standard_Real aLowerLimitActualTranslationX = aLowOrderPairObj->MinTranslationX();
+      Standard_Real aUpperLimitActualTranslationY = aLowOrderPairObj->MaxTranslationY();
+      Standard_Real aLowerLimitActualTranslationY = aLowOrderPairObj->MinTranslationY();
+      Standard_Real aUpperLimitActualTranslationZ = aLowOrderPairObj->MaxTranslationZ();
+      Standard_Real aLowerLimitActualTranslationZ = aLowOrderPairObj->MinTranslationZ();
+      Standard_Real aLowerLimitActualRotationX = aLowOrderPairObj->MinRotationX();
+      Standard_Real aUpperLimitActualRotationX = aLowOrderPairObj->MaxRotationX();
+      Standard_Real aLowerLimitActualRotationY = aLowOrderPairObj->MinRotationY();
+      Standard_Real aUpperLimitActualRotationY = aLowOrderPairObj->MaxRotationY();
+      Standard_Real aLowerLimitActualRotationZ = aLowOrderPairObj->MinRotationZ();
+      Standard_Real aUpperLimitActualRotationZ = aLowOrderPairObj->MaxRotationZ();
+      Handle(StepKinematics_LowOrderKinematicPairWithRange) anUnconstrainedPairWithRange = Handle(StepKinematics_LowOrderKinematicPairWithRange)::DownCast(aKinematicPair);
+      anUnconstrainedPairWithRange->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint,
+        aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslationX, Standard_True, aUpperLimitActualTranslationX,
+        Standard_True, aLowerLimitActualTranslationY, Standard_True, aUpperLimitActualTranslationY,
+        Standard_True, aLowerLimitActualTranslationZ, Standard_True, aUpperLimitActualTranslationZ,
+        Standard_True, aLowerLimitActualRotationX, Standard_True, aUpperLimitActualRotationX,
+        Standard_True, aLowerLimitActualRotationY, Standard_True, aUpperLimitActualRotationY,
+        Standard_True, aLowerLimitActualRotationZ, Standard_True, aUpperLimitActualRotationZ);
+      break;
+    }
+    case(XCAFKinematics_PairType_FullyConstrained):
+    {
+      aKinematicPair = new StepKinematics_FullyConstrainedPair;
+      Handle(StepKinematics_FullyConstrainedPair) aFullyConstrainedPair = Handle(StepKinematics_FullyConstrainedPair)::DownCast(aKinematicPair);
+      aFullyConstrainedPair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint,
+        aTX, aTY, aTZ, aRX, aRY, aRZ);
+      break;
+    }
+    case(XCAFKinematics_PairType_Homokinetic):
+    {
+      aTX = Standard_False;
+      aTY = Standard_False;
+      aTZ = Standard_False;
+      aRY = Standard_False;
+      Standard_Real InputSkewAngle = aLowOrderPairObj->SkewAngle();
+      aKinematicPair = new StepKinematics_HomokineticPair;
+      Handle(StepKinematics_HomokineticPair) aHomokineticPair = Handle(StepKinematics_HomokineticPair)::DownCast(aKinematicPair);
+      aHomokineticPair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint,
+        aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, InputSkewAngle);
+      break;
+    }
+    default:
+      return Standard_False;
+      break;
+    }
+    return Standard_True;
+  }
+  else if (aKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_LowOrderPairObjectWithCoupling)))
+  {
+  Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) aLowOrderPairObjectWithCoupling = Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aKinPairObj);
+    switch (aKinPairObj->Type())
+    {
+    case(XCAFKinematics_PairType_Screw):
+    {
+      Standard_Real aPitch = aLowOrderPairObjectWithCoupling->Pitch();
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_ScrewPairWithRange;
+        Handle(StepKinematics_ScrewPairWithRange) aScrewPairWithRange = Handle(StepKinematics_ScrewPairWithRange)::DownCast(aKinematicPair);
+        Standard_Real aLowLimit = aLowOrderPairObjectWithCoupling->LowLimit();
+        Standard_Real aUpperLimit = aLowOrderPairObjectWithCoupling->UpperLimit();
+        aScrewPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,aPitch,
+          Standard_True, aLowLimit, Standard_True, aUpperLimit);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_ScrewPair;
+        Handle(StepKinematics_ScrewPair) aScrewPair = Handle(StepKinematics_ScrewPair)::DownCast(aKinematicPair);
+        aScrewPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,aPitch);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_RackAndPinion):
+    {
+      Standard_Real aPinionRadius = aLowOrderPairObjectWithCoupling->PinionRadius();
+      if (HasRange)
+      {
+        aKinematicPair = new StepKinematics_RackAndPinionPairWithRange;
+        Standard_Real aLowLimit = aLowOrderPairObjectWithCoupling->LowLimit();
+        Standard_Real aUpperLimit = aLowOrderPairObjectWithCoupling->UpperLimit();
+        Handle(StepKinematics_RackAndPinionPairWithRange) aRackAndPinionPairWithRange = Handle(StepKinematics_RackAndPinionPairWithRange)::DownCast(aKinematicPair);
+        aRackAndPinionPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPinionRadius,
+          Standard_True, aLowLimit, Standard_True, aUpperLimit);
+      }
+      else
+      { 
+        aKinematicPair = new StepKinematics_RackAndPinionPair;
+        Handle(StepKinematics_RackAndPinionPair) aRackAndPinionPair = Handle(StepKinematics_RackAndPinionPair)::DownCast(aKinematicPair);
+        aRackAndPinionPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPinionRadius);
+      }
+
+      break;
+    }
+    case(XCAFKinematics_PairType_Gear):
+    {
+      Standard_Real aBevel = aLowOrderPairObjectWithCoupling->Bevel();
+      Standard_Real aGearRatio = aLowOrderPairObjectWithCoupling->GearRatio();
+      Standard_Real aHelicalAngle = aLowOrderPairObjectWithCoupling->HelicalAngle();
+      Standard_Real aRadiusFirstLink = aLowOrderPairObjectWithCoupling->RadiusFirstLink();;
+      Standard_Real aRadiusSecondLink = aLowOrderPairObjectWithCoupling->RadiusSecondLink();;
+      if (HasRange)
+      {
+        Standard_Real aLowLimit = aLowOrderPairObjectWithCoupling->LowLimit();
+        Standard_Real aUpperLimit = aLowOrderPairObjectWithCoupling->UpperLimit();
+        aKinematicPair = new StepKinematics_GearPairWithRange;
+        Handle(StepKinematics_GearPairWithRange) aGearPairWithRange = Handle(StepKinematics_GearPairWithRange)::DownCast(aKinematicPair);
+        aGearPairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aRadiusFirstLink, aRadiusSecondLink, aBevel, aHelicalAngle, aGearRatio,
+          Standard_True, aLowLimit, Standard_True, aUpperLimit);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_GearPair;
+        Handle(StepKinematics_GearPair) aGearPair = Handle(StepKinematics_GearPair)::DownCast(aKinematicPair);
+        aGearPair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,aRadiusFirstLink,aRadiusSecondLink,aBevel,aHelicalAngle, aGearRatio);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_LinearFlexibleAndPinion):
+    {
+      Standard_Real aPinionRadius = aLowOrderPairObjectWithCoupling->PinionRadius();
+      aKinematicPair = new StepKinematics_LinearFlexibleAndPinionPair;
+      Handle(StepKinematics_LinearFlexibleAndPinionPair) aLinearFlexibleAndPinionPair = Handle(StepKinematics_LinearFlexibleAndPinionPair)::DownCast(aKinematicPair);
+      aLinearFlexibleAndPinionPair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint, aPinionRadius);
+      break;
+    }
+    default:
+      return Standard_False;
+      break;
+    }
+    return Standard_True;
+  }
+  else if (aKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_HighOrderPairObject))) //need to fix
+  {
+  Handle(XCAFKinematics_HighOrderPairObject) aHighOrderPairObject = Handle(XCAFKinematics_HighOrderPairObject)::DownCast(aKinPairObj);
+    switch (aKinPairObj->Type())
+    {
+    case(XCAFKinematics_PairType_PointOnSurface):
+    {
+      GeomToStep_MakeSurface aMaker(aHighOrderPairObject->Surface());
+      Handle(StepGeom_Surface) aPairSurface = aMaker.Value();
+      if (HasRange)
+      {
+        return Standard_False;
+        Standard_Real aLowerLimitYaw = aHighOrderPairObject->LowLimitYaw();
+        Standard_Real aUpperLimitYaw = aHighOrderPairObject->UpperLimitYaw();
+        Standard_Real aLowerLimitPitch = aHighOrderPairObject->LowLimitPitch();
+        Standard_Real aUpperLimitPitch = aHighOrderPairObject->UpperLimitPitch();
+        Standard_Real aLowerLimitRoll = aHighOrderPairObject->LowLimitRoll();
+        Standard_Real aUpperLimitRoll = aHighOrderPairObject->UpperLimitRoll();
+        //GeomToStep_MakeRectangularTrimmedSurface aTrimSurface;
+        Handle(StepGeom_RectangularTrimmedSurface) aRangeOnPairSurface; /*= aHighOrderPairObject->Surface();*/
+        aKinematicPair = new StepKinematics_PointOnSurfacePairWithRange;
+        Handle(StepKinematics_PointOnSurfacePairWithRange) aPointOnSurfacePairWithRange = Handle(StepKinematics_PointOnSurfacePairWithRange)::DownCast(aKinematicPair);
+        aPointOnSurfacePairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurface,aRangeOnPairSurface, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
+          aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_PointOnSurfacePair;
+        Handle(StepKinematics_PointOnSurfacePair) aPointOnSurface = Handle(StepKinematics_PointOnSurfacePair)::DownCast(aKinematicPair);
+        aPointOnSurface->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint,aPairSurface);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_SlidingSurface):
+    {
+      aKinematicPair = new StepKinematics_SlidingSurfacePair;
+      GeomToStep_MakeSurface aMaker(aHighOrderPairObject->Surface());
+      Handle(StepGeom_Surface) aPairSurfac1 = aMaker.Value();
+      GeomToStep_MakeSurface aMaker2(aHighOrderPairObject->Surface());
+      Handle(StepGeom_Surface) aPairSurface2 = aMaker2.Value();
+      Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
+      Handle(StepKinematics_SlidingSurfacePair) aSlidingSurfacePair = Handle(StepKinematics_SlidingSurfacePair)::DownCast(aKinematicPair);
+      aSlidingSurfacePair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurfac1, aPairSurface2, anOrientation);
+      break;
+    }
+    case(XCAFKinematics_PairType_RollingSurface):
+    {
+      aKinematicPair = new StepKinematics_RollingSurfacePair;
+      GeomToStep_MakeSurface aMaker(aHighOrderPairObject->Surface());
+      Handle(StepGeom_Surface) aPairSurfac1 = aMaker.Value();
+      GeomToStep_MakeSurface aMaker2(aHighOrderPairObject->Surface());
+      Handle(StepGeom_Surface) aPairSurface2 = aMaker2.Value();
+      Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
+      Handle(StepKinematics_RollingSurfacePair) aRollingSurfacePair = Handle(StepKinematics_RollingSurfacePair)::DownCast(aKinematicPair);
+      aRollingSurfacePair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurfac1, aPairSurface2, anOrientation);
+      break;
+    }
+    case(XCAFKinematics_PairType_PointOnPlanarCurve):
+    {
+      GeomToStep_MakeCurve aMaker(aHighOrderPairObject->Curve());
+      Handle(StepGeom_Curve) aPairCurve = aMaker.Value();
+      Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
+      if (HasRange)
+      {
+        return Standard_False;
+        Standard_Real aLowerLimitYaw = aHighOrderPairObject->LowLimitYaw();
+        Standard_Real aUpperLimitYaw = aHighOrderPairObject->UpperLimitYaw();
+        Standard_Real aLowerLimitPitch = aHighOrderPairObject->LowLimitPitch();
+        Standard_Real aUpperLimitPitch = aHighOrderPairObject->UpperLimitPitch();
+        Standard_Real aLowerLimitRoll = aHighOrderPairObject->LowLimitRoll();
+        Standard_Real aUpperLimitRoll = aHighOrderPairObject->UpperLimitRoll();
+        Handle(StepGeom_TrimmedCurve) aRangeOnPairCurve; /*= aHighOrderPairObject->Curve();*/
+        aKinematicPair = new StepKinematics_PointOnPlanarCurvePairWithRange;
+        Handle(StepKinematics_PointOnPlanarCurvePairWithRange) aPointOnPlanarCurvePairWithRange = Handle(StepKinematics_PointOnPlanarCurvePairWithRange)::DownCast(aKinematicPair);
+        aPointOnPlanarCurvePairWithRange->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation, aRangeOnPairCurve,Standard_True,aLowerLimitYaw, Standard_True,aUpperLimitYaw, Standard_True,
+          aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True,aLowerLimitRoll, Standard_True, aUpperLimitRoll);
+      }
+      else
+      {
+        aKinematicPair = new StepKinematics_PointOnPlanarCurvePair;
+        Handle(StepKinematics_PointOnPlanarCurvePair) aPointOnPlanarCurvePair = Handle(StepKinematics_PointOnPlanarCurvePair)::DownCast(aKinematicPair);
+        aPointOnPlanarCurvePair->Init(aPairName, aPairName, hasDescription,
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation);
+      }
+      break;
+    }
+    case(XCAFKinematics_PairType_SlidingCurve): 
+    {
+      GeomToStep_MakeCurve aMaker(aHighOrderPairObject->Curve());
+      Handle(StepGeom_Curve) aPairCurve = aMaker.Value();
+      Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
+      GeomToStep_MakeCurve aMaker2(aHighOrderPairObject->Curve());
+      Handle(StepGeom_Curve) aPairCurve2 = aMaker2.Value();
+      aKinematicPair = new StepKinematics_SlidingCurvePair;
+      Handle(StepKinematics_SlidingCurvePair) aSlidingCurvePair = Handle(StepKinematics_SlidingCurvePair)::DownCast(aKinematicPair);
+      aSlidingCurvePair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, aPairCurve2, anOrientation);
+      break;
+    }
+    case(XCAFKinematics_PairType_RollingCurve):
+    {
+      GeomToStep_MakeCurve aMaker(aHighOrderPairObject->Curve());
+      Handle(StepGeom_Curve) aPairCurve = aMaker.Value();
+      Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
+      GeomToStep_MakeCurve aMaker2(aHighOrderPairObject->Curve());
+      Handle(StepGeom_Curve) aPairCurve2 = aMaker2.Value();
+      aKinematicPair = new StepKinematics_RollingCurvePair;
+      Handle(StepKinematics_RollingCurvePair) aRollingCurvePair = Handle(StepKinematics_RollingCurvePair)::DownCast(aKinematicPair);
+      aRollingCurvePair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, aPairCurve2, anOrientation);
+      break;
+    }
+    case(XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve):
+    {
+      aKinematicPair = new StepKinematics_LinearFlexibleAndPlanarCurvePair;
+      GeomToStep_MakeCurve aMaker(aHighOrderPairObject->Curve());
+      Handle(StepGeom_Curve) aPairCurve = aMaker.Value();
+      Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
+      Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair) aLinearFlexibleAndPlanarCurvePair = Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair)::DownCast(aKinematicPair);
+      aLinearFlexibleAndPlanarCurvePair->Init(aPairName, aPairName, hasDescription,
+        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation);
+      break;
+    }
+    default:
+      return Standard_False;
+      break;
+    }
+    return Standard_True;
+  }
+
+  return Standard_False;
+}
+
+static Standard_Boolean createKinematicPairValue(const Handle(XCAFKinematics_PairValueObject)& aKinPairValueObj,
+  Handle(StepKinematics_PairValue)& aPairValue,
+  const Handle(StepKinematics_PairRepresentationRelationship)& aPairReprRelationship)
+{
+  if (aKinPairValueObj->Type() == XCAFKinematics_PairType_NoType)
+    return Standard_False;
+
+
+  switch (aKinPairValueObj->Type())
+  {
+  case(XCAFKinematics_PairType_Revolute):
+  {
+    aPairValue = new StepKinematics_RevolutePairValue;
+    Handle(StepKinematics_RevolutePairValue) aRevolutePairValue = 
+      Handle(StepKinematics_RevolutePairValue)::DownCast(aPairValue);
+    aRevolutePairValue->SetActualRotation(aKinPairValueObj->GetRotation());
+    break;
+  }
+  case(XCAFKinematics_PairType_Prismatic):
+  {
+    aPairValue = new StepKinematics_PrismaticPairValue;
+    Handle(StepKinematics_PrismaticPairValue) aPrismaticPairValue = 
+      Handle(StepKinematics_PrismaticPairValue)::DownCast(aPairValue);
+    aPrismaticPairValue->SetActualTranslation(aKinPairValueObj->GetTranslation());
+    break;
+  }
+  case(XCAFKinematics_PairType_Cylindrical):
+  {
+    aPairValue = new StepKinematics_CylindricalPairValue;
+    Handle(StepKinematics_CylindricalPairValue) aCylindricalPairValue = 
+      Handle(StepKinematics_CylindricalPairValue)::DownCast(aPairValue);
+    aCylindricalPairValue->SetActualTranslation(aKinPairValueObj->GetTranslation());
+    aCylindricalPairValue->SetActualRotation(aKinPairValueObj->GetRotation());
+    break;
+  }
+  case(XCAFKinematics_PairType_Universal):
+  {
+    aPairValue = new StepKinematics_UniversalPairValue;
+    Handle(StepKinematics_UniversalPairValue) aUniversalPairValue = 
+      Handle(StepKinematics_UniversalPairValue)::DownCast(aPairValue);
+    aUniversalPairValue->SetFirstRotationAngle(aKinPairValueObj->GetFirstRotation());
+    aUniversalPairValue->SetSecondRotationAngle(aKinPairValueObj->GetSecondRotation());
+    break;
+  }
+  case(XCAFKinematics_PairType_Spherical):
+  {
+    aPairValue = new StepKinematics_SphericalPairValue;
+    Handle(StepKinematics_SphericalPairValue) aSphericalPairValue = 
+      Handle(StepKinematics_SphericalPairValue)::DownCast(aPairValue);
+    StepKinematics_SpatialRotation InputRotation;
+    InputRotation.SetValue(aKinPairValueObj->GetAllValues());
+    aSphericalPairValue->SetInputOrientation(InputRotation);
+    break;
+  }
+  case(XCAFKinematics_PairType_Planar):
+  {
+    aPairValue = new StepKinematics_PlanarPairValue;
+    Handle(StepKinematics_PrismaticPairValue) aPrismaticPairValue = 
+      Handle(StepKinematics_PrismaticPairValue)::DownCast(aPairValue);
+    aPrismaticPairValue->SetActualTranslation(aKinPairValueObj->GetTranslation());
+    break;
+  }
+  case(XCAFKinematics_PairType_Unconstrained):
+  {
+    aPairValue = new StepKinematics_UnconstrainedPairValue;
+    Handle(StepKinematics_UnconstrainedPairValue) anUnconstrainedPairValue = 
+      Handle(StepKinematics_UnconstrainedPairValue)::DownCast(aPairValue);
+    GeomToStep_MakeAxis2Placement3d anActualPlacement(aKinPairValueObj->GetTransformation());
+    anUnconstrainedPairValue->SetActualPlacement(anActualPlacement.Value());
+    break;
+  }
+  case(XCAFKinematics_PairType_Screw):
+  {
+    aPairValue = new StepKinematics_ScrewPairValue;
+    Handle(StepKinematics_ScrewPairValue) aScrewPairValue = 
+      Handle(StepKinematics_ScrewPairValue)::DownCast(aPairValue);
+    aScrewPairValue->SetActualRotation(aKinPairValueObj->GetRotation());
+    break;
+  }
+  case(XCAFKinematics_PairType_RackAndPinion):
+  {
+    aPairValue = new StepKinematics_RackAndPinionPairValue;
+    Handle(StepKinematics_RackAndPinionPairValue) aRackAndPinionPairValue = 
+      Handle(StepKinematics_RackAndPinionPairValue)::DownCast(aPairValue);
+    aRackAndPinionPairValue->SetActualDisplacement(aKinPairValueObj->GetTranslation());
+    break;
+  }
+  case(XCAFKinematics_PairType_Gear):
+  {
+    aPairValue = new StepKinematics_GearPairValue;
+    Handle(StepKinematics_GearPairValue) aGearPairValue = 
+      Handle(StepKinematics_GearPairValue)::DownCast(aPairValue);
+    aGearPairValue->SetActualRotation1(aKinPairValueObj->GetRotation());
+    break;
+  }
+  case(XCAFKinematics_PairType_PointOnSurface):
+  {
+    aPairValue = new StepKinematics_PointOnSurfacePairValue;
+    Handle(StepKinematics_PointOnSurfacePairValue) aPointOnSurfacePairValue = 
+      Handle(StepKinematics_PointOnSurfacePairValue)::DownCast(aPairValue);
+    Handle(StepGeom_PointOnSurface) aActualPointOnSurface = new StepGeom_PointOnSurface;
+    Handle(StepKinematics_PointOnSurfacePair) aPointOnSurfacePair = 
+      Handle(StepKinematics_PointOnSurfacePair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+    Standard_Real theU;
+    Standard_Real theV;
+    aKinPairValueObj->GetPointOnSurface(theU, theV);
+    aActualPointOnSurface->Init(aPairValue->Name(), aPointOnSurfacePair->PairSurface(), theU, theV);
+    aPointOnSurfacePairValue->SetActualPointOnSurface(aActualPointOnSurface);
+    StepKinematics_SpatialRotation aYRP;
+    Handle(TColStd_HArray1OfReal) anArrayYRP = new TColStd_HArray1OfReal(1,3);
+    Standard_Real aYaw;
+    Standard_Real aPitch;
+    Standard_Real aRoll;
+    aKinPairValueObj->GetYPR(aYaw, aPitch, aRoll);
+    anArrayYRP->SetValue(1, aYaw);
+    anArrayYRP->SetValue(2, aPitch);
+    anArrayYRP->SetValue(3, aRoll);
+    aYRP.SetValue(anArrayYRP);
+    aPointOnSurfacePairValue->SetInputOrientation(aYRP);
+    break;
+  }
+  case(XCAFKinematics_PairType_SlidingSurface):
+  {
+    aPairValue = new StepKinematics_SlidingSurfacePairValue;
+    Handle(StepKinematics_SlidingSurfacePairValue) aSlidingSurfacePairValue =
+      Handle(StepKinematics_SlidingSurfacePairValue)::DownCast(aPairValue);
+    Handle(StepGeom_PointOnSurface) aActualPointOnSurface1 = new StepGeom_PointOnSurface;
+    Handle(StepKinematics_SlidingSurfacePair) SlidingSurfacePair =
+      Handle(StepKinematics_SlidingSurfacePair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+    Standard_Real theU1;
+    Standard_Real theV1;
+    aKinPairValueObj->GetFirstPointOnSurface(theU1, theV1);
+    aActualPointOnSurface1->Init(aPairValue->Name(), SlidingSurfacePair->Surface1(), theU1, theV1);
+    aSlidingSurfacePairValue->SetActualPointOnSurface1(aActualPointOnSurface1);
+    Handle(StepGeom_PointOnSurface) aActualPointOnSurface2 = new StepGeom_PointOnSurface;
+    Standard_Real theU2;
+    Standard_Real theV2;
+    aKinPairValueObj->GetSecondPointOnSurface(theU2, theV2);
+    aActualPointOnSurface2->Init(aPairValue->Name(), SlidingSurfacePair->Surface2(), theU2, theV2);
+    aSlidingSurfacePairValue->SetActualPointOnSurface2(aActualPointOnSurface2);
+    break;
+  }
+  case(XCAFKinematics_PairType_RollingSurface):
+  {
+    aPairValue = new StepKinematics_RollingSurfacePairValue;
+    Handle(StepKinematics_RollingSurfacePairValue) aRollingSurfacePairValue =
+      Handle(StepKinematics_RollingSurfacePairValue)::DownCast(aPairValue);
+    aRollingSurfacePairValue->SetActualRotation(aKinPairValueObj->GetRotation());
+    Handle(StepGeom_PointOnSurface) aActualPointOnSurface = new StepGeom_PointOnSurface;
+    Handle(StepKinematics_RollingSurfacePair) aRollingSurfacePair =
+      Handle(StepKinematics_RollingSurfacePair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation());
+    Standard_Real theU;
+    Standard_Real theV;
+    aKinPairValueObj->GetPointOnSurface(theU, theV);
+    aActualPointOnSurface->Init(aPairValue->Name(), aRollingSurfacePair->Surface1(), theU, theV);
+    aRollingSurfacePairValue->SetActualPointOnSurface(aActualPointOnSurface);
+    break;
+  }
+  case(XCAFKinematics_PairType_PointOnPlanarCurve):
+  {
+    aPairValue = new StepKinematics_PointOnPlanarCurvePairValue;
+    Handle(StepKinematics_PointOnPlanarCurvePairValue) aPointOnPlanarCurvePairValue =
+      Handle(StepKinematics_PointOnPlanarCurvePairValue)::DownCast(aPairValue);
+    StepKinematics_SpatialRotation aYRP;
+    Handle(TColStd_HArray1OfReal) anArrayYRP = new TColStd_HArray1OfReal(1, 3);
+    Standard_Real aYaw;
+    Standard_Real aPitch;
+    Standard_Real aRoll;
+    aKinPairValueObj->GetYPR(aYaw, aPitch, aRoll);
+    anArrayYRP->SetValue(1, aYaw);
+    anArrayYRP->SetValue(2, aPitch);
+    anArrayYRP->SetValue(3, aRoll);
+    aYRP.SetValue(anArrayYRP);
+    aPointOnPlanarCurvePairValue->SetInputOrientation(aYRP);
+    Handle(StepGeom_PointOnCurve) anActualPointOnCurve = new StepGeom_PointOnCurve;
+    Handle(StepKinematics_PointOnPlanarCurvePair) aPointOnPlanarCurvePair =
+      Handle(StepKinematics_PointOnPlanarCurvePair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+    Standard_Real aParametr = aKinPairValueObj->GetPointOnCurve();
+    anActualPointOnCurve->Init(aPointOnPlanarCurvePair->Name(), aPointOnPlanarCurvePair->PairCurve(), aParametr);
+    aPointOnPlanarCurvePairValue->SetActualPointOnCurve(anActualPointOnCurve);
+    break;
+  }
+  case(XCAFKinematics_PairType_SlidingCurve):
+  {
+    aPairValue = new StepKinematics_SlidingCurvePairValue;
+    Handle(StepKinematics_SlidingCurvePairValue) aSlidingCurvePairValue = 
+      Handle(StepKinematics_SlidingCurvePairValue)::DownCast(aPairValue);
+    Handle(StepGeom_PointOnCurve) anActualPointOnCurve1 = new StepGeom_PointOnCurve;
+    Handle(StepKinematics_SlidingCurvePair) aSlidingCurvePair =
+      Handle(StepKinematics_SlidingCurvePair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+    Standard_Real aParametr1 = aKinPairValueObj->GetFirstPointOnCurve();
+    anActualPointOnCurve1->Init(aSlidingCurvePair->Name(), aSlidingCurvePair->Curve1(), aParametr1);
+    aSlidingCurvePairValue->SetActualPointOnCurve1(anActualPointOnCurve1);
+    break;
+  }
+  case(XCAFKinematics_PairType_RollingCurve):
+  {
+    aPairValue = new StepKinematics_RollingCurvePairValue;
+    Handle(StepKinematics_RollingCurvePairValue) aRollingCurvePairValue =
+      Handle(StepKinematics_RollingCurvePairValue)::DownCast(aPairValue);
+    Handle(StepGeom_PointOnCurve) anActualPointOnCurve = new StepGeom_PointOnCurve;
+    Handle(StepKinematics_RollingCurvePair) aRollingCurvePair =
+      Handle(StepKinematics_RollingCurvePair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation());
+    Standard_Real aParametr = aKinPairValueObj->GetPointOnCurve();
+    anActualPointOnCurve->Init(aRollingCurvePair->Name(), aRollingCurvePair->Curve1(), aParametr);
+    aRollingCurvePairValue->SetActualPointOnCurve1(anActualPointOnCurve);
+    break; 
+  }
+  default:
+    return Standard_False;
+    break;
+  }
+  Handle(StepKinematics_KinematicPair) aAppliesToPair =
+    Handle(StepKinematics_KinematicPair)::DownCast(aPairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+  aPairValue->SetAppliesToPair(aAppliesToPair);
+  aPairValue->SetName(aAppliesToPair->Name());
+  return Standard_True;
+}
+
+Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Handle(XSControl_WorkSession)& WS, const TDF_LabelSequence& labels)
+{
+
+  if (labels.Length() <= 0) return Standard_False;
+
+  // get working data
+  const Handle(Interface_InterfaceModel)& Model = WS->Model();
+  const Handle(XSControl_TransferWriter)& TW = WS->TransferWriter();
+  const Handle(Transfer_FinderProcess)& FP = TW->FinderProcess();
+
+  const Handle(Interface_HGraph) aHGraph = WS->HGraph();
+  if (aHGraph.IsNull())
+    return Standard_False;
+
+  Interface_Graph aGraph = aHGraph->Graph();
+  Handle(XCAFDoc_KinematicTool) aKTool = XCAFDoc_DocumentTool::KinematicTool(labels(1));
+  if (aKTool.IsNull()) 
+    return Standard_False;
+
+  TDF_LabelSequence aMechanismsL;
+
+  aMechanismsL.Clear();
+  aMechanismsL = aKTool->GetMechanisms();
+  if (aMechanismsL.Length() <= 0) return Standard_False;
+
+  Standard_Integer aMechInd;
+  for (aMechInd = 1; aMechInd <= aMechanismsL.Length(); aMechInd++)
+  {
+    //write Links
+    Handle(StepKinematics_KinematicLinkRepresentation) aBaseLinksOfMech;
+    Handle(StepRepr_NextAssemblyUsageOccurrence) aGeneralNAUO;
+
+    //containers storing Links and their labels located at a single index
+    TDF_LabelSequence aSeqOfLinskL = aKTool->GetLinks(aMechanismsL.Value(aMechInd));
+    if (aSeqOfLinskL.Length() <= 0)
+      return Standard_False;
+    Handle(TColStd_HArray1OfTransient) aArrayOfRigidLinks = new TColStd_HArray1OfTransient(1, aSeqOfLinskL.Length());
+
+    for (Standard_Integer aLinkInd = 1; aLinkInd <= aSeqOfLinskL.Length(); aLinkInd++)
+    {
+      TDF_Label aLinkL = aSeqOfLinskL.Value(aLinkInd);
+      Handle(StepKinematics_KinematicLink) aLink;
+      Handle(StepShape_ShapeRepresentation) aRefShapeOfLink;
+      Handle(StepRepr_NextAssemblyUsageOccurrence) NAUO;
+      createKinematicLink(FP, aKTool, aLink, aGraph, aLinkL, aRefShapeOfLink, NAUO);
+      Handle(StepRepr_RepresentationContext) aRepresentationContextOfLink = aRefShapeOfLink->ContextOfItems();
+      Handle(StepKinematics_RigidLinkRepresentation) aLinkRepresentation = new StepKinematics_RigidLinkRepresentation;
+      Handle(TCollection_HAsciiString) aNameOfLinkRepr = new TCollection_HAsciiString("");
+      Handle(StepRepr_HArray1OfRepresentationItem) aPlacementsOfPairs = new StepRepr_HArray1OfRepresentationItem;
+      aLinkRepresentation->Init(aNameOfLinkRepr, aPlacementsOfPairs, aRepresentationContextOfLink, aLink);
+      aArrayOfRigidLinks->SetValue(aLinkInd, aLinkRepresentation);
+      Handle(StepKinematics_KinematicLinkRepresentationAssociation) aLinkRepresentationAssociation = new StepKinematics_KinematicLinkRepresentationAssociation;
+      aLinkRepresentationAssociation->Init(aNameOfLinkRepr, aNameOfLinkRepr, aRefShapeOfLink, aLinkRepresentation);
+      Handle(StepKinematics_ContextDependentKinematicLinkRepresentation) aCDKLRS = new StepKinematics_ContextDependentKinematicLinkRepresentation;
+      Handle(StepKinematics_ProductDefinitionRelationshipKinematics) aPDRK = new StepKinematics_ProductDefinitionRelationshipKinematics;
+      StepRepr_CharacterizedDefinition aDefinition;
+      aDefinition.SetValue(NAUO);
+      aGeneralNAUO = NAUO; //Work, but think out
+      aPDRK->Init(aNameOfLinkRepr, Standard_False, aLinkRepresentationAssociation->Description(), aDefinition);
+      aCDKLRS->Init(aLinkRepresentationAssociation, aPDRK);
+      Model->AddEntity(aLink);
+      Model->AddEntity(aLinkRepresentation);
+      Model->AddEntity(aLinkRepresentationAssociation);
+      Model->AddEntity(aPDRK);
+      Model->AddEntity(aCDKLRS);
+    }
+    aBaseLinksOfMech = Handle(StepKinematics_KinematicLinkRepresentation)::DownCast(aArrayOfRigidLinks->Value(1));
+
+    //write joints
+
+    //containers storing Joints and their labels located at a single index
+    //any joint corresponds a unique pair with the same index
+    TDF_LabelSequence aSeqOfJointsL = aKTool->GetJoints(aMechanismsL.Value(aMechInd));
+    if (aSeqOfJointsL.Length() <= 0) 
+      return Standard_False;
+    Handle(TColStd_HArray1OfTransient) aArrayOfJoints = new TColStd_HArray1OfTransient(1, aSeqOfJointsL.Length());
+    Handle(StepRepr_HArray1OfRepresentationItem) anArrayOfPairs = new StepRepr_HArray1OfRepresentationItem(1, aSeqOfJointsL.Length());
+
+    Handle(StepKinematics_KinematicPropertyMechanismRepresentation) aPropertyMechanismRepr = new StepKinematics_KinematicPropertyMechanismRepresentation;
+    Handle(StepKinematics_MechanismRepresentation) aMechanism = new StepKinematics_MechanismRepresentation;
+    StepRepr_RepresentedDefinition aPDK;
+    Handle(StepKinematics_KinematicTopologyStructure) aKTopoStruct = new StepKinematics_KinematicTopologyStructure;
+    for (Standard_Integer aJointInd = 1; aJointInd <= aSeqOfJointsL.Length(); aJointInd++)
+    {
+      TDF_Label aJointL = aSeqOfJointsL.Value(aJointInd);
+      Handle(StepKinematics_KinematicJoint) aJoint;
+      Handle(XCAFDoc_KinematicPair) aKPairAttr;
+      Handle(StepKinematics_KinematicPair) aKinematicPair;
+      if (!aJointL.FindAttribute(XCAFDoc_KinematicPair::GetID(), aKPairAttr))
+        continue;
+      Handle(XCAFKinematics_PairObject) aPairObject = aKPairAttr->GetObject();
+      Handle(StepKinematics_RigidLinkRepresentation) aRigLinkRepr1;
+      Handle(StepKinematics_RigidLinkRepresentation) aRigLinkRepr2;
+      if (!createKinematicJoint(FP, aKTool, aGraph, aJointL, aPairObject, aSeqOfLinskL, aRigLinkRepr1, aRigLinkRepr2, aArrayOfRigidLinks, aJoint))
+        continue;
+      if (!createKinematicPair(aPairObject, aKinematicPair, aJoint, aSeqOfLinskL, aRigLinkRepr1, aRigLinkRepr2, aArrayOfRigidLinks))
+        continue;
+      aArrayOfJoints->SetValue(aJointInd, aJoint);
+      Handle(StepKinematics_PairRepresentationRelationship) aPairReprRelationship = new StepKinematics_PairRepresentationRelationship;
+      StepRepr_RepresentationOrRepresentationReference aDataLinkStart;
+      aDataLinkStart.SetValue(aRigLinkRepr1);
+      StepRepr_RepresentationOrRepresentationReference aDataLinkEnd;
+      aDataLinkEnd.SetValue(aRigLinkRepr2);
+      StepRepr_Transformation aPair;
+      aPair.SetValue(aKinematicPair);
+      aPairReprRelationship->Init(aKinematicPair->Name(), aKinematicPair->Name(), Standard_False, aKinematicPair->Name(), aDataLinkStart, aDataLinkEnd, aPair);
+      anArrayOfPairs->SetValue(aJointInd, aPairReprRelationship);
+
+      Model->AddEntity(aJoint);
+      Model->AddWithRefs(aPairReprRelationship);
+    }
+
+    //write mechanism
+    Handle(StepKinematics_ProductDefinitionKinematics) aProductDefKin = new StepKinematics_ProductDefinitionKinematics;
+    StepRepr_CharacterizedDefinition aKinDefinition;
+    aKinDefinition.SetValue(aGeneralNAUO->RelatingProductDefinition());
+    aProductDefKin->Init(new TCollection_HAsciiString, Standard_False, new TCollection_HAsciiString, aKinDefinition);
+    aKTopoStruct->Init(new TCollection_HAsciiString, anArrayOfPairs, aBaseLinksOfMech->ContextOfItems());
+    StepKinematics_KinematicTopologyRepresentationSelect aTopoSelect;
+    aTopoSelect.SetValue(aKTopoStruct);
+    Handle(TDataStd_Name) aAttrName;
+    aMechanismsL.Value(aMechInd).FindAttribute(TDataStd_Name::GetID(), aAttrName);
+    Handle(TCollection_HAsciiString) aHNameMechanism = new TCollection_HAsciiString(aAttrName->Get());
+    aPDK.SetValue(aProductDefKin);
+    aMechanism->Init(aHNameMechanism, anArrayOfPairs, aBaseLinksOfMech->ContextOfItems(), aTopoSelect);
+    aPropertyMechanismRepr->Init(aPDK, aMechanism, aBaseLinksOfMech);
+    Model->AddWithRefs(aPropertyMechanismRepr);
+
+    //(optional) write States
+    TDF_LabelSequence aSeqOfStates = aKTool->GetStates(aMechanismsL.Value(aMechInd));
+    for (Standard_Integer aStateInd = 1; aStateInd <= aSeqOfStates.Length(); ++aStateInd)
+    {
+      Handle(StepKinematics_MechanismStateRepresentation) aStateRepr = new StepKinematics_MechanismStateRepresentation;
+      TDF_LabelSequence aSeqOfValues = aKTool->GetValuesOfState(aSeqOfStates(aStateInd));
+      Handle(StepRepr_HArray1OfRepresentationItem) aItems = new StepRepr_HArray1OfRepresentationItem(1, aSeqOfValues.Length());
+      for (Standard_Integer aValueInd = 1; aValueInd <= aItems->Length(); ++aValueInd)
+      {
+        TDF_Label aJointL = aKTool->GetJointOfValue(aSeqOfValues(aValueInd));
+        Handle(StepKinematics_KinematicJoint) aJoint;
+        Handle(StepKinematics_PairRepresentationRelationship) aPairReprRelationship;
+        Standard_Integer anIndOfPair;
+        for (anIndOfPair = 1; anIndOfPair <= aSeqOfJointsL.Length(); ++anIndOfPair)
+        {
+          if (aSeqOfJointsL(anIndOfPair) == aJointL)
+          {
+            aPairReprRelationship = Handle(StepKinematics_PairRepresentationRelationship)::DownCast(anArrayOfPairs->Value(anIndOfPair));
+            aJoint = Handle(StepKinematics_KinematicJoint)::DownCast(aArrayOfJoints->Value(anIndOfPair));
+            break;
+          }
+        }
+        if (aJoint.IsNull() || aPairReprRelationship.IsNull())
+          continue;
+        Handle(XCAFDoc_KinematicPairValue) aKPairValueAttr;
+        if (!aSeqOfValues(aValueInd).FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aKPairValueAttr))
+          continue;
+        Handle(TCollection_HAsciiString) aNameOfValue;
+        Handle(TDataStd_Name) aNameAttr;
+        if (aSeqOfValues(aValueInd).FindAttribute(TDataStd_Name::GetID(), aNameAttr))
+          aNameOfValue = new TCollection_HAsciiString(aNameAttr->Get());
+        if (!aSeqOfValues(aValueInd).FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aKPairValueAttr))
+          continue;
+        Handle(XCAFKinematics_PairValueObject) aPairValueObject = aKPairValueAttr->GetObject();
+        Handle(StepKinematics_PairValue) aPairValue;
+        if (!createKinematicPairValue(aPairValueObject, aPairValue, aPairReprRelationship))
+          continue;
+        aPairValue->SetName(aNameOfValue);
+        aItems->SetValue(aValueInd, aPairValue);
+      }
+      Handle(TCollection_HAsciiString) aNameOfState;
+      Handle(TDataStd_Name) aNameAttr;
+      if (aSeqOfStates(aStateInd).FindAttribute(TDataStd_Name::GetID(), aNameAttr))
+        aNameOfState = new TCollection_HAsciiString(aNameAttr->Get());
+      aStateRepr->Init(aNameOfState, aItems, aMechanism->ContextOfItems(), aMechanism);
+      Model->AddWithRefs(aStateRepr);
+    }
+  }
+
+  return Standard_True;
+}
 
 //=======================================================================
 //function : FindPDSforDGT
@@ -3398,333 +4578,333 @@ void STEPCAFControl_Writer::WriteGeomTolerance (const Handle(XSControl_WorkSessi
 //function : WriteDGTs
 //purpose  : 
 //=======================================================================
-Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSession) &WS,
-                                                   const TDF_LabelSequence  &labels ) const
-{
+  Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSession) &WS,
+                                                     const TDF_LabelSequence  &labels ) const
+  {
   
-  if ( labels.Length() <=0 ) return Standard_False;
+    if ( labels.Length() <=0 ) return Standard_False;
   
-  // get working data
-  const Handle(Interface_InterfaceModel) &Model = WS->Model();
-  const Handle(XSControl_TransferWriter) &TW = WS->TransferWriter();
-  const Handle(Transfer_FinderProcess) &FP = TW->FinderProcess();
+    // get working data
+    const Handle(Interface_InterfaceModel) &Model = WS->Model();
+    const Handle(XSControl_TransferWriter) &TW = WS->TransferWriter();
+    const Handle(Transfer_FinderProcess) &FP = TW->FinderProcess();
 
-  const Handle(Interface_HGraph) aHGraph = WS->HGraph();
-  if(aHGraph.IsNull())
-    return Standard_False;
+    const Handle(Interface_HGraph) aHGraph = WS->HGraph();
+    if(aHGraph.IsNull())
+      return Standard_False;
 
-  Interface_Graph aGraph = aHGraph->Graph();
-  Handle(XCAFDoc_DimTolTool) DGTTool = XCAFDoc_DocumentTool::DimTolTool( labels(1) );
-  if(DGTTool.IsNull() ) return Standard_False;
+    Interface_Graph aGraph = aHGraph->Graph();
+    Handle(XCAFDoc_DimTolTool) DGTTool = XCAFDoc_DocumentTool::DimTolTool( labels(1) );
+    if(DGTTool.IsNull() ) return Standard_False;
 
-  TDF_LabelSequence DGTLabels;
+    TDF_LabelSequence DGTLabels;
 
-  STEPConstruct_DataMapOfAsciiStringTransient DatumMap;
+    STEPConstruct_DataMapOfAsciiStringTransient DatumMap;
 
-  // write Datums
-  DGTLabels.Clear();
-  DGTTool->GetDatumLabels(DGTLabels);
-  if(DGTLabels.Length()<=0) return Standard_False;
-  Standard_Integer i;
-  for(i=1; i<=DGTLabels.Length(); i++) {
-    TDF_Label DatumL = DGTLabels.Value(i);
-    TDF_LabelSequence ShapeL;
-    TDF_LabelSequence aNullSeq;
-    if(!DGTTool->GetRefShapeLabel(DatumL,ShapeL,aNullSeq)) continue;
-    // find target shape
-    TopoDS_Shape aShape = XCAFDoc_ShapeTool::GetShape(ShapeL.Value(1));
-    TopLoc_Location Loc;
-    TColStd_SequenceOfTransient seqRI;
-    FindEntities( FP, aShape, Loc, seqRI );
-    if ( seqRI.Length() <= 0 ) {
-      FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<std::endl;
-      continue;
-    }
-    Handle(StepRepr_ProductDefinitionShape) PDS;
-    Handle(StepRepr_RepresentationContext) RC;
-    Handle(Standard_Transient) ent = seqRI.Value(1);
-    Handle(StepShape_AdvancedFace) AF;
-    Handle(StepShape_EdgeCurve) EC;
-    FindPDSforDGT(aGraph,ent,PDS,RC,AF,EC);
-    if(PDS.IsNull()) continue;
-    //std::cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<std::endl;
-    Handle(XCAFDoc_Datum) DatumAttr;
-    if(!DatumL.FindAttribute(XCAFDoc_Datum::GetID(),DatumAttr)) continue;
-    Handle(TCollection_HAsciiString) aName = DatumAttr->GetName();
-    Handle(TCollection_HAsciiString) aDescription = DatumAttr->GetDescription();
-    Handle(TCollection_HAsciiString) anIdentification = DatumAttr->GetIdentification();
-    Handle(StepDimTol_DatumFeature) DF = new StepDimTol_DatumFeature;
-    Handle(StepDimTol_Datum) aDatum = new StepDimTol_Datum;
-    DF->Init(aName, new TCollection_HAsciiString, PDS, StepData_LTrue);
-    Model->AddWithRefs(DF);
-    aDatum->Init(aName, new TCollection_HAsciiString, PDS, StepData_LFalse, anIdentification);
-    Model->AddWithRefs(aDatum);
-    Handle(StepRepr_ShapeAspectRelationship) SAR = new StepRepr_ShapeAspectRelationship;
-    SAR->SetName(aName);
-    SAR->SetRelatingShapeAspect(DF);
-    SAR->SetRelatedShapeAspect(aDatum);
-    Model->AddWithRefs(SAR);
-    // write chain for DatumFeature
-    StepRepr_CharacterizedDefinition CD;
-    CD.SetValue(DF);
-    Handle(StepRepr_PropertyDefinition) PropD = new StepRepr_PropertyDefinition;
-    PropD->Init(aName,Standard_True,aDescription,CD);
-    Model->AddWithRefs(PropD);
-    StepRepr_RepresentedDefinition RD;
-    RD.SetValue(PropD);
-    Handle(StepShape_ShapeRepresentation) SR = new StepShape_ShapeRepresentation;
-    Handle(StepRepr_HArray1OfRepresentationItem) HARI =
-      new StepRepr_HArray1OfRepresentationItem(1,1);
-    HARI->SetValue(1,AF);
-    SR->Init(aName,HARI,RC);
-    Handle(StepShape_ShapeDefinitionRepresentation) SDR = new StepShape_ShapeDefinitionRepresentation;
-    SDR->Init(RD,SR);
-    Model->AddWithRefs(SDR);
-    // write chain for Datum 
-    StepRepr_CharacterizedDefinition CD1;
-    CD1.SetValue(aDatum);
-    Handle(StepRepr_PropertyDefinition) PropD1 = new StepRepr_PropertyDefinition;
-    PropD1->Init(aName,Standard_True,aDescription,CD1);
-    Model->AddWithRefs(PropD1);
-    StepRepr_RepresentedDefinition RD1;
-    RD1.SetValue(PropD1);
-    Handle(StepShape_ShapeRepresentation) SR1 = new StepShape_ShapeRepresentation;
-    Handle(StepRepr_HArray1OfRepresentationItem) HARI1 =
-      new StepRepr_HArray1OfRepresentationItem(1,1);
-    HARI1->SetValue(1,AF->FaceGeometry());
-    SR1->Init(aName,HARI1,RC);
-    Model->AddWithRefs(SR1);
-    Handle(StepShape_ShapeDefinitionRepresentation) SDR1 = new StepShape_ShapeDefinitionRepresentation;
-    SDR1->Init(RD1,SR1);
-    Model->AddWithRefs(SDR1);
-    // add created Datum into Map
-    TCollection_AsciiString stmp(aName->ToCString());
-    stmp.AssignCat(aDescription->ToCString());
-    stmp.AssignCat(anIdentification->ToCString());
-    DatumMap.Bind(stmp,aDatum);
-  }
-
-  // write Tolerances and Dimensions
-  DGTLabels.Clear();
-  DGTTool->GetDimTolLabels(DGTLabels);
-  if(DGTLabels.Length()<=0) return Standard_False;
-  for(i=1; i<=DGTLabels.Length(); i++) {
-    TDF_Label DimTolL = DGTLabels.Value(i);
-    TDF_LabelSequence ShapeL;
-    TDF_LabelSequence aNullSeq;
-    if(!DGTTool->GetRefShapeLabel(DimTolL,ShapeL,aNullSeq)) continue;
-    // find target shape
-    TopoDS_Shape aShape = XCAFDoc_ShapeTool::GetShape(ShapeL.Value(1));
-    TopLoc_Location Loc;
-    TColStd_SequenceOfTransient seqRI;
-    FindEntities( FP, aShape, Loc, seqRI );
-    if ( seqRI.Length() <= 0 ) {
-      FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<std::endl;
-      continue;
-    }
-    Handle(StepRepr_ProductDefinitionShape) PDS;
-    Handle(StepRepr_RepresentationContext) RC;
-    Handle(Standard_Transient) ent = seqRI.Value(1);
-    Handle(StepShape_AdvancedFace) AF;
-    Handle(StepShape_EdgeCurve) EC;
-    FindPDSforDGT(aGraph,ent,PDS,RC,AF,EC);
-    if(PDS.IsNull()) continue;
-    //std::cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<std::endl;
-
-    Handle(XCAFDoc_DimTol) DimTolAttr;
-    if(!DimTolL.FindAttribute(XCAFDoc_DimTol::GetID(),DimTolAttr)) continue;
-    Standard_Integer kind = DimTolAttr->GetKind();
-    Handle(TColStd_HArray1OfReal) aVal = DimTolAttr->GetVal();
-    Handle(TCollection_HAsciiString) aName = DimTolAttr->GetName();
-    Handle(TCollection_HAsciiString) aDescription = DimTolAttr->GetDescription();
-
-    // common part of writing D&GT entities
-    StepRepr_CharacterizedDefinition CD;
-    Handle(StepRepr_ShapeAspect) SA = new StepRepr_ShapeAspect;
-    SA->Init(aName, new TCollection_HAsciiString, PDS, StepData_LTrue);
-    Model->AddWithRefs(SA);
-    CD.SetValue(SA);
-    Handle(StepRepr_PropertyDefinition) PropD = new StepRepr_PropertyDefinition;
-    PropD->Init(aName,Standard_True,aDescription,CD);
-    Model->AddWithRefs(PropD);
-    StepRepr_RepresentedDefinition RD;
-    RD.SetValue(PropD);
-    Handle(StepShape_ShapeRepresentation) SR = new StepShape_ShapeRepresentation;
-    Handle(StepRepr_HArray1OfRepresentationItem) HARI =
-      new StepRepr_HArray1OfRepresentationItem(1,1);
-    if(kind<20) 
-      HARI->SetValue(1,EC);
-    else
-      HARI->SetValue(1,AF);
-    SR->Init(aName,HARI,RC);
-    Handle(StepShape_ShapeDefinitionRepresentation) SDR = new StepShape_ShapeDefinitionRepresentation;
-    SDR->Init(RD,SR);
-    Model->AddWithRefs(SDR);
-    // define aUnit for creation LengthMeasureWithUnit (common for all)
-    StepBasic_Unit aUnit;
-    aUnit = GetUnit(RC);
-
-    // specific part of writing D&GT entities
-    if(kind<20) { //dimension
-      Handle(StepShape_DimensionalSize) DimSize = new StepShape_DimensionalSize;
-      DimSize->Init(SA,aDescription);
-      Model->AddWithRefs(DimSize);
-      if(aVal->Length()>1) {
-        // create MeasureWithUnits
-        Handle(StepBasic_MeasureValueMember) MVM1 = new StepBasic_MeasureValueMember;
-        MVM1->SetName("POSITIVE_LENGTH_MEASURE");
-        MVM1->SetReal(aVal->Value(1));
-        Handle(StepBasic_MeasureWithUnit) MWU1 = new StepBasic_MeasureWithUnit;
-        MWU1->Init(MVM1,aUnit);
-        Handle(StepBasic_MeasureValueMember) MVM2 = new StepBasic_MeasureValueMember;
-        MVM2->SetName("POSITIVE_LENGTH_MEASURE");
-        MVM2->SetReal(aVal->Value(2));
-        Handle(StepBasic_MeasureWithUnit) MWU2 = new StepBasic_MeasureWithUnit;
-        MWU2->Init(MVM2,aUnit);
-        Handle(StepRepr_RepresentationItem) RI1 = new StepRepr_RepresentationItem;
-        RI1->Init(new TCollection_HAsciiString("lower limit"));
-        Handle(StepRepr_RepresentationItem) RI2 = new StepRepr_RepresentationItem;
-        RI2->Init(new TCollection_HAsciiString("upper limit"));
-        Handle(StepRepr_ReprItemAndLengthMeasureWithUnit) RILMU1 =
-          new StepRepr_ReprItemAndLengthMeasureWithUnit;
-        RILMU1->Init(MWU1,RI1);
-        Handle(StepRepr_ReprItemAndLengthMeasureWithUnit) RILMU2 =
-          new StepRepr_ReprItemAndLengthMeasureWithUnit;
-        RILMU2->Init(MWU2,RI2);
-        Model->AddWithRefs(RILMU1);
-        Model->AddWithRefs(RILMU2);
-        //Handle(StepRepr_CompoundItemDefinitionMember) CIDM =
-        //  new StepRepr_CompoundItemDefinitionMember;
-        //Handle(TColStd_HArray1OfTransient) ArrTr = new TColStd_HArray1OfTransient(1,2);
-        //ArrTr->SetValue(1,RILMU1);
-        //ArrTr->SetValue(2,RILMU2);
-        //CIDM->SetArrTransient(ArrTr);
-        //CIDM->SetName("SET_REPRESENTATION_ITEM");
-        //StepRepr_CompoundItemDefinition CID;
-        //CID.SetValue(CIDM);
-        Handle(StepRepr_HArray1OfRepresentationItem) HARIVR =
-          new StepRepr_HArray1OfRepresentationItem(1,2);
-        HARIVR->SetValue(1,RILMU1);
-        HARIVR->SetValue(2,RILMU2);
-        Handle(StepRepr_ValueRange) VR = new StepRepr_ValueRange;
-        //VR->Init(aName,CID);
-        VR->Init(aName,HARIVR);
-        Model->AddEntity(VR);
-        Handle(StepShape_ShapeDimensionRepresentation) SDimR =
-          new StepShape_ShapeDimensionRepresentation;
-        Handle(StepRepr_HArray1OfRepresentationItem) aHARI =
-          new StepRepr_HArray1OfRepresentationItem(1,1);
-        aHARI->SetValue(1,VR);
-        SDimR->Init(aName,aHARI,RC);
-        Model->AddWithRefs(SDimR);
-        Handle(StepShape_DimensionalCharacteristicRepresentation) DimCharR =
-          new StepShape_DimensionalCharacteristicRepresentation;
-        StepShape_DimensionalCharacteristic DimChar;
-        DimChar.SetValue(DimSize);
-        DimCharR->Init(DimChar,SDimR);
-        Model->AddEntity(DimCharR);
+    // write Datums
+    DGTLabels.Clear();
+    DGTTool->GetDatumLabels(DGTLabels);
+    if(DGTLabels.Length()<=0) return Standard_False;
+    Standard_Integer i;
+    for(i=1; i<=DGTLabels.Length(); i++) {
+      TDF_Label DatumL = DGTLabels.Value(i);
+      TDF_LabelSequence ShapeL;
+      TDF_LabelSequence aNullSeq;
+      if(!DGTTool->GetRefShapeLabel(DatumL,ShapeL,aNullSeq)) continue;
+      // find target shape
+      TopoDS_Shape aShape = XCAFDoc_ShapeTool::GetShape(ShapeL.Value(1));
+      TopLoc_Location Loc;
+      TColStd_SequenceOfTransient seqRI;
+      FindEntities( FP, aShape, Loc, seqRI );
+      if ( seqRI.Length() <= 0 ) {
+        FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<std::endl;
+        continue;
       }
+      Handle(StepRepr_ProductDefinitionShape) PDS;
+      Handle(StepRepr_RepresentationContext) RC;
+      Handle(Standard_Transient) ent = seqRI.Value(1);
+      Handle(StepShape_AdvancedFace) AF;
+      Handle(StepShape_EdgeCurve) EC;
+      FindPDSforDGT(aGraph,ent,PDS,RC,AF,EC);
+      if(PDS.IsNull()) continue;
+      //std::cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<std::endl;
+      Handle(XCAFDoc_Datum) DatumAttr;
+      if(!DatumL.FindAttribute(XCAFDoc_Datum::GetID(),DatumAttr)) continue;
+      Handle(TCollection_HAsciiString) aName = DatumAttr->GetName();
+      Handle(TCollection_HAsciiString) aDescription = DatumAttr->GetDescription();
+      Handle(TCollection_HAsciiString) anIdentification = DatumAttr->GetIdentification();
+      Handle(StepDimTol_DatumFeature) DF = new StepDimTol_DatumFeature;
+      Handle(StepDimTol_Datum) aDatum = new StepDimTol_Datum;
+      DF->Init(aName, new TCollection_HAsciiString, PDS, StepData_LTrue);
+      Model->AddWithRefs(DF);
+      aDatum->Init(aName, new TCollection_HAsciiString, PDS, StepData_LFalse, anIdentification);
+      Model->AddWithRefs(aDatum);
+      Handle(StepRepr_ShapeAspectRelationship) SAR = new StepRepr_ShapeAspectRelationship;
+      SAR->SetName(aName);
+      SAR->SetRelatingShapeAspect(DF);
+      SAR->SetRelatedShapeAspect(aDatum);
+      Model->AddWithRefs(SAR);
+      // write chain for DatumFeature
+      StepRepr_CharacterizedDefinition CD;
+      CD.SetValue(DF);
+      Handle(StepRepr_PropertyDefinition) PropD = new StepRepr_PropertyDefinition;
+      PropD->Init(aName,Standard_True,aDescription,CD);
+      Model->AddWithRefs(PropD);
+      StepRepr_RepresentedDefinition RD;
+      RD.SetValue(PropD);
+      Handle(StepShape_ShapeRepresentation) SR = new StepShape_ShapeRepresentation;
+      Handle(StepRepr_HArray1OfRepresentationItem) HARI =
+        new StepRepr_HArray1OfRepresentationItem(1,1);
+      HARI->SetValue(1,AF);
+      SR->Init(aName,HARI,RC);
+      Handle(StepShape_ShapeDefinitionRepresentation) SDR = new StepShape_ShapeDefinitionRepresentation;
+      SDR->Init(RD,SR);
+      Model->AddWithRefs(SDR);
+      // write chain for Datum 
+      StepRepr_CharacterizedDefinition CD1;
+      CD1.SetValue(aDatum);
+      Handle(StepRepr_PropertyDefinition) PropD1 = new StepRepr_PropertyDefinition;
+      PropD1->Init(aName,Standard_True,aDescription,CD1);
+      Model->AddWithRefs(PropD1);
+      StepRepr_RepresentedDefinition RD1;
+      RD1.SetValue(PropD1);
+      Handle(StepShape_ShapeRepresentation) SR1 = new StepShape_ShapeRepresentation;
+      Handle(StepRepr_HArray1OfRepresentationItem) HARI1 =
+        new StepRepr_HArray1OfRepresentationItem(1,1);
+      HARI1->SetValue(1,AF->FaceGeometry());
+      SR1->Init(aName,HARI1,RC);
+      Model->AddWithRefs(SR1);
+      Handle(StepShape_ShapeDefinitionRepresentation) SDR1 = new StepShape_ShapeDefinitionRepresentation;
+      SDR1->Init(RD1,SR1);
+      Model->AddWithRefs(SDR1);
+      // add created Datum into Map
+      TCollection_AsciiString stmp(aName->ToCString());
+      stmp.AssignCat(aDescription->ToCString());
+      stmp.AssignCat(anIdentification->ToCString());
+      DatumMap.Bind(stmp,aDatum);
     }
-    else if(kind<50) { //tolerance
-      if(kind<35) { // tolerance with datum system
-        TDF_LabelSequence DatumLabels;
-        DGTTool->GetDatumOfTolerLabels(DimTolL,DatumLabels);
-        Standard_Integer NbDR = DatumLabels.Length();
-        Handle(StepDimTol_HArray1OfDatumReference) HADR = new StepDimTol_HArray1OfDatumReference(1,NbDR);
-        for(Standard_Integer j=1; j<=NbDR; j++) {
-          Handle(XCAFDoc_Datum) DatumAttr;
-          TDF_Label DatumL = DatumLabels.Value(j);
-          if(!DatumL.FindAttribute(XCAFDoc_Datum::GetID(),DatumAttr)) continue;
-          Handle(TCollection_HAsciiString) aNameD = DatumAttr->GetName();
-          Handle(TCollection_HAsciiString) aDescriptionD = DatumAttr->GetDescription();
-          Handle(TCollection_HAsciiString) anIdentificationD = DatumAttr->GetIdentification();
-          TCollection_AsciiString stmp(aNameD->ToCString());
-          stmp.AssignCat(aDescriptionD->ToCString());
-          stmp.AssignCat(anIdentificationD->ToCString());
-          if(DatumMap.IsBound(stmp)) {
-            Handle(StepDimTol_Datum) aDatum = 
-              Handle(StepDimTol_Datum)::DownCast(DatumMap.Find(stmp));
-            Handle(StepDimTol_DatumReference) DR = new StepDimTol_DatumReference;
-            DR->Init(j,aDatum);
-            Model->AddWithRefs(DR);
-            HADR->SetValue(j,DR);
+
+    // write Tolerances and Dimensions
+    DGTLabels.Clear();
+    DGTTool->GetDimTolLabels(DGTLabels);
+    if(DGTLabels.Length()<=0) return Standard_False;
+    for(i=1; i<=DGTLabels.Length(); i++) {
+      TDF_Label DimTolL = DGTLabels.Value(i);
+      TDF_LabelSequence ShapeL;
+      TDF_LabelSequence aNullSeq;
+      if(!DGTTool->GetRefShapeLabel(DimTolL,ShapeL,aNullSeq)) continue;
+      // find target shape
+      TopoDS_Shape aShape = XCAFDoc_ShapeTool::GetShape(ShapeL.Value(1));
+      TopLoc_Location Loc;
+      TColStd_SequenceOfTransient seqRI;
+      FindEntities( FP, aShape, Loc, seqRI );
+      if ( seqRI.Length() <= 0 ) {
+        FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<std::endl;
+        continue;
+      }
+      Handle(StepRepr_ProductDefinitionShape) PDS;
+      Handle(StepRepr_RepresentationContext) RC;
+      Handle(Standard_Transient) ent = seqRI.Value(1);
+      Handle(StepShape_AdvancedFace) AF;
+      Handle(StepShape_EdgeCurve) EC;
+      FindPDSforDGT(aGraph,ent,PDS,RC,AF,EC);
+      if(PDS.IsNull()) continue;
+      //std::cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<std::endl;
+
+      Handle(XCAFDoc_DimTol) DimTolAttr;
+      if(!DimTolL.FindAttribute(XCAFDoc_DimTol::GetID(),DimTolAttr)) continue;
+      Standard_Integer kind = DimTolAttr->GetKind();
+      Handle(TColStd_HArray1OfReal) aVal = DimTolAttr->GetVal();
+      Handle(TCollection_HAsciiString) aName = DimTolAttr->GetName();
+      Handle(TCollection_HAsciiString) aDescription = DimTolAttr->GetDescription();
+
+      // common part of writing D&GT entities
+      StepRepr_CharacterizedDefinition CD;
+      Handle(StepRepr_ShapeAspect) SA = new StepRepr_ShapeAspect;
+      SA->Init(aName, new TCollection_HAsciiString, PDS, StepData_LTrue);
+      Model->AddWithRefs(SA);
+      CD.SetValue(SA);
+      Handle(StepRepr_PropertyDefinition) PropD = new StepRepr_PropertyDefinition;
+      PropD->Init(aName,Standard_True,aDescription,CD);
+      Model->AddWithRefs(PropD);
+      StepRepr_RepresentedDefinition RD;
+      RD.SetValue(PropD);
+      Handle(StepShape_ShapeRepresentation) SR = new StepShape_ShapeRepresentation;
+      Handle(StepRepr_HArray1OfRepresentationItem) HARI =
+        new StepRepr_HArray1OfRepresentationItem(1,1);
+      if(kind<20) 
+        HARI->SetValue(1,EC);
+      else
+        HARI->SetValue(1,AF);
+      SR->Init(aName,HARI,RC);
+      Handle(StepShape_ShapeDefinitionRepresentation) SDR = new StepShape_ShapeDefinitionRepresentation;
+      SDR->Init(RD,SR);
+      Model->AddWithRefs(SDR);
+      // define aUnit for creation LengthMeasureWithUnit (common for all)
+      StepBasic_Unit aUnit;
+      aUnit = GetUnit(RC);
+
+      // specific part of writing D&GT entities
+      if(kind<20) { //dimension
+        Handle(StepShape_DimensionalSize) DimSize = new StepShape_DimensionalSize;
+        DimSize->Init(SA,aDescription);
+        Model->AddWithRefs(DimSize);
+        if(aVal->Length()>1) {
+          // create MeasureWithUnits
+          Handle(StepBasic_MeasureValueMember) MVM1 = new StepBasic_MeasureValueMember;
+          MVM1->SetName("POSITIVE_LENGTH_MEASURE");
+          MVM1->SetReal(aVal->Value(1));
+          Handle(StepBasic_MeasureWithUnit) MWU1 = new StepBasic_MeasureWithUnit;
+          MWU1->Init(MVM1,aUnit);
+          Handle(StepBasic_MeasureValueMember) MVM2 = new StepBasic_MeasureValueMember;
+          MVM2->SetName("POSITIVE_LENGTH_MEASURE");
+          MVM2->SetReal(aVal->Value(2));
+          Handle(StepBasic_MeasureWithUnit) MWU2 = new StepBasic_MeasureWithUnit;
+          MWU2->Init(MVM2,aUnit);
+          Handle(StepRepr_RepresentationItem) RI1 = new StepRepr_RepresentationItem;
+          RI1->Init(new TCollection_HAsciiString("lower limit"));
+          Handle(StepRepr_RepresentationItem) RI2 = new StepRepr_RepresentationItem;
+          RI2->Init(new TCollection_HAsciiString("upper limit"));
+          Handle(StepRepr_ReprItemAndLengthMeasureWithUnit) RILMU1 =
+            new StepRepr_ReprItemAndLengthMeasureWithUnit;
+          RILMU1->Init(MWU1,RI1);
+          Handle(StepRepr_ReprItemAndLengthMeasureWithUnit) RILMU2 =
+            new StepRepr_ReprItemAndLengthMeasureWithUnit;
+          RILMU2->Init(MWU2,RI2);
+          Model->AddWithRefs(RILMU1);
+          Model->AddWithRefs(RILMU2);
+          //Handle(StepRepr_CompoundItemDefinitionMember) CIDM =
+          //  new StepRepr_CompoundItemDefinitionMember;
+          //Handle(TColStd_HArray1OfTransient) ArrTr = new TColStd_HArray1OfTransient(1,2);
+          //ArrTr->SetValue(1,RILMU1);
+          //ArrTr->SetValue(2,RILMU2);
+          //CIDM->SetArrTransient(ArrTr);
+          //CIDM->SetName("SET_REPRESENTATION_ITEM");
+          //StepRepr_CompoundItemDefinition CID;
+          //CID.SetValue(CIDM);
+          Handle(StepRepr_HArray1OfRepresentationItem) HARIVR =
+            new StepRepr_HArray1OfRepresentationItem(1,2);
+          HARIVR->SetValue(1,RILMU1);
+          HARIVR->SetValue(2,RILMU2);
+          Handle(StepRepr_ValueRange) VR = new StepRepr_ValueRange;
+          //VR->Init(aName,CID);
+          VR->Init(aName,HARIVR);
+          Model->AddEntity(VR);
+          Handle(StepShape_ShapeDimensionRepresentation) SDimR =
+            new StepShape_ShapeDimensionRepresentation;
+          Handle(StepRepr_HArray1OfRepresentationItem) aHARI =
+            new StepRepr_HArray1OfRepresentationItem(1,1);
+          aHARI->SetValue(1,VR);
+          SDimR->Init(aName,aHARI,RC);
+          Model->AddWithRefs(SDimR);
+          Handle(StepShape_DimensionalCharacteristicRepresentation) DimCharR =
+            new StepShape_DimensionalCharacteristicRepresentation;
+          StepShape_DimensionalCharacteristic DimChar;
+          DimChar.SetValue(DimSize);
+          DimCharR->Init(DimChar,SDimR);
+          Model->AddEntity(DimCharR);
+        }
+      }
+      else if(kind<50) { //tolerance
+        if(kind<35) { // tolerance with datum system
+          TDF_LabelSequence DatumLabels;
+          DGTTool->GetDatumOfTolerLabels(DimTolL,DatumLabels);
+          Standard_Integer NbDR = DatumLabels.Length();
+          Handle(StepDimTol_HArray1OfDatumReference) HADR = new StepDimTol_HArray1OfDatumReference(1,NbDR);
+          for(Standard_Integer j=1; j<=NbDR; j++) {
+            Handle(XCAFDoc_Datum) DatumAttr;
+            TDF_Label DatumL = DatumLabels.Value(j);
+            if(!DatumL.FindAttribute(XCAFDoc_Datum::GetID(),DatumAttr)) continue;
+            Handle(TCollection_HAsciiString) aNameD = DatumAttr->GetName();
+            Handle(TCollection_HAsciiString) aDescriptionD = DatumAttr->GetDescription();
+            Handle(TCollection_HAsciiString) anIdentificationD = DatumAttr->GetIdentification();
+            TCollection_AsciiString stmp(aNameD->ToCString());
+            stmp.AssignCat(aDescriptionD->ToCString());
+            stmp.AssignCat(anIdentificationD->ToCString());
+            if(DatumMap.IsBound(stmp)) {
+              Handle(StepDimTol_Datum) aDatum = 
+                Handle(StepDimTol_Datum)::DownCast(DatumMap.Find(stmp));
+              Handle(StepDimTol_DatumReference) DR = new StepDimTol_DatumReference;
+              DR->Init(j,aDatum);
+              Model->AddWithRefs(DR);
+              HADR->SetValue(j,DR);
+            }
+          }
+          // create LengthMeasureWithUnit
+          Handle(StepBasic_MeasureValueMember) MVM = new StepBasic_MeasureValueMember;
+          MVM->SetName("LENGTH_MEASURE");
+          MVM->SetReal(aVal->Value(1));
+          Handle(StepBasic_LengthMeasureWithUnit) LMWU = new StepBasic_LengthMeasureWithUnit;
+          LMWU->Init(MVM,aUnit);
+          // create tolerance by it's type
+          if(kind<24) {
+            Handle(StepDimTol_GeometricToleranceWithDatumReference) GTWDR =
+              new StepDimTol_GeometricToleranceWithDatumReference;
+            GTWDR->SetDatumSystem(HADR);
+            Handle(StepDimTol_ModifiedGeometricTolerance) MGT =
+              new StepDimTol_ModifiedGeometricTolerance;
+            if(kind==21) MGT->SetModifier(StepDimTol_MaximumMaterialCondition);
+            else if(kind==22) MGT->SetModifier(StepDimTol_LeastMaterialCondition);
+            else if(kind==23) MGT->SetModifier(StepDimTol_RegardlessOfFeatureSize);
+            Handle(StepDimTol_GeoTolAndGeoTolWthDatRefAndModGeoTolAndPosTol) GTComplex =
+              new StepDimTol_GeoTolAndGeoTolWthDatRefAndModGeoTolAndPosTol;
+            GTComplex->Init(aName,aDescription,LMWU,SA,GTWDR,MGT);
+            Model->AddWithRefs(GTComplex);
+          }
+          else if(kind==24) {
+            Handle(StepDimTol_AngularityTolerance) aToler =
+              new StepDimTol_AngularityTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==25) {
+            Handle(StepDimTol_CircularRunoutTolerance) aToler =
+              new StepDimTol_CircularRunoutTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==26) {
+            Handle(StepDimTol_CoaxialityTolerance) aToler =
+              new StepDimTol_CoaxialityTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==27) {
+            Handle(StepDimTol_ConcentricityTolerance) aToler =
+              new StepDimTol_ConcentricityTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==28) {
+            Handle(StepDimTol_ParallelismTolerance) aToler =
+              new StepDimTol_ParallelismTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==29) {
+            Handle(StepDimTol_PerpendicularityTolerance) aToler =
+              new StepDimTol_PerpendicularityTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==30) {
+            Handle(StepDimTol_SymmetryTolerance) aToler =
+              new StepDimTol_SymmetryTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
+          }
+          else if(kind==31) {
+            Handle(StepDimTol_TotalRunoutTolerance) aToler =
+              new StepDimTol_TotalRunoutTolerance;
+            aToler->Init(aName,aDescription,LMWU,SA,HADR);
+            Model->AddWithRefs(aToler);
           }
         }
-        // create LengthMeasureWithUnit
-        Handle(StepBasic_MeasureValueMember) MVM = new StepBasic_MeasureValueMember;
-        MVM->SetName("LENGTH_MEASURE");
-        MVM->SetReal(aVal->Value(1));
-        Handle(StepBasic_LengthMeasureWithUnit) LMWU = new StepBasic_LengthMeasureWithUnit;
-        LMWU->Init(MVM,aUnit);
-        // create tolerance by it's type
-        if(kind<24) {
-          Handle(StepDimTol_GeometricToleranceWithDatumReference) GTWDR =
-            new StepDimTol_GeometricToleranceWithDatumReference;
-          GTWDR->SetDatumSystem(HADR);
-          Handle(StepDimTol_ModifiedGeometricTolerance) MGT =
-            new StepDimTol_ModifiedGeometricTolerance;
-          if(kind==21) MGT->SetModifier(StepDimTol_MaximumMaterialCondition);
-          else if(kind==22) MGT->SetModifier(StepDimTol_LeastMaterialCondition);
-          else if(kind==23) MGT->SetModifier(StepDimTol_RegardlessOfFeatureSize);
-          Handle(StepDimTol_GeoTolAndGeoTolWthDatRefAndModGeoTolAndPosTol) GTComplex =
-            new StepDimTol_GeoTolAndGeoTolWthDatRefAndModGeoTolAndPosTol;
-          GTComplex->Init(aName,aDescription,LMWU,SA,GTWDR,MGT);
-          Model->AddWithRefs(GTComplex);
-        }
-        else if(kind==24) {
-          Handle(StepDimTol_AngularityTolerance) aToler =
-            new StepDimTol_AngularityTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==25) {
-          Handle(StepDimTol_CircularRunoutTolerance) aToler =
-            new StepDimTol_CircularRunoutTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==26) {
-          Handle(StepDimTol_CoaxialityTolerance) aToler =
-            new StepDimTol_CoaxialityTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==27) {
-          Handle(StepDimTol_ConcentricityTolerance) aToler =
-            new StepDimTol_ConcentricityTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==28) {
-          Handle(StepDimTol_ParallelismTolerance) aToler =
-            new StepDimTol_ParallelismTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==29) {
-          Handle(StepDimTol_PerpendicularityTolerance) aToler =
-            new StepDimTol_PerpendicularityTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==30) {
-          Handle(StepDimTol_SymmetryTolerance) aToler =
-            new StepDimTol_SymmetryTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
-        else if(kind==31) {
-          Handle(StepDimTol_TotalRunoutTolerance) aToler =
-            new StepDimTol_TotalRunoutTolerance;
-          aToler->Init(aName,aDescription,LMWU,SA,HADR);
-          Model->AddWithRefs(aToler);
-        }
       }
     }
-  }
 
-  return Standard_True;
-}
+    return Standard_True;
+  }
 
 //=======================================================================
 //function : WriteDGTsAP242
@@ -4328,4 +5508,24 @@ void STEPCAFControl_Writer::SetMaterialMode(const Standard_Boolean matmode)
 Standard_Boolean STEPCAFControl_Writer::GetMaterialMode() const
 {
   return myMatMode;
+}
+
+//=======================================================================
+//function : SetKinematicsMode
+//purpose  : 
+//=======================================================================
+
+void STEPCAFControl_Writer::SetKinematicsMode(const Standard_Boolean kinematicsmod)
+{
+  myKPairMode = kinematicsmod;
+}
+
+//=======================================================================
+//function : GetKinematicsMode
+//purpose  : 
+//=======================================================================
+
+Standard_Boolean STEPCAFControl_Writer::GetKinematicsMode() const
+{
+  return myKPairMode;
 }

@@ -228,6 +228,18 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetAllParams(const Handle(TC
 }
 
 //=======================================================================
+//function : HasLimits
+//purpose  : 
+//=======================================================================
+Standard_Boolean XCAFKinematics_LowOrderPairObjectWithCoupling::HasLimits() const
+{
+  return
+    (  myLowLimit != -Precision::Infinite() ||
+      myUpperLimit != Precision::Infinite()
+    );
+}
+
+//=======================================================================
 //function : SetAllLimits
 //purpose  : 
 //=======================================================================

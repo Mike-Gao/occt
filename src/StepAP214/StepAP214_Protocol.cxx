@@ -826,6 +826,7 @@ static Standard_CString schemaAP242DIS = "AP242_MANAGED_MODEL_BASED_3D_ENGINEERI
 #include <StepKinematics_UniversalPairValue.hxx>
 #include <StepKinematics_UniversalPairWithRange.hxx>
 #include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
+#include <StepKinematics_MechanismStateRepresentation.hxx>
 
 #include <StepVisual_SurfaceStyleTransparent.hxx>
 #include <StepVisual_SurfaceStyleReflectanceAmbient.hxx>
@@ -833,7 +834,7 @@ static Standard_CString schemaAP242DIS = "AP242_MANAGED_MODEL_BASED_3D_ENGINEERI
 #include <StepVisual_SurfaceStyleRenderingWithProperties.hxx>
 
 static int THE_StepAP214_Protocol_init = 0;
-static Interface_DataMapOfTransientInteger types(801);
+static Interface_DataMapOfTransientInteger types(803);
 
 //=======================================================================
 //function : StepAP214_Protocol
@@ -1623,6 +1624,7 @@ StepAP214_Protocol::StepAP214_Protocol ()
   types.Bind(STANDARD_TYPE(StepKinematics_LinearFlexibleAndPlanarCurvePair), 797);
   types.Bind(STANDARD_TYPE(StepKinematics_LinearFlexibleLinkRepresentation), 798);
   types.Bind(STANDARD_TYPE(StepKinematics_ActuatedKinPairAndOrderKinPair), 800);
+  types.Bind(STANDARD_TYPE(StepKinematics_MechanismStateRepresentation), 801);
 }
 
 

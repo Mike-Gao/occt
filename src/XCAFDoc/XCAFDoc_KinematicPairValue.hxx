@@ -48,7 +48,9 @@ public:
   
   Standard_EXPORT static const Standard_GUID& GetID();
   
-  Standard_EXPORT static Handle(XCAFDoc_KinematicPairValue) Set (const TDF_Label& theLabel);
+  Standard_EXPORT static Handle(XCAFDoc_KinematicPairValue) Set(const TDF_Label& theValue, const TDF_Label& theJoint);
+
+  Standard_EXPORT static Handle(XCAFDoc_KinematicPairValue) Set(const TDF_Label& theValue);
   
   Standard_EXPORT const Standard_GUID& ID() const Standard_OVERRIDE;
   

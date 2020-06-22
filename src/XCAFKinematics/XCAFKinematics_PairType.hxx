@@ -39,7 +39,7 @@ enum XCAFKinematics_PairType
   XCAFKinematics_PairType_Screw,
   XCAFKinematics_PairType_RackAndPinion,
   XCAFKinematics_PairType_Gear,
-  XCAFKinematics_LinearFlexibleAndPinionPair,
+  XCAFKinematics_PairType_LinearFlexibleAndPinion,
 
   // High order pairs
   XCAFKinematics_PairType_PointOnSurface,
@@ -48,7 +48,7 @@ enum XCAFKinematics_PairType
   XCAFKinematics_PairType_PointOnPlanarCurve,
   XCAFKinematics_PairType_SlidingCurve,
   XCAFKinematics_PairType_RollingCurve,
-  XCAFKinematics_PairType_LinearFlexibleAndPlanarCurvePair
+  XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve
 };
 
 #endif // _XCAFKinematics_PairType_HeaderFile

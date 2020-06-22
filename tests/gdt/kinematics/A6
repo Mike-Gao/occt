@@ -52,12 +52,15 @@ if {$param != "Skew Angle = 30"} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -rotation 20 -second_rotation 20
-set values [XGetPairValues D $joint -rotation]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -rotation 20 -second_rotation 20
+set values [XGetPairValues D $value -rotation]
 if {$values != "20"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -second_rotation]
+set values [XGetPairValues D $value -second_rotation]
 if {$values != "20"} {
   puts "Error: wrong parameter"
 }

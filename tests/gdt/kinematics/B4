@@ -52,8 +52,11 @@ if {$param != "First Link Radius = 1\nSecond Link Radius = 2\nBevel = 3\nHelical
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -rotation 24
-set values [XGetPairValues D $joint -rotation]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -rotation 24
+set values [XGetPairValues D $value -rotation]
 if {$values != "24"} {
   puts "Error: wrong parameter"
 }

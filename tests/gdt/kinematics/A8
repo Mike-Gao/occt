@@ -46,8 +46,11 @@ if {$limits != "0 45 0 30 30 60 0 0 0 0 0 0 "} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -ypr 10 20 30
-set values [XGetPairValues D $joint -ypr]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -ypr 10 20 30
+set values [XGetPairValues D $value -ypr]
 if {$values != "10 20 30"} {
   puts "Error: wrong parameter"
 }

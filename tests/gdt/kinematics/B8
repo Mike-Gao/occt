@@ -17,9 +17,9 @@ set name [XGetPairName D $joint]
 if {$name != "point on planar curve"} {
   puts "Error: wrong parameter"
 }
-XSetPairType D $joint 17
+XSetPairType D $joint 18
 set type [XGetPairType D $joint]
-if {$type != "17"} {
+if {$type != "18"} {
   puts "Error: wrong parameter"
 }
 
@@ -61,12 +61,15 @@ if {$ori != 1} {
   puts "Error: wrong parameter"
 }
 
-XSetPairValues D $joint -point_on_curve 1.5 -ypr 12 13 14
-set values [XGetPairValues D $joint -point_on_curve]
+set state [XAddMechanismState D $mech]
+set value [XAddPairValues D $state]
+
+XSetPairValues D $value $joint -point_on_curve 1.5 -ypr 12 13 14
+set values [XGetPairValues D $value -point_on_curve]
 if {$values != "1.5"} {
   puts "Error: wrong parameter"
 }
-set values [XGetPairValues D $joint -ypr]
+set values [XGetPairValues D $value -ypr]
 if {$values != "12 13 14"} {
   puts "Error: wrong parameter"
 }
