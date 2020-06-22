@@ -28,6 +28,9 @@
 #include <gp_Elips2d.hxx>
 #include <gp_Parab2d.hxx>
 #include <gp_Hypr2d.hxx>
+#include <Geom2d_BSplineCurve.hxx>
+#include <Geom2d_BezierCurve.hxx>
+#include <Geom2d_OffsetCurve.hxx>
 #include <ProjLib.hxx>
 #include <ElSLib.hxx>
 #include <Extrema_ExtElCS.hxx>
@@ -39,6 +42,8 @@
 #include <Geom2dAPI_ProjectPointOnCurve.hxx>
 #include <Geom2dAPI_ExtremaCurveCurve.hxx>
 #include <Geom2dAPI_InterCurveCurve.hxx>
+#include <Geom2dAPI_PointsToBSpline.hxx>
+
 
 #include <Geom_CartesianPoint.hxx>
 #include <Geom_VectorWithMagnitude.hxx>
@@ -87,7 +92,10 @@
 #include <Geom2d_Parabola.hxx>
 #include <Geom2d_Hyperbola.hxx>
 #include <Geom2d_TrimmedCurve.hxx>
-
+#include <Geom2dAdaptor_Curve.hxx>
+#include <Bnd_Box2d.hxx>
+#include <BndLib_Add2dCurve.hxx>
+#include <Adaptor2d_Curve2d.hxx>
 
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
@@ -200,6 +208,10 @@ void GeometrySamples::ExecuteSample(TCollection_AsciiString theSampleName)
     ExtrusionSurface3dSample();
   else if (theSampleName == "RevolutionSurface3dSample")
     RevolutionSurface3dSample();
+  else if (theSampleName == "TrimmedCurve2dSample")
+    TrimmedCurve2dSample();
+  else if (theSampleName == "OffsetCurve2dSample")
+    OffsetCurve2dSample();
   else if (theSampleName == "BoundingBoxOfSurface3dSample")
     BoundingBoxOfSurface3dSample();
   else if (theSampleName == "BoundingBoxOfCurves3dSample")
@@ -1134,17 +1146,81 @@ void GeometrySamples::EllipseInfo3dSample()
 
 void GeometrySamples::PointInfo2dSample()
 {
+  gp_Pnt2d aPnt1;
+  gp_Pnt2d aPnt2(10.0, 10.0);
+  gp_Pnt2d aPnt3(10.0, -10.0);
+  gp_Pnt2d aPnt4(10.0, 10.0);
+  Standard_Boolean anIsEqual2_3 = aPnt2.IsEqual(aPnt3, 1E-6);
+  Standard_Boolean anIsEqual2_4 = aPnt2.IsEqual(aPnt4, 1E-6);
+  Standard_Real aDistance1_2 = aPnt1.Distance(aPnt2);
+  Standard_Real aDistance2_4 = aPnt2.Distance(aPnt4);
+  Standard_Real aSquareDistance1_2 = aPnt1.SquareDistance(aPnt2);
+  Standard_Real aSquareDistance2_4 = aPnt2.SquareDistance(aPnt4);
 
+  myResult << "A coordinate of a point 1: X: " << aPnt1.X()
+    << " Y: " << aPnt1.Y() << std::endl;
+  if (anIsEqual2_3)
+    myResult << "a point 2 is equal to a point 3" << std::endl;
+  else
+    myResult << "a point 2 is different from a point 3" << std::endl;
+  if (anIsEqual2_4)
+    myResult << "a point 2 is equal to a point 4" << std::endl;
+  else
+    myResult << "a point 2 is different from a point 4" << std::endl;
+
+  myResult << "A distance from a point 1  to a point 2 is: " << aDistance1_2 << std::endl;
+  myResult << "A distance from a point 2  to a point 4 is: " << aDistance2_4 << std::endl;
+
+  myResult << "A square distance from a point 1  to a point 2 is: " << aSquareDistance1_2 << std::endl;
+  myResult << "A square distance from a point 2  to a point 4 is: " << aSquareDistance2_4 << std::endl;
+
+  DisplayPnt(aPnt1, "1");
+  DisplayPnt(aPnt2, "2");
+  DisplayPnt(aPnt3, "3");
+  DisplayPnt(aPnt4, "4");
 }
 
 void GeometrySamples::CircleInfo2dSample()
 {
+  gp_Circ2d aCirc(gp_Ax22d(gp_Pnt2d(10.0, 10.0), gp_Vec2d(1.0, 0.0)), 10.0);
+  gp_Pnt2d aPnt1( 0.0, 10.0);
+  gp_Pnt2d aPnt2(10.0,  0.0);
+  gp_Pnt2d aPnt3(20.0, 20.0);
 
-}
-
-void GeometrySamples::ParamSecondOrderCurves3dSample()
-{
-
+  if (aCirc.Contains(aPnt1, 1E-6))
+  {
+    DisplayPnt(aPnt1, "1", Aspect_TOM_STAR);
+    myResult << "A circle contains a point 1" << std::endl;
+  }
+  else
+  {
+    DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS);
+    myResult << "A circle does contain a point 1" << std::endl;
+  }
+  if (aCirc.Contains(aPnt2, 1E-6))
+  {
+    DisplayPnt(aPnt2, "2", Aspect_TOM_STAR);
+    myResult << "A circle contains a point 2" << std::endl;
+  }
+  else
+  {
+    DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS);
+    myResult << "A circle does contain a point 2" << std::endl;
+  }
+  if (aCirc.Contains(aPnt3, 1E-6))
+  {
+    DisplayPnt(aPnt3, "3", Aspect_TOM_STAR);
+    myResult << "A circle contains a point 3" << std::endl;
+  }
+  else
+  {
+    DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS);
+    myResult << "A circle does contain a point 3" << std::endl;
+  }
+  myResult << "Circle area = " << aCirc.Area() << "square units" << std::endl;
+  Handle(Geom2d_Circle) aGeomCircle = new Geom2d_Circle(aCirc);
+  Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeomCircle);
+  myObject2d.Append(anAisCirc);
 }
 
 void GeometrySamples::FreeStyleCurves3dSample()
@@ -1379,14 +1455,74 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
   }
 }
 
-void GeometrySamples::ParamSecondOrderCurves2dSample()
-{
-
-}
-
 void GeometrySamples::FreeStyleCurves2dSample()
 {
 
+  // Define points.
+  gp_Pnt2d aPnt1(0.0, 0.0);
+  gp_Pnt2d aPnt2(5.0, 5.0);
+  gp_Pnt2d aPnt3(10.0, 5.0);
+  gp_Pnt2d aPnt4(15.0, 0.0);
+
+  // Add points to the curve poles array.
+  TColgp_Array1OfPnt2d aBSplinePoles(1, 4);
+  aBSplinePoles.SetValue(1, aPnt1);
+  aBSplinePoles.SetValue(2, aPnt2);
+  aBSplinePoles.SetValue(3, aPnt3);
+  aBSplinePoles.SetValue(4, aPnt4);
+
+  // Define BSpline weights.
+  TColStd_Array1OfReal aBSplineWeights(1, 4);
+  aBSplineWeights.SetValue(1, 1.0);
+  aBSplineWeights.SetValue(2, 0.5);
+  aBSplineWeights.SetValue(3, 0.5);
+  aBSplineWeights.SetValue(4, 1.0);
+
+  // Define knots.
+  TColStd_Array1OfReal aKnots(1, 2);
+  aKnots.SetValue(1, 0.0);
+  aKnots.SetValue(2, 1.0);
+
+  // Define multiplicities.
+  TColStd_Array1OfInteger aMults(1, 2);
+  aMults.SetValue(1, 4);
+  aMults.SetValue(2, 4);
+
+  // Define BSpline degree and periodicity.
+  Standard_Integer aDegree = 3;
+  Standard_Boolean aPeriodic = Standard_False;
+
+  // Create a BSpline curve.
+  Handle(Geom2d_BSplineCurve) aBSplineCurve = 
+    new Geom2d_BSplineCurve(aBSplinePoles, aBSplineWeights, aKnots, aMults, aDegree, aPeriodic);
+
+
+  TColgp_Array1OfPnt2d aBezierPoles(1, 4);
+  gp_Vec2d anUp10Vec(0.0, 10.0);
+  aBezierPoles.SetValue(1, aPnt1.Translated(anUp10Vec));
+  aBezierPoles.SetValue(2, aPnt2.Translated(anUp10Vec));
+  aBezierPoles.SetValue(3, aPnt3.Translated(anUp10Vec));
+  aBezierPoles.SetValue(4, aPnt4.Translated(anUp10Vec));
+
+  // Define Bezier weights.
+  TColStd_Array1OfReal aBezierWeights(1, 4);
+  aBezierWeights.SetValue(1, 0.5);
+  aBezierWeights.SetValue(2, 1.5);
+  aBezierWeights.SetValue(3, 1.5);
+  aBezierWeights.SetValue(4, 0.5);
+
+  // Create Bezier curve.
+  Handle(Geom2d_BezierCurve) aBezierCurve = new Geom2d_BezierCurve(aBezierPoles, aBezierWeights);
+
+  Handle(AdaptorCurve2d_AIS) anAisBSpline = new AdaptorCurve2d_AIS(aBSplineCurve);
+  myObject2d.Append(anAisBSpline);
+  Handle(AdaptorCurve2d_AIS) anAisBezier = new AdaptorCurve2d_AIS(aBezierCurve);
+  myObject2d.Append(anAisBezier);
+
+  DisplayPnt(aPnt1, "1");
+  DisplayPnt(aPnt2, "2");
+  DisplayPnt(aPnt3, "3");
+  DisplayPnt(aPnt4, "4");
 }
 
 void GeometrySamples::TrimmedCurve3dSample()
@@ -1625,7 +1761,38 @@ void GeometrySamples::RevolutionSurface3dSample()
 
 void GeometrySamples::TrimmedCurve2dSample()
 {
+  // Create a closed circular curve.
+  Handle(Geom2d_Circle) aGeomCircle = new Geom2d_Circle(gp_Ax2d(gp_Pnt2d(), gp_Vec2d(1.0, 0.0)), 5.0);
+  Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeomCircle);
+  myObject2d.Append(anAisCirc);
 
+  // Cut off a quarter of the circle.
+  Handle(Geom2d_TrimmedCurve) aCircQuater = new Geom2d_TrimmedCurve(aGeomCircle, 0.0, M_PI_2);
+  aCircQuater->Translate(gp_Vec2d(15.0, 0.0));
+  Handle(AdaptorCurve2d_AIS) anAisCircQuater = new AdaptorCurve2d_AIS(aCircQuater);
+  myObject2d.Append(anAisCircQuater);
+}
+
+void GeometrySamples::OffsetCurve2dSample()
+{
+  Handle(Geom2d_Circle) aGeomCircle = 
+    new Geom2d_Circle(gp_Ax2d(gp_Pnt2d(), gp_Vec2d(1.0, 0.0)), 5.0);
+
+  Standard_Real anExpandOffset = aGeomCircle->Radius() / 4.0;
+  Handle(Geom2d_OffsetCurve) anExpandCircCurve = 
+    new Geom2d_OffsetCurve(aGeomCircle, anExpandOffset);
+
+  Standard_Real anCollapseOffset = -aGeomCircle->Radius() / 2.0;
+  gp_Dir anCollapseDir = gp::DZ();
+  Handle(Geom2d_OffsetCurve) anCollapseCircCurve = 
+    new Geom2d_OffsetCurve(aGeomCircle, anCollapseOffset);
+
+  Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeomCircle);
+  myObject2d.Append(anAisCirc);
+  Handle(AdaptorCurve2d_AIS) anAisExpand = new AdaptorCurve2d_AIS(anExpandCircCurve);
+  myObject2d.Append(anAisExpand);
+  Handle(AdaptorCurve2d_AIS) anAisCollapse = new AdaptorCurve2d_AIS(anCollapseCircCurve);
+  myObject2d.Append(anAisCollapse);
 }
 
 void GeometrySamples::BoundingBoxOfSurface3dSample()
@@ -1717,7 +1884,44 @@ void GeometrySamples::BoundingBoxOfCurves3dSample()
 
 void GeometrySamples::BoundingBoxOfCurves2dSample()
 {
+  // Define points.
+  gp_Pnt2d aPnt1( 0.0,  0.0);
+  gp_Pnt2d aPnt2( 5.0,  5.0);
+  gp_Pnt2d aPnt3(10.0, 10.0);
+  gp_Pnt2d aPnt4(15.0,  5.0);
 
+  // Add points to the curve poles array.
+  TColgp_Array1OfPnt2d aPoles(1, 4);
+  aPoles.SetValue(1, aPnt1);
+  aPoles.SetValue(2, aPnt2);
+  aPoles.SetValue(3, aPnt3);
+  aPoles.SetValue(4, aPnt4);
+
+  // Make a BSpline curve from the points array.
+  Handle(Geom2d_BSplineCurve) aBSplineCurve = Geom2dAPI_PointsToBSpline(aPoles).Curve();
+
+  // Compute BSpline curve bounding box.
+  Bnd_Box2d aBndBox;
+  BndLib_Add2dCurve::AddOptimal(aBSplineCurve, 0.0, 1.0, Precision::PConfusion(), aBndBox);
+  Standard_Real aXmin, aYmin, aXmax, aYmax;
+  aBndBox.Get(aXmin, aYmin, aXmax, aYmax);
+
+  myResult << "Bounding box:" << std::endl;
+  myResult << "  Min corner = [ " << aXmin << ", " << aYmin << " ]" << std::endl;
+  myResult << "  Max corner = [ " << aXmax << ", " << aYmax << " ]" << std::endl;
+
+  Handle(AdaptorCurve2d_AIS) anAisBSpline = new AdaptorCurve2d_AIS(aBSplineCurve);
+
+  Handle(AdaptorVec_AIS) anAisVec1 = new AdaptorVec_AIS(gp_Pnt2d(aXmin, aYmin), gp_Pnt2d(aXmin, aYmax));
+  Handle(AdaptorVec_AIS) anAisVec2 = new AdaptorVec_AIS(gp_Pnt2d(aXmin, aYmax), gp_Pnt2d(aXmax, aYmax));
+  Handle(AdaptorVec_AIS) anAisVec3 = new AdaptorVec_AIS(gp_Pnt2d(aXmax, aYmax), gp_Pnt2d(aXmax, aYmin));
+  Handle(AdaptorVec_AIS) anAisVec4 = new AdaptorVec_AIS(gp_Pnt2d(aXmax, aYmin), gp_Pnt2d(aXmin, aYmin));
+
+  myObject2d.Append(anAisBSpline);
+  myObject2d.Append(anAisVec1);
+  myObject2d.Append(anAisVec2);
+  myObject2d.Append(anAisVec3);
+  myObject2d.Append(anAisVec4);
 }
 
 void GeometrySamples::DumpCircleInfoSample()

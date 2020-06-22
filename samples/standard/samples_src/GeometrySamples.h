@@ -57,11 +57,9 @@ private:
   void EllipseInfo3dSample();
   void PointInfo2dSample();
   void CircleInfo2dSample();
-  void ParamSecondOrderCurves3dSample();
   void FreeStyleCurves3dSample();
   void AnalyticalSurfaces3dSample();
   void FreeStyleSurfaces3dSample();
-  void ParamSecondOrderCurves2dSample();
   void FreeStyleCurves2dSample();
   void TrimmedCurve3dSample();
   void OffsetCurve3dSample();
@@ -71,6 +69,7 @@ private:
   void ExtrusionSurface3dSample();
   void RevolutionSurface3dSample();
   void TrimmedCurve2dSample();
+  void OffsetCurve2dSample();
   void BoundingBoxOfSurface3dSample();
   void BoundingBoxOfCurves3dSample();
   void BoundingBoxOfCurves2dSample();
