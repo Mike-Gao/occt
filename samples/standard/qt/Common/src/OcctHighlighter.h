@@ -37,7 +37,10 @@ private:
   QTextCharFormat mySingleLineCommentFormat;
   QTextCharFormat myMultiLineCommentFormat;
   QTextCharFormat myQuotationFormat;
-  QTextCharFormat myFunctionFormat;
+  QTextCharFormat myFunctionFormat;  
+  QTextCharFormat myOcctFormat;
+  QTextCharFormat myMemberFormat;
+  QTextCharFormat myHelperFormat;
 };
 
 #endif

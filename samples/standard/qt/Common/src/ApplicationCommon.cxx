@@ -83,11 +83,14 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   aCodeViewFont.setPointSize(10);
 
   myCodeView = new QTextEdit;
+  myCodeView->setDocumentTitle("Code");
+  myCodeView->setLineWrapMode(QTextEdit::NoWrap);
   myCodeView->setReadOnly(true);
   myCodeView->setFont(aCodeViewFont);
   myCodeViewHighlighter = new OcctHighlighter(myCodeView->document());
 
   myResultView = new QTextEdit;
+  myResultView->setDocumentTitle("Output");
   myResultView->setReadOnly(true);
   myResultView->setFont(aCodeViewFont);
 
