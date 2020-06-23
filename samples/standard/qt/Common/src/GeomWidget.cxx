@@ -57,6 +57,7 @@ void GeomWidget::FitAll()
   {
     myView3d->fitAll();
     my3dVidget->show();
+    setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
   }
 
 
@@ -66,5 +67,6 @@ void GeomWidget::FitAll()
   {
     myView2d->fitAll();
     my2dVidget->show();
+    setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Menu");
   }
 }

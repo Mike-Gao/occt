@@ -5,6 +5,7 @@
 
 #include "GeometrySamples.h"
 #include "TopologySamples.h"
+#include "TriangulationSamples.h"
 #include "GeomWidget.h"
 
 #include "OcctHighlighter.h"
@@ -83,8 +84,11 @@ private slots:
   void onProcessSample(const QString& theSampleName);
 
 private:
-  enum class ApplicationType { Geometry, Topology, Triangulation, Ocaf, Viewer2d, Viewer3d };
-  static const ApplicationType APP_TYPE = ApplicationType::Geometry;
+  enum class ApplicationType { Geometry, Topology, Triangulation, Ocaf, Viewer2d, Viewer3d, Unknokwn };
+  ApplicationType APP_TYPE = ApplicationType::Topology;
+
+  void    SetAppType(QString theParameter);
+  QString GetTitle();
 
 	void createStandardOperations();
 	void createCasCadeOperations();

@@ -47,16 +47,22 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   mySamples(nullptr)
 {
   stApp = this;
+  SetAppType("Triangulation");
+  setWindowTitle(GetTitle());
 
   switch (APP_TYPE)
   {
   case ApplicationType::Geometry:
     mySamples = new GeometrySamples();
+    MenuFormJson(":/menus/Geometry.json");
     break;
   case ApplicationType::Topology:
     mySamples = new TopologySamples();
+    MenuFormJson(":/menus/Topology.json");
     break;
   case ApplicationType::Triangulation:
+    mySamples = new TriangulationSamples();
+    MenuFormJson(":/menus/Triangulation.json");
     break;
   case ApplicationType::Ocaf:
     break;
@@ -65,9 +71,9 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   case ApplicationType::Viewer2d:
     break;
   default:
+    setWindowTitle("Unknown application");
     break;
   }
-
 
   connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessSample);
@@ -100,7 +106,7 @@ ApplicationCommonWindow::ApplicationCommonWindow()
 
   myDocument3d = createNewDocument();
   myDocument2d = createNewDocument();
-  myGeomWidget = new GeomWidget(myDocument3d, myDocument2d);
+  myGeomWidget = new GeomWidget(myDocument3d, myDocument2d, this);
   myGeomWidget->setContentsMargins(0, 0, 0, 0);
   QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
 
@@ -108,33 +114,55 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   aGeomTextSplitter->addWidget(aCodeResultSplitter);
   aGeomTextSplitter->setStretchFactor(0, 1);
   aGeomTextSplitter->setStretchFactor(1, 1);
+  QList<int> aSizeList{ 640, 640 };
+  aGeomTextSplitter->setSizes(aSizeList);
   setCentralWidget(aGeomTextSplitter);
 
   Q_INIT_RESOURCE(Samples);
-  switch (APP_TYPE)
-  {
-  case ApplicationType::Geometry:
-    MenuFormJson(":/menus/Geometry.json");
-    break;
-  case ApplicationType::Topology:
-    MenuFormJson(":/menus/Topology.json");
-    break;
-  case ApplicationType::Triangulation:
-    break;
-  case ApplicationType::Ocaf:
-    break;
-  case ApplicationType::Viewer3d:
-    break;
-  case ApplicationType::Viewer2d:
-    break;
-  default:
-    break;
-  }
 
   createStandardOperations();
   createCasCadeOperations();
 
   resize(1280, 720);
+}
+
+void ApplicationCommonWindow::SetAppType(QString theParameter)
+{
+  if (theParameter == "Geometry")
+    APP_TYPE = ApplicationType::Geometry;
+  else if (theParameter == "Topology")
+    APP_TYPE = ApplicationType::Topology;
+  else if (theParameter == "Triangulation")
+    APP_TYPE = ApplicationType::Triangulation;
+  else if (theParameter == "Ocaf")
+    APP_TYPE = ApplicationType::Ocaf;
+  else  if (theParameter == "Viewer3d")
+    APP_TYPE = ApplicationType::Viewer3d;
+  else  if (theParameter == "Viewer2d")
+    APP_TYPE = ApplicationType::Viewer2d;
+  else  
+    APP_TYPE = ApplicationType::Unknokwn;
+}
+
+QString ApplicationCommonWindow::GetTitle()
+{
+  switch (APP_TYPE)
+  {
+  case ApplicationType::Geometry:
+    return "Geometry";
+  case ApplicationType::Topology:
+    return "Topology";
+  case ApplicationType::Triangulation:
+    return "Triangulation";
+  case ApplicationType::Ocaf:
+    return "OCAF";
+  case ApplicationType::Viewer3d:
+    return "3D viewer";
+  case ApplicationType::Viewer2d:
+    return "2D Viewer";
+  default:
+    return "Unknown application";
+  }
 }
 
 void ApplicationCommonWindow::createStandardOperations()
@@ -437,12 +465,15 @@ QToolBar* ApplicationCommonWindow::getCasCadeBar()
 
 void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 {
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  setWindowTitle(GetTitle() + " - " + theSampleName);
   mySamples->Process(theSampleName.toUtf8().data());
   myDocument3d->SetObjects(mySamples->Get3dObjects());
   myDocument2d->SetObjects(mySamples->Get2dObjects());
   myCodeView->setPlainText(mySamples->GetCode().ToCString());
   myResultView->setPlainText(mySamples->GetResult().ToCString());
   myGeomWidget->FitAll();
+  QApplication::restoreOverrideCursor();
 }
 
 QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent)
