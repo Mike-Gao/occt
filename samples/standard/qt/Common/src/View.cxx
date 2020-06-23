@@ -104,12 +104,12 @@ void View::init()
   }
 
   if (myIis3dView)
-  {
-    myV3dView->SetBackgroundColor (Quantity_NOC_BLUE4);
+  {    
+    myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.0, 0.3, Quantity_TOC_RGB));
   }
   else
   {
-    myV3dView->SetBackgroundColor (Quantity_NOC_GREEN4);
+    myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.2, 0.0, Quantity_TOC_RGB));
     myV3dView->SetProj(V3d_Zpos);
   }
 

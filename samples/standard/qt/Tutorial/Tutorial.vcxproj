@@ -148,13 +148,14 @@
     <ClCompile Include="..\Common\src\GeomWidget.cxx" />
     <ClCompile Include="..\..\samples_src\GeometrySamples.cxx" />
     <ClCompile Include="src\Main.cxx" />
-    <ClCompile Include="src\MakeBottle.cxx" />
+    <ClCompile Include="..\..\samples_src\MakeBottle.cxx" />
     <ClCompile Include="..\Common\src\Material.cxx" />
     <ClCompile Include="..\Common\src\OcctHighlighter.cxx" />
     <ClCompile Include="..\Common\src\OcctWindow.cxx" />
     <ClCompile Include="..\..\samples_src\TopologySamples.cxx" />
     <ClCompile Include="..\Interface\src\Translate.cxx" />
     <ClCompile Include="..\Common\src\Transparency.cxx" />
+    <ClCompile Include="..\..\samples_src\TriangulationSamples.cxx" />
     <ClCompile Include="..\Common\src\View.cxx" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +227,7 @@
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\GeometrySamples.h" />
     <ClInclude Include="..\Interface\src\IESample.h" />
+    <ClInclude Include="..\..\samples_src\MakeBottle.h" />
     <CustomBuild Include="..\Common\src\Material.h">
       <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\Common\src\Material.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; ..\Common\src\Material.h -o win64\vc14\mocd\moc_Material.cpp</Command>
@@ -268,6 +270,7 @@
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC ../Common/src/Transparency.h</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_Transparency.cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include="..\..\samples_src\TriangulationSamples.h" />
     <CustomBuild Include="..\Common\src\View.h">
       <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\Common\src\View.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/occt-CR31570/samples/standard/qt/Common/src -IC:/Work/occt-CR31570/samples/standard/qt/Interface/src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; ..\Common\src\View.h -o win64\vc14\mocd\moc_View.cpp</Command>
@@ -373,16 +376,17 @@
     <None Include="..\..\samples_src\Geometry.json" />
     <CustomBuild Include="..\..\samples_src\Samples.qrc">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Topology.json;..\..\samples_src\Geometry.json;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Topology.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o debug\qrc_Samples.cpp</Command>
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">RCC ../../samples_src/Samples.qrc</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">debug\qrc_Samples.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Topology.json;..\..\samples_src\Geometry.json;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Topology.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o release\qrc_Samples.cpp</Command>
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">RCC ../../samples_src/Samples.qrc</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">release\qrc_Samples.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\..\samples_src\Topology.json" />
+    <None Include="..\..\samples_src\Triangulation.json" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\Common\src\Common-icon.ts">
