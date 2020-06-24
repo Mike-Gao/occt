@@ -36,6 +36,7 @@ XCAFKinematics_LowOrderPairObject::XCAFKinematics_LowOrderPairObject()
   myMaxTranslationY = Precision::Infinite();
   myMinTranslationZ = -Precision::Infinite();
   myMaxTranslationZ = Precision::Infinite();
+  isRanged = Standard_False;
 }
 
 //=======================================================================
@@ -61,6 +62,7 @@ XCAFKinematics_LowOrderPairObject::
   myMaxTranslationY = theObj->myMaxTranslationY;
   myMinTranslationZ = theObj->myMinTranslationZ;
   myMaxTranslationZ = theObj->myMaxTranslationZ;
+  isRanged = theObj->HasLimits();
 }
 
 //=======================================================================
@@ -68,8 +70,11 @@ XCAFKinematics_LowOrderPairObject::
 //purpose  : 
 //=======================================================================
 Handle(TColStd_HArray1OfReal) XCAFKinematics_LowOrderPairObject::GetAllLimits() const
-{
-  Handle(TColStd_HArray1OfReal) aLimitArray = new TColStd_HArray1OfReal(1, 12);
+{  
+  Handle(TColStd_HArray1OfReal) aLimitArray;
+  if (!HasLimits())
+    return aLimitArray;
+  aLimitArray = new TColStd_HArray1OfReal(1, 12);
   aLimitArray->ChangeValue(1) = myMinRotationX;
   aLimitArray->ChangeValue(2) = myMaxRotationX;
   aLimitArray->ChangeValue(3) = myMinRotationY;
@@ -91,20 +96,7 @@ Handle(TColStd_HArray1OfReal) XCAFKinematics_LowOrderPairObject::GetAllLimits() 
 //=======================================================================
 Standard_Boolean XCAFKinematics_LowOrderPairObject::HasLimits() const
 {
-  return 
-  (  myMinRotationX != -Precision::Infinite() ||
-      myMaxRotationX != Precision::Infinite() ||
-     myMinRotationY != -Precision::Infinite() ||
-      myMaxRotationY != Precision::Infinite() ||
-     myMinRotationZ != -Precision::Infinite() ||
-      myMaxRotationZ != Precision::Infinite() ||
-  myMinTranslationX != -Precision::Infinite() ||
-   myMaxTranslationX != Precision::Infinite() ||
-  myMinTranslationY != -Precision::Infinite() ||
-   myMaxTranslationY != Precision::Infinite() ||
-  myMinTranslationZ != -Precision::Infinite() ||
-   myMaxTranslationZ != Precision::Infinite()
-  );
+  return isRanged;
 }
 
 //=======================================================================
@@ -127,4 +119,5 @@ void XCAFKinematics_LowOrderPairObject::SetAllLimits(const Handle(TColStd_HArray
   myMaxTranslationY = theLimits->Value(10);
   myMinTranslationZ = theLimits->Value(11);
   myMaxTranslationZ = theLimits->Value(12);
+  isRanged = Standard_True;
 }

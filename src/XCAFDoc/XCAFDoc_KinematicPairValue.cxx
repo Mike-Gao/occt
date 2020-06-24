@@ -29,12 +29,6 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_KinematicPairValue, TDF_Attribute)
 
-// Gor first children are reserved for kinematic pair parameters
-enum ValueLab
-{
-  ValueLab_Values = 3
-};
-
 //=======================================================================
 //function : XCAFDoc_KinematicPairValue
 //purpose  : 

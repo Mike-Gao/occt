@@ -16,6 +16,8 @@
 #include <XCAFKinematics_HighOrderPairObject.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Surface.hxx>
+#include <Geom_TrimmedCurve.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(XCAFKinematics_HighOrderPairObject, XCAFKinematics_PairObject)
 
@@ -27,6 +29,7 @@ XCAFKinematics_HighOrderPairObject::
 XCAFKinematics_HighOrderPairObject()
 {
   myLimits = NULL;
+  isRanged = Standard_False;
 }
 
 //=======================================================================
@@ -43,6 +46,7 @@ XCAFKinematics_HighOrderPairObject(const Handle(XCAFKinematics_HighOrderPairObje
   myOrientation = theObj->myOrientation;
   myLimits = theObj->myLimits;
   myGeom = theObj->myGeom;
+  isRanged = theObj->HasLimits();
 }
 
 //=======================================================================
@@ -59,12 +63,12 @@ void XCAFKinematics_HighOrderPairObject::SetType(const XCAFKinematics_PairType t
     break;
   }
   case XCAFKinematics_PairType_SlidingSurface: {
-    myLimits = new TColStd_HArray1OfReal(1, 2);
+    myLimits = NULL;
     myGeom = NCollection_Array1<Handle(Geom_Geometry)>(1, 2);
     break;
   }
   case XCAFKinematics_PairType_RollingSurface: {
-    myLimits = new TColStd_HArray1OfReal(1, 2);
+    myLimits = NULL;
     myGeom = NCollection_Array1<Handle(Geom_Geometry)>(1, 2);
     break;
   }
@@ -84,6 +88,7 @@ void XCAFKinematics_HighOrderPairObject::SetType(const XCAFKinematics_PairType t
     break;
   }
   }
+
 }
 
 //=======================================================================
@@ -98,14 +103,6 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
     aNbLimits = 6;
     break;
   }
-  case XCAFKinematics_PairType_SlidingSurface: {
-    aNbLimits = 2;
-    break;
-  }
-  case XCAFKinematics_PairType_RollingSurface: {
-    aNbLimits = 2;
-    break;
-  }
   case XCAFKinematics_PairType_PointOnPlanarCurve: {
     aNbLimits = 6;
     break;
@@ -113,7 +110,10 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
   }
 
   if (theLimits->Length() == aNbLimits)
+  {
     myLimits = theLimits;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -122,10 +122,7 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
 //=======================================================================
 Standard_Boolean XCAFKinematics_HighOrderPairObject::HasLimits() const
 {
-  Standard_Boolean IsConstraint = Standard_False;
-  for (Standard_Integer anInd = 1; anInd < myLimits->Length() && !IsConstraint; ++anInd)
-    IsConstraint = myLimits->Value(anInd) != NULL;
-  return IsConstraint;
+  return isRanged;
 }
 
 //=======================================================================
@@ -135,7 +132,10 @@ Standard_Boolean XCAFKinematics_HighOrderPairObject::HasLimits() const
 void XCAFKinematics_HighOrderPairObject::SetRotationLowLimit(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_SlidingSurface || Type() == XCAFKinematics_PairType_RollingSurface)
+  {
     myLimits->ChangeValue(1) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -156,7 +156,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::RotationLowLimit()
 void XCAFKinematics_HighOrderPairObject::SetRotationUpperLimit(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_SlidingSurface || Type() == XCAFKinematics_PairType_RollingSurface)
+  {
     myLimits->ChangeValue(2) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -177,7 +180,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::RotationUpperLimit()
 void XCAFKinematics_HighOrderPairObject::SetLowLimitYaw(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
+  {
     myLimits->ChangeValue(1) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -198,7 +204,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::LowLimitYaw()
 void XCAFKinematics_HighOrderPairObject::SetUpperLimitYaw(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
+  {
     myLimits->ChangeValue(2) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -219,7 +228,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::UpperLimitYaw()
 void XCAFKinematics_HighOrderPairObject::SetLowLimitRoll(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
+  {
     myLimits->ChangeValue(3) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -240,7 +252,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::LowLimitRoll()
 void XCAFKinematics_HighOrderPairObject::SetUpperLimitRoll(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
+  {
     myLimits->ChangeValue(4) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -261,7 +276,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::UpperLimitRoll()
 void XCAFKinematics_HighOrderPairObject::SetLowLimitPitch(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
+  {
     myLimits->ChangeValue(5) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -282,7 +300,10 @@ Standard_Real XCAFKinematics_HighOrderPairObject::LowLimitPitch()
 void XCAFKinematics_HighOrderPairObject::SetUpperLimitPitch(const Standard_Real theLimit)
 {
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
+  {
     myLimits->ChangeValue(6) = theLimit;
+    isRanged = Standard_True;
+  }
 }
 
 //=======================================================================
@@ -312,8 +333,16 @@ void XCAFKinematics_HighOrderPairObject::SetCurve(const Handle(Geom_Curve)& theC
 //=======================================================================
 Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::Curve() const
 {
-  if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
-    return Handle(Geom_Curve)::DownCast(myGeom.First());
+  if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve && !myGeom.First().IsNull())
+  {
+    if (myGeom.First()->IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
+    {
+      Handle(Geom_TrimmedCurve) aTrimCurve = Handle(Geom_TrimmedCurve)::DownCast(myGeom.First());
+      return aTrimCurve->BasisCurve();
+    }
+    else 
+      return Handle(Geom_Curve)::DownCast(myGeom.First());
+  }
   return NULL;
 }
 
@@ -360,6 +389,28 @@ Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::SecondCurve() const
 }
 
 //=======================================================================
+//function : SetTrimmedCurve
+//purpose  : 
+//=======================================================================
+void XCAFKinematics_HighOrderPairObject::SetTrimmedCurve(const Handle(Geom_TrimmedCurve)& aTrimCurve)
+{
+  if (Type() != XCAFKinematics_PairType_PointOnPlanarCurve && !HasLimits())
+    return;
+  myGeom.ChangeFirst() = aTrimCurve;
+}
+
+//=======================================================================
+//function : TrimmedCurve
+//purpose  : 
+//=======================================================================
+Handle(Geom_TrimmedCurve) XCAFKinematics_HighOrderPairObject::TrimmedCurve() const
+{
+  if (Type() != XCAFKinematics_PairType_PointOnPlanarCurve)
+    return NULL;
+  return  Handle(Geom_TrimmedCurve)::DownCast(myGeom.First());
+}
+
+//=======================================================================
 //function : SetSurface
 //purpose  : 
 //=======================================================================
@@ -376,7 +427,13 @@ void XCAFKinematics_HighOrderPairObject::SetSurface(const Handle(Geom_Surface)& 
 Handle(Geom_Surface) XCAFKinematics_HighOrderPairObject::Surface() const
 {
   if (Type() == XCAFKinematics_PairType_PointOnSurface)
-    return Handle(Geom_Surface)::DownCast(myGeom.First());
+    if (!myGeom.First().IsNull() && myGeom.First()->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
+    {
+      Handle(Geom_RectangularTrimmedSurface) aTrimSurface = Handle(Geom_RectangularTrimmedSurface)::DownCast(myGeom.First());
+      return aTrimSurface->BasisSurface();
+    }
+    else
+      return Handle(Geom_Surface)::DownCast(myGeom.First());
   return NULL;
 }
 
@@ -420,4 +477,26 @@ Handle(Geom_Surface) XCAFKinematics_HighOrderPairObject::SecondSurface() const
   if (Type() == XCAFKinematics_PairType_SlidingSurface || Type() == XCAFKinematics_PairType_RollingSurface)
     return Handle(Geom_Surface)::DownCast(myGeom.Last());
   return NULL;
+}
+
+//=======================================================================
+//function : SetTrimmedSurface
+//purpose  : 
+//=======================================================================
+void XCAFKinematics_HighOrderPairObject::SetTrimmedSurface(const Handle(Geom_RectangularTrimmedSurface)& aTrimSurface)
+{
+  if (Type() != XCAFKinematics_PairType_PointOnSurface && !HasLimits())
+    return;
+  myGeom.ChangeFirst() = aTrimSurface;
+}
+
+//=======================================================================
+//function : TrimmedSurface
+//purpose  : 
+//=======================================================================
+Handle(Geom_RectangularTrimmedSurface) XCAFKinematics_HighOrderPairObject::TrimmedSurface() const
+{
+  if (Type() != XCAFKinematics_PairType_PointOnSurface)
+    return NULL;
+  return Handle(Geom_RectangularTrimmedSurface)::DownCast(myGeom.First());
 }

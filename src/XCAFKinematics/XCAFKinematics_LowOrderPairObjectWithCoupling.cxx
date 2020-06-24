@@ -24,6 +24,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XCAFKinematics_LowOrderPairObjectWithCoupling, XCAFKi
 XCAFKinematics_LowOrderPairObjectWithCoupling::
   XCAFKinematics_LowOrderPairObjectWithCoupling()
 {
+  isRanged = Standard_False;
   myLowLimit = -Precision::Infinite();
   myUpperLimit = Precision::Infinite();
   myParams = NULL;
@@ -40,6 +41,7 @@ XCAFKinematics_LowOrderPairObjectWithCoupling::
   SetType(theObj->Type());
   SetFirstTransformation(theObj->FirstTransformation());
   SetSecondTransformation(theObj->SecondTransformation());
+  isRanged = theObj->HasLimits();
   myLowLimit = theObj->LowLimit();
   myUpperLimit = theObj->UpperLimit();
   myParams = theObj->GetAllParams();
@@ -64,7 +66,10 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetType(const XCAFKinematics
 //=======================================================================
 Handle(TColStd_HArray1OfReal) XCAFKinematics_LowOrderPairObjectWithCoupling::GetAllLimits() const
 {
-  Handle(TColStd_HArray1OfReal) aLimitArray = new TColStd_HArray1OfReal(1, 2);
+  Handle(TColStd_HArray1OfReal) aLimitArray;
+  if (!HasLimits())
+    return aLimitArray;
+  aLimitArray = new TColStd_HArray1OfReal(1, 2);
   aLimitArray->ChangeValue(1) = myLowLimit;
   aLimitArray->ChangeValue(2) = myUpperLimit;
   return aLimitArray;
@@ -233,10 +238,7 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetAllParams(const Handle(TC
 //=======================================================================
 Standard_Boolean XCAFKinematics_LowOrderPairObjectWithCoupling::HasLimits() const
 {
-  return
-    (  myLowLimit != -Precision::Infinite() ||
-      myUpperLimit != Precision::Infinite()
-    );
+  return isRanged;
 }
 
 //=======================================================================
@@ -247,6 +249,7 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetAllLimits(const Handle(TC
 {
   if (theLimits->Length() == 2)
   {
+    isRanged = Standard_True;
     myLowLimit = theLimits->Value(1);
     myUpperLimit = theLimits->Value(2);
   }

@@ -61,7 +61,24 @@ void RWStepKinematics_RWPointOnSurfacePairValue::ReadStep (const Handle(StepData
   data->ReadEntity (num, 3, "actual_point_on_surface", ach, STANDARD_TYPE(StepGeom_PointOnSurface), aActualPointOnSurface);
 
   StepKinematics_SpatialRotation aInputOrientation;
-  data->ReadEntity (num, 4, "input_orientation", ach, aInputOrientation);
+  if (data->SubListNumber(num, 4, Standard_True))
+  {
+    Handle(TColStd_HArray1OfReal) aItems;
+    Standard_Integer nsub = 0;
+    if (data->ReadSubList(num, 4, "items", ach, nsub)) {
+      Standard_Integer nb = data->NbParams(nsub);
+      aItems = new TColStd_HArray1OfReal(1, nb);
+      Standard_Integer num2 = nsub;
+      for (Standard_Integer i0 = 1; i0 <= nb; i0++) {
+        Standard_Real anIt0;
+        data->ReadReal(num2, i0, "real", ach, anIt0);
+        aItems->SetValue(i0, anIt0);
+      }
+    }
+    aInputOrientation.SetValue(aItems);
+  }
+  else
+    data->ReadEntity(num, 4, "input_orientation", ach, aInputOrientation);
 
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
@@ -91,7 +108,17 @@ void RWStepKinematics_RWPointOnSurfacePairValue::WriteStep (StepData_StepWriter&
 
   SW.Send (ent->ActualPointOnSurface());
 
-  SW.Send (ent->InputOrientation().Value());
+  if (!ent->InputOrientation().YprRotation().IsNull())
+  {
+    // Inherited field : YPR
+    SW.OpenSub();
+    for (Standard_Integer i = 1; i <= ent->InputOrientation().YprRotation()->Length(); i++) {
+      SW.Send(ent->InputOrientation().YprRotation()->Value(i));
+    }
+    SW.CloseSub();
+  }
+  else
+    SW.Send(ent->InputOrientation().Value());
 }
 
 //=======================================================================
@@ -113,5 +140,6 @@ void RWStepKinematics_RWPointOnSurfacePairValue::Share (const Handle(StepKinemat
 
   iter.AddItem (ent->ActualPointOnSurface());
 
-  iter.AddItem (ent->InputOrientation().Value());
+  if (!ent->InputOrientation().RotationAboutDirection().IsNull())
+    iter.AddItem(ent->InputOrientation().Value());
 }

@@ -29,6 +29,8 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_KinematicPair.hxx>
 #include <XCAFDoc_KinematicPairValue.hxx>
@@ -162,7 +164,7 @@ static Standard_Integer removeMechanism(Draw_Interpretor& di, Standard_Integer a
 static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
   if (argc < 3) {
-    di << "Use: XAddLink Doc ParentMechanism [-Base] [shapeLabel1 .. shapeLabelN]\n";
+    di << "Use: XAddLink Doc ParentMechanism [-base] [shapeLabel1 .. shapeLabelN]\n";
     return 1;
   }
 
@@ -173,7 +175,7 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
   TDF_Label aMechanism;
   if (!getLabel(di, aDoc, argv[2], aMechanism))
     return 1;
-  Standard_Boolean IsBase = argc >= 4 && TCollection_AsciiString(argv[3]).IsEqual("-Base");
+  Standard_Boolean IsBase = argc >= 4 && TCollection_AsciiString(argv[3]).IsEqual("-base");
   TDF_LabelSequence aShapeArray;
   for (Standard_Integer i = (IsBase) ? 4 : 3; i < argc; i++) {
     TDF_Label aLabel;
@@ -183,10 +185,7 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
   }
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
-  if(IsBase)
-    di << getEntry(aTool->AddBaseLink(aMechanism, aShapeArray));
-  else 
-    di << getEntry(aTool->AddLink(aMechanism, aShapeArray));
+  di << getEntry(aTool->AddLink(aMechanism, aShapeArray, IsBase));
   return 0;
 }
 
@@ -196,8 +195,8 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
 //=======================================================================
 static Standard_Integer setLink(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  if (argc < 3) {
-    di << "Use: XAddLink Doc Link shapeLabel1 .. shapeLabelN\n";
+  if (argc < 4) {
+    di << "Use: XSetLink Doc Link shapeLabel1 .. shapeLabelN\n";
     return 1;
   }
 
@@ -219,6 +218,32 @@ static Standard_Integer setLink(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   if (!aTool->SetLink(aLink, aShapeArray))
+    return 1;
+
+  return 0;
+}
+
+//=======================================================================
+//function : setBaseLink
+//purpose  : 
+//=======================================================================
+static Standard_Integer setBaseLink(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 3) {
+    di << "Use: XSetBaseLink Doc Link\n";
+    return 1;
+  }
+
+  Handle(TDocStd_Document) aDoc;
+  if (!getDocument(di, argv[1], aDoc))
+    return 1;
+
+  TDF_Label aLink;
+  if (!getLabel(di, aDoc, argv[2], aLink))
+    return 1;
+
+  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
+  if (!aTool->SetBaseLink(aLink))
     return 1;
 
   return 0;
@@ -804,7 +829,8 @@ static Standard_Integer setLimits(Draw_Interpretor& di, Standard_Integer argc, c
   if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
     Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
     anObject->SetAllLimits(aLimitArray);
-    aPair->SetObject(anObject);
+    if (anObject->HasLimits())
+      aPair->SetObject(anObject);
   }
 
   return 0;
@@ -1159,7 +1185,10 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
     // Surface
     Handle(Geom_Surface) aSurface;
     if (anObject->Type() == XCAFKinematics_PairType_PointOnSurface)
-      aSurface = anObject->Surface();
+      if (!anObject->HasLimits())
+        aSurface = anObject->Surface();
+      else
+        aSurface = anObject->TrimmedSurface();
     else {
       switch (aTrsfNb) {
       case 1: aSurface = anObject->FirstSurface();
@@ -1177,7 +1206,10 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
     // Curve
     Handle(Geom_Curve) aCurve;
     if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
+    if (!anObject->HasLimits())
       aCurve = anObject->Curve();
+    else
+      aCurve = anObject->TrimmedCurve();
     else {
       switch (aTrsfNb) {
       case 1: aCurve = anObject->FirstCurve();
@@ -1532,11 +1564,14 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XRemoveMechanism", "XRemoveMechanism Doc Label",
     __FILE__, removeMechanism, g);
 
-  di.Add("XAddLink", "XAddLink Doc ParentMechanism [-Base] [shapeLabel1 .. shapeLabelN]",
+  di.Add("XAddLink", "XAddLink Doc ParentMechanism [-base] [shapeLabel1 .. shapeLabelN]",
     __FILE__, addLink, g);
 
   di.Add("XSetLink", "XSetLink Doc Link shapeLabel1 .. shapeLabelN",
     __FILE__, setLink, g);
+
+  di.Add("XSetBaseLink", "XSetBaseLink Doc Link",
+    __FILE__, setBaseLink, g);
 
   di.Add("XIsLink", "XIsLink Doc Label",
     __FILE__, isLink, g);

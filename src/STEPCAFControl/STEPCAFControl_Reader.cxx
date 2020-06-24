@@ -4327,7 +4327,8 @@ Standard_Boolean addLinksWithShapes(const Handle(XSControl_WorkSession)& theWS,
   const TDF_Label& aMechanism,
   TColStd_SequenceOfTransient& aCollOfLinks,
   TDF_LabelSequence& aSeqOfLinksL,
-  const XCAFDoc_DataMapOfShapeLabel& aMap)
+  const XCAFDoc_DataMapOfShapeLabel& aMap,
+  const Standard_Boolean& IsBase = Standard_False)
 {
   Handle(XSControl_TransferReader) aTR = theWS->TransferReader();
   Handle(Transfer_TransientProcess) aTP = aTR->TransientProcess();
@@ -4362,10 +4363,10 @@ Standard_Boolean addLinksWithShapes(const Handle(XSControl_WorkSession)& theWS,
   {
     aCDKLR = Handle(StepKinematics_ContextDependentKinematicLinkRepresentation)::DownCast(entIt.Value());
   }
-  Handle(StepRepr_NextAssemblyUsageOccurrence) aNAUO =
-    Handle(StepRepr_NextAssemblyUsageOccurrence)::DownCast(aCDKLR->RepresentedProductRelation()->Definition().Value());
+  Handle(StepRepr_PropertyDefinition) aPD =
+    Handle(StepRepr_PropertyDefinition)::DownCast(aCDKLR->RepresentedProductRelation());
   TDF_Label aShapeLabel;
-  Handle(Transfer_Binder) binder = aTP->Find(aNAUO);
+  Handle(Transfer_Binder) binder = aTP->Find(aPD->Definition().Value());
   TopoDS_Shape aShape = TransferBRep::ShapeResult(aTP, binder);
   if (aShape.IsNull())
     return Standard_False;
@@ -4377,7 +4378,7 @@ Standard_Boolean addLinksWithShapes(const Handle(XSControl_WorkSession)& theWS,
   if (aShapes.Length() == 0)
     return Standard_False;
 
-  theLink = aKTool->AddLink(aMechanism, aShapes);
+  theLink = aKTool->AddLink(aMechanism, aShapes, IsBase);
   if (!aLink->Name()->IsEmpty())
     TDataStd_Name::Set(theLink, aLink->Name()->String());
 
@@ -4415,7 +4416,8 @@ XCAFKinematics_PairType getKinematicType(const Handle(StepKinematics_KinematicPa
     return XCAFKinematics_PairType_Spherical; 
   if (aKP->IsKind(STANDARD_TYPE(StepKinematics_PlanarPair)))
     return XCAFKinematics_PairType_Planar; 
-  if (aKP->IsKind(STANDARD_TYPE(StepKinematics_UnconstrainedPair)))
+  if (aKP->IsKind(STANDARD_TYPE(StepKinematics_UnconstrainedPair)) ||
+    aKP->IsKind(STANDARD_TYPE(StepKinematics_LowOrderKinematicPairWithRange)))
     return XCAFKinematics_PairType_Unconstrained;
 
     // Low order pairs with motion coupling
@@ -4518,7 +4520,7 @@ Standard_Boolean setKinematicPairLimits(Handle(XCAFKinematics_PairObject)& aKine
       anObj->SetMaxTranslationY(aPlanarPairWithRange->UpperLimitActualTranslationY());
       anObj->SetMinTranslationY(aPlanarPairWithRange->LowerLimitActualTranslationY());
     }
-    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_UnconstrainedPair)))// three rotation and three translation DOF
+    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_LowOrderKinematicPairWithRange))) // three rotation and three translation DOF
     {
       Handle(StepKinematics_LowOrderKinematicPairWithRange) anUnconstrainedPair = Handle(StepKinematics_LowOrderKinematicPairWithRange)::DownCast(aKP);
       anObj->SetMaxRotationX(anUnconstrainedPair->UpperLimitActualRotationX());
@@ -4539,8 +4541,7 @@ Standard_Boolean setKinematicPairLimits(Handle(XCAFKinematics_PairObject)& aKine
   // Low order pairs with motion coupling
   else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_LowOrderKinematicPairWithMotionCoupling))) 
   {
-    Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObj = Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aKinematicPairObj);//new XCAFKinematics_LowOrderPairObjectWithCoupling;
-    anObj->SetType(getKinematicType(aKP));
+    Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObj = Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aKinematicPairObj);
     if (aKP->IsKind(STANDARD_TYPE(StepKinematics_ScrewPairWithRange)))
     {
       Handle(StepKinematics_ScrewPairWithRange) aScrewPairWithRange = Handle(StepKinematics_ScrewPairWithRange)::DownCast(aKP);
@@ -4559,18 +4560,12 @@ Standard_Boolean setKinematicPairLimits(Handle(XCAFKinematics_PairObject)& aKine
       anObj->SetLowLimit(aGearPairWithRange->LowerLimitActualRotation1());
       anObj->SetUpperLimit(aGearPairWithRange->UpperLimitActualRotation1());
     }
-    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_LinearFlexibleAndPinionPair)))
-    {
-      Handle(StepKinematics_LinearFlexibleAndPinionPair) aLinearFlexibleAndPinionPair = Handle(StepKinematics_LinearFlexibleAndPinionPair)::DownCast(aKP);
-      anObj->SetPinionRadius(aLinearFlexibleAndPinionPair->PinionRadius());
-    }
     return Standard_True;
   }
   // High order pairs
   else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_HighOrderKinematicPair))) 
   {
   Handle(XCAFKinematics_HighOrderPairObject) anObj = Handle(XCAFKinematics_HighOrderPairObject)::DownCast(aKinematicPairObj);//new XCAFKinematics_HighOrderPairObject;
-    anObj->SetType(getKinematicType(aKP));
     if (aKP->IsKind(STANDARD_TYPE(StepKinematics_PointOnSurfacePairWithRange)))
     {
       Handle(StepKinematics_PointOnSurfacePairWithRange) aPointOnSurfacePairWithRange = Handle(StepKinematics_PointOnSurfacePairWithRange)::DownCast(aKP);
@@ -4580,15 +4575,7 @@ Standard_Boolean setKinematicPairLimits(Handle(XCAFKinematics_PairObject)& aKine
       anObj->SetUpperLimitPitch(aPointOnSurfacePairWithRange->UpperLimitPitch());
       anObj->SetLowLimitRoll(aPointOnSurfacePairWithRange->LowerLimitRoll());
       anObj->SetUpperLimitRoll(aPointOnSurfacePairWithRange->UpperLimitRoll());
-      anObj->SetSurface(StepToGeom::MakeSurface(aPointOnSurfacePairWithRange->RangeOnPairSurface()));
-    }
-    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_SurfacePairWithRange)))
-    {
-      Handle(StepKinematics_SurfacePairWithRange) aSurfacePairWithRange = Handle(StepKinematics_SurfacePairWithRange)::DownCast(aKP);
-      anObj->SetRotationLowLimit(aSurfacePairWithRange->LowerLimitActualRotation());
-      anObj->SetRotationUpperLimit(aSurfacePairWithRange->UpperLimitActualRotation());
-      anObj->SetFirstSurface(StepToGeom::MakeSurface(aSurfacePairWithRange->RangeOnSurface1()));
-      anObj->SetSecondSurface(StepToGeom::MakeSurface(aSurfacePairWithRange->RangeOnSurface2()));
+      anObj->SetTrimmedSurface(StepToGeom::MakeRectangularTrimmedSurface(aPointOnSurfacePairWithRange->RangeOnPairSurface()));
     }
     else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_PointOnPlanarCurvePairWithRange)))
     {
@@ -4599,20 +4586,13 @@ Standard_Boolean setKinematicPairLimits(Handle(XCAFKinematics_PairObject)& aKine
       anObj->SetUpperLimitPitch(aPointOnPlanarCurvePairWithRange->UpperLimitPitch());
       anObj->SetLowLimitRoll(aPointOnPlanarCurvePairWithRange->LowerLimitRoll());
       anObj->SetUpperLimitRoll(aPointOnPlanarCurvePairWithRange->UpperLimitRoll());
-      anObj->SetCurve(StepToGeom::MakeCurve(aPointOnPlanarCurvePairWithRange->RangeOnPairCurve()));
-
+      anObj->SetTrimmedCurve(StepToGeom::MakeTrimmedCurve(aPointOnPlanarCurvePairWithRange->RangeOnPairCurve()));
     }
     else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_PlanarCurvePairRange)))
     {
       Handle(StepKinematics_PlanarCurvePairRange) aPlanarCurvePairRange = Handle(StepKinematics_PlanarCurvePairRange)::DownCast(aKP);
       anObj->SetFirstCurve(StepToGeom::MakeCurve(aPlanarCurvePairRange->RangeOnCurve1()));
       anObj->SetSecondCurve(StepToGeom::MakeCurve(aPlanarCurvePairRange->RangeOnCurve2()));
-    }
-    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_LinearFlexibleAndPlanarCurvePair)))
-    {
-      Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair) aLinearFlexibleAndPlanarCurvePair = Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair)::DownCast(aKP);
-      anObj->SetOrientation(aLinearFlexibleAndPlanarCurvePair->Orientation());
-      anObj->SetCurve(StepToGeom::MakeCurve(aLinearFlexibleAndPlanarCurvePair->PairCurve()));
     }
     return Standard_True;
   }
@@ -4681,12 +4661,33 @@ Handle(XCAFKinematics_PairObject) createXCAFKinematicPairObject(const Handle(Ste
       Handle(StepKinematics_PointOnSurfacePair) aPointOnSurfacePair = Handle(StepKinematics_PointOnSurfacePair)::DownCast(aKP);
       aHighOrderPairObject->SetSurface(StepToGeom::MakeSurface(aPointOnSurfacePair->PairSurface()));
     }
-    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_SurfacePair)))
+    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_RollingSurfacePair)))
     {
-      Handle(StepKinematics_SurfacePair) aSurfacePair = Handle(StepKinematics_SurfacePair)::DownCast(aKP);
-      aHighOrderPairObject->SetFirstSurface(StepToGeom::MakeSurface(aSurfacePair->Surface1()));
-      aHighOrderPairObject->SetSecondSurface(StepToGeom::MakeSurface(aSurfacePair->Surface2()));
-      aHighOrderPairObject->SetOrientation(aSurfacePair->Orientation());
+      Handle(StepKinematics_RollingSurfacePair) aRollingSurfacePair = Handle(StepKinematics_RollingSurfacePair)::DownCast(aKP);
+      aHighOrderPairObject->SetFirstSurface(StepToGeom::MakeSurface(aRollingSurfacePair->Surface1()));
+      aHighOrderPairObject->SetSecondSurface(StepToGeom::MakeSurface(aRollingSurfacePair->Surface2()));
+      aHighOrderPairObject->SetOrientation(aRollingSurfacePair->Orientation());
+    }
+    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_SlidingSurfacePair)))
+    {
+      Handle(StepKinematics_SlidingSurfacePair) aSlidingSurfacePair = Handle(StepKinematics_SlidingSurfacePair)::DownCast(aKP);
+      aHighOrderPairObject->SetFirstSurface(StepToGeom::MakeSurface(aSlidingSurfacePair->Surface1()));
+      aHighOrderPairObject->SetSecondSurface(StepToGeom::MakeSurface(aSlidingSurfacePair->Surface2()));
+      aHighOrderPairObject->SetOrientation(aSlidingSurfacePair->Orientation());
+    }
+    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_SlidingCurvePair)))
+    {
+      Handle(StepKinematics_SlidingCurvePair) aSlidingCurvePair = Handle(StepKinematics_SlidingCurvePair)::DownCast(aKP);
+      aHighOrderPairObject->SetFirstCurve(StepToGeom::MakeCurve(aSlidingCurvePair->Curve1()));
+      aHighOrderPairObject->SetSecondCurve(StepToGeom::MakeCurve(aSlidingCurvePair->Curve2()));
+      aHighOrderPairObject->SetOrientation(aSlidingCurvePair->Orientation());
+    }
+    else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_RollingCurvePair)))
+    {
+      Handle(StepKinematics_RollingCurvePair) aRollingCurvePair = Handle(StepKinematics_RollingCurvePair)::DownCast(aKP);
+      aHighOrderPairObject->SetFirstCurve(StepToGeom::MakeCurve(aRollingCurvePair->Curve1()));
+      aHighOrderPairObject->SetSecondCurve(StepToGeom::MakeCurve(aRollingCurvePair->Curve2()));
+      aHighOrderPairObject->SetOrientation(aRollingCurvePair->Orientation());
     }
     else if (aKP->IsKind(STANDARD_TYPE(StepKinematics_PointOnPlanarCurvePair)))
     {
@@ -4751,6 +4752,8 @@ Standard_Boolean setKinematicPairValue(const Handle(XSControl_WorkSession)& theW
   aValueObject = new XCAFKinematics_PairValueObject();
   aValueObject->SetType(aType);
 
+  if (aType == 0)
+    return Standard_False;
   TDF_TagSource aTag;
   TDF_Label aValueL = aTag.NewChild(aState);
 
@@ -4853,6 +4856,8 @@ Standard_Boolean setKinematicPairValue(const Handle(XSControl_WorkSession)& theW
       aPointOnPlanarCurvePairValue->InputOrientation().YprRotation()->Value(2), aPointOnPlanarCurvePairValue->InputOrientation().YprRotation()->Value(3));
   }
   else
+    return Standard_False;
+  if (aValueObject->GetAllValues().IsNull())
     return Standard_False;
   Handle(XCAFDoc_KinematicPairValue) aCAFKinematicPairValue = XCAFDoc_KinematicPairValue::Set(aValueL, aJoint);
   aCAFKinematicPairValue->SetObject(aValueObject);
@@ -5125,7 +5130,7 @@ Standard_Boolean STEPCAFControl_Reader::ReadKinematics(const Handle(XSControl_Wo
     if (!aKPMR->Base().IsNull())
     {
       TDF_Label aLableOfBaseLink;
-      addLinksWithShapes(theWS, theDoc, aKPMR->Base(), aLableOfBaseLink,aMechanism, aCollOfLinks, aSeqOfLinksL, aShapeLabelMap);
+      addLinksWithShapes(theWS, theDoc, aKPMR->Base(), aLableOfBaseLink, aMechanism, aCollOfLinks, aSeqOfLinksL, aShapeLabelMap, Standard_True);
     }
 
     for (Standard_Integer aPairIndex = 1; aPairIndex <= aKMR->NbItems(); ++aPairIndex)

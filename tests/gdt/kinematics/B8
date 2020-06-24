@@ -23,8 +23,8 @@ if {$type != "18"} {
   puts "Error: wrong parameter"
 }
 
-plane p1 0 0 0 0 1 0 1 1 0
-plane p2 0 0 0 0 0 1 0 1 -1
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
 XSetPairTransformation D $joint 1 p1
 XSetPairTransformation D $joint 2 p2
 set dump_in [dump p1]
@@ -47,6 +47,7 @@ if {$limits != "10 20 30 40 50 60 "} {
 }
 
 circle cir 4 4 4 1
+trim cir cir 0 pi/2 
 XSetPairGeomParam D $joint 1 cir
 set dump_in [dump cir]
 XGetPairGeomParam D $joint 1 cir

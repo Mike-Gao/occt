@@ -23,8 +23,8 @@ if {$type != "15"} {
   puts "Error: wrong parameter"
 }
 
-plane p1 0 0 0 0 1 0 1 1 0
-plane p2 0 0 0 0 0 1 0 1 -1
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
 XSetPairTransformation D $joint 1 p1
 XSetPairTransformation D $joint 2 p2
 set dump_in [dump p1]
@@ -46,11 +46,13 @@ if {$limits != "10 20 30 40 50 60 "} {
   puts "Error: wrong parameter"
 }
 
-sphere sph 4 4 4 1
-XSetPairGeomParam D $joint 1 sph
-set dump_in [dump sph]
-XGetPairGeomParam D $joint 1 sph
-set dump_out [dump sph]
+cylinder cy 10 
+trimv cy cy 0 50 
+trimu cy cy 0 50
+XSetPairGeomParam D $joint 1 cy
+set dump_in [dump cy]
+XGetPairGeomParam D $joint 1 cy
+set dump_out [dump cy]
 if {$dump_in != $dump_out} {
   puts "Error: wrong parameter"
 }

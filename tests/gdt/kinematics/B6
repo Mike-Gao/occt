@@ -23,8 +23,8 @@ if {$type != "16"} {
   puts "Error: wrong parameter"
 }
 
-plane p1 0 0 0 0 1 0 1 1 0
-plane p2 0 0 0 0 0 1 0 1 -1
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
 XSetPairTransformation D $joint 1 p1
 XSetPairTransformation D $joint 2 p2
 set dump_in [dump p1]
@@ -37,12 +37,6 @@ set dump_in [dump p2]
 XGetPairTransformation D $joint 2 p2
 set dump_out [dump p2]
 if {$dump_in != $dump_out} {
-  puts "Error: wrong parameter"
-}
-
-XSetPairLimits D $joint 10 20
-set limits [XGetPairLimits D $joint]
-if {$limits != "10 20 "} {
   puts "Error: wrong parameter"
 }
 

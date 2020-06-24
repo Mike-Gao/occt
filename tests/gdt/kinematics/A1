@@ -52,8 +52,8 @@ set result [XGetPairName D $joint1]
 if {$result != "Low order"} {
   puts "Error: wrong kinematic pair data."
 }
-plane p1 0 0 0 1 0 0
-plane p2 0 0 0 0 1 0
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
 XSetPairTransformation D $joint1 1 p1
 set dump_in [dump p1]
 XGetPairTransformation D $joint1 1 p1
@@ -110,9 +110,8 @@ if {[lindex $params 20] != "5"} {
 }
 
 set joint3 [XAddJoint D $mech $link3 $link2]
-XSetPairType D $joint3 15
+XSetPairType D $joint3 16
 XSetPairName D $joint3 High order surface
-XSetPairLimits D $joint3 30 60
 sphere sph 4 4 4 1
 set dump_in [dump sph]
 XSetPairGeomParam D $joint3 1 sph
@@ -121,6 +120,7 @@ set dump_out [dump sph]
 if {$dump_in != $dump_out} {
   puts "Error: wrong kinematic pair data."
 }
+XSetPairLimits D $joint3 30 60
 cylinder cyl 0 0 0 0 1 0 2
 trim cyl cyl 0 2 0 2
 set dump_in [dump cyl]
@@ -133,7 +133,7 @@ if {$dump_in != $dump_out} {
 }
 
 set joint4 [XAddJoint D $mech $link3 0:1:11:1:1:1]
-XSetPairType D $joint4 17
+XSetPairType D $joint4 18
 XSetPairName D $joint4 High order curve
 circle cir 0 0 0 3
 set dump_in [dump cir]

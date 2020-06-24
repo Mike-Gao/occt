@@ -23,6 +23,8 @@
 
 class Geom_Curve;
 class Geom_Surface;
+class Geom_RectangularTrimmedSurface;
+class Geom_TrimmedCurve;
 
 DEFINE_STANDARD_HANDLE(XCAFKinematics_HighOrderPairObject, XCAFKinematics_PairObject)
 
@@ -62,7 +64,10 @@ public:
 
   Handle(TColStd_HArray1OfReal) GetAllLimits() const Standard_OVERRIDE
   {
-    return myLimits;
+    Handle(TColStd_HArray1OfReal) aLimitArray;
+    if (HasLimits())
+      aLimitArray = myLimits;
+    return aLimitArray;
   }
 
   //! Sets low limit of rotation attribute (only for SlidingSurface and RollingSurface)
@@ -153,6 +158,21 @@ public:
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) SecondCurve() const;
 
+  ////! Sets curve attribute (only for PointOnCurve)
+  ////! \param[in] theTrimmedCurve trimmed curve
+  //Standard_EXPORT void SetTrimmedCurve(const Standard_Real& theTrim1, const Standard_Real& theTrim2);
+
+  //! Sets trimmed curve attribute (only for PointOnCurve)
+  //! \param[in] aTrimCurve trimmed curve
+  Standard_EXPORT void SetTrimmedCurve(const Handle(Geom_TrimmedCurve)& aTrimCurve);
+
+  //! Gets trimmed curve attribute (only for PointOnCurve)
+  //! \return trimmed curve
+  Standard_EXPORT Handle(Geom_TrimmedCurve) TrimmedCurve() const;
+
+  ////! \return trimmed curve
+  //Standard_EXPORT void TrimmedCurve(Standard_Real& theTrim1,Standard_Real& theTrim2) const;
+
   //! Sets surface attribute (only for PointOnSurface)
   //! \param[in] theSurface surface
   Standard_EXPORT void SetSurface(const Handle(Geom_Surface)& theSurface);
@@ -177,6 +197,18 @@ public:
   //! \return surface
   Standard_EXPORT Handle(Geom_Surface) SecondSurface() const;
 
+  ////! Sets surface attribute (only for PointOnSurface)
+  ////! \param[in] theTrimmedSurface trimmed surface
+  //Standard_EXPORT void SetTrimmedSurface(const Standard_Real& U1, const Standard_Real& U2, const Standard_Real& V1, const Standard_Real& V2);
+
+  //! Sets trimmed surface attribute (only for PointOnSurface)
+  //! \param[in] aTrimSurface trimmered surface
+  Standard_EXPORT void SetTrimmedSurface(const Handle(Geom_RectangularTrimmedSurface)& aTrimSurface);
+
+  //! Gets trimmed surface attribute (only for PointOnSurface)
+  //! \return trimmed surface
+  Standard_EXPORT Handle(Geom_RectangularTrimmedSurface) TrimmedSurface() const;
+
   DEFINE_STANDARD_RTTIEXT(XCAFKinematics_HighOrderPairObject, XCAFKinematics_PairObject)
 
 private:
@@ -184,6 +216,7 @@ private:
   Standard_Boolean myOrientation;                   //!< orientation
   Handle(TColStd_HArray1OfReal) myLimits;           //!< array of limits, size depends on type
   NCollection_Array1<Handle(Geom_Geometry)> myGeom; //!< curve(s) or surface(s) attributes
+  Standard_Boolean isRanged;                         //!< flag "is limits defined"
 
 };
 

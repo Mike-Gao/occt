@@ -150,8 +150,8 @@ public:
   
   Standard_EXPORT Standard_Boolean GetMaterialMode() const;
 
-  //! Set dimtolmode for indicate write D&GTs or not.
-  Standard_EXPORT void SetKinematicsMode(const Standard_Boolean kinematicsmod);
+  //! Set Kinematic mode for indicate write kinematics or not.
+  Standard_EXPORT void SetKinematicsMode(const Standard_Boolean kinematicmode);
 
   Standard_EXPORT Standard_Boolean GetKinematicsMode() const;
 
@@ -237,7 +237,7 @@ private:
   Standard_Boolean myLayerMode;
   Standard_Boolean myPropsMode;
   Standard_Boolean mySHUOMode;
-  Standard_Boolean myKPairMode;
+  Standard_Boolean myKinematicMode;
   MoniTool_DataMapOfShapeTransient myMapCompMDGPR;
   Standard_Boolean myGDTMode;
   Standard_Boolean myMatMode;

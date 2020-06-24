@@ -23,8 +23,8 @@ if {$type != "4"} {
   puts "Error: wrong parameter"
 }
 
-plane p1 0 0 0 0 0 1
-plane p2 0 1 0 0 0 1 1 1 0
+plane p1 10 20 30 -1 0 0 
+plane p2 10 0 0 1 0 0 0 1 0 
 XSetPairTransformation D $joint 1 p1
 XSetPairTransformation D $joint 2 p2
 set dump_in [dump p1]
@@ -40,9 +40,9 @@ if {$dump_in != $dump_out} {
   puts "Error: wrong parameter"
 }
 
-XSetPairLimits D $joint 0 45 0 0 0 0 0 0 0 10 0 0
+XSetPairLimits D $joint 0 0 0 0 0 45 0 0 0 0 0 45
 set limits [XGetPairLimits D $joint]
-if {$limits != "0 45 0 0 0 0 0 0 0 10 0 0 "} {
+if {$limits != "0 0 0 0 0 45 0 0 0 0 0 45 "} {
   puts "Error: wrong parameter"
 }
 
@@ -60,5 +60,5 @@ set values [XGetPairValues D $value -rotation]
 if {$values != "15"} {
   puts "Error: wrong parameter"
 }
-Close D
 
+Close D

@@ -14,10 +14,10 @@
 // commercial license or contractual agreement.
 
 #include <XCAFDoc_KinematicPair.hxx>
-
 #include <BRep_Builder.hxx>
 #include <gp_Pln.hxx>
 #include <Standard_Dump.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
 #include <Standard_GUID.hxx>
 #include <TColStd_HArray1OfReal.hxx>
 #include <TDataStd_AsciiString.hxx>
@@ -32,6 +32,7 @@
 #include <TNaming_Tool.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <XCAFDoc.hxx>
 #include <XCAFKinematics_HighOrderPairObject.hxx>
 #include <XCAFKinematics_LowOrderPairObject.hxx>
@@ -110,22 +111,6 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
 {
   Backup();
 
-  for (TDF_ChildIterator anIter(Label()); anIter.More(); anIter.Next())
-  {
-    // Check if it needs to clear value label
-    if (anIter.Value().IsEqual(Label().FindChild(ChildLab_Value))) {
-      Handle(TDataStd_Integer) aTypeAttr;
-      if (Label().FindAttribute(TDataStd_Integer::GetID(), aTypeAttr))
-      {
-        int aType = aTypeAttr->Get();
-        if (aType != theObject->Type())
-          anIter.Value().ForgetAllAttributes();
-      }
-    }
-    else
-      anIter.Value().ForgetAllAttributes();
-  }
-
   // Common attributes
   if (!theObject->Name().IsEmpty())
     TDataStd_Name::Set(Label(), theObject->Name());
@@ -133,7 +118,7 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
   TDataXtd_Plane::Set(Label().FindChild(ChildLab_FirstTrsf), gp_Pln(theObject->FirstTransformation()));
   TDataXtd_Plane::Set(Label().FindChild(ChildLab_SecondTrsf), gp_Pln(theObject->SecondTransformation()));
 
-  if (!theObject->GetAllLimits().IsNull() && theObject->GetAllLimits()->Length() > 0) {
+  if (!theObject->GetAllLimits().IsNull() && theObject->HasLimits()) {
     Handle(TDataStd_RealArray) aLimitsAttr;
     aLimitsAttr = TDataStd_RealArray::Set(Label(), getLimitsID(), 1, theObject->GetAllLimits()->Length());
     aLimitsAttr->ChangeArray(theObject->GetAllLimits());
@@ -149,7 +134,7 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
 
   // Low order pairs with motion coupling
   if (theObject->Type() >= XCAFKinematics_PairType_Screw &&
-      theObject->Type() <= XCAFKinematics_PairType_Gear) {
+      theObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPinion) {
     Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObject =
       Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(theObject);
     if (!anObject->GetAllParams().IsNull() && anObject->GetAllParams()->Upper() > 0) {
@@ -166,10 +151,13 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
       Handle(XCAFKinematics_HighOrderPairObject)::DownCast(theObject);
     TDataStd_Integer::Set(Label(), getParamsID(), (Standard_Integer)anObject->Orientation());
     BRep_Builder aBuilder;
-    if (theObject->Type() >= XCAFKinematics_PairType_PointOnSurface && !anObject->Surface().IsNull())
+    if (theObject->Type() == XCAFKinematics_PairType_PointOnSurface && !anObject->Surface().IsNull())
     {
       TopoDS_Face aFace;
-      aBuilder.MakeFace(aFace, anObject->Surface(), Precision::Confusion());
+      if (anObject->HasLimits())
+        aBuilder.MakeFace(aFace, anObject->TrimmedSurface(), Precision::Confusion());
+      else
+        aBuilder.MakeFace(aFace, anObject->Surface(), Precision::Confusion());
       TNaming_Builder aTNBuild(Label().FindChild(ChildLab_FirstGeomParam));
       aTNBuild.Generated(aFace);
     }
@@ -191,7 +179,10 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
     if (theObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve && !anObject->Curve().IsNull())
     {
       TopoDS_Edge anEdge;
-      aBuilder.MakeEdge(anEdge, anObject->Curve(), Precision::Confusion());
+      if (anObject->HasLimits())
+        aBuilder.MakeEdge(anEdge, anObject->TrimmedCurve(), Precision::Confusion());
+      else 
+        aBuilder.MakeEdge(anEdge, anObject->Curve(), Precision::Confusion());
       TNaming_Builder aTNBuild(Label().FindChild(ChildLab_FirstGeomParam));
       aTNBuild.Generated(anEdge);
     }

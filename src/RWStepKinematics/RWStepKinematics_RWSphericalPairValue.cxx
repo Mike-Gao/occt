@@ -54,10 +54,27 @@ void RWStepKinematics_RWSphericalPairValue::ReadStep (const Handle(StepData_Step
   Handle(StepKinematics_KinematicPair) aPairValue_AppliesToPair;
   data->ReadEntity (num, 2, "pair_value.applies_to_pair", ach, STANDARD_TYPE(StepKinematics_KinematicPair), aPairValue_AppliesToPair);
 
-  // Own fields of SphericalPairValue
 
+  // Own fields of SphericalPairValue
   StepKinematics_SpatialRotation aInputOrientation;
-  data->ReadEntity (num, 3, "input_orientation", ach, aInputOrientation);
+  if (data->SubListNumber(num, 3, Standard_True))
+  {
+    Handle(TColStd_HArray1OfReal) aItems;
+    Standard_Integer nsub = 0;
+    if (data->ReadSubList(num, 3, "items", ach, nsub)) {
+      Standard_Integer nb = data->NbParams(nsub);
+      aItems = new TColStd_HArray1OfReal(1, nb);
+      Standard_Integer num2 = nsub;
+      for (Standard_Integer i0 = 1; i0 <= nb; i0++) {
+        Standard_Real anIt0;
+        data->ReadReal(num2, i0, "real", ach, anIt0);
+        aItems->SetValue(i0, anIt0);
+      }
+    }
+    aInputOrientation.SetValue(aItems);
+  }
+  else 
+    data->ReadEntity (num, 3, "input_orientation", ach, aInputOrientation);
 
   // Initialize entity
   ent->Init(aRepresentationItem_Name,
@@ -70,21 +87,31 @@ void RWStepKinematics_RWSphericalPairValue::ReadStep (const Handle(StepData_Step
 //purpose  : 
 //=======================================================================
 
-void RWStepKinematics_RWSphericalPairValue::WriteStep (StepData_StepWriter& SW,
-                                                       const Handle(StepKinematics_SphericalPairValue)& ent) const
+void RWStepKinematics_RWSphericalPairValue::WriteStep(StepData_StepWriter& SW,
+  const Handle(StepKinematics_SphericalPairValue)& ent) const
 {
 
   // Own fields of RepresentationItem
 
-  SW.Send (ent->Name());
+  SW.Send(ent->Name());
 
   // Own fields of PairValue
 
-  SW.Send (ent->AppliesToPair());
+  SW.Send(ent->AppliesToPair());
 
   // Own fields of SphericalPairValue
 
-  SW.Send (ent->InputOrientation().Value());
+  if (!ent->InputOrientation().YprRotation().IsNull())
+  {
+    // Inherited field : YPR
+    SW.OpenSub();
+    for (Standard_Integer i = 1; i <= ent->InputOrientation().YprRotation()->Length(); i++) {
+      SW.Send(ent->InputOrientation().YprRotation()->Value(i));
+    }
+    SW.CloseSub();
+  }
+  else
+    SW.Send(ent->InputOrientation().Value());
 }
 
 //=======================================================================
@@ -104,5 +131,6 @@ void RWStepKinematics_RWSphericalPairValue::Share (const Handle(StepKinematics_S
 
   // Own fields of SphericalPairValue
 
-  iter.AddItem (ent->InputOrientation().Value());
+  if (!ent->InputOrientation().RotationAboutDirection().IsNull())
+    iter.AddItem(ent->InputOrientation().Value());
 }
