@@ -2,11 +2,9 @@
 #define APPLICATIONCOMMON_H
 
 #include "DocumentCommon.h"
-
-#include "GeometrySamples.h"
-#include "TopologySamples.h"
-#include "TriangulationSamples.h"
+#include "BaseSample.h"
 #include "GeomWidget.h"
+#include "TranslateDialog.h"
 
 #include "OcctHighlighter.h"
 
@@ -28,11 +26,11 @@
 
 enum class StdActions
 {
-  FileNewId, FilePrefUseVBOId, FileCloseId, FilePreferencesId, FileQuitId, ViewToolId, ViewStatusId, HelpAboutId
+  FileNew, FilePrefUseVBO, FileClose, FilePreferences, FileQuit, ViewTool, ViewStatus, HelpAbout
 };
 enum class ToolActions
 {
-  ToolWireframeId, ToolShadingId, ToolColorId, ToolMaterialId, ToolTransparencyId, ToolDeleteId
+  ToolWireframe, ToolShading, ToolColor, ToolMaterial, ToolTransparency, ToolDelete
 };
 
 class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
@@ -75,16 +73,17 @@ protected:
   QMenu*        getFilePopup();
   QToolBar*     getCasCadeBar();
 
-  QMenu* MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent);
-  void MenuFormJson(const QString& thePath);
+  QMenu* MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent, QSignalMapper* theMapper);
+  void MenuFormJson(const QString& thePath, QSignalMapper* theMapper);
 
 private slots:
   void onCloseAllWindows() { qApp->closeAllWindows(); }
 
   void onProcessSample(const QString& theSampleName);
+  void onProcessExchange(const QString& theSampleName);
 
 private:
-  enum class ApplicationType { Geometry, Topology, Triangulation, Ocaf, Viewer2d, Viewer3d, Unknokwn };
+  enum class ApplicationType { Geometry, Topology, Triangulation, DataExchange, Ocaf, Viewer2d, Viewer3d, Unknokwn };
   ApplicationType APP_TYPE = ApplicationType::Topology;
 
   void    SetAppType(QString theParameter);
@@ -93,8 +92,12 @@ private:
 	void createStandardOperations();
 	void createCasCadeOperations();
 
+  QString selectFileName(const QString& theSampleName, int& theMode);
+  TranslateDialog* ApplicationCommonWindow::getDialog(const QString& theSampleName);
+
 private:
   Handle(BaseSample) mySamples;
+
 
 	QMap<StdActions,               QAction*>  myStdActions;
   QMap<ToolActions,              QAction*>  myToolActions;
@@ -107,6 +110,7 @@ private:
 
   QList<QMenu*>    mySamplePopups;
   QSignalMapper*   mySampleMapper;
+  QSignalMapper*   myExchangeMapper;
   QTextEdit*       myCodeView;
   QTextEdit*       myResultView;
   OcctHighlighter* myCodeViewHighlighter;

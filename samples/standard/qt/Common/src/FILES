@@ -13,5 +13,7 @@ OcctWindow.cxx
 OcctWindow.h
 Transparency.cxx
 Transparency.h
+TranslateDialog.h
+TranslateDialog.cxx
 View.cxx
 View.h
