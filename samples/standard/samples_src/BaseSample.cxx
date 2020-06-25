@@ -57,7 +57,6 @@ void BaseSample::Process(TCollection_AsciiString theSampleName)
   {
     TraceError(TCollection_AsciiString("Error in sample: ") + theSampleName);
   }
-
 }
 
 void BaseSample::SetCodePach(TCollection_AsciiString theSampleSourcePach)

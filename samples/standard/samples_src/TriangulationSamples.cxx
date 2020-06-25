@@ -12,7 +12,6 @@
 #include <Poly_Triangulation.hxx>
 
 
-
 void TriangulationSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 {
   Standard_Boolean anIsSamplePresent = Standard_True;
@@ -27,7 +26,6 @@ void TriangulationSamples::ExecuteSample(TCollection_AsciiString theSampleName)
   }
   myIsProcessed = anIsSamplePresent;
 }
-
 
 void TriangulationSamples::Triangulation3dSample()
 {

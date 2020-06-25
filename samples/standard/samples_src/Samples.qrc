@@ -3,5 +3,6 @@
         <file>Geometry.json</file>
         <file>Topology.json</file>
         <file>Triangulation.json</file>
+        <file>DataExchange.json</file>
     </qresource>
 </RCC>

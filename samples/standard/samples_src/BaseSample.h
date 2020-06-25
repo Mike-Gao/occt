@@ -23,7 +23,7 @@ public:
   TCollection_AsciiString                           GetResult();
   TCollection_AsciiString                           GetCode();
 
-  void Process(TCollection_AsciiString theSampleName);
+  virtual void Process(TCollection_AsciiString theSampleName);
   void SetCodePach(TCollection_AsciiString theSampleSourcePach);
 
   DEFINE_STANDARD_RTTI_INLINE(BaseSample, Standard_Transient)
@@ -31,15 +31,7 @@ public:
 protected:
   virtual void ExecuteSample(TCollection_AsciiString theSampleName) = 0;
           void FindSourceCode(TCollection_AsciiString theSampleName);
-
-private:
-  void             TraceError(TCollection_AsciiString theErrorMessage);
-
-  Standard_Integer FindEndOfPhrase(TCollection_AsciiString theText, 
-                                   TCollection_AsciiString theRegexpTemplate);
-  Standard_Integer FindClosingBracket(TCollection_AsciiString theText,
-                                      Standard_Integer theOpeningBracketIndex,
-                                      Standard_Character theClosingBracketSymbol);
+          void TraceError(TCollection_AsciiString theErrorMessage);
 
 protected:
   Standard_Boolean                                  myIsProcessed;
@@ -52,6 +44,13 @@ protected:
 	TCollection_AsciiString                           myCodePath;
 
   static const TCollection_AsciiString FILE_EXTENSION;
+
+private:
+  Standard_Integer FindEndOfPhrase(TCollection_AsciiString theText, 
+                                   TCollection_AsciiString theRegexpTemplate);
+  Standard_Integer FindClosingBracket(TCollection_AsciiString theText,
+                                      Standard_Integer theOpeningBracketIndex,
+                                      Standard_Character theClosingBracketSymbol);
 };
 
 #endif  //BASESAMPLE_H

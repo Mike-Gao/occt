@@ -3,6 +3,5 @@ ApplicationTut.h
 DocumentTut.cxx
 DocumentTut.h
 Main.cxx
-MakeBottle.cxx
 Tutorial-icon.ts
 Tutorial-string.ts

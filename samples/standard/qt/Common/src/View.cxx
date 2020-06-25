@@ -909,9 +909,9 @@ void View::Popup( const int /*x*/, const int /*y*/ )
   if ( myContext->NbSelected() )
   {
     QMenu* myToolMenu = new QMenu( 0 );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolWireframeId) );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolShadingId ) );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolColorId ) );
+    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolWireframe) );
+    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolShading) );
+    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolColor) );
         
     QMenu* myMaterMenu = new QMenu( myToolMenu );
 
@@ -922,8 +922,8 @@ void View::Popup( const int /*x*/, const int /*y*/ )
     for (QAction* aMatAction: aMeterActions)
       myMaterMenu->addAction(aMatAction);
        
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolTransparencyId ) );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolDeleteId ) );
+    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolTransparency) );
+    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolDelete) );
     addItemInPopup(myToolMenu);
     myToolMenu->exec( QCursor::pos() );
     delete myToolMenu;
