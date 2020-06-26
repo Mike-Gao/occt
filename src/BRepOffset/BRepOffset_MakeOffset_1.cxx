@@ -60,6 +60,7 @@
 #include <BOPTools_AlgoTools3D.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BOPTools_AlgoTools2D.hxx>
+#include <BOPTools_Set.hxx>
 
 #include <IntTools_Context.hxx>
 #include <IntTools_ShrunkRange.hxx>
@@ -169,6 +170,15 @@ static
                         TopTools_MapOfShape& theMEInverted,
                         TopTools_MapOfShape& theEdgesInvalidByVertex,
                         TopTools_MapOfShape& theEdgesValidByVertex);
+
+static
+  void FindInvalidEdges (const TopTools_ListOfShape& theLFOffset,
+                         const TopTools_IndexedDataMapOfShapeListOfShape& theFImages,
+                         const TopTools_IndexedMapOfShape& theInvEdges,
+                         const TopTools_IndexedMapOfShape& theValidEdges,
+                         BRepOffset_DataMapOfShapeIndexedMapOfShape& theLocInvEdges,
+                         BRepOffset_DataMapOfShapeMapOfShape& theLocValidEdges,
+                         BRepOffset_DataMapOfShapeMapOfShape& theNeutralEdges);
 
 static
   void FindInvalidFaces(TopTools_ListOfShape& theLFImages,
@@ -994,7 +1004,11 @@ void BuildSplitsOfFaces(const TopTools_ListOfShape& theLF,
   if (theInvEdges.IsEmpty() && theArtInvFaces.IsEmpty() && aDMFMIE.IsEmpty()) {
     return;
   }
-  //
+
+  // Additional step to find invalid edges by checking unclassified edges
+  // in the splits of SD faces
+  FindInvalidEdges (aLFDone, theFImages, theInvEdges, theValidEdges, aDMFMIE, aDMFMVE, aDMFMNE);
+
 #ifdef OFFSET_DEBUG
   // show invalid edges
   TopoDS_Compound aCEInv1;
@@ -1918,6 +1932,175 @@ void FindInvalidEdges(const TopoDS_Face& theF,
   }
 }
 
+
+namespace 
+{
+  static void addAsNeutral (const TopoDS_Shape& theE,
+                            const TopoDS_Shape& theFInv,
+                            const TopoDS_Shape& theFVal,
+                            BRepOffset_DataMapOfShapeIndexedMapOfShape& theLocInvEdges,
+                            BRepOffset_DataMapOfShapeMapOfShape& theLocValidEdges)
+  {
+    TopTools_IndexedMapOfShape* pMEInv = theLocInvEdges.ChangeSeek (theFInv);
+    if (!pMEInv)
+      pMEInv = theLocInvEdges.Bound (theFInv, TopTools_IndexedMapOfShape());
+    pMEInv->Add (theE);
+
+    TopTools_MapOfShape* pMEVal = theLocValidEdges.ChangeSeek (theFVal);
+    if (!pMEVal)
+      pMEVal = theLocValidEdges.Bound (theFVal, TopTools_MapOfShape());
+    pMEVal->Add (theE);
+  }
+
+}
+//=======================================================================
+//function : FindInvalidEdges
+//purpose  : Additional method to look for invalid faces
+//=======================================================================
+void FindInvalidEdges (const TopTools_ListOfShape& theLFOffset,
+                       const TopTools_IndexedDataMapOfShapeListOfShape& theFImages,
+                       const TopTools_IndexedMapOfShape& theInvEdges,
+                       const TopTools_IndexedMapOfShape& theValidEdges,
+                       BRepOffset_DataMapOfShapeIndexedMapOfShape& theLocInvEdges,
+                       BRepOffset_DataMapOfShapeMapOfShape& theLocValidEdges,
+                       BRepOffset_DataMapOfShapeMapOfShape& theNeutralEdges)
+{
+  // 1. Find edges unclassified in faces
+  // 2. Find SD faces in which the same edge is classified
+  // 3. Check if the edge is neutral in face in which it wasn't classified
+
+  NCollection_IndexedDataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aMEUnclassified;
+  TopTools_DataMapOfShapeShape aFSplitFOffset;
+
+  TopTools_IndexedDataMapOfShapeListOfShape anEFMap;
+  for (TopTools_ListOfShape::Iterator itLFO (theLFOffset); itLFO.More(); itLFO.Next())
+  {
+    const TopoDS_Shape& aF = itLFO.Value();
+    const TopTools_ListOfShape& aLFImages = theFImages.FindFromKey (aF);
+    for (TopTools_ListOfShape::Iterator itLF (aLFImages); itLF.More(); itLF.Next())
+    {
+      const TopoDS_Shape& aFIm = itLF.Value();
+
+      TopExp::MapShapesAndAncestors (aFIm, TopAbs_EDGE, TopAbs_FACE, anEFMap);
+
+      const TopTools_IndexedMapOfShape* pMEInvalid = theLocInvEdges.Seek (aFIm);
+      const TopTools_MapOfShape* pMEValid = theLocValidEdges.Seek (aFIm);
+
+      for (TopExp_Explorer expE (aFIm, TopAbs_EDGE); expE.More(); expE.Next())
+      {
+        const TopoDS_Shape& aE = expE.Current();
+        if (theInvEdges.Contains (aE) != theValidEdges.Contains (aE))
+        {
+          // edge is classified in some face
+
+          if ((!pMEInvalid || !pMEInvalid->Contains (aE)) && 
+              (!pMEValid   || !pMEValid->Contains (aE)))
+          {
+            // but not in the current one
+            TopTools_MapOfShape *pMap = aMEUnclassified.ChangeSeek (aE);
+            if (!pMap)
+              pMap = &aMEUnclassified (aMEUnclassified.Add (aE, TopTools_MapOfShape()));
+            pMap->Add (aFIm);
+
+            aFSplitFOffset.Bind (aFIm, aF);
+          }
+        }
+      }
+    }
+  }
+
+  if (aMEUnclassified.IsEmpty())
+    return;
+
+  // Analyze unclassified edges
+  const Standard_Integer aNbE = aMEUnclassified.Extent();
+  for (Standard_Integer iE = 1; iE <= aNbE; ++iE)
+  {
+    const TopoDS_Shape& aE = aMEUnclassified.FindKey (iE);
+    const TopTools_MapOfShape& aMFUnclassified = aMEUnclassified (iE);
+
+    const TopTools_ListOfShape& aLF = anEFMap.FindFromKey (aE);
+
+    for (TopTools_ListOfShape::Iterator itLF (aLF); itLF.More(); itLF.Next())
+    {
+      const TopoDS_Shape& aFClassified = itLF.Value();
+      if (aMFUnclassified.Contains (aFClassified))
+        continue;
+
+      BOPTools_Set anEdgeSetClass;
+      anEdgeSetClass.Add (aFClassified, TopAbs_EDGE);
+
+      TopoDS_Shape aEClassified;
+      FindShape (aE, aFClassified, aEClassified);
+      TopAbs_Orientation anOriClass = aEClassified.Orientation();
+
+      gp_Dir aDNClass;
+      BOPTools_AlgoTools3D::GetNormalToFaceOnEdge (TopoDS::Edge (aEClassified), TopoDS::Face (aFClassified), aDNClass);
+
+      const TopTools_IndexedMapOfShape* pMEInvalid = theLocInvEdges.Seek (aFClassified);
+      Standard_Boolean isInvalid = pMEInvalid && pMEInvalid->Contains (aE);
+
+      for (TopTools_MapOfShape::Iterator itM (aMFUnclassified); itM.More(); itM.Next())
+      {
+        const TopoDS_Shape& aFUnclassified = itM.Value();
+
+        BOPTools_Set anEdgeSetUnclass;
+        anEdgeSetUnclass.Add (aFUnclassified, TopAbs_EDGE);
+
+        if (anEdgeSetClass.IsEqual (anEdgeSetUnclass))
+        {
+          gp_Dir aDNUnclass;
+          BOPTools_AlgoTools3D::GetNormalToFaceOnEdge (TopoDS::Edge (aE), TopoDS::Face (aFUnclassified), aDNUnclass);
+
+          Standard_Boolean isSameOri = aDNClass.IsEqual (aDNUnclass, Precision::Angular());
+
+          // Among other splits of the same face find those where the edge is contained with different
+          // orientation
+          const TopoDS_Shape& aFOffset = aFSplitFOffset.Find (aFUnclassified);
+          const TopTools_ListOfShape& aLFSplits = theFImages.FindFromKey (aFOffset);
+          TopTools_ListOfShape::Iterator itLFSp (aLFSplits);
+          for (; itLFSp.More(); itLFSp.Next())
+          {
+            const TopoDS_Shape& aFSp = itLFSp.Value();
+
+            if (!aFSp.IsSame (aFUnclassified) && aMFUnclassified.Contains (aFSp))
+            {
+              TopoDS_Shape aEUnclassified;
+              FindShape (aE, aFSp, aEUnclassified);
+
+              TopAbs_Orientation anOriUnclass = aEUnclassified.Orientation();
+              if (!isSameOri)
+                anOriUnclass = TopAbs::Reverse (anOriUnclass);
+
+              if (anOriClass != anOriUnclass)
+              {
+                // make the edge neutral for the face
+                TopTools_MapOfShape* pMENeutral = theNeutralEdges.ChangeSeek (aFOffset);
+                if (!pMENeutral)
+                  pMENeutral = theNeutralEdges.Bound (aFOffset, TopTools_MapOfShape());
+                pMENeutral->Add (aE);
+
+                if (isInvalid && isSameOri)
+                {
+                  // make edge invalid in aFUnclassified and valid in aFSp
+                  addAsNeutral (aE, aFClassified, aFSp, theLocInvEdges, theLocValidEdges);
+                }
+                else
+                {
+                  // make edge invalid in aFSp and valid in aFUnclassified
+                  addAsNeutral (aE, aFSp, aFClassified, theLocInvEdges, theLocValidEdges);
+                }
+              }
+            }
+          }
+          if (itLFSp.More())
+            break;
+        }
+      }
+    }
+  }
+}
+
 //=======================================================================
 //function : FindInvalidFaces
 //purpose  : Looking for the invalid faces by analyzing their invalid edges
@@ -2014,7 +2197,7 @@ void FindInvalidFaces(TopTools_ListOfShape& theLFImages,
       //
       bValidLoc = pMVE && pMVE->Contains(aEIm);
       bInverted = theMEInverted.Contains(aEIm);
-      if (!bInvalid && bTreatInvertedAsInvalid) {
+      if (!bInvalid && !bInvalidLoc && bTreatInvertedAsInvalid) {
         bInvalid = bInverted;
       }
       //
@@ -2023,7 +2206,7 @@ void FindInvalidFaces(TopTools_ListOfShape& theLFImages,
       }
       //
       bAllValid &= bValidLoc;
-      bAllInvalid &= bInvalid;
+      bAllInvalid &= (bInvalid || bInvalidLoc);
       bAllInvNeutral &= (bAllInvalid && bNeutral);
       bIsInvalidByInverted &= (bInvalidLoc || bInverted);
     }
