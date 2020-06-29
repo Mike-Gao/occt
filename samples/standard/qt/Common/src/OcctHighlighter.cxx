@@ -82,7 +82,8 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent): QSyntaxHighlighter(pare
   const QString aMemberPatterns[] =
   {
     QStringLiteral("myIsProcessed"), QStringLiteral("myObject2d"), QStringLiteral("myObject3d"),
-    QStringLiteral("myResult"), QStringLiteral("myCode"),  QStringLiteral("myCodePath")
+    QStringLiteral("myResult"), QStringLiteral("myCode"),  QStringLiteral("myCodePath"),
+    QStringLiteral("myFileName"), QStringLiteral("myStepType"),  QStringLiteral("myViewer")
   };
   for (const QString &aPattern : aMemberPatterns)
   {

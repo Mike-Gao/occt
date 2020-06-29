@@ -53,7 +53,7 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   mySamples(nullptr)
 {
   stApp = this;
-  SetAppType("DataExchange");
+  SetAppType("Triangulation");
   setWindowTitle(GetTitle());
 
   switch (APP_TYPE)
@@ -140,6 +140,7 @@ ApplicationCommonWindow::ApplicationCommonWindow()
     if (aDataExchangeSamples)
     {
       aDataExchangeSamples->AppendBottle();
+      aDataExchangeSamples->SetView(myGeomWidget->Get3dView());
       myDocument3d->SetObjects(mySamples->Get3dObjects());
       myGeomWidget->FitAll();
     }
@@ -593,7 +594,8 @@ TranslateDialog* ApplicationCommonWindow::getDialog(const QString& theSampleName
     aFormatFilter = "STL Files (*.stl)";
   else if (DataExchangeSamples::IsVrmlSample(aSampleName))
     aFormatFilter = "VRML Files (*.vrml)";
-
+  else if (DataExchangeSamples::IsImageSample(aSampleName))
+    aFormatFilter = "All Image Files (*.bmp *.gif *.jpg *.jpeg *.png *.tga)";
 
   QStringList aFilters;
   aFilters.append(aFormatFilter);

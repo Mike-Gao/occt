@@ -24,10 +24,11 @@
 #include <TopTools_HSequenceOfShape.hxx>
 #include <STEPControl_Reader.hxx>
 #include <IGESControl_Reader.hxx>
-
+#include <Graphic3d_TextureEnv.hxx>
 
 DataExchangeSamples::DataExchangeSamples():
-  myStepType(STEPControl_StepModelType(-1))
+  myStepType(STEPControl_StepModelType(-1)),
+  myView(nullptr)
 {
 
 }
@@ -54,7 +55,7 @@ void DataExchangeSamples::AppendBottle()
   TopoDS_Shape aBottle = MakeBottle(50, 70, 30);
   Handle(AIS_InteractiveObject) aShape = new AIS_Shape(aBottle);
   myObject3d.Append(aShape);
-  myResult << "A bottle shape was created: " << std::endl;
+  myResult << "A bottle shape was created." << std::endl;
 }
 
 Standard_Boolean DataExchangeSamples::IsExportSample(TCollection_AsciiString theSampleName)
@@ -114,6 +115,14 @@ Standard_Boolean DataExchangeSamples::IsVrmlSample(TCollection_AsciiString theSa
     return Standard_False;
 }
 
+Standard_Boolean DataExchangeSamples::IsImageSample(TCollection_AsciiString theSampleName)
+{
+  if (theSampleName == "ImageExportSample")
+    return Standard_True;
+  else
+    return Standard_False;
+}
+
 
 void DataExchangeSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 {
@@ -167,14 +176,11 @@ void DataExchangeSamples::BrepExportSample()
 
 void DataExchangeSamples::StepExportSample()
 {
-  //TranslateDlg* theDlg = getDialog(-1, false);
-  //STEPControl_StepModelType type = (STEPControl_StepModelType)theDlg->getMode();
   if (myStepType < 0)
   {
     myResult << "Unknown step type" << std::endl;
     return;
   }
-
 
   IFSelect_ReturnStatus aStatus;
 
@@ -301,7 +307,14 @@ void DataExchangeSamples::VrmlExportSample()
 
 void DataExchangeSamples::ImageExportSample()
 {
-  myResult << "Sample";
+  if (myView)
+  {
+    Standard_Boolean aResult = myView->Dump(myFileName.ToCString());
+    if (aResult)
+      myResult << "An image file was successfully written" << std::endl;
+    else
+      myResult << "An image file was not written" << std::endl;
+  }
 }
 
 void DataExchangeSamples::BrepImportSample()

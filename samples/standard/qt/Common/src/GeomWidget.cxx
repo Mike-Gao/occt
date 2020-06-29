@@ -70,3 +70,8 @@ void GeomWidget::FitAll()
     setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Menu");
   }
 }
+
+Handle(V3d_View) GeomWidget::Get3dView()
+{
+  return myView3d->getView();
+}
