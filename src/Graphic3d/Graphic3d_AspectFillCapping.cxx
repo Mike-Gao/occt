@@ -113,7 +113,7 @@ void Graphic3d_AspectFillCapping::SetHatchRotationPeristent (const Standard_Bool
 //function : DumpJson
 //purpose  : 
 //=======================================================================
-void Graphic3d_AspectFillCapping::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+void Graphic3d_AspectFillCapping::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
   OCCT_DUMP_CLASS_BEGIN (theOStream, Graphic3d_AspectFillCapping);
 
