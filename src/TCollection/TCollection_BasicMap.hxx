@@ -27,7 +27,6 @@
 #include <Standard_OStream.hxx>
 class TCollection_BasicMapIterator;
 
-
 //! Root  class of  all the maps,  provides utilitites
 //! for managing the buckets.
 //! Maps are dynamically extended data structures where
@@ -94,25 +93,22 @@ public:
 
   
   //! Returns the number of buckets in <me>.
-    Standard_Integer NbBuckets() const;
-  
+  Standard_Integer NbBuckets() const { return myNbBuckets; }
+
   //! Returns the number of keys already stored in <me>.
-    Standard_Integer Extent() const;
-  
+  Standard_Integer Extent() const { return mySize; }
+
   //! Returns  True when the map  contains no keys.
   //! This is exactly Extent() == 0.
-    Standard_Boolean IsEmpty() const;
-  
+  Standard_Boolean IsEmpty() const { return mySize == 0; }
+
   //! Prints  on <S> usefull  statistics  about  the map
   //! <me>.  It  can be used  to test the quality of the hashcoding.
   Standard_EXPORT void Statistics (Standard_OStream& S) const;
 
-
 friend class TCollection_BasicMapIterator;
 
-
 protected:
-
   
   //! Initialize the map.  Single is  True when the  map
   //! uses only one table of buckets.
@@ -134,14 +130,14 @@ protected:
   
   //! Returns   True  if resizing   the   map should  be
   //! considered.
-    Standard_Boolean Resizable() const;
-  
+  Standard_Boolean Resizable() const { return IsEmpty() || (!mySaturated && (mySize > myNbBuckets)); }
+
   //! Decrement the  extent of the  map.
-    void Increment();
-  
+  void Increment() { ++mySize; }
+
   //! Decrement the  extent of the  map.
-    void Decrement();
-  
+  void Decrement() { --mySize; }
+
   //! Destroys the buckets.
   Standard_EXPORT void Destroy();
 
@@ -149,24 +145,13 @@ protected:
   Standard_Address myData1;
   Standard_Address myData2;
 
-
 private:
-
-
 
   Standard_Boolean isDouble;
   Standard_Boolean mySaturated;
   Standard_Integer myNbBuckets;
   Standard_Integer mySize;
 
-
 };
-
-
-#include <TCollection_BasicMap.lxx>
-
-
-
-
 
 #endif // _TCollection_BasicMap_HeaderFile

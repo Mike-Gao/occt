@@ -23,44 +23,24 @@
 #include <TCollection_MapNodePtr.hxx>
 #include <Standard_Transient.hxx>
 
-
 class TCollection_MapNode;
 DEFINE_STANDARD_HANDLE(TCollection_MapNode, Standard_Transient)
 
 //! Basic class root of all the Maps.
 class TCollection_MapNode : public Standard_Transient
 {
-
 public:
 
-  
-    TCollection_MapNode(const TCollection_MapNodePtr& n);
-  
-    TCollection_MapNodePtr& Next() const;
+  TCollection_MapNode(const TCollection_MapNodePtr& n) : myNext(n) {}
 
-
-
+  TCollection_MapNodePtr& Next() const { return (TCollection_MapNodePtr&)myNext; }
 
   DEFINE_STANDARD_RTTIEXT(TCollection_MapNode,Standard_Transient)
 
-protected:
-
-
-
-
 private:
-
 
   TCollection_MapNodePtr myNext;
 
-
 };
-
-
-#include <TCollection_MapNode.lxx>
-
-
-
-
 
 #endif // _TCollection_MapNode_HeaderFile

@@ -64,16 +64,13 @@ public:
   //! Returns true if there is a current entry for this iterator in the map.
   //! Use the function Next to set this iterator to the position of
   //! the next entry, if it exists.
-    Standard_Boolean More() const;
-  
+  Standard_Boolean More() const { return myNode != 0L; }
+
   //! Sets this iterator to the position of the next entry of the map.
   //! Nothing is changed if there is no more entry to explore in
   //! the map: this iterator is always positioned on the last entry
   //! of the map but the function More returns false.
   Standard_EXPORT void Next();
-
-
-
 
 protected:
 
@@ -90,23 +87,12 @@ protected:
 
   Standard_Address myNode;
 
-
 private:
-
-
 
   Standard_Integer myNbBuckets;
   Standard_Address myBuckets;
   Standard_Integer myBucket;
 
-
 };
-
-
-#include <TCollection_BasicMapIterator.lxx>
-
-
-
-
 
 #endif // _TCollection_BasicMapIterator_HeaderFile
