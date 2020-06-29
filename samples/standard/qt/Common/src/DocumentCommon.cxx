@@ -78,6 +78,10 @@ Handle(AIS_InteractiveContext) DocumentCommon::getContext()
 {
   return myContext;
 }
+Handle(V3d_Viewer) DocumentCommon::getViewer()
+{
+  return myViewer;
+}
 
 void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects)
 {

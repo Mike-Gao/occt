@@ -1057,10 +1057,10 @@ bool View::dump(Standard_CString theFile)
   return myV3dView->Dump(theFile);
 }
 
-//Handle(V3d_View)& View::getView()
-//{
-//  return myV3dView;
-//}
+Handle(V3d_View) View::getView()
+{
+  return myV3dView;
+}
 
 Handle(AIS_InteractiveContext)& View::getContext()
 {

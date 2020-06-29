@@ -63,6 +63,7 @@ public:
                                                       TopAbs_ShapeEnum& SelectionMode,
                                                       Standard_Boolean& );
     virtual QPaintEngine*         paintEngine() const;
+    Handle(V3d_View)              getView();
 signals:
     void                          selectionChanged();
 
@@ -97,11 +98,10 @@ protected:
 
     virtual void                  addItemInPopup( QMenu* );
 
-//    Handle(V3d_View)&                     getView();
-    Handle(AIS_InteractiveContext)&       getContext();
-    void                                  activateCursor( const CurrentAction3d );
-    void                                  Popup( const int x, const int y );
-    CurrentAction3d                       getCurrentMode();
+    Handle(AIS_InteractiveContext)& getContext();
+    void                            activateCursor( const CurrentAction3d );
+    void                            Popup( const int x, const int y );
+    CurrentAction3d                 getCurrentMode();
 
     virtual void onLButtonDown( const int nFlags, const QPoint point );
     virtual void onMButtonDown( const int nFlags, const QPoint point );
@@ -122,7 +122,7 @@ private:
     void MultiDragEvent( const int x, const int y, const int TheState );
     void MultiInputEvent( const int x, const int y );
     void DrawRectangle( const int MinX, const int MinY,
-                                                 const int MaxX, const int MaxY, const bool Draw );
+                        const int MaxX, const int MaxY, const bool Draw );
 
 private:
     bool                            myIsRaytracing;

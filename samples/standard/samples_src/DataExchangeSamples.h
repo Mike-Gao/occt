@@ -5,7 +5,7 @@
 #include "BaseSample.h"
 
 #include <STEPControl_StepModelType.hxx>
-
+#include <V3d_View.hxx>
 
 class DataExchangeSamples;
 DEFINE_STANDARD_HANDLE(DataExchangeSamples, BaseSample)
@@ -21,6 +21,7 @@ public:
   void AppendBottle();
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
   void SetStepType(STEPControl_StepModelType theStepType) { myStepType = theStepType; };
+  void SetView(Handle(V3d_View) theView) { myView = theView; };
 
   static Standard_Boolean IsExportSample(TCollection_AsciiString theSampleName);
   static Standard_Boolean IsImportSample(TCollection_AsciiString theSampleName);
@@ -29,14 +30,15 @@ public:
   static Standard_Boolean IsIgesSample(TCollection_AsciiString theSampleName);
   static Standard_Boolean IsStlSample(TCollection_AsciiString theSampleName); 
   static Standard_Boolean IsVrmlSample(TCollection_AsciiString theSampleName);
-
+  static Standard_Boolean IsImageSample(TCollection_AsciiString theSampleName);
 
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 
 private:
-  TCollection_AsciiString myFileName;
+  TCollection_AsciiString   myFileName;
   STEPControl_StepModelType myStepType;
+  Handle(V3d_View)          myView;
 
   Standard_Boolean CheckFacetedBrep();
   // One function for every sample

@@ -16,11 +16,11 @@ public:
              QWidget* parent = nullptr);
 
   void FitAll();
-
+  Handle(V3d_View) Get3dView();
 
 private:
-  View*           myView3d;
-  View*           myView2d;
+  View*    myView3d;
+  View*    myView2d;
 
   QWidget* my3dVidget;
   QWidget* my2dVidget;
