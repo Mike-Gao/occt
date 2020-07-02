@@ -60,22 +60,22 @@ void IntWalk_PWalking::ComputePasInit(const Standard_Real theDeltaU1,
   if(!Precision::IsInfinite(aDeltaU1))
     pasuv[0]=Max(Increment*Max(theDeltaU1, aRangePart*aDeltaU1), pasuv[0]);
   else
-    pasuv[0]=Max(Increment*theDeltaU1, pasuv[0]);
+    pasuv[0]=Min(10.,Max(Increment*theDeltaU1, pasuv[0]));
 
   if(!Precision::IsInfinite(aDeltaV1))
     pasuv[1]=Max(Increment*Max(theDeltaV1, aRangePart*aDeltaV1), pasuv[1]);
   else
-    pasuv[1]=Max(Increment*theDeltaV1, pasuv[1]);
+    pasuv[1]=Min(10.,Max(Increment*theDeltaV1, pasuv[1]));
 
   if(!Precision::IsInfinite(aDeltaU2))
     pasuv[2]=Max(Increment*Max(theDeltaU2, aRangePart*aDeltaU2), pasuv[2]);
   else
-    pasuv[2]=Max(Increment*theDeltaU2, pasuv[2]);
+    pasuv[2]=Min(10.,Max(Increment*theDeltaU2, pasuv[2]));
 
   if(!Precision::IsInfinite(aDeltaV2))
     pasuv[3]=Max(Increment*Max(theDeltaV2, aRangePart*aDeltaV2), pasuv[3]);
   else
-    pasuv[3]=Max(Increment*theDeltaV2, pasuv[3]);
+    pasuv[3]=Min(10.,Max(Increment*theDeltaV2, pasuv[3]));
 
   const Standard_Real ResoU1tol = Adaptor3d_HSurfaceTool::UResolution(Caro1, tolconf);
   const Standard_Real ResoV1tol = Adaptor3d_HSurfaceTool::VResolution(Caro1, tolconf);
@@ -256,10 +256,26 @@ STATIC_PRECEDENT_INFLEXION(0)
   NEWRESO = ResoV2 * MAXVAL ;
   if(NEWRESO > ResoV2 && NEWRESO<10) {     ResoV2 = NEWRESO;  }
 
-  pasuv[0]=pasMax*Abs(UM1-Um1);
-  pasuv[1]=pasMax*Abs(VM1-Vm1);
-  pasuv[2]=pasMax*Abs(UM2-Um2);
-  pasuv[3]=pasMax*Abs(VM2-Vm2);
+  pasuv[0] = pasuv[1] = pasuv[2] = pasuv[3] = 10.;
+  if (!Precision::IsInfinite(UM1 - Um1))
+  {
+    pasuv[0] = pasMax*Abs(UM1 - Um1);
+  }
+
+  if (!Precision::IsInfinite(VM1 - Vm1))
+  {
+    pasuv[1] = pasMax*Abs(VM1 - Vm1);
+  }
+
+  if (!Precision::IsInfinite(UM2 - Um2))
+  {
+    pasuv[2] = pasMax*Abs(UM2 - Um2);
+  }
+
+  if (!Precision::IsInfinite(VM2 - Vm2))
+  {
+    pasuv[3] = pasMax*Abs(VM2 - Vm2);
+  }
 
   if(ResoU1>0.0001*pasuv[0]) ResoU1=0.00001*pasuv[0];
   if(ResoV1>0.0001*pasuv[1]) ResoV1=0.00001*pasuv[1];
@@ -322,9 +338,9 @@ STATIC_PRECEDENT_INFLEXION(0)
 
   //-- ComputePasInit(pasuv,Um1,UM1,Vm1,VM1,Um2,UM2,Vm2,VM2,Caro1,Caro2);
 
-  for (Standard_Integer i = 0; i<=3;i++) {
-    if(pasuv[i]>10) 
-      pasuv[i] = 10; 
+ for (Standard_Integer i = 0; i<=3;i++) {
+    //if(pasuv[i]>10) 
+    //  pasuv[i] = 10; 
     pasInit[i] = pasSav[i] = pasuv[i]; 
   }
 
@@ -418,10 +434,26 @@ STATIC_PRECEDENT_INFLEXION(0)
     ResoV2 = NEWRESO;
   }
   //
-  pasuv[0]=pasMax*Abs(UM1-Um1);
-  pasuv[1]=pasMax*Abs(VM1-Vm1);
-  pasuv[2]=pasMax*Abs(UM2-Um2);
-  pasuv[3]=pasMax*Abs(VM2-Vm2);
+  pasuv[0] = pasuv[1] = pasuv[2] = pasuv[3] = 10.;
+  if (!Precision::IsInfinite(UM1 - Um1))
+  {
+    pasuv[0] = pasMax*Abs(UM1 - Um1);
+  }
+
+  if (!Precision::IsInfinite(VM1 - Vm1))
+  {
+    pasuv[1] = pasMax*Abs(VM1 - Vm1);
+  }
+
+  if (!Precision::IsInfinite(UM2 - Um2))
+  {
+    pasuv[2] = pasMax*Abs(UM2 - Um2);
+  }
+
+  if (!Precision::IsInfinite(VM2 - Vm2))
+  {
+    pasuv[3] = pasMax*Abs(VM2 - Vm2);
+  }
   //
   if(Adaptor3d_HSurfaceTool::IsUPeriodic(Caro1)==Standard_False) { 
     UM1+=KELARG*pasuv[0];  
@@ -674,10 +706,10 @@ void IntWalk_PWalking::Perform(const TColStd_Array1OfReal& ParDep,
 
   for (Standard_Integer i=0; i<4; ++i)
   {
-    if(pasuv[i]>10)
-    {
-      pasuv[i] = 10;
-    }
+    //if(pasuv[i]>10)
+    //{
+    //  pasuv[i] = 10;
+    //}
 
     pasInit[i] = pasSav[i] = pasuv[i]; 
   }
