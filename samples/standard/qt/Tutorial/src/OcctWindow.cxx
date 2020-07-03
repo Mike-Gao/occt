@@ -1,4 +1,4 @@
-#include <OcctWindow.h>
+#include "OcctWindow.h"
 
 IMPLEMENT_STANDARD_RTTIEXT(OcctWindow,Aspect_Window)
 

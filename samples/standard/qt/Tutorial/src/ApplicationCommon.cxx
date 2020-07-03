@@ -205,7 +205,7 @@ void ApplicationCommonWindow::createStandardOperations()
   filePrefUseVBOAction->setChecked( true );
   myStdActions.insert(StdActions::FilePrefUseVBO, filePrefUseVBOAction );
 
-  QAction* fileQuitAction = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "Quit", "CTRL+Q", "quit.png");
+  QAction* fileQuitAction = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "Quit", "CTRL+Q");
   myStdActions.insert(StdActions::FileQuit, fileQuitAction );
 
   QAction* viewToolAction = CreateAction(&ApplicationCommonWindow::onViewToolBar, "Toolbar");
@@ -213,23 +213,23 @@ void ApplicationCommonWindow::createStandardOperations()
   viewToolAction->setChecked( true );
   myStdActions.insert(StdActions::ViewTool, viewToolAction );
 
-  QAction* helpAboutAction = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", "help.png");
+  QAction* helpAboutAction = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", ":/icons/help.png");
   myStdActions.insert(StdActions::HelpAbout, helpAboutAction);
 
   // create preferences menu
-  QMenu* aPrefMenu = new QMenu( QObject::tr("MNU_PREFERENCES") );
+  QMenu* aPrefMenu = new QMenu(tr("&Preferences"));
   aPrefMenu->addAction( filePrefUseVBOAction );
 
   // populate a menu with all actions
   myFilePopup = new QMenu( this );
-  myFilePopup = menuBar()->addMenu( QObject::tr("MNU_FILE") );
+  myFilePopup = menuBar()->addMenu(tr("&File"));
   myFilePopup->addMenu( aPrefMenu );
   myFilePopup->addAction( fileQuitAction );
 
   // add a view menu
   QMenu * view = new QMenu( this );
 
-  view = menuBar()->addMenu( QObject::tr("MNU_VIEW") );
+  view = menuBar()->addMenu(tr("&View"));
   view->addAction( viewToolAction );
 
   for(QMenu* aSampleMenu: mySamplePopups)
@@ -240,11 +240,11 @@ void ApplicationCommonWindow::createStandardOperations()
   // add a help menu
   QMenu * help = new QMenu( this );
   menuBar()->addSeparator();
-  help = menuBar()->addMenu( QObject::tr("MNU_HELP") );
+  help = menuBar()->addMenu(tr("&Help"));
   help->addAction( helpAboutAction );
 
   // populate a tool bar with some actions
-  myStdToolBar = addToolBar( tr( "File Operations" ) );
+  myStdToolBar = addToolBar(tr("File Operations"));
   myStdToolBar->addAction( helpAboutAction );
 
 }
@@ -252,83 +252,81 @@ void ApplicationCommonWindow::createStandardOperations()
 void ApplicationCommonWindow::createCasCadeOperations()
 {
   myCasCadeBar = addToolBar( tr( "Shape Operations" ) );
-
-  QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
   QAction* a;
 
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Wireframe", "", "tool_wireframe.png");
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Wireframe"), "", ":/icons/tool_wireframe.png");
   myToolActions.insert(ToolActions::ToolWireframe, a );
 
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Shading", "", "tool_shading.png");
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Shading"), "", ":/icons/tool_shading.png");
   myToolActions.insert(ToolActions::ToolShading, a );
 
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Color", "", "tool_color.png");
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Color"), "", ":/icons/tool_color.png");
   myToolActions.insert(ToolActions::ToolColor, a );
 
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Material", "", "tool_material.png");
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Material"), "", ":/icons/tool_material.png");
   myToolActions.insert(ToolActions::ToolMaterial, a );
 
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Transparency", "", "tool_transparency.png");
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Transparency"), "", ":/icons/tool_transparency.png");
   myToolActions.insert(ToolActions::ToolTransparency, a );
 
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, "Delete", "", "tool_delete.png");
+  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Delete"), "", ":/icons/tool_delete.png");
   myToolActions.insert(ToolActions::ToolDelete, a );
 
   QSignalMapper* sm = new QSignalMapper( this );
   connect( sm, SIGNAL( mapped( int ) ), this, SLOT( onSetMaterial( int ) ) );
 
-  a = new QAction( QObject::tr("MNU_BRASS"), this );
-  a->setToolTip( QObject::tr("TBR_BRASS") );
-  a->setStatusTip( QObject::tr("TBR_BRASS") );
+  a = new QAction(tr("Brass"), this );
+  a->setToolTip(tr("Brass") );
+  a->setStatusTip(tr("Brass") );
   sm->setMapping( a,(int)Graphic3d_NOM_BRASS );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_BRASS, a );
 
-  a = new QAction( QObject::tr("MNU_BRONZE"), this );
-  a->setToolTip( QObject::tr("TBR_BRONZE") );
-  a->setStatusTip( QObject::tr("TBR_BRONZE") );
+  a = new QAction(tr("Bronze"), this );
+  a->setToolTip(tr("Bronze") );
+  a->setStatusTip(tr("Bronze") );
   sm->setMapping( a, ( int )Graphic3d_NOM_BRONZE );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_BRONZE, a );
 
-  a = new QAction( QObject::tr("MNU_COPPER"), this );
-  a->setToolTip( QObject::tr("TBR_COPPER") );
-  a->setStatusTip( QObject::tr("TBR_COPER") );
+  a = new QAction(tr("Copper"), this );
+  a->setToolTip(tr("Copper") );
+  a->setStatusTip(tr("Copper") );
   sm->setMapping( a, ( int )Graphic3d_NOM_COPPER );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_COPPER, a );
 
-  a = new QAction( QObject::tr("MNU_GOLD"), this );
-  a->setToolTip( QObject::tr("TBR_GOLD") );
-  a->setStatusTip( QObject::tr("TBR_GOLD") );
+  a = new QAction(tr("Gold"), this );
+  a->setToolTip(tr("Gold") );
+  a->setStatusTip(tr("Gold") );
   sm->setMapping( a, ( int )Graphic3d_NOM_GOLD );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_GOLD, a );
 
-  a = new QAction( QObject::tr("MNU_PEWTER"), this );
-  a->setToolTip( QObject::tr("TBR_PEWTER") );
-  a->setStatusTip( QObject::tr("TBR_PEWTER") );
+  a = new QAction(tr("Pewter"), this );
+  a->setToolTip(tr("Pewter") );
+  a->setStatusTip(tr("Pewter") );
   sm->setMapping( a, ( int )Graphic3d_NOM_PEWTER );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_PEWTER, a );
 
-  a = new QAction( QObject::tr("MNU_PLASTER"), this );
-  a->setToolTip( QObject::tr("TBR_PLASTER") );
-  a->setStatusTip( QObject::tr("TBR_PLASTER") );
+  a = new QAction(tr("Placter"), this );
+  a->setToolTip(tr("Placter") );
+  a->setStatusTip(tr("Placter") );
   sm->setMapping( a, ( int )Graphic3d_NOM_PLASTER );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_PLASTER, a );
 
-  a = new QAction( QObject::tr("MNU_PLASTIC"), this );
-  a->setToolTip( QObject::tr("TBR_PLASTIC") );
-  a->setStatusTip( QObject::tr("TBR_PLASTIC") );
+  a = new QAction(tr("Plactic"), this );
+  a->setToolTip(tr("Plactic") );
+  a->setStatusTip(tr("Plactic") );
   sm->setMapping( a, ( int )Graphic3d_NOM_PLASTIC );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_PLASTIC, a );
 
-  a = new QAction( QObject::tr("MNU_SILVER"), this );
-  a->setToolTip( QObject::tr("TBR_SILVER") );
-  a->setStatusTip( QObject::tr("TBR_SILVER") );
+  a = new QAction(tr("Silver"), this );
+  a->setToolTip(tr("Silver") );
+  a->setStatusTip(tr("Silver") );
   sm->setMapping( a, ( int )Graphic3d_NOM_SILVER );
   connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
   myMaterialActions.insert( Graphic3d_NOM_SILVER, a );
@@ -399,8 +397,9 @@ void ApplicationCommonWindow::onViewToolBar()
 
 void ApplicationCommonWindow::onAbout()
 {
-  QMessageBox::information( this, QObject::tr( "TIT_ABOUT" ), QObject::tr( "INF_ABOUT" ), QObject::tr("BTN_OK" ),
-                            QString::null, QString::null, 0, 0 );
+  QMessageBox::information( this, tr("Tutorial"), 
+                            tr("Qt based application to study Open CASCADE Technology"), 
+                            tr("Ok" ), QString::null, QString::null, 0, 0 );
 }
 
 
@@ -450,23 +449,23 @@ TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
 
 template <typename PointerToMemberFunction>
 QAction* ApplicationCommonWindow::CreateAction(PointerToMemberFunction theHandlerMethod,
-                                               const char* theActionName, 
-                                               const char* theShortcut, 
-                                               const char* theIconName)
+                                               QString theActionName, 
+                                               QString theShortcut,
+                                               QString theIconName)
 {
   QAction* aAction(NULL);
-  if (theIconName)
+  if (!theIconName.isEmpty())
   {
-    QPixmap aIcon = QPixmap(getResourceDir() + QString("/") + theIconName);
-    aAction = new QAction(aIcon, QObject::tr(theActionName), this);
+    QPixmap aIcon = QPixmap(theIconName);
+    aAction = new QAction(aIcon, theActionName, this);
   }
   else
   {
-    aAction = new QAction(QObject::tr(theActionName), this);
+    aAction = new QAction(theActionName, this);
   }
-  aAction->setToolTip(QObject::tr(theActionName));
-  aAction->setStatusTip(QObject::tr(theActionName));
-  aAction->setShortcut(QString(theShortcut));
+  aAction->setToolTip(theActionName);
+  aAction->setStatusTip(theActionName);
+  aAction->setShortcut(theShortcut);
   connect(aAction, &QAction::triggered, this, theHandlerMethod);
   return aAction;
 }

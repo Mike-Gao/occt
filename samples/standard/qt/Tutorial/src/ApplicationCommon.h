@@ -63,9 +63,9 @@ public slots:
 protected:
   template <typename PointerToMemberFunction>
   QAction* CreateAction(PointerToMemberFunction theHandlerMethod,
-                        const char* theActionName,
-                        const char* theShortcut = NULL,
-                        const char* theIconName = NULL);
+                        QString theActionName,
+                        QString theShortcut = "",
+                        QString theIconName = "");
 
   template <typename PointerToMemberFunction>
   QAction* CreateSample(PointerToMemberFunction theHandlerMethod,

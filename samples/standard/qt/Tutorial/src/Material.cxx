@@ -20,7 +20,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	QSignalMapper *sm = new QSignalMapper( this );
 	connect( sm, SIGNAL( mapped( int ) ), this, SIGNAL( sendMaterialChanged( int ) ) );
 
-	b = new QPushButton( QObject::tr("BTN_PLASTER"), this );
+	b = new QPushButton(tr("Plaster"), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_PLASTER );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -28,7 +28,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_BRASS" ), this );
+	b = new QPushButton( QObject::tr( "Brass" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_BRASS );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -36,7 +36,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_BRONZE" ), this );
+	b = new QPushButton(tr( "Bronze" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_BRONZE );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -44,7 +44,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_COPPER" ), this );
+	b = new QPushButton(tr( "Copper" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_COPPER );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -52,7 +52,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_GOLD" ), this );
+	b = new QPushButton(tr( "Gold" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_GOLD );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -60,7 +60,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_PEWTER" ), this );
+	b = new QPushButton(tr( "Pewter" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_PEWTER );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -68,7 +68,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_PLASTIC" ), this );
+	b = new QPushButton(tr( "Plastic" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_PLASTIC );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
@@ -76,7 +76,7 @@ DialogMaterial::DialogMaterial(QWidget * parent,
 	myButtons.append( b );
 	vbl->addWidget( b );
 
-	b = new QPushButton( QObject::tr( "BTN_SILVER" ), this );
+	b = new QPushButton(tr( "Silver" ), this );
   sm->setMapping( b, ( int )Graphic3d_NOM_SILVER );
   connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
 	b->setCheckable( true );
