@@ -1,7 +1,6 @@
 #ifndef DOCUMENTCOMMON_H
 #define DOCUMENTCOMMON_H
 
-#include "IESample.h"
 #include "CommonSample.h"
 
 #include <Standard_WarningsDisable.hxx>

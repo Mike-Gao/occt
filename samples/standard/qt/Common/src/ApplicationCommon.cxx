@@ -19,6 +19,7 @@
 #include <QMdiSubWindow>
 #include <QMessageBox>
 
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -42,7 +43,7 @@
 static ApplicationCommonWindow* stApp = 0;
 static QMdiArea* stWs = 0;
 
-ApplicationCommonWindow::ApplicationCommonWindow()
+ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   : QMainWindow(nullptr),
   mySampleMapper(new QSignalMapper(this)),
   myExchangeMapper(new QSignalMapper(this)),
@@ -53,8 +54,12 @@ ApplicationCommonWindow::ApplicationCommonWindow()
   mySamples(nullptr)
 {
   stApp = this;
-  SetAppType("Triangulation");
+  SetAppType(theSampleType);
   setWindowTitle(GetTitle());
+
+
+
+
 
   switch (APP_TYPE)
   {

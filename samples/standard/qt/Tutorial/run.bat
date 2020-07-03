@@ -1,6 +1,6 @@
 Setlocal EnableDelayedExpansion
 
-call "%~dp0env.bat" %1 %2 %3
+call "%~dp0env.bat" %1 %2 %3 %4
 
 set "BIN_DIR=win%ARCH%\%VCVER%\bind"
 if ["%CASDEB%"] == [""] (
@@ -10,7 +10,7 @@ if ["%CASDEB%"] == [""] (
 if not exist "%~dp0%BIN_DIR%\Tutorial.exe" goto ERR_EXE
 
 echo Starting Tutorial .....
-"%~dp0%BIN_DIR%\Tutorial.exe"
+"%~dp0%BIN_DIR%\Tutorial.exe" %4
 
 goto END
 

@@ -1,11 +1,12 @@
 #include "ApplicationTut.h"
 
 #include <OSD_Environment.hxx>
-
 #include <Standard_WarningsDisable.hxx>
+#include <Standard_WarningsRestore.hxx>
+
 #include <QApplication>
 #include <QTranslator>
-#include <Standard_WarningsRestore.hxx>
+#include <QCommandLineParser>
 
 int main ( int argc, char* argv[] )
 {
@@ -39,7 +40,16 @@ int main ( int argc, char* argv[] )
     if( isOK )
       a.installTranslator( &iconTutTrans );
 
-    ApplicationTut* mw = new ApplicationTut();
+    if (argc < 2)
+    {
+      std::cout << "An argumetn absent";
+      return 0;
+    }
+
+    QString anSampleType(argv[1]);
+
+
+    ApplicationTut* mw = new ApplicationTut(anSampleType);
     mw->setWindowTitle( QObject::tr( "TIT_SAMPLE" ) );
     QString aResName( resDir + QString( "/" ) + QObject::tr( "ICON_SAMPLE" ) );
     mw->setWindowIcon( QPixmap( aResName ) );
