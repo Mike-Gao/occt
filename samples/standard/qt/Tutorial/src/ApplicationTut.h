@@ -10,7 +10,7 @@ class ApplicationTut: public ApplicationCommonWindow
 
 public:
 	
-  ApplicationTut();
+  ApplicationTut(QString theSampleType);
   ~ApplicationTut();
 
   static QString    getTutResourceDir();

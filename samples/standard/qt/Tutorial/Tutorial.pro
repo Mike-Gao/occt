@@ -8,13 +8,11 @@ SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
 
 HEADERS   = src/*.h \
             $${SAMPLESROOT}/../samples_src/*.h \
-            $${SAMPLESROOT}/Common/src/*.h \
-            $${SAMPLESROOT}/Interface/src/*.h
+            $${SAMPLESROOT}/Common/src/*.h 
 
 SOURCES   = src/*.cxx \
             $${SAMPLESROOT}/../samples_src/*.cxx \
-            $${SAMPLESROOT}/Common/src/*.cxx \
-            $${SAMPLESROOT}/Interface/src/*.cxx
+            $${SAMPLESROOT}/Common/src/*.cxx 
 			
 RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc
 

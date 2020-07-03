@@ -1,0 +1,50 @@
+{
+
+spot light source 
+
+Create a positional light source 
+
+Create a directional light source 
+
+Create an ambient light source 
+	"Viewer 3D": {
+		"Light source": [{
+				"text": "Spot",
+				"function": "SpotLight3dSample",
+				"description": ""
+			},
+			{
+				"text": "Positional",
+				"function": "PositionalLight3dSample",
+				"description": ""
+			},
+			{
+				"text": "Directional",
+				"function": "DirectionalLight3dSample",
+				"description": ""
+			}
+		],
+
+		"Selection mode": [{
+				"text": "Vertices",
+				"function": "VerticesSelect3dSample",
+				"description": ""
+			},
+			{
+				"text": "Edges",
+				"function": "EdgesSelect3dSample",
+				"description": ""
+			},
+			{
+				"text": "Faces",
+				"function": "FacesSelect3dSample",
+				"description": ""
+			},
+			{
+				"text": "Neutral point",
+				"function": "NeutralPoinSelect3dSample",
+				"description": ""
+			}
+		]
+	}
+}

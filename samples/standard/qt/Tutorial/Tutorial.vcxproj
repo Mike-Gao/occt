@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\..\samples_src;..\Common\src;..\Interface\src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\samples_src;..\Common\src;C:/Work/occt-CR31570/samples/standard/qt/Interface/src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>win64\vc14\objd\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -95,7 +95,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\..\samples_src;..\Common\src;..\Interface\src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\moc;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\samples_src;..\Common\src;C:/Work/occt-CR31570/samples/standard/qt/Interface/src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\moc;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>win64\vc14\obj\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -135,7 +135,6 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Interface\src\*.cxx" />
     <ClCompile Include="..\..\samples_src\AdaptorCurve2d_AIS.cxx" />
     <ClCompile Include="..\..\samples_src\AdaptorCurve_AIS.cxx" />
     <ClCompile Include="..\..\samples_src\AdaptorPnt2d_AIS.cxx" />
@@ -218,7 +217,6 @@
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_GeomWidget.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\GeometrySamples.h" />
-    <ClInclude Include="..\Interface\src\IESample.h" />
     <ClInclude Include="..\..\samples_src\MakeBottle.h" />
     <CustomBuild Include="..\Common\src\Material.h">
       <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\Common\src\Material.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>

@@ -9,8 +9,8 @@
 #include <QMdiSubWindow>
 #include <Standard_WarningsRestore.hxx>
 
-ApplicationTut::ApplicationTut()
-    : ApplicationCommonWindow( )
+ApplicationTut::ApplicationTut(QString theSampleType)
+    : ApplicationCommonWindow(theSampleType)
 {
   createMakeBottleOperation();
 }
