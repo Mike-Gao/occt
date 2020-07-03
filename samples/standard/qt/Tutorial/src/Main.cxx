@@ -7,28 +7,25 @@
 
 #include <QApplication>
 #include <QTranslator>
+#include <QLocale>
+#include <QStringList>
 #include <QCommandLineParser>
 
 int main ( int argc, char* argv[] )
 {
-#if QT_VERSION > 0x050000
-    TCollection_AsciiString aPlugindsDirName = OSD_Environment ("QTDIR").Value();
-    if (!aPlugindsDirName.IsEmpty())
-      QApplication::addLibraryPath (QString (aPlugindsDirName.ToCString()) + "/plugins");
-#endif
+  Q_INIT_RESOURCE(Tutorial);
     QApplication a( argc, argv );
 
     QString resDir = ApplicationCommonWindow::getResourceDir();
 
+    QLocale systemLocale = QLocale::system();
+    QStringList ll = systemLocale.uiLanguages();
+
     QTranslator strTrans( 0 );
-    Standard_Boolean isOK = strTrans.load( "Common-string", resDir );
+    Standard_Boolean isOK = strTrans.load("Tutorial-string.ts", "C:\Work\occt-CR31570\samples\standard\qt\Tutorial\res");
     if( isOK )
       a.installTranslator( &strTrans );
 
-    QTranslator iconTrans( 0 );
-    isOK = iconTrans.load( "Common-icon", resDir );
-    if( isOK )
-      a.installTranslator( &iconTrans );
 
     if (argc < 2)
     {
@@ -39,7 +36,7 @@ int main ( int argc, char* argv[] )
     QString anSampleType(argv[1]);
     ApplicationCommonWindow* mw = new ApplicationCommonWindow(anSampleType);
     mw->setWindowTitle("Tutorial");
-    QString aResName( resDir + "/lamp.png");
+    QString aResName(":/icons/lamp.png");
     mw->setWindowIcon( QPixmap( aResName ) );
 
     mw->show();

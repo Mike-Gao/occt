@@ -1,26 +1,26 @@
 TEMPLATE = app
 CONFIG += debug_and_release qt
+CONFIG += lrelease
+CONFIG += embed_translations
+QT += widgets
 
 TARGET = Tutorial
+
 
 # SAMPLESROOT = $$quote($$(CSF_OCCTSamplesPath)/standard/qt)
 SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
 
 HEADERS   = src/*.h \
-            $${SAMPLESROOT}/../samples_src/*.h \
-            $${SAMPLESROOT}/Common/src/*.h 
+            $${SAMPLESROOT}/../samples_src/*.h 
 
 SOURCES   = src/*.cxx \
-            $${SAMPLESROOT}/../samples_src/*.cxx \
-            $${SAMPLESROOT}/Common/src/*.cxx 
+            $${SAMPLESROOT}/../samples_src/*.cxx
 			
-RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc
+RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc 
+RESOURCES += ./res/Tutorial.qrc
 
-TS_FILES  = $${SAMPLESROOT}/Common/src/Common-string.ts \
-            ./src/Tutorial-string.ts
+TRANSLATIONS += ./res/Tutorial-string.ts
 
-RES_FILES = $${SAMPLESROOT}/Common/res/* \
-            ./res/*
 
 RES_DIR   = $$quote($$(RES_DIR))
 
@@ -90,24 +90,4 @@ LIBS += -lTKernel -lTKMath -lTKService -lTKV3d -lTKOpenGl \
     }
 }
 
-lrelease.name = LRELEASE ${QMAKE_FILE_IN}
-lrelease.commands = lrelease ${QMAKE_FILE_IN} -qm $${RES_DIR}/${QMAKE_FILE_BASE}.qm
-lrelease.output = ${QMAKE_FILE_BASE}.qm
-lrelease.input = TS_FILES
-lrelease.clean = $${RES_DIR}/${QMAKE_FILE_BASE}.qm
-lrelease.CONFIG += no_link target_predeps
-QMAKE_EXTRA_COMPILERS += lrelease
-
-copy_res.name = Copy resource ${QMAKE_FILE_IN}
-copy_res.output = ${QMAKE_FILE_BASE}${QMAKE_FILE_EXT}
-copy_res.clean = $${RES_DIR}/${QMAKE_FILE_BASE}${QMAKE_FILE_EXT}
-copy_res.input = RES_FILES
-copy_res.CONFIG += no_link target_predeps
-win32: copy_res.commands = type ${QMAKE_FILE_IN} > $${RES_DIR}/${QMAKE_FILE_BASE}${QMAKE_FILE_EXT}
-unix:  copy_res.commands = cp -f ${QMAKE_FILE_IN} $${RES_DIR}
-QMAKE_EXTRA_COMPILERS += copy_res
-#QMAKE_CXXFLAGS += /wd4996
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += widgets
-} 
+ 
