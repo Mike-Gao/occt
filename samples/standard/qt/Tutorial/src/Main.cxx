@@ -1,4 +1,5 @@
-#include "ApplicationTut.h"
+//#include "ApplicationTut.h"
+#include "ApplicationCommon.h"
 
 #include <OSD_Environment.hxx>
 #include <Standard_WarningsDisable.hxx>
@@ -18,7 +19,6 @@ int main ( int argc, char* argv[] )
     QApplication a( argc, argv );
 
     QString resDir = ApplicationCommonWindow::getResourceDir();
-    QString resTutDir = ApplicationTut::getTutResourceDir();
 
     QTranslator strTrans( 0 );
     Standard_Boolean isOK = strTrans.load( "Common-string", resDir );
@@ -30,16 +30,6 @@ int main ( int argc, char* argv[] )
     if( isOK )
       a.installTranslator( &iconTrans );
 
-    QTranslator strTutTrans( 0 );
-    isOK = strTutTrans.load( "Tutorial-string", resTutDir );
-    if( isOK )
-      a.installTranslator( &strTutTrans );
-
-    QTranslator iconTutTrans( 0 );
-    isOK = iconTutTrans.load( "Tutorial-icon", resTutDir );
-    if( isOK )
-      a.installTranslator( &iconTutTrans );
-
     if (argc < 2)
     {
       std::cout << "An argumetn absent";
@@ -47,11 +37,9 @@ int main ( int argc, char* argv[] )
     }
 
     QString anSampleType(argv[1]);
-
-
-    ApplicationTut* mw = new ApplicationTut(anSampleType);
-    mw->setWindowTitle( QObject::tr( "TIT_SAMPLE" ) );
-    QString aResName( resDir + QString( "/" ) + QObject::tr( "ICON_SAMPLE" ) );
+    ApplicationCommonWindow* mw = new ApplicationCommonWindow(anSampleType);
+    mw->setWindowTitle("Tutorial");
+    QString aResName( resDir + "/lamp.png");
     mw->setWindowIcon( QPixmap( aResName ) );
 
     mw->show();
