@@ -5,4 +5,5 @@
         <file>Triangulation.json</file>
         <file>DataExchange.json</file>
     </qresource>
+    <qresource prefix="/icons"/>
 </RCC>

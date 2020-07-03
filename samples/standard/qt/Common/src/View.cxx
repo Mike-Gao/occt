@@ -365,9 +365,9 @@ void View::initCursors()
   if ( !globPanCursor )
     globPanCursor = new QCursor( Qt::CrossCursor );
   if ( !zoomCursor )
-    zoomCursor = new QCursor( QPixmap( ApplicationCommonWindow::getResourceDir() + QString( "/" ) + QObject::tr( "ICON_CURSOR_ZOOM" ) ) );
+    zoomCursor = new QCursor( QPixmap( ApplicationCommonWindow::getResourceDir() + "/cursor_zoom.png"));
   if ( !rotCursor )
-    rotCursor = new QCursor( QPixmap( ApplicationCommonWindow::getResourceDir() + QString( "/" ) + QObject::tr( "ICON_CURSOR_ROTATE" ) ) );
+    rotCursor = new QCursor( QPixmap( ApplicationCommonWindow::getResourceDir() + "/cursor_rotate.png.png") );
 }
 
 QAction* View::getViewAction(ViewAction theAction)
@@ -404,43 +404,11 @@ void View::initViewActions()
   QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
   QAction* a;
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_FITALL") ), QObject::tr("MNU_FITALL"), this );
+  a = new QAction( QPixmap(dir + "view_fitall.png"), QObject::tr("MNU_FITALL"), this );
   a->setToolTip( QObject::tr("TBR_FITALL") );
   a->setStatusTip( QObject::tr("TBR_FITALL") );
   connect( a, SIGNAL( triggered() ) , this, SLOT( fitAll() ) );
   myViewActions.insert(ViewAction::FitAll, a);
-
-  //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_FITAREA") ), QObject::tr("MNU_FITAREA"), this );
-  //a->setToolTip( QObject::tr("TBR_FITAREA") );
-  //a->setStatusTip( QObject::tr("TBR_FITAREA") );
-  //connect( a, SIGNAL( triggered() ) , this, SLOT( fitArea() ) );
-
-  //a->setCheckable( true );
-  //connect( a, SIGNAL( toggled( bool ) ) , this, SLOT( updateToggled( bool ) ) );
-  //myViewActions.insert(ViewAction::ViewFitAreaId, a );
-
-  //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_ZOOM") ), QObject::tr("MNU_ZOOM"), this );
-  //a->setToolTip( QObject::tr("TBR_ZOOM") );
-  //a->setStatusTip( QObject::tr("TBR_ZOOM") );
-  //connect( a, SIGNAL( triggered() ) , this, SLOT( zoom() ) );
-
-  //a->setCheckable( true );
-  //connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
-  //myViewActions.insert(ViewAction::ViewZoomId, a );
-
-  //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_PAN") ), QObject::tr("MNU_PAN"), this );
-  //a->setToolTip( QObject::tr("TBR_PAN") );
-  //a->setStatusTip( QObject::tr("TBR_PAN") );
-  //connect( a, SIGNAL( triggered() ) , this, SLOT( pan() ) );
-
-  //a->setCheckable( true );
-  //connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
-  //myViewActions.insert(ViewAction::ViewPanId, a );
-
-  //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_GLOBALPAN") ), QObject::tr("MNU_GLOBALPAN"), this );
-  //a->setToolTip( QObject::tr("TBR_GLOBALPAN") );
-  //a->setStatusTip( QObject::tr("TBR_GLOBALPAN") );
-  //connect( a, SIGNAL( triggered() ) , this, SLOT( globalPan() ) );
 
   a->setCheckable( true );
   connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
@@ -448,60 +416,52 @@ void View::initViewActions()
 
   if (myIis3dView)
   {
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_FRONT") ), QObject::tr("MNU_FRONT"), this );
+    a = new QAction( QPixmap(dir + "view_front.png"), QObject::tr("MNU_FRONT"), this );
     a->setToolTip( QObject::tr("TBR_FRONT") );
     a->setStatusTip( QObject::tr("TBR_FRONT") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( front() ) );
     myViewActions.insert(ViewAction::Front, a );
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_BACK") ), QObject::tr("MNU_BACK"), this );
+    a = new QAction( QPixmap(dir + "view_back.png"), QObject::tr("MNU_BACK"), this );
     a->setToolTip( QObject::tr("TBR_BACK") );
     a->setStatusTip( QObject::tr("TBR_BACK") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( back() ) );
     myViewActions.insert(ViewAction::Back, a);
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_TOP") ), QObject::tr("MNU_TOP"), this );
+    a = new QAction( QPixmap(dir + "view_top.png"), QObject::tr("MNU_TOP"), this );
     a->setToolTip( QObject::tr("TBR_TOP") );
     a->setStatusTip( QObject::tr("TBR_TOP") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( top() ) );
     myViewActions.insert(ViewAction::Top, a );
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_BOTTOM") ), QObject::tr("MNU_BOTTOM"), this );
+    a = new QAction( QPixmap(dir + "view_bottom.png"), QObject::tr("MNU_BOTTOM"), this );
     a->setToolTip( QObject::tr("TBR_BOTTOM") );
     a->setStatusTip( QObject::tr("TBR_BOTTOM") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( bottom() ) );
     myViewActions.insert(ViewAction::Bottom, a );
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_LEFT") ), QObject::tr("MNU_LEFT"), this );
+    a = new QAction( QPixmap(dir + "view_left.png"), QObject::tr("MNU_LEFT"), this );
     a->setToolTip( QObject::tr("TBR_LEFT") );
     a->setStatusTip( QObject::tr("TBR_LEFT") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( left() ) );
     myViewActions.insert(ViewAction::Left, a );
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_RIGHT") ), QObject::tr("MNU_RIGHT"), this );
+    a = new QAction( QPixmap(dir + "view_right.png"), QObject::tr("MNU_RIGHT"), this );
     a->setToolTip( QObject::tr("TBR_RIGHT") );
     a->setStatusTip( QObject::tr("TBR_RIGHT") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( right() ) );
     myViewActions.insert(ViewAction::Right, a );
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_AXO") ), QObject::tr("MNU_AXO"), this );
+    a = new QAction( QPixmap(dir + "view_axo.png"), QObject::tr("MNU_AXO"), this );
     a->setToolTip( QObject::tr("TBR_AXO") );
     a->setStatusTip( QObject::tr("TBR_AXO") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( axo() ) );
     myViewActions.insert(ViewAction::Axo, a );
   }
 
-
-  //a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_ROTATION") ), QObject::tr("MNU_ROTATION"), this );
-  //a->setToolTip( QObject::tr("TBR_ROTATION") );
-  //a->setStatusTip( QObject::tr("TBR_ROTATION") );
-  //connect( a, SIGNAL( triggered() ) , this, SLOT( rotation() ) );
-  //a->setCheckable( true );
-  //connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
-  //myViewActions.insert(ViewAction::ViewRotationId, a );
   if (myIis3dView)
   {
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_RESET") ), QObject::tr("MNU_RESET"), this );
+    a = new QAction( QPixmap(dir + "view_reset.png"), QObject::tr("MNU_RESET"), this );
     a->setToolTip( QObject::tr("TBR_RESET") );
     a->setStatusTip( QObject::tr("TBR_RESET") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( reset() ) );
@@ -509,7 +469,7 @@ void View::initViewActions()
 
     QActionGroup* ag = new QActionGroup( this );
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_HLROFF") ), QObject::tr("MNU_HLROFF"), this );
+    a = new QAction( QPixmap(dir + "view_comp_off.png"), QObject::tr("MNU_HLROFF"), this );
     a->setToolTip( QObject::tr("TBR_HLROFF") );
     a->setStatusTip( QObject::tr("TBR_HLROFF") );
     connect( a, SIGNAL( triggered() ) , this, SLOT( hlrOff() ) );
@@ -517,7 +477,7 @@ void View::initViewActions()
     ag->addAction(a);
     myViewActions.insert(ViewAction::HlrOff, a);
 
-    a = new QAction( QPixmap( dir+QObject::tr("ICON_VIEW_HLRON") ), QObject::tr("MNU_HLRON"), this );
+    a = new QAction( QPixmap(dir + "view_comp_on.png"), QObject::tr("MNU_HLRON"), this );
     a->setToolTip( QObject::tr("TBR_HLRON") );
     a->setStatusTip( QObject::tr("TBR_HLRON") );
     connect( a, SIGNAL( triggered() ) ,this, SLOT( hlrOn() ) );  
@@ -536,7 +496,7 @@ void View::initRaytraceActions()
   QString dir = ApplicationCommonWindow::getResourceDir() + QString( "/" );
   QAction* a;
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_RAYTRACING") ), QObject::tr("MNU_TOOL_RAYTRACING"), this );
+  a = new QAction( QPixmap(dir + "raytracing.png"), QObject::tr("MNU_TOOL_RAYTRACING"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_RAYTRACING") );
   a->setStatusTip( QObject::tr("TBR_TOOL_RAYTRACING") );
   a->setCheckable( true );
@@ -544,7 +504,7 @@ void View::initRaytraceActions()
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
   myRaytraceActions.insert(RaytraceAction::ToolRaytracing, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_SHADOWS") ), QObject::tr("MNU_TOOL_SHADOWS"), this );
+  a = new QAction( QPixmap(dir + "shadows.png"), QObject::tr("MNU_TOOL_SHADOWS"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_SHADOWS") );
   a->setStatusTip( QObject::tr("TBR_TOOL_SHADOWS") );
   a->setCheckable( true );
@@ -552,7 +512,7 @@ void View::initRaytraceActions()
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
   myRaytraceActions.insert(RaytraceAction::ToolShadows, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_REFLECTIONS") ), QObject::tr("MNU_TOOL_REFLECTIONS"), this );
+  a = new QAction( QPixmap(dir + "reflections.png"), QObject::tr("MNU_TOOL_REFLECTIONS"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_REFLECTIONS") );
   a->setStatusTip( QObject::tr("TBR_TOOL_REFLECTIONS") );
   a->setCheckable( true );
@@ -560,7 +520,7 @@ void View::initRaytraceActions()
   connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
   myRaytraceActions.insert(RaytraceAction::ToolReflections, a );
 
-  a = new QAction( QPixmap( dir+QObject::tr("ICON_TOOL_ANTIALIASING") ), QObject::tr("MNU_TOOL_ANTIALIASING"), this );
+  a = new QAction( QPixmap(dir + "antialiasing.png"), QObject::tr("MNU_TOOL_ANTIALIASING"), this );
   a->setToolTip( QObject::tr("TBR_TOOL_ANTIALIASING") );
   a->setStatusTip( QObject::tr("TBR_TOOL_ANTIALIASING") );
   a->setCheckable( true );

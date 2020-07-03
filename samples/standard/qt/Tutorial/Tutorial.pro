@@ -16,9 +16,7 @@ SOURCES   = src/*.cxx \
 			
 RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc
 
-TS_FILES  = $${SAMPLESROOT}/Common/src/Common-icon.ts \
-            $${SAMPLESROOT}/Common/src/Common-string.ts \
-            ./src/Tutorial-icon.ts \
+TS_FILES  = $${SAMPLESROOT}/Common/src/Common-string.ts \
             ./src/Tutorial-string.ts
 
 RES_FILES = $${SAMPLESROOT}/Common/res/* \
@@ -28,7 +26,6 @@ RES_DIR   = $$quote($$(RES_DIR))
 
 INCLUDEPATH += $$quote($$(CSF_SampleSources))
 INCLUDEPATH += $$quote($${SAMPLESROOT}/Common/src)
-INCLUDEPATH += $$quote($${SAMPLESROOT}/Interface/src)
 INCLUDEPATH += $$quote($$(CSF_OCCTIncludePath))
 
 

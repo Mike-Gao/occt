@@ -1,10 +1,11 @@
 ApplicationCommon.cxx
 ApplicationCommon.h
-Common-icon.ts
 Common-string.ts
 CommonSample.h
 DocumentCommon.cxx
 DocumentCommon.h
+GeomWidget.cxx
+GeomWidget.h
 Material.cxx
 Material.h
 OcctHighlighter.cxx
