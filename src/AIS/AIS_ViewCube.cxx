@@ -1049,6 +1049,6 @@ void AIS_ViewCube::HilightSelected (const Handle(PrsMgr_PresentationManager3d)& 
   // this method should never be called since AIS_InteractiveObject::HandleClick() has been overridden
   if (theSeq.Size() == 1)
   {
-    //HandleClick (Handle(AIS_ViewCubeOwner)::DownCast (theSeq.First()));
+    HandleClick (Handle(AIS_ViewCubeOwner)::DownCast (theSeq.First()));
   }
 }
