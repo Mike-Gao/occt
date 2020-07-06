@@ -15,7 +15,7 @@
 
 #include <AIS_AnimationCamera.hxx>
 #include <AIS_InteractiveContext.hxx>
-#include <AIS_Manipulator.hxx>
+#include <AIS_DragItem.hxx>
 #include <AIS_Point.hxx>
 #include <AIS_RubberBand.hxx>
 #include <AIS_XRTrackedDevice.hxx>
@@ -2617,12 +2617,12 @@ void AIS_ViewController::OnObjectDragged (const Handle(AIS_InteractiveContext)& 
       }
 
       Handle(AIS_InteractiveObject) aPrs = theCtx->DetectedInteractive();
-      if (Handle(AIS_Manipulator) aManip = Handle(AIS_Manipulator)::DownCast (aPrs))
+      if (AIS_DragItem* aDragItem = dynamic_cast<AIS_DragItem*>(aPrs.get()))
       {
-        if (aManip->HasActiveMode())
+        if (aDragItem->HasActiveMode())
         {
-          myDragObject = aManip;
-          aManip->StartTransform (myGL.Dragging.PointStart.x(), myGL.Dragging.PointStart.y(), theView);
+          myDragObject = aPrs;
+          aDragItem->StartTransform (myGL.Dragging.PointStart.x(), myGL.Dragging.PointStart.y(), theView);
         }
       }
       return;
@@ -2638,9 +2638,9 @@ void AIS_ViewController::OnObjectDragged (const Handle(AIS_InteractiveContext)& 
       {
         theCtx->SetSelectedState (aGlobOwner, true);
       }
-      if (Handle(AIS_Manipulator) aManip = Handle(AIS_Manipulator)::DownCast (myDragObject))
+      if (AIS_DragItem* aDragItem = dynamic_cast<AIS_DragItem*>(myDragObject.get()))
       {
-        aManip->Transform (myGL.Dragging.PointTo.x(), myGL.Dragging.PointTo.y(), theView);
+        aDragItem->Transform (myGL.Dragging.PointTo.x(), myGL.Dragging.PointTo.y(), theView);
       }
       theView->Invalidate();
       return;
@@ -2655,9 +2655,9 @@ void AIS_ViewController::OnObjectDragged (const Handle(AIS_InteractiveContext)& 
       myGL.Dragging.PointTo = myGL.Dragging.PointStart;
       OnObjectDragged (theCtx, theView, AIS_DragAction_Update);
 
-      if (Handle(AIS_Manipulator) aManip = Handle(AIS_Manipulator)::DownCast (myDragObject))
+      if (AIS_DragItem* aDragItem = dynamic_cast<AIS_DragItem*>(myDragObject.get()))
       {
-        aManip->StopTransform (false);
+        aDragItem->StopTransform (false);
       }
       Standard_FALLTHROUGH
     }
@@ -2673,6 +2673,10 @@ void AIS_ViewController::OnObjectDragged (const Handle(AIS_InteractiveContext)& 
         theCtx->SetSelectedState (aGlobOwner, false);
       }
 
+      if (AIS_DragItem* aDragItem = dynamic_cast<AIS_DragItem*>(myDragObject.get()))
+      {
+        aDragItem->StopTransform (false);
+      }
       theView->Invalidate();
       myDragObject.Nullify();
       return;

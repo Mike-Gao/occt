@@ -38,6 +38,7 @@ AIS_DataMapOfSelStat.hxx
 AIS_DisplayMode.hxx
 AIS_DisplayStatus.hxx
 AIS_DragAction.hxx
+AIS_DragItem.hxx
 AIS_ExclusionFilter.cxx
 AIS_ExclusionFilter.hxx
 AIS_ExclusionFilter.lxx

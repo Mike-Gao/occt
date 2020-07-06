@@ -17,6 +17,7 @@
 #define _AIS_Manipulator_HeaderFile
 
 #include <AIS_InteractiveObject.hxx>
+#include <AIS_DragItem.hxx>
 #include <AIS_ManipulatorMode.hxx>
 #include <gp.hxx>
 #include <gp_Ax1.hxx>
@@ -97,7 +98,7 @@ DEFINE_STANDARD_HANDLE (AIS_Manipulator, AIS_InteractiveObject)
 //! On construction an instance of AIS_Manipulator object is bound to Graphic3d_ZLayerId_Topmost layer,
 //! so make sure to call for your AIS_InteractiveContext the method MainSelector()->SetPickClosest (Standard_False)
 //! otherwise you may notice issues with activation of modes.
-class AIS_Manipulator : public AIS_InteractiveObject
+class AIS_Manipulator : public AIS_InteractiveObject, public AIS_DragItem
 {
 public:
 
@@ -168,7 +169,9 @@ public:
   //! @warning It is used in chain with StartTransform-Transform(gp_Trsf)-StopTransform
   //! and is used only for custom transform set. If Transform(const Standard_Integer, const Standard_Integer) is used,
   //! initial data is set automatically, and it is reset on DeactivateCurrentMode call if it is not reset yet.
-  Standard_EXPORT void StartTransform (const Standard_Integer theX, const Standard_Integer theY, const Handle(V3d_View)& theView);
+  Standard_EXPORT void StartTransform (const Standard_Integer theX,
+                                       const Standard_Integer theY,
+                                       const Handle(V3d_View)& theView) Standard_OVERRIDE;
 
   //! Apply to the owning objects the input transformation.
   //! @remark The transformation is set using SetLocalTransformation for owning objects.
@@ -183,13 +186,13 @@ public:
   //! @param theToApply [in] option to apply or to cancel the started transformation.
   //! @warning It is used in chain with StartTransform-Transform(gp_Trsf)-StopTransform
   //! and is used only for custom transform set.
-  Standard_EXPORT void StopTransform (const Standard_Boolean theToApply = Standard_True);
+  Standard_EXPORT void StopTransform (const Standard_Boolean theToApply = Standard_True) Standard_OVERRIDE;
 
   //! Apply transformation made from mouse moving from start position
   //! (save on the first Tranform() call and reset on DeactivateCurrentMode() call.)
   //! to the in/out mouse position (theX, theY)
   Standard_EXPORT gp_Trsf Transform (const Standard_Integer theX, const Standard_Integer theY,
-                                     const Handle(V3d_View)& theView);
+                                     const Handle(V3d_View)& theView) Standard_OVERRIDE;
 
   //! Computes transformation of parent object according to the active mode and input motion vector.
   //! You can use this method to get object transformation according to current mode or use own algorithm
@@ -220,7 +223,7 @@ public:
   Standard_Boolean IsAttached() const { return HasOwner(); }
 
   //! @return true if some part of manipulator is selected (transformation mode is active, and owning object can be transformed).
-  Standard_Boolean HasActiveMode() const { return IsAttached() && myCurrentMode != AIS_MM_None; }
+  Standard_Boolean HasActiveMode() const Standard_OVERRIDE { return IsAttached() && myCurrentMode != AIS_MM_None; }
 
   Standard_Boolean HasActiveTransformation() { return myHasStartedTransformation; }
 
