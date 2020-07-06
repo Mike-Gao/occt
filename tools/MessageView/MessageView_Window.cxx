@@ -33,7 +33,6 @@
 #include <inspector/Convert_Tools.hxx>
 
 #include <inspector/View_Viewer.hxx>
-#include <inspector/View_Widget.hxx>
 
 #include <AIS_Shape.hxx>
 #include <Graphic3d_Camera.hxx>
@@ -50,7 +49,6 @@
 #include <inspector/ViewControl_Tools.hxx>
 #include <inspector/View_Displayer.hxx>
 #include <inspector/View_ToolBar.hxx>
-#include <inspector/View_Widget.hxx>
 #include <inspector/View_Window.hxx>
 #include <inspector/View_Viewer.hxx>
 
@@ -192,7 +190,7 @@ MessageView_Window::MessageView_Window (QWidget* theParent)
   connect (myViewWindow, SIGNAL(eraseAllPerformed()), this, SLOT(onEraseAllPerformed()));
   aVisibilityState->SetDisplayer (myViewWindow->Displayer());
   aVisibilityState->SetPresentationType (View_PresentationType_Main);
-  myViewWindow->ViewWidget()->SetPredefinedSize (MESSAGEVIEW_DEFAULT_VIEW_WIDTH, MESSAGEVIEW_DEFAULT_VIEW_HEIGHT);
+  myViewWindow->SetPredefinedSize (MESSAGEVIEW_DEFAULT_VIEW_WIDTH, MESSAGEVIEW_DEFAULT_VIEW_HEIGHT);
 
   myViewDockWidget = new QDockWidget (tr ("View"), myMainWindow);
   myViewDockWidget->setObjectName (myViewDockWidget->windowTitle());
