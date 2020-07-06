@@ -60,6 +60,9 @@ public:
   //! \return the value
   Standard_EXPORT virtual QVariant initValue (const int theItemRole) const Standard_OVERRIDE;
 
+  //! Updates item by the item properties value
+  Standard_EXPORT virtual void UpdatePropertiesData (const int theRow, const int theColumn, const QVariant& theValue) Standard_OVERRIDE;
+
 protected:
   //! Returns stream value of the item to fulfill property panel.
   //! \return stream value or dummy

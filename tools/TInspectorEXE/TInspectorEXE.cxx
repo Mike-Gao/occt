@@ -132,10 +132,10 @@ int main (int argc, char** argv)
     aReport->SetLimit (100);//30);
     aPlugins.insert("TKMessageView");
 
-    //anActivatedPluginName = "TKVInspector";
+    anActivatedPluginName = "TKVInspector";
     //anActivatedPluginName = "TKMessageView";
     //anActivatedPluginName = "TKDFBrowser";
-    anActivatedPluginName = "TKShapeView";
+    //anActivatedPluginName = "TKShapeView";
   }
   else
     anActivatedPluginName = *aPlugins.rbegin();

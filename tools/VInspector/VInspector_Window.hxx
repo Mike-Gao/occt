@@ -135,6 +135,15 @@ private slots:
   //! Exports the first selected shape into ShapeViewer plugin.
   void onExportToShapeView();
 
+  //! Appends lights into an active V3d view
+  void onAddLight();
+
+  //! Removes selected light from the active V3d view
+  void onRemoveLight();
+
+  //! Switch On/Off light
+  void onOnOffLight();
+
   //! Apply activated display action
   void onDisplayActionTypeClicked();
 
@@ -179,6 +188,9 @@ private:
   //! Creates an istance of 3D view to initialize context.
   //! \return a context of created view.
   Handle(AIS_InteractiveContext) createView();
+
+  //! Appends a light into V3d viewer
+  void addLight (const Graphic3d_TypeOfLightSource& theSourceLight, const Handle(V3d_Viewer)& theViewer);
 
 private:
 

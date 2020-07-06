@@ -28,7 +28,6 @@
 
 #include <inspector/View_DisplayPreview.hxx>
 #include <inspector/View_Viewer.hxx>
-#include <inspector/View_Widget.hxx>
 
 // =======================================================================
 // function : Constructor

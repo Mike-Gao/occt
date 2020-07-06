@@ -36,6 +36,8 @@
 #include <inspector/VInspector_CallBack.hxx>
 #include <inspector/VInspector_Communicator.hxx>
 #include <inspector/VInspector_ItemContext.hxx>
+#include <inspector/VInspector_ItemContextProperties.hxx>
+#include <inspector/VInspector_ItemGraphic3dCLight.hxx>
 #include <inspector/VInspector_ToolBar.hxx>
 #include <inspector/VInspector_Tools.hxx>
 #include <inspector/VInspector_ViewModel.hxx>
@@ -484,6 +486,18 @@ bool VInspector_Window::OpenFile(const TCollection_AsciiString& theFileName)
   {
     aContext = createView();
     SetContext (aContext);
+
+    VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+    if (aViewModel)
+    {
+      const Handle(V3d_Viewer) aViewer = aViewModel->GetContext()->CurrentViewer();
+      if (!aViewer.IsNull())
+      {
+        addLight (Graphic3d_TOLS_POSITIONAL, aViewer);
+        addLight (Graphic3d_TOLS_SPOT, aViewer);
+      }
+    }
+
     isModelUpdated = true;
   }
 
@@ -515,10 +529,34 @@ void VInspector_Window::onTreeViewContextMenuRequested(const QPoint& thePosition
   TreeModel_ItemBasePtr anItemBase = TreeModel_ModelBase::GetItemByIndex (anIndex);
   if (anItemBase)
   {
-    if (itemDynamicCast<VInspector_ItemContext> (anItemBase))
+    if (itemDynamicCast<VInspector_ItemContextProperties> (anItemBase))
     {
       aMenu->addAction (ViewControl_Tools::CreateAction (tr ("Export to MessageView"), SLOT (onExportToMessageView()), GetMainWindow(), this));
       aMenu->addSeparator();
+    }
+
+    if (itemDynamicCast<VInspector_ItemContextProperties> (anItemBase))
+    {
+      aMenu->addSeparator();
+      QMenu* anExplodeMenu = aMenu->addMenu ("Add Light");
+
+      anExplodeMenu->addAction (ViewControl_Tools::CreateAction ("Ambient", SLOT (onAddLight()), myMainWindow, this));
+      anExplodeMenu->addAction (ViewControl_Tools::CreateAction ("Directional", SLOT (onAddLight()), myMainWindow, this));
+      anExplodeMenu->addAction (ViewControl_Tools::CreateAction ("Positional", SLOT (onAddLight()), myMainWindow, this));
+      anExplodeMenu->addAction (ViewControl_Tools::CreateAction ("Spot", SLOT (onAddLight()), myMainWindow, this));
+    }
+
+    if (itemDynamicCast<VInspector_ItemGraphic3dCLight> (anItemBase))
+    {
+      aMenu->addSeparator();
+      aMenu->addAction (ViewControl_Tools::CreateAction ("Remove Light", SLOT (onRemoveLight()), myMainWindow, this));
+      VInspector_ItemGraphic3dCLightPtr anItemLight = itemDynamicCast<VInspector_ItemGraphic3dCLight> (anItemBase);
+      if (!anItemLight->GetLight().IsNull())
+      {
+        bool isOn = anItemLight->GetLight()->IsEnabled();
+        aMenu->addAction (ViewControl_Tools::CreateAction (isOn ? "OFF Light" : "ON Light", SLOT (onOnOffLight()),
+                          myMainWindow, this));
+      }
     }
   }
 
@@ -698,6 +736,97 @@ void VInspector_Window::onExportToShapeView()
 }
 
 // =======================================================================
+// function : onAddLight
+// purpose :
+// =======================================================================
+void VInspector_Window::onAddLight()
+{
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  if (!aViewModel)
+    return;
+  const Handle(V3d_Viewer) aViewer = aViewModel->GetContext()->CurrentViewer();
+  if (aViewer.IsNull())
+    return;
+
+  QAction* anAction = (QAction*)sender();
+  QString aText = anAction->text();
+
+  Graphic3d_TypeOfLightSource aLightSourceType = Graphic3d_TOLS_AMBIENT;
+
+  if (aText == "Ambient")           { aLightSourceType = Graphic3d_TOLS_AMBIENT; }
+  else if (aText == "Directional")  { aLightSourceType = Graphic3d_TOLS_DIRECTIONAL; }
+  else if (aText == "Positional")   { aLightSourceType = Graphic3d_TOLS_POSITIONAL; }
+  else if (aText == "Spot")         { aLightSourceType = Graphic3d_TOLS_SPOT; }
+  else                              { return; }
+
+  addLight(aLightSourceType, aViewer);
+}
+
+// =======================================================================
+// function : onRemoveLight
+// purpose :
+// =======================================================================
+void VInspector_Window::onRemoveLight()
+{
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  const Handle(V3d_Viewer) aViewer = aViewModel ? aViewModel->GetContext()->CurrentViewer() : NULL;
+  if (aViewer.IsNull())
+  {
+    return;
+  }
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
+  VInspector_ItemGraphic3dCLightPtr aLightItem = itemDynamicCast<VInspector_ItemGraphic3dCLight> (
+    TreeModel_ModelBase::GetItemByIndex (anIndex));
+  if (!aLightItem)
+  {
+    return;
+  }
+
+  if (aViewer->ActiveLights().Extent() == 1) // not possible to remove the latest light
+  {
+    return;
+  }
+
+  Handle(Graphic3d_CLight) aLight = aLightItem->GetLight();
+  aViewer->DelLight (aLight);
+  aViewer->UpdateLights();
+
+  aViewer->Invalidate();
+  aViewer->Redraw();
+  UpdateTreeModel();
+}
+
+// =======================================================================
+// function : onOnOffLight
+// purpose :
+// =======================================================================
+void VInspector_Window::onOnOffLight()
+{
+  VInspector_ViewModel* aViewModel = dynamic_cast<VInspector_ViewModel*> (myTreeView->model());
+  const Handle(V3d_Viewer) aViewer = aViewModel ? aViewModel->GetContext()->CurrentViewer() : NULL;
+  if (aViewer.IsNull())
+  {
+    return;
+  }
+
+  QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (myTreeView->selectionModel()->selectedIndexes(), 0);
+
+  VInspector_ItemGraphic3dCLightPtr anItemLight = itemDynamicCast<VInspector_ItemGraphic3dCLight> (
+    TreeModel_ModelBase::GetItemByIndex (anIndex));
+  if (anItemLight->GetLight().IsNull())
+    return;
+
+  bool isOn = anItemLight->GetLight()->IsEnabled();
+  anItemLight->GetLight()->SetEnabled (!isOn);
+
+  aViewer->UpdateLights();
+  aViewer->Invalidate();
+  aViewer->Redraw();
+  UpdateTreeModel();
+}
+
+// =======================================================================
 // function : onDisplayActionTypeClicked
 // purpose :
 // =======================================================================
@@ -760,7 +889,7 @@ void VInspector_Window::onCollapseAll()
 }
 
 // =======================================================================
-// function : UpdateTreeModel
+// function : OnTestAddChild
 // purpose :
 // =======================================================================
 void VInspector_Window::OnTestAddChild()
@@ -910,4 +1039,33 @@ View_Displayer* VInspector_Window::displayer()
     return myViewWindow->Displayer();
 
   return myDisplayer;
+}
+
+// =======================================================================
+// function : addLight
+// purpose :
+// =======================================================================
+void VInspector_Window::addLight (const Graphic3d_TypeOfLightSource& theSourceLight,
+                                  const Handle(V3d_Viewer)& theViewer)
+{
+  Standard_Boolean aNeedDirection = theSourceLight == Graphic3d_TOLS_DIRECTIONAL ||
+                                    theSourceLight == Graphic3d_TOLS_SPOT;
+
+  Handle(Graphic3d_CLight) aLight = new Graphic3d_CLight (theSourceLight);
+  if (aNeedDirection)
+  {
+    aLight->SetDirection (gp::DZ());
+  }
+  if (theSourceLight == Graphic3d_TOLS_SPOT)
+  {
+    aLight->SetAngle (M_PI - ShortRealEpsilon());
+    aLight->SetPosition (gp_Pnt (-100, -100, -100));
+  }
+
+  theViewer->AddLight (aLight);
+  theViewer->SetLightOn (aLight);
+
+  theViewer->Invalidate();
+  theViewer->Redraw();
+  UpdateTreeModel();
 }

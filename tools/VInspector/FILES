@@ -12,6 +12,8 @@ VInspector_ItemContext.cxx
 VInspector_ItemContext.hxx
 VInspector_ItemContextProperties.cxx
 VInspector_ItemContextProperties.hxx
+VInspector_ItemGraphic3dCLight.cxx
+VInspector_ItemGraphic3dCLight.hxx
 VInspector_ItemHistoryElement.cxx
 VInspector_ItemHistoryElement.hxx
 VInspector_ItemHistoryRoot.cxx
@@ -25,6 +27,8 @@ VInspector_ItemSelectMgrViewerSelector.cxx
 VInspector_ItemSelectMgrViewerSelector.hxx
 VInspector_ItemV3dViewer.cxx
 VInspector_ItemV3dViewer.hxx
+VInspector_PresentationLight.cxx
+VInspector_PresentationLight.hxx
 VInspector_ToolActionType.hxx
 VInspector_ToolBar.cxx
 VInspector_ToolBar.hxx

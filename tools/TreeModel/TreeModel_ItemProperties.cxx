@@ -20,6 +20,7 @@
 
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <gp_XYZ.hxx>
+#include <Quantity_ColorRGBA.hxx>
 #include <Standard_Dump.hxx>
 
 #include <Standard_WarningsDisable.hxx>
@@ -186,7 +187,38 @@ ViewControl_EditType TreeModel_ItemProperties::EditType (const int, const int th
   if (theColumn == 0)
     return ViewControl_EditType_None;
 
+  Quantity_Color aColor;
+  const Standard_SStream& aStream = Item()->Stream();
+  if (Convert_Tools::ConvertStreamToColor (aStream, aColor))
+  {
+    return ViewControl_EditType_Color;
+  }
+
   return ViewControl_EditType_Line;
+}
+
+// =======================================================================
+// function : ReplaceValue
+// purpose :
+// =======================================================================
+Standard_Boolean ReplaceValue(const TCollection_AsciiString& theFromValue,
+                              const TCollection_AsciiString& theToValue,
+                              Standard_DumpValue& theStreamValue)
+{
+  //TCollection_AsciiString myValue; //!< current string value
+  //Standard_Integer myStartPosition; //!< position of the value first char in the whole stream
+
+  TCollection_AsciiString aStreamValue = theStreamValue.myValue;
+  int aFromLength = theFromValue.Length();
+
+  int aPosition = aStreamValue.FirstLocationInSet (theFromValue, 1, aStreamValue.Length());
+  if (aPosition < 1)
+    return Standard_False;
+
+  aStreamValue.Remove (aPosition + 2, aFromLength);
+  aStreamValue.Insert (aPosition + 2, theToValue);
+  theStreamValue.myValue = aStreamValue;
+  return Standard_True;
 }
 
 // =======================================================================
@@ -198,12 +230,54 @@ bool TreeModel_ItemProperties::SetData (const int theRow, const int theColumn, c
   if (theColumn == 0)
     return false;
 
-  if (theRole == Qt::DisplayRole || theRole == Qt::EditRole)
+  if (theRole != Qt::DisplayRole && theRole != Qt::EditRole)
+    return false;
+
+  if (myRowValues.Size() == 1 && theColumn == 1)
   {
-    myRowValues.ChangeFromIndex (theRow + 1).Value = theValue;
+    TCollection_AsciiString aStreamValue (theValue.toString().toStdString().c_str());
+    NCollection_IndexedDataMap<TCollection_AsciiString, Standard_DumpValue> aKeyToValues;
+    if (Standard_Dump::SplitJson (aStreamValue, aKeyToValues))
+    {
+      Standard_SStream aStream;
+      aStream << aStreamValue.ToCString();
+
+      int aStartPos = 1;
+      Quantity_ColorRGBA aColor;
+      if (aColor.InitFromJson (aStream, aStartPos))
+      {
+        Standard_Real aRed, aGreen, aBlue;
+        aColor.GetRGB().Values (aRed, aGreen, aBlue, Quantity_TOC_sRGB);
+        int aDelta = 255;
+        myRowValues.ChangeFromIndex (1).CustomValues.insert ((int)Qt::BackgroundRole, QColor((int)(aRed * aDelta),
+          (int)(aGreen * aDelta), (int)(aBlue * aDelta)));
+      }
+      Standard_DumpValue aValue = aKeyToValues.FindFromIndex (1);
+      myStreamValue.myValue = aValue.myValue.ToCString();
+      myRowValues.ChangeFromIndex (1).Value = aValue.myValue.ToCString();
+
+      Item()->UpdatePropertiesData (theRow, theColumn, theValue);
+      return true;
+    }
+    TCollection_AsciiString aFromValue = myRowValues.ChangeFromIndex (1).Value.toString().toStdString().c_str();
+    if (ReplaceValue(aFromValue, aStreamValue, myStreamValue))
+    {
+      aStreamValue = myStreamValue.myValue;
+      if (Standard_Dump::SplitJson (aStreamValue, aKeyToValues))
+      {
+        Standard_DumpValue aValue = aKeyToValues.FindFromIndex (1);
+        myStreamValue.myValue = aValue.myValue.ToCString();
+        myRowValues.ChangeFromIndex (1).Value = aValue.myValue.ToCString();
+
+        Item()->UpdatePropertiesData (theRow, theColumn, aStreamValue.ToCString());
+        return true;
+      }
+    }
   }
 
-  return false;
+  myRowValues.ChangeFromIndex (theRow + 1).Value = theValue;
+  Item()->UpdatePropertiesData (theRow, theColumn, theValue);
+  return true;
 }
 
 // =======================================================================
