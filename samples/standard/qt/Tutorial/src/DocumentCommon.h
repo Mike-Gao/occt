@@ -24,6 +24,7 @@ public:
 	ApplicationCommonWindow*       getApplication();
 	Handle(AIS_InteractiveContext) getContext();
   Handle(V3d_Viewer)             getViewer();
+  void                           setViewer(Handle(V3d_Viewer) theViewer);
 
   void SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects);
   bool IsEmpty() const { return myContextIsEmpty; } 

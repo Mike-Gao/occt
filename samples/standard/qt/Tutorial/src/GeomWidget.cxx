@@ -71,6 +71,13 @@ void GeomWidget::FitAll()
   }
 }
 
+void GeomWidget::Show3d()
+{
+  myView3d->fitAll();
+  my3dVidget->show();
+  setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
+}
+
 Handle(V3d_View) GeomWidget::Get3dView()
 {
   return myView3d->getView();

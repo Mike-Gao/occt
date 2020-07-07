@@ -83,6 +83,7 @@ private slots:
 
   void onProcessSample(const QString& theSampleName);
   void onProcessExchange(const QString& theSampleName);
+  void onProcessOcaf(const QString& theSampleName);
 
 private:
 
@@ -94,8 +95,9 @@ private:
 	void createStandardOperations();
 	void createCasCadeOperations();
 
-  QString selectFileName(const QString& theSampleName, int& theMode);
-  TranslateDialog* ApplicationCommonWindow::getDialog(const QString& theSampleName);
+  QString selectFileName(const QString& theSampleName, TranslateDialog* theDialog, int& theMode);
+  TranslateDialog* ApplicationCommonWindow::getDataExchangeDialog(const QString& theSampleName);
+  TranslateDialog* ApplicationCommonWindow::getOcafDialog(const QString& theSampleName);
 
 private:
   Handle(BaseSample) mySamples;
@@ -113,6 +115,7 @@ private:
   QList<QMenu*>    mySamplePopups;
   QSignalMapper*   mySampleMapper;
   QSignalMapper*   myExchangeMapper;
+  QSignalMapper*   myOcafMapper;
   QTextEdit*       myCodeView;
   QTextEdit*       myResultView;
   OcctHighlighter* myCodeViewHighlighter;
