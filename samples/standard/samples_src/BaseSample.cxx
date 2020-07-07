@@ -153,7 +153,6 @@ Standard_Integer BaseSample::FindClosingBracket(TCollection_AsciiString theText,
       TraceError("No closing bracket found!");
       break;
     }
-    Standard_Character aCh = theText.Value(aStartFindIndex);
     TCollection_AsciiString aRSubstr = theText.SubString(aStartFindIndex, theText.Length());
     if (theText.Value(aStartFindIndex) == anOpeningBracketSymbol)
       aBracketDepth++;

@@ -5,6 +5,7 @@
 #include "TopologySamples.h"
 #include "TriangulationSamples.h"
 #include "DataExchangeSamples.h"
+#include "OcafSamples.h"
 
 
 #include <QtGlobal>
@@ -47,6 +48,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   : QMainWindow(nullptr),
   mySampleMapper(new QSignalMapper(this)),
   myExchangeMapper(new QSignalMapper(this)),
+  myOcafMapper(new QSignalMapper(this)),
   myStdToolBar(nullptr),
   myCasCadeBar(nullptr),
   myViewBar(nullptr),
@@ -56,10 +58,6 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   stApp = this;
   SetAppType(theSampleType);
   setWindowTitle(GetTitle());
-
-
-
-
 
   switch (APP_TYPE)
   {
@@ -80,6 +78,8 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
     MenuFormJson(":/menus/DataExchange.json", myExchangeMapper);
     break;
   case ApplicationType::Ocaf:
+    mySamples = new OcafSamples();
+    MenuFormJson(":/menus/Ocaf.json", myOcafMapper);
     break;
   case ApplicationType::Viewer3d:
     break;
@@ -94,6 +94,8 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
           this, &ApplicationCommonWindow::onProcessSample);
   connect(myExchangeMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessExchange);  
+  connect(myOcafMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+          this, &ApplicationCommonWindow::onProcessOcaf);  
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
   mySamples->SetCodePach(aSampleSourcePach);
 
@@ -150,8 +152,17 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
       myGeomWidget->FitAll();
     }
   }
-
-
+  else if (APP_TYPE == ApplicationType::Ocaf)
+  {
+    Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
+    if (aOcafSamples)
+    {
+      aOcafSamples->SetContext(myDocument3d->getContext());
+      aOcafSamples->SetViewer(myDocument3d->getViewer());
+      onProcessOcaf("CreateOcafDocument");
+      myGeomWidget->Show3d();
+    }
+  }
   resize(1280, 720);
 }
 
@@ -398,7 +409,7 @@ void ApplicationCommonWindow::onViewToolBar()
 void ApplicationCommonWindow::onAbout()
 {
   QMessageBox::information( this, tr("Tutorial"), 
-                            tr("Qt based application to study Open CASCADE Technology"), 
+                            tr("Qt based application to study OpenCASCADE Technology"), 
                             tr("Ok" ), QString::null, QString::null, 0, 0 );
 }
 
@@ -510,13 +521,14 @@ void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 
 void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
 {
-  QApplication::setOverrideCursor(Qt::WaitCursor);
+
   setWindowTitle(GetTitle() + " - " + theSampleName);
   int aMode;
-  QString aFileName = selectFileName(theSampleName, aMode);
+  QString aFileName = selectFileName(theSampleName, getDataExchangeDialog(theSampleName), aMode);
   Handle(DataExchangeSamples) aDataExchangeSamples = Handle(DataExchangeSamples)::DownCast(mySamples);
   if (aDataExchangeSamples)
   {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     aDataExchangeSamples->SetFileName(aFileName.toUtf8().data());
     aDataExchangeSamples->SetStepType(static_cast<STEPControl_StepModelType>(aMode));
     mySamples->Process(theSampleName.toUtf8().data());
@@ -525,29 +537,51 @@ void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
     myCodeView->setPlainText(mySamples->GetCode().ToCString());
     myResultView->setPlainText(mySamples->GetResult().ToCString());
     myGeomWidget->FitAll();
+    QApplication::restoreOverrideCursor();
   }
-  QApplication::restoreOverrideCursor();
 }
 
-QString ApplicationCommonWindow::selectFileName(const QString& theSampleName, int& theMode)
+void ApplicationCommonWindow::onProcessOcaf(const QString& theSampleName)
 {
-  std::shared_ptr<TranslateDialog> aDialog(getDialog(theSampleName));
+  setWindowTitle(GetTitle() + " - " + theSampleName);
+  Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
+  if (aOcafSamples)
+  {
+    if (theSampleName.indexOf("Dialog") == 0)
+    {
+      int aMode; // not used
+      QString aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
+      aOcafSamples->SetFileName(aFileName.toUtf8().data());
+    }
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    mySamples->Process(theSampleName.toUtf8().data());
+    myCodeView->setPlainText(mySamples->GetCode().ToCString());
+    myResultView->setPlainText(mySamples->GetResult().ToCString());
+    QApplication::restoreOverrideCursor();
+  }
+
+}
+
+QString ApplicationCommonWindow::selectFileName(const QString& theSampleName,
+                                                TranslateDialog* theDialog, int& theMode)
+{
+  std::shared_ptr<TranslateDialog> aDialog(theDialog);
 
   int ret = aDialog->exec();
   theMode = aDialog->getMode();
 
   qApp->processEvents();
 
-  QString file;
+  QString aFilename;
   QStringList fileNames;
   if (ret != QDialog::Accepted)
-    return file;
+    return aFilename;
 
   fileNames = aDialog->selectedFiles();
   if (!fileNames.isEmpty())
-    file = fileNames[0];
+    aFilename = fileNames[0];
 
-  if (!QFileInfo(file).completeSuffix().length())
+  if (!QFileInfo(aFilename).completeSuffix().length())
   {
     QString selFilter = aDialog->selectedNameFilter();
     int idx = selFilter.indexOf("(*.");
@@ -559,14 +593,14 @@ QString ApplicationCommonWindow::selectFileName(const QString& theSampleName, in
         idx = tail.indexOf(")");
       QString ext = tail.left(idx);
       if (ext.length())
-        file += QString(".") + ext;
+        aFilename += QString(".") + ext;
     }
   }
 
-  return file;
+  return aFilename;
 }
 
-TranslateDialog* ApplicationCommonWindow::getDialog(const QString& theSampleName)
+TranslateDialog* ApplicationCommonWindow::getDataExchangeDialog(const QString& theSampleName)
 {
   TranslateDialog* aTranslateDialog = new TranslateDialog(this, 0, true);
   TCollection_AsciiString aSampleName(theSampleName.toUtf8().data());
@@ -575,11 +609,13 @@ TranslateDialog* ApplicationCommonWindow::getDialog(const QString& theSampleName
   {
     aTranslateDialog->setWindowTitle("Export file");
     aTranslateDialog->setFileMode(QFileDialog::AnyFile);
+    aTranslateDialog->setAcceptMode(QFileDialog::AcceptSave);
   }
-  if (DataExchangeSamples::IsImportSample(aSampleName))
+  else if (DataExchangeSamples::IsImportSample(aSampleName))
   {
     aTranslateDialog->setWindowTitle("Import file");
     aTranslateDialog->setFileMode(QFileDialog::ExistingFile);
+    aTranslateDialog->setAcceptMode(QFileDialog::AcceptOpen);
   }
   QString aFormatFilter;
   if (DataExchangeSamples::IsBrepSample(aSampleName))
@@ -609,6 +645,36 @@ TranslateDialog* ApplicationCommonWindow::getDialog(const QString& theSampleName
   aTranslateDialog->clear();
   return aTranslateDialog;
 }
+
+TranslateDialog* ApplicationCommonWindow::getOcafDialog(const QString& theSampleName)
+{
+  TranslateDialog* aTranslateDialog = new TranslateDialog(this, 0, true);
+  TCollection_AsciiString aSampleName(theSampleName.toUtf8().data());
+
+  if (OcafSamples::IsExportSample(aSampleName))
+  {
+    aTranslateDialog->setWindowTitle("Export file");
+    aTranslateDialog->setFileMode(QFileDialog::AnyFile);
+    aTranslateDialog->setAcceptMode(QFileDialog::AcceptSave);
+  }
+  else if (OcafSamples::IsImportSample(aSampleName))
+  {
+    aTranslateDialog->setWindowTitle("Import file");
+    aTranslateDialog->setFileMode(QFileDialog::ExistingFile);
+    aTranslateDialog->setAcceptMode(QFileDialog::AcceptOpen);
+  }
+  QStringList aFilters;
+  if (OcafSamples::IsBinarySample(aSampleName))
+    aFilters.append("Binary OCAF Sample (*.cbf)");
+  if (OcafSamples::IsXmlSample(aSampleName))
+    aFilters.append("XML OCAF Sample (*.xml)");
+  aFilters.append("All Files(*.*)");
+
+  aTranslateDialog->setNameFilters(aFilters);
+  aTranslateDialog->clear();
+  return aTranslateDialog;
+}
+
 
 QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent, QSignalMapper* theMapper)
 {

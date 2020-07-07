@@ -17,6 +17,7 @@ public:
 
   void FitAll();
   Handle(V3d_View) Get3dView();
+  void Show3d();
 
 private:
   View*    myView3d;

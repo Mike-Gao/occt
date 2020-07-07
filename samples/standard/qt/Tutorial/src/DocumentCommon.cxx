@@ -83,6 +83,11 @@ Handle(V3d_Viewer) DocumentCommon::getViewer()
   return myViewer;
 }
 
+void DocumentCommon::setViewer(Handle(V3d_Viewer) theViewer)
+{
+  myViewer = theViewer;
+}
+
 void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects)
 {
   myContext->RemoveAll(Standard_True);

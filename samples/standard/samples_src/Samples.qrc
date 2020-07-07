@@ -4,5 +4,7 @@
         <file>Topology.json</file>
         <file>Triangulation.json</file>
         <file>DataExchange.json</file>
+        <file>Viewer3d.json</file>
+        <file>Ocaf.json</file>
     </qresource>
 </RCC>
