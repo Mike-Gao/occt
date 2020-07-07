@@ -57,7 +57,6 @@ Graphic3d_ClipPlane::Graphic3d_ClipPlane()
   myIsCapping  (Standard_False)
 {
   makeId();
-  init();
 }
 
 // =======================================================================
@@ -78,10 +77,9 @@ Graphic3d_ClipPlane::Graphic3d_ClipPlane (const Graphic3d_Vec4d& theEquation)
   myIsCapping  (Standard_False)
 {
   makeId();
-  init (gp_Pln (theEquation.x(), theEquation.y(), theEquation.z(), theEquation.a()));
   updateInversedPlane();
 }
- 
+
 // =======================================================================
 // function : Graphic3d_ClipPlane
 // purpose  :
@@ -100,17 +98,8 @@ Graphic3d_ClipPlane::Graphic3d_ClipPlane(const Graphic3d_ClipPlane& theOther)
   myIsOn       (theOther.myIsOn),
   myIsCapping  (theOther.myIsCapping)
 {
-  *myAspect = *theOther.CappingAspect();
-  *mySectionStyle = *theOther.CappingSectionStyle();
-
   makeId();
-  init (theOther.myPlane,
-        theOther.myEquationRev,
-        theOther.myIsOn,
-        theOther.myIsCapping,
-        theOther.ToOverrideCappingAspect(),
-        theOther.CappingSectionStyle());
-  updateInversedPlane();
+  *myAspect = *theOther.CappingAspect();
 }
 
 // =======================================================================
@@ -129,9 +118,8 @@ Graphic3d_ClipPlane::Graphic3d_ClipPlane(const gp_Pln& thePlane)
   myIsCapping  (Standard_False)
 {
   thePlane.Coefficients (myEquation[0], myEquation[1], myEquation[2], myEquation[3]);
-  makeId();
-  init (thePlane);
   updateInversedPlane();
+  makeId();
 }
 
 // =======================================================================
@@ -143,7 +131,6 @@ void Graphic3d_ClipPlane::SetEquation (const Graphic3d_Vec4d& theEquation)
   myPlane = gp_Pln (theEquation.x(), theEquation.y(), theEquation.z(), theEquation.w());
   myEquation = theEquation;
   updateInversedPlane();
-  myOrientationDirty = Standard_True;
   myEquationMod++;
 }
 
@@ -156,7 +143,6 @@ void Graphic3d_ClipPlane::SetEquation (const gp_Pln& thePlane)
   myPlane = thePlane;
   thePlane.Coefficients (myEquation[0], myEquation[1], myEquation[2], myEquation[3]);
   updateInversedPlane();
-  myOrientationDirty = Standard_True;
   myEquationMod++;
 }
 
@@ -322,96 +308,6 @@ void Graphic3d_ClipPlane::makeId()
 }
 
 // =======================================================================
-// function : SetCappingSectionStyle
-// purpose  :
-// =======================================================================
-void Graphic3d_ClipPlane::SetCappingSectionStyle (const Handle(Graphic3d_AspectFillCapping)& theStyle)
-{
-  mySectionStyle = theStyle;
-}
-
-// =======================================================================
-// function : OrientationMatrix
-// purpose  :
-// =======================================================================
-const Graphic3d_Mat4& Graphic3d_ClipPlane::OrientationMatrix() const
-{
-  if (myOrientationDirty)
-  {
-    const Standard_ShortReal aDirection[] = {
-      static_cast<Standard_ShortReal> (myEquation[0]),
-      static_cast<Standard_ShortReal> (myEquation[1]),
-      static_cast<Standard_ShortReal> (myEquation[2])
-     };
-
-    const Standard_ShortReal aTranslate[] = {
-      static_cast<Standard_ShortReal> (myEquation[0] * -myEquation[3]),
-      static_cast<Standard_ShortReal> (myEquation[1] * -myEquation[3]),
-      static_cast<Standard_ShortReal> (myEquation[2] * -myEquation[3])
-    };
-
-    Standard_ShortReal aSide1[] = { 0.0f, 0.0f, 0.0f };
-    Standard_ShortReal aSide2[] = { 0.0f, 0.0f, 0.0f };
-
-    const Standard_ShortReal aMagintude = static_cast<Standard_ShortReal> (Sqrt (myEquation[0] * myEquation[0] + myEquation[2] * myEquation[2]));
-
-    if (aMagintude < ShortRealSmall())
-    {
-      aSide1[0] = 1.0f;
-    }
-    else
-    {
-      aSide1[0] =  aDirection[2] / aMagintude;
-      aSide1[2] = -aDirection[0] / aMagintude;
-    }
-
-    aSide2[0] = (-aSide1[1] * aDirection[2]) - (-aSide1[2] * aDirection[1]);
-    aSide2[1] = (-aSide1[2] * aDirection[0]) - (-aSide1[0] * aDirection[2]);
-    aSide2[2] = (-aSide1[0] * aDirection[1]) - (-aSide1[1] * aDirection[0]);
-
-    myOrientationMat.SetValue (0, 0, aSide1[0]);
-    myOrientationMat.SetValue (1, 0, aSide1[1]);
-    myOrientationMat.SetValue (2, 0, aSide1[2]);
-    myOrientationMat.SetValue (3, 0, 0.0F);
-
-    myOrientationMat.SetValue (0, 1, aDirection[0]);
-    myOrientationMat.SetValue (1, 1, aDirection[1]);
-    myOrientationMat.SetValue (2, 1, aDirection[2]);
-    myOrientationMat.SetValue (3, 1, 0.0F);
-
-    myOrientationMat.SetValue (0, 2, aSide2[0]);
-    myOrientationMat.SetValue (1, 2, aSide2[1]);
-    myOrientationMat.SetValue (2, 2, aSide2[2]);
-    myOrientationMat.SetValue (3, 2, 0.0F);
-
-    myOrientationMat.SetValue (0, 3, aTranslate[0]);
-    myOrientationMat.SetValue (1, 3, aTranslate[1]);
-    myOrientationMat.SetValue (2, 3, aTranslate[2]);
-    myOrientationMat.SetValue (3, 3, 1.0F);
-
-    myOrientationDirty = Standard_False;
-  }
-
-  return myOrientationMat;
-}
-
-// =======================================================================
-// function : init
-// purpose  :
-// =======================================================================
-void Graphic3d_ClipPlane::init (const gp_Pln& /*thePlane*/,
-                                const Graphic3d_Vec4d& /*theEquationRev*/,
-                                const Standard_Boolean /*theIsOn*/,
-                                const Standard_Boolean /*theIsCapping*/,
-                                const Standard_Boolean theOverrideStyle,
-                                const Handle(Graphic3d_AspectFillCapping)& theStyle)
-{
-  myOverrideObjectStyle = theOverrideStyle;
-  mySectionStyle        = theStyle.IsNull() ? new Graphic3d_AspectFillCapping() : theStyle;
-  myOrientationDirty    = Standard_True;
-}
-
-// =======================================================================
 // function : updateChainLen
 // purpose  :
 // =======================================================================
@@ -430,7 +326,6 @@ void Graphic3d_ClipPlane::updateChainLen()
 // =======================================================================
 void Graphic3d_ClipPlane::SetChainNextPlane (const Handle(Graphic3d_ClipPlane)& thePlane)
 {
-  myOrientationDirty = Standard_True;
   ++myEquationMod;
   if (!myNextInChain.IsNull())
   {
