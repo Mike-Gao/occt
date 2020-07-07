@@ -115,7 +115,7 @@ void View_Displayer::DisplayPresentation (const Handle(Standard_Transient)& theP
     aDisplayed.Append (aPresentation);
   }
 
-  if (!myIsKeepPresentations || myFitAllActive)
+  if (/*!myIsKeepPresentations ||*/ myFitAllActive)
     fitAllView();
 
   myDisplayed.Bind (theType, aDisplayed);
@@ -290,7 +290,7 @@ void View_Displayer::UpdatePreview (const View_DisplayActionType theType,
                                     const NCollection_List<Handle(Standard_Transient)>& thePresentations)
 {
   myDisplayPreview->UpdatePreview (theType, thePresentations);
-  if (!myIsKeepPresentations || myFitAllActive)
+  if (/*!myIsKeepPresentations ||*/ myFitAllActive)
     fitAllView();
 }
 
