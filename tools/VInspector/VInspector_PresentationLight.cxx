@@ -78,8 +78,6 @@ VInspector_PresentationLight::VInspector_PresentationLight()
 : AIS_InteractiveObject(),
   myIndent (200), myTranslateMode (0/*position*/), myHasStartedTransformation (Standard_False)
 {
-  View_PreviewParameters aPreviewParameters (false);
-  SetAttributes (aPreviewParameters.GetDrawer());
 }
 
 // =======================================================================
