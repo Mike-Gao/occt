@@ -48,7 +48,6 @@ private:
   Handle(V3d_Viewer)             myViewer;
   Handle(TDocStd_Document) myOcafDoc;
   Handle(AIS_InteractiveContext) myContext;
-  Handle(TOcaf_Application) myOcaf_Application;
 
   // One function for every sample
   void CreateOcafDocument();

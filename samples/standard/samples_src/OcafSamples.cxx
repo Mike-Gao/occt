@@ -15,9 +15,10 @@
 #include <TFunction_DriverTable.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <PCDM_StoreStatus.hxx>
+#include <BinDrivers.hxx>
+#include <XmlDrivers.hxx>
 
 OcafSamples::OcafSamples() :
-  myOcaf_Application(new TOcaf_Application()),
   myViewer(nullptr)
 {
 
@@ -107,8 +108,8 @@ Standard_Boolean OcafSamples::IsXmlSample(TCollection_AsciiString theSampleName)
 
 void OcafSamples::CreateOcafDocument()
 {
-  // Create a new Ocaf document
-  myOcaf_Application->NewDocument("BinOcaf", myOcafDoc);
+  Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
+  anOcaf_Application->NewDocument("BinOcaf", myOcafDoc);
   TPrsStd_AISViewer::New(myOcafDoc->Main(), myViewer);
 
   Handle(AIS_InteractiveContext) anAisContext;
@@ -118,7 +119,6 @@ void OcafSamples::CreateOcafDocument()
 
   // Set the maximum number of available "undo" actions
   myOcafDoc->SetUndoLimit(10);
-
 }
 
 void OcafSamples::CreateBoxOcafSample()
@@ -462,66 +462,73 @@ void OcafSamples::RedoOcafSample()
 
 void OcafSamples::DialogSaveBinOcafSample()
 {
+  Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
+  BinDrivers::DefineFormat(anOcaf_Application);
   myOcafDoc->ChangeStorageFormat("BinOcaf");
-//  myOcafDoc->SetRequestedFolder(myFileName..);
   // Saves the document in the current application
-  PCDM_StoreStatus aStorestatus = myOcaf_Application->SaveAs(myOcafDoc, myFileName);
-  if(aStorestatus == PCDM_StoreStatus::PCDM_SS_OK)
+  PCDM_StoreStatus aStoreStatus = anOcaf_Application->SaveAs(myOcafDoc, myFileName);
+  if(aStoreStatus == PCDM_StoreStatus::PCDM_SS_OK)
     myResult << "The file was saved successfully" << std::endl;
   else
-    myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStorestatus << std::endl;
+    myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStoreStatus << std::endl;
 }
 
 void OcafSamples::DialogOpenOcafSample()
 {
+  Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
+  // load persistence
+  BinDrivers::DefineFormat(anOcaf_Application);
+  XmlDrivers::DefineFormat(anOcaf_Application);
   // Open the document in the current application
-  myOcaf_Application->Open(myFileName, myOcafDoc);
+  PCDM_ReaderStatus aReaderStatus = anOcaf_Application->Open(myFileName, myOcafDoc);
+  if (aReaderStatus == PCDM_ReaderStatus::PCDM_RS_OK)
+  {
+    // Connect the document CAF (myDoc) with the AISContext (myAISContext)
+    TPrsStd_AISViewer::New(myOcafDoc->Main(), myViewer);
+    myOcafDoc->SetUndoLimit(10);
 
-  // Connect the document CAF (myDoc) with the AISContext (myAISContext)
-  TPrsStd_AISViewer::New(myOcafDoc->Main(), myViewer);
-  myOcafDoc->SetUndoLimit(10);
+    Handle(AIS_InteractiveContext) aContext;
+    TPrsStd_AISViewer::Find(myOcafDoc->Main(), aContext);
+    aContext->SetDisplayMode(AIS_Shaded, Standard_True);
+    myContext = aContext;
 
-  Handle(AIS_InteractiveContext) aContext;
-  TPrsStd_AISViewer::Find(myOcafDoc->Main(), aContext);
-  aContext->SetDisplayMode(AIS_Shaded, Standard_True);
-  myContext = aContext;
-
-  // Display the presentations (which was not stored in the document)
-  DisplayPresentation();
-
-  myResult << "Open a document";
+    // Display the presentations (which was not stored in the document)
+    DisplayPresentation();
+    myResult << "Open a document" << std::endl;
+  }
+  else
+    myResult << "Error! The file wasn't opened. PCDM_ReaderStatus: " << aReaderStatus << std::endl;
 }
 
 void OcafSamples::DialogSaveXmlOcafSample()
 {
+  Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
+  XmlDrivers::DefineFormat(anOcaf_Application);
   myOcafDoc->ChangeStorageFormat("XmlOcaf");
-  try
-  {
-    // Saves the document in the current application
-    myOcaf_Application->SaveAs(myOcafDoc, myFileName);
-  }
-  catch (...)
-  {
-    myResult << "Error! The file wasn't saved." << std::endl;
-    return;
-  }
-  myResult << "The file was saved successfully" << std::endl;
+  // Saves the document in the current application
+  PCDM_StoreStatus aStoreStatus = anOcaf_Application->SaveAs(myOcafDoc, myFileName);
+  if (aStoreStatus == PCDM_StoreStatus::PCDM_SS_OK)
+    myResult << "The file was saved successfully" << std::endl;
+  else
+    myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStoreStatus << std::endl;
 }
 
 void OcafSamples::DisplayPresentation()
 {
-  TDF_Label LabSat = myOcafDoc->Main();
+  TDF_Label aRootlabel = myOcafDoc->Main();
 
-  for (TDF_ChildIterator it(LabSat); it.More(); it.Next())
+  for (TDF_ChildIterator it(aRootlabel); it.More(); it.Next())
   {
     TDF_Label aLabel = it.Value();
     Handle(TNaming_NamedShape) aNamedShape;
-    if (!aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNamedShape)) continue;
+    if (!aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNamedShape)) 
+      continue;
     Handle(TDataStd_Integer) aDataInteger;
 
     // To know if the object was displayed
     if (aLabel.FindAttribute(TDataStd_Integer::GetID(), aDataInteger))
-      if (!aDataInteger->Get())  continue;
+      if (!aDataInteger->Get())  
+        continue;
 
     Handle(TPrsStd_AISPresentation) anAisPresentation;
     if (!aLabel.FindAttribute(TPrsStd_AISPresentation::GetID(), anAisPresentation))
