@@ -1,12 +1,4 @@
 {
-
-spot light source 
-
-Create a positional light source 
-
-Create a directional light source 
-
-Create an ambient light source 
 	"Viewer 3D": {
 		"Light source": [{
 				"text": "Spot",
@@ -21,6 +13,16 @@ Create an ambient light source
 			{
 				"text": "Directional",
 				"function": "DirectionalLight3dSample",
+				"description": ""
+			},
+			{
+				"text": "Ambient",
+				"function": "AmbientLight3dSample",
+				"description": ""
+			},
+			{
+				"text": "Clear",
+				"function": "ClearLight3dSample",
 				"description": ""
 			}
 		],
@@ -43,6 +45,60 @@ Create an ambient light source
 			{
 				"text": "Neutral point",
 				"function": "NeutralPoinSelect3dSample",
+				"description": ""
+			}
+		],
+
+    "Shape presentation": [
+      {
+        "text": "WireFrame",
+        "function": "WireFramePresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Shading",
+        "function": "ShadingPresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Set color to red",
+        "function": "RedColorPresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Set color to gray",
+        "function": "GrayColorPresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Set plastic material",
+        "function": "PlasticPresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Set bronze material",
+        "function": "BronzePresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Set opaque",
+        "function": "OpaquePresentation3dSample",
+        "description": ""
+      },
+      {
+        "text": "Set half transparency",
+        "function": "HalfTransparencyPresentation3dSample",
+        "description": ""
+      }
+    ],
+    "OpenGL VBO mode": [{
+				"text": "Vertex Buffer Object mode ON",
+				"function": "VboOn3dSample",
+				"description": ""
+			},
+			{
+				"text": "Vertex Buffer Object mode OFF",
+				"function": "VboOff3dSample",
 				"description": ""
 			}
 		]
