@@ -537,7 +537,8 @@ namespace OpenGl_Raytrace
   {
     OpenGl_PrimitiveArray* anArray = dynamic_cast<OpenGl_PrimitiveArray*> (theNode->elem);
     return anArray != NULL
-        && anArray->DrawMode() >= GL_TRIANGLES;
+        && anArray->DrawMode() >= GL_TRIANGLES
+        && !anArray->HasPersistence();
   }
 
   // =======================================================================
@@ -548,7 +549,8 @@ namespace OpenGl_Raytrace
   {
     const OpenGl_PrimitiveArray* anArray = dynamic_cast<const OpenGl_PrimitiveArray*> (theElement);
     return anArray != NULL
-        && anArray->DrawMode() >= GL_TRIANGLES;
+        && anArray->DrawMode() >= GL_TRIANGLES
+        && !anArray->HasPersistence();
   }
 
   // =======================================================================

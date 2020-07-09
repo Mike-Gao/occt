@@ -675,9 +675,10 @@ void OpenGl_PrimitiveArray::drawMarkers (const Handle(OpenGl_Workspace)& theWork
 // =======================================================================
 OpenGl_PrimitiveArray::OpenGl_PrimitiveArray (const OpenGl_GraphicDriver* theDriver)
 
-: myDrawMode  (DRAW_MODE_NONE),
-  myIsFillType(Standard_False),
-  myIsVboInit (Standard_False)
+: myDrawMode       (DRAW_MODE_NONE),
+  myIsFillType     (Standard_False),
+  myIsVboInit      (Standard_False),
+  myHasPersistence (Standard_False)
 {
   if (theDriver != NULL)
   {
@@ -695,12 +696,13 @@ OpenGl_PrimitiveArray::OpenGl_PrimitiveArray (const OpenGl_GraphicDriver*       
                                               const Handle(Graphic3d_Buffer)&      theAttribs,
                                               const Handle(Graphic3d_BoundBuffer)& theBounds)
 
-: myIndices   (theIndices),
-  myAttribs   (theAttribs),
-  myBounds    (theBounds),
-  myDrawMode  (DRAW_MODE_NONE),
-  myIsFillType(Standard_False),
-  myIsVboInit (Standard_False)
+: myIndices        (theIndices),
+  myAttribs        (theAttribs),
+  myBounds         (theBounds),
+  myDrawMode       (DRAW_MODE_NONE),
+  myIsFillType     (Standard_False),
+  myIsVboInit      (Standard_False),
+  myHasPersistence (Standard_False)
 {
   if (!myIndices.IsNull()
     && myIndices->NbElements < 1)

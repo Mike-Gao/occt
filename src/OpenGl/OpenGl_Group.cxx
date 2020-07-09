@@ -68,6 +68,7 @@ OpenGl_Group::OpenGl_Group (const Handle(Graphic3d_Structure)& theStruct)
   {
     throw Graphic3d_GroupDefinitionError("OpenGl_Group should be created by OpenGl_Structure!");
   }
+  SetPersistence (!aStruct->TransformPersistence().IsNull());
 }
 
 // =======================================================================
@@ -200,6 +201,7 @@ void OpenGl_Group::AddPrimitiveArray (const Graphic3d_TypeOfPrimitiveArray theTy
   const OpenGl_GraphicDriver* aDriver = aStruct->GlDriver();
 
   OpenGl_PrimitiveArray* anArray = new OpenGl_PrimitiveArray (aDriver, theType, theIndices, theAttribs, theBounds);
+  anArray->SetPersistence (HasPersistence());
   AddElement (anArray);
 
   Graphic3d_Group::AddPrimitiveArray (theType, theIndices, theAttribs, theBounds, theToEvalMinMax);

@@ -226,7 +226,8 @@ void OpenGl_Structure::OnVisibilityChanged()
 Standard_Boolean OpenGl_Structure::IsRaytracable() const
 {
   if (!myGroups.IsEmpty()
-    && myIsRaytracable)
+    && myIsRaytracable
+    && myTrsfPers.IsNull())
   {
     return Standard_True;
   }

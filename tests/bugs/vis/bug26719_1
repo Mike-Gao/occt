@@ -49,3 +49,6 @@ vmoveto 259 135
 if {[vreadpixel 275 142 -rgb -name] != "DARKGOLDENROD"} { puts "ERROR: zoom persistent box is highlighted instead in precision test!" }
 if {[vreadpixel 243 123 -rgb -name] != "CYAN"}          { puts "ERROR: the shape behind zoom persistent object was not highlighted dynamically in precision test!" }
 vdump ${imagedir}/${casename}_3.png
+
+vraytrace 1
+vdump ${imagedir}/${casename}_raytrace.png

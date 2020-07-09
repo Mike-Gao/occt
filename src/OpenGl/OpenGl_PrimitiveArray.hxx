@@ -98,6 +98,12 @@ public:
                                     const Handle(Graphic3d_Buffer)&      theAttribs,
                                     const Handle(Graphic3d_BoundBuffer)& theBounds);
 
+  //! Return TRUE if element has transform persistence
+  Standard_Boolean HasPersistence() const { return myHasPersistence; }
+
+  //! Set transform persistence flag
+  void SetPersistence (Standard_Boolean theHasPersistence) { myHasPersistence = theHasPersistence || myHasPersistence; }
+
 public:
 
   //! Returns index VBO.
@@ -157,6 +163,7 @@ protected:
   GLshort                               myDrawMode;
   mutable Standard_Boolean              myIsFillType;
   mutable Standard_Boolean              myIsVboInit;
+  Standard_Boolean                      myHasPersistence;
 
   Standard_Size                         myUID; //!< Unique ID of primitive array. 
 

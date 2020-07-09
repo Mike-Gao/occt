@@ -139,6 +139,12 @@ public:
   //! Returns true if the group contains Polygons, Triangles or Quadrangles.
   bool ContainsFacet() const { return myContainsFacet; }
 
+  //! Return TRUE if group contains primitives with transform persistence
+  Standard_Boolean HasPersistence() const { return myHasPersistence; }
+
+  //! Set transform persistence flag
+  void SetPersistence (Standard_Boolean theHasPersistence) { myHasPersistence = theHasPersistence || myHasPersistence; }
+
   //! Returns Standard_True if the group <me> is deleted.
   //! <me> is deleted after the call Remove (me) or the
   //! associated structure is deleted.
@@ -290,10 +296,11 @@ protected:
 
 protected:
 
-  Graphic3d_Structure* myStructure;     //!< pointer to the parent structure
-  Graphic3d_BndBox4f   myBounds;        //!< bounding box
-  bool                 myIsClosed;      //!< flag indicating closed volume
-  bool                 myContainsFacet; //!< flag indicating that this group contains face primitives
+  Graphic3d_Structure* myStructure;      //!< pointer to the parent structure
+  Graphic3d_BndBox4f   myBounds;         //!< bounding box
+  bool                 myIsClosed;       //!< flag indicating closed volume
+  bool                 myContainsFacet;  //!< flag indicating that this group contains face primitives
+  bool                 myHasPersistence; //!< flag indicating that this group contains primitives with transform persistence
 
 };
 
