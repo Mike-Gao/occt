@@ -24,7 +24,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XCAFKinematics_LowOrderPairObjectWithCoupling, XCAFKi
 XCAFKinematics_LowOrderPairObjectWithCoupling::
   XCAFKinematics_LowOrderPairObjectWithCoupling()
 {
-  isRanged = Standard_False;
+  myIsRanged = Standard_False;
   myLowLimit = -Precision::Infinite();
   myUpperLimit = Precision::Infinite();
   myParams = NULL;
@@ -41,7 +41,7 @@ XCAFKinematics_LowOrderPairObjectWithCoupling::
   SetType(theObj->Type());
   SetFirstTransformation(theObj->FirstTransformation());
   SetSecondTransformation(theObj->SecondTransformation());
-  isRanged = theObj->HasLimits();
+  myIsRanged = theObj->HasLimits();
   myLowLimit = theObj->LowLimit();
   myUpperLimit = theObj->UpperLimit();
   myParams = theObj->GetAllParams();
@@ -102,7 +102,7 @@ Standard_Real XCAFKinematics_LowOrderPairObjectWithCoupling::Pitch() const
 //=======================================================================
 void XCAFKinematics_LowOrderPairObjectWithCoupling::SetPinionRadius(const Standard_Real theRadius)
 {
-  if (Type() == XCAFKinematics_PairType_RackAndPinion)
+  if (Type() == XCAFKinematics_PairType_RackAndPinion || Type() == XCAFKinematics_PairType_LinearFlexibleAndPinion)
     myParams->ChangeFirst() = theRadius;
 }
 
@@ -112,7 +112,7 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetPinionRadius(const Standa
 //=======================================================================
 Standard_Real XCAFKinematics_LowOrderPairObjectWithCoupling::PinionRadius() const
 {
-  if (Type() == XCAFKinematics_PairType_RackAndPinion)
+  if (Type() == XCAFKinematics_PairType_RackAndPinion || Type() == XCAFKinematics_PairType_LinearFlexibleAndPinion)
     return myParams->First();
   return 0;
 }
@@ -238,7 +238,7 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetAllParams(const Handle(TC
 //=======================================================================
 Standard_Boolean XCAFKinematics_LowOrderPairObjectWithCoupling::HasLimits() const
 {
-  return isRanged;
+  return myIsRanged;
 }
 
 //=======================================================================
@@ -249,7 +249,7 @@ void XCAFKinematics_LowOrderPairObjectWithCoupling::SetAllLimits(const Handle(TC
 {
   if (theLimits->Length() == 2)
   {
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
     myLowLimit = theLimits->Value(1);
     myUpperLimit = theLimits->Value(2);
   }

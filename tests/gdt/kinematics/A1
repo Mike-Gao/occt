@@ -2,9 +2,9 @@
 # Test scenario for kinematics
 #==============================
 
-# ReadStep D [locate_data_file as1-oc-214.stp]
+ ReadStep D [locate_data_file as1-oc-214.stp]
 # Load document with shape structure
-ReadStep D C:/Work/files/as1.stp
+# ReadStep D C:/Work/files/as1.stp
 # Add parent mechanism
 set mech [XAddMechanism D]
 

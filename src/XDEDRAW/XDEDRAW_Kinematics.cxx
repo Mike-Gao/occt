@@ -175,9 +175,9 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
   TDF_Label aMechanism;
   if (!getLabel(di, aDoc, argv[2], aMechanism))
     return 1;
-  Standard_Boolean IsBase = argc >= 4 && TCollection_AsciiString(argv[3]).IsEqual("-base");
+  Standard_Boolean isBase = argc >= 4 && TCollection_AsciiString(argv[3]).IsEqual("-base");
   TDF_LabelSequence aShapeArray;
-  for (Standard_Integer i = (IsBase) ? 4 : 3; i < argc; i++) {
+  for (Standard_Integer i = (isBase) ? 4 : 3; i < argc; i++) {
     TDF_Label aLabel;
     if (!getLabel(di, aDoc, argv[i], aLabel))
       continue;
@@ -185,7 +185,7 @@ static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, con
   }
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
-  di << getEntry(aTool->AddLink(aMechanism, aShapeArray, IsBase));
+  di << getEntry(aTool->AddLink(aMechanism, aShapeArray, isBase));
   return 0;
 }
 
@@ -961,6 +961,7 @@ static Standard_Integer getParameters(Draw_Interpretor& di, Standard_Integer arg
       di << "Pitch = " << anObject->Pitch();
       break;
     case XCAFKinematics_PairType_RackAndPinion:
+    case XCAFKinematics_PairType_LinearFlexibleAndPinion:
       di << "Pinion Radius = " << anObject->PinionRadius();
       break;
     case XCAFKinematics_PairType_Gear:
@@ -1540,6 +1541,106 @@ static Standard_Integer getValues(Draw_Interpretor& di, Standard_Integer argc, c
 }
 
 //=======================================================================
+//function : dump
+//purpose  : 
+//=======================================================================
+static Standard_Integer dump(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 2) {
+    di << "Use: XDumpKinematics Doc\n";
+    return 1;
+  }
+  Handle(TDocStd_Document) aDoc;
+  DDocStd::GetDocument(argv[1], aDoc);
+  if (aDoc.IsNull()) {
+    di << argv[1] << " is not a document\n";
+    return 1;
+  }
+  Handle(XCAFDoc_KinematicTool) aKTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
+
+  TDF_LabelSequence aMechanisms = aKTool->GetMechanisms();
+
+  di << "\n NbOfMechanisms             : ( " << aMechanisms.Length()<<" )";
+  Standard_Integer nbLinks = 0,
+    nbRefShapes = 0,
+    nbHigeOrderPairs = 0,
+    nbLowOrderPairsWithMotionCoupling = 0,
+    nbLowOrderPairs = 0,
+    nbHigeOrderPairsWithRange = 0,
+    nbLowOrderPairsWithMotionCouplingAndRange = 0,
+    nbLowOrderPairsWithRange = 0,
+    nbStates = 0,
+    nbHigeOrderPairValues = 0,
+    nbLowOrderPairWithMotionCouplingValues = 0,
+    nbLowOrderPairValues = 0;
+
+  for (Standard_Integer aMechInd = 1; aMechInd <= aMechanisms.Length(); ++aMechInd) 
+  {
+    TDF_Label aMechanism = aMechanisms.Value(aMechInd);
+    TDF_LabelSequence aLinks = aKTool->GetLinks(aMechanism);
+    nbLinks += aLinks.Length();
+    for (Standard_Integer aLinkInd = 1; aLinkInd <= nbLinks; ++aLinkInd)
+      nbRefShapes += aKTool->GetRefShapes(aLinks.Value(aLinkInd)).Length();
+    TDF_LabelSequence aJoints = aKTool->GetJoints(aMechanism);
+    for (Standard_Integer aJointInd = 1; aJointInd <= aJoints.Length(); ++aJointInd)
+    {
+      Handle(XCAFDoc_KinematicPair) aKinAttr;
+      if (!aJoints.Value(aJointInd).FindAttribute(XCAFDoc_KinematicPair::GetID(), aKinAttr))
+        continue;
+      Handle(XCAFKinematics_PairObject) anObject = aKinAttr->GetObject();
+      if (anObject.IsNull())
+        continue;
+      XCAFKinematics_PairType aKinType = anObject->Type();
+      if (aKinType >= XCAFKinematics_PairType_FullyConstrained &&
+          aKinType <= XCAFKinematics_PairType_Unconstrained)
+      {
+        if (anObject->HasLimits())
+          nbLowOrderPairsWithRange++;
+        else
+          nbLowOrderPairs++;
+        nbLowOrderPairValues += aKTool->GetValuesOfJoint(aJoints.Value(aJointInd)).Length();
+      }
+      else if (aKinType >= XCAFKinematics_PairType_Screw &&
+               aKinType <= XCAFKinematics_PairType_LinearFlexibleAndPinion)
+      {
+        if (anObject->HasLimits())
+          nbLowOrderPairsWithMotionCouplingAndRange++;
+        else
+          nbLowOrderPairsWithMotionCoupling++;
+        nbLowOrderPairWithMotionCouplingValues += aKTool->GetValuesOfJoint(aJoints.Value(aJointInd)).Length();
+      }
+      else if (aKinType >= XCAFKinematics_PairType_PointOnSurface &&
+               aKinType <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+      {
+        if (anObject->HasLimits())
+          nbHigeOrderPairsWithRange++;
+        else
+          nbHigeOrderPairs++;
+        nbHigeOrderPairValues += aKTool->GetValuesOfJoint(aJoints.Value(aJointInd)).Length();
+      }
+    }
+    nbStates += aKTool->GetStates(aMechanism).Length();
+  }
+  di << "\n NbOfKinematicLinks         : ( " << nbLinks <<" )";
+  di << "\n NbOfRefShapes              : ( " << nbRefShapes << " )";
+  di << "\n KinematicPairsWithoutRange : ";
+  di << " NbOfLowOrderPairs ( " << nbLowOrderPairs << " )";
+  di << " NbOfLowOrderPairsWithMotionCoupling ( " << nbLowOrderPairsWithMotionCoupling << " )";
+  di << " NbOfHightOrderPairs ( " << nbHigeOrderPairs << " )";
+  di << "\n KinematicPairsWithRange    : ";
+  di << " NbOfLowOrderPairs ( " << nbLowOrderPairsWithRange << " )";
+  di << " NbOfLowOrderPairsWithMotionCoupling ( " << nbLowOrderPairsWithMotionCouplingAndRange << " )";
+  di << " NbOfHightOrderPairs ( " << nbHigeOrderPairsWithRange << " )";
+  di << "\n NbOfStates                 : ( " << nbStates << " )";
+  di << "\n KinematicValues            : ";
+  di << " NbOfLowOrderPairs ( " << nbLowOrderPairValues << " )";
+  di << " NbOfLowOrderPairsWithMotionCoupling ( " << nbLowOrderPairWithMotionCouplingValues << " )";
+  di << " NbOfHightOrderPairs ( " << nbHigeOrderPairValues << " )";
+  return 0;
+}
+
+
+//=======================================================================
 //function : InitCommands
 //purpose  : 
 //=======================================================================
@@ -1638,6 +1739,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\t 18 PointOnPlanarCurve\n"
     "\t 19 SlidingCurve\n"
     "\t 20 RollingCurve\n"
+    "\t 21 LinearFlexibleAndPlanarCurve\n"
     __FILE__, setType, g);
 
   di.Add("XGetPairType", "XGetPairType Doc Joint",
@@ -1709,4 +1811,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\t-ypr - current yaw pitch roll angles - 3 numbers"
     "\t-trsf - for unconstrained only current location direction xdirection - 9 numbers",
     __FILE__, getValues, g);
+
+  di.Add("XDumpKinematics", "XDumpKinematics Doc",
+    __FILE__, dump, g);
 }

@@ -52,7 +52,7 @@ public:
   void SetMinRotationX(const Standard_Real theLimit)
   {
     myMinRotationX = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MinRotationX() const
@@ -63,7 +63,7 @@ public:
   void SetMaxRotationX(const Standard_Real theLimit)
   {
     myMaxRotationX = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MaxRotationX() const
@@ -76,7 +76,7 @@ public:
   void SetMinRotationY(const Standard_Real theLimit)
   {
     myMinRotationY = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MinRotationY() const
@@ -87,7 +87,7 @@ public:
   void SetMaxRotationY(const Standard_Real theLimit)
   {
     myMaxRotationY = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MaxRotationY() const
@@ -100,7 +100,7 @@ public:
   void SetMinRotationZ(const Standard_Real theLimit)
   {
     myMinRotationZ = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MinRotationZ() const
@@ -111,7 +111,7 @@ public:
   void SetMaxRotationZ(const Standard_Real theLimit)
   {
     myMaxRotationZ = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MaxRotationZ() const
@@ -124,7 +124,7 @@ public:
   void SetMinTranslationX(const Standard_Real theLimit)
   {
     myMinTranslationX = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MinTranslationX() const
@@ -135,7 +135,7 @@ public:
   void SetMaxTranslationX(const Standard_Real theLimit)
   {
     myMaxTranslationX = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MaxTranslationX() const
@@ -148,7 +148,7 @@ public:
   void SetMinTranslationY(const Standard_Real theLimit)
   {
     myMinTranslationY = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MinTranslationY() const
@@ -159,7 +159,7 @@ public:
   void SetMaxTranslationY(const Standard_Real theLimit)
   {
     myMaxTranslationY = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MaxTranslationY() const
@@ -172,7 +172,7 @@ public:
   void SetMinTranslationZ(const Standard_Real theLimit)
   {
     myMinTranslationZ = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MinTranslationZ() const
@@ -183,7 +183,7 @@ public:
   void SetMaxTranslationZ(const Standard_Real theLimit)
   {
     myMaxTranslationZ = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 
   Standard_Real MaxTranslationZ() const
@@ -229,7 +229,7 @@ private:
   Standard_Real myMinTranslationZ; //!< minimum value of translation in z-direction
   Standard_Real myMaxTranslationZ; //!< maximum value of translation in z-direction
   Standard_Real mySkewAngle;       //!< param for universal/homokinetic pair
-  Standard_Boolean isRanged;        //!< flag "is limits defined"
+  Standard_Boolean myIsRanged;     //!< flag "is limits defined"
 
 };
 

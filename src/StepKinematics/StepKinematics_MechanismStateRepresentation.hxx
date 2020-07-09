@@ -34,14 +34,14 @@ public:
   //! Returns a MechanismStateRepresentation
   Standard_EXPORT StepKinematics_MechanismStateRepresentation();
 
-  Standard_EXPORT void Init(const Handle(TCollection_HAsciiString)& aName, const Handle(StepRepr_HArray1OfRepresentationItem)& aItems, const Handle(StepRepr_RepresentationContext)& aContextOfItems, const Handle(StepKinematics_MechanismRepresentation) aMechanism);
+  Standard_EXPORT void Init(const Handle(TCollection_HAsciiString)& theName, const Handle(StepRepr_HArray1OfRepresentationItem)& theItems, const Handle(StepRepr_RepresentationContext)& theContextOfItems, const Handle(StepKinematics_MechanismRepresentation) theMechanism);
 
-  Standard_EXPORT void SetMechanism(const Handle(StepKinematics_MechanismRepresentation)& aMechanism);
+  Standard_EXPORT void SetMechanism(const Handle(StepKinematics_MechanismRepresentation)& theMechanism);
 
   Standard_EXPORT Handle(StepKinematics_MechanismRepresentation) Mechanism() const;
 
 private:
-  Handle(StepKinematics_MechanismRepresentation) representedMechanism;
+  Handle(StepKinematics_MechanismRepresentation) myRepresentedMechanism;
 
   DEFINE_STANDARD_RTTIEXT(StepKinematics_MechanismStateRepresentation,StepRepr_Representation)
 };

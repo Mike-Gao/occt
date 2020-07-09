@@ -41,7 +41,7 @@ public:
 
   void SetLowLimit(const Standard_Real theLimit)
   {
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
     myLowLimit = theLimit;
   }
 
@@ -52,7 +52,7 @@ public:
 
   void SetUpperLimit(const Standard_Real theLimit)
   {
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
     myUpperLimit = theLimit;
   }
 
@@ -141,7 +141,7 @@ private:
   Standard_Real myLowLimit;               //!< low limit of motion range
   Standard_Real myUpperLimit;             //!< upper limit of motion range
   Handle(TColStd_HArray1OfReal) myParams; //!< additional parameters of kinematic pair
-  Standard_Boolean isRanged;               //!< flag "is limits defined"
+  Standard_Boolean myIsRanged;            //!< flag "is limits defined"
 
 };
 

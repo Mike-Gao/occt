@@ -101,6 +101,9 @@ class StepGeom_CartesianTransformationOperator3d;
 class StepGeom_TrimmedCurve;
 class StepGeom_Vector;
 class StepKinematics_SuParameters;
+class StepKinematics_SpatialRotation;
+class StepRepr_GlobalUnitAssignedContext;
+class TColStd_HArray1OfReal;
 
 //! This class provides static methods to convert STEP geometric entities to OCCT.
 //! The methods returning handles will return null handle in case of error.
@@ -157,6 +160,7 @@ public:
   Standard_EXPORT static Handle(Geom2d_BSplineCurve) MakeTrimmedCurve2d (const Handle(StepGeom_TrimmedCurve)& SC);
   Standard_EXPORT static Handle(Geom_VectorWithMagnitude) MakeVectorWithMagnitude (const Handle(StepGeom_Vector)& SV);
   Standard_EXPORT static Handle(Geom2d_VectorWithMagnitude) MakeVectorWithMagnitude2d (const Handle(StepGeom_Vector)& SV);
+  Standard_EXPORT static Handle(TColStd_HArray1OfReal) MakeYprRotation(const StepKinematics_SpatialRotation& SR, const Handle(StepRepr_GlobalUnitAssignedContext)& theCntxt);
 };
 
 #endif // _StepToGeom_HeaderFile

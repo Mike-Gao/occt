@@ -1,0 +1,13 @@
+# !!!! This file is generated automatically, do not edit manually! See end script
+set filename chuck_3_jaw_AP242_v2.stp
+
+set ref_data {
+
+ NbOfMechanisms             : ( 1 )
+ NbOfKinematicLinks         : ( 4 )
+ NbOfRefShapes              : ( 4 )
+ KinematicPairsWithoutRange :  NbOfLowOrderPairs ( 0 ) NbOfLowOrderPairsWithMotionCoupling ( 0 ) NbOfHightOrderPairs ( 0 )
+ KinematicPairsWithRange    :  NbOfLowOrderPairs ( 3 ) NbOfLowOrderPairsWithMotionCoupling ( 0 ) NbOfHightOrderPairs ( 0 )
+ NbOfStates                 : ( 2 )
+ KinematicValues            :  NbOfLowOrderPairs ( 6 ) NbOfLowOrderPairsWithMotionCoupling ( 0 ) NbOfHightOrderPairs ( 0 )
+}

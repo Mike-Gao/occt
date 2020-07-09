@@ -132,10 +132,16 @@
 #include <StepGeom_UniformSurfaceAndRationalBSplineSurface.hxx>
 #include <StepGeom_Vector.hxx>
 #include <StepKinematics_SuParameters.hxx>
+#include <StepKinematics_SpatialRotation.hxx>
+#include <StepKinematics_RotationAboutDirection.hxx>
 
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
 
+#include <StepBasic_PlaneAngleMeasureWithUnit.hxx>
+#include <StepBasic_ConversionBasedUnitAndPlaneAngleUnit.hxx>
+#include <StepBasic_SiUnitAndPlaneAngleUnit.hxx>
+#include <StepRepr_GlobalUnitAssignedContext.hxx>
 #include <UnitsMethods.hxx>
 
 //=============================================================================
@@ -2061,4 +2067,240 @@ Handle(Geom2d_VectorWithMagnitude) StepToGeom::MakeVectorWithMagnitude2d (const 
     return new Geom2d_VectorWithMagnitude(V);
   }
   return 0;
+}
+
+//=============================================================================
+// Creation d' un YptRotation de Kinematic a partir d' un SpatialRotation de Step
+//=============================================================================
+
+Handle(TColStd_HArray1OfReal) StepToGeom::MakeYprRotation(const StepKinematics_SpatialRotation& SR, const Handle(StepRepr_GlobalUnitAssignedContext)& theCntxt)
+{
+  //If rotation is already a ypr_rotation, return it immediately
+  Handle(TColStd_HArray1OfReal) anYPRRotation;
+  if (!SR.YprRotation().IsNull() &&
+      SR.YprRotation()->Length() == 3)
+  {
+    anYPRRotation = SR.YprRotation();
+  }
+  //rotation is a rotation_about_direction
+  else if (!SR.RotationAboutDirection().IsNull() &&
+           SR.RotationAboutDirection()->DirectionOfAxis()->DirectionRatios()->Length() == 3 &&
+           !theCntxt.IsNull())
+  {
+    Handle(Geom_Direction) anAxis;
+    anAxis = new Geom_Direction(SR.RotationAboutDirection()->DirectionOfAxis()->DirectionRatiosValue(1),
+                                SR.RotationAboutDirection()->DirectionOfAxis()->DirectionRatiosValue(2),
+                                SR.RotationAboutDirection()->DirectionOfAxis()->DirectionRatiosValue(3));
+    Standard_Real anAngle = SR.RotationAboutDirection()->RotationAngle();
+    if (anAngle == 0.)
+    {
+      // a zero rotation is converted trivially
+      anYPRRotation = new TColStd_HArray1OfReal(1, 3);
+      anYPRRotation->SetValue(1, 0.);
+      anYPRRotation->SetValue(2, 0.);
+      anYPRRotation->SetValue(3, 0.);
+      return anYPRRotation;
+    }
+    Standard_Real dx = anAxis->X();
+    Standard_Real dy = anAxis->Y();
+    Standard_Real dz = anAxis->Z();
+    NCollection_Sequence<Handle(StepBasic_NamedUnit)> aPaUnits;
+    for (Standard_Integer anInd = 1; anInd <= theCntxt->Units()->Length(); ++anInd)
+    {
+      if (theCntxt->UnitsValue(anInd)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndPlaneAngleUnit))||
+          theCntxt->UnitsValue(anInd)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit)))
+          aPaUnits.Append(theCntxt->UnitsValue(anInd));
+    }
+    if (aPaUnits.Length() != 1)
+      return anYPRRotation;
+    Handle(StepBasic_NamedUnit) aPau = aPaUnits.Value(1);
+    while (!aPau.IsNull() && aPau->IsKind((STANDARD_TYPE(StepBasic_ConversionBasedUnitAndPlaneAngleUnit))))
+    {
+      Handle(StepBasic_ConversionBasedUnitAndPlaneAngleUnit) aConverUnit = Handle(StepBasic_ConversionBasedUnitAndPlaneAngleUnit)::DownCast(aPau);
+      anAngle = anAngle * aConverUnit->ConversionFactor()->ValueComponent();
+      aPau = aConverUnit->ConversionFactor()->UnitComponent().NamedUnit();
+    }
+    if(aPau.IsNull())
+      return anYPRRotation;
+    Handle(StepBasic_SiUnitAndPlaneAngleUnit) aSiUnit = Handle(StepBasic_SiUnitAndPlaneAngleUnit)::DownCast(aPau);
+    if(aSiUnit.IsNull() || aSiUnit->Name() != StepBasic_SiUnitName::StepBasic_sunRadian)
+      return anYPRRotation;
+    switch (aSiUnit->Prefix())
+    {
+    case(StepBasic_spExa):
+      anAngle = 1.E18 * anAngle;
+      break;
+    case(StepBasic_spPeta):
+      anAngle = 1.E15 * anAngle;
+      break;
+    case(StepBasic_spTera):
+      anAngle = 1.E12 * anAngle;
+      break;
+    case(StepBasic_spGiga):
+      anAngle = 1.E9 * anAngle;
+      break;
+    case(StepBasic_spMega):
+      anAngle = 1.E6 * anAngle;
+      break;
+    case(StepBasic_spKilo):
+      anAngle = 1.E3 * anAngle;
+      break;
+    case(StepBasic_spHecto):
+      anAngle = 1.E2 * anAngle;
+      break;
+    case(StepBasic_spDeca):
+      anAngle = 1.E1 * anAngle;
+      break;
+    case(StepBasic_spDeci):
+      anAngle = 1.E-1 * anAngle;
+      break;
+    case(StepBasic_spCenti):
+      anAngle = 1.E-2 * anAngle;
+      break;
+    case(StepBasic_spMilli):
+      anAngle = 1.E-3 * anAngle;
+      break;
+    case(StepBasic_spMicro):
+      anAngle = 1.E-6 * anAngle;
+      break;
+    case(StepBasic_spNano):
+      anAngle = 1.E-9 * anAngle;
+      break;
+    case(StepBasic_spPico):
+      anAngle = 1.E-12 * anAngle;
+      break;
+    case(StepBasic_spFemto):
+      anAngle = 1.E-15 * anAngle;
+      break;
+    case(StepBasic_spAtto):
+      anAngle = 1.E-18 * anAngle;
+      break;
+    }
+    Standard_Real anUcf = SR.RotationAboutDirection()->RotationAngle() / anAngle;
+    Standard_Real aSA = Sin(anAngle);
+    Standard_Real aCA = Cos(anAngle);
+    Standard_Real aYaw = 0, aPitch = 0, aRoll = 0;
+    // axis parallel either to x-axis or to z-axis?
+    if (dy == 0. && dx * dz == 0.)
+    {
+      while (anAngle <= -M_PI)
+        anAngle = anAngle + 2 * M_PI;
+      while (anAngle > M_PI)
+        anAngle = anAngle - 2 * M_PI;
+
+      aYaw = anUcf * anAngle;
+      if (anAngle != M_PI)
+        aRoll = -aYaw;
+      else
+        aRoll = aYaw;
+      anYPRRotation = new TColStd_HArray1OfReal(1, 3);
+      anYPRRotation->SetValue(1, 0.);
+      anYPRRotation->SetValue(2, 0.);
+      anYPRRotation->SetValue(3, 0.);
+      if (dx != 0.)
+        if (dx > 0.)
+          anYPRRotation->SetValue(3, aYaw);
+        else
+          anYPRRotation->SetValue(3, aRoll);
+      else
+        if (dz > 0.)
+          anYPRRotation->SetValue(1, aYaw);
+        else
+          anYPRRotation->SetValue(1, aRoll);
+      return anYPRRotation;
+    }
+
+    // axis parallel to y-axis - use y-axis as pitch axis
+    if ((dy != 0.0) && (dx == 0.0) && (dz == 0.0))
+    {
+      if (aCA >= 0.0)
+      {
+        aYaw = 0.0;
+        aRoll = 0.0;
+      }
+      else
+      {
+        aYaw = anUcf * M_PI;
+        aRoll = aYaw;
+      }
+      aPitch = anUcf * ATan2(aSA, Abs(aCA));
+      if (dy < 0.0)
+        aPitch = -aPitch;
+      anYPRRotation = new TColStd_HArray1OfReal(1, 3);
+      anYPRRotation->SetValue(1, aYaw);
+      anYPRRotation->SetValue(2, aPitch);
+      anYPRRotation->SetValue(3, aRoll);
+      return anYPRRotation;
+    }
+     // axis not parallel to any axis of coordinate system
+     // compute rotation matrix
+    Standard_Real aCm1 = 1 - aCA;
+
+    Standard_Real aRotMat[3][3] = { { dx * dx * aCm1 + aCA ,dx * dy * aCm1 - dz * aSA, dx * dz * aCm1 + dy * aSA },
+                                    { dx * dy * aCm1 + dz * aSA,dy * dy * aCm1 + aCA, dy * dz * aCm1 - dx * aSA },
+                                    { dx * dz * aCm1 - dy * aSA, dy * dz * aCm1 + dx * aSA,dz * dz * aCm1 + aCA } };
+
+    // aRotMat[1][3] equals SIN(pitch_angle)
+    if (Abs(aRotMat[0][2] == 1.))
+    {
+      // |aPithc| = PI/2
+      if (aRotMat[0][2] == 1.)
+        aPitch = M_PI_2;
+      else
+        aPitch = -M_PI_2;
+      // In this case, only the sum or difference of roll and yaw angles
+      // is relevant and can be evaluated from the matrix.
+      // According to IP `rectangular pitch angle' for ypr_rotation,
+      // the roll angle is set to zero.
+      aRoll = 0.;
+      aYaw = ATan2(aRotMat[1][0], aRotMat[1][1]);
+      // result of ATAN is in the range[-PI / 2, PI / 2].
+      // Here all four quadrants are needed.
+
+      if (aRotMat[1][1] < 0.)
+        if (aYaw <= 0.)
+          aYaw = aYaw + M_PI;
+        else
+          aYaw = aYaw - M_PI;
+    }
+    else
+    {
+      // COS (pitch_angle) not equal to zero
+      aYaw = ATan2(-aRotMat[0][1], aRotMat[0][0]);
+
+      if (aRotMat[0][0] < 0.)
+      {
+        if (aYaw <= 0.)
+          aYaw = aYaw + M_PI;
+        else
+          aYaw = aYaw - M_PI;
+      }
+      Standard_Real aSY = Sin(aYaw);
+      Standard_Real aCY = Cos(aYaw);
+      Standard_Real aSR = Sin(aRoll);
+      Standard_Real aCR = Cos(aRoll);
+
+      if (Abs(aSY) > Abs(aCY) &&
+          Abs(aSY) > Abs(aSR) &&
+          Abs(aSY) > Abs(aCR))
+        aCm1 = -aRotMat[0][1] / aSY;
+      else
+        if (Abs(aCY) > Abs(aSR) && Abs(aCY) > Abs(aCR))
+          aCm1 = aRotMat[0][0] / aCY;
+        else
+          if (Abs(aSR) > Abs(aCR))
+            aCm1 = -aRotMat[1][2] / aSR;
+          else
+            aCm1 = aRotMat[2][2] / aCR;
+      aPitch = ATan2(aRotMat[0][2], aCm1);
+    }
+    aYaw = aYaw * anUcf;
+    aPitch = aPitch * anUcf;
+    aRoll = aRoll * anUcf;
+    anYPRRotation = new TColStd_HArray1OfReal(1, 3);
+    anYPRRotation->SetValue(1, aYaw);
+    anYPRRotation->SetValue(2, aPitch);
+    anYPRRotation->SetValue(3, aRoll);
+  }
+  return anYPRRotation;
 }

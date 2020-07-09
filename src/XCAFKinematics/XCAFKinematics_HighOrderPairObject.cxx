@@ -29,7 +29,7 @@ XCAFKinematics_HighOrderPairObject::
 XCAFKinematics_HighOrderPairObject()
 {
   myLimits = NULL;
-  isRanged = Standard_False;
+  myIsRanged = Standard_False;
 }
 
 //=======================================================================
@@ -46,7 +46,7 @@ XCAFKinematics_HighOrderPairObject(const Handle(XCAFKinematics_HighOrderPairObje
   myOrientation = theObj->myOrientation;
   myLimits = theObj->myLimits;
   myGeom = theObj->myGeom;
-  isRanged = theObj->HasLimits();
+  myIsRanged = theObj->HasLimits();
 }
 
 //=======================================================================
@@ -87,6 +87,11 @@ void XCAFKinematics_HighOrderPairObject::SetType(const XCAFKinematics_PairType t
     myGeom = NCollection_Array1<Handle(Geom_Geometry)>(1, 2);
     break;
   }
+  case XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve: {
+    myLimits = NULL;
+    myGeom = NCollection_Array1<Handle(Geom_Geometry)>(1, 1);
+    break;
+  }
   }
 
 }
@@ -112,7 +117,7 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
   if (theLimits->Length() == aNbLimits)
   {
     myLimits = theLimits;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -122,7 +127,7 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
 //=======================================================================
 Standard_Boolean XCAFKinematics_HighOrderPairObject::HasLimits() const
 {
-  return isRanged;
+  return myIsRanged;
 }
 
 //=======================================================================
@@ -134,7 +139,7 @@ void XCAFKinematics_HighOrderPairObject::SetRotationLowLimit(const Standard_Real
   if (Type() == XCAFKinematics_PairType_SlidingSurface || Type() == XCAFKinematics_PairType_RollingSurface)
   {
     myLimits->ChangeValue(1) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -158,7 +163,7 @@ void XCAFKinematics_HighOrderPairObject::SetRotationUpperLimit(const Standard_Re
   if (Type() == XCAFKinematics_PairType_SlidingSurface || Type() == XCAFKinematics_PairType_RollingSurface)
   {
     myLimits->ChangeValue(2) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -182,7 +187,7 @@ void XCAFKinematics_HighOrderPairObject::SetLowLimitYaw(const Standard_Real theL
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
   {
     myLimits->ChangeValue(1) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -206,7 +211,7 @@ void XCAFKinematics_HighOrderPairObject::SetUpperLimitYaw(const Standard_Real th
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
   {
     myLimits->ChangeValue(2) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -230,7 +235,7 @@ void XCAFKinematics_HighOrderPairObject::SetLowLimitRoll(const Standard_Real the
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
   {
     myLimits->ChangeValue(3) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -254,7 +259,7 @@ void XCAFKinematics_HighOrderPairObject::SetUpperLimitRoll(const Standard_Real t
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
   {
     myLimits->ChangeValue(4) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -278,7 +283,7 @@ void XCAFKinematics_HighOrderPairObject::SetLowLimitPitch(const Standard_Real th
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
   {
     myLimits->ChangeValue(5) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -302,7 +307,7 @@ void XCAFKinematics_HighOrderPairObject::SetUpperLimitPitch(const Standard_Real 
   if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_PointOnSurface)
   {
     myLimits->ChangeValue(6) = theLimit;
-    isRanged = Standard_True;
+    myIsRanged = Standard_True;
   }
 }
 
@@ -352,7 +357,7 @@ Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::Curve() const
 //=======================================================================
 void XCAFKinematics_HighOrderPairObject::SetFirstCurve(const Handle(Geom_Curve)& theCurve)
 {
-  if (Type() == XCAFKinematics_PairType_SlidingCurve || Type() == XCAFKinematics_PairType_RollingCurve)
+  if (Type() >= XCAFKinematics_PairType_SlidingCurve && Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
     myGeom.ChangeFirst() = theCurve;
 }
 
@@ -362,7 +367,7 @@ void XCAFKinematics_HighOrderPairObject::SetFirstCurve(const Handle(Geom_Curve)&
 //=======================================================================
 Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::FirstCurve() const
 {
-  if (Type() == XCAFKinematics_PairType_SlidingCurve || Type() == XCAFKinematics_PairType_RollingCurve)
+  if (Type() >= XCAFKinematics_PairType_SlidingCurve && Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
     return Handle(Geom_Curve)::DownCast(myGeom.First());
   return NULL;
 }

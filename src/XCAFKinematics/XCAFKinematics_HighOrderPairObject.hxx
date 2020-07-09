@@ -36,6 +36,8 @@ DEFINE_STANDARD_HANDLE(XCAFKinematics_HighOrderPairObject, XCAFKinematics_PairOb
 //! - XCAFKinematics_PairType_PointOnPlanarCurve
 //! - XCAFKinematics_PairType_SlidingCurve
 //! - XCAFKinematics_PairType_RollingCurve
+//! - XCAFKinematics_PairType_RollingCurve
+//! - XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve
 class XCAFKinematics_HighOrderPairObject : public XCAFKinematics_PairObject
 {
 
@@ -158,8 +160,8 @@ public:
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) SecondCurve() const;
 
-  ////! Sets curve attribute (only for PointOnCurve)
-  ////! \param[in] theTrimmedCurve trimmed curve
+  //! Sets curve attribute (only for PointOnCurve)
+  //! \param[in] theTrimmedCurve trimmed curve
   //Standard_EXPORT void SetTrimmedCurve(const Standard_Real& theTrim1, const Standard_Real& theTrim2);
 
   //! Sets trimmed curve attribute (only for PointOnCurve)
@@ -170,7 +172,7 @@ public:
   //! \return trimmed curve
   Standard_EXPORT Handle(Geom_TrimmedCurve) TrimmedCurve() const;
 
-  ////! \return trimmed curve
+  //! \return trimmed curve
   //Standard_EXPORT void TrimmedCurve(Standard_Real& theTrim1,Standard_Real& theTrim2) const;
 
   //! Sets surface attribute (only for PointOnSurface)
@@ -197,8 +199,8 @@ public:
   //! \return surface
   Standard_EXPORT Handle(Geom_Surface) SecondSurface() const;
 
-  ////! Sets surface attribute (only for PointOnSurface)
-  ////! \param[in] theTrimmedSurface trimmed surface
+  //! Sets surface attribute (only for PointOnSurface)
+  //! \param[in] theTrimmedSurface trimmed surface
   //Standard_EXPORT void SetTrimmedSurface(const Standard_Real& U1, const Standard_Real& U2, const Standard_Real& V1, const Standard_Real& V2);
 
   //! Sets trimmed surface attribute (only for PointOnSurface)
@@ -216,7 +218,7 @@ private:
   Standard_Boolean myOrientation;                   //!< orientation
   Handle(TColStd_HArray1OfReal) myLimits;           //!< array of limits, size depends on type
   NCollection_Array1<Handle(Geom_Geometry)> myGeom; //!< curve(s) or surface(s) attributes
-  Standard_Boolean isRanged;                         //!< flag "is limits defined"
+  Standard_Boolean myIsRanged;                      //!< flag "is limits defined"
 
 };
 

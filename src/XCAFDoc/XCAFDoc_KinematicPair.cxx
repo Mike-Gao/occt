@@ -146,7 +146,7 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
 
   // High order pairs
   if (theObject->Type() >= XCAFKinematics_PairType_PointOnSurface &&
-      theObject->Type() <= XCAFKinematics_PairType_RollingCurve) {
+      theObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve) {
     Handle(XCAFKinematics_HighOrderPairObject) anObject =
       Handle(XCAFKinematics_HighOrderPairObject)::DownCast(theObject);
     TDataStd_Integer::Set(Label(), getParamsID(), (Standard_Integer)anObject->Orientation());
@@ -186,8 +186,8 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
       TNaming_Builder aTNBuild(Label().FindChild(ChildLab_FirstGeomParam));
       aTNBuild.Generated(anEdge);
     }
-    if (theObject->Type() == XCAFKinematics_PairType_SlidingCurve ||
-        theObject->Type() == XCAFKinematics_PairType_RollingCurve)
+    if (theObject->Type() >= XCAFKinematics_PairType_SlidingCurve &&
+        theObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
     {
       TopoDS_Edge anEdge1, anEdge2;
       if (!anObject->FirstCurve().IsNull()) {
@@ -220,10 +220,10 @@ Handle(XCAFKinematics_PairObject) XCAFDoc_KinematicPair::GetObject()  const
         aType <= XCAFKinematics_PairType_Unconstrained)
       anObject = new XCAFKinematics_LowOrderPairObject();
     else if (aType >= XCAFKinematics_PairType_Screw &&
-             aType <= XCAFKinematics_PairType_Gear)
+             aType <= XCAFKinematics_PairType_LinearFlexibleAndPinion)
       anObject = new XCAFKinematics_LowOrderPairObjectWithCoupling();
     else if (aType >= XCAFKinematics_PairType_PointOnSurface &&
-             aType <= XCAFKinematics_PairType_RollingCurve)
+             aType <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
       anObject = new XCAFKinematics_HighOrderPairObject();
     anObject->SetType((XCAFKinematics_PairType)aType);
   }
@@ -266,7 +266,7 @@ Handle(XCAFKinematics_PairObject) XCAFDoc_KinematicPair::GetObject()  const
 
   // Low order pairs with motion coupling
   if (anObject->Type() >= XCAFKinematics_PairType_Screw &&
-      anObject->Type() <= XCAFKinematics_PairType_Gear) {
+      anObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPinion) {
     Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) aDefObject =
       Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(anObject);
     Handle(TDataStd_RealArray) aParamsAttr;
@@ -278,7 +278,7 @@ Handle(XCAFKinematics_PairObject) XCAFDoc_KinematicPair::GetObject()  const
 
   // High order pairs
   if (anObject->Type() >= XCAFKinematics_PairType_PointOnSurface &&
-      anObject->Type() <= XCAFKinematics_PairType_RollingCurve) {
+      anObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve) {
     Handle(XCAFKinematics_HighOrderPairObject) aDefObject =
       Handle(XCAFKinematics_HighOrderPairObject)::DownCast(anObject);
     Handle(TDataStd_Integer) anOrienAttr;
@@ -318,8 +318,8 @@ Handle(XCAFKinematics_PairObject) XCAFDoc_KinematicPair::GetObject()  const
         aDefObject->SetCurve(BRep_Tool::Curve(anEdge, aFirst, aLast));
       }
     }
-    if (anObject->Type() == XCAFKinematics_PairType_SlidingCurve ||
-        anObject->Type() == XCAFKinematics_PairType_RollingCurve)
+    if (anObject->Type() >= XCAFKinematics_PairType_SlidingCurve &&
+        anObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
     {
       if (Label().FindChild(ChildLab_FirstGeomParam).FindAttribute(TNaming_NamedShape::GetID(), aNS))
       {

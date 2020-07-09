@@ -63,41 +63,42 @@ public:
 
   //! Adds new empty label for link.
   //! \param[in] theMechanism parent mechanism
-  //! param[in] IsBase link is base of mechanism
+  //! \param[in] isBase link is base of mechanism
   //! \return created link label
   Standard_EXPORT TDF_Label AddLink(const TDF_Label& theMechanism,
-                                    const Standard_Boolean& IsBase = Standard_False);
+                                    const Standard_Boolean& isBase = Standard_False);
 
   //! Adds new label with link.
-  //! param[in] theMechanism parent mechanism
-  //! param[in] theShapes all details of link
-  //! param[in] IsBase link is base of mechanism
+  //! \param[in] theMechanism parent mechanism
+  //! \param[in] theShapes all details of link
+  //! \param[in] isBase link is base of mechanism
   //! \return created link label
   Standard_EXPORT TDF_Label AddLink(const TDF_Label& theMechanism,
                                     const TDF_LabelSequence& theShapes,
-                                    const Standard_Boolean& IsBase = Standard_False);
+                                    const Standard_Boolean& isBase = Standard_False);
 
   //! Adds new label with link.
   //! \param[in] theMechanism parent mechanism
   //! \param[in] theShape singular detail of link
+  //! \param[in] isBase link is base of mechanism
   //! \return created link label
   Standard_EXPORT TDF_Label AddLink(const TDF_Label& theMechanism,
-                                    const TDF_Label& theShapeá,
-                                    const Standard_Boolean& IsBase = Standard_False);
+                                    const TDF_Label& theShape,
+                                    const Standard_Boolean& isBase = Standard_False);
 
   //! Checks is the given label a link
   //! \return the result of check
   Standard_EXPORT Standard_Boolean IsLink(const TDF_Label& theLink) const;
 
   //! Sets shapes references for link
-  //! param[in] theLink link to set shapes
-  //! param[in] theShapes all details of link
+  //! \param[in] theLink link to set shapes
+  //! \param[in] theShapes all details of link
   //! \return true in case of success, false otherwise
   Standard_EXPORT Standard_Boolean SetLink(const TDF_Label& theLink,
                                            const TDF_LabelSequence& theShapes);
 
   //! Sets shapes references for link
-  //! param[in] theLink link to set base
+  //! \param[in] theLink link to set base
   //! \return true in case of success, false otherwise
   Standard_EXPORT Standard_Boolean SetBaseLink(const TDF_Label& theLink);
 
@@ -159,8 +160,13 @@ public:
 
   // Retrieves all values labels of the given state
   //! \param[in] theState parent state
-  //! \return value set
+  //! \return set of values
   Standard_EXPORT TDF_LabelSequence GetValuesOfState(const TDF_Label& theState) const;
+
+  //! Gets references to state of the given value.
+  //! \param[in] theValue value to get
+  //! \return state
+  Standard_EXPORT TDF_Label GetStateOfValue(const TDF_Label& theValue) const;
 
   //! Gets references to joints of the given value.
   //! \param[in] theValue value to get
