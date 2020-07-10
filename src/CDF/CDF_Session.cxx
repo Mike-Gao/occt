@@ -114,7 +114,8 @@ Standard_Boolean CDF_Session::FindApplication(const Standard_ThreadId theID, Han
   Standard_Mutex::Sentry aLocker(THE_MUTEX);
   if (myAppDirectory.IsBound(theID))
   {
-    return myAppDirectory.Find(theID, theApp);
+    theApp = Handle(CDF_Application)::DownCast (myAppDirectory.Find(theID));
+    return ! theApp.IsNull();
   }
   return Standard_False;
 }
