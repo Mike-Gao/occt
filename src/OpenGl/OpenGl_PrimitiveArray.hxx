@@ -97,6 +97,14 @@ public:
                                     const Handle(Graphic3d_Buffer)&      theAttribs,
                                     const Handle(Graphic3d_BoundBuffer)& theBounds);
 
+public:
+
+  //! Returns index VBO.
+  const Handle(OpenGl_VertexBuffer)& IndexVbo() const { return  myVboIndices; }
+
+  //! Returns attributes VBO.
+  const Handle(OpenGl_VertexBuffer)& AttributesVbo() const { return myVboAttribs; }
+
 protected:
 
   //! VBO initialization procedures

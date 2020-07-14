@@ -818,3 +818,35 @@ void OpenGl_FrameBuffer::UnbindBuffer (const Handle(OpenGl_Context)& theGlCtx)
     theGlCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, NO_FRAMEBUFFER);
   }
 }
+
+// =======================================================================
+// function : EstimatedDataSize
+// purpose  :
+// =======================================================================
+Standard_Size OpenGl_FrameBuffer::EstimatedDataSize() const
+{
+  if (!IsValid())
+  {
+    return 0;
+  }
+
+  Standard_Size aSize = 0;
+  for (OpenGl_TextureArray::Iterator aTextureIt (myColorTextures); aTextureIt.More(); aTextureIt.Next())
+  {
+    aSize += aTextureIt.Value()->EstimatedDataSize();
+  }
+  if (!myDepthStencilTexture.IsNull())
+  {
+    aSize += myDepthStencilTexture->EstimatedDataSize();
+  }
+  if (myGlColorRBufferId != NO_RENDERBUFFER
+  && !myColorFormats.IsEmpty())
+  {
+    aSize += OpenGl_Texture::PixelSizeOfPixelFormat (myColorFormats.First()) * myInitVPSizeX * myInitVPSizeY;
+  }
+  if (myGlDepthRBufferId != NO_RENDERBUFFER)
+  {
+    aSize += OpenGl_Texture::PixelSizeOfPixelFormat (myDepthFormat) * myInitVPSizeX * myInitVPSizeY;
+  }
+  return aSize;
+}
