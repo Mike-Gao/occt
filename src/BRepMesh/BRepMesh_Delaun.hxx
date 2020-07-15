@@ -29,6 +29,7 @@
 #include <TColStd_Array1OfInteger.hxx>
 #include <TColStd_SequenceOfInteger.hxx>
 #include <TColStd_MapOfInteger.hxx>
+#include <Message_ProgressSentry.hxx>
 
 class Bnd_B2d;
 class Bnd_Box2d;
@@ -59,7 +60,8 @@ public:
   Standard_EXPORT void RemoveVertex (const BRepMesh_Vertex& theVertex);
 
   //! Adds some vertices into the triangulation.
-  Standard_EXPORT void AddVertices (BRepMesh::Array1OfVertexOfDelaun& theVertices);
+  Standard_EXPORT void AddVertices (BRepMesh::Array1OfVertexOfDelaun& theVertices, 
+                                    Message_ProgressSentry&           theProgressEntry);
 
   //! Modify mesh to use the edge.
   //! @return True if done
@@ -221,6 +223,9 @@ private:
   //! Creates the triangles beetween the given node and the given polyline.
   void createTriangles (const Standard_Integer         theVertexIndex,
                         BRepMesh::MapOfIntegerInteger& thePoly);
+  void createTriangles (const Standard_Integer         theVertexIndex,
+                        BRepMesh::MapOfIntegerInteger& thePoly,
+                        Message_ProgressSentry&        theProgressEntry);
 
   //! Add a triangle based on the given oriented edges into mesh
   void addTriangle (const Standard_Integer (&theEdgesId)[3],
@@ -252,6 +257,9 @@ private:
                                                 BRepMesh::SequenceOfInteger& thePolygon,
                                                 BRepMesh::SequenceOfBndB2d&  thePolyBoxes);
   
+  //! Creates the triangles on new nodes.
+  void createTrianglesOnNewVertices (BRepMesh::Array1OfInteger& theVertexIndices,
+                                     Message_ProgressSentry&    theProgressEntry);
   //! Creates the triangles on new nodes.
   void createTrianglesOnNewVertices (BRepMesh::Array1OfInteger& theVertexIndices);
 
@@ -322,6 +330,9 @@ private:
 
   //! Performs insertion of internal edges into mesh.
   void insertInternalEdges();
+
+  //! Performs insertion of internal edges into mesh.
+  void insertInternalEdges(Message_ProgressSentry& theProgressEntry);
 
 private:
 

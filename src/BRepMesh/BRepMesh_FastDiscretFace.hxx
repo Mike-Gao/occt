@@ -27,6 +27,7 @@
 #include <BRepMesh_Triangle.hxx>
 #include <BRepMesh_Classifier.hxx>
 #include <ElSLib.hxx>
+#include <Message_ProgressSentry.hxx>
 
 class BRepMesh_DataStructureOfDelaun;
 class BRepMesh_FaceAttribute;
@@ -60,17 +61,18 @@ public:
     const Standard_Boolean isInternalVerticesMode,
     const Standard_Boolean isControlSurfaceDeflection);
 
-  Standard_EXPORT void Perform(const Handle(BRepMesh_FaceAttribute)& theAttribute);
-
+  Standard_EXPORT void Perform(const Handle(BRepMesh_FaceAttribute)& theAttribute, Message_ProgressSentry& theProgressEntry);
+ 
   DEFINE_STANDARD_RTTIEXT(BRepMesh_FastDiscretFace,Standard_Transient)
 
 private:
 
-  void add(const Handle(BRepMesh_FaceAttribute)& theAttribute);
+  void add(const Handle(BRepMesh_FaceAttribute)& theAttribute, Message_ProgressSentry& theProgressEntry);
   void add(const TopoDS_Vertex& theVertex);
 
   Standard_Real control(BRepMesh_Delaun&         theMeshBuilder,
-                        const Standard_Boolean   theIsFirst);
+                        const Standard_Boolean   theIsFirst,
+                        Message_ProgressSentry&  theProgressEntry);
 
   //! Registers the given nodes in mesh data structure and
   //! performs refinement of existing mesh.
@@ -80,12 +82,14 @@ private:
   //! @return TRUE if vertices were been inserted, FALSE elewhere.
   Standard_Boolean addVerticesToMesh(
     const BRepMesh::ListOfVertex& theVertices,
-    BRepMesh_Delaun&              theMeshBuilder);
+    BRepMesh_Delaun&              theMeshBuilder,
+    Message_ProgressSentry&       theProgressEntry);
 
   //! Calculates nodes lying on face's surface and inserts them to a mesh.
   //! @param theMeshBuilder initialized tool refining mesh 
   //! in respect to inserting nodes.
-  void insertInternalVertices(BRepMesh_Delaun&         theMeshBuilder);
+  void insertInternalVertices(BRepMesh_Delaun&         theMeshBuilder, 
+                              Message_ProgressSentry&  theProgressEntry);
 
   //! Calculates nodes lying on spherical surface.
   //! @param theNewVertices list of vertices to be extended and added to mesh.

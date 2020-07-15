@@ -34,6 +34,9 @@
 #include <BRepMesh_ShapeTool.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopTools_IndexedDataMapOfShapeListOfShape.hxx>
+#include <Message_ProgressSentry.hxx>
+#include <BRepMesh_FaceSentry.hxx>
+#include <OSD_Parallel.hxx>
 
 class BRepMesh_DataStructureOfDelaun;
 class Bnd_Box;
@@ -127,11 +130,24 @@ public:
   //! Triangulate a face previously recorded for 
   //! processing by call to Add(). Can be executed in 
   //! parallel threads.
-  Standard_EXPORT void Process(const TopoDS_Face& face) const;
+  Standard_EXPORT void Process(const TopoDS_Face& theFace, Message_ProgressSentry& theProgrEntry) const;
 
-  void operator () (const TopoDS_Face& face) const
+  void operator () (const BRepMesh_FaceSentry& aFaceSentry) const
   {
-    Process(face);
+    if (!aFaceSentry.GetProgressEntry()->More())
+    {
+      return;
+    }
+    Process(aFaceSentry.GetFace(), *aFaceSentry.GetProgressEntry());  
+   
+    if (aFaceSentry.IsParallel())
+    {
+      aFaceSentry.GetProgressEntry()->Next(OSD_Parallel::NbLogicalProcessors());
+    }
+    else
+    {
+      aFaceSentry.GetProgressEntry()->Next();
+    }
   }
   
   //! Returns parameters of meshing

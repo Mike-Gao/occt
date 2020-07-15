@@ -128,10 +128,10 @@ void BRepMesh_FastDiscret::Perform(const TopoDS_Shape& theShape)
 //function : Process
 //purpose  : 
 //=======================================================================
-void BRepMesh_FastDiscret::Process(const TopoDS_Face& theFace) const
+void BRepMesh_FastDiscret::Process(const TopoDS_Face& theFace, Message_ProgressSentry& theProgrEntry) const
 {
   Handle(BRepMesh_FaceAttribute) anAttribute;
-  if (GetFaceAttribute(theFace, anAttribute))
+  if (GetFaceAttribute(theFace, anAttribute) && theProgrEntry.More())
   {
     try
     {
@@ -139,7 +139,7 @@ void BRepMesh_FastDiscret::Process(const TopoDS_Face& theFace) const
 
       BRepMesh_FastDiscretFace aTool(myParameters.Angle, myParameters.MinSize, 
         myParameters.InternalVerticesMode, myParameters.ControlSurfaceDeflection);
-      aTool.Perform(anAttribute);
+      aTool.Perform(anAttribute, theProgrEntry);
     }
     catch (Standard_Failure)
     {

@@ -22,6 +22,7 @@
 #include <TopTools_DataMapOfShapeReal.hxx>
 #include <BRepMesh_DiscretRoot.hxx>
 #include <BRepMesh.hxx>
+#include <Message_ProgressIndicator.hxx>
 
 #include <vector>
 
@@ -51,7 +52,7 @@ public: //! @name mesher API
   //! used for the faces will be the maximum deflection of their edges.
   //! @param theAngDeflection angular deflection.
   //! @param isInParallel if TRUE shape will be meshed in parallel.
-  Standard_EXPORT BRepMesh_IncrementalMesh(
+  Standard_EXPORT BRepMesh_IncrementalMesh (
     const TopoDS_Shape&    theShape,
     const Standard_Real    theLinDeflection,
     const Standard_Boolean isRelative = Standard_False,
@@ -64,10 +65,11 @@ public: //! @name mesher API
   //! @param theShape shape to be meshed.
   //! @param theParameters - parameters of meshing
   Standard_EXPORT BRepMesh_IncrementalMesh (const TopoDS_Shape& theShape,
-                                            const BRepMesh_FastDiscret::Parameters& theParameters);
+                                            const BRepMesh_FastDiscret::Parameters& theParameters,
+                                            const Handle(Message_ProgressIndicator) &theProgress = NULL);
 
   //! Performs meshing ot the shape.
-  Standard_EXPORT virtual void Perform() Standard_OVERRIDE;
+  Standard_EXPORT virtual void Perform(const Handle(Message_ProgressIndicator) &theProgress = NULL) Standard_OVERRIDE;
   
 public: //! @name accessing to parameters.
 
@@ -126,7 +128,7 @@ protected:
 private:
 
   //! Builds the incremental mesh for the shape.
-  void update();
+  void update(const Handle(Message_ProgressIndicator) &theProgress = NULL);
 
   //! Checks triangulation of the given face for consistency 
   //! with the chosen tolerance. If some edge of face has no
@@ -167,7 +169,7 @@ private:
                               const Standard_Boolean isWithCheck);
 
   //! Stores mesh to the shape.
-  void commit();
+  void commit(Message_ProgressSentry& theSentry);
 
   //! Stores mesh of internal edges to the face.
   void commitEdges(const TopoDS_Face& theFace);
