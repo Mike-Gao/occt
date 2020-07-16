@@ -346,7 +346,10 @@ else()
   endif()
 endif()
 
-if (BUILD_SHARED_LIBS)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.0.0")
+  # Declare the dependencies public so that all code that uses this library automatically also links with the dependencies
+  target_link_libraries (${PROJECT_NAME} PUBLIC ${USED_TOOLKITS_BY_CURRENT_PROJECT} ${USED_EXTERNAL_LIBS_BY_CURRENT_PROJECT})
+elseif (BUILD_SHARED_LIBS)
   target_link_libraries (${PROJECT_NAME} ${USED_TOOLKITS_BY_CURRENT_PROJECT} ${USED_EXTERNAL_LIBS_BY_CURRENT_PROJECT})
 endif()
 
