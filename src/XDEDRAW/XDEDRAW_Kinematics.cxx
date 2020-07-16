@@ -164,7 +164,7 @@ static Standard_Integer removeMechanism(Draw_Interpretor& di, Standard_Integer a
 static Standard_Integer addLink(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
   if (argc < 3) {
-    di << "Use: XAddLink Doc ParentMechanism [-base] [shapeLabel1 .. shapeLabelN]\n";
+    di << "Use: XAddLink Doc ParentMechanism [-base] [shapeLabel1 ... shapeLabelN]\n";
     return 1;
   }
 
@@ -655,7 +655,7 @@ static Standard_Integer getName(Draw_Interpretor& di, Standard_Integer argc, con
 static Standard_Integer setType(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
   if (argc < 4) {
-    di << "Use: XSetPairType Doc Joint Type[1, 19]\n";
+    di << "Use: XSetPairType Doc Joint Type[1, 21]\n";
     return 1;
   }
 
@@ -1253,6 +1253,34 @@ static Standard_Integer addMechanismState(Draw_Interpretor& di, Standard_Integer
 }
 
 //=======================================================================
+//function : removeMechanismState
+//purpose  : 
+//=======================================================================
+static Standard_Integer removeMechanismState(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 3) {
+    di << "Use: XRemoveMechanismState Doc State\n";
+    return 1;
+  }
+
+  Handle(TDocStd_Document) aDoc;
+  if (!getDocument(di, argv[1], aDoc))
+    return 1;
+
+  TDF_Label aState;
+  if (!getLabel(di, aDoc, argv[2], aState) && aState.Father().Tag() != 3)
+    return 1;  
+  
+  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
+  TDF_Label aMechanism = aState.Father().Father();
+  if(!aTool->IsMechanism(aMechanism))
+    return 1;
+
+  aTool->RemoveState(aState);
+  return 0;
+}
+
+//=======================================================================
 //function : addValues
 //purpose  : 
 //=======================================================================
@@ -1541,6 +1569,29 @@ static Standard_Integer getValues(Draw_Interpretor& di, Standard_Integer argc, c
 }
 
 //=======================================================================
+//function : removeValues
+//purpose  : 
+//=======================================================================
+static Standard_Integer removeValues(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 3) {
+    di << "Use: XRemovePairValues Doc Value\n";
+    return 1;
+  }
+
+  Handle(TDocStd_Document) aDoc;
+  if (!getDocument(di, argv[1], aDoc))
+    return 1;
+  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
+  TDF_Label aValue;
+  if (!getLabel(di, aDoc, argv[2], aValue) && !aTool->IsValue(aValue))
+    return 1;
+
+  aTool->RemoveValue(aValue);
+  return 0;
+}
+
+//=======================================================================
 //function : dump
 //purpose  : 
 //=======================================================================
@@ -1665,7 +1716,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XRemoveMechanism", "XRemoveMechanism Doc Label",
     __FILE__, removeMechanism, g);
 
-  di.Add("XAddLink", "XAddLink Doc ParentMechanism [-base] [shapeLabel1 .. shapeLabelN]",
+  di.Add("XAddLink", "XAddLink Doc ParentMechanism [-base] [shapeLabel1 ... shapeLabelN]",
     __FILE__, addLink, g);
 
   di.Add("XSetLink", "XSetLink Doc Link shapeLabel1 .. shapeLabelN",
@@ -1716,7 +1767,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XGetPairName", "XGetPairName Doc Joint",
     __FILE__, getName, g);
 
-  di.Add("XSetPairType", "XSetPairType Doc Joint Type[0..19]"
+  di.Add("XSetPairType", "XSetPairType Doc Joint Type[0..21]"
     "Values:\n"
     "\t  0 type is absent\n"
     "\t  1 FullyConstrained\n"
@@ -1785,6 +1836,9 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XAddMechanismState", "XAddMechanismState Doc Mechanism",
     __FILE__, addMechanismState, g);
 
+  di.Add("XRemoveMechanismState", "XRemoveMechanismState Doc State",
+    __FILE__, removeMechanismState, g);
+
   di.Add("XAddPairValues", "XAddPairValues Doc State [Joint -Key1 Values1 -KeyN ValuesN]"
     "\t-[first_/second_]rotation - current rotation - 1 number"
     "\t-[first_/second_]translation - current translation - 1 number"
@@ -1811,6 +1865,9 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\t-ypr - current yaw pitch roll angles - 3 numbers"
     "\t-trsf - for unconstrained only current location direction xdirection - 9 numbers",
     __FILE__, getValues, g);
+
+  di.Add("XRemovePairValues", "XRemovePairValues Doc Value",
+    __FILE__, removeValues, g);
 
   di.Add("XDumpKinematics", "XDumpKinematics Doc",
     __FILE__, dump, g);

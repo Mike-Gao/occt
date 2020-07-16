@@ -122,7 +122,6 @@
 #include <StepRepr_PropertyDefinitionRepresentation.hxx>
 #include <StepRepr_Representation.hxx>
 #include <StepRepr_RepresentationItem.hxx>
-#include <StepRepr_Transformation.hxx>
 #include <StepRepr_HArray1OfRepresentationItem.hxx>
 #include <StepRepr_RepresentationMap.hxx>
 #include <StepRepr_RepresentationRelationship.hxx>
@@ -131,7 +130,6 @@
 #include <StepRepr_ReprItemAndLengthMeasureWithUnitAndQRI.hxx>
 #include <StepRepr_ReprItemAndPlaneAngleMeasureWithUnit.hxx>
 #include <StepRepr_ReprItemAndPlaneAngleMeasureWithUnitAndQRI.hxx>
-#include <StepRepr_ShapeRepresentationRelationshipWithTransformation.hxx>
 #include <StepRepr_SequenceOfRepresentationItem.hxx>
 #include <StepRepr_ShapeAspect.hxx>
 #include <StepRepr_ShapeAspectDerivingRelationship.hxx>
@@ -274,6 +272,8 @@
 #include <StepVisual_TessellatedItem.hxx>
 #include <StepVisual_TessellatedGeometricSet.hxx>
 #include <StepVisual_TessellatedCurveSet.hxx>
+#include <StepVisual_CoordinatesList.hxx>
+// Start Added for kinematics implementation
 #include <StepKinematics_KinematicJoint.hxx>
 #include <StepKinematics_KinematicLink.hxx>
 #include <StepKinematics_PairValue.hxx>
@@ -290,17 +290,13 @@
 #include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
 #include <StepKinematics_ActuatedKinematicPair.hxx>
 #include <StepKinematics_RigidLinkRepresentation.hxx>
-#include <StepKinematics_KinematicTopologyStructure.hxx>
-#include <StepShape_Vertex.hxx>
 #include <XCAFKinematics_PairValueObject.hxx>
 #include <StepKinematics_KinematicLinkRepresentation.hxx>
 #include <StepKinematics_ProductDefinitionKinematics.hxx>
 #include <StepKinematics_SuParameters.hxx>
-#include <NCollection_Vector.hxx>
 #include <StepKinematics_ContextDependentKinematicLinkRepresentation.hxx>
 #include <StepKinematics_KinematicLinkRepresentationAssociation.hxx>
 #include <StepKinematics_ProductDefinitionRelationshipKinematics.hxx>
-//
 #include <StepKinematics_CylindricalPair.hxx>
 #include <StepKinematics_CylindricalPairWithRange.hxx>
 #include <StepKinematics_FullyConstrainedPair.hxx>
@@ -343,7 +339,6 @@
 #include <XCAFKinematics_LowOrderPairObject.hxx>
 #include <XCAFKinematics_LowOrderPairObjectWithCoupling.hxx>
 #include <XCAFKinematics_HighOrderPairObject.hxx>
-
 #include <StepKinematics_SlidingSurfacePairValue.hxx>
 #include <StepKinematics_RollingSurfacePairValue.hxx>
 #include <StepKinematics_RevolutePairValue.hxx>
@@ -364,8 +359,9 @@
 #include <StepKinematics_LinearFlexibleAndPlanarCurvePair.hxx>
 #include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
 #include <StepKinematics_MechanismStateRepresentation.hxx>
+// End Added for kinematics implementation
 
-
+#include <NCollection_Vector.hxx>
 #include <TColgp_HArray1OfXYZ.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepTools.hxx>
@@ -4369,12 +4365,12 @@ Standard_Boolean addLinkWithShapes(const Handle(XSControl_WorkSession)& theWS,
   if (aShapes.Length() == 0)
     return Standard_False;
 
-  theLink = aKTool->AddLink(theMechanism, aShapes, theIsBase);
+  theLink = aKTool->AddLink(theMechanism, aShapes, theIsBase); 
+  if (theLink.IsNull())
+    return Standard_False;
   if (!aLink->Name()->IsEmpty())
     TDataStd_Name::Set(theLink, aLink->Name()->String());
 
-  if (theLink.IsNull())
-    return Standard_False;
   theMapOfLinks.Bind(theLinkRepresentation, theLink);
   return Standard_True;
 }
@@ -4757,8 +4753,9 @@ Standard_Boolean setKinematicPairValue(const Handle(XSControl_WorkSession)& theW
   if (aPairType == XCAFKinematics_PairType_NoType)
     return Standard_False;
   aValueObject->SetType(aPairType);
-  TDF_TagSource aTag;
-  TDF_Label aValueL = aTag.NewChild(theState);
+  TDF_Label aValueL = aKTool->AddValue(theState);
+  if (aValueL.IsNull())
+    return Standard_False;
 
   // Low order pairs
   if (theValue->IsKind(STANDARD_TYPE(StepKinematics_RevolutePairValue)))
@@ -5110,17 +5107,17 @@ Standard_Boolean STEPCAFControl_Reader::ReadKinematics(const Handle(XSControl_Wo
       TDataStd_Name::Set(aMechanism, aKMR->Name()->String());
 
     //Collecting Links and labels of Links
-    NCollection_DataMap<Handle(StepKinematics_KinematicLinkRepresentation), TDF_Label> theMapOfLinks;
+    NCollection_DataMap<Handle(StepKinematics_KinematicLinkRepresentation), TDF_Label> aMapOfLinks;
 
     //read base link
     if (!aKPMR->Base().IsNull())
     {
       TDF_Label aLableOfBaseLink;
-      addLinkWithShapes(theWS, theDoc, aKPMR->Base(), aMechanism, theShapeLabelMap, aLableOfBaseLink, theMapOfLinks, Standard_True);
+      addLinkWithShapes(theWS, theDoc, aKPMR->Base(), aMechanism, theShapeLabelMap, aLableOfBaseLink, aMapOfLinks, Standard_True);
     }
     
     //read joints with their links
-    NCollection_DataMap<Handle(StepKinematics_KinematicJoint), TDF_Label> theMapOfJoints;
+    NCollection_DataMap<Handle(StepKinematics_KinematicJoint), TDF_Label> aMapOfJoints;
     for (Standard_Integer aPairIndex = 1; aPairIndex <= aKMR->NbItems(); ++aPairIndex)
     {
       if (!aKMR->ItemsValue(aPairIndex)->IsKind(STANDARD_TYPE(StepKinematics_PairRepresentationRelationship)))
@@ -5128,8 +5125,7 @@ Standard_Boolean STEPCAFControl_Reader::ReadKinematics(const Handle(XSControl_Wo
       Handle(StepKinematics_PairRepresentationRelationship) aPRR =
         Handle(StepKinematics_PairRepresentationRelationship)::DownCast(aKMR->ItemsValue(aPairIndex));
       if (aPRR.IsNull()) continue;
-      Handle(StepKinematics_KinematicPair) aKinematicPair
-        = Handle(StepKinematics_KinematicPair)::DownCast(aPRR->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+      Handle(StepKinematics_KinematicPair) aKinematicPair = aPRR->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair();
       if (aKinematicPair.IsNull())
         continue;
       //find joint & links
@@ -5143,9 +5139,9 @@ Standard_Boolean STEPCAFControl_Reader::ReadKinematics(const Handle(XSControl_Wo
       if (aLinkRepresentation1.IsNull() || aLinkRepresentation2.IsNull())
         continue;
       TDF_Label aJoint, aLink1, aLink2;
-      if (!addLinkWithShapes(theWS, theDoc, aLinkRepresentation1, aMechanism, theShapeLabelMap, aLink1, theMapOfLinks))
+      if (!addLinkWithShapes(theWS, theDoc, aLinkRepresentation1, aMechanism, theShapeLabelMap, aLink1, aMapOfLinks))
         continue;
-      if (!addLinkWithShapes(theWS, theDoc, aLinkRepresentation2, aMechanism, theShapeLabelMap, aLink2, theMapOfLinks))
+      if (!addLinkWithShapes(theWS, theDoc, aLinkRepresentation2, aMechanism, theShapeLabelMap, aLink2, aMapOfLinks))
         continue;
       //Setting info
       aJoint = aKTool->AddJoint(aMechanism, aLink1, aLink2);
@@ -5155,7 +5151,7 @@ Standard_Boolean STEPCAFControl_Reader::ReadKinematics(const Handle(XSControl_Wo
         continue;
       setKinematicPairLimit(aKinematicPair, aPairObject);
       aCAFKinPair->SetObject(aPairObject);
-      theMapOfJoints.Bind(aKinematicJoint, aJoint);
+      aMapOfJoints.Bind(aKinematicJoint, aJoint);
     }
 
     // (optional)
@@ -5173,7 +5169,7 @@ Standard_Boolean STEPCAFControl_Reader::ReadKinematics(const Handle(XSControl_Wo
         Handle(StepKinematics_KinematicJoint) aKinematicJoint = aValue->AppliesToPair()->Joint();
         if (aKinematicJoint.IsNull())
           continue;
-        TDF_Label aJoint = theMapOfJoints.Find(aKinematicJoint);
+        TDF_Label aJoint = aMapOfJoints.Find(aKinematicJoint);
         setKinematicPairValue(theWS, theDoc, aKinematicJoint, aValue, aState, aJoint);
       }
     }

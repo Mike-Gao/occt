@@ -4244,8 +4244,6 @@ Standard_Boolean RWStepAP214_ReadWriteModule::IsComplex
       return Standard_True;
     case 719:
       return Standard_True;
-    case 796:
-      return Standard_True;
     default:
       return Standard_False;
     }

@@ -153,6 +153,15 @@ public:
   //! \return created state label
   Standard_EXPORT TDF_Label AddState(const TDF_Label& theMechanism);
 
+  //! Adds new empty label for Value.
+  //! \param[in] theState parent state
+  //! \return created value label
+  Standard_EXPORT TDF_Label AddValue(const TDF_Label& theState);
+
+  //! Removes the given value
+  //! \param[in] theValue value to remove
+  Standard_EXPORT void RemoveValue(const TDF_Label& theValue);
+
   // Retrieves all States labels of the given mechanism
   //! \param[in] theMechanism parent mechanism
   //! \return state set
@@ -206,8 +215,12 @@ public:
 
   //! Gets references to joints of the given link.
   //! \param[in] theLink link to get
+  //! \param[in] toFirst take a reference first link of joint 
+  //! \param[in] toSecond take a reference second link of joint 
   //! \return set of joints
-  Standard_EXPORT TDF_LabelSequence GetJointsOfLink(const TDF_Label& theLink) const;
+  Standard_EXPORT TDF_LabelSequence GetJointsOfLink(const TDF_Label& theLink,
+                                                    const Standard_Boolean& toFirst = Standard_True,
+                                                    const Standard_Boolean& toSecond = Standard_True) const;
 
   //! Gets reference shapes of the given link.
   //! \param[in] theLink link to get

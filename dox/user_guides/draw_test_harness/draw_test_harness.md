@@ -10527,6 +10527,664 @@ Calculates the real volume of a pointed shape with a given deflection.
 XShapeVolume a 0 
 ~~~~~
 
+@subsection occt_draw_8_10  XDE kinematics commands 
+
+@subsubsection occt_draw_8_10_1  XAddMechanism
+
+Syntax:
+~~~~~
+XAddMechanism <document> 
+~~~~~
+
+Adds a new empty kinematic mechanism.
+
+**Example:**
+~~~~~
+XAddMechanism D
+== 0:11:1
+~~~~~
+
+@subsubsection occt_draw_8_10_2  XIsMechanism
+
+Syntax:
+~~~~~
+XIsMechanism <document> <label>
+~~~~~
+
+Returns 1 if the Label is a kinematic mechanism, else returns 0.
+
+**Example:**
+~~~~~
+XIsMechanism D 0:11:1
+== 1
+~~~~~
+
+@subsubsection occt_draw_8_10_3  XRemoveMechanism
+
+Syntax:
+~~~~~
+XRemoveMechanism <document> <label>
+~~~~~
+
+Removes a kinematic mechanism from a document (by it’s label).
+
+**Example:**
+~~~~~
+XRemoveMechanism D 0:11:1
+~~~~~
+
+@subsubsection occt_draw_8_10_4  XAddLink
+
+Syntax:
+~~~~~
+XAddLink <document> <parentMechanism> [-base] [shapeLabel1] ... [shapeLabelN]
+~~~~~
+
+Adds a kinematic link to a given mechanism. By default, a new link is added as empty and a non-base, otherwise it is necessary to pass label(s) of shape as the last parameters and -base as the third parameter.
+
+**Example:**
+~~~~~
+# add full (with shape) link to the mechanism
+XAddLink D 0:11:1 0:1:1:1
+# add empty base link to the mechanism
+XAddLink D 0:11:1 -base
+== 0:11:1:1:2
+~~~~~
+
+@subsubsection occt_draw_8_10_5  XSetLink
+
+Syntax:
+~~~~~
+XSetLink <document> <linkLabel> <shapeLabel1> [shapeLabel2] ... [shapeLabelN]
+~~~~~
+
+Sets a reference between a shape (set of shapes) and a kinematic link.
+
+**Example:**
+~~~~~
+XSetLink D 0:11:1:1:2 0:1:1:2
+~~~~~
+
+@subsubsection occt_draw_8_10_6  XSetBaseLink
+
+Syntax:
+~~~~~
+XSetBaseLink <document> <linkLabel>
+~~~~~
+
+Sets a kinematic link as a base of the mechanism.
+
+**Example:**
+~~~~~
+XSetBaseLink D 0:11:1:1:2
+~~~~~
+
+@subsubsection occt_draw_8_10_7  XIsLink
+
+Syntax:
+~~~~~
+XIsLink <document> <linkLabel>
+~~~~~
+
+Returns 1 if the label is a kinematic link, else returns 0.
+
+**Example:**
+~~~~~
+XIsLink D 0:11:1:1:1
+== 1
+~~~~~
+
+@subsubsection occt_draw_8_10_8  XRemoveLink
+
+Syntax:
+~~~~~
+XRemoveLink <doxument> <label>
+~~~~~
+
+Removes a kinematic link and referenced by it kinematic joints from a document (by it’s label).
+
+**Example:**
+~~~~~
+XRemoveLink D 0:11:1:1:1
+~~~~~
+
+@subsubsection occt_draw_8_10_9  XAddJoint
+
+Syntax:
+~~~~~
+XAddJoint <document> <parentMechanism> [linkLabel1 linkLabel2]
+~~~~~
+
+Adds a kinematic joint to a given mechanism. By default, a new joint is added as empty, otherwise it is necessary to pass couple (start and end) of the kinematic links as the last parameters.
+
+**Example:**
+~~~~~
+# add full (with links) joint to the mechanism
+XAddJoint D 0:11:1 0:11:1:1:1 0:11:1:1:2
+== 0:11:1:2:1
+# add empty joint to the mechanism
+XAddJoint D 0:11:1
+== 0:11:1:2:2
+~~~~~
+
+@subsubsection occt_draw_8_10_10  XSetJoint
+
+Syntax:
+~~~~~
+XSetJoint <document> <jointLabel> <linkLabel1> <linkLabel2>
+~~~~~
+
+Sets a reference between a kinematic joint and couple (start and end) of the kinematic links
+
+**Example:**
+~~~~~
+XSetJoint D 0:11:1:2:1 0:11:1:1:1 0:11:1:1:2
+~~~~~
+
+@subsubsection occt_draw_8_10_11  XIsJoint
+
+Syntax:
+~~~~~
+XIsJoint <document> <jointLabel>
+~~~~~
+
+Returns 1 if the label is a kinematic joint, else returns 0.
+
+**Example:**
+~~~~~
+XIsJoint D 0:11:1:2:1
+== 1
+~~~~~
+
+@subsubsection occt_draw_8_10_12  XRemoveJoint
+
+Syntax:
+~~~~~
+XRemoveJoint <document> <jointLabel>
+~~~~~
+
+Removes a kinematic joint from a document (by it’s label).
+
+**Example:**
+~~~~~
+XRemoveJoint D 0:11:1:2:1
+~~~~~
+
+@subsubsection occt_draw_8_10_13  XGetMechanisms
+
+Syntax:
+~~~~~
+XGetMechanisms <document>
+~~~~~
+
+Prints all kinematic mechanisms in an XCAF document.
+
+**Example:**
+~~~~~
+XGetMechanisms D
+== 0:11:1 0:11:2
+~~~~~
+
+@subsubsection occt_draw_8_10_14  XGetLinks
+
+Syntax:
+~~~~~
+XGetLinks <document> <parentMechanism>
+~~~~~
+
+Prints all kinematic links of the given mechanism in an XCAF document.
+
+**Example:**
+~~~~~
+XGetLinks D 0:11:1
+== 0:11:1:1:1 0:11:1:1:2
+~~~~~
+
+@subsubsection occt_draw_8_10_15  XGetJoints
+
+Syntax:
+~~~~~
+XGetJoints <document> <parentMechanism>
+~~~~~
+
+Prints all kinematic joints of the given mechanism in an XCAF document.
+
+**Example:**
+~~~~~
+XGetJoints 0:11:1
+== 0:11:1:2:1 0:11:1:2:2
+~~~~~
+
+@subsubsection occt_draw_8_10_16  XGetLinksOfJoint
+
+Syntax:
+~~~~~
+XGetLinksOfJoint <document> <jointLabel>
+~~~~~
+
+Prints start and end kinematic links of the given joint in an XCAF document.
+
+**Example:**
+~~~~~
+XGetLinksOfJoint D 0:11:1:2:1
+== 0:11:1:1:1 0:11:1:1:2
+~~~~~
+
+@subsubsection occt_draw_8_10_17  XGetJointsOfLink
+
+Syntax:
+~~~~~
+XGetJointsOfLink <document> <linkLabel>
+~~~~~
+
+Prints all kinematic links that reference a kinematic joint in an XCAF document.
+
+**Example:**
+~~~~~
+XGetJointsOfLink D 0:11:1:1:1
+== 0:11:1:2:1
+~~~~~
+
+@subsubsection occt_draw_8_10_18  XGetRefShapes
+
+Syntax:
+~~~~~
+XGetRefShapes <document> <linkLabel>
+~~~~~
+
+Prints all shape that reference a kinematic link in an XCAF document.
+
+**Example:**
+~~~~~
+XGetRefShapes D 0:11:1:1:1
+== 0:1:1:1
+~~~~~
+
+@subsubsection occt_draw_8_10_19  XSetPairName
+
+Syntax:
+~~~~~
+XSetPairName <document> <jointLabel> <name>
+~~~~~
+
+Sets the name of the kinematic pair.
+
+**Example:**
+~~~~~
+XSetPairName D 0:11:1:2:1 revolute
+~~~~~
+
+@subsubsection occt_draw_8_10_20  XGetPairName
+
+Syntax:
+~~~~~
+XGetPairName <document> <jointLabel>
+~~~~~
+
+Prints the name of the kinematic pair.
+
+**Example:**
+~~~~~
+XGetPairName D 0:11:1:2:1
+== revolute
+~~~~~
+
+@subsubsection occt_draw_8_10_21  XSetPairType
+
+Syntax:
+~~~~~
+XSetPairType <document> <jointLabel> <type {0|1|...|21}>
+~~~~~
+
+Sets a type of the kinematic pair.
+
+<i>\<Type\></i> may be:
+* 0  type is absent
+* 1  FullyConstrained
+* 2  Revolute
+* 3  Prismatic
+* 4  Cylindrical
+* 5  Universal
+* 6  Homokinetic
+* 7  SphericalWithPin
+* 8  Spherical
+* 9  Planar
+* 10 Unconstrained
+* 11 Screw
+* 12 RackAndPinion
+* 13 Gear
+* 14 LinearFlexibleAndPinion
+* 15 PointOnSurface
+* 16 SlidingSurface
+* 17 RollingSurface
+* 18 PointOnPlanarCurve
+* 19 SlidingCurve
+* 20 RollingCurve
+* 21 LinearFlexibleAndPlanarCurve
+
+**Example:**
+~~~~~
+XSetPairType D 0:11:1:2:1 2
+~~~~~
+
+@subsubsection occt_draw_8_10_22  XGetPairType
+
+Syntax:
+~~~~~
+XGetPairType <document> <jointLabel>
+~~~~~
+
+Prints a type of the kinematic pair.
+
+**Example:**
+~~~~~
+XGetPairType D 0:11:1:2:1
+== 2
+~~~~~
+
+@subsubsection occt_draw_8_10_23  XSetPairTransformation
+
+Syntax:
+~~~~~
+XSetPairTransformation <document> <jointLabel>  <transform_nb {1|2}> <plane> 
+~~~~~
+
+Sets a placement describes a relative position and orientation of a frame with respect to another frame.
+
+**Example:**
+~~~~~
+plane p1 10 20 30 -1 0 0 
+XSetPairTransformation D 0:11:1:2:1 1 p1
+~~~~~
+
+@subsubsection occt_draw_8_10_24  XGetPairTransformation
+
+Syntax:
+~~~~~
+XGetPairTransformation <document> <jointLabel>  <transform_nb {1|2}> <planeName> 
+~~~~~
+
+Creates a new variable names <i>\<planeName\></i> with a copy of the content of an first or second pair transformation.
+
+**Example:**
+~~~~~
+XGetPairTransformation D 0:11:1:2:1 1 p1
+~~~~~
+
+@subsubsection occt_draw_8_10_25  XSetPairOrientation
+
+Syntax:
+~~~~~
+XSetPairOrientation <document> <jointLabel>  <orientation {0|1}>
+~~~~~
+
+Sets orientation, directions correspond to the type of the kinematic pair.
+
+**Example:**
+~~~~~
+XSetPairOrientation D 0:11:1:2:1 1
+~~~~~
+
+@subsubsection occt_draw_8_10_26  XGetPairOrientation
+
+Syntax:
+~~~~~
+XGetPairOrientation <document> <jointLabel>
+~~~~~
+
+Prints orientation of the kinematic pair.
+
+**Example:**
+~~~~~
+XGetPairOrientation D 0:11:1:2:1
+== 1
+~~~~~
+
+@subsubsection occt_draw_8_10_27  XSetPairLimits
+
+Syntax:
+~~~~~
+XSetPairLimits <document> <jointLabel> <value1> ... <valueN>
+~~~~~
+
+Sets the limits of the kinematic pair according to the type
+
+<i>\<type - nb_of_values\></i>:
+* low order pair - 12 values
+* low order pair with motion coupling - 2 values
+* high order pair - 2 or 6 values.
+
+**Example:**
+~~~~~
+# sets limits for the low order pair with motion coupling
+XSetPairLimits D 0:11:1:2:1 15 30
+~~~~~
+
+@subsubsection occt_draw_8_10_28  XGetPairLimits
+
+Syntax:
+~~~~~
+XGetPairLimits <document> <jointLabel>
+~~~~~
+
+Prints all limits of the kinematic pair.
+
+**Example:**
+~~~~~
+# gets limits for the low order pair with motion coupling
+XGetPairLimits D 0:11:1:2:1
+== 15 30
+~~~~~
+
+@subsubsection occt_draw_8_10_29  XSetPairParams
+
+Syntax:
+~~~~~
+XSetPairParams <document> <jointLabel> <value1> ... <valueN>
+~~~~~
+
+Sets the params of the low order pair with motion coupling according to the type.
+
+<i>\<Type -  nb_of_values\></i>:
+* screw - 1 values
+ * pitch
+* rackAndPinion - 1 values
+ * pinionRadius
+* gear - 5
+ * firstLinkRadius
+ * secondLinkRadius
+ * bevel
+ * helicalAngle
+ * gearRatio
+
+**Example:**
+~~~~~
+XSetPairParams D 0:11:1:2:1 15 
+~~~~~
+
+@subsubsection occt_draw_8_10_30  XGetPairParams
+
+Syntax:
+~~~~~
+XGetPairParams <document> <jointLabel>
+~~~~~
+
+Prints all params of the kinematic pair.
+
+**Example:**
+~~~~~
+XGetPairParams D 0:11:1:2:1
+== 15
+~~~~~
+
+@subsubsection occt_draw_8_10_31  XSetPairGeomParam
+
+Syntax:
+~~~~~
+XSetPairGeomParam <document> <jointLabel>  <number_of_the_parameter {1|2}> {<surface>|<face>|<curve>|<edge>} 
+~~~~~
+
+Sets the parametrs of the high order pair according to the type.
+
+The following syntax is used: 
+* <i>\<limited\></i>
+ * point on surface
+  * trimmed surface | trimmed face
+ * point on curve 
+  * trimmed curve | trimmed edge
+* <i>\<not limited\></i>
+ * point on surface
+  * surface | face
+ * point on curve
+  * curve | edge
+ * sliding surface
+  * surface | face
+  * surface | face
+ * rolling surface
+  * surface | face
+  * surface | face
+ * sliding curve
+  * curve | edge
+  * curve | edge
+ * rolling curve
+  * curve | edge
+  * curve | edge
+ * linear flexible and planar curve
+  * curve | edge
+
+**Example:**
+~~~~~
+circle cir 4 4 4 1
+XSetPairGeomParam D 0:11:1:2:1 1 cir
+~~~~~
+
+@subsubsection occt_draw_8_10_32  XGetPairGeomParam
+
+Syntax:
+~~~~~
+XGetPairGeomParam <document> <jointLabel>  <number_of_the_parameter {1|2}> <name>
+~~~~~
+
+Creates a new variable names <i>\<name\></i> with a copy of the content of an first or second geom parametrs of pair.
+
+**Example:**
+~~~~~
+XGetPairGeomParam D 0:11:1:2:1 1 face
+~~~~~
+
+@subsubsection occt_draw_8_10_33  XAddMechanismState
+
+Syntax:
+~~~~~
+XAddMechanismState <document> <parentMechanism>
+~~~~~
+
+Adds a new empty kinematic mechanism state.
+
+**Example:**
+~~~~~
+XAddMechanismState D 0:11:1
+== 0:11:1:3:1
+~~~~~
+
+@subsubsection occt_draw_8_10_34  XRemoveMechanismState
+
+Syntax:
+~~~~~
+XRemoveMechanismState <document> <stateLabel>
+~~~~~
+
+Removes a kinematic mechanism state with all kinematic values from a document (by it’s label).
+
+**Example:**
+~~~~~
+XRemoveMechanismState D 0:11:1:3:1
+~~~~~
+
+@subsubsection occt_draw_8_10_35  XAddPairValues
+
+Syntax:
+~~~~~
+XAddPairValues <document> <stateLabel> [jointLabel] [-key1 values1] ... [-keyN valuesN]
+~~~~~
+
+Adds a kinematic value to a given state. By default, a new value is added as empty , otherwise it is necessary to pass label of reference joint as the third parameters and set of { -key value } according type, conteined in the joint.
+
+The following syntax of {-key value} is used: 
+* -[first_/second_]rotation - current rotation - 1 number
+* -[first_/second_]translation - current translation - 1 number
+* -[first_/second_]point_on_surface - current (u,v) - 2 numbers
+* -[first_/second_]point_on_curve - current (t) - 1 number
+* -ypr - current yaw pitch roll angles - 3 numbers
+* -trsf - for unconstrained only current location direction xdirection - 9 numbers
+
+**Example:**
+~~~~~
+XAddPairValues D 0:11:1:3:1 
+== 0:11:1:3:1:1
+~~~~~
+
+@subsubsection occt_draw_8_10_36  XSetPairValues
+
+Syntax:
+~~~~~
+XSetPairValues <document> <valueLabel> <jointLabel> <-key1 values1> ... <-keyN valuesN>
+~~~~~
+
+Sets a reference between a kinematic value and kinematic joint and sets parametr(s) of the kinematic value.
+
+The following syntax of {-key value} is used: 
+* -[first_/second_]rotation - current rotation - 1 number
+* -[first_/second_]translation - current translation - 1 number
+* -[first_/second_]point_on_surface - current (u,v) - 2 numbers
+* -[first_/second_]point_on_curve - current (t) - 1 number
+* -ypr - current yaw pitch roll angles - 3 numbers
+* -trsf - for unconstrained only current location direction xdirection - 9 numbers
+
+**Example:**
+~~~~~
+XSetPairValues D 0:11:1:3:1:1 0:11:1:2:1 -first_point_on_surface 1.5 -second_point_on_curve 7
+~~~~~
+
+@subsubsection occt_draw_8_10_37  XGetPairValues
+
+Syntax:
+~~~~~
+XGetPairValues <document> <valueLabel> <-key>
+~~~~~
+
+Prints parameter of the kinematic value according kinematic type.
+
+The following syntax of <i>\<-key\></i> is used:
+* -[first_/second_]rotation - current rotation 
+* -[first_/second_]translation - current translation 
+* -[first_/second_]point_on_surface - current (u,v)
+* -[first_/second_]point_on_curve - current (t)
+* -ypr - current yaw pitch roll angles
+* -trsf - for unconstrained only current location direction xdirection
+
+**Example:**
+~~~~~
+XGetPairValues D 0:11:1:3:1:1 -rotation
+== 1
+~~~~~
+
+@subsubsection occt_draw_8_10_37  XRemovePairValues
+
+Syntax:
+~~~~~
+XRemovePairValues <document> <valueLabel>
+~~~~~
+
+Removes a kinematic value from a document (by it’s label).
+
+**Example:**
+~~~~~
+XRemovePairValues D 0:11:1:3:1:1
+~~~~~
+
+
+
 @section occt_draw_9 Shape Healing commands
 
 

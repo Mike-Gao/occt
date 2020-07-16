@@ -148,7 +148,7 @@ Notes API provides the following functionality:
 @subsection occt_xde_1_11 Kinematics
 
 Kinematic data storage is realized according to ISO 10303-105:2019(E) and STEP Schema AP242 2019 year.
-All kinematic data is divided onto mechanisms each mechanism has its graph of links (references to shapes) and joints (kinematic pair information).
+All kinematic data is divided onto mechanisms each mechanism has its graph of links (references to shapes), joints (kinematic pair information) and (optional) states(sets of kinematic values).
 Each joint corresponds to one kinematic pair from the list:
 * Low order pairs
   - fully constrained pair (no DOF);
@@ -165,18 +165,24 @@ Each joint corresponds to one kinematic pair from the list:
   - screw pair;
   - rack and pinion pair;
   - gear pair;
+  - linear flexible and pinion pair
 * High order pairs
   - point on surface pair;
   - sliding surface pair;
   - rolling surface pair;
   - point on planar curve pair;
   - sliding curve pair;
-  - rolling curve pair.
+  - rolling curve pair;
+  - linear flexible and planar curve pair.
   
 The kinematic pair information consists of
 * parameters;
 * limits (optional);
 * current position (optional).
+
+The kinematic value consist of
+* reference to joint; 
+* paramters;
 
 All mentioned data depends on the kinematic pair type.
 
@@ -1107,26 +1113,84 @@ this method creates a new mechanism and two empty subfolders for links and joint
 The next step is specifying of links (mechanism details)  via *AddLink* and *SetLink* commands.
 The last step of kinematic graph creation is adding of joints with using *AddJoint* and *SetJoint* commands.
 
+Here is an example of creating a new mechanism and adding a new joint with two links:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+TDF_Label aMechaism = myKTool->AddMechanism(); 
+TDF_Label aStartShape = ...
+TDF_Label aLink1 = myKTool->AddLink(aMechaism, aStartShape); // start link of joint
+TDF_Label aEndShape = ...
+TDF_Label aLink2 = myKTool->AddLink(aMechaism, aEndShape); // end link of joint
+TDF_Label aJoint = myKTool->AddJoint(aMechaism, aLink1, aLink2).
+~~~~~
+
+(Optional) the state label contains pair values to each kinematic joint within the kinematic mechanism.
+You can create new state with the empty kinematic value of joint, use:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+TDF_Label aMechaism = myKTool->AddMechanism(); 
+TDF_Label aJoint = ...
+TDF_Label aState = myKTool->AddState(aMechanism);
+TDF_Label aValue = myKTool->AddValue(aState).
+~~~~~
+
+**Note** Any mechanism has a base link. By default, the end link of the first joint is the base of the mechanism.
+You can specify any link as basic, use: 
+~~~~~
+TDF_Label aLink2 = myKTool->AddLink(aMechaism, aEndShape, Standard_True); // if base link exist, old base loses specification.
+~~~~~
+
 @subsubsection occt_xde_2_11_2 Checking
 
-Commands *IsMechanism*, *IsLink* and *IsJoint* helps to check that created labels are valid.
-To retrieve current graph state use the next methods: *GetMechanisms*, *GetLinks*, *GetJoints* *GetLinksOfJoint*, *GetJointOfLink*, *GetRefShapes (for link)*. 
+Commands to check that created labels are valid:
+- *IsMechanism* : checking for main labels of links and joints;
+- *IsLink* : checking for references to shape of the given link;
+- *IsJoint* : checking for references to end and start link of the given joint;
+- *IsValue* : checking for conteined  assigning data.
+
+To retrieve current graph state use the next methods:
+- *GetMechanisms* : retrieves all mechanisms labels;
+- *GetStates* : retrieves all state labels of the given mechanism;
+- *GetValuesOfState* : retrieves all references to values labels of the given state;
+- *GetStateOfValue* : retrieves the state label of the given value;
+- *GetLinks* : retrieves all links labels of the given mechanism;
+- *GetJoints* : retrieves all joint labels of the given mechanism;
+- *GetLinksOfJoint* : retrieves two references to links labels of the given joint;
+- *GetJointOfLink* : retrieves all references to joint labels of the given link;
+- *GetValuesOfJoint* : retrieves all references to value labels of the given joint;
+- *GetJointOfValue* : retrieves the joint label of the given value;
+- *GetRefShapes* : retrieves all references to shape labels of the given **link**.
 
 @subsubsection occt_xde_2_11_3 Editing
 
-To change links's referred shapes use *SetLink*.
-To change joint's referred links use *SetJoint*.
+To change links's referred shapes use:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+TDF_Label aLink = ...
+TDF_Label aShape = ... // or TDF_LabelSequence aShape
+aKTool->*SetLink*(aLink, aShape).
+~~~~~
+
+To change joint's referred links use:
+~~~~~
+Handle(XCAFDoc_KinematicTool) myKTool = ...
+aKTool->*SetJoint*(aJointLabel, aLink1Label, aLink2Label).
+~~~~~
 
 @subsubsection occt_xde_2_11_4 Deleting
 
-All kinematic data can be removed by *RemoveLink*, *RemoveJoint* and *RemoveMechanism* commands.
+All kinematic data can be removed use the next methods:
+- *RemoveLink* : removes the given link and all joints reference to it;
+- *RemoveJoint* : removes the given joint;
+- *RemoveMechanism* : removes the given mechanism with all its childrens;
+- *RemoveState* : removes the given state with all its values;
+- *RemoveValue* : removes the given value.
 
 @subsubsection occt_xde_2_11_5 Assigning data
 
 Each kinematic pair type has its set of parameters and so should be processed separately. The code below is a common example.
 
-Set data.
-
+Set pair data:
 ~~~~~
 // Create an object according to necessary type (LowOrder/LowOrderWithCoupling/HighOrder)
 XCAFKinematics_PairObject anObject = new XCAFKinematics_PairObject();
@@ -1138,13 +1202,33 @@ Handle(XCAFDoc_KinematicPair) aPair = XCAFDoc_KinematicPair::Set(aJointLabel);
 aPair->SetObject(anObject);
 ~~~~~
 
-Get data.
+(Optional) set kinematic value data:
+~~~~~
+// Create an object according to necessary type (RevolutePair, PrismaticPair, ...)
+Handle(StepKinematics_PairValue) aValueObject = new StepKinematics_PairValue;
+// Fill parameters according type
+...
+// Add attribute
+Handle(XCAFDoc_KinematicPairValue) aXCAFValue = XCAFDoc_KinematicPairValue::Set(aValueLabel, aJointLabel);
+aXCAFValue->SetObject(aValueObject);
+~~~~~
+
+Get pair data:
 ~~~~~
 // Get attribute from the label
 Handle(XCAFDoc_KinematicPair) aPair;
 if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
   Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
   TCollection_AsciiString aName = anObject->Name();
+}
+~~~~~
+
+(Optional) get kinematic value data:
+~~~~~
+// Get attribute from the label
+Handle(XCAFDoc_KinematicPairValue) aPairValue;
+if (aValueLabel.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue)) {
+  Handle(XCAFKinematics_PairValueObject) aPairValueObject = aPairValue->GetObject();
 }
 ~~~~~
 

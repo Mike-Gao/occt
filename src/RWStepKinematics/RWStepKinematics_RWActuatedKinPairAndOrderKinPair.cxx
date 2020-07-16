@@ -13,11 +13,9 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <RWStepKinematics_RWActuatedKinematicPair.hxx>
 #include <Interface_Check.hxx>
 #include <Interface_EntityIterator.hxx>
 #include <RWStepKinematics_RWActuatedKinPairAndOrderKinPair.hxx>
-#include <StepBasic_MeasureWithUnit.hxx>
 #include <StepData_StepReaderData.hxx>
 #include <StepData_StepWriter.hxx>
 #include <StepKinematics_ActuatedKinPairAndOrderKinPair.hxx>
@@ -65,7 +63,6 @@
 #include <StepKinematics_UnconstrainedPairValue.hxx>
 #include <StepKinematics_UniversalPair.hxx>
 #include <StepKinematics_UniversalPairWithRange.hxx>
-#include <RWStepKinematics_RWPrismaticPairWithRange.hxx>
 
 //=======================================================================
 //function : RWStepDimTol_RWGeoTolAndGeoTolWthMod

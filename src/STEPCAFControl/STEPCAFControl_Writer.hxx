@@ -156,8 +156,6 @@ public:
   Standard_EXPORT Standard_Boolean GetKinematicsMode() const;
 
 
-
-
 protected:
   //! Mehod to writing sequence of root assemblies or part of the file specified by use by one label 
   Standard_EXPORT Standard_Boolean Transfer (const TDF_LabelSequence& L, const STEPControl_StepModelType mode = STEPControl_AsIs, const Standard_CString multi = 0);

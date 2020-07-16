@@ -144,11 +144,11 @@ public:
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) Curve() const;
 
-  //! Sets curve attribute (only for SlidingCurve and RollingCurve)
+  //! Sets curve attribute (only for SlidingCurve, RollingCurve LinearAndFlexibleCurve)
   //! \param[in] theCurve curve
   Standard_EXPORT void SetFirstCurve(const Handle(Geom_Curve)& theCurve);
 
-  //! Gets curve attribute (only for SlidingCurve and RollingCurve)
+  //! Gets curve attribute (only for SlidingCurve, RollingCurve LinearAndFlexibleCurve)
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) FirstCurve() const;
 

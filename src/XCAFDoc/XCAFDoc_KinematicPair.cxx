@@ -186,8 +186,8 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
       TNaming_Builder aTNBuild(Label().FindChild(ChildLab_FirstGeomParam));
       aTNBuild.Generated(anEdge);
     }
-    if (theObject->Type() >= XCAFKinematics_PairType_SlidingCurve &&
-        theObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+    if (anObject->Type() == XCAFKinematics_PairType_SlidingCurve ||
+        anObject->Type() == XCAFKinematics_PairType_RollingCurve)
     {
       TopoDS_Edge anEdge1, anEdge2;
       if (!anObject->FirstCurve().IsNull()) {
@@ -199,6 +199,15 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
         aBuilder.MakeEdge(anEdge2, anObject->SecondCurve(), Precision::Confusion());
         TNaming_Builder aTNBuild2(Label().FindChild(ChildLab_SecondGeomParam));
         aTNBuild2.Generated(anEdge2);
+      }
+    }
+    if (anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+    {
+      TopoDS_Edge anEdge;
+      if (!anObject->FirstCurve().IsNull()) {
+        aBuilder.MakeEdge(anEdge, anObject->FirstCurve(), Precision::Confusion());
+        TNaming_Builder aTNBuild1(Label().FindChild(ChildLab_FirstGeomParam));
+        aTNBuild1.Generated(anEdge);
       }
     }
   }
@@ -318,8 +327,8 @@ Handle(XCAFKinematics_PairObject) XCAFDoc_KinematicPair::GetObject()  const
         aDefObject->SetCurve(BRep_Tool::Curve(anEdge, aFirst, aLast));
       }
     }
-    if (anObject->Type() >= XCAFKinematics_PairType_SlidingCurve &&
-        anObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+    if (anObject->Type() == XCAFKinematics_PairType_SlidingCurve ||
+        anObject->Type() == XCAFKinematics_PairType_RollingCurve)
     {
       if (Label().FindChild(ChildLab_FirstGeomParam).FindAttribute(TNaming_NamedShape::GetID(), aNS))
       {
@@ -332,6 +341,15 @@ Handle(XCAFKinematics_PairObject) XCAFDoc_KinematicPair::GetObject()  const
         TopoDS_Edge anEdge = TopoDS::Edge(TNaming_Tool::GetShape(aNS));
         Standard_Real aFirst, aLast;
         aDefObject->SetSecondCurve(BRep_Tool::Curve(anEdge, aFirst, aLast));
+      }
+    }
+    if (anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+    {
+      if (Label().FindChild(ChildLab_FirstGeomParam).FindAttribute(TNaming_NamedShape::GetID(), aNS))
+      {
+        TopoDS_Edge anEdge = TopoDS::Edge(TNaming_Tool::GetShape(aNS));
+        Standard_Real aFirst, aLast;
+        aDefObject->SetFirstCurve(BRep_Tool::Curve(anEdge, aFirst, aLast));
       }
     }
   }
