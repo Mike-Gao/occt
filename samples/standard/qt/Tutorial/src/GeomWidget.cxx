@@ -54,21 +54,12 @@ void GeomWidget::FitAll()
   if (myDocument3d->IsEmpty())
     my3dVidget->hide();
   else
-  {
-    myView3d->fitAll();
-    my3dVidget->show();
-    setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
-  }
-
+    Show3d();
 
   if (myDocument2d->IsEmpty())
     my2dVidget->hide();
   else
-  {
-    myView2d->fitAll();
-    my2dVidget->show();
-    setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Menu");
-  }
+    Show2d();
 }
 
 void GeomWidget::Show3d()
@@ -78,7 +69,19 @@ void GeomWidget::Show3d()
   setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
 }
 
+void GeomWidget::Show2d()
+{
+  myView2d->fitAll();
+  my2dVidget->show();
+  setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan");
+}
+
 Handle(V3d_View) GeomWidget::Get3dView()
 {
   return myView3d->getView();
+}
+
+Handle(V3d_View) GeomWidget::Get2dView()
+{
+  return myView2d->getView();
 }

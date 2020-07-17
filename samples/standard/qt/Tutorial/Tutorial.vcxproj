@@ -73,7 +73,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmaind.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgetsd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Guid.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Cored.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGLd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmaind.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgetsd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Guid.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Cored.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGLd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -113,7 +113,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmain.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgets.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Gui.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Core.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGL.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmain.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgets.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Gui.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Core.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGL.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -151,6 +151,9 @@
     <ClCompile Include="..\..\samples_src\OcafSamples.cxx" />
     <ClCompile Include="src\OcctHighlighter.cxx" />
     <ClCompile Include="src\OcctWindow.cxx" />
+    <ClCompile Include="..\..\samples_src\Sample2D_Face.cxx" />
+    <ClCompile Include="..\..\samples_src\Sample2D_Image.cxx" />
+    <ClCompile Include="..\..\samples_src\Sample2D_Markers.cxx" />
     <ClCompile Include="..\..\samples_src\TOcafFunction_BoxDriver.cxx" />
     <ClCompile Include="..\..\samples_src\TOcafFunction_CutDriver.cxx" />
     <ClCompile Include="..\..\samples_src\TOcafFunction_CylDriver.cxx" />
@@ -160,6 +163,8 @@
     <ClCompile Include="src\TranstaleDialog.cxx" />
     <ClCompile Include="..\..\samples_src\TriangulationSamples.cxx" />
     <ClCompile Include="src\View.cxx" />
+    <ClCompile Include="..\..\samples_src\Viewer2dSamples.cxx" />
+    <ClCompile Include="..\..\samples_src\Viewer3dSamples.cxx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\samples_src\AdaptorCurve2d_AIS.h" />
@@ -223,6 +228,9 @@
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="src\OcctWindow.h" />
+    <ClInclude Include="..\..\samples_src\Sample2D_Face.h" />
+    <ClInclude Include="..\..\samples_src\Sample2D_Image.h" />
+    <ClInclude Include="..\..\samples_src\Sample2D_Markers.h" />
     <ClInclude Include="..\..\samples_src\TOcafFunction_BoxDriver.h" />
     <ClInclude Include="..\..\samples_src\TOcafFunction_CutDriver.h" />
     <ClInclude Include="..\..\samples_src\TOcafFunction_CylDriver.h" />
@@ -250,6 +258,8 @@
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/View.h</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_View.cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include="..\..\samples_src\Viewer2dSamples.h" />
+    <ClInclude Include="..\..\samples_src\Viewer3dSamples.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="win64\vc14\moc\moc_ApplicationCommon.cpp">
@@ -330,13 +340,14 @@
     <None Include="..\..\samples_src\DataExchange.json" />
     <None Include="..\..\samples_src\Geometry.json" />
     <None Include="..\..\samples_src\Ocaf.json" />
+    <None Include="..\..\samples_src\Open_Cascade_logotype_for_website.png" />
     <CustomBuild Include="..\..\samples_src\Samples.qrc">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Open_Cascade_logotype_for_website.png;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\Viewer2d.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o debug\qrc_Samples.cpp</Command>
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">RCC ../../samples_src/Samples.qrc</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">debug\qrc_Samples.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Open_Cascade_logotype_for_website.png;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\Viewer2d.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o release\qrc_Samples.cpp</Command>
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">RCC ../../samples_src/Samples.qrc</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">release\qrc_Samples.cpp;%(Outputs)</Outputs>
@@ -354,6 +365,7 @@
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">RCC res/Tutorial.qrc</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">release\qrc_Tutorial.cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <None Include="..\..\samples_src\Viewer2d.json" />
     <None Include="..\..\samples_src\Viewer3d.json" />
     <None Include="res\antialiasing.png" />
     <None Include="res\cursor_rotate.png" />

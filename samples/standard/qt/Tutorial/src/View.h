@@ -30,42 +30,39 @@ public:
 
     ~View();
 
-    virtual void                  init();
-    bool                          dump( Standard_CString theFile );
-    QAction*              getViewAction(ViewAction theAction);
-    QList<QAction*>       getViewActions();
-    QAction*              getRaytraceAction(RaytraceAction theAction);
-    void                          noActiveActions();
-    bool                          isShadingMode();
+    virtual void    init();
+    bool            dump( Standard_CString theFile );
+    QAction*        getViewAction(ViewAction theAction);
+    QList<QAction*> getViewActions();
+    QAction*        getRaytraceAction(RaytraceAction theAction);
+    void noActiveActions();
+    bool sShadingMode();
 
-    void                          EnableRaytracing();
-    void                          DisableRaytracing();
+    void EnableRaytracing();
+    void DisableRaytracing();
 
-    void                          SetRaytracedShadows (bool theState);
-    void                          SetRaytracedReflections (bool theState);
-    void                          SetRaytracedAntialiasing (bool theState);
+    void SetRaytracedShadows (bool theState);
+    void SetRaytracedReflections (bool theState);
+    void SetRaytracedAntialiasing (bool theState);
 
-    bool                          IsRaytracingMode() const { return myIsRaytracing; }
-    bool                          IsShadowsEnabled() const { return myIsShadowsEnabled; }
-    bool                          IsReflectionsEnabled() const { return myIsReflectionsEnabled; }
-    bool                          IsAntialiasingEnabled() const { return myIsAntialiasingEnabled; }
+    bool IsRaytracingMode() const { return myIsRaytracing; }
+    bool IsShadowsEnabled() const { return myIsShadowsEnabled; }
+    bool IsReflectionsEnabled() const { return myIsReflectionsEnabled; }
+    bool IsAntialiasingEnabled() const { return myIsAntialiasingEnabled; }
 
-    static QString                GetMessages( int type,TopAbs_ShapeEnum aSubShapeType,
-                                               TopAbs_ShapeEnum aShapeType );
-    static QString                GetShapeType( TopAbs_ShapeEnum aShapeType );
+    static QString GetMessages(int type,TopAbs_ShapeEnum aSubShapeType, TopAbs_ShapeEnum aShapeType);
+    static QString GetShapeType(TopAbs_ShapeEnum aShapeType);
 
-    Standard_EXPORT static void   OnButtonuseraction( int ExerciceSTEP,
-                                                      Handle(AIS_InteractiveContext)& );
-    Standard_EXPORT static void   DoSelection( int Id,
-                                               Handle(AIS_InteractiveContext)& );
-    Standard_EXPORT static void   OnSetSelectionMode( Handle(AIS_InteractiveContext)&,
-                                                      Standard_Integer&,
-                                                      TopAbs_ShapeEnum& SelectionMode,
-                                                      Standard_Boolean& );
-    virtual QPaintEngine*         paintEngine() const;
-    Handle(V3d_View)              getView();
+    Standard_EXPORT static void OnButtonuseraction(int ExerciceSTEP, Handle(AIS_InteractiveContext)& );
+    Standard_EXPORT static void DoSelection(int Id, Handle(AIS_InteractiveContext)& );
+    Standard_EXPORT static void OnSetSelectionMode(Handle(AIS_InteractiveContext)&,
+                                                   Standard_Integer&,
+                                                   TopAbs_ShapeEnum& SelectionMode,
+                                                   Standard_Boolean& );
+    virtual QPaintEngine* paintEngine() const;
+    Handle(V3d_View)      getView();
 signals:
-    void                          selectionChanged();
+    void selectionChanged();
 
 public slots:
     void fitAll();
@@ -100,7 +97,6 @@ protected:
 
     Handle(AIS_InteractiveContext)& getContext();
     void                            activateCursor( const CurrentAction3d );
-    void                            Popup( const int x, const int y );
     CurrentAction3d                 getCurrentMode();
 
     virtual void onLButtonDown( const int nFlags, const QPoint point );
@@ -121,8 +117,6 @@ private:
     void MultiMoveEvent( const int x, const int y );
     void MultiDragEvent( const int x, const int y, const int TheState );
     void MultiInputEvent( const int x, const int y );
-    void DrawRectangle( const int MinX, const int MinY,
-                        const int MaxX, const int MaxY, const bool Draw );
 
 private:
     bool                            myIsRaytracing;

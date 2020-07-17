@@ -40,7 +40,6 @@ class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
 public:
   ApplicationCommonWindow(QString theSampleType);
 
-	static ApplicationCommonWindow* getApplication();
 	static QString                  getResourceDir();
   static TCollection_AsciiString  getSampleSourceDir();
 
@@ -53,12 +52,7 @@ protected:
   virtual DocumentCommon* createNewDocument();
 
 public slots:
-  void            onUseVBO();
   virtual void    onAbout();
-  void            onViewToolBar();
-  void            onToolAction();
-  void            windowsMenuActivated( bool checked/*int id*/ );
-	void            onSetMaterial( int theMaterial );
 
 protected:
   template <typename PointerToMemberFunction>
@@ -79,11 +73,13 @@ protected:
   void MenuFormJson(const QString& thePath, QSignalMapper* theMapper);
 
 private slots:
-  void onCloseAllWindows() { qApp->closeAllWindows(); }
+  void onCloseAllWindows() { qApp->closeAllWindows(); };
 
   void onProcessSample(const QString& theSampleName);
   void onProcessExchange(const QString& theSampleName);
   void onProcessOcaf(const QString& theSampleName);
+  void onProcessViewer3d(const QString& theSampleName);
+  void onProcessViewer2d(const QString& theSampleName);
 
 private:
 
@@ -93,11 +89,10 @@ private:
   QString GetTitle();
 
 	void createStandardOperations();
-	void createCasCadeOperations();
 
   QString selectFileName(const QString& theSampleName, TranslateDialog* theDialog, int& theMode);
-  TranslateDialog* ApplicationCommonWindow::getDataExchangeDialog(const QString& theSampleName);
-  TranslateDialog* ApplicationCommonWindow::getOcafDialog(const QString& theSampleName);
+  TranslateDialog* getDataExchangeDialog(const QString& theSampleName);
+  TranslateDialog* getOcafDialog(const QString& theSampleName);
 
 private:
   Handle(BaseSample) mySamples;
@@ -116,6 +111,9 @@ private:
   QSignalMapper*   mySampleMapper;
   QSignalMapper*   myExchangeMapper;
   QSignalMapper*   myOcafMapper;
+  QSignalMapper*   myViewer3dMapper;
+  QSignalMapper*   myViewer2dMapper;
+
   QTextEdit*       myCodeView;
   QTextEdit*       myResultView;
   OcctHighlighter* myCodeViewHighlighter;
