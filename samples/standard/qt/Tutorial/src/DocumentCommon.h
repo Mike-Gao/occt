@@ -21,7 +21,6 @@ public:
 	DocumentCommon(ApplicationCommonWindow* );
 	~DocumentCommon();
 
-	ApplicationCommonWindow*       getApplication();
 	Handle(AIS_InteractiveContext) getContext();
   Handle(V3d_Viewer)             getViewer();
   void                           setViewer(Handle(V3d_Viewer) theViewer);
@@ -35,17 +34,6 @@ signals:
   void selectionChanged();
 	void sendCloseDocument( DocumentCommon* );
 
-public slots:
-	virtual void onMaterial();
-  virtual void onMaterial( int );
-	virtual void onDelete();
-
-	void onWireframe();
-	void onShading();
-	void onColor();
-	void onTransparency();
-	void onTransparency( int );
-
 private:
   Handle(V3d_Viewer) Viewer (const Standard_ExtString theName,
                              const Standard_CString theDomain,
@@ -55,7 +43,6 @@ private:
                              const Standard_Boolean theDefaultComputedMode );
 
 protected:
-	ApplicationCommonWindow*       myApp;
 	Handle(V3d_Viewer)             myViewer;
 	Handle(AIS_InteractiveContext) myContext;
   bool myContextIsEmpty;

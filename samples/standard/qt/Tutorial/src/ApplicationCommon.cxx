@@ -6,7 +6,8 @@
 #include "TriangulationSamples.h"
 #include "DataExchangeSamples.h"
 #include "OcafSamples.h"
-
+#include "Viewer3dSamples.h"
+#include "Viewer2dSamples.h"
 
 #include <QtGlobal>
 #include <QApplication>
@@ -41,7 +42,6 @@
 #include <stdlib.h>
 #include <memory>
 
-static ApplicationCommonWindow* stApp = 0;
 static QMdiArea* stWs = 0;
 
 ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
@@ -49,13 +49,14 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   mySampleMapper(new QSignalMapper(this)),
   myExchangeMapper(new QSignalMapper(this)),
   myOcafMapper(new QSignalMapper(this)),
+  myViewer3dMapper(new QSignalMapper(this)),
+  myViewer2dMapper(new QSignalMapper(this)),
   myStdToolBar(nullptr),
   myCasCadeBar(nullptr),
   myViewBar(nullptr),
   myFilePopup(nullptr),
   mySamples(nullptr)
 {
-  stApp = this;
   SetAppType(theSampleType);
   setWindowTitle(GetTitle());
 
@@ -82,20 +83,28 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
     MenuFormJson(":/menus/Ocaf.json", myOcafMapper);
     break;
   case ApplicationType::Viewer3d:
+    mySamples = new Viewer3dSamples();
+    MenuFormJson(":/menus/Viewer3d.json", myViewer3dMapper);
     break;
   case ApplicationType::Viewer2d:
+    mySamples = new Viewer2dSamples();
+    MenuFormJson(":/menus/Viewer2d.json", myViewer2dMapper);
     break;
   default:
     setWindowTitle("Unknown application");
-    break;
+    return;
   }
 
-  connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+  connect(mySampleMapper,   static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessSample);
   connect(myExchangeMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessExchange);  
-  connect(myOcafMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+  connect(myOcafMapper,     static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
           this, &ApplicationCommonWindow::onProcessOcaf);  
+  connect(myViewer3dMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+          this, &ApplicationCommonWindow::onProcessViewer3d);
+  connect(myViewer2dMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+          this, &ApplicationCommonWindow::onProcessViewer2d);
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
   mySamples->SetCodePach(aSampleSourcePach);
 
@@ -139,7 +148,6 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   Q_INIT_RESOURCE(Samples);
 
   createStandardOperations();
-  createCasCadeOperations();
 
   if (APP_TYPE == ApplicationType::DataExchange)
   {
@@ -163,6 +171,31 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
       myGeomWidget->Show3d();
     }
   }
+  else if (APP_TYPE == ApplicationType::Viewer3d)
+  {
+    Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
+    if (aViewer3dSamples)
+    {
+      aViewer3dSamples->SetContext(myDocument3d->getContext());
+      aViewer3dSamples->AppendBottle();
+      aViewer3dSamples->SetView(myGeomWidget->Get3dView());
+      myDocument3d->SetObjects(mySamples->Get3dObjects());
+      myGeomWidget->FitAll();
+    }
+  }
+  else if (APP_TYPE == ApplicationType::Viewer2d)
+  {
+    Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
+    if (aViewer2dSamples)
+    {
+      aViewer2dSamples->SetContext(myDocument2d->getContext());
+      aViewer2dSamples->SetView(myGeomWidget->Get2dView());
+      aViewer2dSamples->SetViewer(myDocument2d->getViewer());
+      myDocument2d->SetObjects(mySamples->Get2dObjects());
+      myGeomWidget->Show2d();
+    }
+  }
+
   resize(1280, 720);
 }
 
@@ -211,37 +244,17 @@ QString ApplicationCommonWindow::GetTitle()
 
 void ApplicationCommonWindow::createStandardOperations()
 {
-  QAction* filePrefUseVBOAction = CreateAction(&ApplicationCommonWindow::onUseVBO, "Use VBO");
-  filePrefUseVBOAction->setCheckable( true );
-  filePrefUseVBOAction->setChecked( true );
-  myStdActions.insert(StdActions::FilePrefUseVBO, filePrefUseVBOAction );
 
   QAction* fileQuitAction = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "Quit", "CTRL+Q");
   myStdActions.insert(StdActions::FileQuit, fileQuitAction );
 
-  QAction* viewToolAction = CreateAction(&ApplicationCommonWindow::onViewToolBar, "Toolbar");
-  viewToolAction->setCheckable( true );
-  viewToolAction->setChecked( true );
-  myStdActions.insert(StdActions::ViewTool, viewToolAction );
-
   QAction* helpAboutAction = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", ":/icons/help.png");
   myStdActions.insert(StdActions::HelpAbout, helpAboutAction);
-
-  // create preferences menu
-  QMenu* aPrefMenu = new QMenu(tr("&Preferences"));
-  aPrefMenu->addAction( filePrefUseVBOAction );
 
   // populate a menu with all actions
   myFilePopup = new QMenu( this );
   myFilePopup = menuBar()->addMenu(tr("&File"));
-  myFilePopup->addMenu( aPrefMenu );
   myFilePopup->addAction( fileQuitAction );
-
-  // add a view menu
-  QMenu * view = new QMenu( this );
-
-  view = menuBar()->addMenu(tr("&View"));
-  view->addAction( viewToolAction );
 
   for(QMenu* aSampleMenu: mySamplePopups)
   {
@@ -253,99 +266,6 @@ void ApplicationCommonWindow::createStandardOperations()
   menuBar()->addSeparator();
   help = menuBar()->addMenu(tr("&Help"));
   help->addAction( helpAboutAction );
-
-  // populate a tool bar with some actions
-  myStdToolBar = addToolBar(tr("File Operations"));
-  myStdToolBar->addAction( helpAboutAction );
-
-}
-
-void ApplicationCommonWindow::createCasCadeOperations()
-{
-  myCasCadeBar = addToolBar( tr( "Shape Operations" ) );
-  QAction* a;
-
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Wireframe"), "", ":/icons/tool_wireframe.png");
-  myToolActions.insert(ToolActions::ToolWireframe, a );
-
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Shading"), "", ":/icons/tool_shading.png");
-  myToolActions.insert(ToolActions::ToolShading, a );
-
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Color"), "", ":/icons/tool_color.png");
-  myToolActions.insert(ToolActions::ToolColor, a );
-
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Material"), "", ":/icons/tool_material.png");
-  myToolActions.insert(ToolActions::ToolMaterial, a );
-
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Transparency"), "", ":/icons/tool_transparency.png");
-  myToolActions.insert(ToolActions::ToolTransparency, a );
-
-  a = CreateAction(&ApplicationCommonWindow::onToolAction, tr("Delete"), "", ":/icons/tool_delete.png");
-  myToolActions.insert(ToolActions::ToolDelete, a );
-
-  QSignalMapper* sm = new QSignalMapper( this );
-  connect( sm, SIGNAL( mapped( int ) ), this, SLOT( onSetMaterial( int ) ) );
-
-  a = new QAction(tr("Brass"), this );
-  a->setToolTip(tr("Brass") );
-  a->setStatusTip(tr("Brass") );
-  sm->setMapping( a,(int)Graphic3d_NOM_BRASS );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_BRASS, a );
-
-  a = new QAction(tr("Bronze"), this );
-  a->setToolTip(tr("Bronze") );
-  a->setStatusTip(tr("Bronze") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_BRONZE );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_BRONZE, a );
-
-  a = new QAction(tr("Copper"), this );
-  a->setToolTip(tr("Copper") );
-  a->setStatusTip(tr("Copper") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_COPPER );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_COPPER, a );
-
-  a = new QAction(tr("Gold"), this );
-  a->setToolTip(tr("Gold") );
-  a->setStatusTip(tr("Gold") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_GOLD );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_GOLD, a );
-
-  a = new QAction(tr("Pewter"), this );
-  a->setToolTip(tr("Pewter") );
-  a->setStatusTip(tr("Pewter") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_PEWTER );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_PEWTER, a );
-
-  a = new QAction(tr("Placter"), this );
-  a->setToolTip(tr("Placter") );
-  a->setStatusTip(tr("Placter") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_PLASTER );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_PLASTER, a );
-
-  a = new QAction(tr("Plactic"), this );
-  a->setToolTip(tr("Plactic") );
-  a->setStatusTip(tr("Plactic") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_PLASTIC );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_PLASTIC, a );
-
-  a = new QAction(tr("Silver"), this );
-  a->setToolTip(tr("Silver") );
-  a->setStatusTip(tr("Silver") );
-  sm->setMapping( a, ( int )Graphic3d_NOM_SILVER );
-  connect( a, SIGNAL( triggered() ), sm, SLOT( map() ) );
-  myMaterialActions.insert( Graphic3d_NOM_SILVER, a );
-
-  for (QAction* anAction: myToolActions)
-    myCasCadeBar->addAction(anAction);
-
-  myViewBar = addToolBar(tr("View Operations"));
 }
 
 QAction*  ApplicationCommonWindow::getToolAction(ToolActions theAction)
@@ -359,51 +279,10 @@ QList<QAction*> ApplicationCommonWindow::getMaterialActions()
 }
 
 
-void ApplicationCommonWindow::windowsMenuActivated( bool checked )
-{
-  QAction* aSender = qobject_cast<QAction*>( sender() );
-  if ( !aSender )
-    return;
-  QWidget * w = stWs->subWindowList().at( aSender->data().toInt() );
-  if ( w && checked )
-    w->setFocus();
-}
-
-ApplicationCommonWindow* ApplicationCommonWindow::getApplication()
-{
-  return stApp;
-}
 
 DocumentCommon* ApplicationCommonWindow::createNewDocument()
 {
   return new DocumentCommon(this);
-}
-
-void ApplicationCommonWindow::onUseVBO()
-{
-  Handle(AIS_InteractiveContext) aContextAIS = myDocument3d->getContext();
-
-  if (aContextAIS.IsNull())
-    return;
-
-  Handle(OpenGl_GraphicDriver) aDriver =
-    Handle(OpenGl_GraphicDriver)::DownCast (aContextAIS->CurrentViewer()->Driver());
-
-  if (!aDriver.IsNull())
-  {
-    aDriver->ChangeOptions().vboDisable = Standard_True;
-  }
-}
-
-void ApplicationCommonWindow::onViewToolBar()
-{
-  bool show = myStdActions.value(StdActions::ViewTool)->isChecked();
-  if ( show == myStdToolBar->isVisible() )
-    return;
-  if ( show )
-    myStdToolBar->show();
-  else
-    myStdToolBar->hide();
 }
 
 void ApplicationCommonWindow::onAbout()
@@ -411,34 +290,6 @@ void ApplicationCommonWindow::onAbout()
   QMessageBox::information( this, tr("Tutorial"), 
                             tr("Qt based application to study OpenCASCADE Technology"), 
                             tr("Ok" ), QString::null, QString::null, 0, 0 );
-}
-
-
-void ApplicationCommonWindow::onToolAction()
-{
-  QAction* sentBy = (QAction*)sender();
-  if( sentBy == myToolActions.value(ToolActions::ToolWireframe) )
-    myDocument3d->onWireframe();
-
-  if( sentBy == myToolActions.value(ToolActions::ToolShading) )
-    myDocument3d->onShading();
-
-  if( sentBy == myToolActions.value(ToolActions::ToolColor) )
-    myDocument3d->onColor();
-
-  if( sentBy == myToolActions.value(ToolActions::ToolMaterial) )
-    myDocument3d->onMaterial();
-
-  if( sentBy == myToolActions.value(ToolActions::ToolTransparency) )
-    myDocument3d->onTransparency();
-
-  if( sentBy == myToolActions.value(ToolActions::ToolDelete) )
-    myDocument3d->onDelete();
-}
-
-void ApplicationCommonWindow::onSetMaterial( int theMaterial )
-{
-    myDocument3d->onMaterial( theMaterial );
 }
 
 QString ApplicationCommonWindow::getResourceDir()
@@ -521,7 +372,6 @@ void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 
 void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
 {
-
   setWindowTitle(GetTitle() + " - " + theSampleName);
   int aMode;
   QString aFileName = selectFileName(theSampleName, getDataExchangeDialog(theSampleName), aMode);
@@ -555,11 +405,42 @@ void ApplicationCommonWindow::onProcessOcaf(const QString& theSampleName)
     }
     QApplication::setOverrideCursor(Qt::WaitCursor);
     mySamples->Process(theSampleName.toUtf8().data());
+    myDocument2d->SetObjects(mySamples->Get2dObjects());
     myCodeView->setPlainText(mySamples->GetCode().ToCString());
     myResultView->setPlainText(mySamples->GetResult().ToCString());
     QApplication::restoreOverrideCursor();
   }
+}
 
+void ApplicationCommonWindow::onProcessViewer3d(const QString& theSampleName)
+{
+  setWindowTitle(GetTitle() + " - " + theSampleName);
+  Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
+  if (aViewer3dSamples)
+  {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    mySamples->Process(theSampleName.toUtf8().data());
+    myCodeView->setPlainText(mySamples->GetCode().ToCString());
+    myResultView->setPlainText(mySamples->GetResult().ToCString());
+    myGeomWidget->FitAll();
+    QApplication::restoreOverrideCursor();
+  }
+}
+
+void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
+{
+  setWindowTitle(GetTitle() + " - " + theSampleName);
+  Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
+  if (aViewer2dSamples)
+  {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    mySamples->Process(theSampleName.toUtf8().data());
+    myDocument2d->SetObjects(mySamples->Get2dObjects());
+    myCodeView->setPlainText(mySamples->GetCode().ToCString());
+    myResultView->setPlainText(mySamples->GetResult().ToCString());
+    myGeomWidget->Show2d();
+    QApplication::restoreOverrideCursor();
+  }
 }
 
 QString ApplicationCommonWindow::selectFileName(const QString& theSampleName,

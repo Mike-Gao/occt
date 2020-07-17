@@ -24,9 +24,7 @@ public:
 
   enum class ExchangeType { None, Binary, Xml };
   virtual void Process(TCollection_AsciiString theSampleName) override;
-  //void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
-  //void SetStepType(STEPControl_StepModelType theStepType) { myStepType = theStepType; };
-  //void SetView(Handle(V3d_View) theView) { myView = theView; };
+
   void               SetViewer(Handle(V3d_Viewer) theViewer) { myViewer = theViewer; };
   void               SetContext(Handle(AIS_InteractiveContext) theContext) { myContext = theContext; };
   void               SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };

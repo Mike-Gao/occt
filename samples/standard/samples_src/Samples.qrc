@@ -6,5 +6,9 @@
         <file>DataExchange.json</file>
         <file>Viewer3d.json</file>
         <file>Ocaf.json</file>
+        <file>Viewer2d.json</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>Open_Cascade_logotype_for_website.png</file>
     </qresource>
 </RCC>

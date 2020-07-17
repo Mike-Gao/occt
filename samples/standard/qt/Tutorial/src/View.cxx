@@ -93,9 +93,9 @@ void View::init()
   if ( myV3dView.IsNull() )
     myV3dView = myContext->CurrentViewer()->CreateView();
 
-  Handle(OcctWindow) hWnd = new OcctWindow ( this );
-  myV3dView->SetWindow (hWnd);
-  if ( !hWnd->IsMapped() )
+  Handle(OcctWindow) hWnd = new OcctWindow(this);
+  myV3dView->SetWindow(hWnd);
+  if(!hWnd->IsMapped())
   {
     hWnd->Map();
   }
@@ -116,15 +116,13 @@ void View::init()
     myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
 }
 
-void View::paintEvent( QPaintEvent *  )
+void View::paintEvent(QPaintEvent *)
 {
-//  QApplication::syncX();
   myV3dView->Redraw();
 }
 
-void View::resizeEvent( QResizeEvent * )
+void View::resizeEvent(QResizeEvent *)
 {
-//  QApplication::syncX();
   if( !myV3dView.IsNull() )
   {
     myV3dView->MustBeResized();
@@ -583,70 +581,17 @@ void View::onLButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
 
   myCurrentMode = CurrentAction3d::DynamicZooming;
 
-  //if ( nFlags & CASCADESHORTCUTKEY )
-  //{
-  //  myCurrentMode = CurAction3d_DynamicZooming;
-  //}
-  //else
-  //{
-  //  switch ( myCurrentMode )
-  //  {
-  //    case CurAction3d_Nothing:
-  //         if ( nFlags & MULTISELECTIONKEY )
-  //           MultiDragEvent( myXmax, myYmax, -1 );
-  //         else
-  //           DragEvent( myXmax, myYmax, -1 );
-  //         break;
-  //    case CurAction3d_DynamicZooming:
-  //         break;
-  //    case CurAction3d_WindowZooming:
-  //         break;
-  //    case CurAction3d_DynamicPanning:
-  //         break;
-  //    case CurAction3d_GlobalPanning:
-  //         break;
-  //    case CurAction3d_DynamicRotation:
-  //         if (myHlrModeIsOn)
-  //         {
-  //           myV3dView->SetComputedMode (Standard_False);
-  //         }
-  //         myV3dView->StartRotation( point.x(), point.y() );
-  //         break;
-  //    default:
-  //         throw Standard_Failure( "incompatible Current Mode" );
-  //         break;
-  //  }
-  //}
   activateCursor( myCurrentMode );
 }
 
 void View::onMButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint /*point*/ )
 {
-//  if ( nFlags & CASCADESHORTCUTKEY )
-    myCurrentMode = CurrentAction3d::DynamicPanning;
+  myCurrentMode = CurrentAction3d::DynamicPanning;
   activateCursor( myCurrentMode );
 }
 
 void View::onRButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint point )
 {
-  //if ( nFlags & CASCADESHORTCUTKEY )
-  //{
-  //  if (myHlrModeIsOn)
-  //  {
-  //    myV3dView->SetComputedMode (Standard_False);
-  //  }
-  //  myCurrentMode = CurAction3d_DynamicRotation;
-  //  myV3dView->StartRotation( point.x(), point.y() );
-  //}
-  //else
-  //{
-  //  Popup( point.x(), point.y() );
-  //}
-
-  //if (myHlrModeIsOn)
-  //{
-  //  myV3dView->SetComputedMode(Standard_False);
-  //}
   if (myIis3dView)
   { 
     myCurrentMode = CurrentAction3d::DynamicRotation;
@@ -672,7 +617,6 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
             }
             else
             {
-              DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );
               myXmax = point.x();
               myYmax = point.y();
               if ( nFlags & MULTISELECTIONKEY )
@@ -686,7 +630,6 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
             noActiveActions();
             break;
         case CurrentAction3d::WindowZooming:
-            DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );//,LongDash);
             myXmax = point.x();
             myYmax = point.y();
             if ( (abs( myXmin - myXmax ) > ValZWMin ) ||
@@ -723,21 +666,17 @@ void View::onMButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint /*point*/ )
 
 void View::onRButtonUp( Qt::MouseButtons /*nFlags*/, const QPoint point )
 {
-    if ( myCurrentMode == CurrentAction3d::Nothing )
-        Popup( point.x(), point.y() );
-    else
+    QApplication::setOverrideCursor( Qt::WaitCursor );
+    // reset tyhe good Degenerated mode according to the strored one
+    //   --> dynamic rotation may have change it
+    if (myHlrModeIsOn)
     {
-        QApplication::setOverrideCursor( Qt::WaitCursor );
-        // reset tyhe good Degenerated mode according to the strored one
-        //   --> dynamic rotation may have change it
-        if (myHlrModeIsOn)
-        {
-          myV3dView->SetComputedMode (myHlrModeIsOn);
-          myV3dView->Redraw();
-        }
-        QApplication::restoreOverrideCursor();
-        myCurrentMode = CurrentAction3d::Nothing;
+      myV3dView->SetComputedMode (myHlrModeIsOn);
+      myV3dView->Redraw();
     }
+    QApplication::restoreOverrideCursor();
+    myCurrentMode = CurrentAction3d::Nothing;
+
     activateCursor( myCurrentMode );
 }
 
@@ -750,12 +689,10 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
         case CurrentAction3d::Nothing:
           myXmax = point.x();
           myYmax = point.y();
-          DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );
           if ( nFlags & MULTISELECTIONKEY )
               MultiDragEvent( myXmax, myYmax, 0 );
           else
             DragEvent( myXmax, myYmax, 0 );
-            DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_True );
             break;
         case CurrentAction3d::DynamicZooming:
           myV3dView->Zoom( myXmax, myYmax, point.x(), point.y() );
@@ -765,8 +702,6 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
         case CurrentAction3d::WindowZooming:
           myXmax = point.x();
           myYmax = point.y();
-          DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_False );
-          DrawRectangle( myXmin, myYmin, myXmax, myYmax, Standard_True );
           break;
         case CurrentAction3d::DynamicPanning:
           myV3dView->Pan( point.x() - myXmax, myYmax - point.y() );
@@ -856,100 +791,8 @@ void View::MultiInputEvent( const int /*x*/, const int /*y*/ )
   emit selectionChanged();
 }
 
-void View::Popup( const int /*x*/, const int /*y*/ )
-{
-  ApplicationCommonWindow* stApp = ApplicationCommonWindow::getApplication();
-  if ( myContext->NbSelected() )
-  {
-    QMenu* myToolMenu = new QMenu( 0 );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolWireframe) );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolShading) );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolColor) );
-        
-    QMenu* myMaterMenu = new QMenu( myToolMenu );
-
-    QList<QAction*> aMeterActions = stApp->getMaterialActions();
-        
-    myMaterMenu = myToolMenu->addMenu( QPixmap(":/icons/tool_material.png"), tr("Material") );
-    for (QAction* aMatAction: aMeterActions)
-      myMaterMenu->addAction(aMatAction);
-       
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolTransparency) );
-    myToolMenu->addAction(stApp->getToolAction(ToolActions::ToolDelete) );
-    addItemInPopup(myToolMenu);
-    myToolMenu->exec( QCursor::pos() );
-    delete myToolMenu;
-  }
-  else
-  {
-    if (!myBackMenu)
-    {
-      myBackMenu = new QMenu( 0 );
-
-      QAction* a = new QAction(tr("Change Background"), this );
-      a->setToolTip(tr("Change Background") );
-      connect( a, SIGNAL( triggered() ), this, SLOT( onBackground() ) );
-      myBackMenu->addAction( a );  
-      addItemInPopup(myBackMenu);
-
-      a = new QAction(tr("Environment Map"), this );
-      a->setToolTip(tr("Environment Map") );
-      connect( a, SIGNAL( triggered() ), this, SLOT( onEnvironmentMap() ) );
-      a->setCheckable( true );
-      a->setChecked( false );
-      myBackMenu->addAction( a );  
-      addItemInPopup(myBackMenu);
-    }
-
-    myBackMenu->exec( QCursor::pos() );
-  }
-}
-
 void View::addItemInPopup( QMenu* /*theMenu*/)
 {
-}
-
-void View::DrawRectangle(const int MinX, const int MinY,
-       const int MaxX, const int MaxY, const bool Draw)
-{ 
-  static Standard_Integer StoredMinX, StoredMaxX, StoredMinY, StoredMaxY;
-  static Standard_Boolean m_IsVisible;
-
-  StoredMinX = (MinX < MaxX) ? MinX: MaxX ;
-  StoredMinY = (MinY < MaxY) ? MinY: MaxY ;
-  StoredMaxX = (MinX > MaxX) ? MinX: MaxX ;
-  StoredMaxY = (MinY > MaxY) ? MinY: MaxY ;
-
-  QRect aRect;
-  aRect.setRect( StoredMinX, StoredMinY, abs(StoredMaxX-StoredMinX), abs(StoredMaxY-StoredMinY));
-
-  if ( !myRectBand ) 
-  {
-    myRectBand = new QRubberBand( QRubberBand::Rectangle, this );
-    myRectBand->setStyle( QStyleFactory::create("windows") );
-    myRectBand->setGeometry( aRect );
-    myRectBand->show();
-
-    /*QPalette palette;
-    palette.setColor(myRectBand->foregroundRole(), Qt::white);
-    myRectBand->setPalette(palette);*/
-  }
-
-  if ( m_IsVisible && !Draw ) // move or up  : erase at the old position
-  {
-    myRectBand->hide();
-    delete myRectBand;
-    myRectBand = 0;
-    m_IsVisible = false;
-  }
-
-  if (Draw) // move : draw
-  {
-    //aRect.setRect( StoredMinX, StoredMinY, abs(StoredMaxX-StoredMinX), abs(StoredMaxY-StoredMinY));
-    m_IsVisible = true;
-    myRectBand->setGeometry( aRect );
-    //myRectBand->show();
-  }
 }
 
 void View::noActiveActions()

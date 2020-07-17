@@ -460,25 +460,18 @@ void OcafSamples::RedoOcafSample()
     myResult << "Nothing to redo" << std::endl;
 }
 
-void OcafSamples::DialogSaveBinOcafSample()
-{
-  Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
-  BinDrivers::DefineFormat(anOcaf_Application);
-  myOcafDoc->ChangeStorageFormat("BinOcaf");
-  // Saves the document in the current application
-  PCDM_StoreStatus aStoreStatus = anOcaf_Application->SaveAs(myOcafDoc, myFileName);
-  if(aStoreStatus == PCDM_StoreStatus::PCDM_SS_OK)
-    myResult << "The file was saved successfully" << std::endl;
-  else
-    myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStoreStatus << std::endl;
-}
-
 void OcafSamples::DialogOpenOcafSample()
 {
   Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
   // load persistence
   BinDrivers::DefineFormat(anOcaf_Application);
   XmlDrivers::DefineFormat(anOcaf_Application);
+  // Look for already opened
+  if (anOcaf_Application->IsInSession(myFileName))
+  {
+    myResult << "Document: " << myFileName << " is already in session" << std::endl;
+    return;
+  }
   // Open the document in the current application
   PCDM_ReaderStatus aReaderStatus = anOcaf_Application->Open(myFileName, myOcafDoc);
   if (aReaderStatus == PCDM_ReaderStatus::PCDM_RS_OK)
@@ -487,6 +480,7 @@ void OcafSamples::DialogOpenOcafSample()
     TPrsStd_AISViewer::New(myOcafDoc->Main(), myViewer);
     myOcafDoc->SetUndoLimit(10);
 
+    myContext->RemoveAll(Standard_False);
     Handle(AIS_InteractiveContext) aContext;
     TPrsStd_AISViewer::Find(myOcafDoc->Main(), aContext);
     aContext->SetDisplayMode(AIS_Shaded, Standard_True);
@@ -498,6 +492,19 @@ void OcafSamples::DialogOpenOcafSample()
   }
   else
     myResult << "Error! The file wasn't opened. PCDM_ReaderStatus: " << aReaderStatus << std::endl;
+}
+
+void OcafSamples::DialogSaveBinOcafSample()
+{
+  Handle(TOcaf_Application) anOcaf_Application = new TOcaf_Application;
+  BinDrivers::DefineFormat(anOcaf_Application);
+  myOcafDoc->ChangeStorageFormat("BinOcaf");
+  // Saves the document in the current application
+  PCDM_StoreStatus aStoreStatus = anOcaf_Application->SaveAs(myOcafDoc, myFileName);
+  if (aStoreStatus == PCDM_StoreStatus::PCDM_SS_OK)
+    myResult << "The file was saved successfully" << std::endl;
+  else
+    myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStoreStatus << std::endl;
 }
 
 void OcafSamples::DialogSaveXmlOcafSample()

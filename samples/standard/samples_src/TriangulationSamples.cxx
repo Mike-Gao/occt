@@ -81,14 +81,12 @@ void TriangulationSamples::Triangulation3dSample()
         }
       }
     }
-    Handle(AIS_Shape)	anAisCompound = new AIS_Shape(aCompound);
-    myObject3d.Append(anAisCompound);
     Handle(AIS_Triangulation) anAisTriangulation = new AIS_Triangulation(aTriangulation);
     aNbTriangles += aTriangulation->NbTriangles();
     myObject3d.Append(anAisTriangulation);
-
-    aNbTriangles += aTriangulation->NbTriangles();
   }
+  Handle(AIS_Shape)	anAisCompound = new AIS_Shape(aCompound);
+  myObject3d.Append(anAisCompound);
   Handle(AIS_Shape) AISBottle = new AIS_Shape(aBottle);
   myObject3d.Append(AISBottle);
 

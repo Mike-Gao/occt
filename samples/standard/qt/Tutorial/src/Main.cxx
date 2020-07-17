@@ -35,7 +35,6 @@ int main ( int argc, char* argv[] )
 
     QString anSampleType(argv[1]);
     ApplicationCommonWindow* mw = new ApplicationCommonWindow(anSampleType);
-    mw->setWindowTitle("Tutorial");
     QString aResName(":/icons/lamp.png");
     mw->setWindowIcon( QPixmap( aResName ) );
 
