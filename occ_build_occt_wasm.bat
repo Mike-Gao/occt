@@ -11,7 +11,7 @@ set "aCasSrc=%~dp0"
 if exist env_custom.bat call env_custom.bat
 
 call "%EMSDK_ROOT%\emsdk_env.bat"
-set "aToolchain=%EMSDK%/fastcomp/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+set "aToolchain=%EMSDK%/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
 
 set "anOcctVerSuffix="
 set "anOcctVersion=0.0.0"

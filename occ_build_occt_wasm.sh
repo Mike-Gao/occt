@@ -22,7 +22,7 @@ fi
 
 . ${EMSDK_ROOT}/emsdk_env.sh
 
-export aToolchain="${EMSDK}/fastcomp/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+export aToolchain="${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
 
 export aGitBranch=`git symbolic-ref --short HEAD`
 
