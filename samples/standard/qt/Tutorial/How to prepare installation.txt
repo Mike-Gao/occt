@@ -1,0 +1,4 @@
+1. In Tutorial.pro change SAMPLESROOT
+  to SAMPLESROOT = $$quote($$(CSF_OCCTSamplesPath)/standard/qt)
+2. In env.bat change CasCade enviroment call
+  to call "%~dp0..\..\..\..\env.bat" %1 %2 %3

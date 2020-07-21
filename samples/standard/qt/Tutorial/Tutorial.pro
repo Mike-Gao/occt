@@ -8,6 +8,7 @@ TARGET = Tutorial
 
 
 SAMPLESROOT = $$quote($$(CSF_OCCTSamplesPath)/standard/qt)
+SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
 
 HEADERS   = src/*.h \
             $${SAMPLESROOT}/../samples_src/*.h 
