@@ -32,6 +32,8 @@ GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   myView3d = new View(myDocument3d->getContext(), true, parent);
   QToolBar* aToolBar3d = new QToolBar;
   aToolBar3d->addActions(myView3d->getViewActions());
+  aToolBar3d->addSeparator();
+  aToolBar3d->addActions(myView3d->getRaytraceActions());
   a3dLayout->addWidget(aToolBar3d);
   a3dLayout->addWidget(myView3d);
   my3dVidget->setLayout(a3dLayout);
@@ -65,6 +67,12 @@ void GeomWidget::FitAll()
 void GeomWidget::Show3d()
 {
   myView3d->fitAll();
+  QAction * aShadingAction = myView3d->getViewAction(ViewAction::Shading);
+  aShadingAction->trigger();
+  aShadingAction->setChecked(true);
+  QAction * aHlrOffAction = myView3d->getViewAction(ViewAction::HlrOff);
+  aHlrOffAction->trigger();
+  aHlrOffAction->setChecked(true);
   my3dVidget->show();
   setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
 }

@@ -1,6 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include <functional>
 
 #include <QWidget>
 #include <QAction>
@@ -18,7 +19,7 @@ class QRubberBand;
 enum class CurrentAction3d { Nothing, DynamicZooming, WindowZooming, 
                              DynamicPanning, GlobalPanning, DynamicRotation };
 enum class ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top, Bottom, 
-                        Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn };
+                        Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe };
 enum class RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
 //class COMMONSAMPLE_EXPORT View: public QWidget
@@ -31,12 +32,10 @@ public:
     ~View();
 
     virtual void    init();
-    bool            dump( Standard_CString theFile );
-    QAction*        getViewAction(ViewAction theAction);
     QList<QAction*> getViewActions();
+    QAction*        getViewAction(ViewAction theAction);
+    QList<QAction*> getRaytraceActions();
     QAction*        getRaytraceAction(RaytraceAction theAction);
-    void noActiveActions();
-    bool sShadingMode();
 
     void EnableRaytracing();
     void DisableRaytracing();
@@ -81,6 +80,9 @@ public slots:
     void reset();
     void hlrOn();
     void hlrOff();
+    void shading();
+    void wireframe();
+
     void updateToggled( bool );
     void onBackground();
     void onEnvironmentMap();
@@ -93,7 +95,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* ) override;
     virtual void mouseMoveEvent( QMouseEvent* ) override;
 
-    virtual void                  addItemInPopup( QMenu* );
+    virtual void addItemInPopup( QMenu* );
 
     Handle(AIS_InteractiveContext)& getContext();
     void                            activateCursor( const CurrentAction3d );
@@ -118,13 +120,15 @@ private:
     void MultiDragEvent( const int x, const int y, const int TheState );
     void MultiInputEvent( const int x, const int y );
 
-private:
-    bool                            myIsRaytracing;
-    bool                            myIsShadowsEnabled;
-    bool                            myIsReflectionsEnabled;
-    bool                            myIsAntialiasingEnabled;
+    QAction* RegisterAction(QString theIconPath, QString thePromt, void (View::*theSlot)(void));
 
-    bool myIis3dView;
+private:
+    bool myIsRaytracing;
+    bool myIsShadowsEnabled;
+    bool myIsReflectionsEnabled;
+    bool myIsAntialiasingEnabled;
+
+    bool myIs3dView;
 
     bool                            myDrawRect;           // set when a rect is used for selection or magnify 
     Handle(V3d_View)                myV3dView;

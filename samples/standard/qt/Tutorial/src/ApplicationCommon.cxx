@@ -605,7 +605,23 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
 void ApplicationCommonWindow::MenuFormJson(const QString & thePath, QSignalMapper* theMapper)
 {
   QFile aJsonFile(thePath);
-  aJsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+  QString anErrorMessage;
+  if (aJsonFile.error() != QFile::NoError)
+  {
+    anErrorMessage = aJsonFile.errorString();
+    std::cout << "QFile creating error: " << anErrorMessage.toStdString();
+    return;
+  }
+  if (!aJsonFile.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+    std::cout << "File " << theMapper << " could not open";
+    if (aJsonFile.error() != QFile::NoError)
+    {
+      anErrorMessage = aJsonFile.errorString();
+      std::cout << "QFile opening error: " << anErrorMessage.toStdString();
+    }
+    return;
+  }
   QString aJsonString = aJsonFile.readAll();
   aJsonFile.close();
 

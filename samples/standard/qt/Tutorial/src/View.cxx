@@ -6,6 +6,8 @@
 #include "ApplicationCommon.h"
 #include "OcctWindow.h"
 
+
+
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QPainter>
@@ -50,7 +52,7 @@ View::View( Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* p
   myIsShadowsEnabled (true),
   myIsReflectionsEnabled (false),
   myIsAntialiasingEnabled (false),
-  myIis3dView(is3dView),
+  myIs3dView(is3dView),
   myBackMenu( NULL )
 {
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
@@ -100,7 +102,7 @@ void View::init()
     hWnd->Map();
   }
 
-  if (myIis3dView)
+  if (myIs3dView)
   {    
     myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.0, 0.3, Quantity_TOC_RGB));
   }
@@ -153,7 +155,7 @@ void View::pan()
 
 void View::rotation()
 {
-  if(myIis3dView)
+  if(myIs3dView)
     myCurrentMode = CurrentAction3d::DynamicRotation;
   else 
     myCurrentMode = CurrentAction3d::Nothing;
@@ -171,13 +173,13 @@ void View::globalPan()
 
 void View::front()
 {
-  if (myIis3dView)
+  if (myIs3dView)
     myV3dView->SetProj( V3d_Yneg );
 }
 
 void View::back()
 {
-  if (myIis3dView)
+  if (myIs3dView)
     myV3dView->SetProj( V3d_Ypos );
 }
 
@@ -188,25 +190,25 @@ void View::top()
 
 void View::bottom()
 {
-  if (myIis3dView)
+  if (myIs3dView)
     myV3dView->SetProj( V3d_Zneg );
 }
 
 void View::left()
 {
-  if (myIis3dView)
+  if (myIs3dView)
     myV3dView->SetProj( V3d_Xneg );
 }
 
 void View::right()
 {
-  if (myIis3dView)
+  if (myIs3dView)
     myV3dView->SetProj( V3d_Xpos );
 }
 
 void View::axo()
 {
-  if (myIis3dView)
+  if (myIs3dView)
     myV3dView->SetProj( V3d_XposYnegZpos );
 }
 
@@ -218,19 +220,34 @@ void View::reset()
 void View::hlrOff()
 {
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  myHlrModeIsOn = Standard_False;
-  myV3dView->SetComputedMode (myHlrModeIsOn);
+  myV3dView->SetComputedMode (Standard_False);
   myV3dView->Redraw();
+  QAction* aShadingAction = getViewAction(ViewAction::Shading);
+  aShadingAction->setEnabled(true);
+  QAction* aWireframeAction = getViewAction(ViewAction::Wireframe);
+  aWireframeAction->setEnabled(true);
   QApplication::restoreOverrideCursor();
 }
 
 void View::hlrOn()
 {
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  myHlrModeIsOn = Standard_True;
-  myV3dView->SetComputedMode (myHlrModeIsOn);
+  myV3dView->SetComputedMode (Standard_True);
   myV3dView->Redraw();
+  QAction* aShadingAction = getViewAction(ViewAction::Shading);
+  aShadingAction->setEnabled(false);
+  QAction* aWireframeAction = getViewAction(ViewAction::Wireframe);
+  aWireframeAction->setEnabled(false);
   QApplication::restoreOverrideCursor();
+}
+
+void View::shading()
+{
+  myContext->SetDisplayMode(1, Standard_True);
+}
+void View::wireframe()
+{
+  myContext->SetDisplayMode(0, Standard_True);
 }
 
 void View::SetRaytracedShadows (bool theState)
@@ -365,21 +382,25 @@ void View::initCursors()
     rotCursor = new QCursor( QPixmap(":/icons/cursor_rotate.png") );
 }
 
-QAction* View::getViewAction(ViewAction theAction)
-{
-  initViewActions();
-  return myViewActions.value(theAction);
-}
-
-QList<QAction*>   View::getViewActions()
+QList<QAction*> View::getViewActions()
 {
   initViewActions();
   return myViewActions.values();
 }
 
-QAction* View::getRaytraceAction(RaytraceAction theAction)
+QList<QAction*>  View::getRaytraceActions()
 {
   initRaytraceActions();
+  return myRaytraceActions.values();
+}
+
+QAction* View::getViewAction(ViewAction theAction)
+{
+  return myViewActions.value(theAction);
+}
+
+QAction* View::getRaytraceAction(RaytraceAction theAction)
+{
   return myRaytraceActions.value(theAction);
 }
 
@@ -391,94 +412,61 @@ QPaintEngine* View::paintEngine() const
   return 0;
 }
 
+QAction* View::RegisterAction(QString theIconPath, QString thePromt, void (View::*theSlot)(void))
+{
+  QAction* anAction = new QAction(QPixmap(theIconPath), thePromt, this);
+  anAction->setToolTip(thePromt);
+  anAction->setStatusTip(thePromt);
+  connect(anAction, &QAction::triggered, this, theSlot);
+  return anAction;
+}
+
 void View::initViewActions()
 {
   if ( !myViewActions.empty() )
     return;
-
-  QAction* a;
-
-  a = new QAction( QPixmap(":/icons/view_fitall.png"), tr("FilAll"), this );
-  a->setStatusTip(tr("FilAll") );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( fitAll() ) );
-  myViewActions.insert(ViewAction::FitAll, a);
-
-  a->setCheckable( true );
-  connect( a, SIGNAL( toggled(bool) ) , this, SLOT( updateToggled(bool) ) );
-  myViewActions.insert(ViewAction::GlobalPan, a );
-
-  if (myIis3dView)
+  myViewActions.insert(ViewAction::FitAll, 
+    RegisterAction(":/icons/view_fitall.png", tr("FilAll"), &View::fitAll));
+  if (myIs3dView)
   {
-    a = new QAction( QPixmap(":/icons/view_front.png"), tr("Front"), this );
-    a->setToolTip(tr("Front") );
-    a->setStatusTip(tr("Front") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( front() ) );
-    myViewActions.insert(ViewAction::Front, a );
+    myViewActions.insert(ViewAction::Front, 
+      RegisterAction(":/icons/view_front.png", tr("Front"), &View::front));
+    myViewActions.insert(ViewAction::Back,
+      RegisterAction(":/icons/view_back.png", tr("Back"), &View::back));
+    myViewActions.insert(ViewAction::Top,
+      RegisterAction(":/icons/view_top.png", tr("Top"), &View::top));
+    myViewActions.insert(ViewAction::Bottom,
+      RegisterAction(":/icons/view_bottom.png", tr("Bottom"), &View::bottom));
+    myViewActions.insert(ViewAction::Left,
+      RegisterAction(":/icons/view_left.png", tr("Left"), &View::left));
+    myViewActions.insert(ViewAction::Right,
+      RegisterAction(":/icons/view_right.png", tr("Right"), &View::right));
+    myViewActions.insert(ViewAction::Axo,
+      RegisterAction(":/icons/view_axo.png", tr("Isometric"), &View::axo));
 
-    a = new QAction( QPixmap(":/icons/view_back.png"), tr("Back"), this );
-    a->setToolTip(tr("Back") );
-    a->setStatusTip(tr("Back") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( back() ) );
-    myViewActions.insert(ViewAction::Back, a);
+    myViewActions.insert(ViewAction::Reset,
+      RegisterAction(":/icons/view_reset.png", tr("Reset"), &View::reset));
 
-    a = new QAction( QPixmap(":/icons/view_top.png"), tr("Top"), this );
-    a->setToolTip(tr("Top") );
-    a->setStatusTip(tr("Top") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( top() ) );
-    myViewActions.insert(ViewAction::Top, a );
+    QActionGroup* aShadingActionGroup = new QActionGroup( this );
+    QAction* aShadingAction = RegisterAction(":/icons/tool_shading.png", tr("Shading"), &View::shading);
+    aShadingAction->setCheckable( true );
+    aShadingActionGroup->addAction(aShadingAction);
+    myViewActions.insert(ViewAction::Shading, aShadingAction);
+    QAction* aWireframeAction = RegisterAction(":/icons/tool_wireframe.png", tr("Wireframe"), &View::wireframe);
+    aWireframeAction->setCheckable( true );
+    aShadingActionGroup->addAction(aWireframeAction);
+    myViewActions.insert(ViewAction::Wireframe, aWireframeAction);
 
-    a = new QAction( QPixmap(":/icons/view_bottom.png"), tr("Bottom"), this );
-    a->setToolTip(tr("Bottom") );
-    a->setStatusTip(tr("Bottom") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( bottom() ) );
-    myViewActions.insert(ViewAction::Bottom, a );
-
-    a = new QAction( QPixmap(":/icons/view_left.png"), tr("Left"), this );
-    a->setToolTip(tr("Left") );
-    a->setStatusTip(tr("Left") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( left() ) );
-    myViewActions.insert(ViewAction::Left, a );
-
-    a = new QAction( QPixmap(":/icons/view_right.png"), tr("Right"), this );
-    a->setToolTip(tr("Right") );
-    a->setStatusTip(tr("Right") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( right() ) );
-    myViewActions.insert(ViewAction::Right, a );
-
-    a = new QAction( QPixmap(":/icons/view_axo.png"), tr("Isometric"), this );
-    a->setToolTip(tr("Isometric") );
-    a->setStatusTip(tr("Isometric") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( axo() ) );
-    myViewActions.insert(ViewAction::Axo, a );
+    QActionGroup* aHlrActionGroup = new QActionGroup( this );
+    QAction* aHlrOffAction = RegisterAction(":/icons/view_comp_off.png", tr("HLR off"), &View::hlrOff);
+    aHlrOffAction->setCheckable( true );
+    aHlrActionGroup->addAction(aHlrOffAction);
+    myViewActions.insert(ViewAction::HlrOff, aHlrOffAction);
+    QAction* aHlrOnAction = RegisterAction(":/icons/view_comp_on.png", tr("HLR on"), &View::hlrOn);
+    aHlrOnAction->setCheckable( true );
+    aHlrActionGroup->addAction(aHlrOnAction);
+    myViewActions.insert(ViewAction::HlrOn, aHlrOnAction);
   }
-
-  if (myIis3dView)
-  {
-    a = new QAction( QPixmap(":/icons/view_reset.png"), tr("Reset"), this );
-    a->setToolTip(tr("Reset") );
-    a->setStatusTip(tr("Reset") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( reset() ) );
-    myViewActions.insert(ViewAction::Reset, a );
-
-    QActionGroup* ag = new QActionGroup( this );
-
-    a = new QAction( QPixmap(":/icons/view_comp_off.png"), tr("HLR off"), this );
-    a->setToolTip(tr("HLR off") );
-    a->setStatusTip(tr("HLR off") );
-    connect( a, SIGNAL( triggered() ) , this, SLOT( hlrOff() ) );
-    a->setCheckable( true );
-    ag->addAction(a);
-    myViewActions.insert(ViewAction::HlrOff, a);
-
-    a = new QAction( QPixmap(":/icons/view_comp_on.png"), tr("HLR on"), this );
-    a->setToolTip(tr("HLR on") );
-    a->setStatusTip(tr("HLR on") );
-    connect( a, SIGNAL( triggered() ) ,this, SLOT( hlrOn() ) );  
-    a->setCheckable( true );
-    ag->addAction(a);
-    myViewActions.insert(ViewAction::HlrOn, a );
-  }
-
 }
 
 void View::initRaytraceActions()
@@ -486,38 +474,25 @@ void View::initRaytraceActions()
   if (!myRaytraceActions.empty())
     return;
 
-  QAction* a;
-  a = new QAction( QPixmap(":/icons/raytracing.png"), tr("Ray-tracing"), this );
-  a->setToolTip(tr("Ray-tracing") );
-  a->setStatusTip(tr("Ray-tracing") );
-  a->setCheckable( true );
-  a->setChecked( false );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceAction::ToolRaytracing, a );
+  QAction* aRayTraceAction = RegisterAction(":/icons/raytracing.png", tr("Ray-tracing"), &View::onRaytraceAction);
+  myRaytraceActions.insert(RaytraceAction::ToolRaytracing, aRayTraceAction);
+  aRayTraceAction->setCheckable( true );
+  aRayTraceAction->setChecked( false );
 
-  a = new QAction( QPixmap(":/icons/shadows.png"), tr("Shadows"), this );
-  a->setToolTip(tr("Shadows") );
-  a->setStatusTip(tr("Shadows") );
-  a->setCheckable( true );
-  a->setChecked( true );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceAction::ToolShadows, a );
+  QAction* aShadowAction = RegisterAction(":/icons/shadows.png", tr("Shadows"), &View::onRaytraceAction);
+  myRaytraceActions.insert(RaytraceAction::ToolShadows, aShadowAction);
+  aShadowAction->setCheckable( true );
+  aShadowAction->setChecked( true );
 
-  a = new QAction( QPixmap(":/icons/reflections.png"), tr("Reflections"), this );
-  a->setToolTip(tr("Reflections") );
-  a->setStatusTip(tr("Reflections") );
-  a->setCheckable( true );
-  a->setChecked( false );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceAction::ToolReflections, a );
+  QAction* aReflectAction = RegisterAction(":/icons/reflections.png", tr("Reflections"), &View::onRaytraceAction);
+  myRaytraceActions.insert(RaytraceAction::ToolReflections, aReflectAction);
+  aReflectAction->setCheckable( true );
+  aReflectAction->setChecked( false );
 
-  a = new QAction( QPixmap(":/icons/antialiasing.png"), tr("Anti-aliasing"), this );
-  a->setToolTip(tr("Anti-aliasing") );
-  a->setStatusTip(tr("Anti-aliasing") );
-  a->setCheckable( true );
-  a->setChecked( false );
-  connect( a, SIGNAL( triggered() ) , this, SLOT( onRaytraceAction() ) );
-  myRaytraceActions.insert(RaytraceAction::ToolAntialiasing, a );
+  QAction* anAntiAliasingAction = RegisterAction(":/icons/antialiasing.png", tr("Anti-aliasing"), &View::onRaytraceAction);
+  myRaytraceActions.insert(RaytraceAction::ToolAntialiasing, anAntiAliasingAction);
+  anAntiAliasingAction->setCheckable( true );
+  anAntiAliasingAction->setChecked( false );
 }
 
 void View::mousePressEvent( QMouseEvent* e )
@@ -592,7 +567,7 @@ void View::onMButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint /*p
 
 void View::onRButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint point )
 {
-  if (myIis3dView)
+  if (myIs3dView)
   { 
     myCurrentMode = CurrentAction3d::DynamicRotation;
     myV3dView->StartRotation(point.x(), point.y());
@@ -627,7 +602,6 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
             break;
         case CurrentAction3d::DynamicZooming:
             myCurrentMode = CurrentAction3d::Nothing;
-            noActiveActions();
             break;
         case CurrentAction3d::WindowZooming:
             myXmax = point.x();
@@ -636,20 +610,16 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
                  (abs( myYmin - myYmax ) > ValZWMin ) )
               myV3dView->WindowFitAll( myXmin, myYmin, myXmax, myYmax );
             myCurrentMode = CurrentAction3d::Nothing;
-            noActiveActions();
             break;
         case CurrentAction3d::DynamicPanning:
             myCurrentMode = CurrentAction3d::Nothing;
-            noActiveActions();
             break;
         case CurrentAction3d::GlobalPanning :
             myV3dView->Place( point.x(), point.y(), myCurZoom );
             myCurrentMode = CurrentAction3d::Nothing;
-            noActiveActions();
             break;
         case CurrentAction3d::DynamicRotation:
             myCurrentMode = CurrentAction3d::Nothing;
-            noActiveActions();
             break;
         default:
             throw Standard_Failure(" incompatible Current Mode ");
@@ -795,16 +765,6 @@ void View::addItemInPopup( QMenu* /*theMenu*/)
 {
 }
 
-void View::noActiveActions()
-{
-    for(QAction* anAction: myViewActions)
-    {
-        setCursor( *defCursor );
-        anAction->setCheckable( true );
-        anAction->setChecked( false );
-    }
-}
-
 void View::onBackground()
 {
     QColor aColor ;
@@ -847,10 +807,7 @@ void View::onEnvironmentMap()
   myV3dView->Redraw();
 }
 
-bool View::dump(Standard_CString theFile)
-{
-  return myV3dView->Dump(theFile);
-}
+
 
 Handle(V3d_View) View::getView()
 {
