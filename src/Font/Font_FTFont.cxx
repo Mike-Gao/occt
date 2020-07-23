@@ -544,7 +544,12 @@ float Font_FTFont::AdvanceX (Standard_Utf32Char theUCharNext) const
 
   FT_Vector aKern;
   getKerning (aKern, myUChar, theUCharNext);
-  return myWidthScaling * fromFTPoints<float> (myActiveFTFace->glyph->advance.x + aKern.x);
+
+  //std::cerr << " dx: " << fromFTPoints<float> (myActiveFTFace->glyph->lsb_delta - myActiveFTFace->glyph->rsb_delta)
+  //          << " " << myActiveFTFace->glyph->lsb_delta << " " << myActiveFTFace->glyph->rsb_delta << "\n";
+
+  return myWidthScaling * fromFTPoints<float> (myActiveFTFace->glyph->advance.x + aKern.x
+                                             + myActiveFTFace->glyph->lsb_delta - myActiveFTFace->glyph->rsb_delta);
 }
 
 // =======================================================================
