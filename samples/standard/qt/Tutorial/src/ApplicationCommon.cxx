@@ -196,7 +196,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
     }
   }
 
-  resize(1280, 720);
+  resize(1280, 560);
 }
 
 void ApplicationCommonWindow::SetAppType(QString theParameter)

@@ -18,7 +18,7 @@ GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   my2dVidget->setContentsMargins(0, 0, 0, 0);
   QVBoxLayout* a2dLayout = new QVBoxLayout;
   a2dLayout->setMargin(0);
-  myView2d = new View(myDocument2d->getContext(), false, parent);
+  myView2d = new View(myDocument2d->getContext(), false, this);
   QToolBar* aToolBar2d = new QToolBar;
   aToolBar2d->addActions(myView2d->getViewActions());
   a2dLayout->addWidget(aToolBar2d);
@@ -29,7 +29,7 @@ GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   my3dVidget->setContentsMargins(0, 0, 0, 0);
   QVBoxLayout* a3dLayout = new QVBoxLayout;
   a3dLayout->setMargin(0);
-  myView3d = new View(myDocument3d->getContext(), true, parent);
+  myView3d = new View(myDocument3d->getContext(), true, this);
   QToolBar* aToolBar3d = new QToolBar;
   aToolBar3d->addActions(myView3d->getViewActions());
   aToolBar3d->addSeparator();
