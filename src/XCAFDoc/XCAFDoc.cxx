@@ -337,6 +337,10 @@ const Standard_GUID& XCAFDoc::KinematicRefLink2GUID()
   return ID;
 }
 
+//=======================================================================
+//function : KinematicRefJointGUID
+//purpose  : 
+//=======================================================================
 Standard_EXPORT const Standard_GUID& XCAFDoc::KinematicRefJointGUID()
 {
   static const Standard_GUID ID("596B048C-A965-4514-A059-464560BFAE4E");

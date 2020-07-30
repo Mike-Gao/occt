@@ -24,19 +24,20 @@ class TColStd_HArray1OfReal;
 DEFINE_STANDARD_HANDLE(XCAFKinematics_LowOrderPairObject, XCAFKinematics_PairObject)
 
 //! \class XCAFKinematics_LowOrderPairObject
-//! \brief Object for low order kinematic pairs:
-//! - XCAFKinematics_PairType_FullyConstrained
-//! - XCAFKinematics_PairType_Revolute
-//! - XCAFKinematics_PairType_Prismatic
-//! - XCAFKinematics_PairType_Cylindrical
-//! - XCAFKinematics_PairType_Universal
-//! - XCAFKinematics_PairType_Homokinetic
-//! - XCAFKinematics_PairType_SphericalWithPin
-//! - XCAFKinematics_PairType_Spherical
-//! - XCAFKinematics_PairType_Planar
-//! - XCAFKinematics_PairType_Unconstrained
-//! Not all limits are used for each pair, if less than 3 translation/rotation
-//! limits is used values should be specified in alphabetical order.
+//! \brief Object for low order kinematic pairs: 
+//! - XCAFKinematics_PairType_FullyConstrained <F, F, F, F, F, F>
+//! - XCAFKinematics_PairType_Revolute         <F, F, T, F, F, F>
+//! - XCAFKinematics_PairType_Prismatic        <F, F, F, T, F, F>
+//! - XCAFKinematics_PairType_Cylindrical      <F, F, T, F, F, T>
+//! - XCAFKinematics_PairType_Universal        <T, F, T, F, F, F>
+//! - XCAFKinematics_PairType_Homokinetic      <T, F, T, F, F, F>
+//! - XCAFKinematics_PairType_SphericalWithPin <F, T, T, F, F, F>
+//! - XCAFKinematics_PairType_Spherical        <T, T, T, F, F, F>
+//! - XCAFKinematics_PairType_Planar           <T, F, F, T, T, F>
+//! - XCAFKinematics_PairType_Unconstrained    <T, T, T, T, T, T>
+//! Not all limits are used for each pair, 
+//! values should be specified in alphabetical order: <rX, rY, rZ, tX, tY, tZ>
+
 class XCAFKinematics_LowOrderPairObject : public XCAFKinematics_PairObject
 {
 

@@ -99,7 +99,7 @@ if { $mist < 1} {
   if { [llength $xst2] > 0 } {
     regexp {NbOfMechanisms +: +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbMechanism_Second
     regexp {NbOfKinematicLinks +: +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbLink_Second
-    regexp {NbOfRefShapes +: +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbRefShape_Secondt
+    regexp {NbOfRefShapes +: +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbRefShape_Second
     regexp {KinematicPairsWithoutRange +: +NbOfLowOrderPairs +[(] +([-0-9.+eE]+) +[)] +NbOfLowOrderPairsWithMotionCoupling +[(] +([-0-9.+eE]+) +[)] +NbOfHightOrderPairs +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbLowPair_Second nbLowPairWthMotCoupl_Second nbHighPair_Second 
     regexp {KinematicPairsWithRange +: +NbOfLowOrderPairs +[(] +([-0-9.+eE]+) +[)] +NbOfLowOrderPairsWithMotionCoupling +[(] +([-0-9.+eE]+) +[)] +NbOfHightOrderPairs +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbLowPairWthRng_Second nbLowPairWthMotCouplAndRng_Second nbHighPairWthRng__Second
     regexp {NbOfStates +: +[(] +([-0-9.+eE]+) +[)]} $xst2 full nbState_Second

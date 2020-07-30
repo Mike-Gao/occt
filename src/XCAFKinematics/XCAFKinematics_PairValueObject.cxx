@@ -47,8 +47,8 @@ void XCAFKinematics_PairValueObject::SetType(const XCAFKinematics_PairType theTy
   Standard_Integer aNbParams = 0;
   switch (myType) {
   case XCAFKinematics_PairType_Revolute:
-      aNbParams = 1;
-      break;
+    aNbParams = 1;
+    break;
   case XCAFKinematics_PairType_Prismatic:
     aNbParams = 1;
     break;

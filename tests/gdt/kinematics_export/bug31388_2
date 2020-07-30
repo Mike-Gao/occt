@@ -1,5 +1,5 @@
 # !!!! This file is generated automatically, do not edit manually! See end script
-set filename mazak_kinematic_v3.stp
+set filename bug31388_2.stp
 
 set ref_data {
 

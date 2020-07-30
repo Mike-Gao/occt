@@ -512,11 +512,11 @@ static Standard_Integer getLinksOfJoint(Draw_Interpretor& di, Standard_Integer a
   if (!getDocument(di, argv[1], aDoc))
     return 1;
 
+  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
     return 1;
 
-  Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aLink1, aLink2;
   aTool->GetLinksOfJoint(aJoint, aLink1, aLink2);
 
@@ -598,7 +598,7 @@ static Standard_Integer setName(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   TCollection_AsciiString aName;
@@ -610,11 +610,14 @@ static Standard_Integer setName(Draw_Interpretor& di, Standard_Integer argc, con
   }
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    anObject->SetName(aName);
-    aPair->SetObject(anObject);
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
   }
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  anObject->SetName(aName);
+  aPair->SetObject(anObject);
 
   return 0;
 }
@@ -636,14 +639,17 @@ static Standard_Integer getName(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    di << anObject->Name();
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
   }
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  di << anObject->Name();
 
   return 0;
 }
@@ -665,25 +671,28 @@ static Standard_Integer setType(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    int aType = Draw::Atoi(argv[3]);
-    if (aType >= XCAFKinematics_PairType_FullyConstrained &&
-        aType <= XCAFKinematics_PairType_Unconstrained)
-      anObject = new XCAFKinematics_LowOrderPairObject();
-    else if (aType >= XCAFKinematics_PairType_Screw &&
-             aType <= XCAFKinematics_PairType_LinearFlexibleAndPinion)
-      anObject = new XCAFKinematics_LowOrderPairObjectWithCoupling();
-    else if (aType >= XCAFKinematics_PairType_PointOnSurface &&
-             aType <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
-      anObject = new XCAFKinematics_HighOrderPairObject();
-    anObject->SetType((XCAFKinematics_PairType)aType);
-    aPair->SetObject(anObject);
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
   }
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  int aType = Draw::Atoi(argv[3]);
+  if (aType >= XCAFKinematics_PairType_FullyConstrained &&
+      aType <= XCAFKinematics_PairType_Unconstrained)
+    anObject = new XCAFKinematics_LowOrderPairObject();
+  else if (aType >= XCAFKinematics_PairType_Screw &&
+           aType <= XCAFKinematics_PairType_LinearFlexibleAndPinion)
+    anObject = new XCAFKinematics_LowOrderPairObjectWithCoupling();
+  else if (aType >= XCAFKinematics_PairType_PointOnSurface &&
+           aType <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+    anObject = new XCAFKinematics_HighOrderPairObject();
+  anObject->SetType((XCAFKinematics_PairType)aType);
+  aPair->SetObject(anObject);
 
   return 0;
 }
@@ -705,14 +714,17 @@ static Standard_Integer getType(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    di << anObject->Type();
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
   }
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  di << anObject->Type();
 
   return 0;
 }
@@ -734,29 +746,33 @@ static Standard_Integer setTrsf(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    Standard_Integer aTrsfNb = Draw::Atoi(argv[3]);
-    Handle(Geom_Plane) aSurface = Handle(Geom_Plane)::DownCast(DrawTrSurf::GetSurface(argv[4]));
-    if (aSurface.IsNull()) {
-      di << "Invalid transformation\n";
-      return 1;
-    }
-    switch (aTrsfNb) {
-    case 1: anObject->SetFirstTransformation(aSurface->Position());
-      break;
-    case 2: anObject->SetSecondTransformation(aSurface->Position());
-      break;
-    default:
-      di << "Invalid number of transformation\n";
-      return 1;
-    }
-    aPair->SetObject(anObject);
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
   }
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  Standard_Integer aTrsfNb = Draw::Atoi(argv[3]);
+  Handle(Geom_Plane) aSurface = Handle(Geom_Plane)::DownCast(DrawTrSurf::GetSurface(argv[4]));
+  if (aSurface.IsNull()) {
+    di << "Invalid transformation\n";
+    return 1;
+  }
+  switch (aTrsfNb) {
+  case 1: anObject->SetFirstTransformation(aSurface->Position());
+    break;
+  case 2: anObject->SetSecondTransformation(aSurface->Position());
+    break;
+  default:
+    di << "Invalid number of transformation\n";
+    return 1;
+  }
+  aPair->SetObject(anObject);
+
 
   return 0;
 }
@@ -778,23 +794,26 @@ static Standard_Integer getTrsf(Draw_Interpretor& di, Standard_Integer argc, con
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    Standard_Integer aTrsfNb = Draw::Atoi(argv[3]);
-    Standard_CString aName = argv[4];
-    switch (aTrsfNb) {
-    case 1: DrawTrSurf::Set(aName, new Geom_Plane(anObject->FirstTransformation()));
-      break;
-    case 2: DrawTrSurf::Set(aName, new Geom_Plane(anObject->SecondTransformation()));
-      break;
-    default:
-      di << "Invalid number of transformation\n";
-      return 1;
-    }
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
+  }
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  Standard_Integer aTrsfNb = Draw::Atoi(argv[3]);
+  Standard_CString aName = argv[4];
+  switch (aTrsfNb) {
+  case 1: DrawTrSurf::Set(aName, new Geom_Plane(anObject->FirstTransformation()));
+    break;
+  case 2: DrawTrSurf::Set(aName, new Geom_Plane(anObject->SecondTransformation()));
+    break;
+  default:
+    di << "Invalid number of transformation\n";
+    return 1;
   }
 
   return 0;
@@ -817,21 +836,24 @@ static Standard_Integer setLimits(Draw_Interpretor& di, Standard_Integer argc, c
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
+
+  Handle(XCAFDoc_KinematicPair) aPair;
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
+  }
 
   Handle(TColStd_HArray1OfReal) aLimitArray = new TColStd_HArray1OfReal(1, argc - 3);
   for (Standard_Integer i = 3; i < argc; i++) {
     aLimitArray->ChangeValue(i - 2) = Draw::Atof(argv[i]);
   }
 
-  Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    anObject->SetAllLimits(aLimitArray);
-    if (anObject->HasLimits())
-      aPair->SetObject(anObject);
-  }
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  anObject->SetAllLimits(aLimitArray);
+  if (anObject->HasLimits())
+    aPair->SetObject(anObject);
 
   return 0;
 }
@@ -853,7 +875,7 @@ static Standard_Integer getLimits(Draw_Interpretor& di, Standard_Integer argc, c
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
@@ -888,30 +910,33 @@ static Standard_Integer setParameters(Draw_Interpretor& di, Standard_Integer arg
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
+
+  Handle(XCAFDoc_KinematicPair) aPair;
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
+    di << "Invalid kinematic pair object\n";
+    return 1;
+  }
 
   Handle(TColStd_HArray1OfReal) aParamArray = new TColStd_HArray1OfReal(1, argc - 3);
   for (Standard_Integer i = 3; i < argc; i++) {
     aParamArray->ChangeValue(i - 2) = Draw::Atof(argv[i]);
   }
 
-  Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObject = 
-      Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aPair->GetObject());
-    if (!anObject.IsNull()) {
-      anObject->SetAllParams(aParamArray);
-      aPair->SetObject(anObject);
-      return 0;
-    }
-    Handle(XCAFKinematics_LowOrderPairObject) aLowObject =
-      Handle(XCAFKinematics_LowOrderPairObject)::DownCast(aPair->GetObject());
-    if (!aLowObject.IsNull()) {
-      aLowObject->SetSkewAngle(aParamArray->First());
-      aPair->SetObject(aLowObject);
-      return 0;
-    }
+  Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObject =
+    Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aPair->GetObject());
+  if (!anObject.IsNull()) {
+    anObject->SetAllParams(aParamArray);
+    aPair->SetObject(anObject);
+    return 0;
+  }
+  Handle(XCAFKinematics_LowOrderPairObject) aLowObject =
+    Handle(XCAFKinematics_LowOrderPairObject)::DownCast(aPair->GetObject());
+  if (!aLowObject.IsNull()) {
+    aLowObject->SetSkewAngle(aParamArray->First());
+    aPair->SetObject(aLowObject);
+    return 0;
   }
 
   di << "Wrong type of object\n";
@@ -935,43 +960,44 @@ static Standard_Integer getParameters(Draw_Interpretor& di, Standard_Integer arg
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObject =
-      Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aPair->GetObject());
-    if (anObject.IsNull()) {
-      Handle(XCAFKinematics_LowOrderPairObject) aLowObject =
-        Handle(XCAFKinematics_LowOrderPairObject)::DownCast(aPair->GetObject());
-      if (!aLowObject.IsNull() &&
-          (aLowObject->Type() == XCAFKinematics_PairType_Universal ||
-           aLowObject->Type() == XCAFKinematics_PairType_Homokinetic)) {
-        di << "Skew Angle = " << aLowObject->SkewAngle();
-        return 0;
-      }
-      else {
-        di << "Wrong type of object\n";
-        return 1;
-      }
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair))
+    return 1;
+
+  Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObject =
+    Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(aPair->GetObject());
+  if (anObject.IsNull()) {
+    Handle(XCAFKinematics_LowOrderPairObject) aLowObject =
+      Handle(XCAFKinematics_LowOrderPairObject)::DownCast(aPair->GetObject());
+    if (!aLowObject.IsNull() &&
+      (aLowObject->Type() == XCAFKinematics_PairType_Universal ||
+        aLowObject->Type() == XCAFKinematics_PairType_Homokinetic)) {
+      di << "Skew Angle = " << aLowObject->SkewAngle();
+      return 0;
     }
-    switch (anObject->Type()) {
-    case XCAFKinematics_PairType_Screw:
-      di << "Pitch = " << anObject->Pitch();
-      break;
-    case XCAFKinematics_PairType_RackAndPinion:
-    case XCAFKinematics_PairType_LinearFlexibleAndPinion:
-      di << "Pinion Radius = " << anObject->PinionRadius();
-      break;
-    case XCAFKinematics_PairType_Gear:
-      di << "First Link Radius = " << anObject->RadiusFirstLink() << "\n";
-      di << "Second Link Radius = " << anObject->RadiusSecondLink() << "\n";
-      di << "Bevel = " << anObject->Bevel() << "\n";
-      di << "Helical Angle = " << anObject->HelicalAngle() << "\n";
-      di << "Gear Ratio = " << anObject->GearRatio();
-      break;
+    else {
+      di << "Wrong type of object\n";
+      return 1;
     }
+  }
+  switch (anObject->Type()) {
+  case XCAFKinematics_PairType_Screw:
+    di << "Pitch = " << anObject->Pitch();
+    break;
+  case XCAFKinematics_PairType_RackAndPinion:
+  case XCAFKinematics_PairType_LinearFlexibleAndPinion:
+    di << "Pinion Radius = " << anObject->PinionRadius();
+    break;
+  case XCAFKinematics_PairType_Gear:
+    di << "First Link Radius = " << anObject->RadiusFirstLink() << "\n";
+    di << "Second Link Radius = " << anObject->RadiusSecondLink() << "\n";
+    di << "Bevel = " << anObject->Bevel() << "\n";
+    di << "Helical Angle = " << anObject->HelicalAngle() << "\n";
+    di << "Gear Ratio = " << anObject->GearRatio();
+    break;
   }
 
   return 0;
@@ -994,21 +1020,22 @@ static Standard_Integer setOrientation(Draw_Interpretor& di, Standard_Integer ar
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    Handle(XCAFKinematics_HighOrderPairObject) aHighObject =
-      Handle(XCAFKinematics_HighOrderPairObject)::DownCast(anObject);
-    if (aHighObject.IsNull()) {
-      di << "Error: Orientation could be applied only for high order kinematic pair\n";
-      return 1;
-    }
-    aHighObject->SetOrientation(Draw::Atoi(argv[3]) != 0 );
-    aPair->SetObject(anObject);
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair))
+    return 1;
+
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  Handle(XCAFKinematics_HighOrderPairObject) aHighObject =
+    Handle(XCAFKinematics_HighOrderPairObject)::DownCast(anObject);
+  if (aHighObject.IsNull()) {
+    di << "Error: Orientation could be applied only for high order kinematic pair\n";
+    return 1;
   }
+  aHighObject->SetOrientation(Draw::Atoi(argv[3]) != 0);
+  aPair->SetObject(anObject);
 
   return 0;
 }
@@ -1030,20 +1057,20 @@ static Standard_Integer getOrientation(Draw_Interpretor& di, Standard_Integer ar
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
 
   Handle(XCAFDoc_KinematicPair) aPair;
-  if (aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
-    Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
-    Handle(XCAFKinematics_HighOrderPairObject) aHighObject =
-      Handle(XCAFKinematics_HighOrderPairObject)::DownCast(anObject);
-    if (aHighObject.IsNull()) {
-      di << "Error: Orientation could be applied only for high order kinematic pair\n";
-      return 1;
-    }
-    di << aHighObject->Orientation();
+  if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair))
+    return 1;
+  Handle(XCAFKinematics_PairObject) anObject = aPair->GetObject();
+  Handle(XCAFKinematics_HighOrderPairObject) aHighObject =
+    Handle(XCAFKinematics_HighOrderPairObject)::DownCast(anObject);
+  if (aHighObject.IsNull()) {
+    di << "Error: Orientation could be applied only for high order kinematic pair\n";
+    return 1;
   }
+  di << aHighObject->Orientation();
 
   return 0;
 }
@@ -1065,7 +1092,7 @@ static Standard_Integer setGeomParam(Draw_Interpretor& di, Standard_Integer argc
 
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
   Handle(XCAFDoc_KinematicPair) aPair;
   if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
@@ -1130,6 +1157,8 @@ static Standard_Integer setGeomParam(Draw_Interpretor& di, Standard_Integer argc
     }
     if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
       anObject->SetCurve(aCurve);
+    else if (anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+      anObject->SetFirstCurve(aCurve);
     else {
       switch (aParamNb) {
       case 1: anObject->SetFirstCurve(aCurve);
@@ -1164,7 +1193,7 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[2], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[2], aJoint))
     return 1;
   Handle(XCAFDoc_KinematicPair) aPair;
   if (!aJoint.FindAttribute(XCAFDoc_KinematicPair::GetID(), aPair)) {
@@ -1207,10 +1236,12 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
     // Curve
     Handle(Geom_Curve) aCurve;
     if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
-    if (!anObject->HasLimits())
-      aCurve = anObject->Curve();
-    else
-      aCurve = anObject->TrimmedCurve();
+      if (!anObject->HasLimits())
+        aCurve = anObject->Curve();
+      else
+        aCurve = anObject->TrimmedCurve();
+    else if(anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+      aCurve = anObject->FirstCurve();
     else {
       switch (aTrsfNb) {
       case 1: aCurve = anObject->FirstCurve();
@@ -1268,15 +1299,12 @@ static Standard_Integer removeMechanismState(Draw_Interpretor& di, Standard_Inte
     return 1;
 
   TDF_Label aState;
-  if (!getLabel(di, aDoc, argv[2], aState) && aState.Father().Tag() != 3)
+  if (!getLabel(di, aDoc, argv[2], aState))
     return 1;  
   
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
-  TDF_Label aMechanism = aState.Father().Father();
-  if(!aTool->IsMechanism(aMechanism))
-    return 1;
-
   aTool->RemoveState(aState);
+
   return 0;
 }
 
@@ -1296,12 +1324,10 @@ static Standard_Integer addValues(Draw_Interpretor& di, Standard_Integer argc, c
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aState;
-  if (!getLabel(di, aDoc, argv[2], aState))
+  if (!getLabel(di, aDoc, argv[2], aState) || !aTool->IsState(aState))
     return 1;
-  TDF_Label aMechanism = aState.Father().Father();
+  TDF_Label aValue = aTool->AddValue(aState);
 
-  TDF_TagSource aTag;
-  TDF_Label aValue = aTag.NewChild(aState);
   if (argc == 3)
   {
     Handle(XCAFDoc_KinematicPairValue) aPairValue;
@@ -1309,7 +1335,7 @@ static Standard_Integer addValues(Draw_Interpretor& di, Standard_Integer argc, c
   }
   else {
     TDF_Label aJoint;
-    if (!getLabel(di, aDoc, argv[3], aJoint) || !aTool->IsJoint(aJoint))
+    if (!getLabel(di, aDoc, argv[3], aJoint))
       return 1;
 
     Handle(XCAFKinematics_PairValueObject) anObject;
@@ -1401,9 +1427,8 @@ static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, c
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aJoint;
-  if (!getLabel(di, aDoc, argv[3], aJoint) || !aTool->IsJoint(aJoint))
+  if (!getLabel(di, aDoc, argv[3], aJoint))
     return 1;
-  TDF_Label aMechanism = aJoint.Father().Father();
   TDF_Label aValue;
   if (!getLabel(di, aDoc, argv[2], aValue) || !aTool->IsValue(aValue))
     return 1;
@@ -1418,19 +1443,15 @@ static Standard_Integer setValues(Draw_Interpretor& di, Standard_Integer argc, c
   }
   Handle(XCAFKinematics_PairObject) aPairObject = aPair->GetObject();
 
-  if (aValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue))
-  {
-    aPairValue = XCAFDoc_KinematicPairValue::Set(aValue, aJoint);
-    anObject = aPairValue->GetObject();
-    if (anObject->GetAllValues().IsNull())
-      anObject->SetType(aPairObject->Type());
+  if (!aValue.FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aPairValue)) {
+    di << "Invalid kinematic value object\n";
+    return 1;
   }
-  else {
-    anObject = new XCAFKinematics_PairValueObject();
-    aPairValue = XCAFDoc_KinematicPairValue::Set(aValue,aJoint);
+  anObject = aPairValue->GetObject();
+  if (anObject->GetAllValues().IsNull() ||
+      anObject->Type() != aPairObject->Type())
     anObject->SetType(aPairObject->Type());
-  }
-
+  XCAFDoc_KinematicPairValue::Set(aValue, aJoint);
   try {
     Standard_Integer anIt = 4;
     while (anIt < argc) {
@@ -1506,9 +1527,8 @@ static Standard_Integer getValues(Draw_Interpretor& di, Standard_Integer argc, c
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aValue;
-  if (!getLabel(di, aDoc, argv[2], aValue) || !aTool->IsValue(aValue))
+  if (!getLabel(di, aDoc, argv[2], aValue))
     return 1;
-
 
   Handle(XCAFKinematics_PairValueObject) anObject;
   Handle(XCAFDoc_KinematicPairValue) aPairValue;
@@ -1584,7 +1604,7 @@ static Standard_Integer removeValues(Draw_Interpretor& di, Standard_Integer argc
     return 1;
   Handle(XCAFDoc_KinematicTool) aTool = XCAFDoc_DocumentTool::KinematicTool(aDoc->Main());
   TDF_Label aValue;
-  if (!getLabel(di, aDoc, argv[2], aValue) && !aTool->IsValue(aValue))
+  if (!getLabel(di, aDoc, argv[2], aValue))
     return 1;
 
   aTool->RemoveValue(aValue);
@@ -1625,18 +1645,18 @@ static Standard_Integer dump(Draw_Interpretor& di, Standard_Integer argc, const 
     nbLowOrderPairWithMotionCouplingValues = 0,
     nbLowOrderPairValues = 0;
 
-  for (Standard_Integer aMechInd = 1; aMechInd <= aMechanisms.Length(); ++aMechInd) 
+  for (TDF_LabelSequence::Iterator anIt(aMechanisms); anIt.More(); anIt.Next())
   {
-    TDF_Label aMechanism = aMechanisms.Value(aMechInd);
+    TDF_Label aMechanism = anIt.Value();
     TDF_LabelSequence aLinks = aKTool->GetLinks(aMechanism);
     nbLinks += aLinks.Length();
     for (Standard_Integer aLinkInd = 1; aLinkInd <= nbLinks; ++aLinkInd)
       nbRefShapes += aKTool->GetRefShapes(aLinks.Value(aLinkInd)).Length();
     TDF_LabelSequence aJoints = aKTool->GetJoints(aMechanism);
-    for (Standard_Integer aJointInd = 1; aJointInd <= aJoints.Length(); ++aJointInd)
+    for (TDF_LabelSequence::Iterator anIt(aJoints); anIt.More(); anIt.Next())
     {
       Handle(XCAFDoc_KinematicPair) aKinAttr;
-      if (!aJoints.Value(aJointInd).FindAttribute(XCAFDoc_KinematicPair::GetID(), aKinAttr))
+      if (!anIt.Value().FindAttribute(XCAFDoc_KinematicPair::GetID(), aKinAttr))
         continue;
       Handle(XCAFKinematics_PairObject) anObject = aKinAttr->GetObject();
       if (anObject.IsNull())
@@ -1649,7 +1669,7 @@ static Standard_Integer dump(Draw_Interpretor& di, Standard_Integer argc, const 
           nbLowOrderPairsWithRange++;
         else
           nbLowOrderPairs++;
-        nbLowOrderPairValues += aKTool->GetValuesOfJoint(aJoints.Value(aJointInd)).Length();
+        nbLowOrderPairValues += aKTool->GetValuesOfJoint(anIt.Value()).Length();
       }
       else if (aKinType >= XCAFKinematics_PairType_Screw &&
                aKinType <= XCAFKinematics_PairType_LinearFlexibleAndPinion)
@@ -1658,7 +1678,7 @@ static Standard_Integer dump(Draw_Interpretor& di, Standard_Integer argc, const 
           nbLowOrderPairsWithMotionCouplingAndRange++;
         else
           nbLowOrderPairsWithMotionCoupling++;
-        nbLowOrderPairWithMotionCouplingValues += aKTool->GetValuesOfJoint(aJoints.Value(aJointInd)).Length();
+        nbLowOrderPairWithMotionCouplingValues += aKTool->GetValuesOfJoint(anIt.Value()).Length();
       }
       else if (aKinType >= XCAFKinematics_PairType_PointOnSurface &&
                aKinType <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
@@ -1667,7 +1687,7 @@ static Standard_Integer dump(Draw_Interpretor& di, Standard_Integer argc, const 
           nbHigeOrderPairsWithRange++;
         else
           nbHigeOrderPairs++;
-        nbHigeOrderPairValues += aKTool->GetValuesOfJoint(aJoints.Value(aJointInd)).Length();
+        nbHigeOrderPairValues += aKTool->GetValuesOfJoint(anIt.Value()).Length();
       }
     }
     nbStates += aKTool->GetStates(aMechanism).Length();
@@ -1822,6 +1842,7 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\tScrew - Pitch\n"
     "\tRackAndPinion - PinionRadius\n"
     "\tGear -FirstLinkRadius SecondLinkRadius Bevel HelicalAngle GearRatio \n"
+    "\tLinear - SkewAngle \n"
     __FILE__, setParameters, g);
 
   di.Add("XGetPairParams", "XGetPairParams Doc Joint",

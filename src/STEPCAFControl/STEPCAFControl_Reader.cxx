@@ -4318,13 +4318,13 @@ void collectViewShapes(const Handle(XSControl_WorkSession)& theWS,
 //purpose  : set links of the Kinematic Joint in the OCAF
 //=======================================================================
 Standard_Boolean addLinkWithShapes(const Handle(XSControl_WorkSession)& theWS,
-                                    const Handle(TDocStd_Document)& theDoc,
-                                    const Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepresentation,
-                                    const TDF_Label& theMechanism,
-                                    const XCAFDoc_DataMapOfShapeLabel& theMap,
-                                    TDF_Label& theLink,
-                                    NCollection_DataMap<Handle(StepKinematics_KinematicLinkRepresentation), TDF_Label>& theMapOfLinks,
-                                    const Standard_Boolean& theIsBase = Standard_False)
+                                   const Handle(TDocStd_Document)& theDoc,
+                                   const Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepresentation,
+                                   const TDF_Label& theMechanism,
+                                   const XCAFDoc_DataMapOfShapeLabel& theMap,
+                                   TDF_Label& theLink,
+                                   NCollection_DataMap<Handle(StepKinematics_KinematicLinkRepresentation), TDF_Label>& theMapOfLinks,
+                                   const Standard_Boolean& theIsBase = Standard_False)
 {
   Handle(XSControl_TransferReader) aTR = theWS->TransferReader();
   Handle(Transfer_TransientProcess) aTP = aTR->TransientProcess();
@@ -4337,33 +4337,34 @@ Standard_Boolean addLinkWithShapes(const Handle(XSControl_WorkSession)& theWS,
     return Standard_True;
   Handle(StepKinematics_KinematicLinkRepresentationAssociation) aKLRA1;
   for (Interface_EntityIterator anIterLinks = aGraph.Sharings(theLinkRepresentation);
-    anIterLinks.More() && aKLRA1.IsNull(); anIterLinks.Next())
-  {
+    anIterLinks.More(); anIterLinks.Next()) {
     aKLRA1 = Handle(StepKinematics_KinematicLinkRepresentationAssociation)::DownCast(anIterLinks.Value());
+    if (aKLRA1.IsNull())
+      continue;
+
+    Handle(StepKinematics_ContextDependentKinematicLinkRepresentation) aCDKLR;
+    Interface_EntityIterator entIt = aGraph.Sharings(aKLRA1);
+    for (entIt.Start(); entIt.More() & aCDKLR.IsNull(); entIt.Next())
+    {
+      aCDKLR = Handle(StepKinematics_ContextDependentKinematicLinkRepresentation)::DownCast(entIt.Value());
+    }
+    if (aCDKLR.IsNull())
+      continue;
+    Handle(StepRepr_PropertyDefinition) aPD =
+      Handle(StepRepr_PropertyDefinition)::DownCast(aCDKLR->RepresentedProductRelation());
+    if (aPD.IsNull())
+      continue;
+    TDF_Label aShapeLabel;
+    Handle(Transfer_Binder) binder = aTP->Find(aPD->Definition().Value());
+    TopoDS_Shape aShape = TransferBRep::ShapeResult(aTP, binder);
+    if (aShape.IsNull())
+      continue;
+    if (theMap.IsBound(aShape))
+      aShapes.Append(theMap(aShape));
+    else if (aSTool->Search(aShape, aShapeLabel))
+      aShapes.Append(aShapeLabel);
   }
-  if (aKLRA1.IsNull())
-    return Standard_False;
-  Handle(StepKinematics_ContextDependentKinematicLinkRepresentation) aCDKLR;
-  Interface_EntityIterator entIt = aGraph.Sharings(aKLRA1);
-  for (entIt.Start(); entIt.More() & aCDKLR.IsNull(); entIt.Next())
-  {
-    aCDKLR = Handle(StepKinematics_ContextDependentKinematicLinkRepresentation)::DownCast(entIt.Value());
-  }
-  Handle(StepRepr_PropertyDefinition) aPD =
-    Handle(StepRepr_PropertyDefinition)::DownCast(aCDKLR->RepresentedProductRelation());
-  if (aPD.IsNull())
-    return Standard_False;
-  TDF_Label aShapeLabel;
-  Handle(Transfer_Binder) binder = aTP->Find(aPD->Definition().Value());
-  TopoDS_Shape aShape = TransferBRep::ShapeResult(aTP, binder);
-  if (aShape.IsNull())
-    return Standard_False;
-  if (theMap.IsBound(aShape))
-    aShapeLabel = theMap(aShape);
-  else
-    aSTool->Search(aShape, aShapeLabel, Standard_True, Standard_True, Standard_True);
-  aShapes.Append(aShapeLabel);
-  if (aShapes.Length() == 0)
+  if (aShapes.IsEmpty())
     return Standard_False;
 
   theLink = aKTool->AddLink(theMechanism, aShapes, theIsBase); 
@@ -4719,7 +4720,7 @@ Handle(XCAFKinematics_PairObject) createXCAFKinematicPairObject(const Handle(Ste
 }
 
 //=======================================================================
-//function : setPairValue
+//function : setKinematicPairValue
 //purpose  : set pair Value of the kinematic pair in OCAF
 //=======================================================================
 Standard_Boolean setKinematicPairValue(const Handle(XSControl_WorkSession)& theWS,

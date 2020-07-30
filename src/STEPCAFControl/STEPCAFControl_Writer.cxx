@@ -2194,44 +2194,33 @@ Standard_Boolean STEPCAFControl_Writer::WriteSHUOs (const Handle(XSControl_WorkS
 //function : createKinematicLink
 //purpose  : auxilary
 //=======================================================================
-static Standard_Boolean createKinematicLink(const Handle(Transfer_FinderProcess)& FP,
+static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)& theWS,
                                             const Handle(XCAFDoc_KinematicTool)& theKTool,
                                             const Interface_Graph& theGraph,
-                                            const TDF_Label& theLabelLink,  
-                                            Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepresentation,
-                                            Handle(StepKinematics_KinematicLink)& theLink,
-                                            Handle(StepShape_ShapeRepresentation)& theShapeRepr,
-                                            Handle(StepRepr_PropertyDefinition)& thePDS)
+                                            const TDF_Label& theLabelLink,
+                                            NCollection_IndexedDataMap<TDF_Label, Handle(StepKinematics_KinematicLinkRepresentation), TDF_LabelMapHasher>& theMapOfLinks,
+                                            Handle(StepKinematics_RigidLinkRepresentation)& theBaseLink,
+                                            Handle(StepRepr_PropertyDefinition)& theGeneralPD)
 {
-  theLink = new StepKinematics_KinematicLink;
+  const Handle(Interface_InterfaceModel)& Model = theWS->Model();
+  const Handle(XSControl_TransferWriter)& TW = theWS->TransferWriter();
+  const Handle(Transfer_FinderProcess)& FP = TW->FinderProcess();
+  Handle(StepKinematics_KinematicLink) aLink = new StepKinematics_KinematicLink;
 
   Handle(TDataStd_Name) aNameLink;
   Handle(TCollection_HAsciiString) aHNameLink;
   if (theLabelLink.FindAttribute(TDataStd_Name::GetID(), aNameLink))
     aHNameLink = new TCollection_HAsciiString(aNameLink->Get());
-  else
-    aHNameLink = new TCollection_HAsciiString("Link "+ theLabelLink.Tag());
-  theLink->Init(aHNameLink);
-
-  // find ref shapes
-  TDF_LabelSequence aShapesStartL = theKTool->GetRefShapes(theLabelLink);
-  if (aShapesStartL.IsEmpty()) return Standard_False;
-  TopoDS_Shape aTopoShapeStart = XCAFDoc_ShapeTool::GetShape(aShapesStartL.Value(1));
-  TopLoc_Location aLocStart;
-  TColStd_SequenceOfTransient seqRI;
-  FindEntities(FP, aTopoShapeStart, aLocStart, seqRI);
-  if (seqRI.Length() <= 0) {
-    FP->Messenger()->SendInfo() << "Warning: Cannot find RI for " << aTopoShapeStart.TShape()->DynamicType()->Name() << std::endl;
-    return Standard_False;
-  }
+  aLink->Init(aHNameLink);
 
   //Choose type of the representation link
+  Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr;
   TDF_LabelSequence aJoints = theKTool->GetJointsOfLink(theLabelLink,Standard_True,Standard_False);
   Standard_Boolean isLinear = Standard_False;
-  for (Standard_Integer anIndOfJoint = 1; anIndOfJoint <= aJoints.Length(); ++anIndOfJoint)
+  for (TDF_LabelSequence::Iterator anItJoint(aJoints); anItJoint.More(); anItJoint.Next())
   {
     Handle(XCAFDoc_KinematicPair) aKPairAttr;
-    if (!aJoints(anIndOfJoint).FindAttribute(XCAFDoc_KinematicPair::GetID(), aKPairAttr))
+    if (!anItJoint.Value().FindAttribute(XCAFDoc_KinematicPair::GetID(), aKPairAttr))
       continue;
     Handle(XCAFKinematics_PairObject) aPairObject = aKPairAttr->GetObject();
     if (aPairObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPinion ||
@@ -2241,28 +2230,74 @@ static Standard_Boolean createKinematicLink(const Handle(Transfer_FinderProcess)
       return Standard_False;
   }
   if (isLinear)
-    theLinkRepresentation = new StepKinematics_LinearFlexibleLinkRepresentation;
+    aLinkRepr = new StepKinematics_LinearFlexibleLinkRepresentation;
   else
-    theLinkRepresentation = new StepKinematics_RigidLinkRepresentation;
+    aLinkRepr = new StepKinematics_RigidLinkRepresentation;
 
-  // get PDS of Shape
-  Interface_EntityIterator anIter = theGraph.Sharings(seqRI.Value(1));
-  for (anIter.Start(); anIter.More() && thePDS.IsNull(); anIter.Next()) {
-    theShapeRepr = Handle(StepShape_ShapeRepresentation)::DownCast(anIter.Value());
-    if (theShapeRepr.IsNull())
+  Model->AddEntity(aLink);
+  Model->AddEntity(aLinkRepr);
+
+  // find ref shapes
+  TDF_LabelSequence aShapesL = theKTool->GetRefShapes(theLabelLink);
+  if (aShapesL.IsEmpty())
+    return Standard_False;
+  for (TDF_LabelSequence::Iterator anItShapes(aShapesL); anItShapes.More(); anItShapes.Next()) {
+    TopoDS_Shape aTopoShape = XCAFDoc_ShapeTool::GetShape(anItShapes.Value());
+    TopLoc_Location aLoc;
+    TColStd_SequenceOfTransient seqRI;
+    FindEntities(FP, aTopoShape, aLoc, seqRI);
+    if (seqRI.Length() <= 0) {
+      FP->Messenger()->SendInfo() << "Warning: Cannot find RI for " << aTopoShape.TShape()->DynamicType()->Name() << std::endl;
       continue;
-    Interface_EntityIterator aSDRIt = theGraph.Sharings(theShapeRepr);
-    for (aSDRIt.Start(); aSDRIt.More() && thePDS.IsNull(); aSDRIt.Next()) {
-      Handle(StepShape_ShapeDefinitionRepresentation) aSDR =
-        Handle(StepShape_ShapeDefinitionRepresentation)::DownCast(aSDRIt.Value());
-      if (aSDR.IsNull()) continue;
-      thePDS = aSDR->Definition().PropertyDefinition();
-      if (!thePDS.IsNull())
-        return Standard_True;
     }
+
+    // get PDS of Shape
+    Handle(StepShape_ShapeRepresentation) aShapeRepr;
+    Handle(StepRepr_PropertyDefinition) aPD;
+    Interface_EntityIterator anItRI = theGraph.Sharings(seqRI.Value(1));
+    for (anItRI.Start(); anItRI.More() && aPD.IsNull(); anItRI.Next()) {
+      aShapeRepr = Handle(StepShape_ShapeRepresentation)::DownCast(anItRI.Value());
+      if (aShapeRepr.IsNull())
+        continue;
+      Interface_EntityIterator aSDRIt = theGraph.Sharings(aShapeRepr);
+      for (aSDRIt.Start(); aSDRIt.More() && aPD.IsNull(); aSDRIt.Next()) {
+        Handle(StepShape_ShapeDefinitionRepresentation) aSDR =
+          Handle(StepShape_ShapeDefinitionRepresentation)::DownCast(aSDRIt.Value());
+        if (aSDR.IsNull()) continue;
+        aPD = aSDR->Definition().PropertyDefinition();
+      }
+    }
+    if (aPD.IsNull())
+      return Standard_False;
+    Handle(StepRepr_RepresentationContext) aRepresentationContextOfLink = aShapeRepr->ContextOfItems();
+
+    Handle(TCollection_HAsciiString) aNameOfLinkRepr = new TCollection_HAsciiString("");
+    Handle(StepRepr_HArray1OfRepresentationItem) aPlacementsOfPairs = new StepRepr_HArray1OfRepresentationItem();
+    aLinkRepr->Init(aNameOfLinkRepr, aPlacementsOfPairs, aRepresentationContextOfLink, aLink);
+    theMapOfLinks.Add(theLabelLink, aLinkRepr);
+
+    if (theGeneralPD.IsNull() && !isLinear)
+      theGeneralPD = aPD;
+
+    Handle(TDataStd_Integer) aBase;
+    if (theBaseLink.IsNull() && theLabelLink.FindAttribute(TDataStd_Integer::GetID(), aBase)) {
+      theGeneralPD = aPD;
+      theBaseLink = Handle(StepKinematics_RigidLinkRepresentation)::DownCast(aLinkRepr);
+    }
+
+    Handle(StepKinematics_KinematicLinkRepresentationAssociation) aLinkRepresentationAssociation = new StepKinematics_KinematicLinkRepresentationAssociation;
+    aLinkRepresentationAssociation->Init(aNameOfLinkRepr, aNameOfLinkRepr, aLinkRepr, aShapeRepr);
+    Handle(StepKinematics_ContextDependentKinematicLinkRepresentation) aCDKLRS = new StepKinematics_ContextDependentKinematicLinkRepresentation;
+    Handle(StepKinematics_ProductDefinitionRelationshipKinematics) aPDRK = new StepKinematics_ProductDefinitionRelationshipKinematics;
+    theGeneralPD = aPD;
+    aPDRK->Init(aNameOfLinkRepr, Standard_False, aLinkRepresentationAssociation->Description(), aPD->Definition());
+    aCDKLRS->Init(aLinkRepresentationAssociation, aPDRK);
+    Model->AddEntity(aLinkRepresentationAssociation);
+    Model->AddEntity(aPDRK);
+    Model->AddEntity(aCDKLRS);
   }
 
-  return Standard_False;
+  return Standard_True;
 }
 
 //=======================================================================
@@ -2514,11 +2549,6 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
     }
     case(XCAFKinematics_PairType_Planar):
     {
-      if (isRanged)
-        theKinematicPair = new StepKinematics_PlanarPairWithRange;
-      else
-        theKinematicPair = new StepKinematics_PlanarPair;
-
       aTZ = Standard_False;
       aRX = Standard_False;
       aRY = Standard_False;
@@ -2695,7 +2725,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
     }
     return Standard_True;
   }
-  else if (theKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_HighOrderPairObject))) //need to fix
+  else if (theKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_HighOrderPairObject)))
   {
   Handle(XCAFKinematics_HighOrderPairObject) aHighOrderPairObject = Handle(XCAFKinematics_HighOrderPairObject)::DownCast(theKinPairObj);
     switch (theKinPairObj->Type())
@@ -2854,6 +2884,10 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
   return Standard_False;
 }
 
+//=======================================================================
+//function : createKinematicPairValue
+//purpose  : 
+//=======================================================================
 static Standard_Boolean createKinematicPairValue(const Handle(XCAFKinematics_PairValueObject)& theKinPairValueObj,
                                                  const Handle(StepKinematics_PairRepresentationRelationship)& thePairReprRelationship,
                                                  Handle(StepKinematics_PairValue)& thePairValue)
@@ -2889,14 +2923,6 @@ static Standard_Boolean createKinematicPairValue(const Handle(XCAFKinematics_Pai
     break;
   }
   case(XCAFKinematics_PairType_Universal):
-  {
-    thePairValue = new StepKinematics_UniversalPairValue;
-    Handle(StepKinematics_UniversalPairValue) aUniversalPairValue =
-      Handle(StepKinematics_UniversalPairValue)::DownCast(thePairValue);
-    aUniversalPairValue->SetFirstRotationAngle(theKinPairValueObj->GetFirstRotation());
-    aUniversalPairValue->SetSecondRotationAngle(theKinPairValueObj->GetSecondRotation());
-    break;
-  }
   case(XCAFKinematics_PairType_Homokinetic):
   {
     thePairValue = new StepKinematics_UniversalPairValue;
@@ -2907,15 +2933,6 @@ static Standard_Boolean createKinematicPairValue(const Handle(XCAFKinematics_Pai
     break;
   }
   case(XCAFKinematics_PairType_Spherical):
-  {
-    thePairValue = new StepKinematics_SphericalPairValue;
-    Handle(StepKinematics_SphericalPairValue) aSphericalPairValue =
-      Handle(StepKinematics_SphericalPairValue)::DownCast(thePairValue);
-    StepKinematics_SpatialRotation InputRotation;
-    InputRotation.SetValue(theKinPairValueObj->GetAllValues());
-    aSphericalPairValue->SetInputOrientation(InputRotation);
-    break;
-  }
   case(XCAFKinematics_PairType_SphericalWithPin):
   {
     thePairValue = new StepKinematics_SphericalPairValue;
@@ -3122,55 +3139,29 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
     return Standard_False;
 
   TDF_LabelSequence aMechanismsL;
-
-  aMechanismsL.Clear();
   aMechanismsL = aKTool->GetMechanisms();
   if (aMechanismsL.Length() <= 0) return Standard_False;
 
-  Standard_Integer aMechInd;
-  for (Standard_Integer aMechInd = 1; aMechInd <= aMechanismsL.Length(); aMechInd++)
+  for (TDF_LabelSequence::Iterator anItMech(aMechanismsL); anItMech.More(); anItMech.Next())
   {
     // write Links
     Handle(StepKinematics_RigidLinkRepresentation) aBaseLinkOfMech;
     Handle(StepRepr_PropertyDefinition) aGeneralDefinition;
 
-    TDF_LabelSequence aSeqOfLinskL = aKTool->GetLinks(aMechanismsL.Value(aMechInd));
+    TDF_LabelSequence aSeqOfLinskL = aKTool->GetLinks(anItMech.Value());
     if (aSeqOfLinskL.Length() <= 0)
       continue;
     NCollection_IndexedDataMap<TDF_Label, Handle(StepKinematics_KinematicLinkRepresentation), TDF_LabelMapHasher> aMapOfLinks;
 
-    for (Standard_Integer aLinkInd = 1; aLinkInd <= aSeqOfLinskL.Length(); aLinkInd++)
+    for (TDF_LabelSequence::Iterator anItLink(aSeqOfLinskL); anItLink.More(); anItLink.Next())
     {
-      TDF_Label aLinkL = aSeqOfLinskL.Value(aLinkInd);
+      TDF_Label aLinkL = anItLink.Value();
       Handle(StepKinematics_KinematicLink) aLink;
       Handle(StepShape_ShapeRepresentation) aRefShapeOfLink;
       Handle(StepRepr_PropertyDefinition) aPD;    
       Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepresentation;
-      if (!createKinematicLink(FP, aKTool, aGraph, aLinkL, aLinkRepresentation, aLink, aRefShapeOfLink, aPD))
+      if (!createKinematicLink(theWS, aKTool, aGraph, aLinkL, aMapOfLinks, aBaseLinkOfMech, aGeneralDefinition))
         continue;
-      Handle(StepRepr_RepresentationContext) aRepresentationContextOfLink = aRefShapeOfLink->ContextOfItems();
-
-      Handle(TCollection_HAsciiString) aNameOfLinkRepr = new TCollection_HAsciiString("");
-      Handle(StepRepr_HArray1OfRepresentationItem) aPlacementsOfPairs = new StepRepr_HArray1OfRepresentationItem;
-      aLinkRepresentation->Init(aNameOfLinkRepr, aPlacementsOfPairs, aRepresentationContextOfLink, aLink);
-      aMapOfLinks.Add(aSeqOfLinskL(aLinkInd), aLinkRepresentation);
-
-      Handle(TDataStd_Integer) aBase;
-      if (aBaseLinkOfMech.IsNull() && aLinkL.FindAttribute(TDataStd_Integer::GetID(), aBase))
-        aBaseLinkOfMech = Handle(StepKinematics_RigidLinkRepresentation)::DownCast(aLinkRepresentation);
-
-      Handle(StepKinematics_KinematicLinkRepresentationAssociation) aLinkRepresentationAssociation = new StepKinematics_KinematicLinkRepresentationAssociation;
-      aLinkRepresentationAssociation->Init(aNameOfLinkRepr, aNameOfLinkRepr, aLinkRepresentation, aRefShapeOfLink);
-      Handle(StepKinematics_ContextDependentKinematicLinkRepresentation) aCDKLRS = new StepKinematics_ContextDependentKinematicLinkRepresentation;
-      Handle(StepKinematics_ProductDefinitionRelationshipKinematics) aPDRK = new StepKinematics_ProductDefinitionRelationshipKinematics;
-      aGeneralDefinition = aPD;
-      aPDRK->Init(aNameOfLinkRepr, Standard_False, aLinkRepresentationAssociation->Description(), aPD->Definition());
-      aCDKLRS->Init(aLinkRepresentationAssociation, aPDRK);
-      Model->AddEntity(aLink);
-      Model->AddEntity(aLinkRepresentation);
-      Model->AddEntity(aLinkRepresentationAssociation);
-      Model->AddEntity(aPDRK);
-      Model->AddEntity(aCDKLRS);
     }
     if (aGeneralDefinition.IsNull())
       continue;
@@ -3183,7 +3174,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
       continue;
 
     // write joints
-    TDF_LabelSequence aSeqOfJointsL = aKTool->GetJoints(aMechanismsL.Value(aMechInd));
+    TDF_LabelSequence aSeqOfJointsL = aKTool->GetJoints(anItMech.Value());
     if (aSeqOfJointsL.Length() <= 0) 
       continue;
     NCollection_IndexedDataMap<TDF_Label, Handle(StepKinematics_KinematicJoint), TDF_LabelMapHasher> aMapofJoints;
@@ -3193,9 +3184,10 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
     Handle(StepKinematics_MechanismRepresentation) aMechanism = new StepKinematics_MechanismRepresentation;
     StepRepr_RepresentedDefinition aPDK;
     Handle(StepKinematics_KinematicTopologyStructure) aKTopoStruct = new StepKinematics_KinematicTopologyStructure;
-    for (Standard_Integer aJointInd = 1; aJointInd <= aSeqOfJointsL.Length(); aJointInd++)
+    Standard_Integer aJointInd = 1;
+    for (TDF_LabelSequence::Iterator anItJoint(aSeqOfJointsL); anItJoint.More(); anItJoint.Next())
     {
-      TDF_Label aJointL = aSeqOfJointsL.Value(aJointInd);
+      TDF_Label aJointL = anItJoint.Value();
       Handle(StepKinematics_KinematicJoint) aJoint;
       Handle(XCAFDoc_KinematicPair) aKPairAttr;
       Handle(StepKinematics_KinematicPair) aKinematicPair;
@@ -3208,7 +3200,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
         continue;
       if (!createKinematicPair(aPairObject,aJoint,aKinematicPair, aLinkRepr1, aLinkRepr2))
         continue;
-      aMapofJoints.Add(aSeqOfJointsL(aJointInd), aJoint);
+      aMapofJoints.Add(anItJoint.Value(), aJoint);
       Handle(StepKinematics_PairRepresentationRelationship) aPairReprRelationship = new StepKinematics_PairRepresentationRelationship;
       StepRepr_RepresentationOrRepresentationReference aDataLinkStart;
       aDataLinkStart.SetValue(aLinkRepr1);
@@ -3218,7 +3210,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
       aPair.SetValue(aKinematicPair);
       Handle(TCollection_HAsciiString) aDescription;
       aPairReprRelationship->Init(aKinematicPair->Name(), aKinematicPair->Name(), Standard_False, aDescription, aDataLinkStart, aDataLinkEnd, aPair);
-      anArrayOfPairs->SetValue(aJointInd, aPairReprRelationship);
+      anArrayOfPairs->SetValue(aJointInd++, aPairReprRelationship);
 
       Model->AddEntity(aJoint);
       Model->AddWithRefs(aPairReprRelationship);
@@ -3231,7 +3223,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
     StepKinematics_KinematicTopologyRepresentationSelect aTopoSelect;
     aTopoSelect.SetValue(aKTopoStruct);
     Handle(TDataStd_Name) aAttrName;
-    aMechanismsL.Value(aMechInd).FindAttribute(TDataStd_Name::GetID(), aAttrName);
+    anItMech.Value().FindAttribute(TDataStd_Name::GetID(), aAttrName);
     Handle(TCollection_HAsciiString) aHNameMechanism = new TCollection_HAsciiString(aAttrName->Get());
     aPDK.SetValue(aProductDefKin);
     aMechanism->Init(aHNameMechanism, anArrayOfPairs, aBaseLinkOfMech->ContextOfItems(), aTopoSelect);
@@ -3239,17 +3231,18 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
     Model->AddWithRefs(aPropertyMechanismRepr);
 
     // (optional) write States
-    TDF_LabelSequence aSeqOfStates = aKTool->GetStates(aMechanismsL.Value(aMechInd));
-    for (Standard_Integer aStateInd = 1; aStateInd <= aSeqOfStates.Length(); ++aStateInd)
+    TDF_LabelSequence aSeqOfStates = aKTool->GetStates(anItMech.Value());
+    for (TDF_LabelSequence::Iterator anItState(aSeqOfStates); anItState.More(); anItState.Next())
     {
       Handle(StepKinematics_MechanismStateRepresentation) aStateRepr = new StepKinematics_MechanismStateRepresentation;
-      TDF_LabelSequence aSeqOfValues = aKTool->GetValuesOfState(aSeqOfStates(aStateInd));
+      TDF_LabelSequence aSeqOfValues = aKTool->GetValuesOfState(anItState.Value());
       if (aSeqOfValues.IsEmpty())
         continue;
       Handle(StepRepr_HArray1OfRepresentationItem) aItems = new StepRepr_HArray1OfRepresentationItem(1, aSeqOfValues.Length());
-      for (Standard_Integer aValueInd = 1; aValueInd <= aItems->Length(); ++aValueInd)
+      Standard_Integer aValueInd = 1;
+      for (TDF_LabelSequence::Iterator anItValue(aSeqOfValues); anItValue.More(); anItValue.Next())
       {
-        TDF_Label aJointL = aKTool->GetJointOfValue(aSeqOfValues(aValueInd));
+        TDF_Label aJointL = aKTool->GetJointOfValue(anItValue.Value());
         Handle(StepKinematics_KinematicJoint) aJoint;
         Handle(StepKinematics_PairRepresentationRelationship) aPairReprRelationship;
         if (!aMapofJoints.FindFromKey(aJointL, aJoint))
@@ -3258,22 +3251,22 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
         if (aPairReprRelationship.IsNull())
           continue;
         Handle(XCAFDoc_KinematicPairValue) aKPairValueAttr;
-        if (!aSeqOfValues(aValueInd).FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aKPairValueAttr))
+        if (!anItValue.Value().FindAttribute(XCAFDoc_KinematicPairValue::GetID(), aKPairValueAttr))
           continue;
         Handle(TCollection_HAsciiString) aNameOfValue;
         Handle(TDataStd_Name) aNameAttr;
-        if (aSeqOfValues(aValueInd).FindAttribute(TDataStd_Name::GetID(), aNameAttr))
+        if (anItValue.Value().FindAttribute(TDataStd_Name::GetID(), aNameAttr))
           aNameOfValue = new TCollection_HAsciiString(aNameAttr->Get());
         Handle(XCAFKinematics_PairValueObject) aPairValueObject = aKPairValueAttr->GetObject();
         Handle(StepKinematics_PairValue) aPairValue;
         if (!createKinematicPairValue(aPairValueObject, aPairReprRelationship, aPairValue))
           continue;
         aPairValue->SetName(aNameOfValue);
-        aItems->SetValue(aValueInd, aPairValue);
+        aItems->SetValue(aValueInd++, aPairValue);
       }
       Handle(TCollection_HAsciiString) aNameOfState;
       Handle(TDataStd_Name) aNameAttr;
-      if (aSeqOfStates(aStateInd).FindAttribute(TDataStd_Name::GetID(), aNameAttr))
+      if (anItState.Value().FindAttribute(TDataStd_Name::GetID(), aNameAttr))
         aNameOfState = new TCollection_HAsciiString(aNameAttr->Get());
       aStateRepr->Init(aNameOfState, aItems, aMechanism->ContextOfItems(), aMechanism);
       Model->AddWithRefs(aStateRepr);

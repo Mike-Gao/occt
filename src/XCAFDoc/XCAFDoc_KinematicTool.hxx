@@ -153,6 +153,10 @@ public:
   //! \return created state label
   Standard_EXPORT TDF_Label AddState(const TDF_Label& theMechanism);
 
+  //! Checks is the given label a State
+  //! \return the result of check
+  Standard_EXPORT Standard_Boolean IsState(const TDF_Label& theState) const;
+
   //! Adds new empty label for Value.
   //! \param[in] theState parent state
   //! \return created value label

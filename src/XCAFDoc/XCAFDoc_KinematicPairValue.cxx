@@ -61,13 +61,19 @@ Handle(XCAFDoc_KinematicPairValue) XCAFDoc_KinematicPairValue::Set(const TDF_Lab
     theValue.AddAttribute(anAttr);
   }
 
+  // check for exist old reference
   Handle(TDataStd_TreeNode) aJointNode, aValueNode;
+  if (theValue.FindAttribute(XCAFDoc::KinematicRefJointGUID(), aValueNode)) {
+    if (aValueNode->HasFather() && aValueNode->Father()->Label() == theJoint)
+      return anAttr;
+    aValueNode->Remove();
+  }
+
   // Add reference to Joint
   aValueNode = TDataStd_TreeNode::Set(theJoint, XCAFDoc::KinematicRefJointGUID());
   aJointNode = TDataStd_TreeNode::Set(theValue, XCAFDoc::KinematicRefJointGUID());
 
   aValueNode->Append(aJointNode);
-
   return anAttr;
 }
 

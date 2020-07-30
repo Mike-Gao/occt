@@ -47,7 +47,6 @@ enum ChildLab
   ChildLab_SecondTrsf,
   ChildLab_FirstGeomParam,
   ChildLab_SecondGeomParam,
-  ChildLab_Value
 };
 
 //=======================================================================
@@ -118,7 +117,7 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
   TDataXtd_Plane::Set(Label().FindChild(ChildLab_FirstTrsf), gp_Pln(theObject->FirstTransformation()));
   TDataXtd_Plane::Set(Label().FindChild(ChildLab_SecondTrsf), gp_Pln(theObject->SecondTransformation()));
 
-  if (!theObject->GetAllLimits().IsNull() && theObject->HasLimits()) {
+  if (theObject->HasLimits()) {
     Handle(TDataStd_RealArray) aLimitsAttr;
     aLimitsAttr = TDataStd_RealArray::Set(Label(), getLimitsID(), 1, theObject->GetAllLimits()->Length());
     aLimitsAttr->ChangeArray(theObject->GetAllLimits());
@@ -137,7 +136,7 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
       theObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPinion) {
     Handle(XCAFKinematics_LowOrderPairObjectWithCoupling) anObject =
       Handle(XCAFKinematics_LowOrderPairObjectWithCoupling)::DownCast(theObject);
-    if (!anObject->GetAllParams().IsNull() && anObject->GetAllParams()->Upper() > 0) {
+    if (!anObject->GetAllParams().IsNull() && !anObject->GetAllParams()->IsEmpty()) {
       Handle(TDataStd_RealArray) aParamsAttr;
       aParamsAttr = TDataStd_RealArray::Set(Label(), getParamsID(), 1, anObject->GetAllParams()->Upper());
       aParamsAttr->ChangeArray(anObject->GetAllParams());
@@ -186,8 +185,8 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
       TNaming_Builder aTNBuild(Label().FindChild(ChildLab_FirstGeomParam));
       aTNBuild.Generated(anEdge);
     }
-    if (anObject->Type() == XCAFKinematics_PairType_SlidingCurve ||
-        anObject->Type() == XCAFKinematics_PairType_RollingCurve)
+    if (anObject->Type() >= XCAFKinematics_PairType_SlidingCurve &&
+        anObject->Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
     {
       TopoDS_Edge anEdge1, anEdge2;
       if (!anObject->FirstCurve().IsNull()) {
@@ -199,15 +198,6 @@ void XCAFDoc_KinematicPair::SetObject(const Handle(XCAFKinematics_PairObject)& t
         aBuilder.MakeEdge(anEdge2, anObject->SecondCurve(), Precision::Confusion());
         TNaming_Builder aTNBuild2(Label().FindChild(ChildLab_SecondGeomParam));
         aTNBuild2.Generated(anEdge2);
-      }
-    }
-    if (anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
-    {
-      TopoDS_Edge anEdge;
-      if (!anObject->FirstCurve().IsNull()) {
-        aBuilder.MakeEdge(anEdge, anObject->FirstCurve(), Precision::Confusion());
-        TNaming_Builder aTNBuild1(Label().FindChild(ChildLab_FirstGeomParam));
-        aTNBuild1.Generated(anEdge);
       }
     }
   }

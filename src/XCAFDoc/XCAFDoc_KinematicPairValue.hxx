@@ -35,10 +35,11 @@ class XCAFDoc_KinematicPairValue;
 DEFINE_STANDARD_HANDLE(XCAFDoc_KinematicPairValue, TDF_Attribute)
 
 //! Attribute to store kinematic pair value.
-//! This parameter is an additional attribute for kinematic pair attribute
+//! This parameter is an additional attribute for kinematic pair attribute,
+//! which characterizes the pair for one of the mechanism states. 
 //! It is prohibited to store inconsistent data:
 //! - to store this attribute without kinematic value attribute
-//! - to store attributes with different types
+//! - to store this attribute not of the same type as the type of the pair
 class XCAFDoc_KinematicPairValue : public TDF_Attribute
 {
 

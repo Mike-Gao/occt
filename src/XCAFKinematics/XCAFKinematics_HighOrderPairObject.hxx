@@ -36,7 +36,6 @@ DEFINE_STANDARD_HANDLE(XCAFKinematics_HighOrderPairObject, XCAFKinematics_PairOb
 //! - XCAFKinematics_PairType_PointOnPlanarCurve
 //! - XCAFKinematics_PairType_SlidingCurve
 //! - XCAFKinematics_PairType_RollingCurve
-//! - XCAFKinematics_PairType_RollingCurve
 //! - XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve
 class XCAFKinematics_HighOrderPairObject : public XCAFKinematics_PairObject
 {
@@ -66,10 +65,10 @@ public:
 
   Handle(TColStd_HArray1OfReal) GetAllLimits() const Standard_OVERRIDE
   {
-    Handle(TColStd_HArray1OfReal) aLimitArray;
+
     if (HasLimits())
-      aLimitArray = myLimits;
-    return aLimitArray;
+      return myLimits;
+    return NULL;
   }
 
   //! Sets low limit of rotation attribute (only for SlidingSurface and RollingSurface)
@@ -160,10 +159,6 @@ public:
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) SecondCurve() const;
 
-  //! Sets curve attribute (only for PointOnCurve)
-  //! \param[in] theTrimmedCurve trimmed curve
-  //Standard_EXPORT void SetTrimmedCurve(const Standard_Real& theTrim1, const Standard_Real& theTrim2);
-
   //! Sets trimmed curve attribute (only for PointOnCurve)
   //! \param[in] aTrimCurve trimmed curve
   Standard_EXPORT void SetTrimmedCurve(const Handle(Geom_TrimmedCurve)& aTrimCurve);
@@ -172,15 +167,12 @@ public:
   //! \return trimmed curve
   Standard_EXPORT Handle(Geom_TrimmedCurve) TrimmedCurve() const;
 
-  //! \return trimmed curve
-  //Standard_EXPORT void TrimmedCurve(Standard_Real& theTrim1,Standard_Real& theTrim2) const;
-
   //! Sets surface attribute (only for PointOnSurface)
   //! \param[in] theSurface surface
   Standard_EXPORT void SetSurface(const Handle(Geom_Surface)& theSurface);
 
   //! Gets surface attribute (only for PointOnSurface)
-  //! \return curve
+  //! \return surface
   Standard_EXPORT Handle(Geom_Surface) Surface() const;
 
   //! Sets surface attribute (only for SlidingSurface and RollingSurface)
@@ -198,10 +190,6 @@ public:
   //! Gets surface attribute (only for SlidingSurface and RollingSurface)
   //! \return surface
   Standard_EXPORT Handle(Geom_Surface) SecondSurface() const;
-
-  //! Sets surface attribute (only for PointOnSurface)
-  //! \param[in] theTrimmedSurface trimmed surface
-  //Standard_EXPORT void SetTrimmedSurface(const Standard_Real& U1, const Standard_Real& U2, const Standard_Real& V1, const Standard_Real& V2);
 
   //! Sets trimmed surface attribute (only for PointOnSurface)
   //! \param[in] aTrimSurface trimmered surface
