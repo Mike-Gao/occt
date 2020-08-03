@@ -167,6 +167,9 @@ protected:
              Bnd_Box,
              TColStd_MapTransientHasher> BOPAlgo_DataMapOfPaveBlockBndBox;
 
+  typedef NCollection_DataMap
+    <Standard_Integer,
+    BOPDS_MapOfPaveBlock> BOPAlgo_DataMapOfIntegerMapOfPaveBlock;
 
   //! Sets non-destructive mode automatically if an argument 
   //! contains a locked sub-shape (see TopoDS_Shape::Locked()).
@@ -474,6 +477,19 @@ protected:
   //! In case self-interference is found the warning is added.
   Standard_EXPORT void CheckSelfInterference();
 
+  //! The method looks for the additional common blocks among pairs of edges
+  //! with the same bounding vertices.
+  Standard_EXPORT void ForceInterfEE();
+
+  //! The method looks for the additional edge/face common blocks
+  //! among pairs of edge/face having the same vertices.
+  Standard_EXPORT void ForceInterfEF();
+
+  //! Performs intersection of given pave blocks
+  //! with all faces from arguments.
+  Standard_EXPORT void ForceInterfEF(const BOPDS_IndexedMapOfPaveBlock& theMPB,
+                                     const Standard_Boolean theAddInterf);
+
 
   BOPCol_ListOfShape myArguments;
   BOPDS_PDS myDS;
@@ -484,6 +500,8 @@ protected:
   Standard_Boolean myIsPrimary;
   Standard_Boolean myAvoidBuildPCurve;
   BOPAlgo_GlueEnum myGlue;
+
+  BOPAlgo_DataMapOfIntegerMapOfPaveBlock myFPBDone; //!< Fence map of intersected faces and pave blocks
 
 
 private:

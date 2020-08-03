@@ -23,7 +23,7 @@ tolerance f0
 
 bop h0 f0
 bopsection result
-checkprops result -l 142.264
+checkprops result -l 150.23
 
 set nbshapes_expected "
 Number of shapes in shape

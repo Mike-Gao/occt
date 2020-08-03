@@ -67,3 +67,6 @@ Warning: Removal of internal boundaries among Faces has failed
 
 .BOPAlgo_AlertRemovalOfIBForEdgesFailed
 Warning: Removal of internal boundaries among Edges has failed
+
+.BOPAlgo_AlertSolidBuilderUnusedFaces
+Warning: Some of the faces passed to the Solid Builder algorithm have not been classified and not used for solids creation
