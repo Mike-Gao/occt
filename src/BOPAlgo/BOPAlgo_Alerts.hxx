@@ -78,4 +78,7 @@ DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertShellSplitterFailed)
 //! Some edges are too small and have no valid range
 DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertTooSmallEdge)
 
+//! Some of the faces passed to the Solid Builder algorithm have not been classified
+//! and not used for solids creation
+DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertSolidBuilderUnusedFaces)
 #endif // _BOPAlgo_Alerts_HeaderFile

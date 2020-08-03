@@ -54,7 +54,8 @@ BOPAlgo_PaveFiller::BOPAlgo_PaveFiller()
 BOPAlgo_PaveFiller::BOPAlgo_PaveFiller
   (const Handle(NCollection_BaseAllocator)& theAllocator)
 :
-  BOPAlgo_Algo(theAllocator)
+  BOPAlgo_Algo(theAllocator),
+  myFPBDone(1, theAllocator)
 {
   myDS = NULL;
   myIterator = NULL;
@@ -285,6 +286,13 @@ void BOPAlgo_PaveFiller::PerformInternal()
   }
   UpdatePaveBlocksWithSDVertices();
   UpdateInterfsWithSDVertices();
+  //
+  // Force intersection of edges after increase
+  // of the tolerance values of their vertices
+  //ForceInterfEE();
+  // Force Edge/Face intersection after increase
+  // of the tolerance values of their vertices
+  ForceInterfEF();
   //
   // 22
   PerformFF();
