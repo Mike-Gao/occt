@@ -25,6 +25,7 @@ Graphic3d_AspectLine3d::Graphic3d_AspectLine3d()
 : myColor (Quantity_NOC_YELLOW),
   myType  (Aspect_TOL_SOLID),
   myWidth (1.0f),
+  myLineFactor  (1),
   myLinePattern (0xFFFF)
 {
   //
@@ -40,6 +41,7 @@ Graphic3d_AspectLine3d::Graphic3d_AspectLine3d (const Quantity_Color&   theColor
 : myColor (theColor),
   myType  (theType),
   myWidth ((float )theWidth),
+  myLineFactor  (1),
   myLinePattern (DefaultLinePatternForType (theType))
 {
   if (myWidth <= 0.0f)

@@ -107,6 +107,19 @@ public:
     return Aspect_TOL_USERDEFINED;
   }
 
+  //! Return a multiplier for each bit in the line stipple pattern within [1, 256] range; 1 by default.
+  uint16_t LineStippleFactor() const { return myLineFactor; }
+
+  //! Set a multiplier for each bit in the line stipple pattern.
+  void SetLineStippleFactor (uint16_t theFactor)
+  {
+    if (theFactor == 0 || theFactor > 256)
+    {
+      throw Standard_OutOfRange ("Graphic3d_Aspects::SetLineStippleFactor(), bad factor value");
+    }
+    myLineFactor = theFactor;
+  }
+
   //! Return line width.
   Standard_ShortReal Width() const { return myWidth; }
 
@@ -141,6 +154,7 @@ public:
 
     return myProgram == theOther.myProgram
         && myType    == theOther.myType
+        && myLineFactor == theOther.myLineFactor
 		&& myLinePattern == theOther.myLinePattern
         && myColor   == theOther.myColor
         && myWidth   == theOther.myWidth;
@@ -165,6 +179,7 @@ protected:
   Quantity_ColorRGBA myColor;
   Aspect_TypeOfLine  myType;
   Standard_ShortReal myWidth;
+  uint16_t           myLineFactor;
   uint16_t           myLinePattern;
 
 };

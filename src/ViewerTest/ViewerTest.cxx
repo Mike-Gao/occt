@@ -1664,6 +1664,7 @@ struct ViewerTest_AspectsChangeSet
 
   Standard_Integer         ToSetTypeOfLine;
   uint16_t                 StippleLinePattern;
+  uint16_t                 StippleLineFactor;
 
   Standard_Integer         ToSetTypeOfMarker;
   Aspect_TypeOfMarker      TypeOfMarker;
@@ -1710,6 +1711,7 @@ struct ViewerTest_AspectsChangeSet
     LineWidth         (1.0),
     ToSetTypeOfLine   (0),
     StippleLinePattern(0xFFFF),
+    StippleLineFactor (1),
     ToSetTypeOfMarker (0),
     TypeOfMarker      (Aspect_TOM_PLUS),
     ToSetMarkerSize   (0),
@@ -2129,6 +2131,25 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
     {
       aChangeSet->ToSetTypeOfLine = -1;
     }
+    else if (anArg == "-setstipplelinefactor"
+          || anArg == "-setstipplefactor"
+          || anArg == "-setlinefactor"
+          || anArg == "-stipplelinefactor"
+          || anArg == "-stipplefactor"
+          || anArg == "-linefactor")
+    {
+      if (aChangeSet->ToSetTypeOfLine == -1)
+      {
+        std::cout << "Error: -setStippleLineFactor requires -setLineType\n";
+        return 1;
+      }
+      if (++anArgIter >= theArgNb)
+      {
+        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        return 1;
+      }
+      aChangeSet->StippleLineFactor = (uint16_t )Draw::Atoi (theArgVec[anArgIter]);
+    }
     else if (anArg == "-setmarkertype"
           || anArg == "-setpointtype")
     {
@@ -2340,6 +2361,7 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
       aChangeSet->LineWidth = 1.0;
       aChangeSet->ToSetTypeOfLine = -1;
       aChangeSet->StippleLinePattern = 0xFFFF;
+      aChangeSet->StippleLineFactor = 1;
       aChangeSet->ToSetTypeOfMarker = -1;
       aChangeSet->TypeOfMarker = Aspect_TOM_PLUS;
       aChangeSet->ToSetMarkerSize = -1;
@@ -2493,10 +2515,15 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
     if (aChangeSet->ToSetTypeOfLine != 0)
     {
       aDrawer->LineAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+      aDrawer->LineAspect()->Aspect()->SetLineStippleFactor     (aChangeSet->StippleLineFactor);
       aDrawer->WireAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+      aDrawer->WireAspect()->Aspect()->SetLineStippleFactor     (aChangeSet->StippleLineFactor);
       aDrawer->FreeBoundaryAspect()->Aspect()->SetLinePattern   (aChangeSet->StippleLinePattern);
+      aDrawer->FreeBoundaryAspect()->Aspect()->SetLineStippleFactor (aChangeSet->StippleLineFactor);
       aDrawer->UnFreeBoundaryAspect()->Aspect()->SetLinePattern (aChangeSet->StippleLinePattern);
+      aDrawer->UnFreeBoundaryAspect()->Aspect()->SetLineStippleFactor (aChangeSet->StippleLineFactor);
       aDrawer->SeenLineAspect()->Aspect()->SetLinePattern       (aChangeSet->StippleLinePattern);
+      aDrawer->SeenLineAspect()->Aspect()->SetLineStippleFactor (aChangeSet->StippleLineFactor);
     }
     if (aChangeSet->ToSetTypeOfMarker != 0)
     {
@@ -2671,10 +2698,15 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
         if (aChangeSet->ToSetTypeOfLine != 0)
         {
           aDrawer->LineAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+          aDrawer->LineAspect()->Aspect()->SetLineStippleFactor     (aChangeSet->StippleLineFactor);
           aDrawer->WireAspect()->Aspect()->SetLinePattern           (aChangeSet->StippleLinePattern);
+          aDrawer->WireAspect()->Aspect()->SetLineStippleFactor     (aChangeSet->StippleLineFactor);
           aDrawer->FreeBoundaryAspect()->Aspect()->SetLinePattern   (aChangeSet->StippleLinePattern);
+          aDrawer->FreeBoundaryAspect()->Aspect()->SetLineStippleFactor (aChangeSet->StippleLineFactor);
           aDrawer->UnFreeBoundaryAspect()->Aspect()->SetLinePattern (aChangeSet->StippleLinePattern);
+          aDrawer->UnFreeBoundaryAspect()->Aspect()->SetLineStippleFactor (aChangeSet->StippleLineFactor);
           aDrawer->SeenLineAspect()->Aspect()->SetLinePattern       (aChangeSet->StippleLinePattern);
+          aDrawer->SeenLineAspect()->Aspect()->SetLineStippleFactor (aChangeSet->StippleLineFactor);
           toRedisplay = Standard_True;
         }
         if (aChangeSet->ToSetTypeOfMarker != 0)
@@ -6254,7 +6286,8 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
       "\n\t\t:          [-setMaterial MatName] [-unsetMaterial]"
       "\n\t\t:          [-setTransparency Transp] [-unsetTransparency]"
       "\n\t\t:          [-setWidth LineWidth] [-unsetWidth]"
-      "\n\t\t:          [-setLineType {solid|dash|dot|dotDash|0xHexPattern}] [-unsetLineType]"
+      "\n\t\t:          [-setLineType {solid|dash|dot|dotDash|0xHexPattern} [-stippleFactor factor]]"
+      "\n\t\t:          [-unsetLineType]"
       "\n\t\t:          [-setMarkerType {.|+|x|O|xcircle|pointcircle|ring1|ring2|ring3|ball|ImagePath}]"
       "\n\t\t:          [-unsetMarkerType]"
       "\n\t\t:          [-setMarkerSize Scale] [-unsetMarkerSize]"
