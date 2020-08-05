@@ -69,7 +69,28 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent): QSyntaxHighlighter(pare
     QStringLiteral("TCollection_Side"), QStringLiteral("Standard_False"), QStringLiteral("Standard_True"), 
     QStringLiteral("TCollection"), QStringLiteral("NCollection"), QStringLiteral("gp_Trsf"), QStringLiteral("Handle"),
     QStringLiteral("Aspect_TOL_DASH"),  QStringLiteral("Aspect_TOM_O_STAR"), QStringLiteral("Aspect_TOL_SOLID"),
-    QStringLiteral("Aspect_TOM_O_STAR")
+    QStringLiteral("Aspect_TOM_O_STAR"), QStringLiteral("AIS_InteractiveObject"), QStringLiteral("AIS_ListOfInteractive"),
+    QStringLiteral("Aspect_GDM_Lines"), QStringLiteral("Aspect_GDM_Points"), QStringLiteral("Aspect_TOM_POINT"),
+    QStringLiteral("Aspect_TOM_RING1"), QStringLiteral("Aspect_TOM_O"),QStringLiteral("BinDrivers"),
+    QStringLiteral("DefineFormat"), QStringLiteral("Font_FA_Bold"), QStringLiteral("Font_FA_BoldItalic"),
+    QStringLiteral("Font_FA_Italic"), QStringLiteral("Font_FA_Regular"), QStringLiteral("DownCast"),
+    QStringLiteral("gp_Pln"), QStringLiteral("Graphic3d_AspectMarker3d"), QStringLiteral("Graphic3d_HTA_LEFT"),
+    QStringLiteral("Graphic3d_NameOfMaterial"), QStringLiteral("Graphic3d_NOM_BRONZE"), QStringLiteral("Graphic3d_NOM_PLASTIC"),
+    QStringLiteral("Graphic3d_VTA_BOTTOM"), QStringLiteral("OpenGl_GraphicDriver"), QStringLiteral("PCDM_RS_OK"),
+    QStringLiteral("PCDM_SS_OK"), QStringLiteral("PCDM_ReaderStatus"), QStringLiteral("PCDM_StoreStatus"),
+    QStringLiteral("Prs3d_Drawer"), QStringLiteral("TPrsStd_AISPresentation"), QStringLiteral("Quantity_Color"),
+    QStringLiteral("Quantity_NameOfColor"), QStringLiteral("Quantity_NOC_BLUE1"), QStringLiteral("Quantity_NOC_CADETBLUE"),
+    QStringLiteral("Quantity_NOC_GREEN"), QStringLiteral("Quantity_NOC_MAGENTA1"), QStringLiteral("Quantity_NOC_RED"),
+    QStringLiteral("Quantity_NOC_YELLOW"), QStringLiteral("Quantity_NOC_WHITE"), QStringLiteral("Quantity_NOC_MATRABLUE"),
+    QStringLiteral("Quantity_TOC_RGB"), QStringLiteral("Quantity_TOC_HLS"), QStringLiteral("Standard_GUID"),
+    QStringLiteral("TColStd_ListIteratorOfListOfTransient"), QStringLiteral("TColStd_ListOfTransient"), QStringLiteral("TDataStd_Integer"),
+    QStringLiteral("TDataStd_Name"), QStringLiteral("TDataStd_Real"), QStringLiteral("TFunction_Driver"),
+    QStringLiteral("TFunction_DriverTable"), QStringLiteral("TFunction_Function"), QStringLiteral("TFunction_Logbook"),
+    QStringLiteral("TDF_Label"), QStringLiteral("TDF_TagSource"), QStringLiteral("TNaming_NamedShape"),
+    QStringLiteral("TopAbs_EDGE"), QStringLiteral("TopAbs_FACE"), QStringLiteral("TopAbs_VERTEX"),
+    QStringLiteral("TPrsStd_AISPresentation"), QStringLiteral("TPrsStd_AISViewer"), QStringLiteral("V3d_AmbientLight"),
+    QStringLiteral("V3d_DirectionalLight"), QStringLiteral("V3d_PositionalLight"), QStringLiteral("V3d_SpotLight"),
+    QStringLiteral("XmlDrivers")
   };
   for (const QString &aPattern : anOcctPatterns)
   {
@@ -77,25 +98,14 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent): QSyntaxHighlighter(pare
     aRule.myFormat = myOcctFormat;
     myHighlightingRules.append(aRule);
   }
-
-  myMemberFormat.setFontWeight(QFont::Black);
-  const QString aMemberPatterns[] =
-  {
-    QStringLiteral("myIsProcessed"), QStringLiteral("myObject2d"), QStringLiteral("myObject3d"),
-    QStringLiteral("myResult"), QStringLiteral("myCode"),  QStringLiteral("myCodePath"),
-    QStringLiteral("myFileName"), QStringLiteral("myStepType"),  QStringLiteral("myViewer")
-  };
-  for (const QString &aPattern : aMemberPatterns)
-  {
-    aRule.myPattern = QRegularExpression(aPattern);
-    aRule.myFormat = myMemberFormat;
-    myHighlightingRules.append(aRule);
-  }
   
-  myHelperFormat.setForeground(Qt::gray);
+  myHelperFormat.setForeground(Qt::red);
   const QString aHelperPatterns[] =
   {
-    QStringLiteral("AdaptorCurve_AIS"), QStringLiteral("AdaptorVec_AIS"), QStringLiteral("AdaptorCurve2d_AIS"), QStringLiteral("AdaptorPnt2d_AIS")
+    QStringLiteral("AdaptorCurve_AIS"), QStringLiteral("AdaptorVec_AIS"), QStringLiteral("AdaptorCurve2d_AIS"), 
+    QStringLiteral("AdaptorPnt2d_AIS"), QStringLiteral("Sample2D_Image"), QStringLiteral("Sample2D_Markers"),
+    QStringLiteral("Sample2D_Face"), QStringLiteral("TOcafFunction_BoxDriver"), QStringLiteral("TOcafFunction_CylDriver"),
+    QStringLiteral("DisplayPresentation")
   };
   for (const QString &aPattern : aHelperPatterns)
   {
@@ -146,10 +156,14 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent): QSyntaxHighlighter(pare
     myHighlightingRules.append(aRule);
   }
 
-  myClassFormat.setFontWeight(QFont::Bold);
-  myClassFormat.setForeground(Qt::darkMagenta);
-  aRule.myPattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
-  aRule.myFormat = myClassFormat;
+  myMemberFormat.setFontWeight(QFont::Bold);
+  aRule.myPattern = QRegularExpression(QStringLiteral("\\bmy[0-9A-Za-z]+\\b"));
+  aRule.myFormat = myMemberFormat;
+  myHighlightingRules.append(aRule);
+
+  myLocalFormat.setForeground(Qt::darkMagenta);
+  aRule.myPattern = QRegularExpression(QStringLiteral("\\ba[0-9A-Za-z]+\\b"));
+  aRule.myFormat = myLocalFormat;
   myHighlightingRules.append(aRule);
 
   myQuotationFormat.setForeground(Qt::darkRed);
@@ -157,11 +171,11 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent): QSyntaxHighlighter(pare
   aRule.myFormat = myQuotationFormat;
   myHighlightingRules.append(aRule);
 
-  //myFunctionFormat.setFontItalic(true);
-  //myFunctionFormat.setForeground(Qt::blue);
-  //aRule.myPattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
-  //aRule.myFormat = myFunctionFormat;
-  //myHighlightingRules.append(aRule);
+  myFunctionFormat.setFontItalic(true);
+  myFunctionFormat.setForeground(Qt::blue);
+  aRule.myPattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
+  aRule.myFormat = myFunctionFormat;
+  myHighlightingRules.append(aRule);
 
   mySingleLineCommentFormat.setForeground(Qt::darkGreen);
   aRule.myPattern = QRegularExpression(QStringLiteral("//[^\n]*"));

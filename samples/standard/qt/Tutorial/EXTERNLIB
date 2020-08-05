@@ -1,6 +1,9 @@
 TKBRep
+TKBin
 TKBool
 TKBO
+TKCDF
+TKBRep
 TKCDF
 TKFillet
 TKG2d
@@ -29,5 +32,4 @@ TKXSBase
 TKLCAF
 TKCAF
 TKVCAF
-TKBin
 TKXml

@@ -157,12 +157,12 @@ void DataExchangeSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 
 void DataExchangeSamples::BrepExportSample()
 {
-  Standard_Boolean aIsShapeExist = Standard_False;
+  Standard_Boolean anIsShapeExist = Standard_False;
   for (Handle(AIS_InteractiveObject) anObject : myObject3d)
   {
     if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
     {
-      aIsShapeExist = Standard_True;
+      anIsShapeExist = Standard_True;
       if (BRepTools::Write(aShape->Shape(), myFileName.ToCString()))
         myResult << "A shape was successfully written" << std::endl;
       else
@@ -170,7 +170,7 @@ void DataExchangeSamples::BrepExportSample()
       break; // write only one shape
     }
   }
-  if(!aIsShapeExist)
+  if(!anIsShapeExist)
     myResult << "A shape does not exist" << std::endl;
 }
 
@@ -230,16 +230,16 @@ void DataExchangeSamples::IgesExportSample()
   IGESControl_Writer anIgesWriter(Interface_Static::CVal("XSTEP.iges.unit"),
     Interface_Static::IVal("XSTEP.iges.writebrep.mode"));
 
-  Standard_Boolean aIsShapeExist = Standard_False;
+  Standard_Boolean anIsShapeExist = Standard_False;
   for (Handle(AIS_InteractiveObject) anObject : myObject3d)
   {
     if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
     {
-      aIsShapeExist = Standard_True;
+      anIsShapeExist = Standard_True;
       anIgesWriter.AddShape(aShape->Shape());
     }
   }
-  if (aIsShapeExist)
+  if (anIsShapeExist)
   {
     anIgesWriter.ComputeModel();
     if(anIgesWriter.Write(myFileName.ToCString()))
@@ -257,16 +257,16 @@ void DataExchangeSamples::StlExportSample()
   BRep_Builder builder;
   builder.MakeCompound(aTopoCompound);
 
-  Standard_Boolean aIsShapeExist = Standard_False;
+  Standard_Boolean anIsShapeExist = Standard_False;
   for (Handle(AIS_InteractiveObject) anObject : myObject3d)
   {
     if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
     {
-      aIsShapeExist = Standard_True;
+      anIsShapeExist = Standard_True;
       builder.Add(aTopoCompound, aShape->Shape());
     }
   }
-  if (aIsShapeExist)
+  if (anIsShapeExist)
   {
     StlAPI_Writer aStlWriter;
     if (aStlWriter.Write(aTopoCompound, myFileName.ToCString()))
@@ -284,16 +284,16 @@ void DataExchangeSamples::VrmlExportSample()
   BRep_Builder aBrepBuilder;
   aBrepBuilder.MakeCompound(aTopoCompound);
 
-  Standard_Boolean aIsShapeExist = Standard_False;
+  Standard_Boolean anIsShapeExist = Standard_False;
   for (Handle(AIS_InteractiveObject) anObject : myObject3d)
   {
     if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
     {
-      aIsShapeExist = Standard_True;
+      anIsShapeExist = Standard_True;
       aBrepBuilder.Add(aTopoCompound, aShape->Shape());
     }
   }
-  if (aIsShapeExist)
+  if (anIsShapeExist)
   {
     VrmlAPI_Writer aVrmlWriter;
     if (aVrmlWriter.Write(aTopoCompound, myFileName.ToCString()))
