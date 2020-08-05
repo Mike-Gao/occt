@@ -33,13 +33,13 @@ private:
   QRegularExpression myCommentEndExpression;
 
   QTextCharFormat myKeywordFormat;
-  QTextCharFormat myClassFormat;
   QTextCharFormat mySingleLineCommentFormat;
   QTextCharFormat myMultiLineCommentFormat;
   QTextCharFormat myQuotationFormat;
   QTextCharFormat myFunctionFormat;  
   QTextCharFormat myOcctFormat;
   QTextCharFormat myMemberFormat;
+  QTextCharFormat myLocalFormat;
   QTextCharFormat myHelperFormat;
 };
 

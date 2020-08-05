@@ -44,7 +44,7 @@
 			},
 			{
 				"text": "Neutral point",
-				"function": "NeutralPoinSelect3dSample",
+				"function": "NeutralPointSelect3dSample",
 				"description": ""
 			}
 		],

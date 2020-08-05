@@ -33,7 +33,7 @@ private:
   void VerticesSelect3dSample();
   void EdgesSelect3dSample();
   void FacesSelect3dSample();
-  void NeutralPoinSelect3dSample();
+  void NeutralPointSelect3dSample();
   void WireFramePresentation3dSample();
   void ShadingPresentation3dSample();
   void RedColorPresentation3dSample();

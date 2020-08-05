@@ -29,6 +29,8 @@ void Viewer3dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     EdgesSelect3dSample();
   else if (theSampleName == "FacesSelect3dSample")
     FacesSelect3dSample();
+  else if (theSampleName == "NeutralPointSelect3dSample")
+    NeutralPointSelect3dSample();
   else if (theSampleName == "WireFramePresentation3dSample")
     WireFramePresentation3dSample();
   else if (theSampleName == "ShadingPresentation3dSample")
@@ -149,7 +151,7 @@ void Viewer3dSamples::FacesSelect3dSample()
   myContext->Activate(AIS_Shape::SelectionMode(TopAbs_FACE));
 }
 
-void Viewer3dSamples::NeutralPoinSelect3dSample()
+void Viewer3dSamples::NeutralPointSelect3dSample()
 {
   myContext->Deactivate();
   myContext->Activate(0);
