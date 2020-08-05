@@ -65,7 +65,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>win64\vc14\objd\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CONSOLE;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -73,15 +73,15 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmaind.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgetsd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Guid.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Cored.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGLd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgetsd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Guid.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Cored.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGLd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;C:\Work\3d_party\qt5.11.2-vc14-64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <OutputFile>$(OutDir)\Tutorial.exe</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <Midl>
@@ -90,7 +90,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CONSOLE;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
@@ -104,7 +104,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>win64\vc14\obj\</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CONSOLE;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName></ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -113,8 +113,8 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Work\3d_party\qt5.11.2-vc14-64\lib\qtmain.lib;shell32.lib;TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgets.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Gui.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Core.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGL.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgets.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Gui.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Core.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGL.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;C:\Work\3d_party\qt5.11.2-vc14-64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -122,7 +122,7 @@
       <LinkIncremental>false</LinkIncremental>
       <OutputFile>$(OutDir)\Tutorial.exe</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <Midl>
@@ -131,7 +131,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CONSOLE;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

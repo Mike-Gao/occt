@@ -19,6 +19,10 @@ public:
   void SetView(Handle(V3d_View) theView) { myView = theView; };
   void SetViewer(Handle(V3d_Viewer) theViewer) { myViewer = theViewer; };
   void SetContext(Handle(AIS_InteractiveContext) theContext) { myContext = theContext; };
+  void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
+  static Standard_Boolean IsFileSample(TCollection_AsciiString theSampleName);
+  static Standard_Boolean IsShadedSample(TCollection_AsciiString theSampleName);
+
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 
@@ -36,7 +40,7 @@ private:
   void ClearGrid2dSample();
   void BackgroungImage2dSample();
 
-
+  TCollection_AsciiString        myFileName;
   Handle(V3d_View)               myView;
   Handle(V3d_Viewer)             myViewer;
   Handle(AIS_InteractiveContext) myContext;

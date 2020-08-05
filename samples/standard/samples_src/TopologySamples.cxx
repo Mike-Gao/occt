@@ -1,6 +1,7 @@
 #include "TopologySamples.h"
 
 #include <gp_Circ.hxx>
+#include <gp_Circ2d.hxx>
 #include <gp_Cylinder.hxx>
 #include <gp_Lin.hxx>
 #include <gp_Pln.hxx>
@@ -10,6 +11,7 @@
 #include <Geom_Axis1Placement.hxx>
 #include <Geom_Axis2Placement.hxx>
 #include <Geom_BSplineCurve.hxx>
+#include <Geom2d_BSplineCurve.hxx>
 #include <Geom_BSplineSurface.hxx>
 #include <Geom_CartesianPoint.hxx>
 #include <Geom_CylindricalSurface.hxx>
@@ -17,6 +19,7 @@
 #include <Geom_Plane.hxx>
 #include <Geom_ToroidalSurface.hxx>
 #include <GeomAPI_PointsToBSpline.hxx>
+#include <Geom2dAPI_PointsToBSpline.hxx>
 #include <GeomAPI_PointsToBSplineSurface.hxx>
 
 #include <TopoDS.hxx>
@@ -50,6 +53,7 @@
 #include <BRepBuilderAPI_Copy.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeEdge2d.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepBuilderAPI_MakeShell.hxx>
@@ -435,7 +439,89 @@ void TopologySamples::Solid3dSample()
 
 void TopologySamples::Edge2dSample()
 {
+  // Make an edge from two 2D points.
+  gp_Pnt2d aPnt1(0.0, 10.0);
+  gp_Pnt2d aPnt2(10.0, 10.0);
+  TopoDS_Edge anEdgeP12 = BRepBuilderAPI_MakeEdge2d(aPnt1, aPnt2);
+  myResult << "TopoDS_Edge between [ "
+    << aPnt1.X() << ", " << aPnt1.Y() << " ] and [ "
+    << aPnt2.X() << ", " << aPnt2.Y() << " ] was created in yellow" << std::endl
+    << std::endl;
 
+  // Make an edge from a sercular segment.
+  // Create a circle of the radius 5.0.
+  gp_Circ2d aCirc(gp::OX2d(), 5.0);
+  // Make a circular edge from the 1st quoter in the parametric space.
+  TopoDS_Edge anEdgeCirc = BRepBuilderAPI_MakeEdge2d(aCirc, 0.0, M_PI_2);
+  myResult << "TopoDS_Edge on the 2D circle's 1st quoter" << std::endl
+    << "with the center at [ " << aCirc.Location().X() << ", " << aCirc.Location().Y() 
+    << " ] and R = " << aCirc.Radius() << " was created in red" << std::endl
+    << std::endl;
+
+  // Make an edge from a 2D curve (BSpline).
+  // Define points.
+  gp_Pnt2d aPole1(0.0, 0.0);
+  gp_Pnt2d aPole2(5.0, 5.0);
+  gp_Pnt2d aPole3(10.0, 10.0);
+  gp_Pnt2d aPole4(15.0, 5.0);
+  // Add points to the curve poles array.
+  TColgp_Array1OfPnt2d aPoles(1, 4);
+  aPoles.SetValue(1, aPole1);
+  aPoles.SetValue(2, aPole2);
+  aPoles.SetValue(3, aPole3);
+  aPoles.SetValue(4, aPole4);
+  // Make a BSpline curve from the points array
+  Handle(Geom2d_BSplineCurve) aBSplineCurve = Geom2dAPI_PointsToBSpline(aPoles).Curve();
+  // Make an edge between two point on the BSpline curve.
+  gp_Pnt2d aPntOnCurve1, aPntOnCurve2;
+  aBSplineCurve->D0(0.75 * aBSplineCurve->FirstParameter()
+    + 0.25 * aBSplineCurve->LastParameter(),
+    aPntOnCurve1);
+  aBSplineCurve->D0(0.25 * aBSplineCurve->FirstParameter()
+    + 0.75 * aBSplineCurve->LastParameter(),
+    aPntOnCurve2);
+  TopoDS_Edge anEdgeBSpline = BRepBuilderAPI_MakeEdge2d(aBSplineCurve, aPntOnCurve1, aPntOnCurve2);
+  myResult << "TopoDS_Edge on the 2D BSpline curve" << std::endl
+    << "between [ " << aPntOnCurve1.X() << ", " << aPntOnCurve1.Y() 
+    << " ] and [ "  << aPntOnCurve2.X() << ", " << aPntOnCurve2.Y() << " ]" << std::endl
+    << "was created in green" << std::endl;
+
+  Handle(AIS_ColoredShape) anAisEdgeP12 = new AIS_ColoredShape(anEdgeP12);
+  Handle(AIS_ColoredShape) anAisEdgeCirc = new AIS_ColoredShape(anEdgeCirc);
+  Handle(AIS_ColoredShape) anAisEdgeBSpline = new AIS_ColoredShape(anEdgeBSpline);
+  anAisEdgeP12->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
+  anAisEdgeCirc->SetColor(Quantity_Color(Quantity_NOC_RED));
+  anAisEdgeBSpline->SetColor(Quantity_Color(Quantity_NOC_GREEN));
+  myObject2d.Append(anAisEdgeP12);
+  myObject2d.Append(anAisEdgeCirc);
+  myObject2d.Append(anAisEdgeBSpline);
+  Handle(AIS_TextLabel) anAisEdgeP12Label = new AIS_TextLabel();
+  anAisEdgeP12Label->SetText("Edge between two 2d points");
+  anAisEdgeP12Label->SetPosition(0.5 * (gp_XYZ(aPnt1.X(), aPnt1.Y()+0.5, 0.0) + gp_XYZ(aPnt2.X(), aPnt2.Y()+0.5, 0.0)));
+  anAisEdgeP12Label->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
+  myObject2d.Append(anAisEdgeP12Label);
+  Handle(AIS_TextLabel) anAisEdgeCircLabel = new AIS_TextLabel();
+  anAisEdgeCircLabel->SetText("Circular edge");
+  anAisEdgeCircLabel->SetPosition(gp_XYZ(aCirc.Location().X(), aCirc.Location().Y()+0.5, 0.0));
+  anAisEdgeCircLabel->SetColor(Quantity_Color(Quantity_NOC_RED));
+  myObject2d.Append(anAisEdgeCircLabel);
+  Handle(AIS_TextLabel) anAisEdgeBSplineLabel = new AIS_TextLabel();
+  anAisEdgeBSplineLabel->SetText("BSpline edge");
+  anAisEdgeBSplineLabel->SetPosition(gp_XYZ(aPole3.X(), aPole3.Y()+0.5, 0.0));
+  anAisEdgeBSplineLabel->SetColor(Quantity_Color(Quantity_NOC_GREEN));
+  myObject2d.Append(anAisEdgeBSplineLabel);
+  TopoDS_Vertex anEdgeP12_V1, anEdgeP12_V2;
+  TopExp::Vertices(anEdgeP12, anEdgeP12_V1, anEdgeP12_V2);
+  myObject2d.Append(new AIS_Shape(anEdgeP12_V1));
+  myObject2d.Append(new AIS_Shape(anEdgeP12_V2));
+  TopoDS_Vertex anEdgeCirc_V1, anEdgeCirc_V2;
+  TopExp::Vertices(anEdgeCirc, anEdgeCirc_V1, anEdgeCirc_V2);
+  myObject2d.Append(new AIS_Shape(anEdgeCirc_V1));
+  myObject2d.Append(new AIS_Shape(anEdgeCirc_V2));
+  TopoDS_Vertex anEdgeBSpline_V1, anEdgeBSpline_V2;
+  TopExp::Vertices(anEdgeBSpline, anEdgeBSpline_V1, anEdgeBSpline_V2);
+  myObject2d.Append(new AIS_Shape(anEdgeBSpline_V1));
+  myObject2d.Append(new AIS_Shape(anEdgeBSpline_V2));
 }
 
 void TopologySamples::Box3dSample()

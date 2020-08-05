@@ -26,7 +26,6 @@ int main ( int argc, char* argv[] )
     if( isOK )
       a.installTranslator( &strTrans );
 
-
     if (argc < 2)
     {
       std::cout << "An argumetn absent";

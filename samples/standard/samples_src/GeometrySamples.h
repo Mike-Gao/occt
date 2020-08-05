@@ -75,7 +75,6 @@ private:
   void BoundingBoxOfCurves2dSample();
   void DumpCircleInfoSample();
   void DumpBSplineCurveInfoSample();
-
 };
 
 #endif  //GEOMETRYSAMPLES_H

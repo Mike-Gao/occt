@@ -25,7 +25,8 @@ public:
   Handle(V3d_Viewer)             getViewer();
   void                           setViewer(Handle(V3d_Viewer) theViewer);
 
-  void SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects);
+  void SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects,
+                  Standard_Boolean theDisplayShaded = Standard_False);
   bool IsEmpty() const { return myContextIsEmpty; } 
 	
 protected:

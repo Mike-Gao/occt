@@ -42,9 +42,8 @@ protected:
 private:
   ExchangeType myExchangeType;
   TCollection_AsciiString   myFileName;
-//  Handle(V3d_View)          myView;
   Handle(V3d_Viewer)             myViewer;
-  Handle(TDocStd_Document) myOcafDoc;
+  Handle(TDocStd_Document)       myOcafDoc;
   Handle(AIS_InteractiveContext) myContext;
 
   // One function for every sample
