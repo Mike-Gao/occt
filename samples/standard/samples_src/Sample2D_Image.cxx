@@ -26,9 +26,8 @@ Sample2D_Image::Sample2D_Image(TCollection_AsciiString& aFileName,
 }
 void Sample2D_Image::MakeShape()
 {
-  Handle(Graphic3d_Texture1D) anImageTexture = 
-    new Graphic3d_Texture1Dsegment(myFilename);
-  Standard_Real coeff = (Standard_Real)(anImageTexture->GetImage()->Height())/
+  Handle(Graphic3d_Texture1D) anImageTexture = new Graphic3d_Texture1Dsegment(myFilename);
+  Standard_Real coeff =  (Standard_Real)(anImageTexture->GetImage()->Height()) /
     (anImageTexture->GetImage()->Width())*myScale;
   TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(myX,myY,0.), gp_Pnt(100*myScale+myX,myY,0.));
   TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(100*myScale+myX,myY,0.), gp_Pnt(100*myScale+myX,100*coeff+myY,0.));

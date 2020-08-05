@@ -47,6 +47,22 @@ void Viewer2dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
   myIsProcessed = anIsSamplePresent;
 }
 
+Standard_Boolean Viewer2dSamples::IsFileSample(TCollection_AsciiString theSampleName)
+{
+  if (theSampleName == "BackgroungImage2dSample")
+    return Standard_True;
+  else
+    return Standard_False;
+}
+
+Standard_Boolean Viewer2dSamples::IsShadedSample(TCollection_AsciiString theSampleName)
+{
+  if (theSampleName == "BackgroungImage2dSample")
+    return Standard_True;
+  else
+    return Standard_False;
+}
+
 void Viewer2dSamples::TextView2dSample()
 {
   Standard_Integer aColor = Quantity_NameOfColor::Quantity_NOC_MATRABLUE;
@@ -255,8 +271,7 @@ void Viewer2dSamples::ClearGrid2dSample()
 
 void Viewer2dSamples::BackgroungImage2dSample()
 {
-  TCollection_AsciiString aFilePath(":/images/Open_Cascade_logotype_for_website.png");
-  Handle(Sample2D_Image) anImage = new Sample2D_Image(aFilePath);
+  Handle(Sample2D_Image) anImage = new Sample2D_Image(myFileName);
   anImage->SetCoord(40, 50);
   anImage->SetScale(1.0);
   myObject2d.Append(anImage);

@@ -433,13 +433,29 @@ void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
   Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
   if (aViewer2dSamples)
   {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    mySamples->Process(theSampleName.toUtf8().data());
-    myDocument2d->SetObjects(mySamples->Get2dObjects());
-    myCodeView->setPlainText(mySamples->GetCode().ToCString());
-    myResultView->setPlainText(mySamples->GetResult().ToCString());
-    myGeomWidget->Show2d();
-    QApplication::restoreOverrideCursor();
+    Standard_Boolean anIsFileSample = Viewer2dSamples::IsFileSample(theSampleName.toUtf8().data());
+    QString aFileName;
+    if(anIsFileSample)
+    {
+      int aMode; // not used
+      aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
+      aViewer2dSamples->SetFileName(aFileName.toUtf8().data());
+    }
+    if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty()))
+    {
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+      mySamples->Process(theSampleName.toUtf8().data());
+      if(!Viewer2dSamples::IsShadedSample(theSampleName.toUtf8().data()))
+        myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_False);
+      else
+        myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_True);
+      myCodeView->setPlainText(mySamples->GetCode().ToCString());
+      myResultView->setPlainText(mySamples->GetResult().ToCString());
+      myGeomWidget->Show2d();
+      QApplication::restoreOverrideCursor();
+    }
+    else
+      myResultView->setPlainText("No file selected!");
   }
 }
 

@@ -83,7 +83,8 @@ void DocumentCommon::setViewer(Handle(V3d_Viewer) theViewer)
   myViewer = theViewer;
 }
 
-void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects)
+void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects,
+                     Standard_Boolean theDisplayShaded)
 {
   myContext->RemoveAll(Standard_False);
   if (theObjects.IsEmpty())
@@ -92,7 +93,10 @@ void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveO
     myContextIsEmpty = false;
   for (const Handle(AIS_InteractiveObject) anObject : theObjects)
   {
-    myContext->Display(anObject, Standard_False);
+    if(!theDisplayShaded)
+      myContext->Display(anObject, Standard_False);
+    else
+      myContext->Display(anObject, AIS_Shaded, 0, Standard_False);
   }
   myViewer->Redraw();
 }
