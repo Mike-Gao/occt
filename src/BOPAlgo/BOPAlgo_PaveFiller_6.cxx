@@ -628,7 +628,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
         }
         //
         Standard_Integer nEOut;
-        Standard_Real aTolNew;
+        Standard_Real aTolNew = -1.;
         bExist = IsExistingPaveBlock(aPB, aNC, aLSE, nEOut, aTolNew);
         if (bExist)
         {
@@ -1660,10 +1660,20 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
   const Standard_Real aTolV1 = Max(aTolV11, aTolV12) + myFuzzyValue;
 
   Standard_Real aTolCheck = theTolR3D + myFuzzyValue;
+  const Standard_Real aCoeffTolAdd = 10.;
+  Standard_Real aMaxTolAdd = Min(0.001, aCoeffTolAdd * aTolCheck);
 
   // Look for the existing pave block closest to the section curve
   Standard_Boolean bFound = Standard_False;
   theTolNew = ::RealLast();
+
+  gp_Pnt aPm1;
+  gp_Vec aVTgt1;
+  const Handle(Geom_Curve)& aC3d = aIC.Curve();
+  aC3d->D1(0.5*(aT1 + aT2), aPm1, aVTgt1);
+  Standard_Boolean isVtgt1Valid = aVTgt1.SquareMagnitude() > gp::Resolution();
+  if (isVtgt1Valid)
+    aVTgt1.Normalize();
 
   for (TColStd_ListOfInteger::Iterator it (aSelector.Indices()); it.More(); it.Next())
   {
@@ -1686,6 +1696,9 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
       continue;
 
     Standard_Real aDist = 0.;
+    Standard_Real aCoeff = 1.; //Coeff for taking in account deflections between edge and theNC
+    //when aPB is not common block
+    Standard_Real aDistm1m2 = 0.;
 
     Standard_Real aRealTol = aTolCheck;
     if (myDS->IsCommonBlock(aPB))
@@ -1696,7 +1709,51 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
         // increase the chance to coincide with section curve
         aRealTol *= 2.;
     }
-      
+    else if (iFlag1 == 2 && iFlag2 == 2)
+    {
+      //Check, if edge could be common block with section curve
+      // and increase the chance to coincide with section curve
+      //skip processing if one edge is closed, but other is not closed
+      //such configurations can give iFlag1 == 2 && iFlag2 == 2
+      Standard_Boolean bSkipProcessing = ((nV11 == nV12) && (nV21 != nV22)) || ((nV11 != nV12) && (nV21 == nV22));
+      Standard_Real aTolAdd = Max(aRealTol, Max(aTolV1, aTolV2));
+      if (!bSkipProcessing && aTolAdd <= aMaxTolAdd)
+      {
+
+        if (isVtgt1Valid)
+        {
+          BRepAdaptor_Curve aBAC2(aSp);
+          if (aIC.Type() != GeomAbs_Line ||
+            aBAC2.GetType() != GeomAbs_Line)
+          {
+            GeomAPI_ProjectPointOnCurve& aProjPC = myContext->ProjPC(aSp);
+            aProjPC.Perform(aPm1);
+            if (aProjPC.NbPoints())
+            {
+              gp_Pnt aPm2;
+              gp_Vec aVTgt2;
+              aBAC2.D1(aProjPC.LowerDistanceParameter(), aPm2, aVTgt2);
+              if (aVTgt2.SquareMagnitude() > gp::Resolution())
+              {
+                // The angle should be close to zero
+                Standard_Real aCos = aVTgt1.Dot(aVTgt2.Normalized());
+                if (Abs(aCos) >= 0.9063)
+                {
+                  aDistm1m2 = aProjPC.LowerDistance();
+                  aTolAdd *= 2.;
+                  if (aDistm1m2 <= aTolAdd)
+                  {
+                    aRealTol = aTolAdd;
+                    aCoeff = 1.05;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     Bnd_Box aBoxTmp = aBoxPm;
     aBoxTmp.Enlarge(aRealTol);
 
@@ -1726,7 +1783,7 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
       if (aDistToSp < theTolNew)
       {
         aPBOut = aPB;
-        theTolNew = aDistToSp;
+        theTolNew = aCoeff * aDistToSp;
         bFound = Standard_True;
       }
     }
