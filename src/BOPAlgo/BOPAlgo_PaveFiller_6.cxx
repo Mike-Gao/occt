@@ -438,7 +438,8 @@ void BOPAlgo_PaveFiller::MakeBlocks()
     aDMBV.Clear();
     aMVTol.Clear();
     //
-    myDS->VerticesOnIn(nF1, nF2, aMVOnIn, aMPBOnIn);
+    BOPDS_MapOfPaveBlock aMPBCommon;
+    myDS->VerticesOnIn(nF1, nF2, aMVOnIn, aMPBOnIn, aMPBCommon);
     myDS->SharedEdges(nF1, nF2, aLSE, aAllocator);
     
     // 1. Treat Points
@@ -552,7 +553,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
           continue;
         }
         //
-        bExist=IsExistingPaveBlock(aPB, aNC, aTolR3D, aMPBOnIn, aPBOut);
+        bExist=IsExistingPaveBlock(aPB, aNC, aTolR3D, aMPBOnIn, aMPBCommon, aPBOut);
         if (bExist) {
           if (aMPBAdd.Add(aPBOut)) {
             Standard_Boolean bInBothFaces = Standard_True;
@@ -1266,6 +1267,7 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
      const BOPDS_Curve& theNC,
      const Standard_Real theTolR3D,
      const BOPDS_IndexedMapOfPaveBlock& theMPBOnIn,
+     const BOPDS_MapOfPaveBlock& /*theMPBCommon*/,
      Handle(BOPDS_PaveBlock&) aPBOut)
 {
   Standard_Boolean bRet;
@@ -1276,22 +1278,28 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
   //
   bRet=Standard_False;
   const IntTools_Curve& aIC=theNC.Curve();
+  //Standard_Real aTolCheck = theTolR3D + myFuzzyValue;
   //
   thePB->Range(aT1, aT2);
   thePB->Indices(nV11, nV12);
+
+  const Standard_Real aTolV11 = BRep_Tool::Tolerance(*(TopoDS_Vertex*)(&myDS->Shape(nV11)));
+  const Standard_Real aTolV12 = BRep_Tool::Tolerance(*(TopoDS_Vertex*)(&myDS->Shape(nV12)));
+  const Standard_Real aTolV1 = Max(aTolV11, aTolV12);
+
   //first point
   aIC.D0(aT1, aP1);
   aBoxP1.Add(aP1);
-  aBoxP1.Enlarge(theTolR3D);
+  aBoxP1.Enlarge(aTolV11);
   //intermediate point
   aTm=IntTools_Tools::IntermediatePoint (aT1, aT2);
   aIC.D0(aTm, aPm);
   aBoxPm.Add(aPm);
-  aBoxPm.Enlarge(theTolR3D);
+  //aBoxPm.Enlarge(theTolR3D);
   //last point
   aIC.D0(aT2, aP2);
   aBoxP2.Add(aP2);
-  aBoxP2.Enlarge(theTolR3D);
+  aBoxP2.Enlarge(aTolV12);
   //
   aNbPB = theMPBOnIn.Extent();
   for (i = 1; i <= aNbPB; ++i) {
@@ -1300,6 +1308,10 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
     nSp=aPB->Edge();
     if (nSp < 0)
       continue;
+    const Standard_Real aTolV21 = BRep_Tool::Tolerance(*(TopoDS_Vertex*)(&myDS->Shape(nV21)));
+    const Standard_Real aTolV22 = BRep_Tool::Tolerance(*(TopoDS_Vertex*)(&myDS->Shape(nV22)));
+    const Standard_Real aTolV2 = Max(aTolV21, aTolV22);
+
     const BOPDS_ShapeInfo& aSISp=myDS->ChangeShapeInfo(nSp);
     const TopoDS_Edge& aSp=(*(TopoDS_Edge *)(&aSISp.Shape()));
     const Bnd_Box& aBoxSp=aSISp.Box();
@@ -1309,19 +1321,31 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
     iFlag2 = (nV12 == nV21 || nV12 == nV22) ? 2 : 
       (!aBoxSp.IsOut(aBoxP2) ? 1 : 0);
     if (iFlag1 && iFlag2) {
-      if (aBoxSp.IsOut(aBoxPm) || myContext->ComputePE(aPm, 
-                                                       theTolR3D, 
+      Standard_Real aRealTol = theTolR3D + myFuzzyValue;
+      Bnd_Box aBoxTmp = aBoxPm;
+      if (myDS->IsCommonBlock(aPB))
+      {
+        aRealTol = Max(aRealTol, Max(aTolV1, aTolV2));
+        //if (theMPBCommon.Contains (aPB))
+        //  // for an edge, which is a common block with a face,
+        //  // increase the chance to coincide with section curve
+        //  aRealTol *= 2.;
+      }
+
+      aBoxTmp.Enlarge (aRealTol);
+      if (aBoxSp.IsOut(aBoxTmp) || myContext->ComputePE(aPm, 
+                                                       aRealTol, 
                                                        aSp, 
                                                        aTx)) {
         continue;
       }
       //
       if (iFlag1 == 1) {
-        iFlag1 = !myContext->ComputePE(aP1, theTolR3D, aSp, aTx);
+        iFlag1 = !myContext->ComputePE(aP1, aRealTol, aSp, aTx);
       }
       //
       if (iFlag2 == 1) {
-        iFlag2 = !myContext->ComputePE(aP2, theTolR3D, aSp, aTx);
+        iFlag2 = !myContext->ComputePE(aP2, aRealTol, aSp, aTx);
       }
       //
       if (iFlag1 && iFlag2) {

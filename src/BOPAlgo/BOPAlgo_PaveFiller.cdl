@@ -52,7 +52,8 @@ uses
     PaveBlock from BOPDS, 
     CommonBlock from BOPDS, 
     Curve from BOPDS,  
-    IndexedDataMapOfShapeCoupleOfPaveBlocks from BOPDS,
+    DataMapOfIntegerMapOfPaveBlock from BOPDS,
+    IndexedDataMapOfShapeCoupleOfPaveBlocks from BOPDS, 
     MapOfPaveBlock from BOPDS,  
     IndexedMapOfPaveBlock from BOPDS,  
     ListOfPaveBlock from BOPDS, 
@@ -265,7 +266,8 @@ is
         thePB:PaveBlock from BOPDS;  
         theNC:Curve from BOPDS;
         theTolR3D:Real from Standard; 
-        theMPB:IndexedMapOfPaveBlock from BOPDS; 
+        theMPB:IndexedMapOfPaveBlock from BOPDS;  
+        theMPBCommon:MapOfPaveBlock from BOPDS;
         thePBOut:out PaveBlock from BOPDS)
       returns Boolean from Standard 
       is protected;  
@@ -576,6 +578,18 @@ is
     -- been put on other section edges with greater tolerance, which has caused
     -- increase of the tolerance value of the vertices.
 
+    ForceInterfEF(me:out) 
+        is protected; 
+    ---Purpose: The method looks for the additional edge/face common blocks
+    --  among pairs of edge/face having the same vertices.
+
+    ForceInterfEF(me:out; 
+            theMPB: IndexedMapOfPaveBlock from BOPDS; 
+            theAddInterf: Boolean from Standard) 
+        is  protected;
+    ---Purpose: Performs intersection of given pave blocks
+    --  with all faces from arguments.
+
 
 fields  
     myArguments   : ListOfShape from BOPCol is protected;  
@@ -585,5 +599,6 @@ fields
     mySectionAttribute : SectionAttribute from BOPAlgo is protected;
     myFuzzyValue  : Real from Standard is protected;
     myNonDestructive : Boolean from Standard is protected;   
-    myIsPrimary      : Boolean from Standard is protected;   
+    myIsPrimary      : Boolean from Standard is protected;    
+    myFPBDone        : DataMapOfIntegerMapOfPaveBlock from BOPDS is protected;
 end PaveFiller;

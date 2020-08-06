@@ -1535,7 +1535,8 @@ void BOPDS_DS::VerticesOnIn
   (const Standard_Integer nF1,
    const Standard_Integer nF2,
    BOPCol_MapOfInteger& aMI,
-   BOPDS_IndexedMapOfPaveBlock& aMPB)const
+   BOPDS_IndexedMapOfPaveBlock& aMPB,
+   BOPDS_MapOfPaveBlock& theMPBCommon) const
 {
   Standard_Integer i, j, nV, nV1, nV2, aNbPB;
   BOPCol_MapIteratorOfMapOfInteger aIt;
@@ -1557,6 +1558,10 @@ void BOPDS_DS::VerticesOnIn
       aPB->Indices(nV1, nV2);
       aMI.Add(nV1);
       aMI.Add(nV2);
+      if (i < 2) {
+        if (pMPB[2].Contains(aPB) || pMPB[3].Contains(aPB))
+          theMPBCommon.Add(aPB);
+      }
     }
   }
   //

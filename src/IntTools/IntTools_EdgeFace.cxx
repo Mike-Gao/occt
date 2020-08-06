@@ -265,6 +265,103 @@ const IntTools_Range&  IntTools_EdgeFace::Range() const
 } 
 
 //=======================================================================
+//function : UseQuickCoincidenceCheck
+//purpose  : 
+//=======================================================================
+void IntTools_EdgeFace::UseQuickCoincidenceCheck(const Standard_Boolean bFlag)
+{
+  myQuickCoincidenceCheck=bFlag;
+}
+
+//=======================================================================
+//function : IsCoincidenceCheckedQuickly
+//purpose  : 
+//=======================================================================
+Standard_Boolean IntTools_EdgeFace::IsCoincidenceCheckedQuickly() const
+{
+  return myQuickCoincidenceCheck;
+}
+
+//=======================================================================
+//function :  IsCoincident
+//purpose  : 
+//=======================================================================
+Standard_Boolean IntTools_EdgeFace::IsCoincident() 
+{
+  Standard_Integer i, iCnt;
+  Standard_Real dT, aT, aD, aT1, aT2, aU, aV;
+
+  gp_Pnt aP;
+  TopAbs_State aState;
+  gp_Pnt2d aP2d;
+  //
+  GeomAPI_ProjectPointOnSurf& aProjector=myContext->ProjPS(myFace);
+
+  const Standard_Integer aNbSeg=23;
+  const Standard_Real aTresh=0.5;
+  const Standard_Integer aTreshIdxF = RealToInt((aNbSeg+1)*0.25),
+                         aTreshIdxL = RealToInt((aNbSeg+1)*0.75);
+  const Handle(Geom_Surface) aSurf = BRep_Tool::Surface(myFace);
+
+  aT1=myRange.First();
+  aT2=myRange.Last();
+  dT=(aT2-aT1)/aNbSeg;
+  //
+  Standard_Boolean isClassified = Standard_False;
+  iCnt=0;
+  for(i=0; i <= aNbSeg; ++i) {
+    aT = aT1+i*dT;
+    aP=myC.Value(aT);
+    //
+    aProjector.Perform(aP);
+    if (!aProjector.IsDone()) {
+      continue;
+    }
+    //
+    
+    aD=aProjector.LowerDistance();
+    if (aD>myCriteria) {
+      continue;
+    }
+    //
+
+    ++iCnt; 
+
+    //We classify only three points: in the begin, in the 
+    //end and in the middle of the edge.
+    //However, exact middle point (when i == (aNbSeg + 1)/2)
+    //can be unprojectable. Therefore, it will not be able to
+    //be classified. Therefore, points with indexes in 
+    //[aTreshIdxF, aTreshIdxL] range are made available 
+    //for classification.
+    //isClassified == TRUE if MIDDLE point has been choosen and
+    //classified correctly.
+
+    if(((0 < i) && (i < aTreshIdxF)) || ((aTreshIdxL < i ) && (i < aNbSeg)))
+      continue;
+
+    if(isClassified && (i != aNbSeg))
+      continue;
+
+    aProjector.LowerDistanceParameters(aU, aV);
+    aP2d.SetX(aU);
+    aP2d.SetY(aV);
+
+    IntTools_FClass2d& aClass2d=myContext->FClass2d(myFace);
+    aState = aClass2d.Perform(aP2d);
+    
+    if(aState == TopAbs_OUT)
+      return Standard_False;
+
+    if(i != 0)
+      isClassified = Standard_True;
+  }
+  //
+  const Standard_Real aCoeff=(Standard_Real)iCnt/((Standard_Real)aNbSeg+1);
+  return (aCoeff > aTresh);
+}
+
+//=======================================================================
 //function : CheckData
 //purpose  : 
 //=======================================================================
@@ -1255,6 +1352,16 @@ void IntTools_EdgeFace::Perform()
     myFClass2d.Init(myFace, 1.e-6);
   }
   
+  if (myQuickCoincidenceCheck) {
+    if (IsCoincident()) {
+      aCommonPrt.SetType(TopAbs_EDGE);
+      aCommonPrt.SetRange1(myRange.First(), myRange.Last());
+      mySeqOfCommonPrts.Append(aCommonPrt);
+      myIsDone=Standard_True;
+      return;
+    }
+  }
+
   IntTools_BeanFaceIntersector anIntersector(myC, myS, myTolE, myTolF);
   anIntersector.SetBeanParameters(myRange.First(), myRange.Last());
   //

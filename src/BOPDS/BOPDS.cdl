@@ -82,7 +82,8 @@ is
     imported VectorOfFaceInfo from BOPDS;  
     imported MapOfPave from BOPDS;
     imported IndexedDataMapOfPaveBlockListOfPaveBlock from BOPDS;
-    imported DataMapOfIntegerListOfPaveBlock from BOPDS;
+    imported DataMapOfIntegerListOfPaveBlock from BOPDS; 
+    imported DataMapOfIntegerMapOfPaveBlock from BOPDS;
     imported IndexedMapOfPaveBlock from BOPDS;
     imported IndexedDataMapOfPaveBlockListOfInteger from BOPDS;
     imported IndexedDataMapOfShapeCoupleOfPaveBlocks from BOPDS;

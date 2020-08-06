@@ -168,6 +168,17 @@ is
             aD:out Real from Standard)  
         returns Boolean from Standard;
     
+    UseQuickCoincidenceCheck (me:out;  
+            theFlag: Boolean from Standard);
+    ---Purpose: 
+    --- Enables the option for quick coincidence check for the edge and face. 
+    --- Disabled by default.
+     
+    IsCoincidenceCheckedQuickly (me) 
+        returns Boolean from Standard;
+    ---Purpose:
+    --- Returns true if quick coincidence check was enabled.
+    
     -------------------------------------------------------
     --  Block  of  protected methods of  the  algorithm  --
     -------------------------------------------------------    
@@ -247,7 +258,12 @@ is
             aCP: CommonPrt from IntTools; 
             aTX:out Real from Standard) 
         returns Boolean from Standard 
-        is protected; 
+        is protected;  
+         
+    IsCoincident(me:out) 
+        returns Boolean from Standard 
+        is protected;
+    ---Purpose: Checks if the edge is in the face.
 
 fields
 --        Data
@@ -287,6 +303,8 @@ fields
     myPar1            :  Real from  Standard; 
     myParallel        :  Boolean  from  Standard;   
     
-    myRange           :  Range from IntTools; 
+    myRange           :  Range from IntTools;  
+     
+    myQuickCoincidenceCheck : Boolean from Standard;
     
 end EdgeFace;

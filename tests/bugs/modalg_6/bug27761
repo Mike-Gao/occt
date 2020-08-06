@@ -13,4 +13,4 @@ bsection result c1 c2
 
 checkshape result
 # approximate theoretical length of the result
-set length 0.00192547
+set length 0.00200173

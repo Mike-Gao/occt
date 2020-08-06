@@ -50,7 +50,8 @@ BOPAlgo_PaveFiller::BOPAlgo_PaveFiller
   (const Handle(NCollection_BaseAllocator)& theAllocator)
 :
   BOPAlgo_Algo(theAllocator),
-  myFuzzyValue(0.)
+  myFuzzyValue(0.),
+  myFPBDone(1, theAllocator)
 {
   myDS=NULL;
   myIterator=NULL;
@@ -296,6 +297,8 @@ void BOPAlgo_PaveFiller::PerformInternal()
     return; 
   }
   UpdatePaveBlocksWithSDVertices();
+
+  ForceInterfEF();
   //
   // 22
   PerformFF();
