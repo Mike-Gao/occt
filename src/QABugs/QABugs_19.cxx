@@ -4357,6 +4357,53 @@ static Standard_Integer OCC30708_2 (Draw_Interpretor& di, Standard_Integer, cons
 
   return 0;
 }
+#include <ExprIntrp_GenExp.hxx>
+#include <Expr_GeneralExpression.hxx>
+#include <Expr_NamedUnknown.hxx>
+//=======================================================================
+//function :  OCC31697
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC31697(Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
+{
+  if (argc < 3)
+  {
+    di << "Usage : " << argv[0] << " expression  variable\n";
+    return 1;
+  }
+
+  TCollection_AsciiString  anExpStr(argv[1]);
+  TCollection_AsciiString  aVarStr(argv[2]);
+
+  Handle(ExprIntrp_GenExp) exprIntrp = ExprIntrp_GenExp::Create();
+
+  //
+  // Create the expression
+  exprIntrp->Process(anExpStr);
+
+  if (!exprIntrp->IsDone())
+  {
+    di << "Interpretation of expression " << argv[1] << " failed\n";
+    return 1;
+  }
+
+  Handle(Expr_GeneralExpression) anExpr = exprIntrp->Expression();
+  Handle(Expr_NamedUnknown) aVar = new Expr_NamedUnknown(aVarStr);
+
+  if (!anExpr->Contains(aVar))
+  {
+    di << "Expression " << argv[1] << " does not contain variable " << argv[2] << "\n";
+    return 1;
+  }
+
+  Handle(Expr_GeneralExpression) aDer = anExpr->Derivative(aVar);
+
+  TCollection_AsciiString  aDerStr = aDer->String();
+
+  di << "The derivative of the " << argv[1] << " by " << argv[2] << " is equal to " << aDerStr << "\n";
+
+  return 0;
+}
 
 void QABugs::Commands_19(Draw_Interpretor& theCommands) {
   const char *group = "QABugs";
@@ -4455,5 +4502,6 @@ void QABugs::Commands_19(Draw_Interpretor& theCommands) {
   theCommands.Add ("OCC30708_2", "Tests initialization of the BRepLib_MakeWire with null shape",
                    __FILE__, OCC30708_2, group);
 
+ theCommands.Add("OCC31697", "OCC31697 expression variable", __FILE__, OCC31697, group);
   return;
 }
