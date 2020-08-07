@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -16,7 +16,7 @@
     <Keyword>Qt4VSv1.0</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <PlatformToolset>v140</PlatformToolset>
     <OutputDirectory>win64\vc14\bind\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
@@ -25,7 +25,7 @@
     <IntermediateDirectory>win64\vc14\objd\</IntermediateDirectory>
     <PrimaryOutput>Tutorial</PrimaryOutput>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <PlatformToolset>v140</PlatformToolset>
     <OutputDirectory>win64\vc14\bin\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
@@ -36,25 +36,25 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\bind\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\objd\</IntDir>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Tutorial</TargetName>
-    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</IgnoreImportLibrary>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\bin\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\obj\</IntDir>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Tutorial</TargetName>
-    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</IgnoreImportLibrary>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\bind\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\objd\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Tutorial</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\obj\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Tutorial</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;..\..\samples_src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\mocd;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
@@ -75,7 +75,7 @@
     <Link>
       <AdditionalDependencies>TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgetsd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Guid.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Cored.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGLd.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;C:\Work\3d_party\qt5.11.2-vc14-64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>_CONSOLE;_DEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;..\..\samples_src;C:\Work\install-CR31570\inc;C:\Work\3d_party\qt5.11.2-vc14-64\include;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtWidgets;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtGui;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtANGLE;C:\Work\3d_party\qt5.11.2-vc14-64\include\QtCore;win64\vc14\moc;C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
@@ -106,7 +106,8 @@
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>_CONSOLE;NDEBUG;NO_COMMONSAMPLE_EXPORTS;NO_IESAMPLE_EXPORTS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
-      <ProgramDataBaseFileName></ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -115,7 +116,7 @@
     <Link>
       <AdditionalDependencies>TKernel.lib;TKMath.lib;TKService.lib;TKV3d.lib;TKOpenGl.lib;TKBRep.lib;TKIGES.lib;TKSTL.lib;TKVRML.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKG3d.lib;TKG2d.lib;TKXSBase.lib;TKShHealing.lib;TKHLR.lib;TKTopAlgo.lib;TKMesh.lib;TKPrim.lib;TKCDF.lib;TKBool.lib;TKBO.lib;TKFillet.lib;TKOffset.lib;TKLCAF.lib;TKCAF.lib;TKVCAF.lib;TKBin.lib;TKXml.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Widgets.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Gui.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\Qt5Core.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libEGL.lib;C:\Work\3d_party\qt5.11.2-vc14-64\lib\libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Work\3d_party\qt5.11.2-vc14-64\lib;C:\Work\install-CR31570\win64\vc14\libd;C:\Work\3d_party\qt5.11.2-vc14-64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -172,60 +173,100 @@
     <ClInclude Include="..\..\samples_src\AdaptorPnt2d_AIS.h" />
     <ClInclude Include="..\..\samples_src\AdaptorVec_AIS.h" />
     <CustomBuild Include="src\ApplicationCommon.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\ApplicationCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\ApplicationCommon.h -o win64\vc14\mocd\moc_ApplicationCommon.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/ApplicationCommon.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_ApplicationCommon.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\ApplicationCommon.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\ApplicationCommon.h -o win64\vc14\moc\moc_ApplicationCommon.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/ApplicationCommon.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_ApplicationCommon.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\ApplicationCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\ApplicationCommon.h -o win64\vc14\mocd\moc_ApplicationCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/ApplicationCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_ApplicationCommon.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\ApplicationCommon.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\ApplicationCommon.h -o win64\vc14\moc\moc_ApplicationCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/ApplicationCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_ApplicationCommon.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\BaseSample.h" />
     <ClInclude Include="src\CommonSample.h" />
     <ClInclude Include="..\..\samples_src\DataExchangeSamples.h" />
     <CustomBuild Include="src\DocumentCommon.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\DocumentCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\DocumentCommon.h -o win64\vc14\mocd\moc_DocumentCommon.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/DocumentCommon.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_DocumentCommon.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\DocumentCommon.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\DocumentCommon.h -o win64\vc14\moc\moc_DocumentCommon.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/DocumentCommon.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_DocumentCommon.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\DocumentCommon.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\DocumentCommon.h -o win64\vc14\mocd\moc_DocumentCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/DocumentCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_DocumentCommon.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\DocumentCommon.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\DocumentCommon.h -o win64\vc14\moc\moc_DocumentCommon.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/DocumentCommon.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_DocumentCommon.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="src\GeomWidget.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\GeomWidget.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\GeomWidget.h -o win64\vc14\mocd\moc_GeomWidget.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/GeomWidget.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_GeomWidget.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\GeomWidget.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\GeomWidget.h -o win64\vc14\moc\moc_GeomWidget.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/GeomWidget.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_GeomWidget.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\GeomWidget.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\GeomWidget.h -o win64\vc14\mocd\moc_GeomWidget.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/GeomWidget.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_GeomWidget.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\GeomWidget.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\GeomWidget.h -o win64\vc14\moc\moc_GeomWidget.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/GeomWidget.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_GeomWidget.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\GeometrySamples.h" />
     <ClInclude Include="..\..\samples_src\MakeBottle.h" />
     <CustomBuild Include="src\Material.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\Material.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\Material.h -o win64\vc14\mocd\moc_Material.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/Material.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_Material.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\Material.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\Material.h -o win64\vc14\moc\moc_Material.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/Material.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_Material.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\Material.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\Material.h -o win64\vc14\mocd\moc_Material.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/Material.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_Material.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\Material.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\Material.h -o win64\vc14\moc\moc_Material.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/Material.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Material.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\OcafSamples.h" />
     <CustomBuild Include="src\OcctHighlighter.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\OcctHighlighter.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\OcctHighlighter.h -o win64\vc14\mocd\moc_OcctHighlighter.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/OcctHighlighter.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\OcctHighlighter.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\OcctHighlighter.h -o win64\vc14\moc\moc_OcctHighlighter.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/OcctHighlighter.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\OcctHighlighter.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\OcctHighlighter.h -o win64\vc14\mocd\moc_OcctHighlighter.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/OcctHighlighter.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\OcctHighlighter.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\OcctHighlighter.h -o win64\vc14\moc\moc_OcctHighlighter.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/OcctHighlighter.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_OcctHighlighter.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="src\OcctWindow.h" />
     <ClInclude Include="..\..\samples_src\Sample2D_Face.h" />
@@ -238,99 +279,115 @@
     <ClInclude Include="..\..\samples_src\TopologySamples.h" />
     <ClInclude Include="src\TranslateDialog.h" />
     <CustomBuild Include="src\Transparency.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\Transparency.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\Transparency.h -o win64\vc14\mocd\moc_Transparency.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/Transparency.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_Transparency.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\Transparency.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\Transparency.h -o win64\vc14\moc\moc_Transparency.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/Transparency.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_Transparency.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\Transparency.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\Transparency.h -o win64\vc14\mocd\moc_Transparency.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/Transparency.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_Transparency.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\Transparency.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\Transparency.h -o win64\vc14\moc\moc_Transparency.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/Transparency.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_Transparency.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\TriangulationSamples.h" />
     <CustomBuild Include="src\View.h">
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">src\View.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\View.h -o win64\vc14\mocd\moc_View.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC src/View.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_View.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">src\View.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Rem IncrediBuild_AllowRemote &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;Rem IncrediBuild_OutputFile moc_header.output &#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE&quot; -I&quot;C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\shared&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\um&quot; -I&quot;C:\Program Files (x86)\Windows Kits\8.1\include\\winrt&quot; src\View.h -o win64\vc14\moc\moc_View.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC src/View.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_View.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">src\View.h;win64\vc14\mocd\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -D_DEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/mocd/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\View.h -o win64\vc14\mocd\moc_View.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC src/View.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_View.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">src\View.h;win64\vc14\moc\moc_predefs.h;C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rem IncrediBuild_AllowRemote 
+if errorlevel 1 goto VCEnd
+Rem IncrediBuild_OutputFile moc_header.output 
+if errorlevel 1 goto VCEnd
+C:\Work\3d_party\qt5.11.2-vc14-64\bin\moc.exe  -DNDEBUG -DNO_COMMONSAMPLE_EXPORTS -DNO_IESAMPLE_EXPORTS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include C:/Work/occt-CR31570/samples/standard/qt/Tutorial/win64/vc14/moc/moc_predefs.h -IC:/Work/3d_party/qt5.11.2-vc14-64/mkspecs/win32-msvc -IC:/Work/occt-CR31570/samples/standard/qt/Tutorial -IC:/Work/occt-CR31570/samples/standard/samples_src -IC:/Work/install-CR31570/inc -IC:/Work/3d_party/qt5.11.2-vc14-64/include -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtWidgets -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtGui -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtANGLE -IC:/Work/3d_party/qt5.11.2-vc14-64/include/QtCore -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE" -I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" src\View.h -o win64\vc14\moc\moc_View.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC src/View.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_View.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\..\samples_src\Viewer2dSamples.h" />
     <ClInclude Include="..\..\samples_src\Viewer3dSamples.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="win64\vc14\moc\moc_ApplicationCommon.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_ApplicationCommon.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_DocumentCommon.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_DocumentCommon.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_GeomWidget.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_GeomWidget.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_Material.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_Material.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_OcctHighlighter.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_OcctHighlighter.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_Transparency.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_Transparency.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\moc\moc_View.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="win64\vc14\mocd\moc_View.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <CustomBuild Include="win64\vc14\moc\moc_predefs.h.cbt">
       <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">cl -BxC:\Work\3d_party\qt5.11.2-vc14-64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -O2 -MD -E C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp 2>NUL >win64\vc14\moc\moc_predefs.h</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">Generate moc_predefs.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">win64\vc14\moc\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -BxC:\Work\3d_party\qt5.11.2-vc14-64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -O2 -MD -E C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;win64\vc14\moc\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">win64\vc14\moc\moc_predefs.h;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="win64\vc14\mocd\moc_predefs.h.cbt">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">cl -BxC:\Work\3d_party\qt5.11.2-vc14-64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zi -MDd -E C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp 2>NUL >win64\vc14\mocd\moc_predefs.h</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">Generate moc_predefs.h</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">win64\vc14\mocd\moc_predefs.h;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -BxC:\Work\3d_party\qt5.11.2-vc14-64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zi -MDd -E C:\Work\3d_party\qt5.11.2-vc14-64\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;win64\vc14\mocd\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">win64\vc14\mocd\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <ClCompile Include="debug\qrc_Samples.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="release\qrc_Samples.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="debug\qrc_Tutorial.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="release\qrc_Tutorial.cpp">
-      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,30 +397,29 @@
     <None Include="..\..\samples_src\DataExchange.json" />
     <None Include="..\..\samples_src\Geometry.json" />
     <None Include="..\..\samples_src\Ocaf.json" />
-    <None Include="..\..\samples_src\Open_Cascade_logotype_for_website.png" />
     <CustomBuild Include="..\..\samples_src\Samples.qrc">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Open_Cascade_logotype_for_website.png;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\Viewer2d.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o debug\qrc_Samples.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">RCC ../../samples_src/Samples.qrc</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">debug\qrc_Samples.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Open_Cascade_logotype_for_website.png;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\Viewer2d.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o release\qrc_Samples.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">RCC ../../samples_src/Samples.qrc</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">release\qrc_Samples.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Open_Cascade_logotype_for_website.png;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\Viewer2d.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o debug\qrc_Samples.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RCC ../../samples_src/Samples.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\qrc_Samples.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\samples_src\Samples.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;..\..\samples_src\Open_Cascade_logotype_for_website.png;..\..\samples_src\Topology.json;..\..\samples_src\Viewer3d.json;..\..\samples_src\Ocaf.json;..\..\samples_src\Viewer2d.json;..\..\samples_src\DataExchange.json;..\..\samples_src\Geometry.json;..\..\samples_src\Triangulation.json;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Samples ..\..\samples_src\Samples.qrc -o release\qrc_Samples.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RCC ../../samples_src/Samples.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\qrc_Samples.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\..\samples_src\Topology.json" />
     <None Include="..\..\samples_src\Triangulation.json" />
     <CustomBuild Include="res\Tutorial.qrc">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">res\Tutorial.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;res\view_reset.png;res\help.png;res\view_bottom.png;res\view_right.png;res\shadows.png;res\tool_shading.png;res\view_axo.png;res\raytracing.png;res\tool_color.png;res\cursor_zoom.png;res\view_comp_on.png;res\tool_wireframe.png;res\view_left.png;res\view_back.png;res\tool_delete.png;res\view_top.png;res\tool_material.png;res\tool_transparency.png;res\view_front.png;res\reflections.png;res\view_comp_off.png;res\lamp.png;res\view_fitall.png;res\antialiasing.png;res\cursor_rotate.png;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Tutorial res\Tutorial.qrc -o debug\qrc_Tutorial.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">RCC res/Tutorial.qrc</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">debug\qrc_Tutorial.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">res\Tutorial.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;res\view_reset.png;res\help.png;res\view_bottom.png;res\view_right.png;res\shadows.png;res\tool_shading.png;res\view_axo.png;res\raytracing.png;res\tool_color.png;res\cursor_zoom.png;res\view_comp_on.png;res\tool_wireframe.png;res\view_left.png;res\view_back.png;res\tool_delete.png;res\view_top.png;res\tool_material.png;res\tool_transparency.png;res\view_front.png;res\reflections.png;res\view_comp_off.png;res\lamp.png;res\view_fitall.png;res\antialiasing.png;res\cursor_rotate.png;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Tutorial res\Tutorial.qrc -o release\qrc_Tutorial.cpp</Command>
-      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">RCC res/Tutorial.qrc</Message>
-      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">release\qrc_Tutorial.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res\Tutorial.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;res\view_reset.png;res\help.png;res\view_bottom.png;res\view_right.png;res\shadows.png;res\tool_shading.png;res\view_axo.png;res\raytracing.png;res\tool_color.png;res\cursor_zoom.png;res\view_comp_on.png;res\tool_wireframe.png;res\view_left.png;res\view_back.png;res\tool_delete.png;res\view_top.png;res\tool_material.png;res\tool_transparency.png;res\view_front.png;res\reflections.png;res\view_comp_off.png;res\lamp.png;res\view_fitall.png;res\antialiasing.png;res\cursor_rotate.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Tutorial res\Tutorial.qrc -o debug\qrc_Tutorial.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RCC res/Tutorial.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\qrc_Tutorial.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res\Tutorial.qrc;C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe;res\view_reset.png;res\help.png;res\view_bottom.png;res\view_right.png;res\shadows.png;res\tool_shading.png;res\view_axo.png;res\raytracing.png;res\tool_color.png;res\cursor_zoom.png;res\view_comp_on.png;res\tool_wireframe.png;res\view_left.png;res\view_back.png;res\tool_delete.png;res\view_top.png;res\tool_material.png;res\tool_transparency.png;res\view_front.png;res\reflections.png;res\view_comp_off.png;res\lamp.png;res\view_fitall.png;res\antialiasing.png;res\cursor_rotate.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Work\3d_party\qt5.11.2-vc14-64\bin\rcc.exe -name Tutorial res\Tutorial.qrc -o release\qrc_Tutorial.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RCC res/Tutorial.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\qrc_Tutorial.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\..\samples_src\Viewer2d.json" />
     <None Include="..\..\samples_src\Viewer3d.json" />

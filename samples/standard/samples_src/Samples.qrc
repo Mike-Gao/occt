@@ -8,7 +8,4 @@
         <file>Viewer2d.json</file>
         <file>Ocaf.json</file>
     </qresource>
-    <qresource prefix="/images">
-        <file>Open_Cascade_logotype_for_website.png</file>
-    </qresource>
 </RCC>
