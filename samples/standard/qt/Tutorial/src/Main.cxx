@@ -22,6 +22,7 @@
 #include <QLocale>
 #include <QStringList>
 #include <QCommandLineParser>
+#include <conio.h>
 
 int main ( int argc, char* argv[] )
 {
@@ -44,12 +45,26 @@ int main ( int argc, char* argv[] )
       return 0;
     }
 
-    QString anSampleType(argv[1]);
-    ApplicationCommonWindow* mw = new ApplicationCommonWindow(anSampleType);
-    QString aResName(":/icons/lamp.png");
-    mw->setWindowIcon( QPixmap( aResName ) );
+    QString aSampleType(argv[1]);
+    ApplicationCommonWindow::ApplicationType anAppType = ApplicationCommonWindow::AppTypeFromString(aSampleType);
+    if (anAppType != ApplicationCommonWindow::ApplicationType::Unknokwn)
+    {
+      ApplicationCommonWindow* mw = new ApplicationCommonWindow(anAppType);
+      QString aResName(":/icons/lamp.png");
+      mw->setWindowIcon( QPixmap( aResName ) );
 
-    mw->show();
+      mw->show();
     
-    return a.exec();
+      return a.exec();
+    }
+    else
+    {
+      std::cerr << "Incorrect application type: \"" << aSampleType.toStdString()
+        << "\". Pleace use: Geometry | Topology | Triangulation | DataExchange | Ocaf | Viewer3d | Viewer2d"
+        << std::endl;
+      std::cout << "Press any key...";
+      getch();
+      return -1;
+    }
+
 }
