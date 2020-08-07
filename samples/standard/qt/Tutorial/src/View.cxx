@@ -1,3 +1,16 @@
+// Copyright (c) 2020 OPEN CASCADE SAS
+//
+// This file is part of Open CASCADE Technology software library.
+//
+// This library is free software; you can redistribute it and/or modify it under
+// the terms of the GNU Lesser General Public License version 2.1 as published
+// by the Free Software Foundation, with special exception defined in the file
+// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
+// distribution for complete text of the license and disclaimer of any warranty.
+//
+// Alternatively, this file may be used under the terms of Open CASCADE
+// commercial license or contractual agreement.
+
 #if !defined _WIN32
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
@@ -554,7 +567,11 @@ void View::onLButtonDown( const int/*Qt::MouseButtons*/ nFlags, const QPoint poi
   myXmax = point.x();
   myYmax = point.y();
 
-  myCurrentMode = CurrentAction3d::DynamicZooming;
+
+  if(myContext->HasDetected())
+    myCurrentMode = CurrentAction3d::ObjectDececting;
+  else
+    myCurrentMode = CurrentAction3d::DynamicZooming;
 
   activateCursor( myCurrentMode );
 }
@@ -580,50 +597,64 @@ void View::onLButtonUp( Qt::MouseButtons nFlags, const QPoint point )
     switch( myCurrentMode )
     {
     case CurrentAction3d::Nothing:
-            if ( point.x() == myXmin && point.y() == myYmin )
-            {
-              // no offset between down and up --> selectEvent
-              myXmax = point.x();
-              myYmax = point.y();
-              if ( nFlags & MULTISELECTIONKEY )
-                  MultiInputEvent( point.x(), point.y() );
-              else
-                  InputEvent( point.x(), point.y() );
-            }
-            else
-            {
-              myXmax = point.x();
-              myYmax = point.y();
-              if ( nFlags & MULTISELECTIONKEY )
-                  MultiDragEvent( point.x(), point.y(), 1 );
-              else
-                  DragEvent( point.x(), point.y(), 1 );
-            }
-            break;
-        case CurrentAction3d::DynamicZooming:
-            myCurrentMode = CurrentAction3d::Nothing;
-            break;
-        case CurrentAction3d::WindowZooming:
-            myXmax = point.x();
-            myYmax = point.y();
-            if ( (abs( myXmin - myXmax ) > ValZWMin ) ||
-                 (abs( myYmin - myYmax ) > ValZWMin ) )
-              myV3dView->WindowFitAll( myXmin, myYmin, myXmax, myYmax );
-            myCurrentMode = CurrentAction3d::Nothing;
-            break;
-        case CurrentAction3d::DynamicPanning:
-            myCurrentMode = CurrentAction3d::Nothing;
-            break;
-        case CurrentAction3d::GlobalPanning :
-            myV3dView->Place( point.x(), point.y(), myCurZoom );
-            myCurrentMode = CurrentAction3d::Nothing;
-            break;
-        case CurrentAction3d::DynamicRotation:
-            myCurrentMode = CurrentAction3d::Nothing;
-            break;
-        default:
-            throw Standard_Failure(" incompatible Current Mode ");
-            break;
+        if ( point.x() == myXmin && point.y() == myYmin )
+        {
+          // no offset between down and up --> selectEvent
+          myXmax = point.x();
+          myYmax = point.y();
+          if ( nFlags & MULTISELECTIONKEY )
+              MultiInputEvent( point.x(), point.y() );
+          else
+              InputEvent( point.x(), point.y() );
+        }
+        else
+        {
+          myXmax = point.x();
+          myYmax = point.y();
+          if ( nFlags & MULTISELECTIONKEY )
+              MultiDragEvent( point.x(), point.y(), 1 );
+          else
+              DragEvent( point.x(), point.y(), 1 );
+        }
+        break;
+    case CurrentAction3d::ObjectDececting:
+    {
+        Handle(AIS_InteractiveObject) aDecectObject = myContext->DetectedInteractive();
+        if (aDecectObject)
+        {
+          TColStd_ListOfInteger aModeList;
+          myContext->ActivatedModes(aDecectObject, aModeList);
+          // No selection for Neutral Mode
+          if(!aModeList.IsEmpty() && aModeList.First() != 0)
+            myContext->Select(Standard_True);
+        }
+        myCurrentMode = CurrentAction3d::Nothing;
+        break;
+    }
+    case CurrentAction3d::DynamicZooming:
+        myCurrentMode = CurrentAction3d::Nothing;
+        break;
+    case CurrentAction3d::WindowZooming:
+        myXmax = point.x();
+        myYmax = point.y();
+        if ( (abs( myXmin - myXmax ) > ValZWMin ) ||
+              (abs( myYmin - myYmax ) > ValZWMin ) )
+          myV3dView->WindowFitAll( myXmin, myYmin, myXmax, myYmax );
+        myCurrentMode = CurrentAction3d::Nothing;
+        break;
+    case CurrentAction3d::DynamicPanning:
+        myCurrentMode = CurrentAction3d::Nothing;
+        break;
+    case CurrentAction3d::GlobalPanning :
+        myV3dView->Place( point.x(), point.y(), myCurZoom );
+        myCurrentMode = CurrentAction3d::Nothing;
+        break;
+    case CurrentAction3d::DynamicRotation:
+        myCurrentMode = CurrentAction3d::Nothing;
+        break;
+    default:
+        throw Standard_Failure(" incompatible Current Mode ");
+        break;
     }
     activateCursor( myCurrentMode );
 }
@@ -684,6 +715,10 @@ void View::onMouseMove( Qt::MouseButtons nFlags, const QPoint point )
           myV3dView->Rotation( point.x(), point.y() );
           myV3dView->Redraw();
           break;
+        case CurrentAction3d::ObjectDececting:
+          myXmax = point.x();
+          myYmax = point.y();
+          break;
         default:
           throw Standard_Failure( "incompatible Current Mode" );
           break;
@@ -724,7 +759,7 @@ void View::DragEvent( const int x, const int y, const int TheState )
 
 void View::InputEvent( const int /*x*/, const int /*y*/ )
 {
-  myContext->Select (Standard_True);
+  myContext->Select(Standard_True);
   emit selectionChanged();
 }
 
