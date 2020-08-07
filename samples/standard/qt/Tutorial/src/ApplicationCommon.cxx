@@ -57,8 +57,9 @@
 
 static QMdiArea* stWs = 0;
 
-ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
+ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
   : QMainWindow(nullptr),
+  APP_TYPE(theSampleType),
   mySampleMapper(new QSignalMapper(this)),
   myExchangeMapper(new QSignalMapper(this)),
   myOcafMapper(new QSignalMapper(this)),
@@ -70,7 +71,6 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   myFilePopup(nullptr),
   mySamples(nullptr)
 {
-  SetAppType(theSampleType);
   setWindowTitle(GetTitle());
 
   switch (APP_TYPE)
@@ -212,24 +212,24 @@ ApplicationCommonWindow::ApplicationCommonWindow(QString theSampleType)
   resize(1280, 560);
 }
 
-void ApplicationCommonWindow::SetAppType(QString theParameter)
+ApplicationCommonWindow::ApplicationType ApplicationCommonWindow::AppTypeFromString(QString theParameter)
 {
   if (theParameter == "Geometry")
-    APP_TYPE = ApplicationType::Geometry;
+    return ApplicationType::Geometry;
   else if (theParameter == "Topology")
-    APP_TYPE = ApplicationType::Topology;
+    return ApplicationType::Topology;
   else if (theParameter == "Triangulation")
-    APP_TYPE = ApplicationType::Triangulation;
+    return ApplicationType::Triangulation;
   else if (theParameter == "DataExchange")
-    APP_TYPE = ApplicationType::DataExchange;
+    return ApplicationType::DataExchange;
   else if (theParameter == "Ocaf")
-    APP_TYPE = ApplicationType::Ocaf;
+    return ApplicationType::Ocaf;
   else  if (theParameter == "Viewer3d")
-    APP_TYPE = ApplicationType::Viewer3d;
+    return ApplicationType::Viewer3d;
   else  if (theParameter == "Viewer2d")
-    APP_TYPE = ApplicationType::Viewer2d;
+    return ApplicationType::Viewer2d;
   else  
-    APP_TYPE = ApplicationType::Unknokwn;
+    return ApplicationType::Unknokwn;
 }
 
 QString ApplicationCommonWindow::GetTitle()

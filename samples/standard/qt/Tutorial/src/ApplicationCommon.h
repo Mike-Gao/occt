@@ -51,15 +51,18 @@ class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
     Q_OBJECT
 
 public:
-  ApplicationCommonWindow(QString theSampleType);
+  enum class ApplicationType { Geometry, Topology, Triangulation, DataExchange, Ocaf, Viewer2d, Viewer3d, Unknokwn };
+  ApplicationCommonWindow(ApplicationType theSampleType);
+
 
 	static QString                  getResourceDir();
   static TCollection_AsciiString  getSampleSourceDir();
+  static ApplicationType          AppTypeFromString(QString theParameter);
 
   QAction* getToolAction(ToolActions theActionId);
   QList<QAction*> getMaterialActions();
 
-  enum class ApplicationType { Geometry, Topology, Triangulation, DataExchange, Ocaf, Viewer2d, Viewer3d, Unknokwn };
+
 	
 protected:
   virtual DocumentCommon* createNewDocument();
@@ -96,9 +99,8 @@ private slots:
 
 private:
 
-  ApplicationType APP_TYPE = ApplicationType::Topology;
+  ApplicationType APP_TYPE;
 
-  void    SetAppType(QString theParameter);
   QString GetTitle();
 
 	void createStandardOperations();
