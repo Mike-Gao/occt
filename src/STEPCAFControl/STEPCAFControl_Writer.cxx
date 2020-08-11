@@ -22,9 +22,7 @@
 
 #include <BRep_Builder.hxx>
 #include <GeomToStep_MakeAxis2Placement3d.hxx>
-#include <Geom_RectangularTrimmedSurface.hxx>
 #include <GeomToStep_MakeCartesianPoint.hxx>
-#include <Geom_TrimmedCurve.hxx>
 #include <HeaderSection_FileSchema.hxx>
 #include <Interface_EntityIterator.hxx>
 #include <Interface_Static.hxx>
@@ -301,7 +299,6 @@
 #include <TopTools_MapOfShape.hxx>
 #include <GeomToStep_MakeSurface.hxx>
 #include <GeomToStep_MakeCurve.hxx>
-#include <GeomToStep_MakeRectangularTrimmedSurface.hxx>
 #include <TopTools_SequenceOfShape.hxx>
 #include <Transfer_ActorOfFinderProcess.hxx>
 #include <Transfer_Binder.hxx>
@@ -2304,9 +2301,7 @@ static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)&
 //function : createKinematicJoint
 //purpose  : auxilary
 //=======================================================================
-static Standard_Boolean createKinematicJoint(const Handle(Transfer_FinderProcess)& theFP,
-                                             const Handle(XCAFDoc_KinematicTool)& theKTool,
-                                             const Interface_Graph& theGraph,
+static Standard_Boolean createKinematicJoint(const Handle(XCAFDoc_KinematicTool)& theKTool,
                                              const TDF_Label& theLabelJoint,
                                              const Handle(XCAFKinematics_PairObject)& theKinPairObj,
                                              const NCollection_IndexedDataMap<TDF_Label, Handle(StepKinematics_KinematicLinkRepresentation), TDF_LabelMapHasher>& theMapOfLinks,
@@ -2732,32 +2727,31 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
     {
     case(XCAFKinematics_PairType_PointOnSurface):
     {
-      if (isRanged)
+      GeomToStep_MakeSurface aMaker(aHighOrderPairObject->Surface());
+      Handle(StepGeom_Surface) aPairSurface = aMaker.Value();
+      if (isRanged && !aPairSurface.IsNull() &&
+        aPairSurface->IsKind(STANDARD_TYPE(StepGeom_RectangularTrimmedSurface)))
       {
-        GeomToStep_MakeSurface aMaker(aHighOrderPairObject->Surface());
-        Handle(StepGeom_Surface) aPairSurface = aMaker.Value();
         Standard_Real aLowerLimitYaw = aHighOrderPairObject->LowLimitYaw();
         Standard_Real aUpperLimitYaw = aHighOrderPairObject->UpperLimitYaw();
         Standard_Real aLowerLimitPitch = aHighOrderPairObject->LowLimitPitch();
         Standard_Real aUpperLimitPitch = aHighOrderPairObject->UpperLimitPitch();
         Standard_Real aLowerLimitRoll = aHighOrderPairObject->LowLimitRoll();
         Standard_Real aUpperLimitRoll = aHighOrderPairObject->UpperLimitRoll();
-        GeomToStep_MakeRectangularTrimmedSurface aMakerTrimmered(aHighOrderPairObject->TrimmedSurface());
-        Handle(StepGeom_RectangularTrimmedSurface) aRangeOnPairSurface = aMakerTrimmered.Value();
+        GeomToStep_MakeSurface aMakerSurface(aHighOrderPairObject->Surface());
+        Handle(StepGeom_RectangularTrimmedSurface) aRangeOnPairSurface = Handle(StepGeom_RectangularTrimmedSurface)::DownCast(aMakerSurface.Value());
         theKinematicPair = new StepKinematics_PointOnSurfacePairWithRange;
         Handle(StepKinematics_PointOnSurfacePairWithRange) aPointOnSurfacePairWithRange = Handle(StepKinematics_PointOnSurfacePairWithRange)::DownCast(theKinematicPair);
         aPointOnSurfacePairWithRange->Init(aPairName, aPairName, hasDescription,
           aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurface,aRangeOnPairSurface, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
           aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
       }
-      else
+      else 
       {
         theKinematicPair = new StepKinematics_PointOnSurfacePair;
-        GeomToStep_MakeSurface aMaker(aHighOrderPairObject->Surface());
-        Handle(StepGeom_Surface) aPairSurface = aMaker.Value();
         Handle(StepKinematics_PointOnSurfacePair) aPointOnSurface = Handle(StepKinematics_PointOnSurfacePair)::DownCast(theKinematicPair);
         aPointOnSurface->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,aPairSurface);
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurface);
       }
       break;
     }
@@ -2792,41 +2786,21 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       GeomToStep_MakeCurve aMaker(aHighOrderPairObject->Curve());
       Handle(StepGeom_Curve) aPairCurve = aMaker.Value();
       Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
-      if (isRanged)
+      if (isRanged && !aPairCurve.IsNull() &&
+        aPairCurve->IsKind(STANDARD_TYPE(StepGeom_TrimmedCurve)))
       {
         Standard_Real aLowerLimitYaw = aHighOrderPairObject->LowLimitYaw();
         Standard_Real aUpperLimitYaw = aHighOrderPairObject->UpperLimitYaw();
         Standard_Real aLowerLimitPitch = aHighOrderPairObject->LowLimitPitch();
         Standard_Real aUpperLimitPitch = aHighOrderPairObject->UpperLimitPitch();
         Standard_Real aLowerLimitRoll = aHighOrderPairObject->LowLimitRoll();
-        Standard_Real aUpperLimitRoll = aHighOrderPairObject->UpperLimitRoll(); 
-        Handle(Geom_TrimmedCurve) aRangeOnCurve = aHighOrderPairObject->TrimmedCurve();
-        Handle(StepGeom_HArray1OfTrimmingSelect) aSTS1 =
-          new StepGeom_HArray1OfTrimmingSelect(1, 2);
-        StepGeom_TrimmingSelect tSel;
-        GeomToStep_MakeCartesianPoint aMP1(aRangeOnCurve->StartPoint());
-        tSel.SetValue(aMP1.Value());
-        aSTS1->SetValue(1, tSel);
-        tSel.SetParameterValue(aRangeOnCurve->FirstParameter());
-        aSTS1->SetValue(2, tSel);
-
-        Handle(StepGeom_HArray1OfTrimmingSelect) aSTS2 =
-          new StepGeom_HArray1OfTrimmingSelect(1, 2);
-        GeomToStep_MakeCartesianPoint aMP2(aRangeOnCurve->EndPoint());
-        tSel.SetValue(aMP2.Value());
-        aSTS2->SetValue(1, tSel);
-        tSel.SetParameterValue(aRangeOnCurve->LastParameter());
-        aSTS2->SetValue(2, tSel);
-
-        Handle(TCollection_HAsciiString) empty =
-          new TCollection_HAsciiString("");
-        Handle(StepGeom_TrimmedCurve) aRangeOnPairCurve = new StepGeom_TrimmedCurve;
-        aRangeOnPairCurve->Init(empty, aPairCurve, aSTS1, aSTS2, Standard_True, StepGeom_tpParameter);
+        Standard_Real aUpperLimitRoll = aHighOrderPairObject->UpperLimitRoll();
+        Handle(StepGeom_TrimmedCurve) aRangeOnPairCurve = Handle(StepGeom_TrimmedCurve)::DownCast(aPairCurve);
         theKinematicPair = new StepKinematics_PointOnPlanarCurvePairWithRange;
         Handle(StepKinematics_PointOnPlanarCurvePairWithRange) aPointOnPlanarCurvePairWithRange = Handle(StepKinematics_PointOnPlanarCurvePairWithRange)::DownCast(theKinematicPair);
         aPointOnPlanarCurvePairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation, aRangeOnPairCurve,Standard_True,aLowerLimitYaw, Standard_True,aUpperLimitYaw, Standard_True,
-          aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True,aLowerLimitRoll, Standard_True, aUpperLimitRoll);
+          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation, aRangeOnPairCurve, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
+          aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
       }
       else
       {
@@ -2866,7 +2840,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
     case(XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve):
     {
       theKinematicPair = new StepKinematics_LinearFlexibleAndPlanarCurvePair;
-      GeomToStep_MakeCurve aMaker(aHighOrderPairObject->FirstCurve());
+      GeomToStep_MakeCurve aMaker(aHighOrderPairObject->Curve());
       Handle(StepGeom_Curve) aPairCurve = aMaker.Value();
       Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
       Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair) aLinearFlexibleAndPlanarCurvePair = Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair)::DownCast(theKinematicPair);
@@ -3109,7 +3083,7 @@ static Standard_Boolean createKinematicPairValue(const Handle(XCAFKinematics_Pai
     break;
   }
   Handle(StepKinematics_KinematicPair) aAppliesToPair =
-    Handle(StepKinematics_KinematicPair)::DownCast(thePairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair());
+    thePairReprRelationship->RepresentationRelationshipWithTransformation()->TransformationOperator().KinematicPair();
   thePairValue->SetAppliesToPair(aAppliesToPair);
   thePairValue->SetName(aAppliesToPair->Name());
   return Standard_True;
@@ -3126,8 +3100,6 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
 
   // get working data
   const Handle(Interface_InterfaceModel)& Model = theWS->Model();
-  const Handle(XSControl_TransferWriter)& TW = theWS->TransferWriter();
-  const Handle(Transfer_FinderProcess)& FP = TW->FinderProcess();
 
   const Handle(Interface_HGraph) aHGraph = theWS->HGraph();
   if (aHGraph.IsNull())
@@ -3196,7 +3168,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
       Handle(XCAFKinematics_PairObject) aPairObject = aKPairAttr->GetObject();
       Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr1;
       Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr2;
-      if (!createKinematicJoint(FP, aKTool, aGraph, aJointL, aPairObject, aMapOfLinks, aLinkRepr1, aLinkRepr2, aJoint))
+      if (!createKinematicJoint(aKTool, aJointL, aPairObject, aMapOfLinks, aLinkRepr1, aLinkRepr2, aJoint))
         continue;
       if (!createKinematicPair(aPairObject,aJoint,aKinematicPair, aLinkRepr1, aLinkRepr2))
         continue;

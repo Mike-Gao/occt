@@ -211,7 +211,7 @@ Handle(Geom_Axis2Placement) StepToGeom::MakeAxis2Placement (const Handle(StepGeo
 }
 
 //=============================================================================
-// Creation d' un AxisPlacement de Geom2d a partir d' un SuParameters de Step
+// Creation of an AxisPlacement from a Kinematic SuParameters for Step
 //=============================================================================
 
 Handle(Geom_Axis2Placement) StepToGeom::MakeAxis2Placement(const Handle(StepKinematics_SuParameters)& SP)
@@ -2071,7 +2071,7 @@ Handle(Geom2d_VectorWithMagnitude) StepToGeom::MakeVectorWithMagnitude2d (const 
 }
 
 //=============================================================================
-// Creation d' un YptRotation de Kinematic a partir d' un SpatialRotation de Step
+// Creation of a YptRotation from a Kinematic SpatialRotation for Step
 //=============================================================================
 
 Handle(TColStd_HArray1OfReal) StepToGeom::MakeYprRotation(const StepKinematics_SpatialRotation& SR, const Handle(StepRepr_GlobalUnitAssignedContext)& theCntxt)
@@ -2080,10 +2080,7 @@ Handle(TColStd_HArray1OfReal) StepToGeom::MakeYprRotation(const StepKinematics_S
   Handle(TColStd_HArray1OfReal) anYPRRotation;
   if (!SR.YprRotation().IsNull() &&
       SR.YprRotation()->Length() == 3)
-  {
-    anYPRRotation = SR.YprRotation();
-    return anYPRRotation;
-  }
+    return  SR.YprRotation();
 
   if (SR.RotationAboutDirection().IsNull() ||
       SR.RotationAboutDirection()->DirectionOfAxis()->DirectionRatios()->Length() != 3 ||
@@ -2152,7 +2149,7 @@ Handle(TColStd_HArray1OfReal) StepToGeom::MakeYprRotation(const StepKinematics_S
     anYPRRotation->SetValue(1, 0.);
     anYPRRotation->SetValue(2, 0.);
     anYPRRotation->SetValue(3, 0.);
-    if (dx != 0.)
+    if (Abs(dx) >= Precision::Confusion())
       if (dx > 0.)
         anYPRRotation->SetValue(3, aYaw);
       else

@@ -194,13 +194,13 @@ public:
 
   void SetSkewAngle(const Standard_Real theAngle)
   {
-    if (Type() == XCAFKinematics_PairType_Universal || XCAFKinematics_PairType_Homokinetic)
+    if (Type() == XCAFKinematics_PairType_Universal || Type() == XCAFKinematics_PairType_Homokinetic)
       mySkewAngle = theAngle;
   }
 
   Standard_Real SkewAngle() const
   {
-    if (Type() == XCAFKinematics_PairType_Universal || XCAFKinematics_PairType_Homokinetic)
+    if (Type() == XCAFKinematics_PairType_Universal || Type() == XCAFKinematics_PairType_Homokinetic)
       return mySkewAngle;
     else return 0;
   }

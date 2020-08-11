@@ -135,19 +135,19 @@ public:
   //! \return limit
   Standard_EXPORT Standard_Real UpperLimitPitch();
 
-  //! Sets curve attribute (only for PointOnPlanarCurve)
+  //! Sets curve attribute (only for PointOnPlanarCurve and LinearAndFlexibleCurve)
   //! \param[in] theCurve curve
   Standard_EXPORT void SetCurve(const Handle(Geom_Curve)& theCurve);
 
-  //! Gets curve attribute (only for PointOnPlanarCurve)
+  //! Gets curve attribute (only for PointOnPlanarCurve and LinearAndFlexibleCurve)
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) Curve() const;
 
-  //! Sets curve attribute (only for SlidingCurve, RollingCurve LinearAndFlexibleCurve)
+  //! Sets curve attribute (only for SlidingCurve and RollingCurve)
   //! \param[in] theCurve curve
   Standard_EXPORT void SetFirstCurve(const Handle(Geom_Curve)& theCurve);
 
-  //! Gets curve attribute (only for SlidingCurve, RollingCurve LinearAndFlexibleCurve)
+  //! Gets curve attribute (only for SlidingCurve and RollingCurve)
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) FirstCurve() const;
 
@@ -158,14 +158,6 @@ public:
   //! Gets curve attribute (only for SlidingCurve and RollingCurve)
   //! \return curve
   Standard_EXPORT Handle(Geom_Curve) SecondCurve() const;
-
-  //! Sets trimmed curve attribute (only for PointOnCurve)
-  //! \param[in] aTrimCurve trimmed curve
-  Standard_EXPORT void SetTrimmedCurve(const Handle(Geom_TrimmedCurve)& aTrimCurve);
-
-  //! Gets trimmed curve attribute (only for PointOnCurve)
-  //! \return trimmed curve
-  Standard_EXPORT Handle(Geom_TrimmedCurve) TrimmedCurve() const;
 
   //! Sets surface attribute (only for PointOnSurface)
   //! \param[in] theSurface surface
@@ -190,14 +182,6 @@ public:
   //! Gets surface attribute (only for SlidingSurface and RollingSurface)
   //! \return surface
   Standard_EXPORT Handle(Geom_Surface) SecondSurface() const;
-
-  //! Sets trimmed surface attribute (only for PointOnSurface)
-  //! \param[in] aTrimSurface trimmered surface
-  Standard_EXPORT void SetTrimmedSurface(const Handle(Geom_RectangularTrimmedSurface)& aTrimSurface);
-
-  //! Gets trimmed surface attribute (only for PointOnSurface)
-  //! \return trimmed surface
-  Standard_EXPORT Handle(Geom_RectangularTrimmedSurface) TrimmedSurface() const;
 
   DEFINE_STANDARD_RTTIEXT(XCAFKinematics_HighOrderPairObject, XCAFKinematics_PairObject)
 

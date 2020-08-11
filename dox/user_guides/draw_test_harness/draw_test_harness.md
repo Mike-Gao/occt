@@ -11169,7 +11169,7 @@ XGetPairValues D 0:11:1:3:1:1 -rotation
 == 1
 ~~~~~
 
-@subsubsection occt_draw_8_10_37  XRemovePairValues
+@subsubsection occt_draw_8_10_38  XRemovePairValues
 
 Syntax:
 ~~~~~

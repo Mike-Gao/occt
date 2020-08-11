@@ -47,6 +47,6 @@ Handle(StepKinematics_KinematicPair) StepRepr_Transformation::KinematicPair() co
 	Handle(StepKinematics_ActuatedKinPairAndOrderKinPair) aComplexPair = GetCasted(StepKinematics_ActuatedKinPairAndOrderKinPair, Value());
 	if (aComplexPair.IsNull())
 		return  GetCasted(StepKinematics_KinematicPair, Value());
-	return GetCasted(StepKinematics_KinematicPair, aComplexPair->GetOrderKinematicPair());
+	return aComplexPair->GetOrderKinematicPair();
 }
 

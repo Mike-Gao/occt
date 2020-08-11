@@ -27,6 +27,7 @@ DEFINE_STANDARD_HANDLE(XCAFKinematics_LowOrderPairObjectWithCoupling, XCAFKinema
 //! - XCAFKinematics_PairType_Screw
 //! - XCAFKinematics_PairType_RackAndPinion
 //! - XCAFKinematics_PairType_Gear
+//! - XCAFKinematics_PairType_LinearFlexibleAndPinion
 class XCAFKinematics_LowOrderPairObjectWithCoupling : public XCAFKinematics_PairObject
 {
 

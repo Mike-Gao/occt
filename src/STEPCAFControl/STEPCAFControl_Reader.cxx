@@ -4350,8 +4350,7 @@ Standard_Boolean addLinkWithShapes(const Handle(XSControl_WorkSession)& theWS,
     }
     if (aCDKLR.IsNull())
       continue;
-    Handle(StepRepr_PropertyDefinition) aPD =
-      Handle(StepRepr_PropertyDefinition)::DownCast(aCDKLR->RepresentedProductRelation());
+    Handle(StepRepr_PropertyDefinition) aPD = aCDKLR->RepresentedProductRelation();
     if (aPD.IsNull())
       continue;
     TDF_Label aShapeLabel;
@@ -4561,7 +4560,7 @@ Standard_Boolean setKinematicPairLimit(const Handle(StepKinematics_KinematicPair
       anObj->SetUpperLimitPitch(aPointOnSurfacePairWithRange->UpperLimitPitch());
       anObj->SetLowLimitRoll(aPointOnSurfacePairWithRange->LowerLimitRoll());
       anObj->SetUpperLimitRoll(aPointOnSurfacePairWithRange->UpperLimitRoll());
-      anObj->SetTrimmedSurface(StepToGeom::MakeRectangularTrimmedSurface(aPointOnSurfacePairWithRange->RangeOnPairSurface()));
+      anObj->SetSurface(StepToGeom::MakeSurface(aPointOnSurfacePairWithRange->RangeOnPairSurface()));
     }
     else if (theKP->IsKind(STANDARD_TYPE(StepKinematics_PointOnPlanarCurvePairWithRange)))
     {
@@ -4572,7 +4571,7 @@ Standard_Boolean setKinematicPairLimit(const Handle(StepKinematics_KinematicPair
       anObj->SetUpperLimitPitch(aPointOnPlanarCurvePairWithRange->UpperLimitPitch());
       anObj->SetLowLimitRoll(aPointOnPlanarCurvePairWithRange->LowerLimitRoll());
       anObj->SetUpperLimitRoll(aPointOnPlanarCurvePairWithRange->UpperLimitRoll());
-      anObj->SetTrimmedCurve(StepToGeom::MakeTrimmedCurve(aPointOnPlanarCurvePairWithRange->RangeOnPairCurve()));
+      anObj->SetCurve(StepToGeom::MakeCurve(aPointOnPlanarCurvePairWithRange->RangeOnPairCurve()));
     }
     else if (theKP->IsKind(STANDARD_TYPE(StepKinematics_PlanarCurvePairRange)))
     {
@@ -4692,7 +4691,7 @@ Handle(XCAFKinematics_PairObject) createXCAFKinematicPairObject(const Handle(Ste
     else if (theKP->IsKind(STANDARD_TYPE(StepKinematics_LinearFlexibleAndPlanarCurvePair)))
     {
       Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair) aLinearFlexibleAndPlanarCurvePair = Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair)::DownCast(theKP);
-      aHighOrderPairObject->SetFirstCurve(StepToGeom::MakeCurve(aLinearFlexibleAndPlanarCurvePair->PairCurve()));
+      aHighOrderPairObject->SetCurve(StepToGeom::MakeCurve(aLinearFlexibleAndPlanarCurvePair->PairCurve()));
       aHighOrderPairObject->SetOrientation(aLinearFlexibleAndPlanarCurvePair->Orientation());
     }
   }

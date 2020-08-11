@@ -328,7 +328,7 @@ Standard_Real XCAFKinematics_HighOrderPairObject::UpperLimitPitch()
 //=======================================================================
 void XCAFKinematics_HighOrderPairObject::SetCurve(const Handle(Geom_Curve)& theCurve)
 {
-  if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
+  if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
     myGeom.ChangeFirst() = theCurve;
 }
 
@@ -338,16 +338,8 @@ void XCAFKinematics_HighOrderPairObject::SetCurve(const Handle(Geom_Curve)& theC
 //=======================================================================
 Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::Curve() const
 {
-  if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve && !myGeom.First().IsNull())
-  {
-    if (myGeom.First()->IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
-    {
-      Handle(Geom_TrimmedCurve) aTrimCurve = Handle(Geom_TrimmedCurve)::DownCast(myGeom.First());
-      return aTrimCurve->BasisCurve();
-    }
-    else 
-      return Handle(Geom_Curve)::DownCast(myGeom.First());
-  }
+  if (Type() == XCAFKinematics_PairType_PointOnPlanarCurve || Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+    return Handle(Geom_Curve)::DownCast(myGeom.First());
   return NULL;
 }
 
@@ -357,7 +349,7 @@ Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::Curve() const
 //=======================================================================
 void XCAFKinematics_HighOrderPairObject::SetFirstCurve(const Handle(Geom_Curve)& theCurve)
 {
-  if (Type() >= XCAFKinematics_PairType_SlidingCurve && Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+  if (Type() == XCAFKinematics_PairType_SlidingCurve || Type() == XCAFKinematics_PairType_RollingCurve)
     myGeom.ChangeFirst() = theCurve;
 }
 
@@ -367,7 +359,7 @@ void XCAFKinematics_HighOrderPairObject::SetFirstCurve(const Handle(Geom_Curve)&
 //=======================================================================
 Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::FirstCurve() const
 {
-  if (Type() >= XCAFKinematics_PairType_SlidingCurve && Type() <= XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+  if (Type() == XCAFKinematics_PairType_SlidingCurve || Type() == XCAFKinematics_PairType_RollingCurve)
     return Handle(Geom_Curve)::DownCast(myGeom.First());
   return NULL;
 }
@@ -394,28 +386,6 @@ Handle(Geom_Curve) XCAFKinematics_HighOrderPairObject::SecondCurve() const
 }
 
 //=======================================================================
-//function : SetTrimmedCurve
-//purpose  : 
-//=======================================================================
-void XCAFKinematics_HighOrderPairObject::SetTrimmedCurve(const Handle(Geom_TrimmedCurve)& aTrimCurve)
-{
-  if (Type() != XCAFKinematics_PairType_PointOnPlanarCurve && !HasLimits())
-    return;
-  myGeom.ChangeFirst() = aTrimCurve;
-}
-
-//=======================================================================
-//function : TrimmedCurve
-//purpose  : 
-//=======================================================================
-Handle(Geom_TrimmedCurve) XCAFKinematics_HighOrderPairObject::TrimmedCurve() const
-{
-  if (Type() != XCAFKinematics_PairType_PointOnPlanarCurve)
-    return NULL;
-  return  Handle(Geom_TrimmedCurve)::DownCast(myGeom.First());
-}
-
-//=======================================================================
 //function : SetSurface
 //purpose  : 
 //=======================================================================
@@ -432,13 +402,7 @@ void XCAFKinematics_HighOrderPairObject::SetSurface(const Handle(Geom_Surface)& 
 Handle(Geom_Surface) XCAFKinematics_HighOrderPairObject::Surface() const
 {
   if (Type() == XCAFKinematics_PairType_PointOnSurface)
-    if (!myGeom.First().IsNull() && myGeom.First()->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
-    {
-      Handle(Geom_RectangularTrimmedSurface) aTrimSurface = Handle(Geom_RectangularTrimmedSurface)::DownCast(myGeom.First());
-      return aTrimSurface->BasisSurface();
-    }
-    else
-      return Handle(Geom_Surface)::DownCast(myGeom.First());
+    return Handle(Geom_Surface)::DownCast(myGeom.First());
   return NULL;
 }
 
@@ -482,26 +446,4 @@ Handle(Geom_Surface) XCAFKinematics_HighOrderPairObject::SecondSurface() const
   if (Type() == XCAFKinematics_PairType_SlidingSurface || Type() == XCAFKinematics_PairType_RollingSurface)
     return Handle(Geom_Surface)::DownCast(myGeom.Last());
   return NULL;
-}
-
-//=======================================================================
-//function : SetTrimmedSurface
-//purpose  : 
-//=======================================================================
-void XCAFKinematics_HighOrderPairObject::SetTrimmedSurface(const Handle(Geom_RectangularTrimmedSurface)& aTrimSurface)
-{
-  if (Type() != XCAFKinematics_PairType_PointOnSurface && !HasLimits())
-    return;
-  myGeom.ChangeFirst() = aTrimSurface;
-}
-
-//=======================================================================
-//function : TrimmedSurface
-//purpose  : 
-//=======================================================================
-Handle(Geom_RectangularTrimmedSurface) XCAFKinematics_HighOrderPairObject::TrimmedSurface() const
-{
-  if (Type() != XCAFKinematics_PairType_PointOnSurface)
-    return NULL;
-  return Handle(Geom_RectangularTrimmedSurface)::DownCast(myGeom.First());
 }

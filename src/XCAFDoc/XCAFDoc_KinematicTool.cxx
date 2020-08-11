@@ -251,6 +251,8 @@ Standard_EXPORT Standard_Boolean XCAFDoc_KinematicTool::SetBaseLink(const TDF_La
      (!aLinkName.IsNull() && !aLinkName->Get().IsDifferent("Link " + theLink.Tag())))
     TDataStd_Name::Set(theLink, "Base");
   TDataStd_Integer::Set(theLink, 1);
+  
+  return Standard_True;
 }
 
 //=======================================================================

@@ -1155,10 +1155,9 @@ static Standard_Integer setGeomParam(Draw_Interpretor& di, Standard_Integer argc
       di << "Invalid geometric argument\n";
       return 1;
     }
-    if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
+    if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve ||
+        anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
       anObject->SetCurve(aCurve);
-    else if (anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
-      anObject->SetFirstCurve(aCurve);
     else {
       switch (aParamNb) {
       case 1: anObject->SetFirstCurve(aCurve);
@@ -1215,10 +1214,7 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
     // Surface
     Handle(Geom_Surface) aSurface;
     if (anObject->Type() == XCAFKinematics_PairType_PointOnSurface)
-      if (!anObject->HasLimits())
-        aSurface = anObject->Surface();
-      else
-        aSurface = anObject->TrimmedSurface();
+      aSurface = anObject->Surface();
     else {
       switch (aTrsfNb) {
       case 1: aSurface = anObject->FirstSurface();
@@ -1235,13 +1231,9 @@ static Standard_Integer getGeomParam(Draw_Interpretor& di, Standard_Integer argc
   else {
     // Curve
     Handle(Geom_Curve) aCurve;
-    if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve)
-      if (!anObject->HasLimits())
-        aCurve = anObject->Curve();
-      else
-        aCurve = anObject->TrimmedCurve();
-    else if(anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
-      aCurve = anObject->FirstCurve();
+    if (anObject->Type() == XCAFKinematics_PairType_PointOnPlanarCurve ||
+        anObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+      aCurve = anObject->Curve();
     else {
       switch (aTrsfNb) {
       case 1: aCurve = anObject->FirstCurve();
@@ -1841,8 +1833,8 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
   di.Add("XSetPairParams", "XSetPairParams Doc Joint Value1 Value2..."
     "\tScrew - Pitch\n"
     "\tRackAndPinion - PinionRadius\n"
-    "\tGear -FirstLinkRadius SecondLinkRadius Bevel HelicalAngle GearRatio \n"
-    "\tLinear - SkewAngle \n"
+    "\tGear - FirstLinkRadius SecondLinkRadius Bevel HelicalAngle GearRatio\n"
+    "\tLinear - PinionRadius\n"
     __FILE__, setParameters, g);
 
   di.Add("XGetPairParams", "XGetPairParams Doc Joint",

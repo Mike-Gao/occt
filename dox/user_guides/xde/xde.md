@@ -148,7 +148,7 @@ Notes API provides the following functionality:
 @subsection occt_xde_1_11 Kinematics
 
 Kinematic data storage is realized according to ISO 10303-105:2019(E) and STEP Schema AP242 2019 year.
-All kinematic data is divided onto mechanisms each mechanism has its graph of links (references to shapes), joints (kinematic pair information) and (optional) states(sets of kinematic values).
+All kinematic data is divided onto mechanisms each mechanism has its graph of links (references to shapes), joints (kinematic pair information) and (optional) states (sets of kinematic values).
 Each joint corresponds to one kinematic pair from the list:
 * Low order pairs
   - fully constrained pair (no DOF);
@@ -182,7 +182,7 @@ The kinematic pair information consists of
 
 The kinematic value consist of
 * reference to joint; 
-* paramters;
+* parameters.
 
 All mentioned data depends on the kinematic pair type.
 
@@ -1102,16 +1102,15 @@ All these methods except for the last one break all links with Document items as
 
 @subsection occt_xde_2_11 Kinematics
 
-In XDE Document Kinematics is managed via *XCAFDoc_KinematicTool*. The Kinematic pair entities are described by two attributes
-*XCAFDoc_KinematicPair* and *XCAFDoc_KinematicPairValue (optional)*. The second attribute is a dependant attribute, 
-it cannot be assigned to label without the main attribute or to a label with the main attribute of another kinematic pair type.
+In XDE Document Kinematics is managed via *XCAFDoc_KinematicTool*.
   
 @subsubsection occt_xde_2_11_1 Creation
 
 All kinematic data refers to the mechanism, so, first of all, it needs to *AddMechanism*, 
 this method creates a new mechanism and two empty subfolders for links and joints. 
 The next step is specifying of links (mechanism details)  via *AddLink* and *SetLink* commands.
-The last step of kinematic graph creation is adding of joints with using *AddJoint* and *SetJoint* commands.
+The next step is adding of joints with using *AddJoint* and *SetJoint* commands.
+The last step of kinematic graph creationp is specifying of states (optional) via *AddState*, *AddValue* and *SetValue* commands.
 
 Here is an example of creating a new mechanism and adding a new joint with two links:
 ~~~~~
@@ -1147,6 +1146,7 @@ Commands to check that created labels are valid:
 - *IsLink* : checking for references to shape of the given link;
 - *IsJoint* : checking for references to end and start link of the given joint;
 - *IsValue* : checking for conteined  assigning data.
+- *IsState* : checking for main label of value;
 
 To retrieve current graph state use the next methods:
 - *GetMechanisms* : retrieves all mechanisms labels;
