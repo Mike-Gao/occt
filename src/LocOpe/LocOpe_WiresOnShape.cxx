@@ -532,6 +532,9 @@ Standard_Boolean Project(const TopoDS_Vertex& V,
   Standard_Boolean valret = Standard_False;
   
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(F);
+
+  Standard_Real aUmin, aUmax, aVmin, aVmax;
+  ShapeAnalysis::GetFaceUVBounds(F, aUmin, aUmax, aVmin, aVmax);
  
   if (theEdge.IsNull())
   {
@@ -618,11 +621,14 @@ Standard_Boolean Project(const TopoDS_Vertex& V,
       if (dumin > dumax && adSurf.IsUPeriodic())
       {
         Standard_Real aX1 = aPBound2d.X();
-        Standard_Real aShift = ShapeAnalysis::AdjustToPeriod(aX1, adSurf.FirstUParameter(), adSurf.LastUParameter());
+        Standard_Real aShift = ShapeAnalysis::AdjustByPeriod(aX1, (aUmin + aUmax) *0.5, adSurf.LastUParameter() - adSurf.FirstUParameter());
+        //Standard_Real aShift = ShapeAnalysis::AdjustToPeriod(aX1, adSurf.FirstUParameter(), adSurf.LastUParameter());
         aX1 += aShift;
         aPBound2d.SetX(aX1);
         Standard_Real aX2 = p2d.X();
-        aShift = ShapeAnalysis::AdjustToPeriod(aX2, adSurf.FirstUParameter(), adSurf.LastUParameter());
+        aShift = ShapeAnalysis::AdjustByPeriod(aX2, (aUmin + aUmax) *0.5, adSurf.LastUParameter() - adSurf.FirstUParameter());
+       
+        //aShift = ShapeAnalysis::AdjustToPeriod(aX2, adSurf.FirstUParameter(), adSurf.LastUParameter());
         aX2 += aShift;
         dumin = Abs(aX2 - aX1);
         if (dumin > dumax &&  (Abs(dumin - adSurf.UPeriod()) < Precision::PConfusion()) )
@@ -637,11 +643,14 @@ Standard_Boolean Project(const TopoDS_Vertex& V,
       if (dvmin > dvmax && adSurf.IsVPeriodic())
       {
         Standard_Real aY1 = aPBound2d.Y();
-        Standard_Real aShift = ShapeAnalysis::AdjustToPeriod(aY1, adSurf.FirstVParameter(), adSurf.LastVParameter());
+        Standard_Real aShift = ShapeAnalysis::AdjustByPeriod(aY1, (aVmin + aVmax) *0.5, adSurf.LastVParameter() - adSurf.FirstVParameter());
+        //Standard_Real aShift = ShapeAnalysis::AdjustToPeriod(aY1, adSurf.FirstVParameter(), adSurf.LastVParameter());
         aY1 += aShift;
         aPBound2d.SetY(aY1);
         Standard_Real aY2 = p2d.Y();
-        aShift = ShapeAnalysis::AdjustToPeriod(aY2, adSurf.FirstVParameter(), adSurf.LastVParameter());
+       
+        aShift = ShapeAnalysis::AdjustByPeriod(aY2, (aVmin + aVmax) *0.5, adSurf.LastVParameter() - adSurf.FirstVParameter());
+        /*aShift = ShapeAnalysis::AdjustToPeriod(aY2, adSurf.FirstVParameter(), adSurf.LastVParameter());*/
         aY2 += aShift;
         dvmin = Abs(aY1 - aY2);
         if (dvmin > dvmax && ( Abs(dvmin - adSurf.VPeriod()) < Precision::Confusion()) )
