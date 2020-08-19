@@ -51,13 +51,22 @@ class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
     Q_OBJECT
 
 public:
-  enum class ApplicationType { Geometry, Topology, Triangulation, DataExchange, Ocaf, Viewer2d, Viewer3d, Unknokwn };
+  enum ApplicationType { 
+    Geometry,
+    Topology,
+    Triangulation,
+    DataExchange,
+    Ocaf,
+    Viewer2d,
+    Viewer3d,
+    Unknown
+  };
   ApplicationCommonWindow(ApplicationType theSampleType);
 
 
 	static QString                  getResourceDir();
   static TCollection_AsciiString  getSampleSourceDir();
-  static ApplicationType          AppTypeFromString(QString theParameter);
+  static ApplicationType          appTypeFromString(const QString& theParameter);
 
   QAction* getToolAction(ToolActions theActionId);
   QList<QAction*> getMaterialActions();
@@ -99,7 +108,7 @@ private slots:
 
 private:
 
-  ApplicationType APP_TYPE;
+  ApplicationType myAppType;
 
   QString GetTitle();
 
