@@ -59,7 +59,7 @@ static QMdiArea* stWs = 0;
 
 ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
   : QMainWindow(nullptr),
-  APP_TYPE(theSampleType),
+  myAppType(theSampleType),
   mySampleMapper(new QSignalMapper(this)),
   myExchangeMapper(new QSignalMapper(this)),
   myOcafMapper(new QSignalMapper(this)),
@@ -73,33 +73,33 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
 {
   setWindowTitle(GetTitle());
 
-  switch (APP_TYPE)
+  switch (myAppType)
   {
-  case ApplicationType::Geometry:
+  case Geometry:
     mySamples = new GeometrySamples();
     MenuFormJson(":/menus/Geometry.json", mySampleMapper);
     break;
-  case ApplicationType::Topology:
+  case Topology:
     mySamples = new TopologySamples();
     MenuFormJson(":/menus/Topology.json", mySampleMapper);
     break;
-  case ApplicationType::Triangulation:
+  case Triangulation:
     mySamples = new TriangulationSamples();
     MenuFormJson(":/menus/Triangulation.json", mySampleMapper);
     break;
-  case ApplicationType::DataExchange:
+  case DataExchange:
     mySamples = new DataExchangeSamples();
     MenuFormJson(":/menus/DataExchange.json", myExchangeMapper);
     break;
-  case ApplicationType::Ocaf:
+  case Ocaf:
     mySamples = new OcafSamples();
     MenuFormJson(":/menus/Ocaf.json", myOcafMapper);
     break;
-  case ApplicationType::Viewer3d:
+  case Viewer3d:
     mySamples = new Viewer3dSamples();
     MenuFormJson(":/menus/Viewer3d.json", myViewer3dMapper);
     break;
-  case ApplicationType::Viewer2d:
+  case Viewer2d:
     mySamples = new Viewer2dSamples();
     MenuFormJson(":/menus/Viewer2d.json", myViewer2dMapper);
     break;
@@ -162,7 +162,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
 
   createStandardOperations();
 
-  if (APP_TYPE == ApplicationType::DataExchange)
+  if (myAppType == DataExchange)
   {
     Handle(DataExchangeSamples) aDataExchangeSamples = Handle(DataExchangeSamples)::DownCast(mySamples);
     if (aDataExchangeSamples)
@@ -173,7 +173,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
       myGeomWidget->FitAll();
     }
   }
-  else if (APP_TYPE == ApplicationType::Ocaf)
+  else if (myAppType == Ocaf)
   {
     Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
     if (aOcafSamples)
@@ -184,7 +184,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
       myGeomWidget->Show3d();
     }
   }
-  else if (APP_TYPE == ApplicationType::Viewer3d)
+  else if (myAppType == Viewer3d)
   {
     Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
     if (aViewer3dSamples)
@@ -196,7 +196,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
       myGeomWidget->FitAll();
     }
   }
-  else if (APP_TYPE == ApplicationType::Viewer2d)
+  else if (myAppType == Viewer2d)
   {
     Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
     if (aViewer2dSamples)
@@ -212,43 +212,43 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
   resize(1280, 560);
 }
 
-ApplicationCommonWindow::ApplicationType ApplicationCommonWindow::AppTypeFromString(QString theParameter)
+ApplicationCommonWindow::ApplicationType ApplicationCommonWindow::appTypeFromString(const QString& theParameter)
 {
-  if (theParameter == "Geometry")
-    return ApplicationType::Geometry;
-  else if (theParameter == "Topology")
-    return ApplicationType::Topology;
-  else if (theParameter == "Triangulation")
-    return ApplicationType::Triangulation;
-  else if (theParameter == "DataExchange")
-    return ApplicationType::DataExchange;
-  else if (theParameter == "Ocaf")
-    return ApplicationType::Ocaf;
-  else  if (theParameter == "Viewer3d")
-    return ApplicationType::Viewer3d;
-  else  if (theParameter == "Viewer2d")
-    return ApplicationType::Viewer2d;
+  QString aParam = theParameter.toLower();
+  if (aParam == "geometry")
+    return Geometry;
+  else if (aParam == "topology")
+    return Topology;
+  else if (aParam == "triangulation")
+    return Triangulation;
+  else if (aParam == "dataexchange")
+    return DataExchange;
+  else if (aParam == "ocaf")
+    return Ocaf;
+  else  if (aParam == "viewer3d")
+    return Viewer3d;
+  else  if (aParam == "viewer2d")
+    return Viewer2d;
   else  
-    return ApplicationType::Unknokwn;
+    return Unknown;
 }
 
 QString ApplicationCommonWindow::GetTitle()
 {
-  switch (APP_TYPE)
-  {
-  case ApplicationType::Geometry:
+  switch (myAppType) {
+  case Geometry:
     return "Geometry";
-  case ApplicationType::Topology:
+  case Topology:
     return "Topology";
-  case ApplicationType::Triangulation:
+  case Triangulation:
     return "Triangulation";
-  case ApplicationType::DataExchange:
+  case DataExchange:
     return "DataExchange";
-  case ApplicationType::Ocaf:
+  case Ocaf:
     return "OCAF";
-  case ApplicationType::Viewer3d:
+  case Viewer3d:
     return "3D viewer";
-  case ApplicationType::Viewer2d:
+  case Viewer2d:
     return "2D Viewer";
   default:
     return "Unknown application";
