@@ -296,7 +296,7 @@ IGESData_IGESReaderTool::IGESData_IGESReaderTool
       Msg34.Arg(thecnum);
       Msg34.Arg(thectyp.Type());
       ach->SendWarning(Msg34);
-      ent->InitDirFieldEntity(13,fieldent);
+      ent->InitDirFieldEntity(13, Color);
     }
     else ent->InitColor(Color);
   }
