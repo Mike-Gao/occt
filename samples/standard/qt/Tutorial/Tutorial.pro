@@ -8,8 +8,9 @@ QT += widgets
 TARGET = Tutorial
 
 
+SAMPLESROOT = $$quote($$(SAMPLESROOT))
 #SAMPLESROOT = $$quote($$(CSF_OCCTSamplesPath)/standard/qt)
-SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
+#SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
 
 HEADERS   = src/*.h \
             $${SAMPLESROOT}/../samples_src/*.h 
@@ -19,9 +20,6 @@ SOURCES   = src/*.cxx \
 			
 RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc 
 RESOURCES += ./res/Tutorial.qrc
-
-TRANSLATIONS += ./res/Tutorial-string.ts
-
 
 RES_DIR   = $$quote($$(RES_DIR))
 
