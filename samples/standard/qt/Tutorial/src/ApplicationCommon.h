@@ -37,11 +37,12 @@
 #include "CommonSample.h"
 #include "View.h"
 
-enum class StdActions
+enum StdActions
 {
   FileNew, FilePrefUseVBO, FileClose, FilePreferences, FileQuit, ViewTool, ViewStatus, HelpAbout
 };
-enum class ToolActions
+
+enum ToolActions
 {
   ToolWireframe, ToolShading, ToolColor, ToolMaterial, ToolTransparency, ToolDelete
 };
@@ -51,7 +52,7 @@ class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
     Q_OBJECT
 
 public:
-  enum ApplicationType { 
+  enum ApplicationType {
     Geometry,
     Topology,
     Triangulation,
@@ -70,9 +71,7 @@ public:
 
   QAction* getToolAction(ToolActions theActionId);
   QList<QAction*> getMaterialActions();
-
-
-	
+ 	
 protected:
   virtual DocumentCommon* createNewDocument();
 
