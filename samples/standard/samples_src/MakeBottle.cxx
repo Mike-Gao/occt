@@ -70,17 +70,17 @@
 
 TopoDS_Shape
 MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
-           const Standard_Real myThickness)
+  const Standard_Real myThickness)
 {
   // Profile : Define Support Points
-  gp_Pnt aPnt1(-myWidth / 2., 0, 0);        
+  gp_Pnt aPnt1(-myWidth / 2., 0, 0);
   gp_Pnt aPnt2(-myWidth / 2., -myThickness / 4., 0);
   gp_Pnt aPnt3(0, -myThickness / 2., 0);
   gp_Pnt aPnt4(myWidth / 2., -myThickness / 4., 0);
   gp_Pnt aPnt5(myWidth / 2., 0, 0);
 
   // Profile : Define the Geometry
-  Handle(Geom_TrimmedCurve) anArcOfCircle = GC_MakeArcOfCircle(aPnt2,aPnt3,aPnt4);
+  Handle(Geom_TrimmedCurve) anArcOfCircle = GC_MakeArcOfCircle(aPnt2, aPnt3, aPnt4);
   Handle(Geom_TrimmedCurve) aSegment1 = GC_MakeSegment(aPnt1, aPnt2);
   Handle(Geom_TrimmedCurve) aSegment2 = GC_MakeSegment(aPnt4, aPnt5);
 
@@ -88,7 +88,7 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
   TopoDS_Edge anEdge1 = BRepBuilderAPI_MakeEdge(aSegment1);
   TopoDS_Edge anEdge2 = BRepBuilderAPI_MakeEdge(anArcOfCircle);
   TopoDS_Edge anEdge3 = BRepBuilderAPI_MakeEdge(aSegment2);
-  TopoDS_Wire aWire  = BRepBuilderAPI_MakeWire(anEdge1, anEdge2, anEdge3);
+  TopoDS_Wire aWire = BRepBuilderAPI_MakeWire(anEdge1, anEdge2, anEdge3);
 
   // Complete Profile
   gp_Ax1 xAxis = gp::OX();
@@ -112,7 +112,7 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
   // Body : Apply Fillets
   BRepFilletAPI_MakeFillet mkFillet(myBody);
   TopExp_Explorer anEdgeExplorer(myBody, TopAbs_EDGE);
-  while(anEdgeExplorer.More()){
+  while (anEdgeExplorer.More()) {
     TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExplorer.Current());
     //Add edge to fillet algorithm
     mkFillet.Add(myThickness / 12., anEdge);
@@ -138,15 +138,15 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
   TopoDS_Face   faceToRemove;
   Standard_Real zMax = -1;
 
-  for(TopExp_Explorer aFaceExplorer(myBody, TopAbs_FACE); aFaceExplorer.More(); aFaceExplorer.Next()){
+  for (TopExp_Explorer aFaceExplorer(myBody, TopAbs_FACE); aFaceExplorer.More(); aFaceExplorer.Next()) {
     TopoDS_Face aFace = TopoDS::Face(aFaceExplorer.Current());
     // Check if <aFace> is the top face of the bottle’s neck 
     Handle(Geom_Surface) aSurface = BRep_Tool::Surface(aFace);
-    if(aSurface->DynamicType() == STANDARD_TYPE(Geom_Plane)){
+    if (aSurface->DynamicType() == STANDARD_TYPE(Geom_Plane)) {
       Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(aSurface);
       gp_Pnt aPnt = aPlane->Location();
-      Standard_Real aZ   = aPnt.Z();
-      if(aZ > zMax){
+      Standard_Real aZ = aPnt.Z();
+      if (aZ > zMax) {
         zMax = aZ;
         faceToRemove = aFace;
       }
@@ -199,9 +199,9 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
   // Building the Resulting Compound 
   TopoDS_Compound aRes;
   BRep_Builder aBuilder;
-  aBuilder.MakeCompound (aRes);
-  aBuilder.Add (aRes, myBody);
-  aBuilder.Add (aRes, myThreading);
+  aBuilder.MakeCompound(aRes);
+  aBuilder.Add(aRes, myBody);
+  aBuilder.Add(aRes, myThreading);
 
   return aRes;
 }

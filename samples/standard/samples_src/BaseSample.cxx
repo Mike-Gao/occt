@@ -49,7 +49,7 @@ TCollection_AsciiString BaseSample::GetResult()
   return aResult;
 }
 
-TCollection_AsciiString BaseSample::GetCode() 
+TCollection_AsciiString BaseSample::GetCode()
 {
   return myCode;
 }
@@ -70,9 +70,9 @@ void BaseSample::Process(TCollection_AsciiString theSampleName)
   }
 }
 
-void BaseSample::SetCodePach(TCollection_AsciiString theSampleSourcePach)
+void BaseSample::SetCodePath(TCollection_AsciiString theSampleSourcePath)
 {
-  myCodePath = theSampleSourcePach;
+  myCodePath = theSampleSourcePath;
 }
 
 void BaseSample::TraceError(TCollection_AsciiString theErrorMessage)
@@ -95,7 +95,7 @@ void BaseSample::FindSourceCode(TCollection_AsciiString theSampleName)
     TCollection_AsciiString aRegexpTemplate = aClassName + "::" + theSampleName + "[\\n\\s]*\\([\\n\\s]*\\)[\\n\\s]*\\{";
     Standard_Integer aOpeningBracketPosition = FindEndOfPhrase(aReadedText, aRegexpTemplate);
     Standard_Integer aClosingBracketPosition = FindClosingBracket(aReadedText, aOpeningBracketPosition, '}');
-    myCode = aReadedText.SubString(aOpeningBracketPosition+1, aClosingBracketPosition-1);
+    myCode = aReadedText.SubString(aOpeningBracketPosition + 1, aClosingBracketPosition - 1);
   }
   catch (...)
   {
@@ -104,8 +104,8 @@ void BaseSample::FindSourceCode(TCollection_AsciiString theSampleName)
 
 }
 
-Standard_Integer BaseSample::FindEndOfPhrase(TCollection_AsciiString theText, 
-                                             TCollection_AsciiString theRegexpTemplate)
+Standard_Integer BaseSample::FindEndOfPhrase(TCollection_AsciiString theText,
+  TCollection_AsciiString theRegexpTemplate)
 {
   Standard_Integer aIndexOfLastFoundSymbol = -1;
   std::string aStdText = theText.ToCString();
@@ -142,9 +142,9 @@ Standard_Integer BaseSample::FindEndOfPhrase(TCollection_AsciiString theText,
   return aIndexOfLastFoundSymbol;
 }
 
-Standard_Integer BaseSample::FindClosingBracket(TCollection_AsciiString theText, 
-                                                Standard_Integer theOpeningBracketIndex, 
-                                                Standard_Character theClosingBracketSymbol)
+Standard_Integer BaseSample::FindClosingBracket(TCollection_AsciiString theText,
+  Standard_Integer theOpeningBracketIndex,
+  Standard_Character theClosingBracketSymbol)
 {
   // TODO this function not implemented at least 2 cases:
   // - brackets in strings & chars
@@ -155,7 +155,7 @@ Standard_Integer BaseSample::FindClosingBracket(TCollection_AsciiString theText,
   aBracketsSet += anOpeningBracketSymbol;
   Standard_Integer aBracketDepth = 1;
   Standard_Integer aStartFindIndex = theOpeningBracketIndex + 1;
-  Standard_Character aStartFindChar = theText.Value(aStartFindIndex-1);
+  //Standard_Character aStartFindChar = theText.Value(aStartFindIndex-1);
   while (aBracketDepth)
   {
     aStartFindIndex = theText.FirstLocationInSet(aBracketsSet, aStartFindIndex, theText.Length());

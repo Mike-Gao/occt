@@ -77,8 +77,7 @@ void TranslateDialog::clear()
 QListView* TranslateDialog::findListView(const QObjectList & childList)
 {
   QListView* listView = 0;
-  for (int i = 0, n = childList.count(); i < n && !listView; i++)
-  {
+  for (int i = 0, n = childList.count(); i < n && !listView; i++) {
     listView = qobject_cast<QListView*>(childList.at(i));
     if (!listView && childList.at(i)) {
       listView = findListView(childList.at(i)->children());

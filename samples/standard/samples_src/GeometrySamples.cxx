@@ -235,8 +235,7 @@ void GeometrySamples::ExecuteSample(TCollection_AsciiString theSampleName)
     DumpCircleInfoSample();
   else if (theSampleName == "DumpBSplineCurveInfoSample")
     DumpBSplineCurveInfoSample();
-  else
-  {
+  else {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -323,20 +322,20 @@ void GeometrySamples::Vectors3dSample()
   // for constructing unit vectors and works, in particular, 
   // with the parametric equations of unit vectors.
   gp_Dir aDir(aVec);
-  Handle(AdaptorVec_AIS) aDirAIS = 
+  Handle(AdaptorVec_AIS) aDirAIS =
     new AdaptorVec_AIS(gp_Pnt(0.0, 0.0, 10.0), aDir, 1.0, 0.5);
   aDirAIS->SetText("gp_Dir");
   myObject3d.Append(aDirAIS);
   myResult << "gp_Dir coorditates: X: " << aDir.X()
-           << ", Y: " << aDir.Y() << ", Z: " << aDir.Z() << std::endl;
+    << ", Y: " << aDir.Y() << ", Z: " << aDir.Z() << std::endl;
 }
 
 void GeometrySamples::InfinityLines3dSample()
 {
-  gp_Pnt aBasePoint   (0.0, 0.0, 0.0);
-  gp_Dir aX_Direction (1.0, 0.0, 0.0);
+  gp_Pnt aBasePoint(0.0, 0.0, 0.0);
+  gp_Dir aX_Direction(1.0, 0.0, 0.0);
   gp_Dir anY_Direction(0.0, 1.0, 0.0);
-  gp_Dir aZ_Direction (0.0, 0.0, 1.0);
+  gp_Dir aZ_Direction(0.0, 0.0, 1.0);
 
 
   // Describes an axis in 3D space.
@@ -440,9 +439,9 @@ void GeometrySamples::PlaneSurfaces3dSample()
   gp_Pln aPln(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0));
   Handle(Geom_Plane) aPlane = new Geom_Plane(aPln);
   Handle(AIS_Plane) anAisPlane = new AIS_Plane(aPlane, aPln.Location(),
-                                                       gp_Pnt(10.0, 10.0, 0.0),
-                                                       gp_Pnt(-10.0, -10.0, 0.0),
-                                               Standard_False);
+    gp_Pnt(10.0, 10.0, 0.0),
+    gp_Pnt(-10.0, -10.0, 0.0),
+    Standard_False);
   myObject3d.Append(anAisPlane);
 
   // Describes an infinite cylindrical surface.A cylinder is defined by its radius and positioned 
@@ -470,7 +469,7 @@ void GeometrySamples::SecondOrderSurfaces3dSample()
   Handle(AIS_Shape) anAisSphere = new AIS_Shape(BRepBuilderAPI_MakeFace(
     aSphericalSurface, 0.0, 2.0*M_PI, 0.0, 2.0*M_PI, Precision::Confusion()).Shape());
   myObject3d.Append(anAisSphere);
-    
+
   gp_Torus aTorus(gp_Ax3(gp_Pnt(0.0, 0.0, 20.0), gp_Dir(0.0, 0.0, 1.0)), 40.0, 10.0);
   Handle(Geom_ToroidalSurface) aToroidalSurface = new Geom_ToroidalSurface(aTorus);
   Handle(AIS_Shape) anAisTorus = new AIS_Shape(BRepBuilderAPI_MakeFace(
@@ -571,7 +570,7 @@ void GeometrySamples::SecondOrderCurves2dSample()
   Handle(Geom2d_Ellipse) aGeomEllipse = new Geom2d_Ellipse(anElips);
   Handle(AdaptorCurve2d_AIS) anAisEllipse = new AdaptorCurve2d_AIS(aGeomEllipse, Aspect_TOL_DASH);
   myObject2d.Append(anAisEllipse);
-    
+
   // Describes a parabola in the plane (2D space). A parabola is defined by its focal length 
   // (that is, the distance between its focus and apex) and positioned in the plane with 
   // a coordinate system (a gp_Ax22d object)
@@ -580,7 +579,7 @@ void GeometrySamples::SecondOrderCurves2dSample()
   Handle(Geom2d_TrimmedCurve) aTrimmedParabola = new Geom2d_TrimmedCurve(aGeomParabola, 40.0, -40.0);
   Handle(AdaptorCurve2d_AIS) anAisParabola = new AdaptorCurve2d_AIS(aTrimmedParabola, Aspect_TOL_DOT);
   myObject2d.Append(anAisParabola);
-    
+
   // Describes a branch of a hyperbola in the plane (2D space). A hyperbola is defined by its major and 
   // minor radii, and positioned in the plane with a coordinate system (a gp_Ax22d object)   
   gp_Hypr2d aHypr2d(gp_Ax2d(gp_Pnt2d(20.0, 0.0), gp_Dir2d(1.0, 0.0)), 20.0, 10.0);
@@ -611,27 +610,25 @@ void GeometrySamples::BarycenterPoint3dSample()
   gp_Pnt aP3(2, 3, -2);
   gp_Pnt aP4(4, 3, 5);
   gp_Pnt aP5(5, 5, 4);
-  TColgp_Array1OfPnt aPntArray(1, 5);             
+  TColgp_Array1OfPnt aPntArray(1, 5);
   aPntArray.SetValue(1, aP1);
   aPntArray.SetValue(2, aP2);
   aPntArray.SetValue(3, aP3);
   aPntArray.SetValue(4, aP4);
   aPntArray.SetValue(5, aP5);
 
-  Standard_Real Tolerance = 8;    
+  Standard_Real Tolerance = 8;
   GProp_PEquation aPEquation(aPntArray, Tolerance);
 
   gp_Pnt aBarycenterPnt5; // P declaration
   Standard_Boolean IsPoint;
 
-  if (aPEquation.IsPoint())
-  {
+  if (aPEquation.IsPoint()) {
     IsPoint = true;
     aBarycenterPnt5 = aPEquation.Point();
     myResult << "GProp_PEquation is a point" << std::endl;
   }
-  else
-  {
+  else {
     IsPoint = false;
     myResult << "GProp_PEquation is not a point" << std::endl;
   }
@@ -642,8 +639,7 @@ void GeometrySamples::BarycenterPoint3dSample()
 
   TCollection_AsciiString aPointName("P");
 
-  for (Standard_Integer i = aPntArray.Lower(); i <= aPntArray.Upper(); i++)
-  {
+  for (Standard_Integer i = aPntArray.Lower(); i <= aPntArray.Upper(); i++) {
     TCollection_AsciiString aString(i);
     aString = aPointName + aString;
     DisplayPnt(aPntArray(i), aString, Aspect_TOM_STAR);
@@ -651,10 +647,9 @@ void GeometrySamples::BarycenterPoint3dSample()
 
   DisplayPnt(aBarycenterPnt5, "Barycenter of 5 points", Aspect_TOM_O_STAR);
   myResult << " IsPoint = ";
-  if (IsPoint)
-  {
-    myResult << "True   -->  " << " P ( " << aBarycenterPnt5.X() 
-             << aBarycenterPnt5.Y() << aBarycenterPnt5.Z() << " );" << std::endl;
+  if (IsPoint) {
+    myResult << "True   -->  " << " P ( " << aBarycenterPnt5.X()
+      << aBarycenterPnt5.Y() << aBarycenterPnt5.Z() << " );" << std::endl;
   }
   else
     myResult << "False";
@@ -700,19 +695,19 @@ void GeometrySamples::MirroredLine3dSample()
   gp_Ax2 aXyzAxis;
   gp_Lin aMirroredLin = aBaseLin.Mirrored(aXyzAxis);
 
-  Handle(AdaptorVec_AIS) aBaseLineAis = 
+  Handle(AdaptorVec_AIS) aBaseLineAis =
     new AdaptorVec_AIS(aBaseLin.Location(), aBaseLin.Direction(), 8.0);
   aBaseLineAis->SetText("Base Line");
   myObject3d.Append(aBaseLineAis);
-  Handle(AdaptorVec_AIS) aMirroredLineAis = 
+  Handle(AdaptorVec_AIS) aMirroredLineAis =
     new AdaptorVec_AIS(aMirroredLin.Location(), aMirroredLin.Direction(), 8.0);
   aMirroredLineAis->SetText("Mirrored Line");
   myObject3d.Append(aMirroredLineAis);
-  Handle(AIS_Plane) anAisPlane = 
+  Handle(AIS_Plane) anAisPlane =
     new AIS_Plane(new Geom_Plane(gp_Ax3(aXyzAxis)), aXyzAxis.Location(),
-                  gp_Pnt(10.0, 10.0, 0.0),
-                  gp_Pnt(-10.0, -10.0, 0.0),
-                  Standard_False);
+      gp_Pnt(10.0, 10.0, 0.0),
+      gp_Pnt(-10.0, -10.0, 0.0),
+      Standard_False);
   myObject3d.Append(anAisPlane);
   Standard_Real anAdgle = aBaseLin.Angle(aMirroredLin)*180.0 / M_PI;
   myResult << "An angle between lines = " << anAdgle << std::endl;
@@ -835,8 +830,7 @@ void GeometrySamples::MinimalDistance3dSample()
   {
     NCollection_Array1<gp_Vec> aVecArray(1, anExtrema_ExtElCS.NbExt());
     NCollection_Array1<gp_Pnt> aPntArray(1, anExtrema_ExtElCS.NbExt());
-    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++)
-    {
+    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++) {
       Extrema_POnCurv aCurvPoint;
       Extrema_POnSurf aSurfPoint;
       anExtrema_ExtElCS.Points(i, aCurvPoint, aSurfPoint);
@@ -851,15 +845,13 @@ void GeometrySamples::MinimalDistance3dSample()
     }
     Standard_Integer aMinDistIndex(0);
     Standard_Real aMinDistance = std::numeric_limits<Standard_Real>::max();
-    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++)
-    {
-      if (aMinDistance > aVecArray(i).Magnitude())
-      {
+    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++) {
+      if (aMinDistance > aVecArray(i).Magnitude()) {
         aMinDistIndex = i;
         aMinDistance = aVecArray(i).Magnitude();
       }
     }
-    Handle(AdaptorVec_AIS) anMinDistanceAis = 
+    Handle(AdaptorVec_AIS) anMinDistanceAis =
       new AdaptorVec_AIS(aPntArray(aMinDistIndex), aVecArray(aMinDistIndex));
     anMinDistanceAis->SetText("Min distance");
     myObject3d.Append(anMinDistanceAis);
@@ -879,10 +871,8 @@ void GeometrySamples::Intersection3dSample()
   gp_Cone aCone(gp_Ax3(gp_Pnt(), gp_Dir(0.0, 0.0, 1.0)), 0.25*M_PI, 0.0);
   IntAna_Quadric anIntAna_Quadric(aCone);
   IntAna_IntConicQuad anIntAna_IntConicQuad(aLine, anIntAna_Quadric);
-  if (anIntAna_IntConicQuad.IsDone())
-  {
-    for (int i = 1; i <= anIntAna_IntConicQuad.NbPoints(); i++)
-    {
+  if (anIntAna_IntConicQuad.IsDone()) {
+    for (int i = 1; i <= anIntAna_IntConicQuad.NbPoints(); i++) {
       const gp_Pnt& aIntersectionPnt = anIntAna_IntConicQuad.Point(i);
       DisplayPnt(aIntersectionPnt, TCollection_AsciiString(i));
     }
@@ -913,7 +903,7 @@ void GeometrySamples::RotatedDirection2dSample()
   gp_Dir2d aBaseDir(1.0, 1.0);
   gp_Dir2d aRotatedDir = aBaseDir.Rotated(M_PI_4);
 
-  myResult << "An angle between directions: " << aBaseDir.Angle(aRotatedDir)*180.0/M_PI << " grad";
+  myResult << "An angle between directions: " << aBaseDir.Angle(aRotatedDir)*180.0 / M_PI << " grad";
   Handle(AdaptorVec_AIS) aBaseAIS = new AdaptorVec_AIS(gp_Pnt2d(), aBaseDir, 5.0);
   aBaseAIS->SetText("Base");
   myObject2d.Append(aBaseAIS);
@@ -1004,10 +994,8 @@ void GeometrySamples::Tangent2dSample()
   GccEnt_QualifiedCirc aQaCirc2(aCirc2, GccEnt_outside);
 
   GccAna_Lin2d2Tan aLin2d2Tan(aQaCirc1, aQaCirc2, 1E-6);
-  if (aLin2d2Tan.IsDone())
-  {
-    for (int i = 1; i <= aLin2d2Tan.NbSolutions(); i++)
-    {
+  if (aLin2d2Tan.IsDone()) {
+    for (int i = 1; i <= aLin2d2Tan.NbSolutions(); i++) {
       const gp_Lin2d& aTangentLin = aLin2d2Tan.ThisSolution(i);
       Handle(AdaptorVec_AIS) anAisLin = new AdaptorVec_AIS(aTangentLin.Location(), aTangentLin.Direction(), 20.0);
       myObject2d.Append(anAisLin);
@@ -1043,11 +1031,10 @@ void GeometrySamples::MinimalDistance2dSample()
   gp_Circ2d aCirc(gp_Ax2d(), 20.0);
   Handle(Geom2d_Circle) aGeom_Circle = new Geom2d_Circle(aCirc);
 
-  Geom2dAPI_ExtremaCurveCurve anExtremaFinder(aGeom_Line, aGeom_Circle,  
+  Geom2dAPI_ExtremaCurveCurve anExtremaFinder(aGeom_Line, aGeom_Circle,
     std::numeric_limits<Standard_Real>::min(),
     std::numeric_limits<Standard_Real>::max(), 0.0, M_PI*2.0);
-  if (anExtremaFinder.NbExtrema())
-  {
+  if (anExtremaFinder.NbExtrema()) {
     gp_Pnt2d aPnt1, aPnt2;
     anExtremaFinder.NearestPoints(aPnt1, aPnt2);
     myResult << "Extrema found: " << anExtremaFinder.NbExtrema() << std::endl;
@@ -1073,13 +1060,12 @@ void GeometrySamples::Intersection2dSample()
   Handle(Geom2d_Parabola) aGeom_Parabola = new Geom2d_Parabola(aParab);
 
   Geom2dAPI_InterCurveCurve anIntersectFinder(aGeom_Line, aGeom_Parabola);
-  for(Standard_Integer i = 1; i <= anIntersectFinder.NbPoints(); i++)
-  {
+  for (Standard_Integer i = 1; i <= anIntersectFinder.NbPoints(); i++) {
     gp_Pnt2d aPnt = anIntersectFinder.Point(i);
     DisplayPnt(aPnt, i);
   }
 
-  myResult  << "Number of intersections : " << anIntersectFinder.NbPoints() << std::endl;
+  myResult << "Number of intersections : " << anIntersectFinder.NbPoints() << std::endl;
 
   Handle(Geom2d_Parabola) aGeomParabola = new Geom2d_Parabola(aParab);
   Handle(Geom2d_TrimmedCurve) aTrimmedParabola = new Geom2d_TrimmedCurve(aGeomParabola, 60.0, -60.0);
@@ -1093,9 +1079,9 @@ void GeometrySamples::Intersection2dSample()
 void GeometrySamples::PointInfo3dSample()
 {
   gp_Pnt aPnt1;
-  gp_Pnt aPnt2(10.0,  10.0, 0.0);
-  gp_Pnt aPnt3(10.0, -10.0, 0.0);    
-  gp_Pnt aPnt4(10.0,  10.0, 0.0); 
+  gp_Pnt aPnt2(10.0, 10.0, 0.0);
+  gp_Pnt aPnt3(10.0, -10.0, 0.0);
+  gp_Pnt aPnt4(10.0, 10.0, 0.0);
   Standard_Boolean anIsEqual2_3 = aPnt2.IsEqual(aPnt3, 1E-6);
   Standard_Boolean anIsEqual2_4 = aPnt2.IsEqual(aPnt4, 1E-6);
   Standard_Real aDistance1_2 = aPnt1.Distance(aPnt2);
@@ -1103,8 +1089,8 @@ void GeometrySamples::PointInfo3dSample()
   Standard_Real aSquareDistance1_2 = aPnt1.SquareDistance(aPnt2);
   Standard_Real aSquareDistance2_4 = aPnt2.SquareDistance(aPnt4);
 
-  myResult << "A coordinate of a point 1: X: " << aPnt1.X() 
-           << " Y: " << aPnt1.Y() << " Z: " << aPnt1.Z() << std::endl;
+  myResult << "A coordinate of a point 1: X: " << aPnt1.X()
+    << " Y: " << aPnt1.Y() << " Z: " << aPnt1.Z() << std::endl;
   if (anIsEqual2_3)
     myResult << "a point 2 is equal to a point 3" << std::endl;
   else
@@ -1196,37 +1182,31 @@ void GeometrySamples::PointInfo2dSample()
 void GeometrySamples::CircleInfo2dSample()
 {
   gp_Circ2d aCirc(gp_Ax22d(gp_Pnt2d(10.0, 10.0), gp_Vec2d(1.0, 0.0)), 10.0);
-  gp_Pnt2d aPnt1( 0.0, 10.0);
-  gp_Pnt2d aPnt2(10.0,  0.0);
+  gp_Pnt2d aPnt1(0.0, 10.0);
+  gp_Pnt2d aPnt2(10.0, 0.0);
   gp_Pnt2d aPnt3(20.0, 20.0);
 
-  if (aCirc.Contains(aPnt1, 1E-6))
-  {
+  if (aCirc.Contains(aPnt1, 1E-6)) {
     DisplayPnt(aPnt1, "1", Aspect_TOM_STAR);
     myResult << "A circle contains a point 1" << std::endl;
   }
-  else
-  {
+  else {
     DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS);
     myResult << "A circle does contain a point 1" << std::endl;
   }
-  if (aCirc.Contains(aPnt2, 1E-6))
-  {
+  if (aCirc.Contains(aPnt2, 1E-6)) {
     DisplayPnt(aPnt2, "2", Aspect_TOM_STAR);
     myResult << "A circle contains a point 2" << std::endl;
   }
-  else
-  {
+  else {
     DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS);
     myResult << "A circle does contain a point 2" << std::endl;
   }
-  if (aCirc.Contains(aPnt3, 1E-6))
-  {
+  if (aCirc.Contains(aPnt3, 1E-6)) {
     DisplayPnt(aPnt3, "3", Aspect_TOM_STAR);
     myResult << "A circle contains a point 3" << std::endl;
   }
-  else
-  {
+  else {
     DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS);
     myResult << "A circle does contain a point 3" << std::endl;
   }
@@ -1239,8 +1219,8 @@ void GeometrySamples::CircleInfo2dSample()
 void GeometrySamples::FreeStyleCurves3dSample()
 {
   // Define points.
-  gp_Pnt aPnt1(0.0,  0.0, 0.0);
-  gp_Pnt aPnt2(5.0,  5.0, 0.0);
+  gp_Pnt aPnt1(0.0, 0.0, 0.0);
+  gp_Pnt aPnt2(5.0, 5.0, 0.0);
   gp_Pnt aPnt3(10.0, 5.0, 0.0);
   gp_Pnt aPnt4(15.0, 0.0, 0.0);
 
@@ -1362,12 +1342,10 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
 {
   // Define a 4x4 grid of points for BSpline surface.
   TColgp_Array2OfPnt aBSplinePnts(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i)
-  {
+  for (Standard_Integer i = 1; i <= 4; ++i) {
     gp_Pnt aPnt;
     aPnt.SetX(5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j)
-    {
+    for (Standard_Integer j = 1; j <= 4; ++j) {
       aPnt.SetY(5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
         aPnt.SetZ(5.0);
@@ -1379,12 +1357,10 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
 
   // Define a 4x4 grid of points for Bezier surface.
   TColgp_Array2OfPnt aBezierPnts(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i)
-  {
+  for (Standard_Integer i = 1; i <= 4; ++i) {
     gp_Pnt aPnt;
     aPnt.SetX(20.0 + 5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j)
-    {
+    for (Standard_Integer j = 1; j <= 4; ++j) {
       aPnt.SetY(20.0 + 5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
         aPnt.SetZ(5.0);
@@ -1396,10 +1372,8 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
 
   // Define BSpline weights.
   TColStd_Array2OfReal aBSplineWeights(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i)
-  {
-    for (Standard_Integer j = 1; j <= 4; ++j)
-    {
+  for (Standard_Integer i = 1; i <= 4; ++i) {
+    for (Standard_Integer j = 1; j <= 4; ++j) {
       if (1 < i && i < 4 && 1 < j && j < 4)
         aBSplineWeights.SetValue(i, j, 0.5);
       else
@@ -1435,10 +1409,8 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
 
   // Define BSpline weights.
   TColStd_Array2OfReal aBezierWeights(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i)
-  {
-    for (Standard_Integer j = 1; j <= 4; ++j)
-    {
+  for (Standard_Integer i = 1; i <= 4; ++i) {
+    for (Standard_Integer j = 1; j <= 4; ++j) {
       if (1 < i && i < 4 && 1 < j && j < 4)
         aBezierWeights.SetValue(i, j, 1.5);
       else
@@ -1458,12 +1430,10 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
   anAisBezierSurf->SetColor(Quantity_Color(Quantity_NOC_GREEN));
   myObject3d.Append(anAisBSplineSurf);
   myObject3d.Append(anAisBezierSurf);
-  for (TColgp_Array2OfPnt::Iterator anIt(aBSplinePnts); anIt.More(); anIt.Next())
-  {
+  for (TColgp_Array2OfPnt::Iterator anIt(aBSplinePnts); anIt.More(); anIt.Next()) {
     myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
   }
-  for (TColgp_Array2OfPnt::Iterator anIt(aBezierPnts); anIt.More(); anIt.Next())
-  {
+  for (TColgp_Array2OfPnt::Iterator anIt(aBezierPnts); anIt.More(); anIt.Next()) {
     myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
   }
 }
@@ -1506,7 +1476,7 @@ void GeometrySamples::FreeStyleCurves2dSample()
   Standard_Boolean aPeriodic = Standard_False;
 
   // Create a BSpline curve.
-  Handle(Geom2d_BSplineCurve) aBSplineCurve = 
+  Handle(Geom2d_BSplineCurve) aBSplineCurve =
     new Geom2d_BSplineCurve(aBSplinePoles, aBSplineWeights, aKnots, aMults, aDegree, aPeriodic);
 
 
@@ -1590,7 +1560,7 @@ void GeometrySamples::OffsetCurve3dSample()
 
   // Expand the circle by Offset equal to a quater of the radius
   // with direction V equal to Z.
-  Standard_Real anExpandOffset = + aCirc.Radius() / 4.0;
+  Standard_Real anExpandOffset = +aCirc.Radius() / 4.0;
   gp_Dir anExpandDir = gp::DZ();
   Handle(Geom_OffsetCurve) anExpandCircCurve = new Geom_OffsetCurve(
     aCircCurve, anExpandOffset, anExpandDir);
@@ -1598,7 +1568,7 @@ void GeometrySamples::OffsetCurve3dSample()
 
   // Collapse the circle by Offset equal to a half of the radius
   // with direction V equal to Z.
-  Standard_Real anCollapseOffset = - aCirc.Radius() / 2.0;
+  Standard_Real anCollapseOffset = -aCirc.Radius() / 2.0;
   gp_Dir anCollapseDir = gp::DZ();
   Handle(Geom_OffsetCurve) anCollapseCircCurve = new Geom_OffsetCurve(
     aCircCurve, anCollapseOffset, anCollapseDir);
@@ -1633,11 +1603,10 @@ void GeometrySamples::BSplineFromCircle3dSample()
   myResult << "Degree:   " << aBSplineFromCirc->Degree() << std::endl;
   myResult << "Periodic: " << (aBSplineFromCirc->IsPeriodic() ? "Yes" : "No") << std::endl;
   myResult << "Poles: [" << aBSplineFromCirc->Poles().Size() << "]" << std::endl;
-  for (TColgp_Array1OfPnt::Iterator anIt(aBSplineFromCirc->Poles()); anIt.More(); anIt.Next())
-  {
-    myResult << "  (" 
-      << anIt.Value().X() 
-      << ", " << anIt.Value().Y() << ", " 
+  for (TColgp_Array1OfPnt::Iterator anIt(aBSplineFromCirc->Poles()); anIt.More(); anIt.Next()) {
+    myResult << "  ("
+      << anIt.Value().X()
+      << ", " << anIt.Value().Y() << ", "
       << anIt.Value().Z() << ")" << std::endl;
   }
 
@@ -1664,7 +1633,7 @@ void GeometrySamples::TrimmedSurface3dSample()
   Standard_Real aUMax = 30.0;
   Standard_Real aVMin = 0.0;
   Standard_Real aVMax = 50.0;
-  Handle(Geom_RectangularTrimmedSurface) aTrimmedPlaneSurf 
+  Handle(Geom_RectangularTrimmedSurface) aTrimmedPlaneSurf
     = new Geom_RectangularTrimmedSurface(aPlaneSurf, aUMin, aUMax, aVMin, aVMax);
   myResult << "Geom_RectangularTrimmedSurface was created in red" << std::endl;
 
@@ -1729,15 +1698,15 @@ void GeometrySamples::ExtrusionSurface3dSample()
 
   // Make a linear extrusion of the ellipse at 45 degrees to Z axis
   gp_Dir aDirOfExtr = gp::DZ();
-  Handle(Geom_SurfaceOfLinearExtrusion) aLinExtrSurf 
+  Handle(Geom_SurfaceOfLinearExtrusion) aLinExtrSurf
     = new Geom_SurfaceOfLinearExtrusion(anEllipseCurve, aDirOfExtr);
   myResult << "Geom_SurfaceOfLinearExtrusion was created in red" << std::endl;
 
   Handle(AIS_ColoredShape) anAisEllipse = new AIS_ColoredShape(
     BRepBuilderAPI_MakeEdge(anEllipseCurve).Shape());
   Handle(AIS_ColoredShape) anAisExtrSurf = new AIS_ColoredShape(
-    BRepBuilderAPI_MakeFace(aLinExtrSurf, 0.0, 2.0 * M_PI, 0.0, 30.0, 
-                            Precision::Confusion()).Shape());
+    BRepBuilderAPI_MakeFace(aLinExtrSurf, 0.0, 2.0 * M_PI, 0.0, 30.0,
+      Precision::Confusion()).Shape());
   anAisEllipse->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
   anAisEllipse->SetWidth(2.5);
   anAisExtrSurf->SetColor(Quantity_Color(Quantity_NOC_RED));
@@ -1752,12 +1721,12 @@ void GeometrySamples::RevolutionSurface3dSample()
   Standard_Real aMinorRadius = 5.0;
   Standard_Real aMajorRadius = 10.0;
   gp_Pnt aCenter(-30.0, 0.0, 0.0);
-  Handle(Geom_Ellipse) anEllipseCurve = new Geom_Ellipse(gp_Ax2(aCenter, gp::DZ()), 
-                                                         aMajorRadius, aMinorRadius);
+  Handle(Geom_Ellipse) anEllipseCurve = new Geom_Ellipse(gp_Ax2(aCenter, gp::DZ()),
+    aMajorRadius, aMinorRadius);
   myResult << "Geom_Ellipse was created in yellow" << std::endl;
 
   // Make a revolution of the ellipse around Y axis
-  Handle(Geom_SurfaceOfRevolution) aRevolSurf 
+  Handle(Geom_SurfaceOfRevolution) aRevolSurf
     = new Geom_SurfaceOfRevolution(anEllipseCurve, gp::OY());
   myResult << "Geom_SurfaceOfRevolution was created in red" << std::endl;
 
@@ -1788,16 +1757,16 @@ void GeometrySamples::TrimmedCurve2dSample()
 
 void GeometrySamples::OffsetCurve2dSample()
 {
-  Handle(Geom2d_Circle) aGeomCircle = 
+  Handle(Geom2d_Circle) aGeomCircle =
     new Geom2d_Circle(gp_Ax2d(gp_Pnt2d(), gp_Vec2d(1.0, 0.0)), 5.0);
 
   Standard_Real anExpandOffset = aGeomCircle->Radius() / 4.0;
-  Handle(Geom2d_OffsetCurve) anExpandCircCurve = 
+  Handle(Geom2d_OffsetCurve) anExpandCircCurve =
     new Geom2d_OffsetCurve(aGeomCircle, anExpandOffset);
 
   Standard_Real anCollapseOffset = -aGeomCircle->Radius() / 2.0;
   gp_Dir anCollapseDir = gp::DZ();
-  Handle(Geom2d_OffsetCurve) anCollapseCircCurve = 
+  Handle(Geom2d_OffsetCurve) anCollapseCircCurve =
     new Geom2d_OffsetCurve(aGeomCircle, anCollapseOffset);
 
   Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeomCircle);
@@ -1812,12 +1781,10 @@ void GeometrySamples::BoundingBoxOfSurface3dSample()
 {
   // Define a 4x4 grid of points for BSpline surface.
   TColgp_Array2OfPnt aPoints(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i)
-  {
+  for (Standard_Integer i = 1; i <= 4; ++i) {
     gp_Pnt aPnt;
     aPnt.SetX(5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j)
-    {
+    for (Standard_Integer j = 1; j <= 4; ++j) {
       aPnt.SetY(5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
         aPnt.SetZ(5.0);
@@ -1828,14 +1795,14 @@ void GeometrySamples::BoundingBoxOfSurface3dSample()
   }
 
   // Make a BSpline surface from the points array.
-  Handle(Geom_BSplineSurface) aBSplineSurf 
+  Handle(Geom_BSplineSurface) aBSplineSurf
     = GeomAPI_PointsToBSplineSurface(aPoints).Surface();
   myResult << "Geom_BSplineSurface was created" << std::endl;
 
   // Compute BSpline surface bounding box.
   Bnd_Box aBndBox;
-  BndLib_AddSurface::AddOptimal(GeomAdaptor_Surface(aBSplineSurf), 
-                                Precision::Confusion(), aBndBox);
+  BndLib_AddSurface::AddOptimal(GeomAdaptor_Surface(aBSplineSurf),
+    Precision::Confusion(), aBndBox);
   myResult << "Bounding box:" << std::endl;
   myResult << "  Min corner = [ "
     << aBndBox.CornerMin().X() << ", "
@@ -1875,14 +1842,14 @@ void GeometrySamples::BoundingBoxOfCurves3dSample()
 
   // Compute BSpline curve bounding box.
   Bnd_Box aBndBox;
-  BndLib_Add3dCurve::AddOptimal(GeomAdaptor_Curve(aBSplineCurve), 
-                                Precision::Confusion(), aBndBox);
+  BndLib_Add3dCurve::AddOptimal(GeomAdaptor_Curve(aBSplineCurve),
+    Precision::Confusion(), aBndBox);
   myResult << "Bounding box:" << std::endl;
-  myResult << "  Min corner = [ " 
+  myResult << "  Min corner = [ "
     << aBndBox.CornerMin().X() << ", "
     << aBndBox.CornerMin().Y() << ", "
     << aBndBox.CornerMin().Z() << " ]" << std::endl;
-  myResult << "  Max corner = [ " 
+  myResult << "  Max corner = [ "
     << aBndBox.CornerMax().X() << ", "
     << aBndBox.CornerMax().Y() << ", "
     << aBndBox.CornerMax().Z() << " ]" << std::endl;
@@ -1898,10 +1865,10 @@ void GeometrySamples::BoundingBoxOfCurves3dSample()
 void GeometrySamples::BoundingBoxOfCurves2dSample()
 {
   // Define points.
-  gp_Pnt2d aPnt1( 0.0,  0.0);
-  gp_Pnt2d aPnt2( 5.0,  5.0);
+  gp_Pnt2d aPnt1(0.0, 0.0);
+  gp_Pnt2d aPnt2(5.0, 5.0);
   gp_Pnt2d aPnt3(10.0, 10.0);
-  gp_Pnt2d aPnt4(15.0,  5.0);
+  gp_Pnt2d aPnt4(15.0, 5.0);
 
   // Add points to the curve poles array.
   TColgp_Array1OfPnt2d aPoles(1, 4);
@@ -1962,8 +1929,8 @@ void GeometrySamples::DumpCircleInfoSample()
   anAisCenterLabel->SetText("Center");
   anAisCenterLabel->SetPosition(aCircCurve->Position().Location());
   Handle(AIS_Point) anAisCenter = new AIS_Point(new Geom_CartesianPoint(aCirc.Location()));
-  Handle(AIS_Axis) anAisAxis = new AIS_Axis(new Geom_Axis2Placement(aCircCurve->Position()), 
-                                                                    AIS_TOAX_ZAxis);
+  Handle(AIS_Axis) anAisAxis = new AIS_Axis(new Geom_Axis2Placement(aCircCurve->Position()),
+    AIS_TOAX_ZAxis);
   myObject3d.Append(anAisCircle);
   myObject3d.Append(anAisCenterLabel);
   myObject3d.Append(anAisAxis);
@@ -1988,8 +1955,8 @@ void GeometrySamples::DumpBSplineCurveInfoSample()
   Handle(Geom_BSplineCurve) aBSplineCurve = GeomAPI_PointsToBSpline(aPoles).Curve();
   myResult << "aBSplineCurve was created:" << std::endl;
   myResult << "  Degree = " << aBSplineCurve->Degree() << std::endl;
-  myResult << "  Parameter range = [ " 
-    << aBSplineCurve->FirstParameter() << ", " 
+  myResult << "  Parameter range = [ "
+    << aBSplineCurve->FirstParameter() << ", "
     << aBSplineCurve->LastParameter() << " ]"
     << std::endl;
   NCollection_List<Standard_Real> aParams;
@@ -2004,15 +1971,15 @@ void GeometrySamples::DumpBSplineCurveInfoSample()
     gp_Vec aVec;
     aBSplineCurve->D1(aParam, aPnt, aVec);
     myResult << "    Param = " << aParam << std::endl;
-    myResult << "        P = [ " << aPnt.X() << ", " 
-                                 << aPnt.Y() << ", " 
-                                 << aPnt.Z() << " ]" << std::endl;
-    myResult << "        D = [ " << aVec.X() << ", " 
-                                 << aVec.Y() << ", " 
-                                 << aVec.Z() << " ]" << std::endl;
+    myResult << "        P = [ " << aPnt.X() << ", "
+      << aPnt.Y() << ", "
+      << aPnt.Z() << " ]" << std::endl;
+    myResult << "        D = [ " << aVec.X() << ", "
+      << aVec.Y() << ", "
+      << aVec.Z() << " ]" << std::endl;
     myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(aPnt)));
     Handle(AIS_TextLabel) anAisCenterLabel = new AIS_TextLabel();
-    Standard_SStream aSS; 
+    Standard_SStream aSS;
     aSS << "P [" << aPnt.X() << ", " << aPnt.Y() << ", " << aPnt.Z() << "]" << std::endl;
     aSS << "D [" << aVec.X() << ", " << aVec.Y() << ", " << aVec.Z() << "]" << std::endl;
     anAisCenterLabel->SetText(aSS.str().c_str());

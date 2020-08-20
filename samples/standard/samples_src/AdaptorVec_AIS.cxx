@@ -61,9 +61,9 @@ AdaptorVec_AIS::AdaptorVec_AIS(const gp_Pnt2d& aPnt2d, const gp_Vec2d& aVec2d, S
 AdaptorVec_AIS::AdaptorVec_AIS(const gp_Pnt2d & aPnt1, const gp_Pnt2d & aPnt2, Standard_Real anArrowLength)
   : myPnt(gp_Pnt(aPnt1.X(), aPnt1.Y(), 0.0))
 {
-    gp_Vec aVec(aPnt2.X() - aPnt1.X(), aPnt2.Y() - aPnt1.Y(), 0.0);
-    myDir = gp_Dir(aVec);
-    myLength = aVec.Magnitude();
+  gp_Vec aVec(aPnt2.X() - aPnt1.X(), aPnt2.Y() - aPnt1.Y(), 0.0);
+  myDir = gp_Dir(aVec);
+  myLength = aVec.Magnitude();
 }
 
 
@@ -96,8 +96,7 @@ void AdaptorVec_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPres
     anArrowAspect->Length());
 
   // Draw text
-  if (myText.Length() != 0)
-  {
+  if (myText.Length() != 0) {
     gp_Pnt aTextPosition = aLastPoint;
     Prs3d_Text::Draw(Prs3d_Root::CurrentGroup(aPresentation),
       myDrawer->TextAspect(),

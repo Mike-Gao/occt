@@ -51,8 +51,7 @@ void Viewer2dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     ClearGrid2dSample();
   else if (theSampleName == "BackgroungImage2dSample")
     BackgroungImage2dSample();
-  else
-  {
+  else {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -79,8 +78,7 @@ Standard_Boolean Viewer2dSamples::IsShadedSample(TCollection_AsciiString theSamp
 void Viewer2dSamples::TextView2dSample()
 {
   Standard_Integer aColor = Quantity_NameOfColor::Quantity_NOC_MATRABLUE;
-  for (Standard_Integer j = 15; j <= 20; j++)
-  {
+  for (Standard_Integer j = 15; j <= 20; j++) {
     Handle(AIS_TextLabel) aText = new AIS_TextLabel();
     aText->SetText(TCollection_AsciiString("font 0 scale ") + (j / 20.0));
     aText->SetPosition(gp_Pnt(0.0, 15.0 * (j - 15.0), 0.0));
@@ -95,8 +93,7 @@ void Viewer2dSamples::TextView2dSample()
     myObject2d.Append(aText);
   }
 
-  for (Standard_Real j = 10; j <= 15; j++)
-  {
+  for (Standard_Real j = 10; j <= 15; j++) {
     Handle(AIS_TextLabel) aText = new AIS_TextLabel();
     aText->SetText(TCollection_AsciiString("font 1 scale ") + (j / 10.0));
     aText->SetPosition(gp_Pnt(80.0, 15.0 * (j - 10.0), 0.0));
@@ -112,8 +109,7 @@ void Viewer2dSamples::TextView2dSample()
   }
 
   aColor = Quantity_NOC_MATRABLUE;
-  for (Standard_Real j = 5; j <= 10; j++)
-  {
+  for (Standard_Real j = 5; j <= 10; j++) {
     Handle(AIS_TextLabel) aText = new AIS_TextLabel();
     aText->SetText(TCollection_AsciiString("font 2 scale ") + (j / 10.0));
     aText->SetPosition(gp_Pnt(140.0, 15.0 * (j - 5.0), 0.0));
@@ -127,8 +123,7 @@ void Viewer2dSamples::TextView2dSample()
     aText->SetZoomable(Standard_False);
     myObject2d.Append(aText);
   }
-  for (Standard_Real j = 10; j <= 15; j++)
-  {
+  for (Standard_Real j = 10; j <= 15; j++) {
     Handle(AIS_TextLabel) aText = new AIS_TextLabel();
     aText->SetText(TCollection_AsciiString("font 3 scale ") + (j / 10.0));
     aText->SetPosition(gp_Pnt(200.0, 15.0 * (j - 10.0), 0.0));
@@ -148,39 +143,32 @@ void Viewer2dSamples::MarkerView2dSample()
 {
   // generic Markers
   Standard_Integer aColor = 20;
-  for (int i = 1; i <= 2; i++)
-  {
+  for (int i = 1; i <= 2; i++) {
     Handle(Sample2D_Markers) aMarker =
       new Sample2D_Markers(10 + 5, 5 * i, Aspect_TOM_POINT, Quantity_NOC_YELLOW, 2.0);
     myObject2d.Append(aMarker);
   }
-  for (int i = 1; i <= 2; i++)
-  {
+  for (int i = 1; i <= 2; i++) {
     Handle(Sample2D_Markers) aMarker =
       new Sample2D_Markers(10 + 10, 5 * i, Aspect_TOM_O, (Quantity_NameOfColor)(aColor++));
     myObject2d.Append(aMarker);
   }
-  for (int i = 1; i <= 2; i++)
-  {
+  for (int i = 1; i <= 2; i++) {
     Handle(Sample2D_Markers) aMarker =
       new Sample2D_Markers(10 + 15, 5 * i, Aspect_TOM_O_PLUS, (Quantity_NameOfColor)(aColor++));
     myObject2d.Append(aMarker);
   }
-  for (int i = 1; i <= 2; i++)
-  {
+  for (int i = 1; i <= 2; i++) {
     Handle(Sample2D_Markers) aMarker =
       new Sample2D_Markers(10 + 20, 5 * i, Aspect_TOM_RING1, (Quantity_NameOfColor)(aColor++));
     myObject2d.Append(aMarker);
   }
-  for (int i = 1; i <= 2; i++)
-  {
-
+  for (int i = 1; i <= 2; i++) {
     Handle(Sample2D_Markers) aMarker =
       new Sample2D_Markers(10 + 25, 5 * i, Aspect_TOM_STAR, (Quantity_NameOfColor)(aColor++));
     myObject2d.Append(aMarker);
   }
-  for (int i = 1; i <= 2; i++)
-  {
+  for (int i = 1; i <= 2; i++) {
     Handle(Sample2D_Markers) aMarker =
       new Sample2D_Markers(10 + 30, 5 * i, Aspect_TOM_O_X, (Quantity_NameOfColor)(aColor++));
     myObject2d.Append(aMarker);
@@ -189,9 +177,8 @@ void Viewer2dSamples::MarkerView2dSample()
 
 void Viewer2dSamples::FillAreaView2dSample()
 {
-  for (int i = 0; i <= 13; ++i)
-    for (int j = 0; j <= 5; ++j)
-    {
+  for (int i = 0; i <= 13; ++i) {
+    for (int j = 0; j <= 5; ++j) {
       //set of rectangles here
       TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(10 * i, 10 * j, 0.), gp_Pnt(10 * i + 7, 10 * j, 0.));
       TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(10 * i + 7, 10 * j, 0.), gp_Pnt(10 * i + 7, 10 * j + 5, 0.));
@@ -215,6 +202,7 @@ void Viewer2dSamples::FillAreaView2dSample()
       myObject2d.Append(aRect);
 
     }
+  }
 }
 
 void Viewer2dSamples::LoopOnFaceView2dSample()
@@ -234,7 +222,7 @@ void Viewer2dSamples::LoopOnFaceView2dSample()
 
 void Viewer2dSamples::RectagularLineGrid2dSample()
 {
-  Handle(Graphic3d_AspectMarker3d) aGridAspect = 
+  Handle(Graphic3d_AspectMarker3d) aGridAspect =
     new Graphic3d_AspectMarker3d(Aspect_TOM_RING1, Quantity_NOC_WHITE, 2);
   myViewer->SetGridEcho(aGridAspect);
   Standard_Integer aWidth = 0, aHeight = 0, anOffset = 0;

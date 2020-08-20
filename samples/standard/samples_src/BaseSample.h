@@ -35,7 +35,7 @@ public:
   TCollection_AsciiString                           GetCode();
 
   virtual void Process(TCollection_AsciiString theSampleName);
-  void SetCodePach(TCollection_AsciiString theSampleSourcePach);
+  void SetCodePath(TCollection_AsciiString theSampleSourcePach);
 
   DEFINE_STANDARD_RTTI_INLINE(BaseSample, Standard_Transient)
 

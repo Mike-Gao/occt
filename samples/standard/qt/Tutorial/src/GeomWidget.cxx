@@ -21,8 +21,8 @@
 #include <QToolBar>
 
 GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
-                       DocumentCommon* theDocument2d,
-                       QWidget* parent)
+  DocumentCommon* theDocument2d,
+  QWidget* parent)
   : QWidget(parent),
   myDocument3d(theDocument3d),
   myDocument2d(theDocument2d)

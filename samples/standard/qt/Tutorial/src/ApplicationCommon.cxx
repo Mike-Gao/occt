@@ -107,18 +107,18 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
     return;
   }
 
-  connect(mySampleMapper,   static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
-          this, &ApplicationCommonWindow::onProcessSample);
+  connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+    this, &ApplicationCommonWindow::onProcessSample);
   connect(myExchangeMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
-          this, &ApplicationCommonWindow::onProcessExchange);  
-  connect(myOcafMapper,     static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
-          this, &ApplicationCommonWindow::onProcessOcaf);  
+    this, &ApplicationCommonWindow::onProcessExchange);
+  connect(myOcafMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+    this, &ApplicationCommonWindow::onProcessOcaf);
   connect(myViewer3dMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
-          this, &ApplicationCommonWindow::onProcessViewer3d);
+    this, &ApplicationCommonWindow::onProcessViewer3d);
   connect(myViewer2dMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
-          this, &ApplicationCommonWindow::onProcessViewer2d);
+    this, &ApplicationCommonWindow::onProcessViewer2d);
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
-  mySamples->SetCodePach(aSampleSourcePach);
+  mySamples->SetCodePath(aSampleSourcePach);
 
   setFocusPolicy(Qt::StrongFocus);
 
@@ -221,7 +221,7 @@ ApplicationCommonWindow::ApplicationType ApplicationCommonWindow::appTypeFromStr
     return Viewer3d;
   else  if (aParam == "viewer2d")
     return Viewer2d;
-  else  
+  else
     return Unknown;
 }
 
@@ -253,16 +253,16 @@ void ApplicationCommonWindow::createStandardOperations()
   myStdActions[HelpAbout] = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", ":/icons/help.png");
 
   // populate a menu with all actions
-  myFilePopup = new QMenu( this );
+  myFilePopup = new QMenu(this);
   myFilePopup = menuBar()->addMenu(tr("&File"));
   myFilePopup->addAction(myStdActions[FileQuit]);
 
-  for(QMenu* aSampleMenu: mySamplePopups) {
+  for (QMenu* aSampleMenu : mySamplePopups) {
     menuBar()->addMenu(aSampleMenu);
   }
 
   // add a help menu
-  QMenu * help = new QMenu( this );
+  QMenu * help = new QMenu(this);
   menuBar()->addSeparator();
   help = menuBar()->addMenu(tr("&Help"));
   help->addAction(myStdActions[HelpAbout]);
@@ -287,33 +287,33 @@ DocumentCommon* ApplicationCommonWindow::createNewDocument()
 
 void ApplicationCommonWindow::onAbout()
 {
-  QMessageBox::information( this, tr("Tutorial"), 
-                            tr("Qt based application to study OpenCASCADE Technology"), 
-                            tr("Ok" ), QString::null, QString::null, 0, 0 );
+  QMessageBox::information(this, tr("Tutorial"),
+    tr("Qt based application to study OpenCASCADE Technology"),
+    tr("Ok"), QString::null, QString::null, 0, 0);
 }
 
 QString ApplicationCommonWindow::getResourceDir()
 {
   static QString aResourceDir =
-    QString (OSD_Environment ("CSF_ResourcesDefaults").Value().ToCString());
+    QString(OSD_Environment("CSF_ResourcesDefaults").Value().ToCString());
   if (aResourceDir.isEmpty())
-    aResourceDir = QString (OSD_Environment ("CSF_OCCTResourcePath").Value().ToCString()) + "/samples";
+    aResourceDir = QString(OSD_Environment("CSF_OCCTResourcePath").Value().ToCString()) + "/samples";
 
   return aResourceDir;
 }
 
 TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
 {
-  TCollection_AsciiString aSampleSourceDir = OSD_Environment ("CSF_SampleSources").Value();
+  TCollection_AsciiString aSampleSourceDir = OSD_Environment("CSF_SampleSources").Value();
   return aSampleSourceDir;
 }
 
 
 template <typename PointerToMemberFunction>
 QAction* ApplicationCommonWindow::CreateAction(PointerToMemberFunction theHandlerMethod,
-                                               QString theActionName, 
-                                               QString theShortcut,
-                                               QString theIconName)
+  QString theActionName,
+  QString theShortcut,
+  QString theIconName)
 {
   QAction* aAction(NULL);
   if (theIconName.isEmpty()) {
@@ -332,17 +332,17 @@ QAction* ApplicationCommonWindow::CreateAction(PointerToMemberFunction theHandle
 
 template <typename PointerToMemberFunction>
 QAction* ApplicationCommonWindow::CreateSample(PointerToMemberFunction theHandlerMethod,
-                                                     const char* theActionName)
+  const char* theActionName)
 {
   QAction* aAction = new QAction(QObject::tr(theActionName), this);
   connect(aAction, &QAction::triggered, this, theHandlerMethod);
   return aAction;
 }
 
-void ApplicationCommonWindow::resizeEvent( QResizeEvent* e )
+void ApplicationCommonWindow::resizeEvent(QResizeEvent* e)
 {
-  QMainWindow::resizeEvent( e );
-  statusBar()->setSizeGripEnabled( !isMaximized() );
+  QMainWindow::resizeEvent(e);
+  statusBar()->setSizeGripEnabled(!isMaximized());
 }
 
 QMenu* ApplicationCommonWindow::getFilePopup()
@@ -433,17 +433,17 @@ void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
   if (aViewer2dSamples) {
     Standard_Boolean anIsFileSample = Viewer2dSamples::IsFileSample(theSampleName.toUtf8().data());
     QString aFileName;
-    if(anIsFileSample) {
+    if (anIsFileSample) {
       int aMode; // not used
       aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
       if (aFileName.isEmpty())
         return;
       aViewer2dSamples->SetFileName(aFileName.toUtf8().data());
     }
-    if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty()))  {
+    if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty())) {
       QApplication::setOverrideCursor(Qt::WaitCursor);
       mySamples->Process(theSampleName.toUtf8().data());
-      if(!Viewer2dSamples::IsShadedSample(theSampleName.toUtf8().data()))
+      if (!Viewer2dSamples::IsShadedSample(theSampleName.toUtf8().data()))
         myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_False);
       else
         myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_True);
@@ -458,7 +458,7 @@ void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
 }
 
 QString ApplicationCommonWindow::selectFileName(const QString& theSampleName,
-                                                TranslateDialog* theDialog, int& theMode)
+  TranslateDialog* theDialog, int& theMode)
 {
   std::shared_ptr<TranslateDialog> aDialog(theDialog);
 
@@ -569,7 +569,7 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
   QMenu* aMenu = new QMenu(theKey, theParent);
   if (theJsonValue.isObject()) {
     QJsonObject aBranchObject = theJsonValue.toObject();
-    for(const QString& aBranchKey: aBranchObject.keys()) {        
+    for (const QString& aBranchKey : aBranchObject.keys()) {
       aMenu->addMenu(MenuFromJsonObject(aBranchObject.value(aBranchKey), aBranchKey, aMenu, theMapper));
     }
     //QList< QPair<QString, QMenu*> >  aMenuList;
@@ -588,7 +588,7 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
   }
   else if (theJsonValue.isArray()) {
     QJsonArray aDataArray = theJsonValue.toArray();
-    for(const QJsonValue& aDataValue: aDataArray)
+    for (const QJsonValue& aDataValue : aDataArray)
     {
       if (aDataValue.isObject())
       {
@@ -599,8 +599,8 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
 
         theMapper->setMapping(anAction, aSampleName);
         connect(anAction, &QAction::triggered, theMapper,
-                static_cast<void (QSignalMapper::*)()>(&QSignalMapper::map));
-        }
+          static_cast<void (QSignalMapper::*)()>(&QSignalMapper::map));
+      }
     }
   }
   return aMenu;

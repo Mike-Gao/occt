@@ -44,12 +44,10 @@ void OcafSamples::Process(TCollection_AsciiString theSampleName)
   myObject2d.Clear();
   myCode.Clear();
   myIsProcessed = Standard_False;
-  try
-  {
+  try {
     ExecuteSample(theSampleName);
   }
-  catch (...)
-  {
+  catch (...) {
     TraceError(TCollection_AsciiString("Error in sample: ") + theSampleName);
   }
 }
@@ -78,8 +76,7 @@ void OcafSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     DialogSaveBinOcafSample();
   else if (theSampleName == "DialogSaveXmlOcafSample")
     DialogSaveXmlOcafSample();
-  else
-  {
+  else {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -139,57 +136,57 @@ void OcafSamples::CreateBoxOcafSample()
   // Open a new command (for undo)
   myOcafDoc->NewCommand();
 
-    // A data structure for our box:
-    // the box itself is attached to the BoxLabel label (as his name and his function attribute) 
-    // its arguments (dimensions: width, length and height; and position: x, y, z) 
-    // are attached to the child labels of the box:
-    // 0:1 Box Label ---> Name --->  Named shape ---> Function
-    //     0:1:1 -- Width Label
-    //     0:1:2 -- Length Label
-    //     0:1:3 -- Height Label
-    //     0:1:4 -- X Label
-    //     0:1:5 -- Y Label
-    //     0:1:6 -- Z Label
+  // A data structure for our box:
+  // the box itself is attached to the BoxLabel label (as his name and his function attribute) 
+  // its arguments (dimensions: width, length and height; and position: x, y, z) 
+  // are attached to the child labels of the box:
+  // 0:1 Box Label ---> Name --->  Named shape ---> Function
+  //     0:1:1 -- Width Label
+  //     0:1:2 -- Length Label
+  //     0:1:3 -- Height Label
+  //     0:1:4 -- X Label
+  //     0:1:5 -- Y Label
+  //     0:1:6 -- Z Label
 
-    // Create a new label in the data structure for the box
-    TDF_Label aLabel = TDF_TagSource::NewChild(myOcafDoc->Main());
+  // Create a new label in the data structure for the box
+  TDF_Label aLabel = TDF_TagSource::NewChild(myOcafDoc->Main());
 
-    Standard_Real aBoxWidth(30.0), aBoxLenght(20.0), aBoxHight(10.0);
-    Standard_Real aBoxX(0.0), aBoxY(0.0), aBoxZ(0.0);
-    Standard_CString aBoxName("OcafBox");
-    // Create the data structure : Set the dimensions, position and name attributes
-    TDataStd_Real::Set(aLabel.FindChild(1), aBoxWidth); 
-    TDataStd_Real::Set(aLabel.FindChild(2), aBoxLenght);
-    TDataStd_Real::Set(aLabel.FindChild(3), aBoxHight); 
-    TDataStd_Real::Set(aLabel.FindChild(4), aBoxX);
-    TDataStd_Real::Set(aLabel.FindChild(5), aBoxY);
-    TDataStd_Real::Set(aLabel.FindChild(6), aBoxZ);
-    TDataStd_Name::Set(aLabel, aBoxName); // Name
+  Standard_Real aBoxWidth(30.0), aBoxLenght(20.0), aBoxHight(10.0);
+  Standard_Real aBoxX(0.0), aBoxY(0.0), aBoxZ(0.0);
+  Standard_CString aBoxName("OcafBox");
+  // Create the data structure : Set the dimensions, position and name attributes
+  TDataStd_Real::Set(aLabel.FindChild(1), aBoxWidth);
+  TDataStd_Real::Set(aLabel.FindChild(2), aBoxLenght);
+  TDataStd_Real::Set(aLabel.FindChild(3), aBoxHight);
+  TDataStd_Real::Set(aLabel.FindChild(4), aBoxX);
+  TDataStd_Real::Set(aLabel.FindChild(5), aBoxY);
+  TDataStd_Real::Set(aLabel.FindChild(6), aBoxZ);
+  TDataStd_Name::Set(aLabel, aBoxName); // Name
 
 
-    // Instanciate a TFunction_Function attribute connected to the current box driver
-    // and attach it to the data structure as an attribute of the Box Label
-    Handle(TFunction_Function) myFunction = TFunction_Function::Set(aLabel, TOcafFunction_BoxDriver::GetID());
+  // Instanciate a TFunction_Function attribute connected to the current box driver
+  // and attach it to the data structure as an attribute of the Box Label
+  Handle(TFunction_Function) myFunction = TFunction_Function::Set(aLabel, TOcafFunction_BoxDriver::GetID());
 
-    // Initialize and execute the box driver (look at the "Execute()" code)
-    Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
+  // Initialize and execute the box driver (look at the "Execute()" code)
+  Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
 
-    Handle(TFunction_Driver) myBoxDriver;
-    // Find the TOcafFunction_BoxDriver in the TFunction_DriverTable using its GUID
-    if (!TFunction_DriverTable::Get()->FindDriver(TOcafFunction_BoxDriver::GetID(), myBoxDriver)) 
-      myResult << "Ocaf Box driver not found" << std::endl;
+  Handle(TFunction_Driver) myBoxDriver;
+  // Find the TOcafFunction_BoxDriver in the TFunction_DriverTable using its GUID
+  if (!TFunction_DriverTable::Get()->FindDriver(TOcafFunction_BoxDriver::GetID(), myBoxDriver))
+    myResult << "Ocaf Box driver not found" << std::endl;
 
-    myBoxDriver->Init(aLabel);
-    if (myBoxDriver->Execute(aLogBook)) 
-      myResult << "Create Box function execute failed" << std::endl;
+  myBoxDriver->Init(aLabel);
+  if (myBoxDriver->Execute(aLogBook))
+    myResult << "Create Box function execute failed" << std::endl;
 
-    // Get the TPrsStd_AISPresentation of the new box TNaming_NamedShape
-    Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
-    // Display it
-    anAisPresentation->Display(1);
-    // Attach an integer attribute to aLabel to memorize it's displayed
-    TDataStd_Integer::Set(aLabel, 1);
-    myContext->UpdateCurrentViewer();
+  // Get the TPrsStd_AISPresentation of the new box TNaming_NamedShape
+  Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
+  // Display it
+  anAisPresentation->Display(1);
+  // Attach an integer attribute to aLabel to memorize it's displayed
+  TDataStd_Integer::Set(aLabel, 1);
+  myContext->UpdateCurrentViewer();
 
   // Close the command (for undo)
   myOcafDoc->CommitCommand();
@@ -204,54 +201,54 @@ void OcafSamples::CreateCylinderOcafSample()
   // Open a new command (for undo)
   myOcafDoc->NewCommand();
 
-    // A data structure for our cylinder:
-    // the cylinder itself is attached to the CylinderLabel label (as his name and his function attribute) 
-    // its arguments (dimensions: radius and height; and position: x, y, z) 
-    // are attached to the child labels of the cylinder:
-    // 0:1 Cylinder Label ---> Name --->  Named shape ---> Function
-    //     0:1:1 -- Radius Label
-    //     0:1:2 -- Height Label
-    //     0:1:3 -- X Label
-    //     0:1:4 -- Y Label
-    //     0:1:5 -- Z Label
+  // A data structure for our cylinder:
+  // the cylinder itself is attached to the CylinderLabel label (as his name and his function attribute) 
+  // its arguments (dimensions: radius and height; and position: x, y, z) 
+  // are attached to the child labels of the cylinder:
+  // 0:1 Cylinder Label ---> Name --->  Named shape ---> Function
+  //     0:1:1 -- Radius Label
+  //     0:1:2 -- Height Label
+  //     0:1:3 -- X Label
+  //     0:1:4 -- Y Label
+  //     0:1:5 -- Z Label
 
-    // Create a new label in the data structure for the cylinder
-    TDF_Label aLabel = TDF_TagSource::NewChild(myOcafDoc->Main());
+  // Create a new label in the data structure for the cylinder
+  TDF_Label aLabel = TDF_TagSource::NewChild(myOcafDoc->Main());
 
-    Standard_Real aCylRadius(10.0), aCylHight(20.0);
-    Standard_Real aCylX(60.0), aCylY(40.0), aCylZ(0.0);
-    Standard_CString aCylName("OcafCylinder");
-    // Create the data structure : Set the dimensions, position and name attributes
-    TDataStd_Real::Set(aLabel.FindChild(1), aCylRadius);
-    TDataStd_Real::Set(aLabel.FindChild(2), aCylHight);
-    TDataStd_Real::Set(aLabel.FindChild(3), aCylX); 
-    TDataStd_Real::Set(aLabel.FindChild(4), aCylY); 
-    TDataStd_Real::Set(aLabel.FindChild(5), aCylZ); 
-    TDataStd_Name::Set(aLabel, aCylName);
+  Standard_Real aCylRadius(10.0), aCylHight(20.0);
+  Standard_Real aCylX(60.0), aCylY(40.0), aCylZ(0.0);
+  Standard_CString aCylName("OcafCylinder");
+  // Create the data structure : Set the dimensions, position and name attributes
+  TDataStd_Real::Set(aLabel.FindChild(1), aCylRadius);
+  TDataStd_Real::Set(aLabel.FindChild(2), aCylHight);
+  TDataStd_Real::Set(aLabel.FindChild(3), aCylX);
+  TDataStd_Real::Set(aLabel.FindChild(4), aCylY);
+  TDataStd_Real::Set(aLabel.FindChild(5), aCylZ);
+  TDataStd_Name::Set(aLabel, aCylName);
 
-    // Instanciate a TFunction_Function attribute connected to the current cylinder driver
-    // and attach it to the data structure as an attribute of the Cylinder Label
-    Handle(TFunction_Function) myFunction = TFunction_Function::Set(aLabel, TOcafFunction_CylDriver::GetID());
+  // Instanciate a TFunction_Function attribute connected to the current cylinder driver
+  // and attach it to the data structure as an attribute of the Cylinder Label
+  Handle(TFunction_Function) myFunction = TFunction_Function::Set(aLabel, TOcafFunction_CylDriver::GetID());
 
-    // Initialize and execute the cylinder driver (look at the "Execute()" code)
-    Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
+  // Initialize and execute the cylinder driver (look at the "Execute()" code)
+  Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
 
-    Handle(TFunction_Driver) myCylDriver;
-    // Find the TOcafFunction_CylDriver in the TFunction_DriverTable using its GUID
-    if (!TFunction_DriverTable::Get()->FindDriver(TOcafFunction_CylDriver::GetID(), myCylDriver))
-      myResult << "Ocaf Cylinder driver not found";
+  Handle(TFunction_Driver) myCylDriver;
+  // Find the TOcafFunction_CylDriver in the TFunction_DriverTable using its GUID
+  if (!TFunction_DriverTable::Get()->FindDriver(TOcafFunction_CylDriver::GetID(), myCylDriver))
+    myResult << "Ocaf Cylinder driver not found";
 
-    myCylDriver->Init(aLabel);
-    if (myCylDriver->Execute(aLogBook))
-      myResult << "Create Cylinder function execute failed";
+  myCylDriver->Init(aLabel);
+  if (myCylDriver->Execute(aLogBook))
+    myResult << "Create Cylinder function execute failed";
 
-    // Get the TPrsStd_AISPresentation of the new box TNaming_NamedShape
-    Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
-    // Display it
-    anAisPresentation->Display(1);
-    // Attach an integer attribute to aLabel to memorize it's displayed
-    TDataStd_Integer::Set(aLabel, 1);
-    myContext->UpdateCurrentViewer();
+  // Get the TPrsStd_AISPresentation of the new box TNaming_NamedShape
+  Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
+  // Display it
+  anAisPresentation->Display(1);
+  // Attach an integer attribute to aLabel to memorize it's displayed
+  TDataStd_Integer::Set(aLabel, 1);
+  myContext->UpdateCurrentViewer();
 
   // Close the command (for undo)
   myOcafDoc->CommitCommand();
@@ -266,16 +263,14 @@ void OcafSamples::ModifyBoxOcafSample()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   Standard_Integer aBoxCount(0);
-  for (Handle(AIS_InteractiveObject) anAisObject: anAisObjectsList)
-  {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
     // Get the main label of the selected object
     Handle(TPrsStd_AISPresentation) anAisPresentation = Handle(TPrsStd_AISPresentation)::DownCast(anAisObject->GetOwner());
     TDF_Label aLabel = anAisPresentation->Label();
 
     // Get the TFunction_Function attribute of the selected object
     Handle(TFunction_Function) aFunction;
-    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction))
-    {
+    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction)) {
       myResult << "Object cannot be modify.";
       return;
     }
@@ -283,8 +278,7 @@ void OcafSamples::ModifyBoxOcafSample()
     Standard_GUID myDriverID = aFunction->GetDriverGUID();
 
     // Case of a box created with the box function driver
-    if (myDriverID == TOcafFunction_BoxDriver::GetID())
-    {
+    if (myDriverID == TOcafFunction_BoxDriver::GetID()) {
       aBoxCount++;
       Standard_Real aBoxX, aBoxY, aBoxZ, aBoxWidth, aBoxLenght, aBoxHight;
 
@@ -311,35 +305,35 @@ void OcafSamples::ModifyBoxOcafSample()
 
       // Open a new command (for undo)
       myOcafDoc->NewCommand();
-        // Modify the box  - 1.5 times increase
-        aBoxWidth *= 1.5; aBoxLenght *= 1.5; aBoxHight *= 1.5;
+      // Modify the box  - 1.5 times increase
+      aBoxWidth *= 1.5; aBoxLenght *= 1.5; aBoxHight *= 1.5;
 
-        TDataStd_Real::Set(aLabel.FindChild(1), aBoxWidth);
-        TDataStd_Real::Set(aLabel.FindChild(2), aBoxLenght);
-        TDataStd_Real::Set(aLabel.FindChild(3), aBoxHight);
-        TDataStd_Real::Set(aLabel.FindChild(4), aBoxX);
-        TDataStd_Real::Set(aLabel.FindChild(5), aBoxY);
-        TDataStd_Real::Set(aLabel.FindChild(6), aBoxZ);
+      TDataStd_Real::Set(aLabel.FindChild(1), aBoxWidth);
+      TDataStd_Real::Set(aLabel.FindChild(2), aBoxLenght);
+      TDataStd_Real::Set(aLabel.FindChild(3), aBoxHight);
+      TDataStd_Real::Set(aLabel.FindChild(4), aBoxX);
+      TDataStd_Real::Set(aLabel.FindChild(5), aBoxY);
+      TDataStd_Real::Set(aLabel.FindChild(6), aBoxZ);
 
-        // Get the TFunction_FunctionDriver GUID used with the TFunction_Function
-        Standard_GUID myDriverID = aFunction->GetDriverGUID();
-        Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
-        Handle(TFunction_Driver) aBoxDriver;
-        // Find the TOcafFunction_BoxDriver in the TFunction_DriverTable using its GUID 
-        TFunction_DriverTable::Get()->FindDriver(myDriverID, aBoxDriver);
-        // Execute the cut if it must be (if an attribute changes)
-        aBoxDriver->Init(aLabel);
+      // Get the TFunction_FunctionDriver GUID used with the TFunction_Function
+      Standard_GUID myDriverID = aFunction->GetDriverGUID();
+      Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
+      Handle(TFunction_Driver) aBoxDriver;
+      // Find the TOcafFunction_BoxDriver in the TFunction_DriverTable using its GUID 
+      TFunction_DriverTable::Get()->FindDriver(myDriverID, aBoxDriver);
+      // Execute the cut if it must be (if an attribute changes)
+      aBoxDriver->Init(aLabel);
 
-        // Set the box touched, it will be usefull to recompute an object which used this box as attribute
-        aLogBook->SetTouched(aLabel);
-        if (aBoxDriver->Execute(aLogBook))
-          myResult << "Recompute failed" << std::endl;
+      // Set the box touched, it will be usefull to recompute an object which used this box as attribute
+      aLogBook->SetTouched(aLabel);
+      if (aBoxDriver->Execute(aLogBook))
+        myResult << "Recompute failed" << std::endl;
 
-        // Get the presentation of the box, display it and set it selected
-        Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
-        TDataStd_Integer::Set(aLabel, 1);
-        anAisPresentation->Display(1);
-        myContext->UpdateCurrentViewer();
+      // Get the presentation of the box, display it and set it selected
+      Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
+      TDataStd_Integer::Set(aLabel, 1);
+      anAisPresentation->Display(1);
+      myContext->UpdateCurrentViewer();
       // Close the command (for undo)
       myOcafDoc->CommitCommand();
 
@@ -349,7 +343,7 @@ void OcafSamples::ModifyBoxOcafSample()
       myResult << "width: " << aBoxWidth << " lenght: " << aBoxLenght << " hight: " << aBoxHight << std::endl;
     }
   }
-  if(aBoxCount)
+  if (aBoxCount)
     myResult << "Number of modified boxes: " << aBoxCount << std::endl;
   else
     myResult << "No boxes to modyfy" << std::endl;
@@ -360,16 +354,14 @@ void OcafSamples::ModifyCylinderOcafSample()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   Standard_Integer aCylCount(0);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
-  {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
     // Get the main label of the selected object
     Handle(TPrsStd_AISPresentation) anAisPresentation = Handle(TPrsStd_AISPresentation)::DownCast(anAisObject->GetOwner());
     TDF_Label aLabel = anAisPresentation->Label();
 
     // Get the TFunction_Function attribute of the selected object
     Handle(TFunction_Function) aFunction;
-    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction))
-    {
+    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction)) {
       myResult << "Object cannot be modify.";
       return;
     }
@@ -377,8 +369,7 @@ void OcafSamples::ModifyCylinderOcafSample()
     Standard_GUID myDriverID = aFunction->GetDriverGUID();
 
     // Case of a box created with the box function driver
-    if (myDriverID == TOcafFunction_CylDriver::GetID())
-    {
+    if (myDriverID == TOcafFunction_CylDriver::GetID()) {
       aCylCount++;
       Standard_Real aCylRadius, aCylHight, aCylX, aCylY, aCylZ;
 
@@ -405,9 +396,9 @@ void OcafSamples::ModifyCylinderOcafSample()
       // Open a new command (for undo)
       myOcafDoc->NewCommand();
       // Modify the cylinder - 2x  increase
-      aCylRadius *= 2.0; aCylHight *= 2.0; 
+      aCylRadius *= 2.0; aCylHight *= 2.0;
       // and move base point in XY plane
-      aCylX *= 2.0; aCylY *= 2.0; 
+      aCylX *= 2.0; aCylY *= 2.0;
 
       TDataStd_Real::Set(aLabel.FindChild(1), aCylRadius);
       TDataStd_Real::Set(aLabel.FindChild(2), aCylHight);
@@ -451,8 +442,7 @@ void OcafSamples::ModifyCylinderOcafSample()
 
 void OcafSamples::UndoOcafSample()
 {
-  if (myOcafDoc->Undo())
-  {
+  if (myOcafDoc->Undo()) {
     myOcafDoc->CommitCommand();
     myContext->UpdateCurrentViewer();
     myResult << "Undo was done successfully" << std::endl;
@@ -463,8 +453,7 @@ void OcafSamples::UndoOcafSample()
 
 void OcafSamples::RedoOcafSample()
 {
-  if (myOcafDoc->Redo())
-  {
+  if (myOcafDoc->Redo()) {
     myOcafDoc->CommitCommand();
     myContext->UpdateCurrentViewer();
     myResult << "Redo was done successfully" << std::endl;
@@ -480,15 +469,13 @@ void OcafSamples::DialogOpenOcafSample()
   BinDrivers::DefineFormat(anOcaf_Application);
   XmlDrivers::DefineFormat(anOcaf_Application);
   // Look for already opened
-  if (anOcaf_Application->IsInSession(myFileName))
-  {
+  if (anOcaf_Application->IsInSession(myFileName)) {
     myResult << "Document: " << myFileName << " is already in session" << std::endl;
     return;
   }
   // Open the document in the current application
   PCDM_ReaderStatus aReaderStatus = anOcaf_Application->Open(myFileName, myOcafDoc);
-  if (aReaderStatus == PCDM_ReaderStatus::PCDM_RS_OK)
-  {
+  if (aReaderStatus == PCDM_ReaderStatus::PCDM_RS_OK) {
     // Connect the document CAF (myDoc) with the AISContext (myAISContext)
     TPrsStd_AISViewer::New(myOcafDoc->Main(), myViewer);
     myOcafDoc->SetUndoLimit(10);
@@ -537,17 +524,16 @@ void OcafSamples::DisplayPresentation()
 {
   TDF_Label aRootlabel = myOcafDoc->Main();
 
-  for (TDF_ChildIterator it(aRootlabel); it.More(); it.Next())
-  {
+  for (TDF_ChildIterator it(aRootlabel); it.More(); it.Next()) {
     TDF_Label aLabel = it.Value();
     Handle(TNaming_NamedShape) aNamedShape;
-    if (!aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNamedShape)) 
+    if (!aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNamedShape))
       continue;
     Handle(TDataStd_Integer) aDataInteger;
 
     // To know if the object was displayed
     if (aLabel.FindAttribute(TDataStd_Integer::GetID(), aDataInteger))
-      if (!aDataInteger->Get())  
+      if (!aDataInteger->Get())
         continue;
 
     Handle(TPrsStd_AISPresentation) anAisPresentation;
