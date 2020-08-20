@@ -107,6 +107,7 @@ protected:
     virtual void mousePressEvent( QMouseEvent* ) override;
     virtual void mouseReleaseEvent(QMouseEvent* ) override;
     virtual void mouseMoveEvent( QMouseEvent* ) override;
+    virtual void wheelEvent(QWheelEvent*) override;
 
     virtual void addItemInPopup( QMenu* );
 
