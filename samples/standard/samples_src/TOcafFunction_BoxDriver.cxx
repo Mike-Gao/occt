@@ -61,8 +61,8 @@ void TOcafFunction_BoxDriver::Validate(Handle(TFunction_Logbook)& log) const
 //=======================================================================
 Standard_Boolean TOcafFunction_BoxDriver::MustExecute(const Handle(TFunction_Logbook)& log) const
 {
-	// If the object's label is modified:
-  if (log->IsModified(Label())) return Standard_True; 
+  // If the object's label is modified:
+  if (log->IsModified(Label())) return Standard_True;
 
   // Cut (in our simple case) has two arguments: The original shape, and the tool shape.
   // They are on the child labels of the box's label:
@@ -70,19 +70,19 @@ Standard_Boolean TOcafFunction_BoxDriver::MustExecute(const Handle(TFunction_Log
   //     ToolNShape - is attached to the second child label.
   // 
   // Let's check them:
-  if (log->IsModified(Label().FindChild(1))) 
+  if (log->IsModified(Label().FindChild(1)))
     return Standard_True; // width.
-  if (log->IsModified(Label().FindChild(2))) 
+  if (log->IsModified(Label().FindChild(2)))
     return Standard_True; // length,
-  if (log->IsModified(Label().FindChild(3))) 
+  if (log->IsModified(Label().FindChild(3)))
     return Standard_True; // width.
-  if (log->IsModified(Label().FindChild(4))) 
+  if (log->IsModified(Label().FindChild(4)))
     return Standard_True; // length,
   if (log->IsModified(Label().FindChild(5)))
     return Standard_True; // width.
   if (log->IsModified(Label().FindChild(6)))
     return Standard_True; // length,
-  
+
  // if there are no any modifications concerned the box,
   // it's not necessary to recompute (to call the method Execute()):
   return Standard_False;
@@ -101,42 +101,42 @@ Standard_Boolean TOcafFunction_BoxDriver::MustExecute(const Handle(TFunction_Log
 //=======================================================================
 Standard_Integer TOcafFunction_BoxDriver::Execute(Handle(TFunction_Logbook)& /*log*/) const
 {
-	// Get the values of dimension and position attributes 
-	Handle(TDataStd_Real) TSR;
-	Standard_Real x,y,z,l,h,w;
-	if (!Label().FindChild(1).FindAttribute(TDataStd_Real::GetID(), TSR )) 
+  // Get the values of dimension and position attributes 
+  Handle(TDataStd_Real) TSR;
+  Standard_Real x, y, z, l, h, w;
+  if (!Label().FindChild(1).FindAttribute(TDataStd_Real::GetID(), TSR))
     return 1;
-	l=TSR->Get();
+  l = TSR->Get();
 
-	if (!Label().FindChild(2).FindAttribute(TDataStd_Real::GetID(), TSR )) 
+  if (!Label().FindChild(2).FindAttribute(TDataStd_Real::GetID(), TSR))
     return 1;
-	h=TSR->Get();
+  h = TSR->Get();
 
-	if (!Label().FindChild(3).FindAttribute(TDataStd_Real::GetID(), TSR )) 
+  if (!Label().FindChild(3).FindAttribute(TDataStd_Real::GetID(), TSR))
     return 1;
-	w=TSR->Get();
+  w = TSR->Get();
 
-	if (!Label().FindChild(4).FindAttribute(TDataStd_Real::GetID(), TSR )) 
+  if (!Label().FindChild(4).FindAttribute(TDataStd_Real::GetID(), TSR))
     return 1;
-	x=TSR->Get();
+  x = TSR->Get();
 
-	if (!Label().FindChild(5).FindAttribute(TDataStd_Real::GetID(), TSR )) 
+  if (!Label().FindChild(5).FindAttribute(TDataStd_Real::GetID(), TSR))
     return 1;
-	y=TSR->Get();
+  y = TSR->Get();
 
-	if (!Label().FindChild(6).FindAttribute(TDataStd_Real::GetID(), TSR )) 
+  if (!Label().FindChild(6).FindAttribute(TDataStd_Real::GetID(), TSR))
     return 1;
-	z=TSR->Get();
+  z = TSR->Get();
 
-	// Build a box using the dimension and position attributes 
-	BRepPrimAPI_MakeBox mkBox( gp_Pnt(x, y ,z), l, h ,w);
-	TopoDS_Shape ResultShape = mkBox.Shape();
+  // Build a box using the dimension and position attributes 
+  BRepPrimAPI_MakeBox mkBox(gp_Pnt(x, y, z), l, h, w);
+  TopoDS_Shape ResultShape = mkBox.Shape();
 
 
-	// Build a TNaming_NamedShape using built box
-	TNaming_Builder B(Label());
-	B.Generated(ResultShape);
-// That's all:
-  // If there are no any mistakes we return 0:
+  // Build a TNaming_NamedShape using built box
+  TNaming_Builder B(Label());
+  B.Generated(ResultShape);
+  // That's all:
+    // If there are no any mistakes we return 0:
   return 0;
 }

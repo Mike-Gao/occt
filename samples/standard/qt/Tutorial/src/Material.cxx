@@ -22,102 +22,102 @@
 #include <Graphic3d_NameOfMaterial.hxx>
 
 DialogMaterial::DialogMaterial(QWidget * parent,
-			        bool modal, Qt::WindowFlags f )
-: QDialog(parent, f)
+  bool modal, Qt::WindowFlags f)
+  : QDialog(parent, f)
 {
-	setModal( modal );
-	QPushButton* b;
-  QVBoxLayout* vbl = new QVBoxLayout( this );
-	vbl->setMargin( 8 );
+  setModal(modal);
+  QPushButton* b;
+  QVBoxLayout* vbl = new QVBoxLayout(this);
+  vbl->setMargin(8);
 
-	QSignalMapper *sm = new QSignalMapper( this );
-	connect( sm, SIGNAL( mapped( int ) ), this, SIGNAL( sendMaterialChanged( int ) ) );
+  QSignalMapper *sm = new QSignalMapper(this);
+  connect(sm, SIGNAL(mapped(int)), this, SIGNAL(sendMaterialChanged(int)));
 
-	b = new QPushButton(tr("Plaster"), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_PLASTER );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Plaster"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_PLASTER);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton( QObject::tr( "Brass" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_BRASS );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(QObject::tr("Brass"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_BRASS);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton(tr( "Bronze" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_BRONZE );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Bronze"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_BRONZE);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton(tr( "Copper" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_COPPER );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Copper"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_COPPER);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton(tr( "Gold" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_GOLD );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Gold"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_GOLD);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton(tr( "Pewter" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_PEWTER );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Pewter"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_PEWTER);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton(tr( "Plastic" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_PLASTIC );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Plastic"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_PLASTIC);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 
-	b = new QPushButton(tr( "Silver" ), this );
-  sm->setMapping( b, ( int )Graphic3d_NOM_SILVER );
-  connect( b, SIGNAL( clicked() ), sm, SLOT( map() ) );	
-	b->setCheckable( true );
-	connect( b, SIGNAL( toggled( bool ) ), this, SLOT( updateButtons( bool ) ) );
-	myButtons.append( b );
-	vbl->addWidget( b );
+  b = new QPushButton(tr("Silver"), this);
+  sm->setMapping(b, (int)Graphic3d_NOM_SILVER);
+  connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+  b->setCheckable(true);
+  connect(b, SIGNAL(toggled(bool)), this, SLOT(updateButtons(bool)));
+  myButtons.append(b);
+  vbl->addWidget(b);
 }
 
 DialogMaterial::~DialogMaterial()
 {
 }
 
-void DialogMaterial::updateButtons( bool isOn )
+void DialogMaterial::updateButtons(bool isOn)
 {
-	if( !isOn )
-		return;
-	
-	QPushButton*sentBy = ( QPushButton* )sender();
+  if (!isOn)
+    return;
 
-	for ( int i = 0; i < myButtons.size(); i++ )
-	{
-	  QPushButton* b = myButtons.at( i );
-	  if( b != sentBy ) {
-      b->setEnabled( true );
-		  b->setChecked( false );
-	  } else {
-	 	  b->setEnabled( false );
-	  }
-	}
+  QPushButton*sentBy = (QPushButton*)sender();
+
+  for (int i = 0; i < myButtons.size(); i++) {
+    QPushButton* b = myButtons.at(i);
+    if (b != sentBy) {
+      b->setEnabled(true);
+      b->setChecked(false);
+    }
+    else {
+      b->setEnabled(false);
+    }
+  }
 }
 

@@ -37,44 +37,43 @@
 // function : Viewer
 // purpose  :
 // =======================================================================
-Handle(V3d_Viewer) DocumentCommon::Viewer (const Standard_ExtString ,
-                                           const Standard_CString ,
-                                           const Standard_Real theViewSize,
-                                           const V3d_TypeOfOrientation theViewProj,
-                                           const Standard_Boolean theComputedMode,
-                                           const Standard_Boolean theDefaultComputedMode )
+Handle(V3d_Viewer) DocumentCommon::Viewer(const Standard_ExtString,
+  const Standard_CString,
+  const Standard_Real theViewSize,
+  const V3d_TypeOfOrientation theViewProj,
+  const Standard_Boolean theComputedMode,
+  const Standard_Boolean theDefaultComputedMode)
 {
   static Handle(OpenGl_GraphicDriver) aGraphicDriver;
 
-  if (aGraphicDriver.IsNull())
-  {
+  if (aGraphicDriver.IsNull()) {
     Handle(Aspect_DisplayConnection) aDisplayConnection;
 #if !defined(_WIN32) && !defined(__WIN32__) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX))
-    aDisplayConnection = new Aspect_DisplayConnection (OSD_Environment ("DISPLAY").Value());
+    aDisplayConnection = new Aspect_DisplayConnection(OSD_Environment("DISPLAY").Value());
 #endif
-    aGraphicDriver = new OpenGl_GraphicDriver (aDisplayConnection);
+    aGraphicDriver = new OpenGl_GraphicDriver(aDisplayConnection);
   }
 
-  Handle(V3d_Viewer) aViewer = new V3d_Viewer (aGraphicDriver);
-  aViewer->SetDefaultViewSize (theViewSize);
-  aViewer->SetDefaultViewProj (theViewProj);
-  aViewer->SetComputedMode (theComputedMode);
-  aViewer->SetDefaultComputedMode (theDefaultComputedMode);
+  Handle(V3d_Viewer) aViewer = new V3d_Viewer(aGraphicDriver);
+  aViewer->SetDefaultViewSize(theViewSize);
+  aViewer->SetDefaultViewProj(theViewProj);
+  aViewer->SetComputedMode(theComputedMode);
+  aViewer->SetDefaultComputedMode(theDefaultComputedMode);
   return aViewer;
 }
 
-DocumentCommon::DocumentCommon(ApplicationCommonWindow* app ): 
-  QObject( app ),
+DocumentCommon::DocumentCommon(ApplicationCommonWindow* app) :
+  QObject(app),
   myContextIsEmpty(true)
 {
-  TCollection_ExtendedString a3DName ("Visu3D");
+  TCollection_ExtendedString a3DName("Visu3D");
 
-  myViewer = Viewer (a3DName.ToExtString(), "", 1000.0, V3d_XposYnegZpos, Standard_True, Standard_True);
+  myViewer = Viewer(a3DName.ToExtString(), "", 1000.0, V3d_XposYnegZpos, Standard_True, Standard_True);
 
   myViewer->SetDefaultLights();
   myViewer->SetLightOn();
 
-  myContext = new AIS_InteractiveContext (myViewer);
+  myContext = new AIS_InteractiveContext(myViewer);
 }
 
 DocumentCommon::~DocumentCommon()
@@ -97,16 +96,15 @@ void DocumentCommon::setViewer(Handle(V3d_Viewer) theViewer)
 }
 
 void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects,
-                     Standard_Boolean theDisplayShaded)
+  Standard_Boolean theDisplayShaded)
 {
   myContext->RemoveAll(Standard_False);
   if (theObjects.IsEmpty())
     myContextIsEmpty = true;
-  else 
+  else
     myContextIsEmpty = false;
-  for (const Handle(AIS_InteractiveObject) anObject : theObjects)
-  {
-    if(!theDisplayShaded)
+  for (const Handle(AIS_InteractiveObject) anObject : theObjects) {
+    if (!theDisplayShaded)
       myContext->Display(anObject, Standard_False);
     else
       myContext->Display(anObject, AIS_Shaded, 0, Standard_False);

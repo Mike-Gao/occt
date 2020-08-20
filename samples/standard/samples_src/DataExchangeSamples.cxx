@@ -38,7 +38,7 @@
 #include <IGESControl_Reader.hxx>
 #include <Graphic3d_TextureEnv.hxx>
 
-DataExchangeSamples::DataExchangeSamples():
+DataExchangeSamples::DataExchangeSamples() :
   myStepType(STEPControl_StepModelType(-1)),
   myView(nullptr)
 {
@@ -47,17 +47,15 @@ DataExchangeSamples::DataExchangeSamples():
 
 void DataExchangeSamples::Process(TCollection_AsciiString theSampleName)
 {
-  if(IsImportSample(theSampleName))
+  if (IsImportSample(theSampleName))
     myObject3d.Clear();
   myObject2d.Clear();
   myCode.Clear();
   myIsProcessed = Standard_False;
-  try
-  {
+  try {
     ExecuteSample(theSampleName);
   }
-  catch (...)
-  {
+  catch (...) {
     TraceError(TCollection_AsciiString("Error in sample: ") + theSampleName);
   }
 }
@@ -158,8 +156,7 @@ void DataExchangeSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     StepImportSample();
   else if (theSampleName == "IgesImportSample")
     IgesImportSample();
-  else
-  {
+  else {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -170,10 +167,8 @@ void DataExchangeSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 void DataExchangeSamples::BrepExportSample()
 {
   Standard_Boolean anIsShapeExist = Standard_False;
-  for (Handle(AIS_InteractiveObject) anObject : myObject3d)
-  {
-    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
-    {
+  for (Handle(AIS_InteractiveObject) anObject : myObject3d) {
+    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject)) {
       anIsShapeExist = Standard_True;
       if (BRepTools::Write(aShape->Shape(), myFileName.ToCString()))
         myResult << "A shape was successfully written" << std::endl;
@@ -182,34 +177,29 @@ void DataExchangeSamples::BrepExportSample()
       break; // write only one shape
     }
   }
-  if(!anIsShapeExist)
+  if (!anIsShapeExist)
     myResult << "A shape does not exist" << std::endl;
 }
 
 void DataExchangeSamples::StepExportSample()
 {
-  if (myStepType < 0)
-  {
+  if (myStepType < 0) {
     myResult << "Unknown step type" << std::endl;
     return;
   }
 
   IFSelect_ReturnStatus aStatus;
 
-  if (myStepType == STEPControl_FacetedBrep && !CheckFacetedBrep())
-  {
+  if (myStepType == STEPControl_FacetedBrep && !CheckFacetedBrep()) {
     myResult << "At least one shape doesn`t contain facetes" << std::endl;
     return;
   }
 
   STEPControl_Writer aStepWriter;
-  for (Handle(AIS_InteractiveObject) anObject : myObject3d)
-  {
-    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
-    {
+  for (Handle(AIS_InteractiveObject) anObject : myObject3d) {
+    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject)) {
       aStatus = aStepWriter.Transfer(aShape->Shape(), myStepType);
-      if (aStatus != IFSelect_RetDone)
-      {
+      if (aStatus != IFSelect_RetDone) {
         myResult << "A shape was not transferred successfully" << std::endl;
         return;
       }
@@ -217,8 +207,7 @@ void DataExchangeSamples::StepExportSample()
   }
   aStatus = aStepWriter.Write(myFileName.ToCString());
 
-  switch (aStatus)
-  {
+  switch (aStatus) {
   case IFSelect_RetError:
     myResult << "Incorrect Data." << std::endl;
     break;
@@ -243,18 +232,15 @@ void DataExchangeSamples::IgesExportSample()
     Interface_Static::IVal("XSTEP.iges.writebrep.mode"));
 
   Standard_Boolean anIsShapeExist = Standard_False;
-  for (Handle(AIS_InteractiveObject) anObject : myObject3d)
-  {
-    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
-    {
+  for (Handle(AIS_InteractiveObject) anObject : myObject3d) {
+    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject)) {
       anIsShapeExist = Standard_True;
       anIgesWriter.AddShape(aShape->Shape());
     }
   }
-  if (anIsShapeExist)
-  {
+  if (anIsShapeExist) {
     anIgesWriter.ComputeModel();
-    if(anIgesWriter.Write(myFileName.ToCString()))
+    if (anIgesWriter.Write(myFileName.ToCString()))
       myResult << "A STEP file was successfully written" << std::endl;
     else
       myResult << "A STEP file was not written" << std::endl;
@@ -270,16 +256,13 @@ void DataExchangeSamples::StlExportSample()
   builder.MakeCompound(aTopoCompound);
 
   Standard_Boolean anIsShapeExist = Standard_False;
-  for (Handle(AIS_InteractiveObject) anObject : myObject3d)
-  {
-    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
-    {
+  for (Handle(AIS_InteractiveObject) anObject : myObject3d) {
+    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject)) {
       anIsShapeExist = Standard_True;
       builder.Add(aTopoCompound, aShape->Shape());
     }
   }
-  if (anIsShapeExist)
-  {
+  if (anIsShapeExist) {
     StlAPI_Writer aStlWriter;
     if (aStlWriter.Write(aTopoCompound, myFileName.ToCString()))
       myResult << "A STL file was successfully written" << std::endl;
@@ -297,16 +280,13 @@ void DataExchangeSamples::VrmlExportSample()
   aBrepBuilder.MakeCompound(aTopoCompound);
 
   Standard_Boolean anIsShapeExist = Standard_False;
-  for (Handle(AIS_InteractiveObject) anObject : myObject3d)
-  {
-    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
-    {
+  for (Handle(AIS_InteractiveObject) anObject : myObject3d) {
+    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject)) {
       anIsShapeExist = Standard_True;
       aBrepBuilder.Add(aTopoCompound, aShape->Shape());
     }
   }
-  if (anIsShapeExist)
-  {
+  if (anIsShapeExist) {
     VrmlAPI_Writer aVrmlWriter;
     if (aVrmlWriter.Write(aTopoCompound, myFileName.ToCString()))
       myResult << "A VRML file was successfully written" << std::endl;
@@ -319,8 +299,7 @@ void DataExchangeSamples::VrmlExportSample()
 
 void DataExchangeSamples::ImageExportSample()
 {
-  if (myView)
-  {
+  if (myView) {
     Standard_Boolean aResult = myView->Dump(myFileName.ToCString());
     if (aResult)
       myResult << "An image file was successfully written" << std::endl;
@@ -334,8 +313,7 @@ void DataExchangeSamples::BrepImportSample()
   TopoDS_Shape aTopoShape;
   BRep_Builder aBuilder;
   Standard_Boolean aResult = BRepTools::Read(aTopoShape, myFileName.ToCString(), aBuilder);
-  if (aResult)
-  {
+  if (aResult) {
     Handle(AIS_Shape) anAisShape = new AIS_Shape(aTopoShape);
     myObject3d.Append(anAisShape);
     myResult << "A BREP file was read successfully" << std::endl;
@@ -349,8 +327,7 @@ void DataExchangeSamples::StepImportSample()
   Handle(TopTools_HSequenceOfShape) aSequence = new TopTools_HSequenceOfShape;
   STEPControl_Reader aReader;
   IFSelect_ReturnStatus status = aReader.ReadFile(myFileName.ToCString());
-  if (status != IFSelect_RetDone)
-  {
+  if (status != IFSelect_RetDone) {
     myResult << "A BREP file was not read successfully" << std::endl;
     return;
   }
@@ -360,16 +337,13 @@ void DataExchangeSamples::StepImportSample()
 
   int aRootsNumber = aReader.NbRootsForTransfer();
   aReader.PrintCheckTransfer(anIsFailsOnly, IFSelect_ItemsByEntity);
-  for (Standard_Integer i = 1; i <= aRootsNumber; i++)
-  {
+  for (Standard_Integer i = 1; i <= aRootsNumber; i++) {
     aReader.TransferRoot(i);
   }
 
   int aShapesNumber = aReader.NbShapes();
-  if (aShapesNumber > 0)
-  {
-    for (int i = 1; i <= aShapesNumber; i++)
-    {
+  if (aShapesNumber > 0) {
+    for (int i = 1; i <= aShapesNumber; i++) {
       TopoDS_Shape aTopoShape = aReader.Shape(i);
       Handle(AIS_Shape) anAisShape = new AIS_Shape(aTopoShape);
       myObject3d.Append(anAisShape);
@@ -383,8 +357,7 @@ void DataExchangeSamples::IgesImportSample()
   IGESControl_Reader Reader;
   int status = Reader.ReadFile(myFileName.ToCString());
 
-  if (status != IFSelect_RetDone)
-  {
+  if (status != IFSelect_RetDone) {
     myResult << "A IGES file was not read successfully" << std::endl;
     return;
   }
@@ -399,21 +372,17 @@ Standard_Boolean DataExchangeSamples::CheckFacetedBrep()
 {
   Standard_Boolean anError = Standard_False;
 
-  for (Handle(AIS_InteractiveObject) anObject : myObject3d)
-  {
-    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject))
-    {
+  for (Handle(AIS_InteractiveObject) anObject : myObject3d) {
+    if (Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast(anObject)) {
       TopoDS_Shape aTopoShape = aShape->Shape();
-      for (TopExp_Explorer aFaceExplorer(aTopoShape, TopAbs_FACE);
-        aFaceExplorer.More() && !anError; aFaceExplorer.Next())
-      {
+      TopExp_Explorer aFaceExplorer(aTopoShape, TopAbs_FACE);
+      for (; aFaceExplorer.More() && !anError; aFaceExplorer.Next()) {
         Handle(Geom_Surface) aSurface = BRep_Tool::Surface(TopoDS::Face(aFaceExplorer.Current()));
         if (!aSurface->IsKind(STANDARD_TYPE(Geom_Plane)))
           anError = Standard_True;
       }
-      for (TopExp_Explorer anEdgeExplorer(aTopoShape, TopAbs_EDGE);
-        anEdgeExplorer.More() && !anError; anEdgeExplorer.Next())
-      {
+      TopExp_Explorer anEdgeExplorer(aTopoShape, TopAbs_EDGE);
+      for (; anEdgeExplorer.More() && !anError; anEdgeExplorer.Next()) {
         Standard_Real fd, ld;
         Handle(Geom_Curve) curve = BRep_Tool::Curve(TopoDS::Edge(anEdgeExplorer.Current()), fd, ld);
         if (!curve->IsKind(STANDARD_TYPE(Geom_Line)))

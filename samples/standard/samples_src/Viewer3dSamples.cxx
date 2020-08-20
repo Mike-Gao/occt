@@ -64,8 +64,7 @@ void Viewer3dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     VboOn3dSample();
   else if (theSampleName == "VboOff3dSample")
     VboOff3dSample();
-  else
-  {
+  else {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -84,15 +83,15 @@ void Viewer3dSamples::AppendBottle()
 void Viewer3dSamples::SpotLight3dSample()
 {
   // Spot light source creation
-  Handle(V3d_SpotLight) aSpotLight = 
-    new V3d_SpotLight (gp_Pnt(100.0, 0.0, 0.0), gp_Dir(-1.0, 0.0, 0.0), Quantity_NOC_RED);
+  Handle(V3d_SpotLight) aSpotLight =
+    new V3d_SpotLight(gp_Pnt(100.0, 0.0, 0.0), gp_Dir(-1.0, 0.0, 0.0), Quantity_NOC_RED);
   aSpotLight->SetIntensity(5000);
   myView->SetLightOn(aSpotLight);
 }
 
 void Viewer3dSamples::PositionalLight3dSample()
 {
-  Handle(V3d_PositionalLight) aPositionalLight = 
+  Handle(V3d_PositionalLight) aPositionalLight =
     new V3d_PositionalLight(gp_Pnt(0.0, -100.0, 5.0), Quantity_NOC_GREEN);
   aPositionalLight->SetAttenuation(1, 0);
   myView->SetLightOn(aPositionalLight);
@@ -100,7 +99,7 @@ void Viewer3dSamples::PositionalLight3dSample()
 
 void Viewer3dSamples::DirectionalLight3dSample()
 {
-  Handle(V3d_DirectionalLight) aDirectionalLight = 
+  Handle(V3d_DirectionalLight) aDirectionalLight =
     new V3d_DirectionalLight(gp_Dir(-1.0, 0.0, -1.0), Quantity_NOC_BLUE1);
   myView->SetLightOn(aDirectionalLight);
 }
@@ -115,15 +114,13 @@ void Viewer3dSamples::ClearLight3dSample()
 {
   //	Setting Off all viewer active lights
   TColStd_ListOfTransient lights;
-  for (myView->Viewer()->InitActiveLights(); 
-       myView->Viewer()->MoreActiveLights(); 
-       myView->Viewer()->NextActiveLights())
-  {
+  for (myView->Viewer()->InitActiveLights();
+    myView->Viewer()->MoreActiveLights();
+    myView->Viewer()->NextActiveLights()) {
     lights.Append(myView->Viewer()->ActiveLight());
   }
   TColStd_ListIteratorOfListOfTransient itrLights(lights);
-  for (; itrLights.More(); itrLights.Next())
-  {
+  for (; itrLights.More(); itrLights.Next()) {
     Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
     myView->Viewer()->SetLightOff(light);
   }
@@ -131,14 +128,12 @@ void Viewer3dSamples::ClearLight3dSample()
   //	Setting Off all view active lights
   lights.Clear();
   for (myView->InitActiveLights();
-       myView->MoreActiveLights(); 
-       myView->NextActiveLights())
-  {
+    myView->MoreActiveLights();
+    myView->NextActiveLights()) {
     lights.Append(myView->ActiveLight());
   }
   itrLights.Initialize(lights);
-  for (; itrLights.More(); itrLights.Next())
-  {
+  for (; itrLights.More(); itrLights.Next()) {
     Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
     myView->SetLightOff(light);
   }
@@ -192,16 +187,15 @@ void Viewer3dSamples::RedColorPresentation3dSample()
 {
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
-  {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
     Quantity_Color aShapeColor;
     myContext->Color(anAisObject, aShapeColor);
     myResult << "A Current shape color: Red = " << aShapeColor.Red()
-             << " Green = " << aShapeColor.Green() << " Blue = " << aShapeColor.Blue() << std::endl;
+      << " Green = " << aShapeColor.Green() << " Blue = " << aShapeColor.Blue() << std::endl;
     aShapeColor.SetValues(0.8, 0.1, 0.1, Quantity_TOC_RGB);
     myContext->SetColor(anAisObject, aShapeColor, Standard_False);
     myResult << "A New shape color: Red = " << aShapeColor.Red()
-             << " Green = " << aShapeColor.Green() << " Blue = " << aShapeColor.Blue() << std::endl;
+      << " Green = " << aShapeColor.Green() << " Blue = " << aShapeColor.Blue() << std::endl;
   }
 }
 
@@ -209,8 +203,7 @@ void Viewer3dSamples::GrayColorPresentation3dSample()
 {
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
-  {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
     Quantity_Color aShapeColor;
     myContext->Color(anAisObject, aShapeColor);
     myResult << "A Current shape color: Hue = " << aShapeColor.Hue()
@@ -246,7 +239,6 @@ void Viewer3dSamples::OpaquePresentation3dSample()
 {
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
-  Graphic3d_NameOfMaterial aMaterial = Graphic3d_NOM_BRONZE;
   for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
     myContext->SetTransparency(anAisObject, 0.0, Standard_False);
   myContext->UpdateCurrentViewer();
@@ -256,7 +248,6 @@ void Viewer3dSamples::HalfTransparencyPresentation3dSample()
 {
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
-  Graphic3d_NameOfMaterial aMaterial = Graphic3d_NOM_BRONZE;
   for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
     myContext->SetTransparency(anAisObject, 0.5, Standard_False);
   myContext->UpdateCurrentViewer();
@@ -267,8 +258,7 @@ void Viewer3dSamples::VboOn3dSample()
   Handle(OpenGl_GraphicDriver) aDriver =
     Handle(OpenGl_GraphicDriver)::DownCast(myContext->CurrentViewer()->Driver());
 
-  if (!aDriver.IsNull())
-  {
+  if (!aDriver.IsNull()) {
     aDriver->ChangeOptions().vboDisable = Standard_False;
   }
 }
@@ -278,8 +268,7 @@ void Viewer3dSamples::VboOff3dSample()
   Handle(OpenGl_GraphicDriver) aDriver =
     Handle(OpenGl_GraphicDriver)::DownCast(myContext->CurrentViewer()->Driver());
 
-  if (!aDriver.IsNull())
-  {
+  if (!aDriver.IsNull()) {
     aDriver->ChangeOptions().vboDisable = Standard_True;
   }
 }
