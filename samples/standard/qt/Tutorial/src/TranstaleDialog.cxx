@@ -23,8 +23,7 @@ TranslateDialog::TranslateDialog(QWidget* parent, Qt::WindowFlags flags, bool mo
 
   QGridLayout* grid = ::qobject_cast<QGridLayout*>(layout());
 
-  if (grid)
-  {
+  if (grid) {
     QVBoxLayout *vbox = new QVBoxLayout;
 
     QWidget* paramGroup = new QWidget(this);
@@ -81,8 +80,7 @@ QListView* TranslateDialog::findListView(const QObjectList & childList)
   for (int i = 0, n = childList.count(); i < n && !listView; i++)
   {
     listView = qobject_cast<QListView*>(childList.at(i));
-    if (!listView && childList.at(i))
-    {
+    if (!listView && childList.at(i)) {
       listView = findListView(childList.at(i)->children());
     }
   }

@@ -29,21 +29,13 @@ int main ( int argc, char* argv[] )
   Q_INIT_RESOURCE(Tutorial);
 	QApplication aQApp( argc, argv );
 
-	//QString resDir = ApplicationCommonWindow::getResourceDir();
-
-	//QLocale systemLocale = QLocale::system();
-	//QStringList ll = systemLocale.uiLanguages();
-
-	//QTranslator strTrans( 0 );
-
-	//QString aSamplePath(getenv("SAMPLESROOT"));
-	//Standard_Boolean isOK = strTrans.load("Tutorial-string.ts", aSamplePath + "/Tutorial/res");
-	//   if( isOK )
-	//     a.installTranslator( &strTrans );
-
   ApplicationCommonWindow::ApplicationType anAppType = ApplicationCommonWindow::Unknown;
   if (argc == 2) {
     anAppType = ApplicationCommonWindow::appTypeFromString(argv[1]);
+    if (anAppType == ApplicationCommonWindow::Unknown) {
+      std::cout << "Wrong application type. Use the one of following options:" << std::endl;
+      std::cout << "Geometry | Topology | Triangulation | DataExchange | Ocaf | Viewer2d | Viewer3d" << std::endl;
+    }
   }
 
   int aChoise = 0;
@@ -64,7 +56,7 @@ int main ( int argc, char* argv[] )
     std::cout << "6. Viewer2d" << std::endl;
     std::cout << "7. Viewer3d" << std::endl;
     std::cout << "0. Exit" << std::endl;
-
+    std::cout << "> ";
     std::cin >> aChoise;
     if (aChoise == 0)
       return 0;
@@ -74,13 +66,3 @@ int main ( int argc, char* argv[] )
       anAppType = (ApplicationCommonWindow::ApplicationType) (aChoise - 1);
   }
 }
-	//else
-	//{
-	//	std::cerr << "Incorrect application type: \"" << aSampleType.toStdString()
-	//	<< "\". Pleace use: Geometry | Topology | Triangulation | DataExchange | Ocaf | Viewer3d | Viewer2d"
-	//	<< std::endl;
-	//	std::cout << "Press any key...";
-	//	getch();
-	//	return -1;
-	//}
-
