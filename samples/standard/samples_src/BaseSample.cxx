@@ -23,6 +23,8 @@
 #include <OSD_File.hxx>
 #include <OSD_Protection.hxx>
 
+#include <QDir>
+
 const TCollection_AsciiString BaseSample::FILE_EXTENSION = "cxx";
 
 
@@ -84,7 +86,8 @@ void BaseSample::TraceError(TCollection_AsciiString theErrorMessage)
 void BaseSample::FindSourceCode(TCollection_AsciiString theSampleName)
 {
   TCollection_AsciiString aClassName = DynamicType()->Name();
-  TCollection_AsciiString aCxxFilePach = myCodePath + '\\' + aClassName + '.' + FILE_EXTENSION;
+  char aSeparator = QDir::separator().toLatin1();
+  TCollection_AsciiString aCxxFilePach = myCodePath + aSeparator + aClassName + '.' + FILE_EXTENSION;
   OSD_File aCxxFile(aCxxFilePach);
   try
   {
@@ -178,9 +181,3 @@ Standard_Integer BaseSample::FindClosingBracket(TCollection_AsciiString theText,
   }
   return aClosingBracketIndex;
 }
-
-
-
-
-
-

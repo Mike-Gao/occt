@@ -60,17 +60,17 @@ static QMdiArea* stWs = 0;
 ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
   : QMainWindow(nullptr),
   myAppType(theSampleType),
-  mySampleMapper(new QSignalMapper(this)),
-  myExchangeMapper(new QSignalMapper(this)),
-  myOcafMapper(new QSignalMapper(this)),
-  myViewer3dMapper(new QSignalMapper(this)),
-  myViewer2dMapper(new QSignalMapper(this)),
   myStdToolBar(nullptr),
   myCasCadeBar(nullptr),
   myViewBar(nullptr),
-  myFilePopup(nullptr),
-  mySamples(nullptr)
+  myFilePopup(nullptr)
 {
+  mySampleMapper = new QSignalMapper(this);
+  myExchangeMapper = new QSignalMapper(this);
+  myOcafMapper = new QSignalMapper(this);
+  myViewer3dMapper = new QSignalMapper(this);
+  myViewer2dMapper = new QSignalMapper(this);
+
   setWindowTitle(GetTitle());
 
   switch (myAppType) {
@@ -304,7 +304,8 @@ QString ApplicationCommonWindow::getResourceDir()
 
 TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
 {
-  TCollection_AsciiString aSampleSourceDir = OSD_Environment("CSF_SampleSources").Value();
+  TCollection_AsciiString aSampleSourceDir = OSD_Environment("aSamplePath").Value();
+  aSampleSourceDir += "/../../samples_src";
   return aSampleSourceDir;
 }
 
@@ -574,7 +575,7 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
     }
     //QList< QPair<QString, QMenu*> >  aMenuList;
     //for(const QString& aBranchKey: aBranchObject.keys())
-    //{   
+    //{
 
     //  aMenuList.append(QPair<QString, QMenu*>(aBranchKey, MenuFromJsonObject(aBranchObject.value(aBranchKey), aBranchKey, aMenu)));
     //}

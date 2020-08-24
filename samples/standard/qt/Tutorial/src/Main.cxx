@@ -22,7 +22,6 @@
 #include <QLocale>
 #include <QStringList>
 #include <QCommandLineParser>
-#include <conio.h>
 
 int main ( int argc, char* argv[] )
 {

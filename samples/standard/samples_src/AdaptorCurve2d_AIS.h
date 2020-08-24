@@ -16,8 +16,8 @@
 
 #include <AIS_InteractiveObject.hxx>
 #include <Geom2d_Curve.hxx>
-#include <Aspect_TypeOfline.hxx>
-#include <Aspect_WidthOfline.hxx>
+#include <Aspect_TypeOfLine.hxx>
+#include <Aspect_WidthOfLine.hxx>
 
 class AdaptorCurve2d_AIS;
 DEFINE_STANDARD_HANDLE(AdaptorCurve2d_AIS, AIS_InteractiveObject)
