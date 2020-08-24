@@ -91,7 +91,7 @@
 #include <AIS_Axis.hxx>
 #include <AIS_ColoredShape.hxx>
 #include <AIS_Plane.hxx>
-#include <AIS_Point.hxx.>
+#include <AIS_Point.hxx>
 #include <AIS_TextLabel.hxx>
 
 void TopologySamples::ExecuteSample(TCollection_AsciiString theSampleName)
@@ -375,7 +375,7 @@ void TopologySamples::Wire3dSample()
     const gp_Pnt& aPnt2 = aPoints.Value(i2);
     TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(aPnt1, aPnt2);
     // Add an edge to the wire under construction.
-    // The edge must be connectable to the wire under construction, and, 
+    // The edge must be connectable to the wire under construction, and,
     // unless it is the first edge of the wire, must satisfy the following
     // condition: one of its vertices must be geometrically coincident
     // with one of the vertices of the wire (provided that the highest
@@ -383,7 +383,7 @@ void TopologySamples::Wire3dSample()
     // be the same vertex.
     // Warning
     // If the edge is not connectable to the wire under construction it is not
-    // added. The function IsDone will return false and the function 
+    // added. The function IsDone will return false and the function
     // Wire will raise an error, until a new connectable edge is added.
     aMakeWire.Add(anEdge);
     Standard_ASSERT_VOID(aMakeWire.IsDone(), "Added edge isn't connectible!");
@@ -391,7 +391,7 @@ void TopologySamples::Wire3dSample()
   // Retrieve a constructed wire.
   TopoDS_Wire aWire = aMakeWire.Wire();
   myResult << "TopoDS_Wire was created. Vertices :" << std::endl;
-  // Reterieve wire virtices. 4 vertices are expected, because of 
+  // Reterieve wire virtices. 4 vertices are expected, because of
   // edges connecting during wire constructing.
   TopTools_IndexedMapOfShape aVertices;
   TopExp::MapShapes(aWire, TopAbs_VERTEX, aVertices);
@@ -1842,5 +1842,3 @@ void TopologySamples::ComputeVolumeProperties3dSample()
   myObject3d.Append(anAisCOM);
   myObject3d.Append(aCOMLabel);
 }
-
-

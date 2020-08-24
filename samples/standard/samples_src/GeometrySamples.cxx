@@ -19,7 +19,7 @@
 #include <gp_XYZ.hxx>
 #include <gp_Vec.hxx>
 #include <gp_Dir.hxx>
-#include <gp_Ax1.hxx> 
+#include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>
 #include <gp_Ax3.hxx>
 #include <gp_Lin.hxx>
@@ -269,7 +269,7 @@ void GeometrySamples::DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText,
 
 void GeometrySamples::ZeroDimensionObjects3dSample()
 {
-  // gp_Pnt describes a point in 3D space. A Geom_CartesianPoint is defined by 
+  // gp_Pnt describes a point in 3D space. A Geom_CartesianPoint is defined by
   // a gp_Pnt point, with its three Cartesian coordinates X, Y and Z.
   gp_Pnt aCoordPnt(10.0, 20.0, 30.0);
   Handle(Geom_CartesianPoint) aCoordGeomPoint = new Geom_CartesianPoint(aCoordPnt);
@@ -317,9 +317,9 @@ void GeometrySamples::Vectors3dSample()
 
   // Describes a unit vector in 3D space.
   // This unit vector is also called "Direction".
-  // See Also gce_MakeDir which provides functions for more complex unit vector 
-  // constructions Geom_Direction which provides additional functions 
-  // for constructing unit vectors and works, in particular, 
+  // See Also gce_MakeDir which provides functions for more complex unit vector
+  // constructions Geom_Direction which provides additional functions
+  // for constructing unit vectors and works, in particular,
   // with the parametric equations of unit vectors.
   gp_Dir aDir(aVec);
   Handle(AdaptorVec_AIS) aDirAIS =
@@ -360,7 +360,7 @@ void GeometrySamples::InfinityLines3dSample()
   myObject3d.Append(aAx2AisY);
   myResult << "gp_Ax2 was created" << std::endl;
 
-  // Describes a coordinate system in 3D space.Unlike a gp_Ax2 coordinate system, 
+  // Describes a coordinate system in 3D space.Unlike a gp_Ax2 coordinate system,
   // a gp_Ax3 can be right - handed("direct sense") or left - handed("indirect sense").
   gp_Ax3 anAxis3(gp_XYZ(0.0, 0.0, 6.0), aZ_Direction, aX_Direction);
   anAxis3.YReverse();
@@ -389,7 +389,7 @@ void GeometrySamples::InfinityLines3dSample()
   myResult << aDirectionDescribtion << std::endl << std::endl;
 
   // Describes a line in 3D space. A line is positioned in space with an axis
-  // (a gp_Ax1 object) which gives it an origin and a unit vector. 
+  // (a gp_Ax1 object) which gives it an origin and a unit vector.
   gp_Lin aLine(gp_Pnt(5.0, 0.0, 0.0), gp_Dir(0.0, 1.0, 0.0));
   Handle(AdaptorVec_AIS) anLineAis = new AdaptorVec_AIS(aLine.Location(), aLine.Direction(), 8.0);
   anLineAis->SetText("gp_Lin");
@@ -405,15 +405,15 @@ void GeometrySamples::SecondOrderCurves3dSample()
   Handle(AIS_Circle) anAisCircle = new AIS_Circle(aGeomCircle);
   myObject3d.Append(anAisCircle);
 
-  // Describes an ellipse in 3D space. An ellipse is defined by its major and minor 
-  // radii and positioned in space with a coordinate system (a gp_Ax2 object) 
+  // Describes an ellipse in 3D space. An ellipse is defined by its major and minor
+  // radii and positioned in space with a coordinate system (a gp_Ax2 object)
   gp_Elips anElips(anAxis2.Translated(gp_Vec(0.0, 0.0, 10.0)), 20.0, 10.0);
   Handle(Geom_Ellipse) aGeomEllipse = new Geom_Ellipse(anElips);
   Handle(AdaptorCurve_AIS) anAisEllipce = new AdaptorCurve_AIS(aGeomEllipse);
   myObject3d.Append(anAisEllipce);
 
-  // Describes a parabola in 3D space. A parabola is defined by its focal length 
-  // (that is, the distance between its focus and apex) and positioned in space with 
+  // Describes a parabola in 3D space. A parabola is defined by its focal length
+  // (that is, the distance between its focus and apex) and positioned in space with
   // a coordinate system (a gp_Ax2 object)
   gp_Parab aParab(anAxis2.Translated(gp_Vec(0.0, 0.0, 20.0)), 2.0);
   Handle(Geom_Parabola) aGeomParabola = new Geom_Parabola(aParab);
@@ -432,8 +432,8 @@ void GeometrySamples::SecondOrderCurves3dSample()
 
 void GeometrySamples::PlaneSurfaces3dSample()
 {
-  // Describes a plane.A plane is positioned in space with a coordinate system(a gp_Ax3 object), 
-  // such that the plane is defined by the origin, "X Direction" and "Y Direction" of this 
+  // Describes a plane.A plane is positioned in space with a coordinate system(a gp_Ax3 object),
+  // such that the plane is defined by the origin, "X Direction" and "Y Direction" of this
   // coordinate system, which is the "local coordinate system" of the plane.The "main Direction"
   // of the coordinate system is a vector normal to the plane.
   gp_Pln aPln(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0));
@@ -444,8 +444,8 @@ void GeometrySamples::PlaneSurfaces3dSample()
     Standard_False);
   myObject3d.Append(anAisPlane);
 
-  // Describes an infinite cylindrical surface.A cylinder is defined by its radius and positioned 
-  // in space with a coordinate system(a gp_Ax3 object), the "main Axis" of which is the axis of 
+  // Describes an infinite cylindrical surface.A cylinder is defined by its radius and positioned
+  // in space with a coordinate system(a gp_Ax3 object), the "main Axis" of which is the axis of
   // the cylinder.This coordinate system is the "local coordinate system" of the cylinder.
   gp_Cylinder aCylinder(gp_Ax3(gp_Pnt(0.0, 0.0, 10.0), gp_Dir(0.0, 0.0, 1.0)), 10.0);
   Handle(Geom_CylindricalSurface) aCylindricalSurface = new Geom_CylindricalSurface(aCylinder);
@@ -453,8 +453,8 @@ void GeometrySamples::PlaneSurfaces3dSample()
     aCylindricalSurface, 0.0, 2.0*M_PI, 0.0, 10.0, Precision::Confusion()).Shape());
   myObject3d.Append(anAisCylinder);
 
-  // Defines an infinite conical surface. A cone is defined by its half-angle (can be negative) at 
-  // the apex and positioned in space with a coordinate system (a gp_Ax3 object) and a "reference radius" 
+  // Defines an infinite conical surface. A cone is defined by its half-angle (can be negative) at
+  // the apex and positioned in space with a coordinate system (a gp_Ax3 object) and a "reference radius"
   gp_Cone aCone(gp_Ax3(gp_Pnt(0.0, 0.0, 30.0), gp_Dir(0.0, 0.0, 1.0)), 0.25*M_PI, 0.0);
   Handle(Geom_ConicalSurface) aConicalSurface = new Geom_ConicalSurface(aCone);
   Handle(AIS_Shape) anAisCone = new AIS_Shape(BRepBuilderAPI_MakeFace(
@@ -509,7 +509,7 @@ void GeometrySamples::ZeroDimensionObjects2dSample()
 
 void GeometrySamples::Vectors2dSample()
 {
-  // Describes a unit vector in the plane (2D space). 
+  // Describes a unit vector in the plane (2D space).
   // This unit vector is also called "Direction".
   gp_Dir2d aDir(3.0, 4.0);
   Handle(AdaptorVec_AIS) anAisDir = new AdaptorVec_AIS(gp_Pnt2d(0.0, 0.0), aDir, 1.0, 0.3);
@@ -534,7 +534,7 @@ void GeometrySamples::InfinityLines2dSample()
   anAisAx2d->SetText("gp_Ax2d");
   myObject2d.Append(anAisAx2d);
 
-  // Describes a coordinate system in a plane (2D space). 
+  // Describes a coordinate system in a plane (2D space).
   gp_Ax22d anAx22d(gp_Pnt2d(0.0, 2.0), gp_Dir2d(1.0, 1.0), Standard_False);
   Handle(AdaptorVec_AIS) anAisAx2d_X = new AdaptorVec_AIS(anAx22d.Location(), anAx22d.XDirection(), 1.0, 0.3);
   anAisAx2d_X->SetText("gp_Ax2d X");
@@ -545,7 +545,7 @@ void GeometrySamples::InfinityLines2dSample()
 
   // Describes a line in 2D space. A line is positioned in the plane with an axis (a gp_Ax2d object) which gives
   // the line its origin and unit vector. A line and an axis are similar objects, thus,
-  // we can convert one into the other. A line provides direct access to the majority of the edit and query 
+  // we can convert one into the other. A line provides direct access to the majority of the edit and query
   // functions available on its positioning axis.
   gp_Lin2d aLin2d(gp_Pnt2d(2.0, 4.0), gp_Dir2d(0.0, -1.0));
   Handle(AdaptorVec_AIS) anAisLin = new AdaptorVec_AIS(aLin2d.Location(), aLin2d.Direction(), 1.0, 0.3);
@@ -556,7 +556,7 @@ void GeometrySamples::InfinityLines2dSample()
 void GeometrySamples::SecondOrderCurves2dSample()
 {
   // Describes a circle in the plane (2D space). A circle is defined by its radius
-  //  and positioned in the plane with a coordinate system (a gp_Ax22d object) 
+  //  and positioned in the plane with a coordinate system (a gp_Ax22d object)
   gp_Circ2d aCirc2d;
   aCirc2d.SetLocation(gp_Pnt2d(0.0, 0.0));
   aCirc2d.SetRadius(10.0);
@@ -564,15 +564,15 @@ void GeometrySamples::SecondOrderCurves2dSample()
   Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeomCircle, Aspect_TOL_SOLID);
   myObject2d.Append(anAisCirc);
 
-  // Describes an ellipse in the plane (2D space). An ellipse is defined by its major 
+  // Describes an ellipse in the plane (2D space). An ellipse is defined by its major
   // and minor radii and positioned in the plane with a coordinate system (a gp_Ax22d object)
   gp_Elips2d anElips(gp_Ax2d(gp_Pnt2d(0.0, 30.0), gp_Dir2d(1.0, 0.0)), 20.0, 10.0);
   Handle(Geom2d_Ellipse) aGeomEllipse = new Geom2d_Ellipse(anElips);
   Handle(AdaptorCurve2d_AIS) anAisEllipse = new AdaptorCurve2d_AIS(aGeomEllipse, Aspect_TOL_DASH);
   myObject2d.Append(anAisEllipse);
 
-  // Describes a parabola in the plane (2D space). A parabola is defined by its focal length 
-  // (that is, the distance between its focus and apex) and positioned in the plane with 
+  // Describes a parabola in the plane (2D space). A parabola is defined by its focal length
+  // (that is, the distance between its focus and apex) and positioned in the plane with
   // a coordinate system (a gp_Ax22d object)
   gp_Parab2d aParab2d(gp_Ax2d(gp_Pnt2d(20.0, 0.0), gp_Dir2d(1.0, 0.0)), 10.0);
   Handle(Geom2d_Parabola) aGeomParabola = new Geom2d_Parabola(aParab2d);
@@ -580,8 +580,8 @@ void GeometrySamples::SecondOrderCurves2dSample()
   Handle(AdaptorCurve2d_AIS) anAisParabola = new AdaptorCurve2d_AIS(aTrimmedParabola, Aspect_TOL_DOT);
   myObject2d.Append(anAisParabola);
 
-  // Describes a branch of a hyperbola in the plane (2D space). A hyperbola is defined by its major and 
-  // minor radii, and positioned in the plane with a coordinate system (a gp_Ax22d object)   
+  // Describes a branch of a hyperbola in the plane (2D space). A hyperbola is defined by its major and
+  // minor radii, and positioned in the plane with a coordinate system (a gp_Ax22d object)
   gp_Hypr2d aHypr2d(gp_Ax2d(gp_Pnt2d(20.0, 0.0), gp_Dir2d(1.0, 0.0)), 20.0, 10.0);
   Handle(Geom2d_Hyperbola) aGeomHyperbola = new Geom2d_Hyperbola(aHypr2d);
   Handle(Geom2d_TrimmedCurve) aTrimmedHyperbola = new Geom2d_TrimmedCurve(aGeomHyperbola, 2.0, -2.0);
@@ -773,7 +773,6 @@ void GeometrySamples::ConjugateObjects3dSample()
   gp_Ax1 aDirectrix1 = aHypr.Directrix1();
   gp_Ax1 aDirectrix2 = aHypr.Directrix2();
   gp_Pnt aFocus1 = aHypr.Focus1();
-  gp_Pnt aFocus2 = aHypr.Focus2();
   gp_Pnt aLocation = aHypr.Location();
 
   Handle(AdaptorVec_AIS) anAsy1AIS =
@@ -936,9 +935,9 @@ void GeometrySamples::MirroredAxis2dSample()
 void GeometrySamples::TransformedEllipse2dSample()
 {
   // Creates an ellipse with the major axis, the major and the minor radius.
-  // The location of the MajorAxis is the center of the ellipse.The sense of 
+  // The location of the MajorAxis is the center of the ellipse.The sense of
   // parametrization is given by Sense.Warnings : It is possible to create
-  // an ellipse with MajorRadius = MinorRadius.Raises 
+  // an ellipse with MajorRadius = MinorRadius.Raises
   // ConstructionError if MajorRadius < MinorRadius or MinorRadius < 0.0.
   gp_Elips2d aBaseEllips(gp_Ax2d(gp_Pnt2d(), gp_Dir2d(1.0, 0.0)), 20.0, 10.0);
   gp_Trsf2d aRotTrsf;
@@ -1116,13 +1115,13 @@ void GeometrySamples::EllipseInfo3dSample()
 {
   gp_Elips anElips(gp_Ax2(gp_Pnt(), gp_Dir(1.0, 0.0, 0.0)), 20.0, 10.0);
   Standard_Real anArea = anElips.Area();
-  // Returns the eccentricity of the ellipse between 0.0 and 1.0 
-  // If f is the distance between the center of the ellipse and the Focus1 then 
+  // Returns the eccentricity of the ellipse between 0.0 and 1.0
+  // If f is the distance between the center of the ellipse and the Focus1 then
   // the eccentricity e = f / MajorRadius. Returns 0 if MajorRadius = 0.
   Standard_Real anEccentricity = anElips.Eccentricity();
   // Returns the distance between the center of the ellipse and focus1 or focus2.
   Standard_Real aFocal = anElips.Focal();
-  // Returns p = (1 - e * e) * MajorRadius where e is the eccentricity 
+  // Returns p = (1 - e * e) * MajorRadius where e is the eccentricity
   // of the ellipse. Returns 0 if MajorRadius = 0.
   Standard_Real aParameter = anElips.Parameter();
 
@@ -1765,7 +1764,6 @@ void GeometrySamples::OffsetCurve2dSample()
     new Geom2d_OffsetCurve(aGeomCircle, anExpandOffset);
 
   Standard_Real anCollapseOffset = -aGeomCircle->Radius() / 2.0;
-  gp_Dir anCollapseDir = gp::DZ();
   Handle(Geom2d_OffsetCurve) anCollapseCircCurve =
     new Geom2d_OffsetCurve(aGeomCircle, anCollapseOffset);
 

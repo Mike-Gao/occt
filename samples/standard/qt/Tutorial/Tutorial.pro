@@ -7,24 +7,25 @@ QT += widgets
 
 TARGET = Tutorial
 
+SAMPLESROOT = $$quote($$(aSamplePath)/..)
 
-SAMPLESROOT = $$quote($$(SAMPLESROOT))
-#SAMPLESROOT = $$quote($$(CSF_OCCTSamplesPath)/standard/qt)
-#SAMPLESROOT = C:/Work/occt-CR31570/samples/standard/qt
+FREEIMAGE_DIR = $$quote($$(FREEIMAGE_DIR))
+TBB_DIR = $$quote($$(TBB_DIR))
 
-HEADERS   = src/*.h \
-            $${SAMPLESROOT}/../samples_src/*.h 
+HEADERS   = ./src/*.h \
+            $${SAMPLESROOT}/../samples_src/*.h
 
-SOURCES   = src/*.cxx \
+SOURCES   = ./src/*.cxx \
             $${SAMPLESROOT}/../samples_src/*.cxx
-			
-RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc 
+
+RESOURCES += $${SAMPLESROOT}/../samples_src/Samples.qrc
 RESOURCES += ./res/Tutorial.qrc
 
 RES_DIR   = $$quote($$(RES_DIR))
 
 INCLUDEPATH += $$quote($$(CSF_SampleSources))
-INCLUDEPATH += $$quote($$(CSF_OCCTIncludePath))
+INCLUDEPATH += $$quote($$(CSF_OCCTIncludePath)) \
+               $${SAMPLESROOT}/../samples_src
 
 
 OCCT_DEFINES = $$(CSF_DEFINES)
@@ -53,8 +54,14 @@ unix {
     equals(MACOSX_USE_GLX, true): DEFINES += MACOSX_USE_GLX
     DEFINES += OCC_CONVERT_SIGNALS QT_NO_STL
     !macx | equals(MACOSX_USE_GLX, true): LIBS += -L$$QMAKE_LIBDIR_X11 $$QMAKE_LIBS_X11 -L$$QMAKE_LIBDIR_OPENGL $$QMAKE_LIBS_OPENGL $$QMAKE_LIBS_THREAD
-    LIBS += -lfreeimageplus
-    LIBS += -ltbb -ltbbmalloc
+
+    !equals(FREEIMAGE_DIR, "") {
+        LIBS += -lfreeimageplus
+    }
+
+    !equals(TBB_DIR, "") {
+        LIBS += -ltbb -ltbbmalloc
+    }
     QMAKE_CXXFLAGS += -std=gnu++11
 }
 
@@ -88,5 +95,3 @@ LIBS += -lTKernel -lTKMath -lTKService -lTKV3d -lTKOpenGl \
         system(mkdir -p $${RES_DIR})
     }
 }
-
- 

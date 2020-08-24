@@ -59,7 +59,8 @@ AdaptorVec_AIS::AdaptorVec_AIS(const gp_Pnt2d& aPnt2d, const gp_Vec2d& aVec2d, S
 }
 
 AdaptorVec_AIS::AdaptorVec_AIS(const gp_Pnt2d & aPnt1, const gp_Pnt2d & aPnt2, Standard_Real anArrowLength)
-  : myPnt(gp_Pnt(aPnt1.X(), aPnt1.Y(), 0.0))
+  : myPnt(gp_Pnt(aPnt1.X(), aPnt1.Y(), 0.0)),
+  myArrowLength(anArrowLength)
 {
   gp_Vec aVec(aPnt2.X() - aPnt1.X(), aPnt2.Y() - aPnt1.Y(), 0.0);
   myDir = gp_Dir(aVec);

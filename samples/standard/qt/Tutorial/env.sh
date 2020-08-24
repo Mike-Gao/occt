@@ -6,9 +6,7 @@ if [ -e "custom.sh" ]; then
   source "custom.sh" $*;
 fi
 
-if [ -e "${aSamplePath}/../../../env.sh" ]; then
-  source "${aSamplePath}/../../../env.sh" $*;
-fi
+source ${CASROOT}/bin/env.sh $*
 
 if [ "${QTDIR}" != "" ]; then
   export PATH=${QTDIR}/bin:${PATH}
