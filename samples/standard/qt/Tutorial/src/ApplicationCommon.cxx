@@ -42,7 +42,7 @@
 #include <QFile>
 #include <QMap>
 #include <QPair>
-
+#include <QGroupBox>
 
 #include <Standard_WarningsDisable.hxx>
 #include <Standard_WarningsRestore.hxx>
@@ -127,29 +127,44 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
   aCodeViewFont.setFixedPitch(true);
   aCodeViewFont.setPointSize(10);
 
-  myCodeView = new QTextEdit;
+  QGroupBox* aCodeFrame = new QGroupBox(tr("Procedure Code"));
+  QVBoxLayout* aCodeLayout = new QVBoxLayout(aCodeFrame);
+  aCodeLayout->setContentsMargins(3, 3, 3, 3);
+  myCodeView = new QTextEdit(aCodeFrame);
+  aCodeLayout->addWidget(myCodeView);
   myCodeView->setDocumentTitle("Code");
   myCodeView->setLineWrapMode(QTextEdit::NoWrap);
   myCodeView->setReadOnly(true);
   myCodeView->setFont(aCodeViewFont);
   myCodeViewHighlighter = new OcctHighlighter(myCodeView->document());
 
-  myResultView = new QTextEdit;
+  QGroupBox* aResultFrame = new QGroupBox(tr("Output"));
+  QVBoxLayout* aResultLayout = new QVBoxLayout(aResultFrame);
+  aResultLayout->setContentsMargins(3, 3, 3, 3);
+  myResultView = new QTextEdit(aResultFrame);
+  aResultLayout->addWidget(myResultView);
   myResultView->setDocumentTitle("Output");
   myResultView->setReadOnly(true);
   myResultView->setFont(aCodeViewFont);
 
   QSplitter* aCodeResultSplitter = new QSplitter(Qt::Vertical);
-  aCodeResultSplitter->addWidget(myCodeView);
-  aCodeResultSplitter->addWidget(myResultView);
+  aCodeResultSplitter->addWidget(aCodeFrame);
+  aCodeResultSplitter->addWidget(aResultFrame);
 
   myDocument3d = createNewDocument();
   myDocument2d = createNewDocument();
+
+  QFrame* aViewFrame = new QFrame;
+  aViewFrame->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  aViewFrame->setLineWidth(3);
+  QVBoxLayout* aViewLayout = new QVBoxLayout(aViewFrame);
+  aViewLayout->setContentsMargins(0, 0, 0, 0);
   myGeomWidget = new GeomWidget(myDocument3d, myDocument2d, this);
-  myGeomWidget->setContentsMargins(0, 0, 0, 0);
+  aViewLayout->addWidget(myGeomWidget);
+  //myGeomWidget->setContentsMargins(0, 0, 0, 0);
   QSplitter* aGeomTextSplitter = new QSplitter(Qt::Horizontal);
 
-  aGeomTextSplitter->addWidget(myGeomWidget);
+  aGeomTextSplitter->addWidget(aViewFrame);
   aGeomTextSplitter->addWidget(aCodeResultSplitter);
   aGeomTextSplitter->setStretchFactor(0, 1);
   aGeomTextSplitter->setStretchFactor(1, 1);

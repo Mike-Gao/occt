@@ -19,6 +19,7 @@
 #include <QWidget>
 
 class ApplicationCommon;
+class QStackedWidget;
 
 class GeomWidget : public QWidget
 {
@@ -40,6 +41,7 @@ private:
 
   QWidget* my3dVidget;
   QWidget* my2dVidget;
+  QStackedWidget* myStackWidget;
 
   DocumentCommon* myDocument3d;
   DocumentCommon* myDocument2d;
