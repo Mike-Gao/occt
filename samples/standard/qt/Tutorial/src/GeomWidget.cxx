@@ -19,6 +19,7 @@
 #include <QTextEdit>
 #include <QStackedLayout>
 #include <QToolBar>
+#include <QStackedWidget>
 
 GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   DocumentCommon* theDocument2d,
@@ -27,21 +28,23 @@ GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   myDocument3d(theDocument3d),
   myDocument2d(theDocument2d)
 {
+  QVBoxLayout* aMainLayout = new QVBoxLayout(this);
+  aMainLayout->setContentsMargins(0, 0, 0, 0);
+
   my2dVidget = new QWidget;
-  my2dVidget->setContentsMargins(0, 0, 0, 0);
-  QVBoxLayout* a2dLayout = new QVBoxLayout;
-  a2dLayout->setMargin(0);
+  QVBoxLayout* a2dLayout = new QVBoxLayout(my2dVidget);
+  a2dLayout->setContentsMargins(0, 0, 0, 0);
+  a2dLayout->setSpacing(0);
   myView2d = new View(myDocument2d->getContext(), false, this);
   QToolBar* aToolBar2d = new QToolBar;
   aToolBar2d->addActions(myView2d->getViewActions());
   a2dLayout->addWidget(aToolBar2d);
   a2dLayout->addWidget(myView2d);
-  my2dVidget->setLayout(a2dLayout);
 
   my3dVidget = new QWidget;
-  my3dVidget->setContentsMargins(0, 0, 0, 0);
-  QVBoxLayout* a3dLayout = new QVBoxLayout;
-  a3dLayout->setMargin(0);
+  QVBoxLayout* a3dLayout = new QVBoxLayout(my3dVidget);
+  a3dLayout->setContentsMargins(0, 0, 0, 0);
+  a3dLayout->setSpacing(0);
   myView3d = new View(myDocument3d->getContext(), true, this);
   QToolBar* aToolBar3d = new QToolBar;
   aToolBar3d->addActions(myView3d->getViewActions());
@@ -49,30 +52,19 @@ GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   aToolBar3d->addActions(myView3d->getRaytraceActions());
   a3dLayout->addWidget(aToolBar3d);
   a3dLayout->addWidget(myView3d);
-  my3dVidget->setLayout(a3dLayout);
 
-  QVBoxLayout* a3d2dLayout = new QVBoxLayout;
-  a3d2dLayout->setMargin(0);
-  a3d2dLayout->addWidget(my3dVidget);
-  a3d2dLayout->addWidget(my2dVidget);
-
-  QVBoxLayout* aWidgetLayout = new QVBoxLayout;
-  aWidgetLayout->setMargin(0);
-  aWidgetLayout->addLayout(a3d2dLayout);
-  setLayout(aWidgetLayout);
+  myStackWidget = new QStackedWidget(this);
+  aMainLayout->addWidget(myStackWidget);
+  myStackWidget->addWidget(my2dVidget);
+  myStackWidget->addWidget(my3dVidget);
 
   FitAll();
 }
 
 void GeomWidget::FitAll()
 {
-  if (myDocument3d->IsEmpty())
-    my3dVidget->hide();
-  else
-    Show3d();
-
   if (myDocument2d->IsEmpty())
-    my2dVidget->hide();
+    Show3d();
   else
     Show2d();
 }
@@ -86,14 +78,14 @@ void GeomWidget::Show3d()
   QAction * aHlrOffAction = myView3d->getViewAction(ViewAction::HlrOff);
   aHlrOffAction->trigger();
   aHlrOffAction->setChecked(true);
-  my3dVidget->show();
+  myStackWidget->setCurrentWidget(my3dVidget);
   setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
 }
 
 void GeomWidget::Show2d()
 {
   myView2d->fitAll();
-  my2dVidget->show();
+  myStackWidget->setCurrentWidget(my2dVidget);
   setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan");
 }
 
