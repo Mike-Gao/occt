@@ -4,12 +4,11 @@ if exist "%~dp0custom.bat" (
   call "%~dp0custom.bat" %1 %2 %3
 )
 
-rem call "%~dp0..\..\..\..\env.bat" %1 %2 %3
-call "C:\Work\install-CR31570\env.bat" %1 %2 %3
+call "%CASROOT%\env.bat" %1 %2 %3
 
 
-if ["%ARCH%"] == ["32"] set VCARCH=x86
-if ["%ARCH%"] == ["64"] set VCARCH=amd64
+rem if ["%ARCH%"] == ["32"] set VCARCH=x86
+rem if ["%ARCH%"] == ["64"] set VCARCH=amd64
 
 if /I ["%1"] == ["vc141"] set "VCVER=vc141"
 set "BIN_DIR=win%ARCH%\%VCVER%\bind"
@@ -32,4 +31,5 @@ if not "%QTDIR%" == "" (
   set "PATH=%QTDIR%/bin;%PATH%"
   set "QT_QPA_PLATFORM_PLUGIN_PATH=%QTDIR%\plugins\platforms"
 )
-set "CSF_SampleSources=%~dp0..\..\samples_src"
+rem set "CSF_SampleSources=%~dp0..\..\samples_src"
+set "aSamplePath=%~dp0"
