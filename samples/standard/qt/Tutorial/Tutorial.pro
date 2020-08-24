@@ -81,10 +81,6 @@ LIBS += -lTKernel -lTKMath -lTKService -lTKV3d -lTKOpenGl \
         -lTKCDF -lTKBool -lTKBO -lTKFillet -lTKOffset -lTKLCAF -lTKCAF -lTKVCAF \
 		-lTKBin -lTKXml
 
-#!equals(FREEIMAGE_DIR, "") {
-#    LIBS += -lfreeimageplus
-#}
-
 !equals(TBB_DIR, "") {
     LIBS += -ltbb -ltbbmalloc
 }
