@@ -15,23 +15,41 @@
 
 #include <Standard_WarningsDisable.hxx>
 #include <QHBoxLayout>
-#include <QSpinBox>
+#include <QSlider>
+#include <QLabel>
 #include <Standard_WarningsRestore.hxx>
 
-DialogTransparency::DialogTransparency(QWidget* parent, Qt::WindowFlags f, bool modal)
-  : QDialog(parent, f)
+DialogTransparency::DialogTransparency(QWidget* parent)
+  : QDialog(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint)
 {
-  setModal(modal);
+  setWindowTitle(tr("Transparency"));
   QHBoxLayout* base = new QHBoxLayout(this);
-  base->setMargin(3);
-  base->setSpacing(3);
-  QSpinBox* aSpin = new QSpinBox(this);
-  aSpin->setRange(0, 10);
-  aSpin->setSingleStep(1);
-  base->addWidget(aSpin);
-  connect(aSpin, SIGNAL(valueChanged(int)), this, SIGNAL(sendTransparencyChanged(int)));
+
+  base->addWidget(new QLabel("0", this));
+
+  mySlider = new QSlider(Qt::Horizontal, this);
+  mySlider->setRange(0, 10);
+  mySlider->setTickPosition(QSlider::TicksBelow);
+  mySlider->setTickInterval(1);
+  mySlider->setPageStep(2);
+  base->addWidget(mySlider);
+  connect(mySlider, SIGNAL(valueChanged(int)), this, SIGNAL(sendTransparencyChanged(int)));
+
+  base->addWidget(new QLabel("10", this));
 }
 
 DialogTransparency::~DialogTransparency()
 {
 }
+
+
+int DialogTransparency::value() const
+{
+  return mySlider->value();
+}
+
+void DialogTransparency::setValue(int theVal) const
+{
+  mySlider->setValue(theVal);
+}
+

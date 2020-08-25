@@ -18,12 +18,21 @@
 
 #include <AIS_InteractiveContext.hxx>
 
+class QSlider;
+
 class DialogTransparency : public QDialog
 {
 	Q_OBJECT
 public:
-	DialogTransparency ( QWidget * parent=0, Qt::WindowFlags f=0, bool modal=true );
+	DialogTransparency ( QWidget * parent=0 );
 	~DialogTransparency();
+
+  int value() const;
+  void setValue(int theVal) const;
+
 signals:
 	void sendTransparencyChanged(int value);
+
+private:
+  QSlider* mySlider;
 };
