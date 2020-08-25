@@ -2211,33 +2211,36 @@ static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)&
   aLink->Init(aHNameLink);
 
   //Choose type of the representation link
-  Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr;
-  TDF_LabelSequence aJoints = theKTool->GetJointsOfLink(theLabelLink,Standard_True,Standard_False);
-  Standard_Boolean isLinear = Standard_False;
-  for (TDF_LabelSequence::Iterator anItJoint(aJoints); anItJoint.More(); anItJoint.Next())
+  Standard_Boolean isLinear = Standard_True;
+  TDF_LabelSequence aJoints = theKTool->GetJointsOfLink(theLabelLink, Standard_True, Standard_False);
+  if (aJoints.IsEmpty())
+    isLinear = Standard_False;
+  for (TDF_LabelSequence::Iterator anItJoint(aJoints); anItJoint.More() && isLinear; anItJoint.Next())
   {
     Handle(XCAFDoc_KinematicPair) aKPairAttr;
     if (!anItJoint.Value().FindAttribute(XCAFDoc_KinematicPair::GetID(), aKPairAttr))
       continue;
     Handle(XCAFKinematics_PairObject) aPairObject = aKPairAttr->GetObject();
-    if (aPairObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPinion ||
-        aPairObject->Type() == XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
-      isLinear = Standard_True;
-    else if(isLinear)
-      return Standard_False;
+    if (aPairObject->Type() == XCAFKinematics_PairType_NoType)
+      continue;
+    if (aPairObject->Type() != XCAFKinematics_PairType_LinearFlexibleAndPinion &&
+        aPairObject->Type() != XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve)
+      isLinear = Standard_False;
   }
-  if (isLinear)
-    aLinkRepr = new StepKinematics_LinearFlexibleLinkRepresentation;
-  else
-    aLinkRepr = new StepKinematics_RigidLinkRepresentation;
+  aJoints = theKTool->GetJointsOfLink(theLabelLink, Standard_False, Standard_True);
+  if (!aJoints.IsEmpty())
+    isLinear = Standard_False;
 
-  Model->AddEntity(aLink);
-  Model->AddEntity(aLinkRepr);
+  Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr;
+  Handle(TCollection_HAsciiString) aNameOfLinkRepr = new TCollection_HAsciiString("");
+  // create empty collection for updating during creating a referenced pairs
+  Handle(StepRepr_HArray1OfRepresentationItem) aPlacementsOfPairs = new StepRepr_HArray1OfRepresentationItem();
 
-  // find ref shapes
   TDF_LabelSequence aShapesL = theKTool->GetRefShapes(theLabelLink);
   if (aShapesL.IsEmpty())
     return Standard_False;
+
+  // find ref shapes
   for (TDF_LabelSequence::Iterator anItShapes(aShapesL); anItShapes.More(); anItShapes.Next()) {
     TopoDS_Shape aTopoShape = XCAFDoc_ShapeTool::GetShape(anItShapes.Value());
     TopLoc_Location aLoc;
@@ -2266,12 +2269,6 @@ static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)&
     }
     if (aPD.IsNull())
       return Standard_False;
-    Handle(StepRepr_RepresentationContext) aRepresentationContextOfLink = aShapeRepr->ContextOfItems();
-
-    Handle(TCollection_HAsciiString) aNameOfLinkRepr = new TCollection_HAsciiString("");
-    Handle(StepRepr_HArray1OfRepresentationItem) aPlacementsOfPairs = new StepRepr_HArray1OfRepresentationItem();
-    aLinkRepr->Init(aNameOfLinkRepr, aPlacementsOfPairs, aRepresentationContextOfLink, aLink);
-    theMapOfLinks.Add(theLabelLink, aLinkRepr);
 
     if (theGeneralPD.IsNull() && !isLinear)
       theGeneralPD = aPD;
@@ -2282,11 +2279,22 @@ static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)&
       theBaseLink = Handle(StepKinematics_RigidLinkRepresentation)::DownCast(aLinkRepr);
     }
 
+    if (aLinkRepr.IsNull())
+    {
+      if (isLinear)
+        aLinkRepr = new StepKinematics_LinearFlexibleLinkRepresentation;
+      else
+        aLinkRepr = new StepKinematics_RigidLinkRepresentation;
+      aLinkRepr->Init(aNameOfLinkRepr, aPlacementsOfPairs, aShapeRepr->ContextOfItems(), aLink);
+      theMapOfLinks.Add(theLabelLink, aLinkRepr);
+      Model->AddEntity(aLink);
+      Model->AddEntity(aLinkRepr);
+    }
+
     Handle(StepKinematics_KinematicLinkRepresentationAssociation) aLinkRepresentationAssociation = new StepKinematics_KinematicLinkRepresentationAssociation;
     aLinkRepresentationAssociation->Init(aNameOfLinkRepr, aNameOfLinkRepr, aLinkRepr, aShapeRepr);
     Handle(StepKinematics_ContextDependentKinematicLinkRepresentation) aCDKLRS = new StepKinematics_ContextDependentKinematicLinkRepresentation;
     Handle(StepKinematics_ProductDefinitionRelationshipKinematics) aPDRK = new StepKinematics_ProductDefinitionRelationshipKinematics;
-    theGeneralPD = aPD;
     aPDRK->Init(aNameOfLinkRepr, Standard_False, aLinkRepresentationAssociation->Description(), aPD->Definition());
     aCDKLRS->Init(aLinkRepresentationAssociation, aPDRK);
     Model->AddEntity(aLinkRepresentationAssociation);
@@ -2338,23 +2346,23 @@ static Standard_Boolean createKinematicJoint(const Handle(XCAFDoc_KinematicTool)
 //=======================================================================
 static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObject)& theKinPairObj,
                                             const Handle(StepKinematics_KinematicJoint)& theJoint,
-                                            Handle(StepKinematics_KinematicPair)& theKinematicPair,
-                                            Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepr1,
-                                            Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepr2)
+                                            const Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepr1,
+                                            const Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepr2,
+                                            Handle(StepKinematics_KinematicPair)& theKinematicPair)
 {
   if (theKinPairObj->Type() == XCAFKinematics_PairType_NoType)
     return Standard_False;
-  Handle(StepRepr_RepresentationItem) theTransformItem1 = GeomToStep_MakeAxis2Placement3d(theKinPairObj->FirstTransformation()).Value();
-  Handle(StepRepr_RepresentationItem) theTransformItem2 = GeomToStep_MakeAxis2Placement3d(theKinPairObj->SecondTransformation()).Value();
-
-  theLinkRepr1->Items()->Resize(theLinkRepr1->Items()->Lower(), theLinkRepr1->Items()->Upper() + 1, Standard_True);
-  theLinkRepr1->Items()->ChangeLast() = theTransformItem1;
-
-  theLinkRepr2->Items()->Resize(theLinkRepr2->Items()->Lower(), theLinkRepr2->Items()->Upper() + 1, Standard_True);
-  theLinkRepr2->Items()->ChangeLast() = theTransformItem2;
+  Handle(StepRepr_RepresentationItem) aTransformItem1 = GeomToStep_MakeAxis2Placement3d(theKinPairObj->FirstTransformation()).Value();
+  Handle(StepRepr_RepresentationItem) aTransformItem2 = GeomToStep_MakeAxis2Placement3d(theKinPairObj->SecondTransformation()).Value();
+  if (aTransformItem1.IsNull() || aTransformItem2.IsNull())
+    return Standard_False;
 
   Standard_Boolean hasDescription = Standard_False;
-  Handle(TCollection_HAsciiString) aPairName = new TCollection_HAsciiString(theKinPairObj->Name());
+  Handle(TCollection_HAsciiString) aPairName;
+  if (!theKinPairObj->Name().Search("Joint"))
+    aPairName = new TCollection_HAsciiString(theKinPairObj->Name());
+  else
+    aPairName = new TCollection_HAsciiString("");
   Handle(TCollection_HAsciiString) aDescription;
   Standard_Boolean isRanged = theKinPairObj->HasLimits();
   if (theKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_LowOrderPairObject)))
@@ -2383,7 +2391,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         aRZ = Standard_True;
         Handle(StepKinematics_RevolutePairWithRange) aRevolutePairWithRange = Handle(StepKinematics_RevolutePairWithRange)::DownCast(theKinematicPair);
         aRevolutePairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualRotation, Standard_True, aUpperLimitActualRotation);
       }
       else
@@ -2391,7 +2399,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_RevolutePair;
         Handle(StepKinematics_RevolutePair) aRevolutePair = Handle(StepKinematics_RevolutePair)::DownCast(theKinematicPair);
         aRevolutePair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ);
       }
       break;
@@ -2410,7 +2418,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         Standard_Real aUpperLimitActualTranslation = aLowOrderPairObj->MaxTranslationX();
         Standard_Real aLowerLimitActualTranslation = aLowOrderPairObj->MinTranslationX();
         aPrismaticPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslation, Standard_True, aUpperLimitActualTranslation);
       }
       else
@@ -2418,7 +2426,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_PrismaticPair;
         Handle(StepKinematics_PrismaticPair) aPrismaticPair = Handle(StepKinematics_PrismaticPair)::DownCast(theKinematicPair);
         aPrismaticPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ);
       }
       break;
@@ -2438,7 +2446,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         Standard_Real aLowerLimitActualRotation = aLowOrderPairObj->MinRotationZ();
         Standard_Real aUpperLimitActualRotation = aLowOrderPairObj->MaxRotationZ();
         aCylindricalPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslation, Standard_True,
           aUpperLimitActualTranslation, Standard_True, aLowerLimitActualRotation, Standard_True, aUpperLimitActualRotation);
       }
@@ -2447,7 +2455,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_CylindricalPair;
         Handle(StepKinematics_CylindricalPair) aCylindricalPair = Handle(StepKinematics_CylindricalPair)::DownCast(theKinematicPair);
         aCylindricalPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ);
       }
       break;
@@ -2468,7 +2476,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         Standard_Real aUpperLimitActualRotationZ = aLowOrderPairObj->MaxRotationZ();
         Standard_Real aLowerLimitActualRotationZ = aLowOrderPairObj->MinRotationZ();
         anUniversalPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, theUniversalPair_InputSkewAngle, Standard_True, aLowerLimitActualRotationX, Standard_True,
           aUpperLimitActualRotationX, Standard_True, aLowerLimitActualRotationZ, Standard_True, aUpperLimitActualRotationZ);
       }
@@ -2477,7 +2485,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_UniversalPair;
         Handle(StepKinematics_UniversalPair) anUniversalPair = Handle(StepKinematics_UniversalPair)::DownCast(theKinematicPair);
         anUniversalPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, theUniversalPair_InputSkewAngle);
       }
       break;
@@ -2498,7 +2506,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_SphericalPairWithPinAndRange;
         Handle(StepKinematics_SphericalPairWithPinAndRange) aSphericalPairWithPinAndRange = Handle(StepKinematics_SphericalPairWithPinAndRange)::DownCast(theKinematicPair);
         aSphericalPairWithPinAndRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitYaw, Standard_True,
           aUpperLimitYaw, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
       }
@@ -2507,7 +2515,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_SphericalPairWithPin;
         Handle(StepKinematics_SphericalPairWithPin) aSphericalPairWithPin = Handle(StepKinematics_SphericalPairWithPin)::DownCast(theKinematicPair);
         aSphericalPairWithPin->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ);
       }
       break;
@@ -2528,7 +2536,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_SphericalPairWithRange;
         Handle(StepKinematics_SphericalPairWithRange) aSphericalPairWithRange = Handle(StepKinematics_SphericalPairWithRange)::DownCast(theKinematicPair);
         aSphericalPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitYaw, Standard_True,
           aUpperLimitYaw, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll, Standard_True, aLowerLimitPitch, Standard_True, aUpperLimitPitch);
       }
@@ -2537,7 +2545,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_SphericalPair;
         Handle(StepKinematics_SphericalPair) aSphericalPair = Handle(StepKinematics_SphericalPair)::DownCast(theKinematicPair);
         aSphericalPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ);
       }
       break;
@@ -2558,7 +2566,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         Standard_Real aLowerLimitActualRotation = aLowOrderPairObj->MinRotationZ();
         Standard_Real aUpperLimitActualRotation = aLowOrderPairObj->MaxRotationZ();
         aPlanarPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualTranslationX, Standard_True, aUpperLimitActualTranslationX, 
           Standard_True, aLowerLimitActualTranslationY, Standard_True, aUpperLimitActualTranslationY,
           Standard_True, aLowerLimitActualRotation, Standard_True, aUpperLimitActualRotation);
@@ -2568,7 +2576,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_PlanarPair;
         Handle(StepKinematics_PlanarPair) aPlanarPair = Handle(StepKinematics_PlanarPair)::DownCast(theKinematicPair);
         aPlanarPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,
           aTX, aTY, aTZ, aRX, aRY, aRZ);
       }
       break;
@@ -2591,7 +2599,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       Standard_Real aUpperLimitActualRotationZ = aLowOrderPairObj->MaxRotationZ();
       Handle(StepKinematics_LowOrderKinematicPairWithRange) anUnconstrainedPairWithRange = Handle(StepKinematics_LowOrderKinematicPairWithRange)::DownCast(theKinematicPair);
       anUnconstrainedPairWithRange->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint,
+        aDescription, aTransformItem1, aTransformItem2, theJoint,
         aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, aLowerLimitActualRotationX, Standard_True, aUpperLimitActualRotationX,
         Standard_True, aLowerLimitActualRotationY, Standard_True, aUpperLimitActualRotationY,
         Standard_True, aLowerLimitActualRotationZ, Standard_True, aUpperLimitActualRotationZ,
@@ -2605,7 +2613,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       theKinematicPair = new StepKinematics_FullyConstrainedPair;
       Handle(StepKinematics_FullyConstrainedPair) aFullyConstrainedPair = Handle(StepKinematics_FullyConstrainedPair)::DownCast(theKinematicPair);
       aFullyConstrainedPair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint,
+        aDescription, aTransformItem1, aTransformItem2, theJoint,
         aTX, aTY, aTZ, aRX, aRY, aRZ);
       break;
     }
@@ -2619,15 +2627,13 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       theKinematicPair = new StepKinematics_HomokineticPair;
       Handle(StepKinematics_HomokineticPair) aHomokineticPair = Handle(StepKinematics_HomokineticPair)::DownCast(theKinematicPair);
       aHomokineticPair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint,
+        aDescription, aTransformItem1, aTransformItem2, theJoint,
         aTX, aTY, aTZ, aRX, aRY, aRZ, Standard_True, InputSkewAngle);
       break;
     }
     default:
       return Standard_False;
-      break;
     }
-    return Standard_True;
   }
   else if (theKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_LowOrderPairObjectWithCoupling)))
   {
@@ -2644,7 +2650,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         Standard_Real aLowLimit = aLowOrderPairObjectWithCoupling->LowLimit();
         Standard_Real aUpperLimit = aLowOrderPairObjectWithCoupling->UpperLimit();
         aScrewPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,aPitch,
+          aDescription, aTransformItem1, aTransformItem2, theJoint,aPitch,
           Standard_True, aLowLimit, Standard_True, aUpperLimit);
       }
       else
@@ -2652,7 +2658,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_ScrewPair;
         Handle(StepKinematics_ScrewPair) aScrewPair = Handle(StepKinematics_ScrewPair)::DownCast(theKinematicPair);
         aScrewPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,aPitch);
+          aDescription, aTransformItem1, aTransformItem2, theJoint,aPitch);
       }
       break;
     }
@@ -2666,7 +2672,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         Standard_Real aUpperLimit = aLowOrderPairObjectWithCoupling->UpperLimit();
         Handle(StepKinematics_RackAndPinionPairWithRange) aRackAndPinionPairWithRange = Handle(StepKinematics_RackAndPinionPairWithRange)::DownCast(theKinematicPair);
         aRackAndPinionPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPinionRadius,
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aPinionRadius,
           Standard_True, aLowLimit, Standard_True, aUpperLimit);
       }
       else
@@ -2674,9 +2680,8 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_RackAndPinionPair;
         Handle(StepKinematics_RackAndPinionPair) aRackAndPinionPair = Handle(StepKinematics_RackAndPinionPair)::DownCast(theKinematicPair);
         aRackAndPinionPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPinionRadius);
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aPinionRadius);
       }
-
       break;
     }
     case(XCAFKinematics_PairType_Gear):
@@ -2693,7 +2698,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_GearPairWithRange;
         Handle(StepKinematics_GearPairWithRange) aGearPairWithRange = Handle(StepKinematics_GearPairWithRange)::DownCast(theKinematicPair);
         aGearPairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aRadiusFirstLink, aRadiusSecondLink, aBevel, aHelicalAngle, aGearRatio,
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aRadiusFirstLink, aRadiusSecondLink, aBevel, aHelicalAngle, aGearRatio,
           Standard_True, aLowLimit, Standard_True, aUpperLimit);
       }
       else
@@ -2701,7 +2706,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_GearPair;
         Handle(StepKinematics_GearPair) aGearPair = Handle(StepKinematics_GearPair)::DownCast(theKinematicPair);
         aGearPair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint,aRadiusFirstLink,aRadiusSecondLink,aBevel,aHelicalAngle, aGearRatio);
+          aDescription, aTransformItem1, aTransformItem2, theJoint,aRadiusFirstLink,aRadiusSecondLink,aBevel,aHelicalAngle, aGearRatio);
       }
       break;
     }
@@ -2711,14 +2716,12 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       theKinematicPair = new StepKinematics_LinearFlexibleAndPinionPair;
       Handle(StepKinematics_LinearFlexibleAndPinionPair) aLinearFlexibleAndPinionPair = Handle(StepKinematics_LinearFlexibleAndPinionPair)::DownCast(theKinematicPair);
       aLinearFlexibleAndPinionPair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint, aPinionRadius);
+        aDescription, aTransformItem1, aTransformItem2, theJoint, aPinionRadius);
       break;
     }
     default:
       return Standard_False;
-      break;
     }
-    return Standard_True;
   }
   else if (theKinPairObj->IsKind(STANDARD_TYPE(XCAFKinematics_HighOrderPairObject)))
   {
@@ -2743,7 +2746,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_PointOnSurfacePairWithRange;
         Handle(StepKinematics_PointOnSurfacePairWithRange) aPointOnSurfacePairWithRange = Handle(StepKinematics_PointOnSurfacePairWithRange)::DownCast(theKinematicPair);
         aPointOnSurfacePairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurface,aRangeOnPairSurface, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aPairSurface,aRangeOnPairSurface, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
           aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
       }
       else 
@@ -2751,7 +2754,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_PointOnSurfacePair;
         Handle(StepKinematics_PointOnSurfacePair) aPointOnSurface = Handle(StepKinematics_PointOnSurfacePair)::DownCast(theKinematicPair);
         aPointOnSurface->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurface);
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aPairSurface);
       }
       break;
     }
@@ -2765,7 +2768,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
       Handle(StepKinematics_SlidingSurfacePair) aSlidingSurfacePair = Handle(StepKinematics_SlidingSurfacePair)::DownCast(theKinematicPair);
       aSlidingSurfacePair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurfac1, aPairSurface2, anOrientation);
+        aDescription, aTransformItem1, aTransformItem2, theJoint, aPairSurfac1, aPairSurface2, anOrientation);
       break;
     }
     case(XCAFKinematics_PairType_RollingSurface):
@@ -2778,7 +2781,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
       Handle(StepKinematics_RollingSurfacePair) aRollingSurfacePair = Handle(StepKinematics_RollingSurfacePair)::DownCast(theKinematicPair);
       aRollingSurfacePair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairSurfac1, aPairSurface2, anOrientation);
+        aDescription, aTransformItem1, aTransformItem2, theJoint, aPairSurfac1, aPairSurface2, anOrientation);
       break;
     }
     case(XCAFKinematics_PairType_PointOnPlanarCurve):
@@ -2799,7 +2802,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_PointOnPlanarCurvePairWithRange;
         Handle(StepKinematics_PointOnPlanarCurvePairWithRange) aPointOnPlanarCurvePairWithRange = Handle(StepKinematics_PointOnPlanarCurvePairWithRange)::DownCast(theKinematicPair);
         aPointOnPlanarCurvePairWithRange->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation, aRangeOnPairCurve, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aPairCurve, anOrientation, aRangeOnPairCurve, Standard_True, aLowerLimitYaw, Standard_True, aUpperLimitYaw, Standard_True,
           aLowerLimitPitch, Standard_True, aUpperLimitPitch, Standard_True, aLowerLimitRoll, Standard_True, aUpperLimitRoll);
       }
       else
@@ -2807,7 +2810,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
         theKinematicPair = new StepKinematics_PointOnPlanarCurvePair;
         Handle(StepKinematics_PointOnPlanarCurvePair) aPointOnPlanarCurvePair = Handle(StepKinematics_PointOnPlanarCurvePair)::DownCast(theKinematicPair);
         aPointOnPlanarCurvePair->Init(aPairName, aPairName, hasDescription,
-          aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation);
+          aDescription, aTransformItem1, aTransformItem2, theJoint, aPairCurve, anOrientation);
       }
       break;
     }
@@ -2821,7 +2824,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       theKinematicPair = new StepKinematics_SlidingCurvePair;
       Handle(StepKinematics_SlidingCurvePair) aSlidingCurvePair = Handle(StepKinematics_SlidingCurvePair)::DownCast(theKinematicPair);
       aSlidingCurvePair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, aPairCurve2, anOrientation);
+        aDescription, aTransformItem1, aTransformItem2, theJoint, aPairCurve, aPairCurve2, anOrientation);
       break;
     }
     case(XCAFKinematics_PairType_RollingCurve):
@@ -2834,7 +2837,7 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       theKinematicPair = new StepKinematics_RollingCurvePair;
       Handle(StepKinematics_RollingCurvePair) aRollingCurvePair = Handle(StepKinematics_RollingCurvePair)::DownCast(theKinematicPair);
       aRollingCurvePair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, aPairCurve2, anOrientation);
+        aDescription, aTransformItem1, aTransformItem2, theJoint, aPairCurve, aPairCurve2, anOrientation);
       break;
     }
     case(XCAFKinematics_PairType_LinearFlexibleAndPlanarCurve):
@@ -2845,17 +2848,21 @@ static Standard_Boolean createKinematicPair(const Handle(XCAFKinematics_PairObje
       Standard_Boolean anOrientation = aHighOrderPairObject->Orientation();
       Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair) aLinearFlexibleAndPlanarCurvePair = Handle(StepKinematics_LinearFlexibleAndPlanarCurvePair)::DownCast(theKinematicPair);
       aLinearFlexibleAndPlanarCurvePair->Init(aPairName, aPairName, hasDescription,
-        aDescription, theTransformItem1, theTransformItem2, theJoint, aPairCurve, anOrientation);
+        aDescription, aTransformItem1, aTransformItem2, theJoint, aPairCurve, anOrientation);
       break;
     }
     default:
       return Standard_False;
-      break;
     }
-    return Standard_True;
   }
 
-  return Standard_False;
+  // updating placements of the both link representations
+  theLinkRepr1->Items()->Resize(theLinkRepr1->Items()->Lower(), theLinkRepr1->Items()->Upper() + 1, Standard_True);
+  theLinkRepr1->Items()->ChangeLast() = aTransformItem1;
+  theLinkRepr2->Items()->Resize(theLinkRepr2->Items()->Lower(), theLinkRepr2->Items()->Upper() + 1, Standard_True);
+  theLinkRepr2->Items()->ChangeLast() = aTransformItem2;
+
+  return Standard_True;
 }
 
 //=======================================================================
@@ -3119,19 +3126,15 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
     // write Links
     Handle(StepKinematics_RigidLinkRepresentation) aBaseLinkOfMech;
     Handle(StepRepr_PropertyDefinition) aGeneralDefinition;
+    NCollection_IndexedDataMap<TDF_Label, Handle(StepKinematics_KinematicLinkRepresentation), TDF_LabelMapHasher> aMapOfLinks;
 
     TDF_LabelSequence aSeqOfLinskL = aKTool->GetLinks(anItMech.Value());
     if (aSeqOfLinskL.Length() <= 0)
       continue;
-    NCollection_IndexedDataMap<TDF_Label, Handle(StepKinematics_KinematicLinkRepresentation), TDF_LabelMapHasher> aMapOfLinks;
 
     for (TDF_LabelSequence::Iterator anItLink(aSeqOfLinskL); anItLink.More(); anItLink.Next())
     {
       TDF_Label aLinkL = anItLink.Value();
-      Handle(StepKinematics_KinematicLink) aLink;
-      Handle(StepShape_ShapeRepresentation) aRefShapeOfLink;
-      Handle(StepRepr_PropertyDefinition) aPD;    
-      Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepresentation;
       if (!createKinematicLink(theWS, aKTool, aGraph, aLinkL, aMapOfLinks, aBaseLinkOfMech, aGeneralDefinition))
         continue;
     }
@@ -3170,7 +3173,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
       Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr2;
       if (!createKinematicJoint(aKTool, aJointL, aPairObject, aMapOfLinks, aLinkRepr1, aLinkRepr2, aJoint))
         continue;
-      if (!createKinematicPair(aPairObject,aJoint,aKinematicPair, aLinkRepr1, aLinkRepr2))
+      if (!createKinematicPair(aPairObject, aJoint, aLinkRepr1, aLinkRepr2, aKinematicPair))
         continue;
       aMapofJoints.Add(anItJoint.Value(), aJoint);
       Handle(StepKinematics_PairRepresentationRelationship) aPairReprRelationship = new StepKinematics_PairRepresentationRelationship;
@@ -3236,6 +3239,8 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
         aPairValue->SetName(aNameOfValue);
         aItems->SetValue(aValueInd++, aPairValue);
       }
+      if (aValueInd == 1)
+        continue;
       Handle(TCollection_HAsciiString) aNameOfState;
       Handle(TDataStd_Name) aNameAttr;
       if (anItState.Value().FindAttribute(TDataStd_Name::GetID(), aNameAttr))

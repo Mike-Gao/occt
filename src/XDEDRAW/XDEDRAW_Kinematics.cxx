@@ -1835,6 +1835,8 @@ void XDEDRAW_Kinematics::InitCommands(Draw_Interpretor& di)
     "\tRackAndPinion - PinionRadius\n"
     "\tGear - FirstLinkRadius SecondLinkRadius Bevel HelicalAngle GearRatio\n"
     "\tLinear - PinionRadius\n"
+    "\tUniversal - SkewAngle\n"
+    "\tHomokinetic - SkewAngle\n"
     __FILE__, setParameters, g);
 
   di.Add("XGetPairParams", "XGetPairParams Doc Joint",

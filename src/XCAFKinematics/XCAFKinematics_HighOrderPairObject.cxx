@@ -108,6 +108,14 @@ void XCAFKinematics_HighOrderPairObject::SetAllLimits(const Handle(TColStd_HArra
     aNbLimits = 6;
     break;
   }
+  case XCAFKinematics_PairType_SlidingSurface: {
+    aNbLimits = 2;
+    break;
+  }
+  case XCAFKinematics_PairType_RollingSurface: {
+    aNbLimits = 2;
+    break;
+  }
   case XCAFKinematics_PairType_PointOnPlanarCurve: {
     aNbLimits = 6;
     break;

@@ -1110,7 +1110,7 @@ All kinematic data refers to the mechanism, so, first of all, it needs to *AddMe
 this method creates a new mechanism and two empty subfolders for links and joints. 
 The next step is specifying of links (mechanism details)  via *AddLink* and *SetLink* commands.
 The next step is adding of joints with using *AddJoint* and *SetJoint* commands.
-The last step of kinematic graph creationp is specifying of states (optional) via *AddState*, *AddValue* and *SetValue* commands.
+The last step of kinematic graph creation is specifying of states (optional) via *AddState*, *AddValue* and *SetValue* commands.
 
 Here is an example of creating a new mechanism and adding a new joint with two links:
 ~~~~~
