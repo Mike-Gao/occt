@@ -18,7 +18,7 @@
 #include "View.h"
 #include "ApplicationCommon.h"
 #include "OcctWindow.h"
-
+#include "Transparency.h"
 
 
 #include <Standard_WarningsDisable.hxx>
@@ -469,6 +469,9 @@ void View::initViewActions()
     aHlrOnAction->setCheckable(true);
     aHlrActionGroup->addAction(aHlrOnAction);
     myViewActions[ViewAction::HlrOn] = aHlrOnAction;
+
+    myViewActions[ViewAction::Transparency] =
+      RegisterAction(":/icons/tool_transparency.png", tr("Transparency"), &View::onTransparency);
   }
 }
 
@@ -840,4 +843,30 @@ Handle(AIS_InteractiveContext)& View::getContext()
 CurrentAction3d View::getCurrentMode()
 {
   return myCurrentMode;
+}
+
+void View::onTransparency()
+{
+  AIS_ListOfInteractive anAisObjectsList;
+  myContext->DisplayedObjects(anAisObjectsList);
+  if (anAisObjectsList.Extent() == 0)
+    return;
+
+  double aTranspValue = anAisObjectsList.First()->Transparency();
+  DialogTransparency aDlg(this);
+  aDlg.setValue(int(aTranspValue * 10));
+  connect(&aDlg, SIGNAL(sendTransparencyChanged(int)), SLOT(onTransparencyChanged(int)));
+  aDlg.exec();
+}
+
+
+void View::onTransparencyChanged(int theVal)
+{
+  AIS_ListOfInteractive anAisObjectsList;
+  myContext->DisplayedObjects(anAisObjectsList);
+  double aTranspValue = theVal / 10.;
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
+    myContext->SetTransparency(anAisObject, aTranspValue, Standard_False);
+
+  myContext->UpdateCurrentViewer();
 }

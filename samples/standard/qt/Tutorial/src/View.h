@@ -32,7 +32,7 @@ class QRubberBand;
 enum class CurrentAction3d { Nothing, DynamicZooming, WindowZooming, 
                              DynamicPanning, GlobalPanning, DynamicRotation, ObjectDececting };
 enum class ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top, Bottom, 
-                        Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe };
+                        Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe, Transparency };
 enum class RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
 //class COMMONSAMPLE_EXPORT View: public QWidget
@@ -95,11 +95,15 @@ public slots:
     void hlrOff();
     void shading();
     void wireframe();
+    void onTransparency();
 
     void updateToggled( bool );
     void onBackground();
     void onEnvironmentMap();
     void onRaytraceAction();
+
+private slots:
+  void onTransparencyChanged(int theVal);
 
 protected:
     virtual void paintEvent( QPaintEvent* ) override;
