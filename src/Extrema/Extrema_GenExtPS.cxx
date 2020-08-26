@@ -369,15 +369,6 @@ void Extrema_GenExtPS::BuildGrid()
 
   myPoints = new Extrema_HArray2OfPOnSurfParams (0, myNbUSamples + 1, 0, myNbVSamples + 1);
   for (int iU = 1; iU <= myNbUSamples; iU++)
-: myumin(0.0),
-  myusup(0.0),
-  myvmin(0.0),
-  myvsup(0.0),
-  myusample(0),
-  myvsample(0),
-  mytolu(0.0),
-  mytolv(0.0),
-  myS(NULL)
   {
     Standard_Real U = myUParams->Value (iU);
     for (int iV = 1; iV <= myNbVSamples; iV++)
