@@ -71,16 +71,19 @@ complex time or redefinition of inherited field are ignored.
 #if defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 #endif
+#if __cplusplus > 199711L
+#define register// Deprecated in C++11.
+#endif
 
 /************************************************/
 /* ERROR MESSAGE FUNCTION                       */
 
 /* external functions (from Express.l) */
-int ec_error ( char *s, char *text );
+int ec_error ( char const *s, char const *text );
 int ec_curline ( void );
 
 #define yyerror ec_error
-void ec_error ( char *s )
+void ec_error ( char const *s )
 {
   printf ( "\nParse error at line %d: %s\n", ec_curline(), s );
 }
@@ -1286,7 +1289,7 @@ case 52:
 { yyval.field = mkfield ( yypvt[-4].str, yypvt[-1].type, yypvt[-2].num ); } break;
 case 53:
 # line 242 "Express.y"
-{ yyval.num = NULL; printf ( "Warning at line %d: field redefinition ignored\n", ec_curline() ); /* redefinition of inherited field */ } break;
+{ yyval.num = 0; printf ( "Warning at line %d: field redefinition ignored\n", ec_curline() ); /* redefinition of inherited field */ } break;
 case 54:
 # line 244 "Express.y"
 { yyval.tlist = mktlist ( yypvt[-0].str, 0 ); /* inherited field specification */ } break;

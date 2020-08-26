@@ -778,3 +778,7 @@ TessellatedItem StepVisual
 TessellatedGeometricSet StepVisual
 TessellatedCurveSet StepVisual
 CoordinatesList StepVisual
+SurfaceStyleTransparent StepVisual
+SurfaceStyleReflectanceAmbient StepVisual
+SurfaceStyleRendering StepVisual
+SurfaceStyleRenderingWithProperties StepVisual

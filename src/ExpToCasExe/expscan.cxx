@@ -20,6 +20,9 @@
 #if defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 #endif
+#if __cplusplus > 199711L
+#define register// Deprecated in C++11.
+#endif
 
 # define U(x) x
 # define NLSTATE yyprevious=YYNEWLINE
@@ -186,7 +189,7 @@ int ec_curline ( void )
   return ec_linenum;
 }
 
-int ec_error ( char *s, char *text )
+int ec_error ( char const *s, char const *text )
 {
   printf ( "\nError at line %d: %s \"%s\"\n", ec_curline(), s, text );
   return 0;
@@ -210,7 +213,7 @@ int ec_error ( char *s, char *text )
 /* parsing rules                    */
 # define YYNEWLINE 10
 int yylex(){
-int nstr; extern int yyprevious;
+int nstr = 0; extern int yyprevious;
 #ifdef __cplusplus
 /* to avoid CC and lint complaining yyfussy not being used ...*/
 static int __lex_hack = 0;

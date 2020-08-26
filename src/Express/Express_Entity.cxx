@@ -427,13 +427,13 @@ Standard_Boolean Express_Entity::GenerateClass () const
   Express::WriteFileStamp ( os );
 
   // write include section
-  os << "#include <Interface_EntityIterator.hxx>" << std::endl;
-  os << "#include <StepData_StepReaderData.hxx>" << std::endl;
-  os << "#include <StepData_StepWriter.hxx>" << std::endl;
   os << "#include <" << RWCPPName->ToCString() << ".hxx>" << std::endl;
   dict.Clear();
   os << "#include <" << CPPname->ToCString() << ".hxx>" << std::endl;
   dict.Bind(CPPname->ToCString(), 1);
+  os << "#include <Interface_EntityIterator.hxx>" << std::endl;
+  os << "#include <StepData_StepReaderData.hxx>" << std::endl;
+  os << "#include <StepData_StepWriter.hxx>" << std::endl;
   WriteRWInclude ( os, dict );
   // write constructor
   Express::WriteMethodStamp ( os, RWCPPName );

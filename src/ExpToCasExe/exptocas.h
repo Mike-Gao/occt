@@ -101,7 +101,7 @@ struct ec_type *mktset     ( int keyword, int ilow, int ihigh, struct ec_type *o
 struct ec_field *mkfield   ( char *name, struct ec_type *type, int optional );
 
 /* Error reporting functions */
-int ec_error ( char *s, char *text );
+int ec_error ( char const *s, char const *text );
 int ec_curline ( void );
 
 /* Access to result of parsing */
