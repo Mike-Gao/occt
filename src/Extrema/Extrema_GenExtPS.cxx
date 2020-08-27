@@ -479,12 +479,21 @@ void Extrema_GenExtPS::BuildTree()
         if (U1 != U2 || V1 != V2)
         {
           gp_Pnt aPMid = myS->Value ((U1 + U2) * 0.5, (V1 + V2) * 0.5);
-          aGridBox.Add (aPMid);
 
           gp_Vec aDir (aPMin.Value(), aPMax.Value());
-          if (aDir.SquareMagnitude() > gp::Resolution())
+          Standard_Real diag = aDir.SquareMagnitude();
+          if (diag > gp::Resolution())
           {
+            //aDir /= Sqrt (diag);
+            //gp_XYZ aPL = aPMin.Value().XYZ() + ((aPMid.XYZ() - aPMin.Value().XYZ()).Dot (aDir.XYZ())) * aDir.XYZ();
+            //gp_XYZ aVMid (aPL - aPMid.XYZ());
+            //aGridBox.Add (gp_Pnt (aPL - 1.1 * aVMid));
+            //aGridBox.Add (gp_Pnt (aPL + 1.1 * aVMid));
             aGridBox.Enlarge (gp_Lin (aPMin.Value(), aDir).Distance (aPMid));
+          }
+          else
+          {
+            aGridBox.Add (aPMid);
           }
         }
         aGridSet.CellBoxSet->UpdateBox (iCell, Bnd_Tools::Bnd2BVH (aGridBox));

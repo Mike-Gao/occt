@@ -23,14 +23,12 @@
 #include <gp_Pnt.hxx>
 #include <Adaptor3d_SurfacePtr.hxx>
 #include <Standard_Real.hxx>
-#include <TColStd_SequenceOfReal.hxx>
-#include <Extrema_SequenceOfPOnSurf.hxx>
 #include <Extrema_ExtFlag.hxx>
 #include <Standard_Boolean.hxx>
 #include <math_FunctionSetWithDerivatives.hxx>
 #include <Standard_Integer.hxx>
 #include <math_Vector.hxx>
-#include <NCollection_Vector.hxx>
+#include <vector>
 class Standard_OutOfRange;
 class gp_Pnt;
 class Adaptor3d_Surface;
@@ -123,8 +121,8 @@ private:
   Standard_Real myU;
   Standard_Real myV;
   gp_Pnt myPs;
-  NCollection_Vector<Standard_Real> mySqDistances;
-  NCollection_Vector<Extrema_POnSurf> myPoints;
+  std::vector<Standard_Real> mySqDistances;
+  std::vector<Extrema_POnSurf> myPoints;
   Standard_Boolean myPinit;
   Standard_Boolean mySinit;
   Extrema_ExtFlag myTarget;
