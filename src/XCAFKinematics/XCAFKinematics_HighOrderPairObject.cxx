@@ -63,12 +63,12 @@ void XCAFKinematics_HighOrderPairObject::SetType(const XCAFKinematics_PairType t
     break;
   }
   case XCAFKinematics_PairType_SlidingSurface: {
-    myLimits = NULL;
+    myLimits = new TColStd_HArray1OfReal(1, 2);
     myGeom = NCollection_Array1<Handle(Geom_Geometry)>(1, 2);
     break;
   }
   case XCAFKinematics_PairType_RollingSurface: {
-    myLimits = NULL;
+    myLimits = new TColStd_HArray1OfReal(1, 2);
     myGeom = NCollection_Array1<Handle(Geom_Geometry)>(1, 2);
     break;
   }
