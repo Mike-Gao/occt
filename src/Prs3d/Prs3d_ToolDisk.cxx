@@ -38,7 +38,7 @@ Prs3d_ToolDisk::Prs3d_ToolDisk (const Standard_Real    theInnerRadius,
 //function : Vertex
 //purpose  :
 //=======================================================================
-gp_Pnt Prs3d_ToolDisk::Vertex (const Standard_Real theU, const Standard_Real theV)
+gp_Pnt Prs3d_ToolDisk::Vertex (const Standard_Real theU, const Standard_Real theV) const
 {
   const Standard_Real aU      = theU * M_PI * 2.0;
   const Standard_Real aRadius = myInnerRadius + (myOuterRadius - myInnerRadius) * theV;
@@ -48,16 +48,7 @@ gp_Pnt Prs3d_ToolDisk::Vertex (const Standard_Real theU, const Standard_Real the
 }
 
 //=======================================================================
-//function : Add
-//purpose  :
-//=======================================================================
-gp_Dir Prs3d_ToolDisk::Normal (const Standard_Real /*theU*/, const Standard_Real /*theV*/)
-{
-  return gp_Dir (0.0, 0.0, -1.0);
-}
-
-//=======================================================================
-//function : Perform
+//function : Create
 //purpose  :
 //=======================================================================
 Handle(Graphic3d_ArrayOfTriangles) Prs3d_ToolDisk::Create (const Standard_Real    theInnerRadius,
