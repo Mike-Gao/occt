@@ -1005,7 +1005,8 @@ void AIS_Manipulator::Disk::Init (const Standard_ShortReal theInnerRadius,
   gp_Ax3 aSystem (myPosition.Location(), myPosition.Direction());
   gp_Trsf aTrsf;
   aTrsf.SetTransformation (aSystem, gp_Ax3());
-  aTool.FillArray (myArray, myTriangulation, aTrsf);
+  myArray = aTool.CreateTriangulation (aTrsf);
+  myTriangulation = aTool.CreatePolyTriangulation (aTrsf);
 }
 
 //=======================================================================
@@ -1024,7 +1025,8 @@ void AIS_Manipulator::Sphere::Init (const Standard_ShortReal theRadius,
   Prs3d_ToolSphere aTool (theRadius, theSlicesNb, theStacksNb);
   gp_Trsf aTrsf;
   aTrsf.SetTranslation (gp_Vec(gp::Origin(), thePosition));
-  aTool.FillArray (myArray, myTriangulation, aTrsf);
+  myArray = aTool.CreateTriangulation (aTrsf);
+  myTriangulation = aTool.CreatePolyTriangulation (aTrsf);
 }
 
 //=======================================================================
@@ -1060,24 +1062,24 @@ void AIS_Manipulator::Cube::Init (const gp_Ax1& thePosition, const Standard_Shor
   addTriangle (1, aBottomLeft, aV3, aV4, -thePosition.Direction());
 
   // Front
-  addTriangle (2, aV3, aV4, aV5, aFront);
-  addTriangle (3, aV3, aV5, aTopRight, aFront);
+  addTriangle (2, aV3, aV5, aV4, -aFront);
+  addTriangle (3, aV3, aTopRight, aV5, -aFront);
 
   // Back
-  addTriangle (4, aBottomLeft, aV2, aV7, -aFront);
-  addTriangle (5, aBottomLeft, aV7, aV6, -aFront);
+  addTriangle (4, aBottomLeft, aV7, aV2, aFront);
+  addTriangle (5, aBottomLeft, aV6, aV7, aFront);
 
   // aTop
   addTriangle (6, aV7, aV6, aV5, thePosition.Direction());
   addTriangle (7, aTopRight, aV7, aV5, thePosition.Direction());
 
-  //Left
-  addTriangle (8, aV6, aV5, aV4, -aRight);
-  addTriangle (9, aBottomLeft, aV6, aV4, -aRight);
+  // Left
+  addTriangle (8, aV6, aV4, aV5, aRight);
+  addTriangle (9, aBottomLeft, aV4, aV6, aRight);
 
   // Right
-  addTriangle (10, aV3, aTopRight, aV7, aRight);
-  addTriangle (11, aV3, aV7, aV2, aRight);
+  addTriangle (10, aV3, aV7, aTopRight, -aRight);
+  addTriangle (11, aV3, aV2, aV7, -aRight);
 }
 
 //=======================================================================
@@ -1148,6 +1150,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
                                                anArrowLength,
                                                myFacettesNumber);
     myTranslatorGroup = Prs3d_Root::NewGroup (thePrs);
+    myTranslatorGroup->SetClosed (true);
     myTranslatorGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
     myTranslatorGroup->AddPrimitiveArray (myTriangleArray);
 
@@ -1169,6 +1172,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
     myCube.Init (gp_Ax1 (myCubePos, myReferenceAxis.Direction()), myBoxSize);
 
     myScalerGroup = Prs3d_Root::NewGroup (thePrs);
+    myScalerGroup->SetClosed (true);
     myScalerGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
     myScalerGroup->AddPrimitiveArray (myCube.Array());
 
