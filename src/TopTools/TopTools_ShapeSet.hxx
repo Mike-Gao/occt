@@ -191,7 +191,6 @@ public:
 
   static const TopTools_FormatVersion THE_CURRENT_VERSION = TopTools_FormatVersion::VERSION_3;
 
-
 private:
   
   //! Reads  from <IS>  a shape  and  returns  it in  S.
@@ -201,6 +200,8 @@ private:
   TopTools_IndexedMapOfShape myShapes;
   TopTools_LocationSet myLocations;
   TopTools_FormatVersion myFormat;
+  Handle(Message_ProgressIndicator) myProgress;
+
   static Standard_CString Version_1, Version_2, Version_3;
 
 };

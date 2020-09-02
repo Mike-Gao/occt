@@ -383,13 +383,13 @@ void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
  aData->HeaderData()->SetSchemaName(myName);
  aData->HeaderData()->SetSchemaVersion(myVersion);
 
-  if ((theDriver->OpenMode() == Storage_VSWrite) || (theDriver->OpenMode() == Storage_VSReadWrite)) {
+  if ((theDriver.OpenMode() == Storage_VSWrite) || (theDriver.OpenMode() == Storage_VSReadWrite)) {
     try {
       OCC_CATCH_SIGNALS
       errorContext = "BeginWriteInfoSection";
-      theDriver->BeginWriteInfoSection();
+      theDriver.BeginWriteInfoSection();
       errorContext = "WriteInfo";
-      theDriver->WriteInfo(aData->NumberOfObjects(),
+      theDriver.WriteInfo(aData->NumberOfObjects(),
                            aData->StringStorageVersion(),
                            aData->CreationDate(),
                            aData->SchemaName(),
@@ -399,14 +399,14 @@ void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
                            aData->DataType(),
                            aData->UserInfo());
       errorContext = "EndWriteInfoSection";
-      theDriver->EndWriteInfoSection();
+      theDriver.EndWriteInfoSection();
 
       errorContext = "BeginWriteCommentSection";
-      theDriver->BeginWriteCommentSection();
+      theDriver.BeginWriteCommentSection();
       errorContext = "WriteComment";
-      theDriver->WriteComment(aData->Comments());
+      theDriver.WriteComment(aData->Comments());
       errorContext = "EndWriteCommentSection";
-      theDriver->EndWriteCommentSection();
+      theDriver.EndWriteCommentSection();
 
       Handle(TColStd_HSequenceOfAsciiString) tlist;
 
@@ -430,42 +430,42 @@ void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
 
       errorContext = "WriteTypeInformations";
       for (i = 1; i <= len; i++) {
-        theDriver->WriteTypeInformations(i,tlist->Value(i).ToCString());
+        theDriver.WriteTypeInformations(i,tlist->Value(i).ToCString());
       }
 
       errorContext = "EndWriteTypeSection";
-      theDriver->EndWriteTypeSection();
+      theDriver.EndWriteTypeSection();
 
       errorContext = "BeginWriteRootSection";
-      theDriver->BeginWriteRootSection();
-      theDriver->SetRootSectionSize(plist->Length());
+      theDriver.BeginWriteRootSection();
+      theDriver.SetRootSectionSize(plist->Length());
 
       errorContext = "WriteRoot";
       for (i = 1; i <= plist->Length(); i++) {
-        theDriver->WriteRoot(plist->Value(i)->Name(),i,"PDocStd_Document");
+        theDriver.WriteRoot(plist->Value(i)->Name(),i,"PDocStd_Document");
       }
 
       errorContext = "EndWriteRootSection";
-      theDriver->EndWriteRootSection();
+      theDriver.EndWriteRootSection();
 
       errorContext = "BeginWriteRefSection";
-      theDriver->BeginWriteRefSection();
-      theDriver->SetRefSectionSize(iData->myObjId - 1);
+      theDriver.BeginWriteRefSection();
+      theDriver.SetRefSectionSize(iData->myObjId - 1);
       errorContext = "WriteReferenceType";
 
       Storage_BucketIterator bit(&iData->myPtoA);
 
       while(bit.More()) {
         p = bit.Value();
-        if (!p.IsNull()) theDriver->WriteReferenceType(p->_refnum,p->_typenum);
+        if (!p.IsNull()) theDriver.WriteReferenceType(p->_refnum,p->_typenum);
         bit.Next();
       }
 
       errorContext = "EndWriteRefSection";
-      theDriver->EndWriteRefSection();
+      theDriver.EndWriteRefSection();
 
       errorContext = "BeginWriteDataSection";
-      theDriver->BeginWriteDataSection();
+      theDriver.BeginWriteDataSection();
 
       Handle(Storage_Schema) me = this;
 
@@ -483,7 +483,7 @@ void Storage_Schema::Write (const Handle(Storage_BaseDriver)& theDriver,
       }
 
       errorContext = "EndWriteDataSection";
-      theDriver->EndWriteDataSection();
+      theDriver.EndWriteDataSection();
     }
     catch(Storage_StreamWriteError const&) {
       aData->SetErrorStatus(Storage_VSWriteError);
