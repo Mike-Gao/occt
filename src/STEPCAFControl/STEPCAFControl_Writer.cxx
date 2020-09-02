@@ -4110,7 +4110,8 @@ static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)&
                                             Handle(StepKinematics_KinematicLinkRepresentation)& theLinkRepr,
                                             Handle(TColStd_HSequenceOfTransient)& theSeqOfContexLink,
                                             Handle(StepKinematics_RigidLinkRepresentation)& theBaseLink,
-                                            Handle(StepRepr_PropertyDefinition)& theGeneralPD)
+                                            Handle(StepRepr_PropertyDefinition)& theGeneralPD,
+                                            Standard_Boolean& isBased)
 {
 
   if (theMapOfLinks.FindFromKey(theLabelOfLink, theLinkRepr))
@@ -4192,7 +4193,8 @@ static Standard_Boolean createKinematicLink(const Handle(XSControl_WorkSession)&
     }
 
     Handle(TDataStd_Integer) aBase;
-    if (theBaseLink.IsNull() || theLabelOfLink.FindAttribute(TDataStd_Integer::GetID(), aBase)) {
+    if (!isBased || theLabelOfLink.FindAttribute(TDataStd_Integer::GetID(), aBase)) {
+      isBased = Standard_True;
       theGeneralPD = aPD;
       theBaseLink = Handle(StepKinematics_RigidLinkRepresentation)::DownCast(theLinkRepr);
     }
@@ -5033,6 +5035,7 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
     for (TDF_LabelSequence::Iterator anItJoint(aSeqOfJointsL); anItJoint.More(); anItJoint.Next())
     {
       TDF_Label aJointL = anItJoint.Value();
+      Standard_Boolean isBased = !aGeneralDefinition.IsNull();
       Handle(StepKinematics_KinematicJoint) aJoint;
       Handle(XCAFDoc_KinematicPair) aKPairAttr;
       Handle(StepKinematics_KinematicPair) aKinematicPair;
@@ -5046,10 +5049,12 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
 
       Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr1;
       Handle(StepKinematics_KinematicLinkRepresentation) aLinkRepr2;
+      Handle(StepKinematics_RigidLinkRepresentation) aBase;
+      Handle(StepRepr_PropertyDefinition) aPD;
       Handle(TColStd_HSequenceOfTransient) aSeqOfContexLink = new TColStd_HSequenceOfTransient;
-      if (!createKinematicLink(theWS,aKTool, aStartLink,aMapOfLinks, aLinkRepr1, aSeqOfContexLink,aBaseLinkOfMech,aGeneralDefinition))
+      if (!createKinematicLink(theWS,aKTool, aStartLink,aMapOfLinks, aLinkRepr1, aSeqOfContexLink, aBase, aPD, isBased))
         continue;
-      if (!createKinematicLink(theWS, aKTool, aEndLink, aMapOfLinks, aLinkRepr2, aSeqOfContexLink, aBaseLinkOfMech, aGeneralDefinition))
+      if (!createKinematicLink(theWS, aKTool, aEndLink, aMapOfLinks, aLinkRepr2, aSeqOfContexLink, aBase, aPD, isBased))
         continue;
       if (!createKinematicJoint(aPairObject, aLinkRepr1, aLinkRepr2, aJoint))
         continue;
@@ -5066,6 +5071,11 @@ Standard_EXPORT Standard_Boolean STEPCAFControl_Writer::WriteKinematics(const Ha
       Handle(TCollection_HAsciiString) aDescription;
       aPairReprRelationship->Init(aKinematicPair->Name(), aKinematicPair->Name(), Standard_False, aDescription, aDataLinkStart, aDataLinkEnd, aPair);
       aSeqOfPairs->Append(aPairReprRelationship);
+      if (!aBase.IsNull())
+      {
+        aGeneralDefinition = aPD;
+        aBaseLinkOfMech = aBase;
+      }
 
       // Write all entities describe mechanism kinematics
       for (TColStd_HSequenceOfTransient::Iterator anItLinks(aSeqOfContexLink->Sequence()); anItLinks.More(); anItLinks.Next())
