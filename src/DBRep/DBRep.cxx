@@ -1628,7 +1628,7 @@ void Draw_SaveAndRestoreDBRep::Save(const Handle(Draw_Drawable3D)& theDrawable3D
   BRepTools_ShapeSet aShapeSet(aBuilder);
   aShapeSet.SetFormat(theVersion);
   aShapeSet.Add(aDrawableShape->Shape());
-  aShapeSet.Write(os, Draw::GetProgressBar()));
+  aShapeSet.Write(os, Draw::GetProgressBar());
   if (!Draw::GetProgressBar().IsNull() && Draw::GetProgressBar()->UserBreak())
     return;
   aShapeSet.Write(aDrawableShape->Shape(), os);
