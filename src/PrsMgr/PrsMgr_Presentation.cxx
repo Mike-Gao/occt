@@ -110,6 +110,7 @@ void PrsMgr_Presentation::Erase()
   // Disconnect other structures
   myStructure->DisconnectAll (Graphic3d_TOC_DESCENDANT);
   // Clear groups and remove graphic structure
+  myStructure->Graphic3d_Structure::Remove();
   myStructure.Nullify();
 }
 
