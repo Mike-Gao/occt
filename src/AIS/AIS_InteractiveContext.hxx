@@ -491,6 +491,7 @@ public: //! @name Selection management
 
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
   //! The objects detected are passed to the main viewer, which is then updated.
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Clear should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const Standard_Integer  theXPMin,
                                            const Standard_Integer  theYPMin,
                                            const Standard_Integer  theXPMax,
@@ -499,27 +500,32 @@ public: //! @name Selection management
                                            const Standard_Boolean  theToUpdateViewer);
   
   //! polyline selection; clears the previous picked list
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Clear should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const TColgp_Array1OfPnt2d& thePolyline,
                                            const Handle(V3d_View)&     theView,
                                            const Standard_Boolean      theToUpdateViewer);
 
   //! Stores and hilights the previous detected; Unhilights the previous picked.
   //! @sa MoveTo().
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Clear should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const Standard_Boolean theToUpdateViewer);
 
   //! Adds the last detected to the list of previous picked.
   //! If the last detected was already declared as picked, removes it from the Picked List.
   //! @sa MoveTo().
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Add should be called instead")
   Standard_EXPORT AIS_StatusOfPick ShiftSelect (const Standard_Boolean theToUpdateViewer);
 
   //! Adds the last detected to the list of previous picked.
   //! If the last detected was already declared as picked, removes it from the Picked List.
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Add should be called instead")
   Standard_EXPORT AIS_StatusOfPick ShiftSelect (const TColgp_Array1OfPnt2d& thePolyline,
                                                 const Handle(V3d_View)&     theView,
                                                 const Standard_Boolean      theToUpdateViewer);
 
   //! Rectangle of selection; adds new detected entities into the picked list,
   //! removes the detected entities that were already stored.
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Add should be called instead")
   Standard_EXPORT AIS_StatusOfPick ShiftSelect (const Standard_Integer  theXPMin,
                                                 const Standard_Integer  theYPMin,
                                                 const Standard_Integer  theXPMax,

@@ -1241,7 +1241,7 @@ The following AIS_InteractiveContext methods have been changed:
   UnsetColor, SetWidth, UnsetWidth, SetMaterial, UnsetMaterial, SetTransparency, UnsetTransparency,
   SetLocalAttributes, UnsetLocalAttributes, SetPolygonOffsets, SetTrihedronSize, SetPlaneSize, SetPlaneSize,
   SetDeviationCoefficient, SetDeviationAngle, SetAngleAndDeviation, SetHLRDeviationCoefficient,
-  SetHLRDeviationAngle, SetHLRAngleAndDeviation, SetSelectedAspect, MoveTo, Select, ShiftSelect, SetSelected,
+  SetHLRDeviationAngle, SetHLRAngleAndDeviation, SetSelectedAspect, MoveTo, Select, SetSelected,
   UpdateSelected, AddOrRemoveSelected, HilightSelected, UnhilightSelected, ClearSelected, ResetOriginalState,
   SubIntensityOn, SubIntensityOff, FitSelected, EraseGlobal, ClearGlobal, ClearGlobalPrs.
 
