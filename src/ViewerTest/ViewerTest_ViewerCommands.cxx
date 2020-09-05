@@ -7546,7 +7546,7 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
   }
 
   NCollection_Sequence<Graphic3d_Vec2i> aPnts;
-  bool isShiftSelection = false, toAllowOverlap = false;
+  bool isAdditionalSelection = false, toAllowOverlap = false;
   for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
   {
     TCollection_AsciiString anArg (theArgVec[anArgIter]);
@@ -7570,7 +7570,7 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
     else if (anArgIter + 1 == theNbArgs
           && anArg.IsIntegerValue())
     {
-      isShiftSelection = anArg.IntegerValue() == 1;
+      isAdditionalSelection = anArg.IntegerValue() == 1;
     }
     else
     {
@@ -7587,13 +7587,13 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
   Handle(ViewerTest_EventManager) aCurrentEventManager = ViewerTest::CurrentEventManager();
   if (aPnts.IsEmpty())
   {
-    if (isShiftSelection)
+    if (isAdditionalSelection)
     {
-      aCtx->ShiftSelect (false);
+      aCtx->Select (AIS_SelectionScheme_Switch);
     }
     else
     {
-      aCtx->Select (false);
+      aCtx->Select (AIS_SelectionScheme_ClearAndAdd);
     }
     aCtx->CurrentViewer()->Invalidate();
   }
@@ -7609,11 +7609,11 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
     {
       std::swap (aPnts.ChangeFirst(), aPnts.ChangeLast());
     }
-    aCurrentEventManager->SelectInViewer (aPnts, isShiftSelection);
+    aCurrentEventManager->SelectInViewer (aPnts, isAdditionalSelection);
   }
   else
   {
-    aCurrentEventManager->SelectInViewer (aPnts, isShiftSelection);
+    aCurrentEventManager->SelectInViewer (aPnts, isAdditionalSelection);
   }
   aCurrentEventManager->FlushViewEvents (aCtx, ViewerTest::CurrentView(), true);
   return 0;

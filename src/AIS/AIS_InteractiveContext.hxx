@@ -25,6 +25,7 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_Selection.hxx>
 #include <AIS_SelectionModesConcurrency.hxx>
+#include <AIS_SelectionScheme.hxx>
 #include <AIS_StatusOfDetection.hxx>
 #include <AIS_StatusOfPick.hxx>
 #include <AIS_TypeOfIso.hxx>
@@ -470,8 +471,28 @@ public: //! @name Selection management
     return AddSelect (theObject->GlobalSelOwner());
   }
 
+  //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima,
+  //! XPMin, YPMin, XPMax, and YPMax in the view.
+  //! The objects detected are passed to the main viewer, which is then updated.
+  Standard_EXPORT AIS_StatusOfPick Select (const Standard_Integer  theXPMin,
+                                           const Standard_Integer  theYPMin,
+                                           const Standard_Integer  theXPMax,
+                                           const Standard_Integer  theYPMax,
+                                           const Handle(V3d_View)& theView,
+                                           const AIS_SelectionScheme theSelScheme);
+  
+  //! polyline selection; clears the previous picked list
+  Standard_EXPORT AIS_StatusOfPick Select (const TColgp_Array1OfPnt2d& thePolyline,
+                                           const Handle(V3d_View)&     theView,
+                                           const AIS_SelectionScheme   theSelScheme);
+
+  //! Stores and hilights the previous detected; Unhilights the previous picked.
+  //! @sa MoveTo().
+  Standard_EXPORT AIS_StatusOfPick Select (const AIS_SelectionScheme theSelScheme);
+
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
   //! The objects detected are passed to the main viewer, which is then updated.
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_ClearAndAdd should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const Standard_Integer  theXPMin,
                                            const Standard_Integer  theYPMin,
                                            const Standard_Integer  theXPMax,
@@ -480,27 +501,32 @@ public: //! @name Selection management
                                            const Standard_Boolean  theToUpdateViewer);
   
   //! polyline selection; clears the previous picked list
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_ClearAndAdd should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const TColgp_Array1OfPnt2d& thePolyline,
                                            const Handle(V3d_View)&     theView,
                                            const Standard_Boolean      theToUpdateViewer);
 
   //! Stores and hilights the previous detected; Unhilights the previous picked.
   //! @sa MoveTo().
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_ClearAndAdd should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const Standard_Boolean theToUpdateViewer);
 
   //! Adds the last detected to the list of previous picked.
   //! If the last detected was already declared as picked, removes it from the Picked List.
   //! @sa MoveTo().
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Switch should be called instead")
   Standard_EXPORT AIS_StatusOfPick ShiftSelect (const Standard_Boolean theToUpdateViewer);
 
   //! Adds the last detected to the list of previous picked.
   //! If the last detected was already declared as picked, removes it from the Picked List.
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Switch should be called instead")
   Standard_EXPORT AIS_StatusOfPick ShiftSelect (const TColgp_Array1OfPnt2d& thePolyline,
                                                 const Handle(V3d_View)&     theView,
                                                 const Standard_Boolean      theToUpdateViewer);
 
   //! Rectangle of selection; adds new detected entities into the picked list,
   //! removes the detected entities that were already stored.
+  Standard_DEPRECATED("This method is deprecated - Select() taking AIS_SelectionScheme_Switch should be called instead")
   Standard_EXPORT AIS_StatusOfPick ShiftSelect (const Standard_Integer  theXPMin,
                                                 const Standard_Integer  theYPMin,
                                                 const Standard_Integer  theXPMax,
@@ -510,6 +536,13 @@ public: //! @name Selection management
 
   //! Returns bounding box of selected objects.
   Standard_EXPORT Bnd_Box BoundingBoxOfSelection() const;
+
+  //! Sets list of owner selected/deselected using selection scheme
+  //! It is possible that selection of other objects is changed relatively selection scheme   .
+  //! \param theOwner owners to change selection state
+  //! \param theSelScheme selection scheme
+  Standard_EXPORT AIS_StatusOfPick Select (const AIS_NListOfEntityOwner& theOwners,
+                                           const AIS_SelectionScheme theSelScheme);
 
   //! Fits the view correspondingly to the bounds of selected objects.
   //! Infinite objects are ignored if infinite state of AIS_InteractiveObject is set to true.

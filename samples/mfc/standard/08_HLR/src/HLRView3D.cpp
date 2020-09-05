@@ -328,7 +328,8 @@ void CHLRView3D::DragEvent(const Standard_Integer  x        ,
     }
 
 	if (TheState == 0)
-	  GetDocument()->GetAISContext()->Select(theButtonDownX,theButtonDownY,x,y,myView);  
+	  GetDocument()->GetAISContext()->Select(theButtonDownX,theButtonDownY,x,y,myView,
+						 AIS_SelectionScheme_ClearAndAdd);  
 }
 
 //-----------------------------------------------------------------------------------------
@@ -337,7 +338,7 @@ void CHLRView3D::DragEvent(const Standard_Integer  x        ,
 void CHLRView3D::InputEvent(const Standard_Integer  x     ,
 				                   const Standard_Integer  y     ) 
 {
-    GetDocument()->GetAISContext()->Select(); 
+    GetDocument()->GetAISContext()->Select(AIS_SelectionScheme_ClearAndAdd); 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -375,7 +376,8 @@ void CHLRView3D::MultiDragEvent(const Standard_Integer  x        ,
     }
 
 	if (TheState == 0)
-	  GetDocument()->GetAISContext()->ShiftSelect(theButtonDownX,theButtonDownY,x,y,myView);  
+	  GetDocument()->GetAISContext()->Select(theButtonDownX,theButtonDownY,x,y,myView,
+						 AIS_SelectionScheme_Switch);  
 }
 
 
@@ -385,6 +387,6 @@ void CHLRView3D::MultiDragEvent(const Standard_Integer  x        ,
 void CHLRView3D::MultiInputEvent(const Standard_Integer  x       ,
 									    const Standard_Integer  y       ) 
 {
-	GetDocument()->GetAISContext()->ShiftSelect(); 
+	GetDocument()->GetAISContext()->Select(AIS_SelectionScheme_Switch); 
 }
 

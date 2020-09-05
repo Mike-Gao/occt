@@ -2572,7 +2572,7 @@ void AIS_ViewController::handleXRPicking (const Handle(AIS_InteractiveContext)& 
        && aTrigClick.IsPressed
        && aTrigClick.IsChanged)
       {
-        theCtx->Select (false);
+        theCtx->Select (AIS_SelectionScheme_ClearAndAdd);
         OnSelectionChanged (theCtx, theView);
         if (const Handle(Aspect_XRAction)& aHaptic = theView->View()->XRSession()->GenericAction (myXRLastPickingHand, Aspect_XRGenericAction_OutputHaptic))
         {
@@ -2751,11 +2751,11 @@ void AIS_ViewController::handleSelectionPick (const Handle(AIS_InteractiveContex
 
       if (myGL.Selection.IsXOR)
       {
-        theCtx->ShiftSelect (false);
+        theCtx->Select (AIS_SelectionScheme_Switch);
       }
       else
       {
-        theCtx->Select (false);
+        theCtx->Select (AIS_SelectionScheme_ClearAndAdd);
       }
 
       // selection affects all Views
@@ -2860,15 +2860,15 @@ void AIS_ViewController::handleSelectionPoly (const Handle(AIS_InteractiveContex
             theCtx->MainSelector()->AllowOverlapDetection (aPnt1.y() != Min (aPnt1.y(), aPnt2.y()));
             if (myGL.Selection.IsXOR)
             {
-              theCtx->ShiftSelect (Min (aPnt1.x(), aPnt2.x()), Min (aPnt1.y(), aPnt2.y()),
-                                   Max (aPnt1.x(), aPnt2.x()), Max (aPnt1.y(), aPnt2.y()),
-                                   theView, false);
+              theCtx->Select (Min (aPnt1.x(), aPnt2.x()), Min (aPnt1.y(), aPnt2.y()),
+                              Max (aPnt1.x(), aPnt2.x()), Max (aPnt1.y(), aPnt2.y()),
+                              theView, AIS_SelectionScheme_Switch);
             }
             else
             {
               theCtx->Select (Min (aPnt1.x(), aPnt2.x()), Min (aPnt1.y(), aPnt2.y()),
                               Max (aPnt1.x(), aPnt2.x()), Max (aPnt1.y(), aPnt2.y()),
-                              theView, false);
+                              theView, AIS_SelectionScheme_ClearAndAdd);
             }
             theCtx->MainSelector()->AllowOverlapDetection (false);
           }
@@ -2886,11 +2886,11 @@ void AIS_ViewController::handleSelectionPoly (const Handle(AIS_InteractiveContex
 
           if (myGL.Selection.IsXOR)
           {
-            theCtx->ShiftSelect (aPolyline, theView, false);
+            theCtx->Select (aPolyline, theView, AIS_SelectionScheme_Switch);
           }
           else
           {
-            theCtx->Select (aPolyline, theView, false);
+            theCtx->Select (aPolyline, theView, AIS_SelectionScheme_ClearAndAdd);
           }
           theCtx->MainSelector()->AllowOverlapDetection (false);
         }
