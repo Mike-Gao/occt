@@ -992,12 +992,8 @@ Dynamic detection and selection are put into effect in a straightforward way.
 There are only a few conventions and functions to be familiar with:
   * *AIS_InteractiveContext::MoveTo* -- passes mouse position to Interactive Context selectors.
   * *AIS_InteractiveContext::Select* -- stores what has been detected at the last *MoveTo*.
-    Replaces the previously selected object.
-    Empties the stack if nothing has been detected at the last move.
-  * *AIS_InteractiveContext::ShiftSelect* -- if the object detected at the last move was not already selected, it is added to the list of the selected objects.
-    If not, it is withdrawn. Nothing happens if you click on an empty area.
-  * *AIS_InteractiveContext::Select* -- selects everything found in the surrounding area.
-  * *AIS_InteractiveContext::ShiftSelect* -- selects what was not previously in the list of selected, deselects those already present.
+    Changes the previously selected object. Depending on the selection scheme, the selection is enriched, replaced or other.
+    Selection is applied to point, rectangular or surrounding area.
 
 Highlighting of detected and selected entities is automatically managed by the Interactive Context.
 The Highlight colors are those dealt with above. You can nonetheless disconnect this automatic mode if you want to manage this part yourself:
@@ -1011,7 +1007,7 @@ The following functions can be used:
   * *AIS_InteractiveContext::HasDetected* -- checks if there is a detected entity;
   * *AIS_InteractiveContext::DetectedOwner* -- returns the (currently highlighted) detected entity.
 
-After using the *Select* and *ShiftSelect* functions, you can explore the list of selections.
+After using the *Select* function, you can explore the list of selections.
 The following functions can be used:
   * *AIS_InteractiveContext::InitSelected* -- initializes an iterator;
   * *AIS_InteractiveContext::MoreSelected* -- checks if the iterator is valid;
