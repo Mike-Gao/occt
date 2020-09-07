@@ -916,6 +916,18 @@ public: //! @name methods to alter or retrieve current state
   //! Bind default Vertex Array Object
   Standard_EXPORT void BindDefaultVao();
 
+  //! Active Frame Buffer Object.
+  const Handle(OpenGl_FrameBuffer)& ActiveFrameBuffer() const
+  {
+    return myActiveFbo;
+  }
+
+  //! Setup Active Frame Buffer Object.
+  void SetActiveFrameBuffer (const Handle(OpenGl_FrameBuffer)& theFbo)
+  {
+    myActiveFbo = theFbo;
+  }
+
   //! Default Frame Buffer Object.
   const Handle(OpenGl_FrameBuffer)& DefaultFrameBuffer() const
   {
@@ -1173,6 +1185,7 @@ private: //! @name fields tracking current state
                                                    //!< currently active sampler objects
   Standard_Integer              myActiveMockTextures; //!< currently active mock sampler objects
   Handle(OpenGl_FrameBuffer)    myDefaultFbo;      //!< default Frame Buffer Object
+  Handle(OpenGl_FrameBuffer)    myActiveFbo;       //!< active Frame Buffer Object
   Handle(OpenGl_LineAttributes) myHatchStyles;     //!< resource holding predefined hatch styles patterns
   Standard_Integer              myActiveHatchType; //!< currently activated type of polygon hatch
   Standard_Boolean              myHatchIsEnabled;  //!< current enabled state of polygon hatching rasterization

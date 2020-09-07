@@ -196,6 +196,7 @@ Standard_Boolean OpenGl_FrameBuffer::Init (const Handle(OpenGl_Context)& theGlCo
   // Build FBO and setup it as texture
   theGlContext->arbFBO->glGenFramebuffers (1, &myGlFBufferId);
   theGlContext->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, myGlFBufferId);
+  theGlContext->SetActiveFrameBuffer (this);
 
   for (Standard_Integer aColorBufferIdx = 0; aColorBufferIdx < myColorTextures.Length(); ++aColorBufferIdx)
   {
@@ -346,6 +347,7 @@ Standard_Boolean OpenGl_FrameBuffer::Init (const Handle(OpenGl_Context)& theGlCo
   // Build FBO and setup it as texture
   theGlContext->arbFBO->glGenFramebuffers (1, &myGlFBufferId);
   theGlContext->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, myGlFBufferId);
+  theGlContext->SetActiveFrameBuffer (this);
   for (Standard_Integer aColorBufferIdx = 0; aColorBufferIdx < myColorTextures.Length(); ++aColorBufferIdx)
   {
     const Handle(OpenGl_Texture)& aColorTexture = myColorTextures (aColorBufferIdx);
@@ -512,6 +514,7 @@ Standard_Boolean OpenGl_FrameBuffer::InitWithRB (const Handle(OpenGl_Context)& t
   // create FBO
   theGlCtx->arbFBO->glGenFramebuffers (1, &myGlFBufferId);
   theGlCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, myGlFBufferId);
+  theGlCtx->SetActiveFrameBuffer (this);
   theGlCtx->arbFBO->glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                                GL_RENDERBUFFER, myGlColorRBufferId);
   if (myGlDepthRBufferId != NO_RENDERBUFFER)
@@ -692,6 +695,7 @@ void OpenGl_FrameBuffer::BindBuffer (const Handle(OpenGl_Context)& theGlCtx)
 {
   theGlCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, myGlFBufferId);
   theGlCtx->SetFrameBufferSRGB (true);
+  theGlCtx->SetActiveFrameBuffer (this);
 }
 
 // =======================================================================
@@ -702,6 +706,7 @@ void OpenGl_FrameBuffer::BindDrawBuffer (const Handle(OpenGl_Context)& theGlCtx)
 {
   theGlCtx->arbFBO->glBindFramebuffer (GL_DRAW_FRAMEBUFFER, myGlFBufferId);
   theGlCtx->SetFrameBufferSRGB (true);
+  theGlCtx->SetActiveFrameBuffer (this);
 }
 
 // =======================================================================
@@ -711,6 +716,7 @@ void OpenGl_FrameBuffer::BindDrawBuffer (const Handle(OpenGl_Context)& theGlCtx)
 void OpenGl_FrameBuffer::BindReadBuffer (const Handle(OpenGl_Context)& theGlCtx)
 {
   theGlCtx->arbFBO->glBindFramebuffer (GL_READ_FRAMEBUFFER, myGlFBufferId);
+  theGlCtx->SetActiveFrameBuffer (this);
 }
 
 // =======================================================================
@@ -728,6 +734,7 @@ void OpenGl_FrameBuffer::UnbindBuffer (const Handle(OpenGl_Context)& theGlCtx)
   {
     theGlCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, NO_FRAMEBUFFER);
     theGlCtx->SetFrameBufferSRGB (false);
+    theGlCtx->SetActiveFrameBuffer (NULL);
   }
 }
 
