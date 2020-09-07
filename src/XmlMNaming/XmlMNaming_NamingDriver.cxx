@@ -239,7 +239,8 @@ Standard_Boolean XmlMNaming_NamingDriver::Paste
   }
 #ifdef OCCT_DEBUG
   else 
-    std::cout << "Current Document Format Version = "  << theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() <<std::endl;
+    std::cout << "Current Document Format Version = " 
+              << static_cast<Standard_Integer>(theRelocTable.GetHeaderData()->XmlStorageVersion()) <<std::endl;
 #endif
   return Standard_True;
 }
