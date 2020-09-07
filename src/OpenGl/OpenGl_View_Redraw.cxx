@@ -1269,6 +1269,7 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
           {
             aCtx->arbFBO->glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
             aCtx->SetFrameBufferSRGB (false);
+            aCtx->SetActiveFrameBuffer (NULL);
           }
 
           // Render non-polygonal elements in default layer
@@ -1285,6 +1286,7 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
       {
         aCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, 0);
         aCtx->SetFrameBufferSRGB (false);
+        aCtx->SetActiveFrameBuffer (NULL);
       }
 
       // Reset OpenGl aspects state to default to avoid enabling of
@@ -1483,6 +1485,7 @@ bool OpenGl_View::blitBuffers (OpenGl_FrameBuffer*    theReadFbo,
   {
     aCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, OpenGl_FrameBuffer::NO_FRAMEBUFFER);
     aCtx->SetFrameBufferSRGB (false);
+    aCtx->SetActiveFrameBuffer (NULL);
   }
   const Standard_Integer aViewport[4] = { 0, 0, aDrawSizeX, aDrawSizeY };
   aCtx->ResizeViewport (aViewport);
@@ -1528,6 +1531,7 @@ bool OpenGl_View::blitBuffers (OpenGl_FrameBuffer*    theReadFbo,
       }
       aCtx->arbFBO->glBindFramebuffer (GL_DRAW_FRAMEBUFFER, OpenGl_FrameBuffer::NO_FRAMEBUFFER);
       aCtx->SetFrameBufferSRGB (false);
+      aCtx->SetActiveFrameBuffer (NULL);
     }
 
     // we don't copy stencil buffer here... does it matter for performance?
@@ -1569,6 +1573,7 @@ bool OpenGl_View::blitBuffers (OpenGl_FrameBuffer*    theReadFbo,
     {
       aCtx->arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, OpenGl_FrameBuffer::NO_FRAMEBUFFER);
       aCtx->SetFrameBufferSRGB (false);
+      aCtx->SetActiveFrameBuffer (NULL);
     }
   }
   else

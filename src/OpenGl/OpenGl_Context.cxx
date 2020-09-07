@@ -458,6 +458,7 @@ void OpenGl_Context::SetReadBuffer (const Standard_Integer theReadBuffer)
    && arbFBO != NULL)
   {
     arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, OpenGl_FrameBuffer::NO_FRAMEBUFFER);
+    SetActiveFrameBuffer (NULL);
   }
   ::glReadBuffer (myReadBuffer);
 #else
@@ -477,6 +478,7 @@ void OpenGl_Context::SetDrawBuffer (const Standard_Integer theDrawBuffer)
    && arbFBO != NULL)
   {
     arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, OpenGl_FrameBuffer::NO_FRAMEBUFFER);
+    SetActiveFrameBuffer (NULL);
   }
   ::glDrawBuffer (aDrawBuffer);
 
@@ -517,6 +519,7 @@ void OpenGl_Context::SetDrawBuffers (const Standard_Integer theNb, const Standar
   if (arbFBO != NULL && useDefaultFbo)
   {
     arbFBO->glBindFramebuffer (GL_FRAMEBUFFER, OpenGl_FrameBuffer::NO_FRAMEBUFFER);
+    SetActiveFrameBuffer (NULL);
   }
 
   myFuncs->glDrawBuffers (theNb, (const GLenum*)theDrawBuffers);

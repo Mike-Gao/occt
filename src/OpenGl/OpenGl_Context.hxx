@@ -923,7 +923,7 @@ public: //! @name methods to alter or retrieve current state
   }
 
   //! Setup Active Frame Buffer Object.
-  Standard_EXPORT void SetActiveFrameBuffer (const Handle(OpenGl_FrameBuffer)& theFbo)
+  void SetActiveFrameBuffer (const Handle(OpenGl_FrameBuffer)& theFbo)
   {
     myActiveFbo = theFbo;
   }
