@@ -22,8 +22,10 @@
 #include <AIS_CameraFrustum.hxx>
 #include <AIS_ColorScale.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_LightSource.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
+#include <AIS_ListOfLight.hxx>
 #include <AIS_Manipulator.hxx>
 #include <AIS_ViewCube.hxx>
 #include <AIS_Shape.hxx>
@@ -10690,6 +10692,14 @@ inline void addLight (const Handle(V3d_Light)& theLightNew,
   }
 }
 
+void addLight(const Handle(AIS_LightSource)& theLightNew,
+              const Graphic3d_ZLayerId theLayer,
+              const Standard_Boolean   theIsGlobal)
+{
+  ViewerTest::CurrentView()->AddLight(theLightNew);
+  addLight (theLightNew->GetLight(), theLayer, theIsGlobal);
+}
+
 //! Auxiliary method
 inline Standard_Integer getLightId (const TCollection_AsciiString& theArgNext)
 {
@@ -14029,7 +14039,591 @@ static int VColorDiff (Draw_Interpretor& theDI, Standard_Integer  theNbArgs, con
 
   return 0;
 }
- 
+
+static int vlight_updated(Draw_Interpretor& theDI, Standard_Integer theNbArgs, const char** theArgVec)
+{
+  Handle(V3d_View)   aView = ViewerTest::CurrentView();
+  Handle(V3d_Viewer) aViewer = ViewerTest::GetViewerFromContext();
+  if (aView.IsNull()
+    || aViewer.IsNull())
+  {
+    Message::SendFail("Error: no active viewer");
+    return 1;
+  }
+
+  Standard_Real anXYZ[3] = {};
+  Standard_Real anAtten[2] = {};
+  if (theNbArgs < 2)
+  {
+    // print lights info
+    Standard_Integer aLightId = 0;
+    for (AIS_ListOfLightIterator aLightIter(aView->ActiveLightSources()); aLightIter.More(); aLightIter.Next(), ++aLightId)
+    {
+      Handle(AIS_LightSource) aLight = aLightIter.Value();
+      const Quantity_Color aColor = aLight->Color();
+      theDI << "Light #" << aLightId
+            << (!aLight->Name().IsEmpty() ? (TCollection_AsciiString(" ") + aLight->Name()) : "")
+            << " [" << aLight->GetId() << "]" << "\n";
+      switch (aLight->GetType())
+      {
+        case V3d_AMBIENT:
+        {
+          theDI << "  Type:       Ambient\n";
+          theDI << "  Intensity:  " << aLight->Intensity() << "\n";
+          break;
+        }
+        case V3d_DIRECTIONAL:
+        {
+          theDI << "  Type:       Directional\n";
+          theDI << "  Intensity:  " << aLight->Intensity() << "\n";
+          theDI << "  Headlight:  " << (aLight->Headlight() ? "TRUE" : "FALSE") << "\n";
+          theDI << "  Smoothness: " << aLight->Smoothness() << "\n";
+          aLight->Direction (anXYZ[0], anXYZ[1], anXYZ[2]);
+          theDI << "  Direction:  " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+          break;
+        }
+        case V3d_POSITIONAL:
+        {
+          theDI << "  Type:       Positional\n";
+          theDI << "  Intensity:  " << aLight->Intensity() << "\n";
+          theDI << "  Headlight:  " << (aLight->Headlight() ? "TRUE" : "FALSE") << "\n";
+          theDI << "  Smoothness: " << aLight->Smoothness() << "\n";
+          aLight->Position (anXYZ[0], anXYZ[1], anXYZ[2]);
+          theDI << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+          aLight->Attenuation (anAtten[0], anAtten[1]);
+          theDI << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
+          theDI << "  Range:      " << aLight->Range() << "\n";
+          break;
+        }
+        case V3d_SPOT:
+        {
+          theDI << "  Type:       Spot\n";
+          theDI << "  Intensity:  " << aLight->Intensity() << "\n";
+          theDI << "  Headlight:  " << (aLight->Headlight() ? "TRUE" : "FALSE") << "\n";
+          aLight->Position (anXYZ[0], anXYZ[1], anXYZ[2]);
+          theDI << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+          aLight->Direction (anXYZ[0], anXYZ[1], anXYZ[2]);
+          theDI << "  Direction:  " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+          aLight->Attenuation (anAtten[0], anAtten[1]);
+          theDI << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
+          theDI << "  Angle:      " << (aLight->Angle() * 180.0 / M_PI) << "\n";
+          theDI << "  Exponent:   " << aLight->Concentration() << "\n";
+          theDI << "  Range:      " << aLight->Range() << "\n";
+          break;
+        }
+        default:
+        {
+          theDI << "  Type:       UNKNOWN\n";
+          break;
+        }
+      }
+      theDI << "  Color:      " << aColor.Red() << ", " << aColor.Green() << ", " << aColor.Blue() << " [" << Quantity_Color::StringName(aColor.Name()) << "]\n";
+    }
+  }
+
+  Handle(AIS_LightSource) aLightNew;
+  Handle(AIS_LightSource) aLightOld = new AIS_LightSource(Graphic3d_TOLS_AMBIENT, ViewerTest::GetAISContext());
+
+  Graphic3d_ZLayerId aLayer = Graphic3d_ZLayerId_UNKNOWN;
+  Standard_Boolean  isGlobal = Standard_True;
+  Standard_Boolean  toCreate = Standard_False;
+  ViewerTest_AutoUpdater anUpdateTool(ViewerTest::GetAISContext(), aView);
+  for (Standard_Integer anArgIt = 1; anArgIt < theNbArgs; ++anArgIt)
+  {
+    Handle(AIS_LightSource) aLightCurr = aLightNew.IsNull() ? aLightOld : aLightNew;
+
+    TCollection_AsciiString aName, aValue;
+    const TCollection_AsciiString anArg(theArgVec[anArgIt]);
+    TCollection_AsciiString anArgCase(anArg);
+    anArgCase.UpperCase();
+    if (anUpdateTool.parseRedrawMode (anArg))
+    {
+      continue;
+    }
+
+    if (anArgCase.IsEqual ("NEW")
+      || anArgCase.IsEqual ("ADD")
+      || anArgCase.IsEqual ("CREATE")
+      || anArgCase.IsEqual ("-NEW")
+      || anArgCase.IsEqual ("-ADD")
+      || anArgCase.IsEqual ("-CREATE"))
+    {
+      toCreate = Standard_True;
+    }
+    else if (anArgCase.IsEqual ("-LAYER")
+      || anArgCase.IsEqual ("-ZLAYER"))
+    {
+      if (++anArgIt >= theNbArgs)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      TCollection_AsciiString aValStr(theArgVec[anArgIt]);
+      aValStr.LowerCase();
+      if (aValStr == "default"
+        || aValStr == "def")
+      {
+        aLayer = Graphic3d_ZLayerId_Default;
+      }
+      else if (aValStr == "top")
+      {
+        aLayer = Graphic3d_ZLayerId_Top;
+      }
+      else if (aValStr == "topmost")
+      {
+        aLayer = Graphic3d_ZLayerId_Topmost;
+      }
+      else if (aValStr == "toposd"
+        || aValStr == "osd")
+      {
+        aLayer = Graphic3d_ZLayerId_TopOSD;
+      }
+      else if (aValStr == "botosd"
+        || aValStr == "bottom")
+      {
+        aLayer = Graphic3d_ZLayerId_BotOSD;
+      }
+      else if (aValStr.IsIntegerValue())
+      {
+        aLayer = Draw::Atoi(theArgVec[anArgIt]);
+      }
+      else
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+    }
+    else if (anArgCase.IsEqual ("GLOB")
+          || anArgCase.IsEqual ("GLOBAL")
+          || anArgCase.IsEqual ("-GLOB")
+          || anArgCase.IsEqual ("-GLOBAL"))
+    {
+      isGlobal = Standard_True;
+    }
+    else if (anArgCase.IsEqual ("LOC")
+          || anArgCase.IsEqual ("LOCAL")
+          || anArgCase.IsEqual ("-LOC")
+          || anArgCase.IsEqual ("-LOCAL"))
+    {
+      isGlobal = Standard_False;
+    }
+    else if (anArgCase.IsEqual ("DEF")
+          || anArgCase.IsEqual ("DEFAULTS")
+          || anArgCase.IsEqual ("-DEF")
+          || anArgCase.IsEqual ("-DEFAULTS"))
+    {
+      toCreate = Standard_False;
+      aViewer->SetDefaultLights();
+    }
+    else if (anArgCase.IsEqual ("CLR")
+          || anArgCase.IsEqual ("CLEAR")
+          || anArgCase.IsEqual ("-CLR")
+          || anArgCase.IsEqual ("-CLEAR"))
+    {
+      toCreate = Standard_False;
+
+      TColStd_SequenceOfInteger aLayers;
+      aViewer->GetAllZLayers (aLayers);
+      for (TColStd_SequenceOfInteger::Iterator aLayeriter(aLayers); aLayeriter.More(); aLayeriter.Next())
+      {
+        if (aLayeriter.Value() == aLayer
+         || aLayer == Graphic3d_ZLayerId_UNKNOWN)
+        {
+          Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (aLayeriter.Value());
+          aSettings.SetLights (Handle(Graphic3d_LightSet)());
+          aViewer->SetZLayerSettings (aLayeriter.Value(), aSettings);
+          if (aLayer != Graphic3d_ZLayerId_UNKNOWN)
+          {
+            break;
+          }
+        }
+      }
+
+      if (aLayer == Graphic3d_ZLayerId_UNKNOWN)
+      {
+        for (AIS_ListOfLightIterator aLightIter(aView->ActiveLightSources()); aLightIter.More();)
+        {
+          Handle(AIS_LightSource) aLight = aLightIter.Value();
+          aLight->DeleteAllDisplayedAttributes();
+          aView->RemoveLight (aLight);
+          aViewer->DelLight (aLight->GetLight());
+          aLightIter = aView->ActiveLightSources();
+        }
+      }
+    }
+    else if (anArgCase.IsEqual ("AMB")
+          || anArgCase.IsEqual ("AMBIENT")
+          || anArgCase.IsEqual ("AMBLIGHT"))
+    {
+      if (!toCreate)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      toCreate = Standard_False;
+      aLightNew = new AIS_LightSource(Graphic3d_TOLS_AMBIENT, ViewerTest::GetAISContext());
+      addLight (aLightNew, aLayer, isGlobal);
+      if (!aLightNew.IsNull())
+        GetMapOfAIS().Bind (aLightNew, aLightNew->GetId());
+    }
+    else if (anArgCase.IsEqual ("DIRECTIONAL")
+          || anArgCase.IsEqual ("DIRLIGHT"))
+    {
+      if (!toCreate)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      toCreate = Standard_False;
+      aLightNew = new AIS_LightSource(Graphic3d_TOLS_DIRECTIONAL, ViewerTest::GetAISContext());
+      addLight (aLightNew, aLayer, isGlobal);
+      if (!aLightNew.IsNull())
+        GetMapOfAIS().Bind (aLightNew, aLightNew->GetId());
+    }
+    else if (anArgCase.IsEqual ("SPOT")
+          || anArgCase.IsEqual ("SPOTLIGHT"))
+    {
+      if (!toCreate)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      toCreate = Standard_False;
+      aLightNew = new AIS_LightSource(Graphic3d_TOLS_SPOT, ViewerTest::GetAISContext());
+      addLight (aLightNew, aLayer, isGlobal);
+      if (!aLightNew.IsNull())
+        GetMapOfAIS().Bind (aLightNew, aLightNew->GetId());
+    }
+    else if (anArgCase.IsEqual ("POSLIGHT")
+          || anArgCase.IsEqual ("POSITIONAL"))
+    {
+      if (!toCreate)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      toCreate = Standard_False;
+      aLightNew = new AIS_LightSource(Graphic3d_TOLS_POSITIONAL, ViewerTest::GetAISContext());
+      addLight (aLightNew, aLayer, isGlobal);
+      if (!aLightNew.IsNull())
+        GetMapOfAIS().Bind (aLightNew, aLightNew->GetId());
+    }
+    else if (anArgCase.IsEqual ("CHANGE")
+          || anArgCase.IsEqual ("-CHANGE"))
+    {
+      if (++anArgIt >= theNbArgs)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+      if (!aLightNew.IsNull() && !aView->ActiveLightSources().Contains(aLightNew))
+        addLight (aLightNew, aLayer, isGlobal);
+      aLightNew.Nullify();
+      const Standard_Integer aLightId = getLightId (theArgVec[anArgIt]);
+      Standard_Integer aLightIt = 0;
+      for (AIS_ListOfLightIterator aLightIter(aView->ActiveLightSources()); aLightIter.More(); aLightIter.Next(), ++aLightIt)
+      {
+        if (aLightIt == aLightId)
+        {
+          aLightOld = aLightIter.Value();
+          break;
+        }
+      }
+
+      if (aLightOld.IsNull())
+      {
+        Message::SendFail() << "Error: Light " << theArgVec[anArgIt] << " is undefined";
+        return 1;
+      }
+    }
+    else if (anArgCase.IsEqual ("DEL")
+          || anArgCase.IsEqual ("DELETE")
+          || anArgCase.IsEqual ("-DEL")
+          || anArgCase.IsEqual ("-DELETE"))
+    {
+      Handle(AIS_LightSource) aLightDel;
+      if (++anArgIt >= theNbArgs)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      const TCollection_AsciiString anArgNext(theArgVec[anArgIt]);
+      const Standard_Integer aLightDelId = getLightId (theArgVec[anArgIt]);
+      Standard_Integer aLightIt = 0;
+      for (AIS_ListOfLightIterator aLightIter(aView->ActiveLightSources()); aLightIter.More(); aLightIter.Next(), ++aLightIt)
+      {
+        aLightDel = aLightIter.Value();
+        if (aLightIt == aLightDelId)
+        {
+          break;
+        }
+      }
+      if (aLightDel.IsNull())
+      {
+        continue;
+      }
+
+      TColStd_SequenceOfInteger aLayers;
+      aViewer->GetAllZLayers (aLayers);
+      for (TColStd_SequenceOfInteger::Iterator aLayeriter(aLayers); aLayeriter.More(); aLayeriter.Next())
+      {
+        if (aLayeriter.Value() == aLayer
+         || aLayer == Graphic3d_ZLayerId_UNKNOWN)
+        {
+          Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (aLayeriter.Value());
+          if (!aSettings.Lights().IsNull())
+          {
+            aSettings.Lights()->Remove (aLightDel->GetLight());
+            if (aSettings.Lights()->IsEmpty())
+            {
+              aSettings.SetLights (Handle(Graphic3d_LightSet)());
+            }
+          }
+          aViewer->SetZLayerSettings (aLayeriter.Value(), aSettings);
+          if (aLayer != Graphic3d_ZLayerId_UNKNOWN)
+          {
+            break;
+          }
+        }
+      }
+
+      if (aLayer == Graphic3d_ZLayerId_UNKNOWN)
+      {
+        aLightDel->DeleteAllDisplayedAttributes();
+        aView->RemoveLight (aLightDel);
+        aViewer->DelLight(aLightDel->GetLight());
+      }
+    }
+    else if (anArgCase.IsEqual ("COLOR")
+          || anArgCase.IsEqual ("COLOUR")
+          || anArgCase.IsEqual ("-COLOR")
+          || anArgCase.IsEqual ("-COLOUR"))
+    {
+      Quantity_Color aColor;
+      Standard_Integer aNbParsed = Draw::ParseColor (theNbArgs - anArgIt - 1,
+                                                     theArgVec + anArgIt + 1,
+                                                     aColor);
+      anArgIt += aNbParsed;
+      if (aNbParsed == 0
+       || aLightCurr.IsNull())
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+      aLightCurr->SetColor (aColor);
+    }
+    else if (anArgCase.IsEqual ("POS")
+      || anArgCase.IsEqual ("POSITION")
+      || anArgCase.IsEqual ("-POS")
+      || anArgCase.IsEqual ("-POSITION"))
+    {
+      if ((anArgIt + 3) >= theNbArgs
+        || aLightCurr.IsNull()
+        || (aLightCurr->GetType() != Graphic3d_TOLS_POSITIONAL
+          && aLightCurr->GetType() != Graphic3d_TOLS_SPOT))
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      anXYZ[0] = Atof (theArgVec[++anArgIt]);
+      anXYZ[1] = Atof (theArgVec[++anArgIt]);
+      anXYZ[2] = Atof (theArgVec[++anArgIt]);
+      aLightCurr->SetPosition (anXYZ[0], anXYZ[1], anXYZ[2]);
+    }
+    else if (anArgCase.IsEqual ("DIR")
+          || anArgCase.IsEqual ("DIRECTION")
+          || anArgCase.IsEqual ("-DIR")
+          || anArgCase.IsEqual ("-DIRECTION"))
+    {
+      if ((anArgIt + 3) >= theNbArgs
+        || aLightCurr.IsNull()
+        || (aLightCurr->GetType() != Graphic3d_TOLS_DIRECTIONAL
+          && aLightCurr->GetType() != Graphic3d_TOLS_SPOT))
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      anXYZ[0] = Atof (theArgVec[++anArgIt]);
+      anXYZ[1] = Atof (theArgVec[++anArgIt]);
+      anXYZ[2] = Atof (theArgVec[++anArgIt]);
+      aLightCurr->SetDirection (anXYZ[0], anXYZ[1], anXYZ[2]);
+    }
+    else if (anArgCase.IsEqual ("SM")
+      || anArgCase.IsEqual ("SMOOTHNESS")
+      || anArgCase.IsEqual ("-SM")
+      || anArgCase.IsEqual ("-SMOOTHNESS"))
+    {
+      if (++anArgIt >= theNbArgs
+        || aLightCurr.IsNull())
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      Standard_ShortReal aSmoothness = (Standard_ShortReal)Atof (theArgVec[anArgIt]);
+      if (Abs (aSmoothness) <= ShortRealEpsilon())
+      {
+        aLightCurr->SetIntensity (1.f);
+      }
+      else if (Abs (aLightCurr->Smoothness()) <= ShortRealEpsilon())
+      {
+        aLightCurr->SetIntensity ((aSmoothness * aSmoothness) / 3.f);
+      }
+      else
+      {
+        Standard_ShortReal aSmoothnessRatio = static_cast<Standard_ShortReal> (aSmoothness / aLightCurr->Smoothness());
+        aLightCurr->SetIntensity (aLightCurr->Intensity() / (aSmoothnessRatio * aSmoothnessRatio));
+      }
+
+      if (aLightCurr->GetType() == Graphic3d_TOLS_POSITIONAL)
+      {
+        aLightCurr->SetSmoothRadius (aSmoothness);
+      }
+      else if (aLightCurr->GetType() == Graphic3d_TOLS_DIRECTIONAL)
+      {
+        aLightCurr->SetSmoothAngle (aSmoothness);
+      }
+    }
+    else if (anArgCase.IsEqual ("INT")
+          || anArgCase.IsEqual ("INTENSITY")
+          || anArgCase.IsEqual ("-INT")
+          || anArgCase.IsEqual ("-INTENSITY"))
+    {
+      if (++anArgIt >= theNbArgs
+         || aLightCurr.IsNull())
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      Standard_ShortReal aIntensity = (Standard_ShortReal)Atof (theArgVec[anArgIt]);
+      aLightCurr->SetIntensity (aIntensity);
+    }
+    else if (anArgCase.IsEqual ("ANG")
+      || anArgCase.IsEqual ("ANGLE")
+      || anArgCase.IsEqual ("-ANG")
+      || anArgCase.IsEqual ("-ANGLE"))
+    {
+      if (++anArgIt >= theNbArgs
+         || aLightCurr.IsNull()
+         || aLightCurr->GetType() != Graphic3d_TOLS_SPOT)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      Standard_ShortReal anAngle = (Standard_ShortReal)Atof (theArgVec[anArgIt]);
+      aLightCurr->SetAngle (Standard_ShortReal(anAngle / 180.0 * M_PI));
+    }
+    else if (anArgCase.IsEqual ("CONSTATTEN")
+      || anArgCase.IsEqual ("CONSTATTENUATION")
+      || anArgCase.IsEqual ("-CONSTATTEN")
+      || anArgCase.IsEqual ("-CONSTATTENUATION"))
+    {
+      if (++anArgIt >= theNbArgs
+        || aLightCurr.IsNull()
+        || (aLightCurr->GetType() != Graphic3d_TOLS_POSITIONAL
+          && aLightCurr->GetType() != Graphic3d_TOLS_SPOT))
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      aLightCurr->Attenuation (anAtten[0], anAtten[1]);
+      anAtten[0] = Atof (theArgVec[anArgIt]);
+      aLightCurr->SetAttenuation ((Standard_ShortReal)anAtten[0], (Standard_ShortReal)anAtten[1]);
+    }
+    else if (anArgCase.IsEqual ("LINATTEN")
+      || anArgCase.IsEqual ("LINEARATTEN")
+      || anArgCase.IsEqual ("LINEARATTENUATION")
+      || anArgCase.IsEqual ("-LINATTEN")
+      || anArgCase.IsEqual ("-LINEARATTEN")
+      || anArgCase.IsEqual ("-LINEARATTENUATION"))
+    {
+      if (++anArgIt >= theNbArgs
+        || aLightCurr.IsNull()
+        || (aLightCurr->GetType() != Graphic3d_TOLS_POSITIONAL
+        && aLightCurr->GetType() != Graphic3d_TOLS_SPOT))
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      aLightCurr->Attenuation (anAtten[0], anAtten[1]);
+      anAtten[1] = Atof (theArgVec[anArgIt]);
+      aLightCurr->SetAttenuation ((Standard_ShortReal)anAtten[0], (Standard_ShortReal)anAtten[1]);
+    }
+    else if (anArgCase.IsEqual ("EXP")
+          || anArgCase.IsEqual ("EXPONENT")
+          || anArgCase.IsEqual ("SPOTEXP")
+          || anArgCase.IsEqual ("SPOTEXPONENT")
+          || anArgCase.IsEqual ("-EXP")
+          || anArgCase.IsEqual ("-EXPONENT")
+          || anArgCase.IsEqual ("-SPOTEXP")
+         || anArgCase.IsEqual ("-SPOTEXPONENT"))
+    {
+      if (++anArgIt >= theNbArgs
+        || aLightCurr.IsNull()
+        || aLightCurr->GetType() != Graphic3d_TOLS_SPOT)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      aLightCurr->SetConcentration ((Standard_ShortReal)Atof (theArgVec[anArgIt]));
+    }
+      else if (anArgCase.IsEqual ("RANGE")
+      || anArgCase.IsEqual ("-RANGE"))
+      {
+      if (++anArgIt >= theNbArgs
+         || aLightCurr.IsNull()
+         || aLightCurr->GetType() == Graphic3d_TOLS_AMBIENT
+         || aLightCurr->GetType() == Graphic3d_TOLS_DIRECTIONAL)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      aLightCurr->SetRange ((Standard_ShortReal)Atof (theArgVec[anArgIt]));
+    }
+    else if (anArgCase.IsEqual ("HEAD")
+          || anArgCase.IsEqual ("HEADLIGHT")
+          || anArgCase.IsEqual ("-HEAD")
+          || anArgCase.IsEqual ("-HEADLIGHT"))
+    {
+      if (aLightCurr.IsNull()
+       || aLightCurr->GetType() == Graphic3d_TOLS_AMBIENT)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      Standard_Boolean isHeadLight = Standard_True;
+      if (anArgIt + 1 < theNbArgs
+      && Draw::ParseOnOff (theArgVec[anArgIt + 1], isHeadLight))
+      {
+        ++anArgIt;
+      }
+      aLightCurr->SetHeadlight (isHeadLight);
+    }
+    else
+    {
+      Message::SendFail() << "Warning: unknown argument '" << anArg << "'";
+    } 
+  }
+  if (!aLightNew.IsNull() && !aView->ActiveLightSources().Contains(aLightNew))
+    addLight (aLightNew, aLayer, isGlobal);
+  return 0;
+}
+
 //===============================================================================================
 //function : VBVHPrebuid
 //purpose  :
@@ -15021,4 +15615,5 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
                   "\n\t\t:   -nbThreads   number of threads, 1 by default; if < 1 then used (NbLogicalProcessors - 1)"
                   "\n\t\t:   -wait        waits for building all of BVH",
                   __FILE__,VSelBvhBuild,group);
+  theCommands.Add("vlight_lightsource", "", __FILE__, vlight_updated, group);
 }

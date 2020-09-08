@@ -17,6 +17,9 @@
 #ifndef _V3d_View_HeaderFile
 #define _V3d_View_HeaderFile
 
+#include <AIS_LightSource.hxx>
+#include <AIS_ListOfLight.hxx>
+
 #include <Aspect_Background.hxx>
 #include <Aspect_FillMethod.hxx>
 #include <Aspect_GradientBackground.hxx>
@@ -715,6 +718,18 @@ public:
   //! Returns a list of active lights.
   const V3d_ListOfLight& ActiveLights() const { return myActiveLights; }
 
+  // !Returns a list of active sources of light.
+  const NCollection_List<Handle(AIS_LightSource)>& ActiveLightSources() const { return myLightSources; }
+
+  //! Removes light from the list.
+  void RemoveLight(const Handle(AIS_LightSource)& theLightDel) { myLightSources.Remove (theLightDel); }
+
+  //! Returns iterator for defined lights.
+  AIS_ListOfLightIterator ActiveLightSourceIterator() const { return AIS_ListOfLightIterator(myActiveLights); }
+
+  //! Adds a Light to the list of defined sources of light.
+  void AddLight( const Handle(AIS_LightSource)& theNewLight) { myLightSources.Append (theNewLight); }
+
   //! Return iterator for defined lights.
   V3d_ListOfLightIterator ActiveLightIterator() const { return V3d_ListOfLightIterator (myActiveLights); }
 
@@ -1071,7 +1086,7 @@ private:
   Graphic3d_Vertex myGravityReferencePoint;
   Standard_Boolean myAutoZFitIsOn;
   Standard_Real myAutoZFitScaleFactor;
-
+  AIS_ListOfLight myLightSources;
 };
 
 #endif // _V3d_View_HeaderFile
