@@ -31,6 +31,7 @@
 #include <SelectMgr_StateOfSelection.hxx>
 #include <SelectMgr_ToleranceMap.hxx>
 #include <Standard_OStream.hxx>
+#include <SelectMgr_BVHThreadPool.hxx>
 
 class SelectMgr_SelectionManager;
 class SelectMgr_SensitiveEntitySet;
@@ -254,6 +255,20 @@ public:
   Standard_DEPRECATED("Deprecated method DetectedEntity() should be replaced by DetectedEntity(int)")
   Standard_EXPORT const Handle(Select3D_SensitiveEntity)& DetectedEntity() const;
 
+public:
+
+  //! Enables/disables building BVH for sensitives in separate threads
+  Standard_EXPORT void SetToPrebuildBVH(Standard_Boolean theToPrebuild, Standard_Integer theThreadsNum = -1);
+
+  //! Queue a sensitive entity to build its BVH
+  Standard_EXPORT void QueueBVHBuild(const Handle(Select3D_SensitiveEntity)& theEntity);
+
+  //! Returns TRUE if building BVH for sensitives in separate threads is enabled
+  Standard_Boolean ToPrebuildBVH()
+  {
+    return myToPrebuildBVH;
+  }
+
 protected:
 
   Standard_EXPORT SelectMgr_ViewerSelector();
@@ -344,6 +359,9 @@ protected:
   gp_Pnt                                        myCameraEye;
   gp_Dir                                        myCameraDir;
   Standard_Real                                 myCameraScale;
+
+  Standard_Boolean                              myToPrebuildBVH;
+  Handle(SelectMgr_BVHThreadPool)               myBVHThreadPool;
 
 private:
 
