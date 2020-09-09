@@ -1386,14 +1386,7 @@ protected: //! @name internal methods
     if (myLastinMain.IsNull())
       return;
 
-    if (myLastinMain->IsAutoHilight())
-    {
-      myMainPM->ClearImmediateDraw();
-    }
-    else
-    {
-      myLastinMain->Selectable()->ClearDynamicHighlight (myMainPM);
-    }
+    myLastinMain->Selectable()->ClearDynamicHighlight (myMainPM);
   }
 
 protected: //! @name internal fields
