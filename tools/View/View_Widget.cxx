@@ -675,8 +675,8 @@ void View_Widget::processDragEvent (const Standard_Integer theX, const Standard_
     break;
     case View_DragMode_ButtonUp:
     {
-      myViewer->GetContext()->Select (myDragButtonDownX, myDragButtonDownY, theX, theY, myViewer->GetView(),
-                                      AIS_SelectionScheme_ClearAndAdd);
+      myViewer->GetContext()->SelectRectangle (myDragButtonDownX, myDragButtonDownY, theX, theY, myViewer->GetView(),
+                                               AIS_SelectionScheme_ClearAndAdd);
       myViewer->GetContext()->UpdateCurrentViewer();
       emit selectionChanged();
       break;
@@ -692,7 +692,7 @@ void View_Widget::processDragEvent (const Standard_Integer theX, const Standard_
 // =======================================================================
 void View_Widget::processInputEvent (const Standard_Integer/* theX*/, const Standard_Integer/* theY*/)
 {
-  myViewer->GetContext()->Select (AIS_SelectionScheme_ClearAndAdd);
+  myViewer->GetContext()->SelectDetected (AIS_SelectionScheme_ClearAndAdd);
   myViewer->GetContext()->UpdateCurrentViewer();
   emit selectionChanged();
 }
@@ -724,8 +724,8 @@ void View_Widget::processDragMultiEvent (const Standard_Integer theX, const Stan
     }
     case View_DragMode_ButtonMove:
     {
-      myViewer->GetContext()->Select (myDragMultiButtonDownX, myDragMultiButtonDownY, theX, theY,
-                                      myViewer->GetView(), AIS_SelectionScheme_Switch);
+      myViewer->GetContext()->SelectRectangle (myDragMultiButtonDownX, myDragMultiButtonDownY, theX, theY,
+                                               myViewer->GetView(), AIS_SelectionScheme_XOR);
       myViewer->GetContext()->UpdateCurrentViewer();
       emit selectionChanged();
       break;
@@ -742,7 +742,7 @@ void View_Widget::processDragMultiEvent (const Standard_Integer theX, const Stan
 // =======================================================================
 void View_Widget::processInputMultiEvent (const Standard_Integer /*theX*/, const Standard_Integer /*theY*/)
 {
-  myViewer->GetContext()->Select (AIS_SelectionScheme_Switch);
+  myViewer->GetContext()->SelectDetected (AIS_SelectionScheme_XOR);
   myViewer->GetContext()->UpdateCurrentViewer();
   emit selectionChanged();
 }

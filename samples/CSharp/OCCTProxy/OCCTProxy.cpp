@@ -245,7 +245,8 @@ public:
   {
     if (!myAISContext().IsNull())
     {
-      myAISContext()->Select (theX1, theY1, theX2, theY2, myView(), AIS_SelectionScheme_ClearAndAdd);
+      myAISContext()->SelectRectangle (theX1, theY1, theX2, theY2, myView(),
+                                       AIS_SelectionScheme_ClearAndAdd);
       myAISContext()->UpdateCurrentViewer();
     }
   }
@@ -257,7 +258,7 @@ public:
   {
     if (!myAISContext().IsNull())
     {
-      myAISContext()->Select (AIS_SelectionScheme_ClearAndAdd);
+      myAISContext()->SelectDetected (AIS_SelectionScheme_ClearAndAdd);
       myAISContext()->UpdateCurrentViewer();
     }
   }
@@ -280,7 +281,8 @@ public:
   {
     if ((!myAISContext().IsNull()) && (!myView().IsNull()))
     {
-      myAISContext()->Select (theX1, theY1, theX2, theY2, myView(), AIS_SelectionScheme_Switch);
+      myAISContext()->SelectRectangle (theX1, theY1, theX2, theY2, myView(),
+                                       AIS_SelectionScheme_XOR);
       myAISContext()->UpdateCurrentViewer();
     }
   }
@@ -292,7 +294,7 @@ public:
   {
     if (!myAISContext().IsNull())
     {
-      myAISContext()->Select (AIS_SelectionScheme_Switch);
+      myAISContext()->SelectDetected (AIS_SelectionScheme_XOR);
       myAISContext()->UpdateCurrentViewer();
     }
   }

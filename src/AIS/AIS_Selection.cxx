@@ -147,7 +147,7 @@ void AIS_Selection::SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
   {
     Clear();
 
-    if (theSelScheme & AIS_SelectionScheme_Switch &&
+    if (theSelScheme & AIS_SelectionScheme_XOR &&
         theSelScheme & AIS_SelectionScheme_PickedIfEmpty &&
         thePickedOwners.Size() < aPrevSelected.Size())
     {
@@ -187,7 +187,7 @@ AIS_SelectStatus AIS_Selection::selectOwner (const Handle(SelectMgr_EntityOwner)
   {
     return AddSelect (theOwner);
   }
-  else if (theSelScheme & AIS_SelectionScheme_Switch)
+  else if (theSelScheme & AIS_SelectionScheme_XOR)
   {
     if (thePreviousSelected.Contains (theOwner)) // was selected, should not be now
     {
