@@ -482,94 +482,20 @@ AIS_StatusOfPick AIS_InteractiveContext::AddSelect (const Handle(SelectMgr_Entit
 }
 
 //=======================================================================
-//function : Select
-//purpose  : 
+//function : SelectRectangle
+//purpose  :
 //=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMin,
-                                                 const Standard_Integer  theYPMin,
-                                                 const Standard_Integer  theXPMax,
-                                                 const Standard_Integer  theYPMax,
-                                                 const Handle(V3d_View)& theView,
-                                                 const Standard_Boolean  toUpdateViewer)
+AIS_StatusOfPick AIS_InteractiveContext::SelectRectangle (const Graphic3d_Vec2i&    thePntMin,
+                                                          const Graphic3d_Vec2i&    thePntMax,
+                                                          const Handle(V3d_View)&   theView,
+                                                          const AIS_SelectionScheme theSelScheme)
 {
   if (theView->Viewer() != myMainVwr)
   {
-    throw Standard_ProgramError ("AIS_InteractiveContext::Select() - invalid argument");
+    throw Standard_ProgramError ("AIS_InteractiveContext::SelectRectangle() - invalid argument");
   }
 
-  // all objects detected by the selector are taken, previous current objects are emptied,
-  // new objects are put...
-  ClearSelected (Standard_False);
   myLastActiveView = theView.get();
-  myMainSel->Pick (theXPMin, theYPMin, theXPMax, theYPMax, theView);
-  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
-  {
-    const Handle(SelectMgr_EntityOwner)& aCurOwner = myMainSel->Picked (aPickIter);
-    if (aCurOwner.IsNull() || !aCurOwner->HasSelectable() || !myFilters->IsOk (aCurOwner))
-      continue;
-
-    mySelection->Select (aCurOwner);
-  }
-
-  if (myAutoHilight)
-  {
-    HilightSelected (toUpdateViewer);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
-  
-}
-
-//=======================================================================
-//function : Select
-//purpose  : Selection by polyline
-//=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& thePolyline,
-                                                 const Handle(V3d_View)&     theView,
-                                                 const Standard_Boolean      toUpdateViewer)
-{
-  if (theView->Viewer() != myMainVwr)
-  {
-    throw Standard_ProgramError ("AIS_InteractiveContext::Select() - invalid argument");
-  }
-
-  // all objects detected by the selector are taken, previous current objects are emptied,
-  // new objects are put...
-  ClearSelected (Standard_False);
-  myLastActiveView = theView.get();
-  myMainSel->Pick (thePolyline, theView);
-  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
-  {
-    const Handle(SelectMgr_EntityOwner) anOwner = myMainSel->Picked (aPickIter);
-    if (anOwner.IsNull() || !anOwner->HasSelectable() || !myFilters->IsOk (anOwner))
-      continue;
-
-    mySelection->Select (anOwner);
-  }
-
-  if (myAutoHilight)
-  {
-    HilightSelected (toUpdateViewer);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
-  
-}
-
-//=======================================================================
-//function : Select
-//purpose  : 
-//=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdateViewer)
-{
   if (!myLastPicked.IsNull())
   {
     Graphic3d_Vec2i aMousePos (-1, -1);
@@ -582,32 +508,158 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdate
     {
       return AIS_SOP_NothingSelected;
     }
-
-    if (myAutoHilight)
-    {
-      clearDynamicHighlight();
-    }
-    if (!myLastPicked->IsSelected()
-      || myLastPicked->IsForcedHilight()
-      || NbSelected() > 1)
-    {
-      SetSelected (myLastPicked, Standard_False);
-      if(toUpdateViewer)
-      {
-        UpdateCurrentViewer();
-      }
-    }
   }
-  else
+
+  myMainSel->Pick (thePntMin.x(), thePntMin.y(), thePntMax.x(), thePntMax.y(), theView);
+
+  AIS_NListOfEntityOwner aPickedOwners;
+  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
   {
-    ClearSelected (toUpdateViewer);
+    aPickedOwners.Append (myMainSel->Picked (aPickIter));
   }
 
-  Standard_Integer aSelNum = NbSelected();
+  return Select (aPickedOwners, theSelScheme);
+}
 
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
+//=======================================================================
+//function : SelectPolygon
+//purpose  :
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::SelectPolygon (const TColgp_Array1OfPnt2d& thePolyline,
+                                                        const Handle(V3d_View)&     theView,
+                                                        const AIS_SelectionScheme   theSelScheme)
+{
+  if (theView->Viewer() != myMainVwr)
+  {
+    throw Standard_ProgramError ("AIS_InteractiveContext::SelectPolygon() - invalid argument");
+  }
+
+  myMainSel->Pick (thePolyline, theView);
+
+  AIS_NListOfEntityOwner aPickedOwners;
+  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
+  {
+    aPickedOwners.Append (myMainSel->Picked (aPickIter));
+  }
+
+  return Select (aPickedOwners, theSelScheme);
+}
+
+//=======================================================================
+//function : SelectPoint
+//purpose  :
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::SelectPoint (const Graphic3d_Vec2i&    thePnt,
+                                                      const Handle(V3d_View)&   theView,
+                                                      const AIS_SelectionScheme theSelScheme)
+{
+  if (theView->Viewer() != myMainVwr)
+  {
+    throw Standard_ProgramError ("AIS_InteractiveContext::SelectPoint() - invalid argument");
+  }
+
+  myLastActiveView = theView.get();
+  if (!myLastPicked.IsNull())
+  {
+    Graphic3d_Vec2i aMousePos (-1, -1);
+    if (myMainSel->GetManager().GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Point)
+    {
+      aMousePos.SetValues ((Standard_Integer )myMainSel->GetManager().GetMousePosition().X(),
+                           (Standard_Integer )myMainSel->GetManager().GetMousePosition().Y());
+    }
+    if (myLastPicked->HandleMouseClick (aMousePos, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_NONE, false))
+    {
+      return AIS_SOP_NothingSelected;
+    }
+  }
+
+  myMainSel->Pick (thePnt.x(), thePnt.y(), theView);
+
+  AIS_NListOfEntityOwner aPickedOwners;
+  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
+  {
+    aPickedOwners.Append (myMainSel->Picked (aPickIter));
+  }
+
+  return Select (aPickedOwners, theSelScheme);
+}
+
+//=======================================================================
+//function : SelectDetected
+//purpose  :
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::SelectDetected (const AIS_SelectionScheme theSelScheme)
+{
+  if (theSelScheme == AIS_SelectionScheme_Replace && !myLastPicked.IsNull())
+  {
+    Graphic3d_Vec2i aMousePos (-1, -1);
+    if (myMainSel->GetManager().GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Point)
+    {
+      aMousePos.SetValues ((Standard_Integer )myMainSel->GetManager().GetMousePosition().X(),
+                           (Standard_Integer )myMainSel->GetManager().GetMousePosition().Y());
+    }
+    if (myLastPicked->HandleMouseClick (aMousePos, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_NONE, false))
+    {
+      return AIS_SOP_NothingSelected;
+    }
+  }
+
+  AIS_NListOfEntityOwner aPickedOwners;
+  aPickedOwners.Append (myLastPicked);
+
+  return Select (aPickedOwners, theSelScheme);
+}
+
+//=======================================================================
+//function : Select
+//purpose  : 
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMin,
+                                                 const Standard_Integer  theYPMin,
+                                                 const Standard_Integer  theXPMax,
+                                                 const Standard_Integer  theYPMax,
+                                                 const Handle(V3d_View)& theView,
+                                                 const Standard_Boolean  toUpdateViewer)
+{
+  AIS_StatusOfPick aStatus = SelectRectangle (Graphic3d_Vec2i (theXPMin, theYPMin),
+                                              Graphic3d_Vec2i(theXPMax, theYPMax),
+                                              theView,
+                                              AIS_SelectionScheme_Replace);
+  if(toUpdateViewer)
+  {
+    UpdateCurrentViewer();
+  }
+  return aStatus;
+}
+
+//=======================================================================
+//function : Select
+//purpose  : Selection by polyline
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& thePolyline,
+                                                 const Handle(V3d_View)&     theView,
+                                                 const Standard_Boolean      toUpdateViewer)
+{
+  AIS_StatusOfPick aStatus = SelectPolygon (thePolyline, theView, AIS_SelectionScheme_Replace);
+  if(toUpdateViewer)
+  {
+    UpdateCurrentViewer();
+  }
+  return aStatus;
+}
+
+//=======================================================================
+//function : Select
+//purpose  : 
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdateViewer)
+{
+  AIS_StatusOfPick aStatus = SelectDetected (AIS_SelectionScheme_Replace);
+  if(toUpdateViewer)
+  {
+    UpdateCurrentViewer();
+  }
+  return aStatus;
 }
 
 //=======================================================================
@@ -616,20 +668,12 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdate
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Boolean toUpdateViewer)
 {
-  if (myAutoHilight)
+  AIS_StatusOfPick aStatus = SelectDetected (AIS_SelectionScheme_XOR);
+  if(toUpdateViewer)
   {
-    clearDynamicHighlight();
+    UpdateCurrentViewer();
   }
-  if (!myLastPicked.IsNull())
-  {
-    AddOrRemoveSelected (myLastPicked, toUpdateViewer);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                        : AIS_SOP_SeveralSelected;
+  return aStatus;
 }
 
 //=======================================================================
@@ -643,37 +687,15 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Integer the
                                                       const Handle(V3d_View)& theView,
                                                       const Standard_Boolean toUpdateViewer)
 {
-  if (theView->Viewer() != myMainVwr)
+  AIS_StatusOfPick aStatus = SelectRectangle (Graphic3d_Vec2i (theXPMin, theYPMin),
+                                              Graphic3d_Vec2i (theXPMax, theYPMax),
+                                              theView,
+                                              AIS_SelectionScheme_XOR);
+  if(toUpdateViewer)
   {
-    throw Standard_ProgramError ("AIS_InteractiveContext::ShiftSelect() - invalid argument");
+    UpdateCurrentViewer();
   }
-
-  myLastActiveView = theView.get();
-  if (myAutoHilight)
-  {
-    UnhilightSelected (Standard_False);
-  }
-  myMainSel->Pick (theXPMin, theYPMin, theXPMax, theYPMax, theView);
-  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
-  {
-    const Handle(SelectMgr_EntityOwner) anOwner = myMainSel->Picked (aPickIter);
-    if (anOwner.IsNull() || !anOwner->HasSelectable() || !myFilters->IsOk (anOwner))
-      continue;
-
-    mySelection->Select (anOwner);
-  }
-
-  if (myAutoHilight)
-  {
-    HilightSelected (toUpdateViewer);
-  }
-
-  Standard_Integer aSelNum = NbSelected();
-
-  return (aSelNum == 0) ? AIS_SOP_NothingSelected
-                        : (aSelNum == 1) ? AIS_SOP_OneSelected
-                                         : AIS_SOP_SeveralSelected;
-
+  return aStatus;
 }
 
 //=======================================================================
@@ -684,29 +706,34 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const TColgp_Array1OfPnt2d
                                                       const Handle(V3d_View)& theView,
                                                       const Standard_Boolean toUpdateViewer)
 {
-  if (theView->Viewer() != myMainVwr)
+  AIS_StatusOfPick aStatus = SelectPolygon (thePolyline, theView, AIS_SelectionScheme_XOR);
+  if(toUpdateViewer)
   {
-    throw Standard_ProgramError ("AIS_InteractiveContext::ShiftSelect() - invalid argument");
+    UpdateCurrentViewer();
   }
+  return aStatus;
+}
 
-  myLastActiveView = theView.get();
+//=======================================================================
+//function : Select
+//purpose  :
+//=======================================================================
+AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_NListOfEntityOwner& theOwners,
+                                                 const AIS_SelectionScheme theSelScheme)
+{
+  // all objects detected by the selector are taken, previous current objects are emptied,
+  // new objects are put...
   if (myAutoHilight)
   {
+    clearDynamicHighlight();
     UnhilightSelected (Standard_False);
   }
-  myMainSel->Pick (thePolyline, theView);
-  for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
-  {
-    const Handle(SelectMgr_EntityOwner) anOwner = myMainSel->Picked (aPickIter);
-    if (anOwner.IsNull() || !anOwner->HasSelectable() || !myFilters->IsOk (anOwner))
-      continue;
 
-    mySelection->Select (anOwner);
-  }
+  mySelection->SelectOwners (theOwners, theSelScheme, myFilters);
 
   if (myAutoHilight)
   {
-    HilightSelected (toUpdateViewer);
+    HilightSelected (Standard_False);
   }
 
   Standard_Integer aSelNum = NbSelected();
