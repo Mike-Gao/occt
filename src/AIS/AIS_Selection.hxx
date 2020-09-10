@@ -18,6 +18,7 @@
 #define _AIS_Selection_HeaderFile
 
 #include <AIS_NListOfEntityOwner.hxx>
+#include <AIS_SelectionScheme.hxx>
 #include <AIS_SelectStatus.hxx>
 #include <Standard.hxx>
 #include <Standard_Type.hxx>
@@ -83,20 +84,25 @@ public:
   //! \param theFilter context filter to skip not acceptable owners
   //! \return result of selection
   Standard_EXPORT virtual void SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
-                                             const int theSelScheme,
+                                             const AIS_SelectionScheme theSelScheme,
                                              const Handle(SelectMgr_Filter)& theFilter);
 
 protected:
-  //! Select or deselect owner depending on the selection scheme
+  //! Append the owner into the current selection if filter is Ok.
   //! \param theOwner element to change selection state
-  //! \param thePreviousSelected previous selected objects
-  //! \param theSelScheme selection scheme, defines how owner is selected
   //! \param theFilter context filter to skip not acceptable owners
   //! \return result of selection
-  Standard_EXPORT virtual AIS_SelectStatus selectOwner (const Handle(SelectMgr_EntityOwner)& theOwner,
-                                                        const AIS_NListOfEntityOwner& thePreviousSelected,
-                                                        const int theSelScheme,
+  Standard_EXPORT virtual AIS_SelectStatus appendOwner (const Handle(SelectMgr_EntityOwner)& theOwner,
                                                         const Handle(SelectMgr_Filter)& theFilter);
+
+  //! XOR the owner to the current selection if filter is Ok.
+  //! \param theOwner element to change selection state
+  //! \param thePreviousSelected previous selected objects
+  //! \param theFilter context filter to skip not acceptable owners
+  //! \return result of selection
+  Standard_EXPORT virtual AIS_SelectStatus XOROwner (const Handle(SelectMgr_EntityOwner)& theOwner,
+                                                     const AIS_NListOfEntityOwner& thePreviousSelected,
+                                                     const Handle(SelectMgr_Filter)& theFilter);
 
 
 private:

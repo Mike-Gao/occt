@@ -485,11 +485,9 @@ AIS_StatusOfPick AIS_InteractiveContext::AddSelect (const Handle(SelectMgr_Entit
 //function : SelectRectangle
 //purpose  : 
 //=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::SelectRectangle (const Standard_Integer  theXPMin,
-                                                          const Standard_Integer  theYPMin,
-                                                          const Standard_Integer  theXPMax,
-                                                          const Standard_Integer  theYPMax,
-                                                          const Handle(V3d_View)& theView,
+AIS_StatusOfPick AIS_InteractiveContext::SelectRectangle (const Graphic3d_Vec2i&    thePntMin,
+                                                          const Graphic3d_Vec2i&    thePntMax,
+                                                          const Handle(V3d_View)&   theView,
                                                           const AIS_SelectionScheme theSelScheme)
 {
   if (theView->Viewer() != myMainVwr)
@@ -512,7 +510,7 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectRectangle (const Standard_Integer
     }
   }
 
-  myMainSel->Pick (theXPMin, theYPMin, theXPMax, theYPMax, theView);
+  myMainSel->Pick (thePntMin.x(), thePntMin.y(), thePntMax.x(), thePntMax.y(), theView);
 
   AIS_NListOfEntityOwner aPickedOwners;
   for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
@@ -551,8 +549,7 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectPolygon (const TColgp_Array1OfPnt
 //function : SelectPoint
 //purpose  :
 //=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::SelectPoint (const Standard_Integer    theXPix,
-                                                      const Standard_Integer    theYPix,
+AIS_StatusOfPick AIS_InteractiveContext::SelectPoint (const Graphic3d_Vec2i&    thePnt,
                                                       const Handle(V3d_View)&   theView,
                                                       const AIS_SelectionScheme theSelScheme)
 {
@@ -576,7 +573,7 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectPoint (const Standard_Integer    
     }
   }
 
-  myMainSel->Pick (theXPix, theYPix, theView);
+  myMainSel->Pick (thePnt.x(), thePnt.y(), theView);
 
   AIS_NListOfEntityOwner aPickedOwners;
   for (Standard_Integer aPickIter = 1; aPickIter <= myMainSel->NbPicked(); ++aPickIter)
@@ -593,7 +590,7 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectPoint (const Standard_Integer    
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::SelectDetected (const AIS_SelectionScheme theSelScheme)
 {
-  if (theSelScheme == AIS_SelectionScheme_ClearAndAdd && !myLastPicked.IsNull())
+  if (theSelScheme == AIS_SelectionScheme_Replace && !myLastPicked.IsNull())
   {
     Graphic3d_Vec2i aMousePos (-1, -1);
     if (myMainSel->GetManager().GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Point)
@@ -624,7 +621,8 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMi
                                                  const Handle(V3d_View)& theView,
                                                  const Standard_Boolean)
 {
-  return SelectRectangle (theXPMin, theYPMin, theXPMax, theYPMax, theView, AIS_SelectionScheme_ClearAndAdd);
+  return SelectRectangle (Graphic3d_Vec2i (theXPMin, theYPMin), Graphic3d_Vec2i(theXPMax, theYPMax),
+                          theView, AIS_SelectionScheme_Replace);
 }
 
 //=======================================================================
@@ -635,7 +633,7 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
                                                  const Handle(V3d_View)&     theView,
                                                  const Standard_Boolean)
 {
-  return SelectPolygon (thePolyline, theView, AIS_SelectionScheme_ClearAndAdd);
+  return SelectPolygon (thePolyline, theView, AIS_SelectionScheme_Replace);
 }
 
 //=======================================================================
@@ -644,7 +642,7 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean)
 {
-  return SelectDetected (AIS_SelectionScheme_ClearAndAdd);
+  return SelectDetected (AIS_SelectionScheme_Replace);
 }
 
 //=======================================================================
@@ -667,7 +665,8 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Integer the
                                                       const Handle(V3d_View)& theView,
                                                       const Standard_Boolean)
 {
-  return SelectRectangle (theXPMin, theYPMin, theXPMax, theYPMax, theView, AIS_SelectionScheme_XOR);
+  return SelectRectangle (Graphic3d_Vec2i (theXPMin, theYPMin), Graphic3d_Vec2i (theXPMax, theYPMax),
+                          theView, AIS_SelectionScheme_XOR);
 }
 
 //=======================================================================

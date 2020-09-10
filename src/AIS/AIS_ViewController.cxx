@@ -2572,7 +2572,7 @@ void AIS_ViewController::handleXRPicking (const Handle(AIS_InteractiveContext)& 
        && aTrigClick.IsPressed
        && aTrigClick.IsChanged)
       {
-        theCtx->SelectDetected (AIS_SelectionScheme_ClearAndAdd);
+        theCtx->SelectDetected (AIS_SelectionScheme_Replace);
         OnSelectionChanged (theCtx, theView);
         if (const Handle(Aspect_XRAction)& aHaptic = theView->View()->XRSession()->GenericAction (myXRLastPickingHand, Aspect_XRGenericAction_OutputHaptic))
         {
@@ -2749,7 +2749,7 @@ void AIS_ViewController::handleSelectionPick (const Handle(AIS_InteractiveContex
         ResetPreviousMoveTo();
       }
 
-       theCtx->SelectDetected (myGL.Selection.IsXOR ? AIS_SelectionScheme_XOR : AIS_SelectionScheme_ClearAndAdd);
+       theCtx->SelectDetected (myGL.Selection.IsXOR ? AIS_SelectionScheme_XOR : AIS_SelectionScheme_Replace);
 
       // selection affects all Views
       theView->Viewer()->Invalidate();
@@ -2851,10 +2851,10 @@ void AIS_ViewController::handleSelectionPoly (const Handle(AIS_InteractiveContex
           else
           {
             theCtx->MainSelector()->AllowOverlapDetection (aPnt1.y() != Min (aPnt1.y(), aPnt2.y()));
-            theCtx->SelectRectangle (Min (aPnt1.x(), aPnt2.x()), Min (aPnt1.y(), aPnt2.y()),
-                                      Max (aPnt1.x(), aPnt2.x()), Max (aPnt1.y(), aPnt2.y()),
+            theCtx->SelectRectangle (Graphic3d_Vec2i (Min (aPnt1.x(), aPnt2.x()), Min (aPnt1.y(), aPnt2.y())),
+                                     Graphic3d_Vec2i (Max (aPnt1.x(), aPnt2.x()), Max (aPnt1.y(), aPnt2.y())),
                                       theView,
-                                      myGL.Selection.IsXOR ? AIS_SelectionScheme_XOR : AIS_SelectionScheme_ClearAndAdd);
+                                      myGL.Selection.IsXOR ? AIS_SelectionScheme_XOR : AIS_SelectionScheme_Replace);
             theCtx->MainSelector()->AllowOverlapDetection (false);
           }
         }
@@ -2870,7 +2870,7 @@ void AIS_ViewController::handleSelectionPoly (const Handle(AIS_InteractiveContex
           }
 
           theCtx->SelectPolygon (aPolyline, theView,
-                                 myGL.Selection.IsXOR ? AIS_SelectionScheme_XOR : AIS_SelectionScheme_ClearAndAdd);
+                                 myGL.Selection.IsXOR ? AIS_SelectionScheme_XOR : AIS_SelectionScheme_Replace);
           theCtx->MainSelector()->AllowOverlapDetection (false);
         }
       }

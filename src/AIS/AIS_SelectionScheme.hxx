@@ -20,15 +20,14 @@
 //! It is possible to use combination of schemes.
 enum AIS_SelectionScheme
 {
-  AIS_SelectionScheme_Empty         = 0x0000, // do nothing
-  AIS_SelectionScheme_Clear         = 0x0001, // clears current selection
-  AIS_SelectionScheme_Add           = 0x0002, // add detected object to current selection
-  AIS_SelectionScheme_XOR           = 0x0004, // switch selection state in values selected/deselected
-  AIS_SelectionScheme_PickedIfEmpty = 0x0008, // if after switch, result selection is empty, select picked objects
-  AIS_SelectionScheme_ClearAndXOR   = AIS_SelectionScheme_Clear | AIS_SelectionScheme_XOR,
-  AIS_SelectionScheme_ClearAndAdd   = AIS_SelectionScheme_Clear | AIS_SelectionScheme_Add,
-  AIS_SelectionScheme_ClearAndXORAndPicked = AIS_SelectionScheme_ClearAndXOR | AIS_SelectionScheme_PickedIfEmpty,
-  AIS_SelectionScheme_Custom // reserved item for custom selection scheme
+  AIS_SelectionScheme_UNKNOWN = -1, //!< unknown scheme
+  AIS_SelectionScheme_Replace = 0,  //!< clear current selection and select detected objects
+  AIS_SelectionScheme_Add,          //!< add detected object to current selection
+  AIS_SelectionScheme_Remove,       //!< removed detected object from the current selection
+  AIS_SelectionScheme_XOR,          //!< perform XOR for detected objects, other selected not touched
+  AIS_SelectionScheme_ReplaceExtra, //!< replace with one difference: if result of replace is an empty,
+                                    //!< and current selection contains detected element, it will be selected
+  AIS_SelectionScheme_Clear         //!< clears current selection
 };
 
 #endif // _AIS_SelectionScheme_HeaderFile

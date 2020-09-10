@@ -7546,7 +7546,7 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
 
   NCollection_Sequence<Graphic3d_Vec2i> aPnts;
   bool toAllowOverlap = false;
-  AIS_SelectionScheme aSelScheme = AIS_SelectionScheme_ClearAndAdd;
+  AIS_SelectionScheme aSelScheme = AIS_SelectionScheme_Replace;
   for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
   {
     TCollection_AsciiString anArg (theArgVec[anArgIter]);

@@ -30,6 +30,7 @@
 #include <AIS_StatusOfPick.hxx>
 #include <AIS_TypeOfIso.hxx>
 #include <Aspect_TypeOfFacingModel.hxx>
+#include <Graphic3d_Vec2.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_TypeOfHighlight.hxx>
 #include <PrsMgr_PresentationManager3d.hxx>
@@ -474,10 +475,8 @@ public: //! @name Selection management
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima,
   //! XPMin, YPMin, XPMax, and YPMax in the view.
   //! The objects detected are passed to the main viewer, which is then updated.
-  Standard_EXPORT AIS_StatusOfPick SelectRectangle (const Standard_Integer    theXPMin,
-                                                    const Standard_Integer    theYPMin,
-                                                    const Standard_Integer    theXPMax,
-                                                    const Standard_Integer    theYPMax,
+  Standard_EXPORT AIS_StatusOfPick SelectRectangle (const Graphic3d_Vec2i& thePntMin,
+                                                    const Graphic3d_Vec2i& thePntMax,
                                                     const Handle(V3d_View)&   theView,
                                                     const AIS_SelectionScheme theSelScheme);
   
@@ -487,8 +486,7 @@ public: //! @name Selection management
                                                   const AIS_SelectionScheme   theSelScheme);
 
   //! Select everything found by the point in given pixel
-  Standard_EXPORT AIS_StatusOfPick SelectPoint (const Standard_Integer    theXPix,
-                                                const Standard_Integer    theYPix,
+  Standard_EXPORT AIS_StatusOfPick SelectPoint (const Graphic3d_Vec2i& thePnt,
                                                 const Handle(V3d_View)&   theView,
                                                 const AIS_SelectionScheme theSelScheme);
 
@@ -498,7 +496,7 @@ public: //! @name Selection management
 
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
   //! The objects detected are passed to the main viewer, which is then updated.
-  Standard_DEPRECATED("This method is deprecated - SelectRectangle() taking AIS_SelectionScheme_ClearAndAdd should be called instead")
+  Standard_DEPRECATED("This method is deprecated - SelectRectangle() taking AIS_SelectionScheme_Replace should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const Standard_Integer  theXPMin,
                                            const Standard_Integer  theYPMin,
                                            const Standard_Integer  theXPMax,
@@ -507,14 +505,14 @@ public: //! @name Selection management
                                            const Standard_Boolean  theToUpdateViewer);
   
   //! polyline selection; clears the previous picked list
-  Standard_DEPRECATED("This method is deprecated - SelectPolygon() taking AIS_SelectionScheme_ClearAndAdd should be called instead")
+  Standard_DEPRECATED("This method is deprecated - SelectPolygon() taking AIS_SelectionScheme_Replace should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const TColgp_Array1OfPnt2d& thePolyline,
                                            const Handle(V3d_View)&     theView,
                                            const Standard_Boolean      theToUpdateViewer);
 
   //! Stores and hilights the previous detected; Unhilights the previous picked.
   //! @sa MoveTo().
-  Standard_DEPRECATED("This method is deprecated - SelectDetected() taking AIS_SelectionScheme_ClearAndAdd should be called instead")
+  Standard_DEPRECATED("This method is deprecated - SelectDetected() taking AIS_SelectionScheme_Replace should be called instead")
   Standard_EXPORT AIS_StatusOfPick Select (const Standard_Boolean theToUpdateViewer);
 
   //! Adds the last detected to the list of previous picked.

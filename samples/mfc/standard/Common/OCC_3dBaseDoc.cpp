@@ -111,9 +111,9 @@ void OCC_3dBaseDoc::DragEvent (const Standard_Integer theMouseX,
     }
   case 1:
     {
-      myAISContext->SelectRectangle (aStartDragX, aStartDragY,
-                                     theMouseX, theMouseY,
-                                     theView, AIS_SelectionScheme_ClearAndAdd);
+      myAISContext->SelectRectangle (Graphic3d_Vec2i (aStartDragX, aStartDragY),
+                                     Graphic3d_Vec2i (theMouseX, theMouseY),
+                                     theView, AIS_SelectionScheme_Replace);
       myAISContext->UpdateCurrentViewer();
       break;
     }
@@ -128,7 +128,7 @@ void OCC_3dBaseDoc::InputEvent (const Standard_Integer theMouseX,
                                 const Handle(V3d_View)& theView)
 {
   myAISContext->MoveTo (theMouseX, theMouseY, theView, Standard_False);
-  myAISContext->SelectDetected (AIS_SelectionScheme_ClearAndAdd);
+  myAISContext->SelectDetected (AIS_SelectionScheme_Replace);
   myAISContext->UpdateCurrentViewer();
 }
 
@@ -177,8 +177,8 @@ void OCC_3dBaseDoc::ShiftDragEvent (const Standard_Integer theMouseX,
   if (theState == 0)
   {
     // button up
-    myAISContext->SelectRectangle (aStartDragX, aStartDragY,
-                                   theMouseX, theMouseY,
+    myAISContext->SelectRectangle (Graphic3d_Vec2i (aStartDragX, aStartDragY),
+                                   Graphic3d_Vec2i (theMouseX, theMouseY),
                                    theView, AIS_SelectionScheme_XOR);
     myAISContext->UpdateCurrentViewer();
   }

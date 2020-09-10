@@ -328,7 +328,9 @@ void CHLRView3D::DragEvent(const Standard_Integer  x        ,
     }
 
 	if (TheState == 0)
-	  GetDocument()->GetAISContext()->SelectRectangle(theButtonDownX,theButtonDownY,x,y,myView,
+	  GetDocument()->GetAISContext()->SelectRectangle(Graphic3d_Vec2i (theButtonDownX,theButtonDownY),
+                                                          Graphic3d_Vec2i (x,y),
+                                                          myView,
 							  AIS_SelectionScheme_ClearAndAdd);  
 }
 
@@ -376,7 +378,9 @@ void CHLRView3D::MultiDragEvent(const Standard_Integer  x        ,
     }
 
 	if (TheState == 0)
-	  GetDocument()->GetAISContext()->SelectRectangle(theButtonDownX,theButtonDownY,x,y,myView,
+	  GetDocument()->GetAISContext()->SelectRectangle(Graphic3d_Vec2i (theButtonDownX,theButtonDownY),
+                                                          Graphic3d_Vec2i (x,y),
+                                                          myView,
 							  AIS_SelectionScheme_XOR);  
 }
 

@@ -138,65 +138,124 @@ AIS_SelectStatus AIS_Selection::AddSelect (const Handle(SelectMgr_EntityOwner)& 
 //purpose  : 
 //=======================================================================
 void AIS_Selection::SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
-                                  const int theSelScheme,
+                                  const AIS_SelectionScheme theSelScheme,
                                   const Handle(SelectMgr_Filter)& theFilter)
 {
-  int aSelScheme = theSelScheme;
-  AIS_NListOfEntityOwner aPrevSelected = Objects();
-  if (theSelScheme & AIS_SelectionScheme_Clear)
+  switch (theSelScheme)
   {
-    Clear();
-
-    if (theSelScheme & AIS_SelectionScheme_XOR &&
-        theSelScheme & AIS_SelectionScheme_PickedIfEmpty &&
-        thePickedOwners.Size() < aPrevSelected.Size())
+    case AIS_SelectionScheme_UNKNOWN:
     {
-      // check if all picked objects are in previous selected list, if so, all objects will be deselected,
-      // but in mode AIS_SelectionScheme_PickedIfEmpty new picked objects should be selected, here, after Clear, Add
-      Standard_Boolean anOtherFound = Standard_False;
+      return;
+    }
+    case AIS_SelectionScheme_Replace:
+    {
+      AIS_NListOfEntityOwner aPrevSelected = Objects();
+      Clear();
+
+      for (AIS_NListOfEntityOwner::Iterator aSelIter (aPrevSelected); aSelIter.More(); aSelIter.Next())
+      {
+        appendOwner(aSelIter.Value(), theFilter);
+      }
+
+      break;
+    }
+    case AIS_SelectionScheme_Add:
+    {
+      AIS_NListOfEntityOwner aPrevSelected = Objects();
       for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
       {
-        anOtherFound = !aPrevSelected.Contains (aSelIter.Value());
-        if (anOtherFound)
-          break;
+        appendOwner(aSelIter.Value(), theFilter);
       }
-      if (!anOtherFound)
-        aSelScheme = AIS_SelectionScheme_Add;
+      break;
     }
-  }
+    case AIS_SelectionScheme_Remove:
+    {
+      AIS_NListOfEntityOwner aPrevSelected = Objects();
+      Clear();
+      for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
+      {
+        appendOwner(aSelIter.Value(), theFilter);
+      }
+      break;
+    }
+    case AIS_SelectionScheme_XOR:
+    {
+      AIS_NListOfEntityOwner aPrevSelected = Objects();
+      for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
+      {
+        XOROwner(aSelIter.Value(), aPrevSelected, theFilter);
+      }
+      break;
+    }
+    case AIS_SelectionScheme_ReplaceExtra:
+    {
+      AIS_NListOfEntityOwner aPrevSelected = Objects();
+      Clear();
 
-  for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
-  {
-    selectOwner(aSelIter.Value(), aPrevSelected, aSelScheme, theFilter);
+      Standard_Boolean toAppend = false;
+      if (thePickedOwners.Size() < aPrevSelected.Size())
+      {
+        // check if all picked objects are in previous selected list, if so, all objects will be deselected,
+        // but in mode AIS_SelectionScheme_PickedIfEmpty new picked objects should be selected, here, after Clear, Add
+        Standard_Boolean anOtherFound = Standard_False;
+        for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
+        {
+          anOtherFound = !aPrevSelected.Contains (aSelIter.Value());
+          if (anOtherFound)
+            break;
+        }
+        if (!anOtherFound)
+          toAppend = Standard_True;
+      }
+      for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
+      {
+        if (toAppend)
+          appendOwner (aSelIter.Value(), theFilter);
+        else
+          XOROwner(aSelIter.Value(), aPrevSelected, theFilter);
+      }
+      break;
+    }
+    case AIS_SelectionScheme_Clear:
+    {
+      Clear();
+      break;
+    }
   }
 }
 
 //=======================================================================
-//function : selectOwner
-//purpose  : 
+//function : appendOwner
+//purpose  :
 //=======================================================================
-AIS_SelectStatus AIS_Selection::selectOwner (const Handle(SelectMgr_EntityOwner)& theOwner,
-                                             const AIS_NListOfEntityOwner& thePreviousSelected,
-                                             const int theSelScheme,
+AIS_SelectStatus AIS_Selection::appendOwner (const Handle(SelectMgr_EntityOwner)& theOwner,
                                              const Handle(SelectMgr_Filter)& theFilter)
 {
   if (theOwner.IsNull() || !theOwner->HasSelectable() || !theFilter->IsOk (theOwner))
     return AIS_SS_NotDone;
 
-  if (theSelScheme & AIS_SelectionScheme_Add)
-  {
-    return AddSelect (theOwner);
-  }
-  else if (theSelScheme & AIS_SelectionScheme_XOR)
-  {
-    if (thePreviousSelected.Contains (theOwner)) // was selected, should not be now
-    {
-      if (theOwner->IsSelected())
-        return Select (theOwner); // deselect
-    }
-    else
-      return AddSelect (theOwner); // was not selected, should be now
-  }
+  return AddSelect (theOwner);
+}
 
+//=======================================================================
+//function : XOROwner
+//purpose  : 
+//=======================================================================
+AIS_SelectStatus AIS_Selection::XOROwner (const Handle(SelectMgr_EntityOwner)& theOwner,
+                                          const AIS_NListOfEntityOwner& thePreviousSelected,
+                                          const Handle(SelectMgr_Filter)& theFilter)
+{
+  if (theOwner.IsNull() || !theOwner->HasSelectable() || !theFilter->IsOk (theOwner))
+    return AIS_SS_NotDone;
+
+  if (thePreviousSelected.Contains (theOwner)) // was selected, should not be now
+  {
+    if (theOwner->IsSelected())
+      return Select (theOwner); // deselect
+  }
+  else
+  {
+    return AddSelect (theOwner); // was not selected, should be now
+  }
   return AIS_SS_NotDone;
 }

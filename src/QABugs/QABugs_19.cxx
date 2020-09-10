@@ -5203,7 +5203,7 @@ static Standard_Integer OCC28310 (Draw_Interpretor& /*theDI*/, Standard_Integer 
   aCtx->Display (aBoxObj, AIS_Shaded, 0, Standard_False);
   ViewerTest::CurrentView()->FitAll();
   aCtx->MoveTo (200, 200, ViewerTest::CurrentView(), Standard_True);
-  aCtx->SelectDetected (AIS_SelectionScheme_ClearAndAdd);
+  aCtx->SelectDetected (AIS_SelectionScheme_Replace);
   aCtx->UpdateCurrentViewer();
 
   aCtx->Remove (aBoxObj, Standard_True);
