@@ -18,9 +18,12 @@
 #define _AIS_Selection_HeaderFile
 
 #include <AIS_NListOfEntityOwner.hxx>
+#include <AIS_SelectionScheme.hxx>
 #include <AIS_SelectStatus.hxx>
 #include <Standard.hxx>
 #include <Standard_Type.hxx>
+
+class SelectMgr_Filter;
 
 //! Class holding the list of selected owners.
 class AIS_Selection : public Standard_Transient
@@ -74,6 +77,32 @@ public:
 
   //! Return selected object at iterator position.
   const Handle(SelectMgr_EntityOwner)& Value() const { return myIterator.Value(); }
+
+  //! Select or deselect owners depending on the selection scheme
+  //! \param theOwners elements to change selection state
+  //! \param theSelScheme selection scheme, defines how owner is selected
+  //! \param theFilter context filter to skip not acceptable owners
+  //! \return result of selection
+  Standard_EXPORT virtual void SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
+                                             const AIS_SelectionScheme theSelScheme,
+                                             const Handle(SelectMgr_Filter)& theFilter);
+
+protected:
+  //! Append the owner into the current selection if filter is Ok.
+  //! \param theOwner element to change selection state
+  //! \param theFilter context filter to skip not acceptable owners
+  //! \return result of selection
+  Standard_EXPORT virtual AIS_SelectStatus appendOwner (const Handle(SelectMgr_EntityOwner)& theOwner,
+                                                        const Handle(SelectMgr_Filter)& theFilter);
+
+  //! XOR the owner to the current selection if filter is Ok.
+  //! \param theOwner element to change selection state
+  //! \param thePreviousSelected previous selected objects
+  //! \param theFilter context filter to skip not acceptable owners
+  //! \return result of selection
+  Standard_EXPORT virtual AIS_SelectStatus XOROwner (const Handle(SelectMgr_EntityOwner)& theOwner,
+                                                     const AIS_NListOfEntityOwner& thePreviousSelected,
+                                                     const Handle(SelectMgr_Filter)& theFilter);
 
 private:
 
