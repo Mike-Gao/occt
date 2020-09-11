@@ -249,7 +249,7 @@ public:
   Standard_EXPORT void DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;
 
   //! Returns true if document has modified attributes since last transaction
-  Standard_EXPORT Standard_Boolean TDocStd_Document::HasModifications() const;
+  Standard_EXPORT Standard_Boolean HasModifications() const;
 
 
   DEFINE_STANDARD_RTTIEXT(TDocStd_Document,CDM_Document)
