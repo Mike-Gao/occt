@@ -331,7 +331,7 @@ void CHLRView3D::DragEvent(const Standard_Integer  x        ,
 	  GetDocument()->GetAISContext()->SelectRectangle(Graphic3d_Vec2i (theButtonDownX,theButtonDownY),
                                                           Graphic3d_Vec2i (x,y),
                                                           myView,
-							  AIS_SelectionScheme_ClearAndAdd);  
+							  AIS_SelectionScheme_Replace);  
 }
 
 //-----------------------------------------------------------------------------------------
@@ -340,7 +340,7 @@ void CHLRView3D::DragEvent(const Standard_Integer  x        ,
 void CHLRView3D::InputEvent(const Standard_Integer  x     ,
 				                   const Standard_Integer  y     ) 
 {
-    GetDocument()->GetAISContext()->SelectDetected(AIS_SelectionScheme_ClearAndAdd); 
+    GetDocument()->GetAISContext()->SelectDetected(AIS_SelectionScheme_Replace); 
 }
 
 //-----------------------------------------------------------------------------------------

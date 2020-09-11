@@ -149,10 +149,9 @@ void AIS_Selection::SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
     }
     case AIS_SelectionScheme_Replace:
     {
-      AIS_NListOfEntityOwner aPrevSelected = Objects();
       Clear();
 
-      for (AIS_NListOfEntityOwner::Iterator aSelIter (aPrevSelected); aSelIter.More(); aSelIter.Next())
+      for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
       {
         appendOwner(aSelIter.Value(), theFilter);
       }
@@ -161,7 +160,6 @@ void AIS_Selection::SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
     }
     case AIS_SelectionScheme_Add:
     {
-      AIS_NListOfEntityOwner aPrevSelected = Objects();
       for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
       {
         appendOwner(aSelIter.Value(), theFilter);
@@ -172,9 +170,13 @@ void AIS_Selection::SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
     {
       AIS_NListOfEntityOwner aPrevSelected = Objects();
       Clear();
-      for (AIS_NListOfEntityOwner::Iterator aSelIter (thePickedOwners); aSelIter.More(); aSelIter.Next())
+      for (AIS_NListOfEntityOwner::Iterator aSelIter (aPrevSelected); aSelIter.More(); aSelIter.Next())
       {
-        appendOwner(aSelIter.Value(), theFilter);
+        // select only those owners that are absent in the current owners list
+        if (!thePickedOwners.Contains(aSelIter.Value()))
+        {
+          appendOwner(aSelIter.Value(), theFilter);
+        }
       }
       break;
     }

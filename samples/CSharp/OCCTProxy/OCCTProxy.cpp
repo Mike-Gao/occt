@@ -248,7 +248,7 @@ public:
       myAISContext()->SelectRectangle (Graphic3d_Vec2i (theX1, theY1),
                                        Graphic3d_Vec2i (theX2, theY2),
                                        myView(),
-                                       AIS_SelectionScheme_ClearAndAdd);
+                                       AIS_SelectionScheme_Replace);
       myAISContext()->UpdateCurrentViewer();
     }
   }
@@ -260,7 +260,7 @@ public:
   {
     if (!myAISContext().IsNull())
     {
-      myAISContext()->SelectDetected (AIS_SelectionScheme_ClearAndAdd);
+      myAISContext()->SelectDetected (AIS_SelectionScheme_Replace);
       myAISContext()->UpdateCurrentViewer();
     }
   }

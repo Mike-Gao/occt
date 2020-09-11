@@ -991,9 +991,10 @@ myContext->MoveTo (thePixelX, thePixelY, myView, true);
 Dynamic detection and selection are put into effect in a straightforward way.
 There are only a few conventions and functions to be familiar with:
   * *AIS_InteractiveContext::MoveTo* -- passes mouse position to Interactive Context selectors.
-  * *AIS_InteractiveContext::Select* -- stores what has been detected at the last *MoveTo*.
+  * *AIS_InteractiveContext::SelectDetected* -- stores what has been detected at the last *MoveTo*.
     Changes the previously selected object. Depending on the selection scheme, the selection is enriched, replaced or other.
-    Selection is applied to point, rectangular or surrounding area.
+  * *AIS_InteractiveContext::SelectPoint/SelectRectangle/SelectPolygon* -- Applies selection to point, rectangular or surrounding area.
+    Changes the previously selected object. Depending on the selection scheme, the selection is enriched, replaced or other.
 
 Highlighting of detected and selected entities is automatically managed by the Interactive Context.
 The Highlight colors are those dealt with above. You can nonetheless disconnect this automatic mode if you want to manage this part yourself:
@@ -1032,6 +1033,18 @@ for (myAISCtx->InitSelected(); myAISCtx->MoreSelected(); myAISCtx->NextSelected(
   }
 }
 ~~~~~
+
+@subsubsection occt_visu_3_4_7 Selection schemes
+
+Select* methods of AIS_InteractiveContext accept some selection scheme as parameter. The table below describes available selection schemes.
+
+| Type | Reaction on click |  | Type | Reaction on click |
+| :----- | :----- | :----- | :----- | :----- |
+| AIS_SelectionScheme_UNKNOWN | @figure{visualization_selection_scheme_UNKNOWN.png, ""}</td> |  |  |  |
+| AIS_SelectionScheme_Replace | @figure{visualization_selection_scheme_replace.png, ""}</td> |  | AIS_SelectionScheme_ReplaceExtra | @figure{visualization_selection_scheme_replaceExtra.png, ""}</td> |
+| AIS_SelectionScheme_Add | @figure{visualization_selection_scheme_add.png, ""}</td> |  | AIS_SelectionScheme_XOR | @figure{visualization_selection_scheme_XOR.png, ""}</td> |
+| AIS_SelectionScheme_Remove | @figure{visualization_selection_scheme_remove.png, ""}</td> |  | AIS_SelectionScheme_Clear | @figure{visualization_selection_scheme_clear.png, ""}</td> |
+
 
 @subsection occt_visu_3_5 Standard Interactive Object Classes
 
