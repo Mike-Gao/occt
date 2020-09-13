@@ -77,6 +77,7 @@
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomFill_Generator.hxx>
 #include <GeomLib.hxx>
+#include <GeomLib_IsPlanarSurface.hxx>
 #include <gp_Cone.hxx>
 #include <gp_Lin2d.hxx>
 #include <gp_Pnt.hxx>
@@ -110,6 +111,7 @@
 #include <TopTools_MapOfShape.hxx>
 #include <TopTools_SequenceOfShape.hxx>
 #include <BRepBuilderAPI_Sewing.hxx>
+#include <BRepBuilderAPI_Copy.hxx>
 #include <Geom_Line.hxx>
 #include <NCollection_Vector.hxx>
 #include <NCollection_IncAllocator.hxx>
@@ -282,6 +284,11 @@ static
 
 static
   Standard_Boolean IsPlanar(const TopoDS_Shape& theS);
+
+static
+void RemoveSeamAndDegeneratedEdges(const TopoDS_Face& theFace,
+                                   TopTools_DataMapOfShapeShape& theMap,
+                                   TopTools_DataMapOfShapeShape& theNewOldMap);
 
 static
   Standard_Boolean TrimEdge(TopoDS_Edge& NE,
@@ -589,6 +596,7 @@ BRepOffset_MakeOffset::BRepOffset_MakeOffset(const TopoDS_Shape&    S,
 : 
 myOffset     (Offset),
 myTol        (Tol),
+myInitialShape(S),
 myShape      (S),
 myMode       (Mode),
 myInter      (Inter),
@@ -599,6 +607,7 @@ myRemoveIntEdges(RemoveIntEdges),
 myDone     (Standard_False)
 {
   myAsDes = new BRepAlgo_AsDes();
+  TryToLinearize();
   MakeOffsetShape();
 }
 
@@ -619,6 +628,7 @@ void BRepOffset_MakeOffset::Initialize(const TopoDS_Shape&    S,
                                        const Standard_Boolean RemoveIntEdges)
 {
   myOffset     = Offset;
+  myInitialShape = S;
   myShape      = S;
   myTol        = Tol;
   myMode       = Mode;
@@ -631,6 +641,7 @@ void BRepOffset_MakeOffset::Initialize(const TopoDS_Shape&    S,
   myIsPerformSewing = Standard_False;
   myIsPlanar = Standard_False;
   Clear();
+  TryToLinearize();
 }
 
 
@@ -651,6 +662,7 @@ void BRepOffset_MakeOffset::Clear()
   myDone     = Standard_False;
   myGenerated.Clear();
   myResMap.Clear();
+  myShapeShapeMap.Clear();
 }
 
 //=======================================================================
@@ -658,14 +670,17 @@ void BRepOffset_MakeOffset::Clear()
 //purpose  : 
 //=======================================================================
 
-void BRepOffset_MakeOffset::AddFace(const TopoDS_Face& F) {
-  myFaces.Add(F);    
+void BRepOffset_MakeOffset::AddFace(const TopoDS_Face& F)
+{
+  TopoDS_Shape aFace = myShapeShapeMap(F);
+  
+  myFaces.Add(aFace);    
   //-------------
   // MAJ SD.
   //-------------
-  myInitOffsetFace.SetRoot (F)  ;    
-  myInitOffsetFace.Bind    (F,F);
-  myImageOffset.SetRoot    (F)  ;  
+  myInitOffsetFace.SetRoot (aFace)  ;    
+  myInitOffsetFace.Bind    (aFace, aFace);
+  myImageOffset.SetRoot    (aFace)  ;  
 }
 
 //=======================================================================
@@ -676,8 +691,12 @@ void BRepOffset_MakeOffset::AddFace(const TopoDS_Face& F) {
 void BRepOffset_MakeOffset::SetOffsetOnFace(const TopoDS_Face&  F, 
                                             const Standard_Real Off)
 {
-  if ( myFaceOffset.IsBound(F)) myFaceOffset.UnBind(F);
-  myFaceOffset.Bind(F,Off);
+  TopoDS_Shape aFace = myShapeShapeMap(F);
+  
+  if ( myFaceOffset.IsBound(aFace))
+    myFaceOffset.UnBind(aFace);
+  
+  myFaceOffset.Bind(aFace, Off);
 }
 
 //=======================================================================
@@ -1512,6 +1531,55 @@ void BRepOffset_MakeOffset::ReplaceRoots()
       }
     }
   }
+}
+
+//=======================================================================
+//function : TryToLinearize
+//purpose  : 
+//=======================================================================
+void BRepOffset_MakeOffset::TryToLinearize()
+{
+  BRepBuilderAPI_Copy Copier;
+  Copier.Perform(myInitialShape, Standard_True, Standard_False);
+  myShape = Copier.Shape();
+
+  TopTools_DataMapOfShapeShape NewOldMap;
+
+  TopTools_IndexedMapOfShape aMap;
+  TopExp::MapShapes(myInitialShape, aMap);
+  for (Standard_Integer i = 1; i <= aMap.Extent(); i++)
+  {
+    const TopoDS_Shape& aSubshape = aMap(i);
+    const TopTools_ListOfShape& aCopyList = Copier.Modified(aSubshape);
+    const TopoDS_Shape& aCopy = aCopyList.First();
+    myShapeShapeMap.Bind(aSubshape, aCopy);
+    NewOldMap.Bind(aCopy, aSubshape);
+  }
+
+  const Standard_Real LinTol = 1.e-5;
+
+  BRep_Builder BB;
+  TopExp_Explorer Explo(myShape, TopAbs_FACE);
+  for (; Explo.More(); Explo.Next())
+  {
+    const TopoDS_Face& aFace = TopoDS::Face(Explo.Current());
+    BRepAdaptor_Surface BAsurf(aFace, Standard_False);
+    if (BAsurf.GetType() == GeomAbs_Plane)
+      continue;
+
+    Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
+    GeomLib_IsPlanarSurface aPlanarityChecker(aSurf, LinTol);
+    if (aPlanarityChecker.IsPlanar())
+    {
+      RemoveSeamAndDegeneratedEdges(aFace, myShapeShapeMap, NewOldMap);
+      gp_Pln aPln = aPlanarityChecker.Plan();
+      Handle(Geom_Plane) aPlane = new Geom_Plane(aPln);
+      TopLoc_Location aLoc;
+      BB.UpdateFace(aFace, aPlane, aLoc, Precision::Confusion());
+    }
+  }
+
+  BRepTools::RemoveUnusedPCurves(myShape);
 }
 
 //=======================================================================
@@ -4362,76 +4430,81 @@ Standard_Boolean BuildShellsCompleteInter(const TopTools_ListOfShape& theLF,
 const TopTools_ListOfShape& BRepOffset_MakeOffset::Generated (const TopoDS_Shape& theS)
 {
   myGenerated.Clear();
-  const TopAbs_ShapeEnum aType = theS.ShapeType();
-  switch (aType)
-  {
-    case TopAbs_VERTEX:
+
+  const TopoDS_Shape* aSubshape = myShapeShapeMap.Seek(theS);
+  if (!aSubshape->IsNull())
+  {  
+    const TopAbs_ShapeEnum aType = aSubshape->ShapeType();
+    switch (aType)
     {
-      if (myAnalyse.HasAncestor (theS))
+    case TopAbs_VERTEX:
       {
-        TopTools_MapOfShape aMFence;
-        const TopTools_ListOfShape& aLA = myAnalyse.Ancestors (theS);
-        TopTools_ListOfShape::Iterator itLA (aLA);
-        for (; myGenerated.IsEmpty() && itLA.More(); itLA.Next())
+        if (myAnalyse.HasAncestor (*aSubshape))
         {
-          const TopoDS_Shape& aE = itLA.Value();
-          if (!myInitOffsetEdge.HasImage (aE))
-            continue;
-          TopTools_ListOfShape aLEIm;
-          myInitOffsetEdge.LastImage (aE, aLEIm);
-          TopTools_ListOfShape::Iterator itLEIm (aLEIm);
-          for (; myGenerated.IsEmpty() && itLEIm.More(); itLEIm.Next())
+          TopTools_MapOfShape aMFence;
+          const TopTools_ListOfShape& aLA = myAnalyse.Ancestors (*aSubshape);
+          TopTools_ListOfShape::Iterator itLA (aLA);
+          for (; myGenerated.IsEmpty() && itLA.More(); itLA.Next())
           {
-            TopoDS_Iterator itV (itLEIm.Value());
-            for (; itV.More(); itV.Next())
+            const TopoDS_Shape& aE = itLA.Value();
+            if (!myInitOffsetEdge.HasImage (aE))
+              continue;
+            TopTools_ListOfShape aLEIm;
+            myInitOffsetEdge.LastImage (aE, aLEIm);
+            TopTools_ListOfShape::Iterator itLEIm (aLEIm);
+            for (; myGenerated.IsEmpty() && itLEIm.More(); itLEIm.Next())
             {
-              if (!aMFence.Add (itV.Value()))
+              TopoDS_Iterator itV (itLEIm.Value());
+              for (; itV.More(); itV.Next())
               {
-                myGenerated.Append (itV.Value());
-                break;
+                if (!aMFence.Add (itV.Value()))
+                {
+                  myGenerated.Append (itV.Value());
+                  break;
+                }
               }
             }
           }
         }
       }
-    }
-    Standard_FALLTHROUGH
+      Standard_FALLTHROUGH
     case TopAbs_EDGE:
-    {
-      if (myInitOffsetEdge.HasImage (theS))
       {
-        myInitOffsetEdge.LastImage (theS, myGenerated);
+        if (myInitOffsetEdge.HasImage (*aSubshape))
+        {
+          myInitOffsetEdge.LastImage (*aSubshape, myGenerated);
+        }
       }
-    }
-    Standard_FALLTHROUGH
+      Standard_FALLTHROUGH
     case TopAbs_FACE:
-    {
-      if (myInitOffsetFace.HasImage (theS))
       {
-        myInitOffsetFace.LastImage (theS, myGenerated);
+        if (myInitOffsetFace.HasImage (*aSubshape))
+        {
+          myInitOffsetFace.LastImage (*aSubshape, myGenerated);
+        }
+        break;
       }
-      break;
-    }
     case TopAbs_SOLID:
-    {
-      if (theS.IsSame (myShape))
-        myGenerated.Append (myOffsetShape);
-      break;
-    }
+      {
+        if (aSubshape->IsSame (myShape))
+          myGenerated.Append (myOffsetShape);
+        break;
+      }
     default:
       break;
-  }
-
-  if (myResMap.IsEmpty())
-    TopExp::MapShapes (myOffsetShape, myResMap);
-
-  for (TopTools_ListOfShape::Iterator it (myGenerated); it.More();)
-  {
-    if (myResMap.Contains (it.Value()))
-      it.Next();
-    else
-      myGenerated.Remove (it);
-  }
+    }
+    
+    if (myResMap.IsEmpty())
+      TopExp::MapShapes (myOffsetShape, myResMap);
+    
+    for (TopTools_ListOfShape::Iterator it (myGenerated); it.More();)
+    {
+      if (myResMap.Contains (it.Value()))
+        it.Next();
+      else
+        myGenerated.Remove (it);
+    }
+  } //if (!aSubshape->IsNull())
 
   return myGenerated;
 }
@@ -4501,6 +4574,78 @@ Standard_Boolean IsPlanar(const TopoDS_Shape& theS)
     }
   }
   return !aExp.More();
+}
+
+//=======================================================================
+//function : RemoveSeamAndDegeneratedEdges
+//purpose  : Removes useless seam and degenerated edges from a face that becomes planar
+//=======================================================================
+void RemoveSeamAndDegeneratedEdges(const TopoDS_Face& theFace,
+                                   TopTools_DataMapOfShapeShape& theMap,
+                                   TopTools_DataMapOfShapeShape& theNewOldMap)
+{
+  TopoDS_Face aFace = theFace;
+  aFace.Orientation(TopAbs_FORWARD);
+
+  Standard_Boolean IsDegOrSeamFound = Standard_False;
+  TopTools_SequenceOfShape Eseq;
+  TopExp_Explorer Explo(aFace, TopAbs_EDGE);
+  for (; Explo.More(); Explo.Next())
+  {
+    const TopoDS_Edge& anEdge = TopoDS::Edge(Explo.Current());
+    if (BRep_Tool::Degenerated(anEdge) ||
+        BRepTools::IsReallyClosed(anEdge, aFace))
+    {
+      IsDegOrSeamFound = Standard_True;
+      const TopoDS_Shape& anOldEdge = theNewOldMap(anEdge);
+      theMap.UnBind(anOldEdge);
+    }
+    else
+      Eseq.Append(anEdge);
+  }
+
+  if (!IsDegOrSeamFound)
+    return;
+
+  //Reconstruct wires
+  BRep_Builder BB;
+  TopTools_ListOfShape wlist;
+  TopoDS_Iterator itface(aFace);
+  for (; itface.More(); itface.Next())
+    wlist.Append(itface.Value());
+
+  aFace.Free(Standard_True);
+  TopTools_ListIteratorOfListOfShape itl(wlist);
+  for (; itl.More(); itl.Next())
+    BB.Remove(aFace, itl.Value());
+
+  while (!Eseq.IsEmpty())
+  {
+    TopoDS_Wire aNewWire;
+    BB.MakeWire(aNewWire);
+    TopoDS_Edge CurEdge = TopoDS::Edge(Eseq(1));
+    BB.Add(aNewWire, CurEdge);
+    Eseq.Remove(1);
+    TopoDS_Vertex FirstVertex, CurVertex;
+    TopExp::Vertices(CurEdge, FirstVertex, CurVertex, Standard_True); //with orientation
+    while (!CurVertex.IsSame(FirstVertex))
+    {
+      TopoDS_Vertex V1, V2;
+      Standard_Integer ind;
+      for (ind = 1; ind <= Eseq.Length(); ind++)
+      {
+        CurEdge = TopoDS::Edge(Eseq(ind));
+        TopExp::Vertices(CurEdge, V1, V2, Standard_True); //with orientation
+        if (V1.IsSame(CurVertex))
+          break;
+      }
+      BB.Add(aNewWire, CurEdge);
+      Eseq.Remove(ind);
+      CurVertex = V2;
+    }
+
+    BB.Add(aFace, aNewWire);
+  }
 }
 
 //=======================================================================

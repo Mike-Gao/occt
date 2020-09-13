@@ -94,7 +94,7 @@ public:
   
   const TopoDS_Shape& InitShape() const
   {
-    return myShape;
+    return myInitialShape;
   }
 
   //! returns information about offset state.
@@ -143,6 +143,8 @@ protected:
 
 private:
 
+  Standard_EXPORT void TryToLinearize();
+  
   Standard_EXPORT void BuildOffsetByArc();
   
   Standard_EXPORT void BuildOffsetByInter();
@@ -215,7 +217,9 @@ private:
 
   Standard_Real myOffset;
   Standard_Real myTol;
+  TopoDS_Shape myInitialShape;
   TopoDS_Shape myShape;
+  TopTools_DataMapOfShapeShape myShapeShapeMap;
   BRepOffset_Mode myMode;
   Standard_Boolean myInter;
   Standard_Boolean mySelfInter;
