@@ -130,7 +130,7 @@ public:
   //! Triangulate a face previously recorded for 
   //! processing by call to Add(). Can be executed in 
   //! parallel threads.
-  Standard_EXPORT void Process(const TopoDS_Face& theFace, Message_ProgressSentry& theProgrEntry) const;
+  Standard_EXPORT void Process(const TopoDS_Face& theFace, Message_ProgressSentry& theProgrEntry = NULL) const;
 
   void operator () (const BRepMesh_FaceSentry& aFaceSentry) const
   {

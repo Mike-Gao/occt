@@ -67,13 +67,13 @@ public:
   DEFINE_STANDARD_ALLOC
 
   
-  Standard_EXPORT Message_ProgressSentry(const Handle(Message_ProgressIndicator)& PI, const Standard_CString name, const Standard_Real min, const Standard_Real max, const Standard_Real step, const Standard_Boolean isInf = Standard_False, const Standard_Real newScopeSpan = 0.0);
+  Standard_EXPORT Message_ProgressSentry(const Handle(Message_ProgressIndicator)& progress, const Standard_CString name, const Standard_Real min, const Standard_Real max, const Standard_Real step, const Standard_Boolean isInf = Standard_False, const Standard_Real newScopeSpan = 0.0);
   
   //! Creates an instance of ProgressSentry attaching it to
   //! the specified ProgressIndicator, selects parameters of
   //! the current scale, and opens a new scope with specified
   //! span (equal to step by default)
-  Standard_EXPORT Message_ProgressSentry(const Handle(Message_ProgressIndicator)& PI, const Handle(TCollection_HAsciiString)& name, const Standard_Real min, const Standard_Real max, const Standard_Real step, const Standard_Boolean isInf = Standard_False, const Standard_Real newScopeSpan = 0.0);
+  Standard_EXPORT Message_ProgressSentry(const Handle(Message_ProgressIndicator)& progress, const Handle(TCollection_HAsciiString)& name, const Standard_Real min, const Standard_Real max, const Standard_Real step, const Standard_Boolean isInf = Standard_False, const Standard_Real newScopeSpan = 0.0);
   
   //! Moves progress indicator to the end of the current scale
   //! and relieves sentry from its duty. Methods other than Show()
