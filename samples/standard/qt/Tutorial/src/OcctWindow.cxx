@@ -94,7 +94,7 @@ void OcctWindow::Unmap() const
 // function : DoResize
 // purpose  :
 // =======================================================================
-Aspect_TypeOfResize OcctWindow::DoResize() const
+Aspect_TypeOfResize OcctWindow::DoResize() 
 {
   int                 aMask = 0;
   Aspect_TypeOfResize aMode = Aspect_TOR_UNKNOWN;

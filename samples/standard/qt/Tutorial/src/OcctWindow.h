@@ -64,7 +64,7 @@ public:
   virtual Aspect_Drawable NativeParentHandle() const override;
 
   //! Applies the resizing to the window <me>
-  virtual Aspect_TypeOfResize DoResize() const override;
+  virtual Aspect_TypeOfResize DoResize() override;
 
   //! Returns True if the window <me> is opened
   //! and False if the window is closed.

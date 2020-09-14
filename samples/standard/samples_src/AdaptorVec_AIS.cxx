@@ -106,12 +106,6 @@ void AdaptorVec_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPres
   }
 }
 
-
-void AdaptorVec_AIS::Compute(const Handle(Prs3d_Projector)& /*aProjector*/,
-  const Handle(Prs3d_Presentation)& /*aPresentation*/)
-{
-}
-
 void AdaptorVec_AIS::ComputeSelection(const Handle(SelectMgr_Selection)& /*aSelection*/,
   const Standard_Integer /*aMode*/)
 {

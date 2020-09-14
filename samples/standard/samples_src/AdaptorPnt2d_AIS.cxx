@@ -22,7 +22,6 @@ AdaptorPnt2d_AIS::AdaptorPnt2d_AIS(const Handle(Geom2d_Point) thePoint, Standard
 
 }
 
-
 AdaptorPnt2d_AIS::~AdaptorPnt2d_AIS()
 {
 
@@ -35,12 +34,6 @@ void AdaptorPnt2d_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPr
   Handle(Geom_CartesianPoint) aGeomPoint = new Geom_CartesianPoint(myPoint);
 
   StdPrs_Point::Add(aPresentation, aGeomPoint, myDrawer);
-}
-
-
-void AdaptorPnt2d_AIS::Compute(const Handle(Prs3d_Projector)& /*aProjector*/,
-  const Handle(Prs3d_Presentation)& /*aPresentation*/)
-{
 }
 
 void AdaptorPnt2d_AIS::ComputeSelection(const Handle(SelectMgr_Selection)& /*aSelection*/,
