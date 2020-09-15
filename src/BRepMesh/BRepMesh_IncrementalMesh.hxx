@@ -64,12 +64,23 @@ public: //! @name mesher API
   //! Automatically calls method Perform.
   //! @param theShape shape to be meshed.
   //! @param theParameters - parameters of meshing
+   Standard_EXPORT BRepMesh_IncrementalMesh (const TopoDS_Shape& theShape,
+                                             const BRepMesh_FastDiscret::Parameters& theParameters);
+
+  //! Constructor.
+  //! Automatically calls method Perform.
+  //! @param theShape shape to be meshed.
+  //! @param theParameters - parameters of meshing
+  //! @param theProgress - progress indicator
   Standard_EXPORT BRepMesh_IncrementalMesh (const TopoDS_Shape& theShape,
                                             const BRepMesh_FastDiscret::Parameters& theParameters,
-                                            const Handle(Message_ProgressIndicator) &theProgress = NULL);
+                                            const Handle(Message_ProgressIndicator) &theProgress);
+
+  // //! Performs meshing ot the shape.
+  Standard_EXPORT virtual void Perform() Standard_OVERRIDE;
 
   //! Performs meshing ot the shape.
-  Standard_EXPORT virtual void Perform(const Handle(Message_ProgressIndicator) &theProgress = NULL) Standard_OVERRIDE;
+  Standard_EXPORT virtual void Perform(const Handle(Message_ProgressIndicator) &theProgress) Standard_OVERRIDE;
   
 public: //! @name accessing to parameters.
 

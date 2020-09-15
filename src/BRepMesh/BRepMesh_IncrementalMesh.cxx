@@ -108,6 +108,17 @@ BRepMesh_IncrementalMesh::BRepMesh_IncrementalMesh( const TopoDS_Shape&    theSh
 //purpose  : 
 //=======================================================================
 BRepMesh_IncrementalMesh::BRepMesh_IncrementalMesh (const TopoDS_Shape& theShape,
+                                                    const BRepMesh_FastDiscret::Parameters& theParameters)  : 
+  myParameters(theParameters) 
+{
+  myShape       = theShape;
+  Perform();
+}
+//=======================================================================
+//function : Constructor
+//purpose  : 
+//=======================================================================
+BRepMesh_IncrementalMesh::BRepMesh_IncrementalMesh (const TopoDS_Shape& theShape,
                                                     const BRepMesh_FastDiscret::Parameters& theParameters,
                                                     const Handle(Message_ProgressIndicator) &theProgress)
   : myParameters(theParameters)
@@ -206,6 +217,17 @@ void BRepMesh_IncrementalMesh::collectFaces()
 //function : Perform
 //purpose  : 
 //=======================================================================
+void BRepMesh_IncrementalMesh::Perform()
+{
+   Handle(Message_ProgressIndicator) aProgress;
+   Perform(aProgress);
+}
+
+//=======================================================================
+//function : Perform
+//purpose  : 
+//=======================================================================
+
 void BRepMesh_IncrementalMesh::Perform(const Handle(Message_ProgressIndicator) &theProgress)
 {
   init();
