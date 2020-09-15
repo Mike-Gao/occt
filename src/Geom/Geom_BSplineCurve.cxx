@@ -184,7 +184,18 @@ Geom_BSplineCurve::Geom_BSplineCurve
                  Periodic);
 
   if (Weights.Length() != Poles.Length())
+  {
+    std::cout << "!!! Size mismatch" << std::endl;
+    std::cout << "Weights size: " << Weights.Length() << std::endl;
+    for(Standard_Real weight: Weights)
+      std::cout << weight << std::endl;
+    std::cout << std::endl;
+    std::cout << "Poles size: " << Poles.Length() << std::endl;
+    for(gp_Pnt pole : Poles)
+      std::cout << pole.X() << " " << pole.Y() << " " << pole.Z() << std::endl;
+    std::cout << std::endl;
     throw Standard_ConstructionError("Geom_BSplineCurve: Weights and Poles array size mismatch");
+  }
 
   Standard_Integer i;
   for (i = Weights.Lower(); i <= Weights.Upper(); i++) {

@@ -155,6 +155,15 @@ public:
   Standard_EXPORT static Handle(Geom2d_BSplineCurve) MakeTrimmedCurve2d (const Handle(StepGeom_TrimmedCurve)& SC);
   Standard_EXPORT static Handle(Geom_VectorWithMagnitude) MakeVectorWithMagnitude (const Handle(StepGeom_Vector)& SV);
   Standard_EXPORT static Handle(Geom2d_VectorWithMagnitude) MakeVectorWithMagnitude2d (const Handle(StepGeom_Vector)& SV);
+
+private:
+   template<class TPntArray, class TCartesianPoint, class TGpPnt, class TBSplineCurve> static
+     Handle(TBSplineCurve) StepToGeom::MakeBSplineCurveCommon
+     (
+       const Handle(StepGeom_BSplineCurve)& theStepGeom_BSplineCurve,
+       TGpPnt(TCartesianPoint::*thePntGetterFunction)() const,
+       Handle(TCartesianPoint) (*thePointMakerFunction)(const Handle(StepGeom_CartesianPoint)&)
+     );
 };
 
 #endif // _StepToGeom_HeaderFile
