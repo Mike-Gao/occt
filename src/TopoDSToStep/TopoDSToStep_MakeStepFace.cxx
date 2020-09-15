@@ -24,6 +24,7 @@
 #include <Bnd_Box2d.hxx>
 #include <BndLib_Add2dCurve.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <Geom2d_BezierCurve.hxx>
 #include <Geom2d_Curve.hxx>
@@ -47,6 +48,7 @@
 #include <Geom_TrimmedCurve.hxx>
 #include <GeomToStep_MakeCurve.hxx>
 #include <GeomToStep_MakeSurface.hxx>
+#include <GProp_GProps.hxx>
 #include <Interface_Static.hxx>
 #include <Precision.hxx>
 #include <ShapeAlgo.hxx>
@@ -179,6 +181,31 @@ void TopoDSToStep_MakeStepFace::Init(const TopoDS_Face& aFace,
     done    = Standard_False;
     return;
   }
+
+  // ------------------    
+  // Check face bounds
+  // ------------------
+  Standard_Real UF, VF, UL, VL;
+  ShapeAlgo::AlgoContainer()->GetFaceUVBounds(aFace, UF, UL, VF, VL);
+  if (UL-UF < Precision::PConfusion() || VL - VF < Precision::PConfusion())
+    done = Standard_False;
+  else
+  {
+    GProp_GProps aGProps;
+    BRepGProp::SurfaceProperties(aFace, aGProps); 
+    if (aGProps.Mass() < Precision::SquarePConfusion())
+      done = Standard_False;
+  }
+  if(!done)
+  {
+#ifdef OCCT_DEBUG
+    std::cout << "Warning : Degenerated face not mapped";
+#endif
+    FP->AddWarning(errShape, "  Degenerated face not mapped");
+    myError = TopoDSToStep_FaceOther;
+    done = Standard_False;
+    return;
+  }
   
   // -----------------
   // Translate Surface
@@ -220,8 +247,8 @@ void TopoDSToStep_MakeStepFace::Init(const TopoDS_Face& aFace,
       gp_Dir X   = Ax3.XDirection();
       
       // create basis curve
-      Standard_Real UF, VF, UL, VL;
-      ShapeAlgo::AlgoContainer()->GetFaceUVBounds ( aFace, UF, UL, VF, VL );
+      //Standard_Real UF, VF, UL, VL;
+      //ShapeAlgo::AlgoContainer()->GetFaceUVBounds ( aFace, UF, UL, VF, VL );
       gp_Ax2 Ax2 ( pos.XYZ() + X.XYZ() * TS->MajorRadius(), X ^ dir, X );
       Handle(Geom_Curve) BasisCurve = new Geom_Circle ( Ax2, TS->MinorRadius() );
       

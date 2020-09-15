@@ -14,7 +14,6 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
 #include <Message_ProgressIndicator.hxx>
 #include <StdFail_NotDone.hxx>
 #include <StepShape_ClosedShell.hxx>
@@ -110,26 +109,26 @@ void TopoDSToStep_Builder::Init(const TopoDS_Shape& aShape,
 	TopExp_Explorer myExp(myShell, TopAbs_FACE);
 
 	TopoDSToStep_MakeStepFace MkFace;
-
-	for (;myExp.More();myExp.Next()) {
-
-	  const TopoDS_Face Face = TopoDS::Face(myExp.Current());
-    
-    MkFace.Init(Face, myTool, FP);
-
-	  if (MkFace.IsDone()) {
+	for (;myExp.More();myExp.Next()) 
+  {
+	  const TopoDS_Face aFace = TopoDS::Face(myExp.Current()); 
+    MkFace.Init(aFace, myTool, FP);
+	  if (MkFace.IsDone()) 
+    {
 	    FS = Handle(StepShape_FaceSurface)::DownCast(MkFace.Value());
 	    Fpms = FS;
 	    mySeq.Append(Fpms);
 	  }
-	  else {
+	  else 
+    {
 	    // MakeFace Error Handling : warning only
 //	    std::cout << "Warning : one Face has not been mapped" << std::endl;
 //	  Handle(TransferBRep_ShapeMapper) errShape =
 //	    new TransferBRep_ShapeMapper(Face);
 //	    FP->AddWarning(errShape, " a Face from a Shell has not been mapped");
 	  }
-    if (!progress.IsNull()) progress->Increment();
+    if (!progress.IsNull()) 
+      progress->Increment();
 	}
 
 	Standard_Integer nbFaces = mySeq.Length();
