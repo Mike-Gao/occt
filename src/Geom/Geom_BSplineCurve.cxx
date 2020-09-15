@@ -186,7 +186,6 @@ Geom_BSplineCurve::Geom_BSplineCurve
   if (Weights.Length() != Poles.Length())
     throw Standard_ConstructionError("Geom_BSplineCurve: Weights and Poles array size mismatch");
 
-
   Standard_Integer i;
   for (i = Weights.Lower(); i <= Weights.Upper(); i++) {
     if (Weights(i) <= gp::Resolution())  
