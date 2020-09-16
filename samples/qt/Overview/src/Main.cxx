@@ -25,7 +25,7 @@
 
 int main ( int argc, char* argv[] )
 {
-  Q_INIT_RESOURCE(Tutorial);
+  Q_INIT_RESOURCE(Overview);
 	QApplication aQApp( argc, argv );
 
   ApplicationCommonWindow::ApplicationType anAppType = ApplicationCommonWindow::Unknown;

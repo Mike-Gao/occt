@@ -7,15 +7,15 @@ if ["%CASDEB%"] == [""] (
   set "BIN_DIR=win%ARCH%\%VCVER%\bin"
 )
 
-if not exist "%~dp0%BIN_DIR%\Tutorial.exe" goto ERR_EXE
+if not exist "%~dp0%BIN_DIR%\Overview.exe" goto ERR_EXE
 
-echo Starting Tutorial .....
-"%~dp0%BIN_DIR%\Tutorial.exe" %4
+echo Starting Overview .....
+"%~dp0%BIN_DIR%\Overview.exe" %4
 
 goto END
 
 :ERR_EXE
-echo Executable %~dp0%BIN_DIR%\Tutorial.exe not found.
+echo Executable %~dp0%BIN_DIR%\Overview.exe not found.
 echo Probably you didn't compile the application.
 pause
 goto END

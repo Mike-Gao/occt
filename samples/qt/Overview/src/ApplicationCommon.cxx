@@ -302,7 +302,7 @@ DocumentCommon* ApplicationCommonWindow::createNewDocument()
 
 void ApplicationCommonWindow::onAbout()
 {
-  QMessageBox::information(this, tr("Tutorial"),
+  QMessageBox::information(this, tr("Overview"),
     tr("Qt based application to study OpenCASCADE Technology"),
     tr("Ok"), QString::null, QString::null, 0, 0);
 }
@@ -320,7 +320,7 @@ QString ApplicationCommonWindow::getResourceDir()
 TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
 {
   TCollection_AsciiString aSampleSourceDir = OSD_Environment("aSamplePath").Value();
-  aSampleSourceDir += "/../../samples_src";
+  aSampleSourceDir += "/../../Overview/code";
   return aSampleSourceDir;
 }
 

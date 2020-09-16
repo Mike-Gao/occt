@@ -10,4 +10,4 @@ call "%~dp0env.bat" %1 %2 %3
 
 call "%VCVARS%" %VCARCH%
 
-qmake -tp vc -r -o Tutorial.sln Tutorial0.pro
+qmake -tp vc -r -o Overview.sln Overview0.pro
