@@ -205,13 +205,15 @@ static void ResultEval(const Handle(Geom_BSplineSurface)& surf,
 //purpose  : 
 //=======================================================================
 
-GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC)
+GeomFill_NSections::GeomFill_NSections (const TColGeom_SequenceOfCurve& NC,
+                                        const Standard_Boolean thePathPeriodic)
 {
   mySections = NC;
   UFirst = 0.;
   ULast = 1.;
   VFirst = 0.;
   VLast = 1.;
+  isPathPeriodic = thePathPeriodic;
   myRefSurf.Nullify();
   ComputeSurface();
 }
@@ -221,8 +223,9 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC)
 //purpose  : 
 //=======================================================================
 
-GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
-				       const TColStd_SequenceOfReal& NP)
+GeomFill_NSections::GeomFill_NSections (const TColGeom_SequenceOfCurve& NC,
+				        const TColStd_SequenceOfReal& NP,
+                                        const Standard_Boolean thePathPeriodic)
 {
   mySections = NC;
   myParams = NP;
@@ -230,6 +233,7 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
   ULast = 1.;
   VFirst = 0.;
   VLast = 1.;
+  isPathPeriodic = thePathPeriodic;
   myRefSurf.Nullify();
   ComputeSurface();
 }
@@ -239,12 +243,13 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
 //purpose  : 
 //=======================================================================
 
-GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
-				       const TColStd_SequenceOfReal& NP,
-				       const Standard_Real UF,
-				       const Standard_Real UL,
-				       const Standard_Real VF,
-				       const Standard_Real VL)
+GeomFill_NSections::GeomFill_NSections (const TColGeom_SequenceOfCurve& NC,
+				        const TColStd_SequenceOfReal& NP,
+				        const Standard_Real UF,
+				        const Standard_Real UL,
+				        const Standard_Real VF,
+				        const Standard_Real VL,
+                                        const Standard_Boolean thePathPeriodic)
 {
   mySections = NC;
   myParams = NP;
@@ -252,6 +257,7 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
   ULast = UL;
   VFirst = VF;
   VLast = VL;
+  isPathPeriodic = thePathPeriodic;
   myRefSurf.Nullify();
   ComputeSurface();
 }
@@ -261,14 +267,15 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
 //purpose  : 
 //=======================================================================
 
-GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
-				       const GeomFill_SequenceOfTrsf& Trsfs,
-				       const TColStd_SequenceOfReal& NP,
-				       const Standard_Real UF,
-				       const Standard_Real UL,
-				       const Standard_Real VF,
-				       const Standard_Real VL,
-				       const Handle(Geom_BSplineSurface)& Surf)
+GeomFill_NSections::GeomFill_NSections (const TColGeom_SequenceOfCurve& NC,
+				        const GeomFill_SequenceOfTrsf& Trsfs,
+				        const TColStd_SequenceOfReal& NP,
+				        const Standard_Real UF,
+				        const Standard_Real UL,
+				        const Standard_Real VF,
+				        const Standard_Real VL,
+				        const Handle(Geom_BSplineSurface)& Surf,
+                                        const Standard_Boolean thePathPeriodic)
 {
   mySections = NC;
   myTrsfs = Trsfs;
@@ -277,6 +284,7 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
   ULast = UL;
   VFirst = VF;
   VLast = VL;
+  isPathPeriodic = thePathPeriodic;
   myRefSurf = Surf;
   ComputeSurface();
 }
@@ -517,7 +525,6 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
 //=======================================================
  void GeomFill_NSections::ComputeSurface()
 {
-
   Handle(Geom_BSplineSurface) BS;
   if (myRefSurf.IsNull()) {
 
@@ -532,12 +539,16 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
 
     GeomFill_SectionGenerator section;
     Handle(Geom_BSplineSurface) surface;
-
+    //isPathPeriodic = ((mySections(jdeb).IsNull == mySections(jfin)) && isPathPeriodic);
+    Standard_Boolean isUPeriodic = true;
     for (j=jdeb; j<=jfin; j++) {
 
         // read the j-th curve
         Handle(Geom_Curve) curv = mySections(j);
-        
+        if (!curv->IsPeriodic())
+        {
+          isUPeriodic = false;
+        }
         // transformation to BSpline reparametrized to [UFirst,ULast]
         Handle(Geom_BSplineCurve) curvBS = Handle(Geom_BSplineCurve)::DownCast (curv);
         if (curvBS.IsNull())
@@ -593,12 +604,12 @@ GeomFill_NSections::GeomFill_NSections(const TColGeom_SequenceOfCurve& NC,
     anApprox.SetContinuity(GeomAbs_C1);
     Standard_Boolean SpApprox = Standard_True;
     anApprox.Perform(line, section, SpApprox);
-
     BS = 
       new Geom_BSplineSurface(anApprox.SurfPoles(), anApprox.SurfWeights(),
                               anApprox.SurfUKnots(), anApprox.SurfVKnots(),
                               anApprox.SurfUMults(), anApprox.SurfVMults(),
-                              anApprox.UDegree(), anApprox.VDegree());
+                              anApprox.UDegree(), anApprox.VDegree(), 
+                              isUPeriodic, isPathPeriodic);
   }
 
   else {

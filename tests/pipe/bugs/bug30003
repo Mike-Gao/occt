@@ -1,0 +1,17 @@
+puts "============"
+puts "OCC30003"
+puts "============"
+puts ""
+#######################################################################
+# Modeling Algorithms - Construction of pipe by two circular sections and spine curve leads to crash
+#######################################################################
+
+pload QAcommands
+
+OCC30003
+
+smallview
+fit
+checkview -screenshot -2d -path ${imagedir}/${test_image}.png
+
+puts "TEST COMPLETED"

@@ -726,7 +726,12 @@ void GeomFill_Pipe::Init(const Handle(Geom_Curve)& Path,
     Standard_Real deb,fin;
     deb = SeqC.First()->FirstParameter();
     fin = SeqC.First()->LastParameter();
-    mySec = new (GeomFill_NSections) (SeqC,SeqP,deb,fin,first,last);
+    Standard_Boolean isPathPeriodic = Path->IsPeriodic();
+    if (deb == first && fin == last)
+    {
+      isPathPeriodic = false;
+    }
+    mySec = new (GeomFill_NSections) (SeqC, SeqP, deb, fin, first, last, isPathPeriodic);
   }
 }
 
@@ -776,7 +781,7 @@ void GeomFill_Pipe::Init(const Handle(Geom_Curve)& Path,
     Standard_Real deb,fin;
     deb =  SeqC.First()->FirstParameter();
     fin =  SeqC.First()->LastParameter();
-    mySec = new (GeomFill_NSections) (SeqC,SeqP,deb,fin,first,last);
+    mySec = new (GeomFill_NSections) (SeqC, SeqP, deb, fin, first, last, false);
   }
 }
 

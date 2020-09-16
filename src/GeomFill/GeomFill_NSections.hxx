@@ -49,26 +49,34 @@ public:
 
   
   //! Make a SectionLaw with N Curves.
-  Standard_EXPORT GeomFill_NSections(const TColGeom_SequenceOfCurve& NC);
+  Standard_EXPORT GeomFill_NSections (const TColGeom_SequenceOfCurve& NC, const Standard_Boolean thePathPeriodic = Standard_False);
   
   //! Make a SectionLaw with N Curves and N associated parameters.
-  Standard_EXPORT GeomFill_NSections(const TColGeom_SequenceOfCurve& NC, const TColStd_SequenceOfReal& NP);
+  Standard_EXPORT GeomFill_NSections (const TColGeom_SequenceOfCurve& NC, const TColStd_SequenceOfReal& NP, 
+                                      const Standard_Boolean thePathPeriodic = Standard_False);
   
   //! Make a SectionLaw with N Curves and N associated parameters.
   //! UF and UL are the parametric bounds of the NSections
-  Standard_EXPORT GeomFill_NSections(const TColGeom_SequenceOfCurve& NC, const TColStd_SequenceOfReal& NP, const Standard_Real UF, const Standard_Real UL);
+  Standard_EXPORT GeomFill_NSections (const TColGeom_SequenceOfCurve& NC, const TColStd_SequenceOfReal& NP, const Standard_Real UF,
+                                      const Standard_Real UL, const Standard_Boolean thePathPeriodic = Standard_False);
   
   //! Make a SectionLaw with N Curves and N associated parameters.
   //! UF and UL are the parametric bounds of the NSections
   //! VF and VL are the parametric bounds of the path
-  Standard_EXPORT GeomFill_NSections(const TColGeom_SequenceOfCurve& NC, const TColStd_SequenceOfReal& NP, const Standard_Real UF, const Standard_Real UL, const Standard_Real VF, const Standard_Real VL);
+  Standard_EXPORT GeomFill_NSections (const TColGeom_SequenceOfCurve& NC, const TColStd_SequenceOfReal& NP, 
+                                      const Standard_Real UF, const Standard_Real UL, 
+                                      const Standard_Real VF, const Standard_Real VL, 
+                                      const Standard_Boolean thePathPeriodic = Standard_False);
   
   //! Make a SectionLaw with N Curves and N associated parameters.
   //! UF and UL are the parametric bounds of the NSections
   //! VF and VL are the parametric bounds of the path
   //! UF and UL are the parametric bounds of the NSections
   //! Surf is a reference surface used by BRepFill_NSections
-  Standard_EXPORT GeomFill_NSections(const TColGeom_SequenceOfCurve& NC, const GeomFill_SequenceOfTrsf& Trsfs, const TColStd_SequenceOfReal& NP, const Standard_Real UF, const Standard_Real UL, const Standard_Real VF, const Standard_Real VL, const Handle(Geom_BSplineSurface)& Surf);
+  Standard_EXPORT GeomFill_NSections (const TColGeom_SequenceOfCurve& NC, const GeomFill_SequenceOfTrsf& Trsfs,
+                                      const TColStd_SequenceOfReal& NP, const Standard_Real UF, const Standard_Real UL, 
+                                      const Standard_Real VF, const Standard_Real VL, const Handle(Geom_BSplineSurface)& Surf,  
+                                      const Standard_Boolean thePathPeriodic = Standard_False);
   
   //! compute the section for v = param
   Standard_EXPORT virtual Standard_Boolean D0 (const Standard_Real Param, TColgp_Array1OfPnt& Poles, TColStd_Array1OfReal& Weigths) Standard_OVERRIDE;
@@ -197,6 +205,7 @@ private:
   Standard_Real ULast;
   Standard_Real VFirst;
   Standard_Real VLast;
+  Standard_Boolean isPathPeriodic;
   TColGeom_SequenceOfCurve mySections;
   GeomFill_SequenceOfTrsf myTrsfs;
   TColStd_SequenceOfReal myParams;

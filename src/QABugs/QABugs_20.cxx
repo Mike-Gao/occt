@@ -2180,6 +2180,41 @@ static Standard_Integer OCC28389(Draw_Interpretor& di, Standard_Integer argc, co
   return 0;
 }
 
+#include <GeomFill_Pipe.hxx>
+//=======================================================================
+//function : OCC30003
+//purpose : Construction of pipe by two circular sections and spine curve
+//=======================================================================
+static Standard_Integer OCC30003 (Draw_Interpretor& , Standard_Integer , const char** )
+{
+  TColgp_Array1OfPnt pathPoles(1, 3);
+  pathPoles(1) = gp_Pnt(0.0, 0.0, 0.0);
+  pathPoles(2) = gp_Pnt(100.0, 0.0, 0.0);
+  pathPoles(3) = gp_Pnt(100.0, 100.0, 0.0);
+
+  Handle(Geom_BezierCurve) path = new Geom_BezierCurve(pathPoles);
+
+  Handle(Geom_Curve)
+    c1 = GeomConvert::CurveToBSplineCurve(new Geom_Circle(gp_Ax2(gp::Origin(), gp::DX()), 10.0), Convert_Polynomial);
+
+  Handle(Geom_Curve)
+    c2 = GeomConvert::CurveToBSplineCurve(new Geom_Circle(gp_Ax2(gp::Origin(), gp::DX()), 20.0), Convert_Polynomial);
+
+  DrawTrSurf::Set("c1", c1);
+  DrawTrSurf::Set("c2", c2);
+  DrawTrSurf::Set("path", path);
+
+  GeomFill_Pipe Pipe(path, c1, c2);
+  Pipe.Perform();
+  Handle(Geom_Surface) surf = Pipe.Surface();
+  BRepBuilderAPI_MakeFace aFace(surf, 0.1);
+  TopoDS_Face face = aFace.Face();
+
+  DBRep::Set("res", face);
+
+  return 0;
+}
+
 #include <TColgp_HArray1OfPnt2d.hxx>
 #include <TColgp_Array1OfVec2d.hxx>
 #include <TColStd_HArray1OfBoolean.hxx>
@@ -3864,6 +3899,8 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC31697", "OCC31697 expression variable", __FILE__, OCC31697, group);
 
   theCommands.Add("OCC31320", "OCC31320 DocName ObjName : tests remove of the children GetFather method if father is removed", __FILE__, OCC31320, group);
+
+  theCommands.Add("OCC30003", "OCC30003", __FILE__, OCC30003, group);
 
   return;
 }
