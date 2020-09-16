@@ -102,7 +102,7 @@ Handle(BinMDF_ADriverTable) BinDrivers::AttributeDrivers
 
 TCollection_AsciiString BinDrivers::StorageVersion()
 {
-  return BinLDrivers::StringStorageVersion();
+  return BinLDrivers::StorageVersion();
 }
 
 PLUGIN(BinDrivers)

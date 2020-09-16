@@ -70,7 +70,7 @@ Standard_Boolean BinMDataStd_RealArrayDriver::Paste
     return Standard_False;
 
   Standard_Boolean aDelta(Standard_False);
-  if(theRelocTable.GetHeaderData()->BinStorageVersion() >= BIN_LDRIVERS_VERSION_3) {
+  if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= BIN_LDRIVERS_VERSION_3) {
     Standard_Byte aDeltaValue;
     if (! (theSource >> aDeltaValue))
       return Standard_False;
@@ -79,7 +79,7 @@ Standard_Boolean BinMDataStd_RealArrayDriver::Paste
   }
   anAtt->SetDelta(aDelta);
 
-  BinMDataStd::SetAttributeID(theSource, anAtt, theRelocTable.GetHeaderData()->BinStorageVersion());
+  BinMDataStd::SetAttributeID(theSource, anAtt, theRelocTable.GetHeaderData()->StorageVersion().IntegerValue());
   return Standard_True; 
 }
 

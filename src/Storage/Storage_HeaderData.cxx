@@ -217,19 +217,9 @@ void Storage_HeaderData::SetCreationDate(const TCollection_AsciiString& d)
   myDate = d;
 }
 
-TCollection_AsciiString Storage_HeaderData::StringStorageVersion() const
+TCollection_AsciiString Storage_HeaderData::StorageVersion() const
 {
   return myStorageVersion;
-}
-
-BinLDrivers_FormatVersion Storage_HeaderData::BinStorageVersion() const
-{
-  return static_cast<BinLDrivers_FormatVersion>(myStorageVersion.IntegerValue());
-}
-
-XmlLDrivers_FormatVersion Storage_HeaderData::XmlStorageVersion() const
-{
-  return static_cast<XmlLDrivers_FormatVersion>(myStorageVersion.IntegerValue());
 }
 
 Storage_Error  Storage_HeaderData::ErrorStatus() const

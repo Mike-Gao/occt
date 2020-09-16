@@ -29,8 +29,6 @@ class BinLDrivers_DocumentRetrievalDriver;
 class BinLDrivers_DocumentSection;
 class TDocStd_Application;
 
-
-
 class BinLDrivers 
 {
 public:
@@ -45,7 +43,7 @@ public:
   Standard_EXPORT static Handle(BinMDF_ADriverTable) AttributeDrivers (const Handle(Message_Messenger)& MsgDrv);
   
   //! returns last storage version
-  Standard_EXPORT static TCollection_AsciiString StringStorageVersion();
+  Standard_EXPORT static TCollection_AsciiString StorageVersion();
 
 public:
 

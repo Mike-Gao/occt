@@ -174,7 +174,7 @@ Standard_Boolean XmlMNaming_NamingDriver::Paste
   }
   aNgName.Index(aNb);
 //
-  if(theRelocTable.GetHeaderData()->XmlStorageVersion() >= XML_LDRIVERS_VERSION_4) {
+  if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= XML_LDRIVERS_VERSION_4) {
     XmlObjMgt_DOMString aDomEntry = anElem.getAttribute(::ContextLabelString());
     if (aDomEntry != NULL)
     {	
@@ -203,8 +203,8 @@ Standard_Boolean XmlMNaming_NamingDriver::Paste
       std::cout << "Retrieving Context Label is NULL" <<std::endl;
 #endif
 
-    if(theRelocTable.GetHeaderData()->XmlStorageVersion() >= XML_LDRIVERS_VERSION_5 &&
-      theRelocTable.GetHeaderData()->XmlStorageVersion() < XML_LDRIVERS_VERSION_7) {
+    if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= XML_LDRIVERS_VERSION_5 &&
+      theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() < XML_LDRIVERS_VERSION_7) {
           // Orientation processing - converting from old format
           Handle(TNaming_NamedShape) aNS;
           if (aNg->Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -223,7 +223,7 @@ Standard_Boolean XmlMNaming_NamingDriver::Paste
             }
           }         
         }
-    if(theRelocTable.GetHeaderData()->XmlStorageVersion() >= XML_LDRIVERS_VERSION_7) {
+    if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= XML_LDRIVERS_VERSION_7) {
        aDOMStr = anElem.getAttribute(::OrientString());
        if (!aDOMStr.GetInteger(aNb))
        {

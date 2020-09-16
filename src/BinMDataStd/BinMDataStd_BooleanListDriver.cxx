@@ -71,7 +71,7 @@ Standard_Boolean BinMDataStd_BooleanListDriver::Paste(const BinObjMgt_Persistent
     }
   }
 
-  BinMDataStd::SetAttributeID(theSource, anAtt, theRelocTable.GetHeaderData()->BinStorageVersion());
+  BinMDataStd::SetAttributeID(theSource, anAtt, theRelocTable.GetHeaderData()->StorageVersion().IntegerValue());
   return Standard_True;
 }
 

@@ -177,7 +177,7 @@ Standard_Integer Storage_Data::NumberOfObjects() const
 
 TCollection_AsciiString Storage_Data::StringStorageVersion() const
 {
-  return myHeaderData->StringStorageVersion();
+  return myHeaderData->StorageVersion();
 }
 
 Storage_Error  Storage_Data::ErrorStatus() const

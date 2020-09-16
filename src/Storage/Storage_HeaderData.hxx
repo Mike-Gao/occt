@@ -52,14 +52,8 @@ public:
   //! return the creation date
   Standard_EXPORT TCollection_AsciiString CreationDate() const;
   
-  //! return the Storage package version as string
-  Standard_EXPORT TCollection_AsciiString StringStorageVersion() const;
-
-  //! return the Storage package version as string
-  Standard_EXPORT BinLDrivers_FormatVersion BinStorageVersion() const;
-
-  //! return the Storage package version as string
-  Standard_EXPORT XmlLDrivers_FormatVersion XmlStorageVersion() const;
+  //! return the Storage package version
+  Standard_EXPORT TCollection_AsciiString StorageVersion() const;
 
   //! get the version of the schema
   Standard_EXPORT TCollection_AsciiString SchemaVersion() const;

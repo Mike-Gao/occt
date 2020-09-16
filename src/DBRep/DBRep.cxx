@@ -1428,7 +1428,7 @@ static Standard_Integer binsave(Draw_Interpretor& di, Standard_Integer argc, con
     return 1;
   }
 
-  if (!BinTools::Write (aShape, argv[2], aVersion))
+  if (!BinTools::Write (aShape, argv[2]))
   {
     di << "Cannot write to the file " << argv[2];
     return 1;

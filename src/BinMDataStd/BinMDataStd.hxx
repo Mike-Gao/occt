@@ -39,7 +39,7 @@ public:
   Standard_EXPORT static void AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable, const Handle(Message_Messenger)& aMsgDrv);
 
 template<class T>
-static void SetAttributeID(const BinObjMgt_Persistent& theSource, const Handle(T)& anAtt, const BinLDrivers_FormatVersion aDocFormatVersion)
+static void SetAttributeID(const BinObjMgt_Persistent& theSource, const Handle(T)& anAtt, const Standard_Integer aDocFormatVersion)
 {
   Standard_Boolean ok = Standard_True;
   if(aDocFormatVersion >= BIN_LDRIVERS_VERSION_8) { // process user defined guid

@@ -97,7 +97,7 @@ Handle(BinMDF_ADriverTable) BinLDrivers::AttributeDrivers
 //purpose  : 
 //=======================================================================
 
-TCollection_AsciiString BinLDrivers::StringStorageVersion()
+TCollection_AsciiString BinLDrivers::StorageVersion()
 {
   TCollection_AsciiString aVersionStr (static_cast<Standard_Integer>(BinLDrivers::THE_CURRENT_VERSION));
   return aVersionStr;

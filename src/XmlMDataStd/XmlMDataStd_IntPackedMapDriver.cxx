@@ -106,7 +106,7 @@ Standard_Boolean XmlMDataStd_IntPackedMapDriver::Paste
     if(Ok) {
       Standard_Boolean aDelta(Standard_False);
 
-      if(theRelocTable.GetHeaderData()->XmlStorageVersion() >= XML_LDRIVERS_VERSION_3) {
+      if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= XML_LDRIVERS_VERSION_3) {
         Standard_Integer aDeltaValue;
         if (!anElement.getAttribute(::IsDeltaOn()).GetInteger(aDeltaValue)) 
         {

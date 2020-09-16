@@ -161,21 +161,21 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
   }
 
   // 1.a Version of writer
-  if (!aHeaderData->StringStorageVersion().IsIntegerValue()) {
+  if (!aHeaderData->StorageVersion().IsIntegerValue()) {
     // file has no format version
     myMsgDriver->Send (aMethStr + "error: file has no format version", Message_Fail);
     myReaderStatus = PCDM_RS_FormatFailure;
     return;
   }
-  BinLDrivers_FormatVersion aFileVer = aHeaderData->BinStorageVersion();
-  BinLDrivers_FormatVersion aCurrVer = BinLDrivers::THE_CURRENT_VERSION;
+  Standard_Integer aFileVer = aHeaderData->StorageVersion().IntegerValue();
+  Standard_Integer aCurrVer = BinLDrivers::THE_CURRENT_VERSION;
   // maintain one-way compatibility starting from version 2+
   if (!CheckDocumentVersion(aFileVer, aCurrVer)) {
     myReaderStatus = PCDM_RS_NoVersion;
     // file was written with another version
     myMsgDriver->Send (aMethStr + "error: wrong file version: " +
-                 aHeaderData->StringStorageVersion() + " while current is " +
-                 BinLDrivers::StringStorageVersion(), Message_Fail);
+                 aHeaderData->StorageVersion() + " while current is " +
+                 BinLDrivers::StorageVersion(), Message_Fail);
     return;
   }
 
@@ -566,8 +566,8 @@ void BinLDrivers_DocumentRetrievalDriver::Clear()
 //purpose  : 
 //=======================================================================
 Standard_Boolean BinLDrivers_DocumentRetrievalDriver::CheckDocumentVersion(
-                                                          const BinLDrivers_FormatVersion theFileVersion,
-                                                          const BinLDrivers_FormatVersion theCurVersion)
+                                                          const Standard_Integer theFileVersion,
+                                                          const Standard_Integer theCurVersion)
 {
   if (theFileVersion < BIN_LDRIVERS_VERSION_2 || theFileVersion > theCurVersion) {
     // file was written with another version

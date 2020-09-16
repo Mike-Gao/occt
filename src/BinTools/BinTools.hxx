@@ -66,7 +66,6 @@ public:
   
   //! Writes <theShape> on <theStream> in binary format.
   Standard_EXPORT static void Write (const TopoDS_Shape& theShape, Standard_OStream& theStream,
-                                     BinTools_FormatVersion theVersion,
                                      const Message_ProgressRange& theRange = Message_ProgressRange());
   
   //! Reads a shape from <theStream> and returns it in <theShape>.
@@ -76,7 +75,6 @@ public:
   //! Writes <theShape> in <theFile>.
   Standard_EXPORT static Standard_Boolean Write
     (const TopoDS_Shape& theShape, const Standard_CString theFile,
-     BinTools_FormatVersion theVersion,
      const Message_ProgressRange& theRange = Message_ProgressRange());
   
   //! Reads a shape from <theFile> and returns it in <theShape>.

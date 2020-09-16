@@ -186,7 +186,7 @@ void BinLDrivers_DocumentSection::Write (Standard_OStream&   theStream,
 void BinLDrivers_DocumentSection::ReadTOC
                                 (BinLDrivers_DocumentSection& theSection,
                                  Standard_IStream&            theStream,
-                                 const BinLDrivers_FormatVersion theDocFormatVersion)
+                                 const Standard_Integer       theDocFormatVersion)
 {
   char aBuf[512];
   Standard_Integer aNameBufferSize;
