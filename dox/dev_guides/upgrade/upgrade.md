@@ -1919,39 +1919,11 @@ Corresponding classes should be renamed in application code (like *AIS_LengthDim
 
 The method Select3D_SensitiveEntity::NbSubElements() has been changed to be constant. Select3D_SensitiveEntity subclasses at application level should be updated accordingly.
 
-@subsection upgrade_750_visualizationOfTriangulation Improved visualization of Triangulation
+@subsection upgrade_750_visualizationOfTriangulation Changes in storage of shapes
 
-* Information about per-vertex triangulations normals stored to BinOCAF and XmlOCAF document, Brep and Binary Brep Shape format (only in case of triangulation-only Faces, with no analytical geometry to restore normals).
-* New versions of formats added (11 for BinOCAF, 10 for XmlOCAF, 4 for Brep Shape and 3 for Binary Brep Shape)
-* Additional constructor with hasNormals option has been added to Poly_Triangulation class
-
-@subsection upgrade_750_formatVersions Changes files format versions
-
-* BinOCAF and XmlOCAF document, Brep and Binary Brep Shape format data type changed from Statdard_Integer to enum class types *BinLDrivers_FormatVersion*, *XmlLDrivers_FormatVersion*, *TopTools_FormatVersion* and *BinTools_FormatVersion* correspondingly.
-* The the types of related class members and the signatures of related methods have been changed correspondingly
-* Static constants *THE_CURRENT_VERSION* have been added to *BinLDrivers*, *XmlLDrivers*, *BinTools_ShapeSet*, *TopTools_ShapeSet* class instead *#define* instruction or *static int*.
-* The method *BinTools_ShapeSet::SetCurrentFormat* has been added
-* The methods named *StorageVersion* has been renamed to *StringStorageVersion* in following classes: *BinLDrivers*, *Storage_Data*, *Storage_HeaderData*, *XmlLDrivers*
-
-@subsection upgrade_750_drawCommands Changes in DRAW commands format
-
-* Option *-version* added to *save* command (allowed values from 1 to 4)
-* Option *-version* added to *binsave* command (allowed values from 1 to 3)
-* The signature of method `Standard_EXPORT static void BinTools::Write (const TopoDS_Shape& theShape, Standard_OStream& theStream)`   has been changed to `Standard_EXPORT static void BinTools::Write (const TopoDS_Shape& theShape, Standard_OStream& theStream, BinTools_FormatVersion theVersion)`
-* The signature of method `Standard_EXPORT static Standard_Boolean Write (const TopoDS_Shape& theShape, const Standard_CString theFile)` has been changed to `Standard_EXPORT static Standard_Boolean Write (const TopoDS_Shape& theShape, const Standard_CString theFile, BinTools_FormatVersion theVersion)`
-* The methods *BinStorageVersion* and *XmlStorageVersion* have been added to *Storage_HeaderData* class
-* The overloaded functions `SetStorageVersion(const BinLDrivers_FormatVersion& aBinVersion)` and `SetStorageVersion (const XmlLDrivers_FormatVersion& aXmlVersion)` have been added to *Storage_HeaderData* class
-  
-@subsection upgrade_750_savingAndRestoring Changes in DRAW Brep text fotmat saving and restoring
-* *Draw_SaveAndRestoreBase* class declaration has been changed from function pointer members to pure virtual functions
-* *Draw_SaveAndRestoreBase* calss declaration has been moved from *Draw_Appli.hxx* to new *Draw_SaveAndRestoreBase.hxx* file 
-* *Draw_SaveAndRestoreBase* class realization has been moved from *Draw_VariableCommands.cxx* to new *Draw_SaveAndRestoreBase.cxx* file 
-* *Draw_First* static pointer moved from *Draw_VariableCommands.cxx* to *Draw_SaveAndRestoreBase* class as static member
-* *GetFirst* static function added to *Draw_SaveAndRestoreBase* class
-* Derived from *Draw_SaveAndRestoreNumber* classes have been added 
-* static non-member functions changed to derived classes overrided virtual functions 
-
-
+* Information about per-vertex triangulations normals are now stored in BinOCAF and XmlOCAF document, BRep and Binary BRep Shape formats (only in case of triangulation-only Faces, with no analytical geometry to restore normals).
+* Versions of formats have been changed (11 for BinOCAF, 10 for XmlOCAF, 4 for BRep Shape and 3 for Binary BRep Shape)
+* Files written with the new version will not be readable by applications of old versions.
 
 @subsection upgrade_750_Booleans Changes in Boolean operations algorithm
 
