@@ -14,7 +14,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
+#include <BinTools_ShapeSet.hxx>
 #include <BRep_TEdge.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepGProp.hxx>
@@ -1379,24 +1379,62 @@ static Standard_Integer XProgress (Draw_Interpretor& di, Standard_Integer argc, 
 // binsave
 //=======================================================================
 
-static Standard_Integer binsave(Draw_Interpretor& di, Standard_Integer n, const char** a)
+static Standard_Integer binsave(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  if (n <= 2) return 1;
+  if (argc < 3)
+  {
+    std::cout << "Syntax error: wrong number of arguments!\n";
+    di.PrintHelp(argv[0]);
+    return 1;
+  }
 
-  TopoDS_Shape aShape = DBRep::Get (a[1]);
+  BinTools_FormatVersion aVersion = BinTools_ShapeSet::THE_CURRENT_VERSION;
+
+  for (Standard_Integer i = 3; i < argc; ++i)
+  {
+    TCollection_AsciiString aParam(argv[i]);
+    aParam.LowerCase();
+    if (aParam == "-version")
+    {
+      ++i;
+      if (i < argc)
+        aVersion =  static_cast<BinTools_FormatVersion>(Draw::Atoi(argv[i]));
+      if (aVersion == BIN_TOOLS_DEFAULT_VERSION)
+        aVersion = BinTools_ShapeSet::THE_CURRENT_VERSION;
+      if (aVersion < BIN_TOOLS_VERSION_1)
+      {
+        std::cout << "Version must not be negative\n";
+        return 1;
+      }
+      if (aVersion > BinTools_ShapeSet::THE_CURRENT_VERSION)
+      {
+        std::cout << "Version higher than " 
+                  << BinTools_ShapeSet::THE_CURRENT_VERSION 
+                  << " is not supported\n";
+        return 1;
+      }
+    }
+    else
+    {
+      std::cout << "Syntax error: unknown argument '" << aParam << "'\n";
+      return 1;
+    }
+  }
+
+  TopoDS_Shape aShape = DBRep::Get (argv[1]);
   if (aShape.IsNull())
   {
-    di << a[1] << " is not a shape";
+    di << argv[1] << " is not a shape";
     return 1;
   }
 
-  if (!BinTools::Write (aShape, a[2]))
+  if (!BinTools::Write (aShape, argv[2]))
   {
-    di << "Cannot write to the file " << a[2];
+    di << "Cannot write to the file " << argv[2];
     return 1;
   }
 
-  di << a[1];
+  di << argv[1];
   return 0;
 }
 
@@ -1573,40 +1611,50 @@ Standard_Real DBRep::HLRAngle()
 { return anglHLR; }
 
 //=======================================================================
-//function : 
-//purpose  : save and restore shapes
+//function : SaveAndRestoreDBRep::Test
+//purpose  : 
 //=======================================================================
 
-static Standard_Boolean stest(const Handle(Draw_Drawable3D)& d) 
+Standard_Boolean Draw_SaveAndRestoreDBRep::Test(const Handle(Draw_Drawable3D)& d) const
 {
   return d->IsInstance(STANDARD_TYPE(DBRep_DrawableShape));
 }
+//=======================================================================
+//function : SaveAndRestoreDBRep::Save
+//purpose  : 
+//=======================================================================
 
-static void ssave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Draw_SaveAndRestoreDBRep::Save(const Handle(Draw_Drawable3D)& d, std::ostream & OS, TopTools_FormatVersion theVersion) const
 {
-  Handle(DBRep_DrawableShape) 
+  const Handle(DBRep_DrawableShape)
     N = Handle(DBRep_DrawableShape)::DownCast(d);
+
   BRep_Builder B;
   BRepTools_ShapeSet S(B);
-  S.Add (N->Shape());
+  S.SetFormatNb(theVersion);
+  S.Add(N->Shape());
   Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
   S.Write(OS, Message_ProgressIndicator::Start(aProgress));
-  if (! aProgress.IsNull() && aProgress->UserBreak())
+  if (!aProgress.IsNull() && aProgress->UserBreak())
     return;
-  S.Write(N->Shape(),OS);
+  S.Write(N->Shape(), OS);
 }
+//=======================================================================
+//function : SaveAndRestoreDBRep::Restore
+//purpose  : 
+//=======================================================================
 
-static Handle(Draw_Drawable3D) srestore (std::istream& IS)
+Handle(Draw_Drawable3D) Draw_SaveAndRestoreDBRep::Restore(std::istream & IS) const
 {
   BRep_Builder B;
   BRepTools_ShapeSet S(B);
   Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
   S.Read(IS, Message_ProgressIndicator::Start(aProgress));
   Handle(DBRep_DrawableShape) N;
-  if (! aProgress.IsNull() && aProgress->UserBreak())
+  if (!aProgress.IsNull() && aProgress->UserBreak())
     return N;
   TopoDS_Shape theShape;
-  S.Read(theShape,IS );
+  S.Read(theShape, IS);
   N = new DBRep_DrawableShape(theShape,
 			    Draw_vert,
 			    Draw_jaune,
@@ -1617,16 +1665,19 @@ static Handle(Draw_Drawable3D) srestore (std::istream& IS)
 			    discret);
   N->DisplayTriangulation(disptriangles);
   N->DisplayPolygons(disppolygons);
-  N->DisplayHLR(withHLR,withRg1,withRgN,withHid,anglHLR);
-  
+  N->DisplayHLR(withHLR, withRg1, withRgN, withHid, anglHLR);
+
   return N;
 }
 
 
-static Draw_SaveAndRestore ssr("DBRep_DrawableShape",
-			       stest,ssave,srestore);
+ static Draw_SaveAndRestoreDBRep saveAndRestoreDBRep;
 
 
+//=======================================================================
+//function : dumps
+//purpose  : 
+//=======================================================================
 void dumps (const TopoDS_Shape& S)
 {
  BRepTools::Dump(S,std::cout);

@@ -13,7 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
+#include <BinLDrivers_FormatVersion.hxx>
 #include <BinMDF_ADriver.hxx>
 #include <BinMNaming.hxx>
 #include <BinMNaming_NamingDriver.hxx>
@@ -234,66 +234,67 @@ Standard_Boolean BinMNaming_NamingDriver::Paste
         aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
                                           "Cannot retrieve reference on "
                                           "Arguments of Name");
-	myMessageDriver->Send (aMsg, Message_Warning);
-	  }
+	      myMessageDriver->Send (aMsg, Message_Warning);
+	    }
 
-    if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() > 3) {
-	TCollection_AsciiString entry;
-	ok = theSource >> entry;
-	if(ok) {
+      if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= BIN_LDRIVERS_VERSION_4) {
+	      TCollection_AsciiString entry;
+	      ok = theSource >> entry;
+	    if(ok) {
 #ifdef OCCT_DEBUG
-	  std::cout << "NamingDriver:: Retrieved Context Label = " << entry << " Ok = " << theSource.IsOK()  <<std::endl;
+	        std::cout << "NamingDriver:: Retrieved Context Label = " << entry << " Ok = " << theSource.IsOK()  <<std::endl;
 #endif
 	 
 //6. context label
-	  if(!entry.IsEmpty() && !entry.IsEqual(TCollection_AsciiString(NULL_ENTRY))) 
-	    {
-	      TDF_Label tLab; // Null label.
-	      TDF_Tool::Label(anAtt->Label().Data(),entry, tLab, Standard_True);
-	      if (!tLab.IsNull()) 
-		aName.ContextLabel(tLab);
+	        if(!entry.IsEmpty() && !entry.IsEqual(TCollection_AsciiString(NULL_ENTRY))) 
+	        {
+	          TDF_Label tLab; // Null label.
+	          TDF_Tool::Label(anAtt->Label().Data(),entry, tLab, Standard_True);
+	          if (!tLab.IsNull()) 
+		          aName.ContextLabel(tLab);
+	        }
+	      }
+
+        if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= BIN_LDRIVERS_VERSION_5 &&
+           theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() < BIN_LDRIVERS_VERSION_7) {
+              // Orientation processing - converting from old format
+          Handle(TNaming_NamedShape) aNShape;
+          if(anAtt->Label().FindAttribute(TNaming_NamedShape::GetID(), aNShape)) {
+                //const TDF_Label& aLab = aNS->Label();
+            TNaming_Iterator itL (aNShape);
+            for (; itL.More(); itL.Next()) {
+              const TopoDS_Shape& S = itL.NewShape();
+              if (S.IsNull()) continue;
+              if(aNShape->Evolution() == TNaming_SELECTED) {
+                if (itL.More() && itL.NewShape().ShapeType() != TopAbs_VERTEX &&
+                      !itL.OldShape().IsNull() && itL.OldShape().ShapeType() == TopAbs_VERTEX ) {//OR-N
+                  TopAbs_Orientation OrientationToApply = itL.OldShape().Orientation();
+                  aName.Orientation(OrientationToApply);
+			          }
+		          }
+		        }
+	        }
+	      }
+        if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() >= BIN_LDRIVERS_VERSION_7) {
+          ok = theSource >> anIndx;
+          TopAbs_Orientation OrientationToApply(TopAbs_FORWARD);
+          if(ok) {
+            OrientationToApply = (TopAbs_Orientation)anIndx;
+		        aName.Orientation(OrientationToApply);
+#ifdef OCCT_DEBUG
+	          std::cout << "NamingDriver:: Retrieved Orientation = " << OrientationToApply << " Ok = " << theSource.IsOK()  <<std::endl;
+#endif
+	        } else {
+              aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
+                                                "Cannot retrieve Name Orientation ");
+	            myMessageDriver->Send (aMsg, Message_Warning);
+	        }
+	      }
 	    }
-	}
-    if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() > 4 && 
-       theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() < 7) {
-          // Orientation processing - converting from old format
-      Handle(TNaming_NamedShape) aNShape;
-      if(anAtt->Label().FindAttribute(TNaming_NamedShape::GetID(), aNShape)) {
-            //const TDF_Label& aLab = aNS->Label();
-        TNaming_Iterator itL (aNShape);
-        for (; itL.More(); itL.Next()) {
-          const TopoDS_Shape& S = itL.NewShape();
-          if (S.IsNull()) continue;
-          if(aNShape->Evolution() == TNaming_SELECTED) {
-            if (itL.More() && itL.NewShape().ShapeType() != TopAbs_VERTEX &&
-                  !itL.OldShape().IsNull() && itL.OldShape().ShapeType() == TopAbs_VERTEX ) {//OR-N
-              TopAbs_Orientation OrientationToApply = itL.OldShape().Orientation();
-              aName.Orientation(OrientationToApply);
-			}
-		  }
-		}
-	  }
-	}
-    if(theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() > 6) {
-      ok = theSource >> anIndx;
-      TopAbs_Orientation OrientationToApply(TopAbs_FORWARD);
-      if(ok) {
-        OrientationToApply = (TopAbs_Orientation)anIndx;
-		aName.Orientation(OrientationToApply);
 #ifdef OCCT_DEBUG
-	    std::cout << "NamingDriver:: Retrieved Orientation = " << OrientationToApply << " Ok = " << theSource.IsOK()  <<std::endl;
+	    std::cout << "Current Document Format Version = " << theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() <<std::endl;      
 #endif
-	  } else {
-          aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
-                                            "Cannot retrieve Name Orientation ");
-	  myMessageDriver->Send (aMsg, Message_Warning);
 	  }
-	}
-	}
-#ifdef OCCT_DEBUG
-	      std::cout << "Current Document Format Version = " << theRelocTable.GetHeaderData()->StorageVersion().IntegerValue() <<std::endl;      
-#endif
-	}
   }
   return ok;
 }

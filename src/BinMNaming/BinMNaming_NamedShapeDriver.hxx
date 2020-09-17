@@ -80,6 +80,7 @@ public:
   //! get the format of topology
     BinTools_LocationSet& GetShapesLocations();
 
+  static const BinTools_FormatVersion THE_CURRENT_VERSION = BIN_TOOLS_VERSION_4;
 
 
 

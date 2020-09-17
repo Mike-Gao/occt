@@ -32,6 +32,13 @@ class TopoDS_Shape;
 class TopTools_LocationSet;
 class TCollection_AsciiString;
 
+enum TopTools_FormatVersion
+{
+  TOP_TOOLS_DEFAULT_VERSION = 0, 
+  TOP_TOOLS_VERSION_1 = 1, 
+  TOP_TOOLS_VERSION_2 = 2, 
+  TOP_TOOLS_VERSION_3 = 3
+};
 
 //! A ShapeSets    contains  a  Shape    and all   its
 //! sub-shapes and locations.  It  can be dump,  write
@@ -52,11 +59,11 @@ public:
   
   Standard_EXPORT void SetFormatNb (const Standard_Integer theFormatNb);
   
-  //! two formats available for the moment:
-  //! First: does not write CurveOnSurface UV Points into the file
-  //! on reading calls Check() method.
-  //! Second: stores CurveOnSurface UV Points.
-  //! On reading format is recognized from Version string.
+  //! 3 formats available for the moment:
+  //! VERSION_1: does not write CurveOnSurface UV Points into the file on reading calls Check() method.
+  //! VERSION_2: stores CurveOnSurface UV Points. On reading format is recognized from Version string.
+  //! VERSION_3: same as VERSION_2 but also stores per-vertex normal information 
+  //! in case of triangulation-only Faces, because no analytical geometry to restore normals
   Standard_EXPORT Standard_Integer FormatNb() const;
   
   //! Clears the content of the set.  This method can be
@@ -181,6 +188,10 @@ public:
   //! Returns number of shapes read from file.
   Standard_EXPORT Standard_Integer NbShapes() const;
 
+
+  static const TopTools_FormatVersion THE_CURRENT_VERSION = TOP_TOOLS_VERSION_3;
+
+
 private:
 
   //! Reads  from <IS>  a shape  and  returns  it in  S.
@@ -191,6 +202,7 @@ private:
   TopTools_IndexedMapOfShape myShapes;
   TopTools_LocationSet myLocations;
   Standard_Integer myFormatNb;
+  static Standard_CString Version_1, Version_2, Version_3;
 
 };
 

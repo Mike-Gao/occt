@@ -85,8 +85,18 @@ friend class HLRTest_OutLiner;
 };
 
 
+class HLRTest_SaveAndRestore : public Draw_SaveAndRestoreBase
+{
+public:
+  HLRTest_SaveAndRestore()
+    :Draw_SaveAndRestoreBase("HLRTest_Projector") {}
 
+  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& OS, TopTools_FormatVersion theVersion) const  override;
+  Handle(Draw_Drawable3D) Restore(std::istream& IS) const override;
+  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
+private:
 
+};
 
 
 

@@ -600,18 +600,19 @@ void HLRTest::Commands (Draw_Interpretor& theCommands)
 //purpose  : 
 //=======================================================================
 
-static Standard_Boolean stest(const Handle(Draw_Drawable3D)& d) 
+Standard_Boolean HLRTest_SaveAndRestore::Test(const Handle(Draw_Drawable3D)& theDrawable3D) const
 {
-  return d->IsInstance(STANDARD_TYPE(HLRTest_Projector));
+  return theDrawable3D->IsInstance(STANDARD_TYPE(HLRTest_Projector));
 }
 
 //=======================================================================
-//function : ssave
+//function : Draw_SaveAndRestoreHLRTest::Save
 //purpose  : 
 //=======================================================================
 
-static void ssave (const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void HLRTest_SaveAndRestore::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
 {
+  theVersion; // to suppress a warning
   Handle(HLRTest_Projector) HP =
     Handle(HLRTest_Projector)::DownCast(d);
 
@@ -639,15 +640,14 @@ static void ssave (const Handle(Draw_Drawable3D)&d, std::ostream& OS)
   OS << M(3,3) << " ";
   OS << V.Coord(3) << " ";
   OS << "\n";
-
 }
 
 //=======================================================================
-//function : srestore
+//function : Draw_SaveAndRestoreHLRTest::Restore
 //purpose  : 
 //=======================================================================
 
-static Handle(Draw_Drawable3D) srestore (std::istream& IS)
+Handle(Draw_Drawable3D) HLRTest_SaveAndRestore::Restore(std::istream& IS) const
 {
   Standard_Boolean pers;
   IS >> pers;
@@ -682,5 +682,5 @@ static Handle(Draw_Drawable3D) srestore (std::istream& IS)
 //purpose  : 
 //=======================================================================
 
-static Draw_SaveAndRestore ssr("HLRTest_Projector",stest,ssave,srestore);
+static HLRTest_SaveAndRestore saveAndRestoreHLRTest;
 
