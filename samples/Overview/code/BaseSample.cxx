@@ -29,6 +29,14 @@ const TCollection_AsciiString BaseSample::FILE_EXTENSION = "cxx";
 
 
 
+void BaseSample::Clear()
+{
+  myObject3d.Clear();
+  myObject2d.Clear();
+  myCode.Clear();
+  myResult.str("");
+}
+
 Standard_Boolean BaseSample::IsProcessed()
 {
   return myIsProcessed;
@@ -79,7 +87,7 @@ void BaseSample::SetCodePath(TCollection_AsciiString theSampleSourcePath)
 
 void BaseSample::TraceError(TCollection_AsciiString theErrorMessage)
 {
-  std::cerr << std::endl << "ERROR: " << theErrorMessage.ToCString();
+  std::cerr << std::endl << "ERROR: " << theErrorMessage.ToCString() << std::endl ;
   myResult << "\nERROR: " << theErrorMessage;
 }
 

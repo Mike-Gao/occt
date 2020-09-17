@@ -47,36 +47,47 @@ enum ToolActions
   ToolWireframe, ToolShading, ToolColor, ToolMaterial, ToolTransparency, ToolDelete
 };
 
+enum ApplicationType 
+{
+  Geometry,
+  Topology,
+  Triangulation,
+  DataExchange,
+  Ocaf,
+  Viewer2d,
+  Viewer3d,
+  Unknown
+};
+
+const QMap<ApplicationType, QString> ALL_CATEGORIES = 
+{ 
+  { ApplicationType::Geometry,"Geometry"}, 
+  { ApplicationType::Topology, "Topology"},
+  { ApplicationType::Triangulation, "Triangulation"},
+  { ApplicationType::DataExchange, "DataExchange"},
+  { ApplicationType::Ocaf, "OCAF"},
+  { ApplicationType::Viewer3d, "3D viewer"},
+  { ApplicationType::Viewer2d, "2D Viewer"}
+};
+
 class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
 {
     Q_OBJECT
 
 public:
-  enum ApplicationType {
-    Geometry,
-    Topology,
-    Triangulation,
-    DataExchange,
-    Ocaf,
-    Viewer2d,
-    Viewer3d,
-    Unknown
-  };
-  ApplicationCommonWindow(ApplicationType theSampleType);
+  ApplicationCommonWindow(ApplicationType theCategory);
 
+  ApplicationType GetApplicationType() { return myAppType; }
+  void SetApplicationType(ApplicationType theApplicationType) { myAppType = theApplicationType; }
 
-	static QString                  getResourceDir();
   static TCollection_AsciiString  getSampleSourceDir();
-  static ApplicationType          appTypeFromString(const QString& theParameter);
-
-  QAction* getToolAction(ToolActions theActionId);
-  QList<QAction*> getMaterialActions();
  	
 protected:
   virtual DocumentCommon* createNewDocument();
 
 public slots:
   virtual void    onAbout();
+  virtual void    onChangeCategory(const QString& theCategory);
 
 protected:
   template <typename PointerToMemberFunction>
@@ -109,8 +120,6 @@ private:
 
   ApplicationType myAppType;
 
-  QString GetTitle();
-
 	void createStandardOperations();
 
   QString selectFileName(const QString& theSampleName, TranslateDialog* theDialog, int& theMode);
@@ -122,6 +131,7 @@ private:
 
 
 	QMap<StdActions,               QAction*>  myStdActions;
+	QMap<ApplicationType,          QAction*>  myCategoryActions;
   QMap<ToolActions,              QAction*>  myToolActions;
   QMap<Graphic3d_NameOfMaterial, QAction*>  myMaterialActions;
 
@@ -129,6 +139,7 @@ private:
 	QToolBar*        myCasCadeBar;
 	QToolBar*        myViewBar;
 	QMenu*           myFilePopup;
+	QMenu*           myCategoryPopup;
 
   QList<QMenu*>    mySamplePopups;
   QSignalMapper*   mySampleMapper;
@@ -136,6 +147,8 @@ private:
   QSignalMapper*   myOcafMapper;
   QSignalMapper*   myViewer3dMapper;
   QSignalMapper*   myViewer2dMapper;
+
+  QSignalMapper*   myCatigoryMapper;
 
   QTextEdit*       myCodeView;
   QTextEdit*       myResultView;

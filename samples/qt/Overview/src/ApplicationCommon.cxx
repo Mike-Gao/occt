@@ -57,55 +57,21 @@
 
 static QMdiArea* stWs = 0;
 
-ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
-  : QMainWindow(nullptr),
-  myAppType(theSampleType),
+ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theCategory)
+  : QMainWindow(nullptr),  
   myStdToolBar(nullptr),
   myCasCadeBar(nullptr),
   myViewBar(nullptr),
   myFilePopup(nullptr)
 {
-  mySampleMapper = new QSignalMapper(this);
+  myAppType = theCategory;
+  mySampleMapper   = new QSignalMapper(this);
   myExchangeMapper = new QSignalMapper(this);
-  myOcafMapper = new QSignalMapper(this);
+  myOcafMapper     = new QSignalMapper(this);
   myViewer3dMapper = new QSignalMapper(this);
   myViewer2dMapper = new QSignalMapper(this);
 
-  setWindowTitle(GetTitle());
-
-  switch (myAppType) {
-  case Geometry:
-    mySamples = new GeometrySamples();
-    MenuFormJson(":/menus/Geometry.json", mySampleMapper);
-    break;
-  case Topology:
-    mySamples = new TopologySamples();
-    MenuFormJson(":/menus/Topology.json", mySampleMapper);
-    break;
-  case Triangulation:
-    mySamples = new TriangulationSamples();
-    MenuFormJson(":/menus/Triangulation.json", mySampleMapper);
-    break;
-  case DataExchange:
-    mySamples = new DataExchangeSamples();
-    MenuFormJson(":/menus/DataExchange.json", myExchangeMapper);
-    break;
-  case Ocaf:
-    mySamples = new OcafSamples();
-    MenuFormJson(":/menus/Ocaf.json", myOcafMapper);
-    break;
-  case Viewer3d:
-    mySamples = new Viewer3dSamples();
-    MenuFormJson(":/menus/Viewer3d.json", myViewer3dMapper);
-    break;
-  case Viewer2d:
-    mySamples = new Viewer2dSamples();
-    MenuFormJson(":/menus/Viewer2d.json", myViewer2dMapper);
-    break;
-  default:
-    setWindowTitle("Unknown application");
-    return;
-  }
+  myCatigoryMapper = new QSignalMapper(this);
 
   connect(mySampleMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
     this, &ApplicationCommonWindow::onProcessSample);
@@ -117,8 +83,9 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
     this, &ApplicationCommonWindow::onProcessViewer3d);
   connect(myViewer2dMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
     this, &ApplicationCommonWindow::onProcessViewer2d);
-  TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
-  mySamples->SetCodePath(aSampleSourcePach);
+
+  connect(myCatigoryMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped),
+    this, &ApplicationCommonWindow::onChangeCategory);
 
   setFocusPolicy(Qt::StrongFocus);
 
@@ -174,6 +141,101 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
 
   Q_INIT_RESOURCE(Samples);
 
+  onChangeCategory(ALL_CATEGORIES[myAppType]);
+
+  resize(1280, 560);
+}
+
+void ApplicationCommonWindow::createStandardOperations()
+{
+  menuBar()->clear(); 
+
+  myStdActions[FileQuit] = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "Quit", "CTRL+Q");
+  myStdActions[HelpAbout] = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", ":/icons/help.png");
+
+  // populate a menu with all actions
+  myFilePopup = new QMenu(this);
+  myFilePopup = menuBar()->addMenu(tr("&File"));
+  myFilePopup->addAction(myStdActions[FileQuit]);
+
+  myCategoryPopup = new QMenu(this);
+  myCategoryPopup = menuBar()->addMenu(tr("&Category"));
+
+  for (ApplicationType aCategory: ALL_CATEGORIES.keys())
+  {
+    QString aCategoryName = ALL_CATEGORIES.value(aCategory);
+    QAction* anAction = myCategoryPopup->addAction(aCategoryName);
+    anAction->setText(aCategoryName);
+    myCatigoryMapper->setMapping(anAction, aCategoryName);
+    connect(anAction, &QAction::triggered, myCatigoryMapper, static_cast<void (QSignalMapper::*)()>(&QSignalMapper::map));
+    myCategoryPopup->addAction(anAction);
+    myCategoryActions.insert(aCategory, anAction);
+  }
+
+  for (QMenu* aSampleMenu : mySamplePopups) 
+    menuBar()->addMenu(aSampleMenu);
+
+  // add a help menu
+  QMenu * help = new QMenu(this);
+  menuBar()->addSeparator();
+  help = menuBar()->addMenu(tr("&Help"));
+  help->addAction(myStdActions[HelpAbout]);
+}
+
+DocumentCommon* ApplicationCommonWindow::createNewDocument()
+{
+  return new DocumentCommon(this);
+}
+
+void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
+{
+  myAppType = ALL_CATEGORIES.key(theCategory);
+  setWindowTitle(ALL_CATEGORIES[myAppType]);
+
+  switch (ALL_CATEGORIES.key(theCategory))
+  {
+  case Geometry:
+    mySamples = new GeometrySamples();
+    MenuFormJson(":/menus/Geometry.json", mySampleMapper);
+    break;
+  case Topology:
+    mySamples = new TopologySamples();
+    MenuFormJson(":/menus/Topology.json", mySampleMapper);
+    break;
+  case Triangulation:
+    mySamples = new TriangulationSamples();
+    MenuFormJson(":/menus/Triangulation.json", mySampleMapper);
+    break;
+  case DataExchange:
+    mySamples = new DataExchangeSamples();
+    MenuFormJson(":/menus/DataExchange.json", myExchangeMapper);
+    break;
+  case Ocaf:
+    mySamples = new OcafSamples();
+    MenuFormJson(":/menus/Ocaf.json", myOcafMapper);
+    break;
+  case Viewer3d:
+    mySamples = new Viewer3dSamples();
+    MenuFormJson(":/menus/Viewer3d.json", myViewer3dMapper);
+    break;
+  case Viewer2d:
+    mySamples = new Viewer2dSamples();
+    MenuFormJson(":/menus/Viewer2d.json", myViewer2dMapper);
+    break;
+  default:
+    setWindowTitle("Unknown application");
+    return;
+  }
+  TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
+  mySamples->SetCodePath(aSampleSourcePach);
+
+  mySamples->Clear();
+  myDocument3d->SetObjects(mySamples->Get3dObjects());
+  myDocument2d->SetObjects(mySamples->Get2dObjects());
+  myCodeView->setPlainText("");
+  myResultView->setPlainText("");
+  myGeomWidget->FitAll();
+
   createStandardOperations();
 
   if (myAppType == DataExchange) {
@@ -215,89 +277,6 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theSampleType)
       myGeomWidget->Show2d();
     }
   }
-
-  resize(1280, 560);
-}
-
-ApplicationCommonWindow::ApplicationType ApplicationCommonWindow::appTypeFromString(const QString& theParameter)
-{
-  QString aParam = theParameter.toLower();
-  if (aParam == "geometry")
-    return Geometry;
-  else if (aParam == "topology")
-    return Topology;
-  else if (aParam == "triangulation")
-    return Triangulation;
-  else if (aParam == "dataexchange")
-    return DataExchange;
-  else if (aParam == "ocaf")
-    return Ocaf;
-  else  if (aParam == "viewer3d")
-    return Viewer3d;
-  else  if (aParam == "viewer2d")
-    return Viewer2d;
-  else
-    return Unknown;
-}
-
-QString ApplicationCommonWindow::GetTitle()
-{
-  switch (myAppType) {
-  case Geometry:
-    return "Geometry";
-  case Topology:
-    return "Topology";
-  case Triangulation:
-    return "Triangulation";
-  case DataExchange:
-    return "DataExchange";
-  case Ocaf:
-    return "OCAF";
-  case Viewer3d:
-    return "3D viewer";
-  case Viewer2d:
-    return "2D Viewer";
-  default:
-    return "Unknown application";
-  }
-}
-
-void ApplicationCommonWindow::createStandardOperations()
-{
-  myStdActions[FileQuit] = CreateAction(&ApplicationCommonWindow::onCloseAllWindows, "Quit", "CTRL+Q");
-  myStdActions[HelpAbout] = CreateAction(&ApplicationCommonWindow::onAbout, "About", "F1", ":/icons/help.png");
-
-  // populate a menu with all actions
-  myFilePopup = new QMenu(this);
-  myFilePopup = menuBar()->addMenu(tr("&File"));
-  myFilePopup->addAction(myStdActions[FileQuit]);
-
-  for (QMenu* aSampleMenu : mySamplePopups) {
-    menuBar()->addMenu(aSampleMenu);
-  }
-
-  // add a help menu
-  QMenu * help = new QMenu(this);
-  menuBar()->addSeparator();
-  help = menuBar()->addMenu(tr("&Help"));
-  help->addAction(myStdActions[HelpAbout]);
-}
-
-QAction*  ApplicationCommonWindow::getToolAction(ToolActions theAction)
-{
-  return myToolActions[theAction];
-}
-
-QList<QAction*> ApplicationCommonWindow::getMaterialActions()
-{
-  return myMaterialActions.values();
-}
-
-
-
-DocumentCommon* ApplicationCommonWindow::createNewDocument()
-{
-  return new DocumentCommon(this);
 }
 
 void ApplicationCommonWindow::onAbout()
@@ -305,16 +284,6 @@ void ApplicationCommonWindow::onAbout()
   QMessageBox::information(this, tr("Overview"),
     tr("Qt based application to study OpenCASCADE Technology"),
     tr("Ok"), QString::null, QString::null, 0, 0);
-}
-
-QString ApplicationCommonWindow::getResourceDir()
-{
-  static QString aResourceDir =
-    QString(OSD_Environment("CSF_ResourcesDefaults").Value().ToCString());
-  if (aResourceDir.isEmpty())
-    aResourceDir = QString(OSD_Environment("CSF_OCCTResourcePath").Value().ToCString()) + "/samples";
-
-  return aResourceDir;
 }
 
 TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
@@ -374,7 +343,7 @@ QToolBar* ApplicationCommonWindow::getCasCadeBar()
 void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  setWindowTitle(GetTitle() + " - " + theSampleName);
+  setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   mySamples->Process(theSampleName.toUtf8().data());
   myDocument3d->SetObjects(mySamples->Get3dObjects());
   myDocument2d->SetObjects(mySamples->Get2dObjects());
@@ -386,7 +355,7 @@ void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 
 void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
 {
-  setWindowTitle(GetTitle() + " - " + theSampleName);
+  setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   int aMode;
   QString aFileName = selectFileName(theSampleName, getDataExchangeDialog(theSampleName), aMode);
   if (aFileName.isEmpty())
@@ -409,7 +378,7 @@ void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
 
 void ApplicationCommonWindow::onProcessOcaf(const QString& theSampleName)
 {
-  setWindowTitle(GetTitle() + " - " + theSampleName);
+  setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
   if (aOcafSamples) {
     if (theSampleName.indexOf("Dialog") == 0) {
@@ -430,7 +399,7 @@ void ApplicationCommonWindow::onProcessOcaf(const QString& theSampleName)
 
 void ApplicationCommonWindow::onProcessViewer3d(const QString& theSampleName)
 {
-  setWindowTitle(GetTitle() + " - " + theSampleName);
+  setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
   if (aViewer3dSamples) {
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -444,7 +413,7 @@ void ApplicationCommonWindow::onProcessViewer3d(const QString& theSampleName)
 
 void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
 {
-  setWindowTitle(GetTitle() + " - " + theSampleName);
+  setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
   if (aViewer2dSamples) {
     Standard_Boolean anIsFileSample = Viewer2dSamples::IsFileSample(theSampleName.toUtf8().data());
@@ -588,19 +557,6 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
     for (const QString& aBranchKey : aBranchObject.keys()) {
       aMenu->addMenu(MenuFromJsonObject(aBranchObject.value(aBranchKey), aBranchKey, aMenu, theMapper));
     }
-    //QList< QPair<QString, QMenu*> >  aMenuList;
-    //for(const QString& aBranchKey: aBranchObject.keys())
-    //{
-
-    //  aMenuList.append(QPair<QString, QMenu*>(aBranchKey, MenuFromJsonObject(aBranchObject.value(aBranchKey), aBranchKey, aMenu)));
-    //}
-    //qSort(aMenuList.begin(), aMenuList.end(), [](MyClass& a, MyClass& b) { return a.a < b.a; });
-    //for(QPair<QString, QMenu*> aMenuPair : aMenuList)
-    //{
-    //  aMenu->addMenu(aMenuPair.second);
-    //}
-
-
   }
   else if (theJsonValue.isArray()) {
     QJsonArray aDataArray = theJsonValue.toArray();
@@ -624,6 +580,7 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
 
 void ApplicationCommonWindow::MenuFormJson(const QString & thePath, QSignalMapper* theMapper)
 {
+  mySamplePopups.clear();
   QFile aJsonFile(thePath);
   QString anErrorMessage;
   if (aJsonFile.error() != QFile::NoError)
@@ -634,7 +591,7 @@ void ApplicationCommonWindow::MenuFormJson(const QString & thePath, QSignalMappe
   }
   if (!aJsonFile.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-    std::cout << "File " << theMapper << " could not open";
+    std::cout << "File " << thePath.toStdString() << " could not open";
     if (aJsonFile.error() != QFile::NoError)
     {
       anErrorMessage = aJsonFile.errorString();

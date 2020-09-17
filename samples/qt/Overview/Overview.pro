@@ -2,7 +2,6 @@ TEMPLATE = app
 CONFIG += debug_and_release qt
 CONFIG += lrelease
 CONFIG += embed_translations
-CONFIG += console
 QT += widgets
 
 TARGET = Overview

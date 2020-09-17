@@ -28,6 +28,7 @@ DEFINE_STANDARD_HANDLE(BaseSample, Standard_Transient)
 class BaseSample: public Standard_Transient
 {
 public:
+  void Clear();
 	Standard_Boolean                                  IsProcessed();
   const NCollection_Vector<Handle(AIS_InteractiveObject)>& Get2dObjects();
   const NCollection_Vector<Handle(AIS_InteractiveObject)>& Get3dObjects();

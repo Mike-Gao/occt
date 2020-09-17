@@ -18,6 +18,7 @@
 #include <Standard_WarningsRestore.hxx>
 
 #include <QApplication>
+#include <QSettings>
 #include <QTranslator>
 #include <QLocale>
 #include <QStringList>
@@ -26,42 +27,44 @@
 int main ( int argc, char* argv[] )
 {
   Q_INIT_RESOURCE(Overview);
+
 	QApplication aQApp( argc, argv );
 
-  ApplicationCommonWindow::ApplicationType anAppType = ApplicationCommonWindow::Unknown;
-  if (argc == 2) {
-    anAppType = ApplicationCommonWindow::appTypeFromString(argv[1]);
-    if (anAppType == ApplicationCommonWindow::Unknown) {
-      std::cout << "Wrong application type. Use the one of following options:" << std::endl;
-      std::cout << "Geometry | Topology | Triangulation | DataExchange | Ocaf | Viewer2d | Viewer3d" << std::endl;
-    }
-  }
+  QSettings settings("Overview.conf", QSettings::IniFormat);
+  settings.beginGroup("ApplicationSetting");
+    ApplicationType aCategory = static_cast<ApplicationType>(settings.value("ApplicationType", "").toInt());
+  settings.endGroup();
 
-  int aChoise = 0;
-  while (1) {
-    if (anAppType != ApplicationCommonWindow::Unknown) {
-      ApplicationCommonWindow* mw = new ApplicationCommonWindow(anAppType);
-      QString aResName(":/icons/lamp.png");
-      mw->setWindowIcon(QPixmap(aResName));
-      mw->show();
-      return aQApp.exec();
-    }
-    std::cout << "Select a tutorial number:" << std::endl;
-    std::cout << "1. Geometry" << std::endl;
-    std::cout << "2. Topology" << std::endl;
-    std::cout << "3. Triangulation" << std::endl;
-    std::cout << "4. Data Exchange" << std::endl;
-    std::cout << "5. OCAF" << std::endl;
-    std::cout << "6. Viewer2d" << std::endl;
-    std::cout << "7. Viewer3d" << std::endl;
-    std::cout << "0. Exit" << std::endl;
-    std::cout << "> ";
-    std::cin >> aChoise;
-    if (aChoise == 0)
-      return 0;
-    if ((aChoise < 1) || (aChoise > 7))
-      anAppType = ApplicationCommonWindow::Unknown;
-    else
-      anAppType = (ApplicationCommonWindow::ApplicationType) (aChoise - 1);
+  ApplicationCommonWindow* aWindow = new ApplicationCommonWindow(aCategory);
+  QString aResName(":/icons/lamp.png");
+  aWindow->setWindowIcon(QPixmap(aResName));
+
+  settings.beginGroup("WindowPosition");
+    int x = settings.value("x", -1).toInt();
+    int y = settings.value("y", -1).toInt();
+    int width = settings.value("width", -1).toInt();
+    int height = settings.value("height", -1).toInt();
+  settings.endGroup();
+
+  if (x > 0 && y > 0 && width > 0 && height > 0) 
+  {
+    aWindow->setGeometry(x, y, width, height);
   }
+  aWindow->SetApplicationType(aCategory);
+
+  aWindow->show();
+  int result = aQApp.exec();
+
+  settings.beginGroup("WindowPosition");
+    settings.setValue("x", aWindow->x());
+    settings.setValue("y", aWindow->y());
+    settings.setValue("width", aWindow->width());
+    settings.setValue("height", aWindow->height());
+  settings.endGroup();
+
+  settings.beginGroup("ApplicationSetting");
+    settings.setValue("ApplicationType", aWindow->GetApplicationType());
+  settings.endGroup();
+
+  return result;
 }
