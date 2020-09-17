@@ -1,0 +1,15 @@
+puts "============================================================================================="
+puts "0031562: Mesh - A surface mesh problem"
+puts "============================================================================================="
+puts ""
+
+restore [locate_data_file bug31562.brep] a
+
+fixshape result a
+checkshape result
+
+vinit
+vdisplay result
+vfit
+
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png
