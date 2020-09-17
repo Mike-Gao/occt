@@ -1422,21 +1422,29 @@ void  DrawTrSurf::BasicCommands(Draw_Interpretor& theCommands)
 
 
 //=================================================================
-// save and restore curves
+// class : DrawTrSurf_SaveAndRestoreCurve
 //=================================================================
 
-static Standard_Boolean ctest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreCurve : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreCurve()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Curve") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Curve));
 }
 
-static void csave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
 {
+  (void)theVersion;
   Handle(DrawTrSurf_Curve) N = Handle(DrawTrSurf_Curve)::DownCast(d);
   GeomTools_CurveSet::PrintCurve(N->GetCurve(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) crestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_Curve) G = GeomTools_CurveSet::ReadCurve(is);
   Handle(DrawTrSurf_Curve) N = 
@@ -1444,30 +1452,35 @@ static Handle(Draw_Drawable3D) crestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore csr("DrawTrSurf_Curve",
-			       ctest,csave,crestore);
-
-
-
+static DrawTrSurf_SaveAndRestoreCurve saveAndRestoreCurve;
 
 //=================================================================
-// save and restore bezier curves
+// class : DrawTrSurf_SaveAndRestoreBezierCurve
 //=================================================================
 
-static Standard_Boolean bzctest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreBezierCurve : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBezierCurve()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BezierCurve") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BezierCurve));
 }
 
-static void bzcsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void)theVersion;
   Handle(DrawTrSurf_BezierCurve) 
     N = Handle(DrawTrSurf_BezierCurve)::DownCast(d);
   GeomTools_CurveSet::PrintCurve(N->GetCurve(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) bzcrestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_BezierCurve) G = 
     Handle(Geom_BezierCurve)::DownCast (GeomTools_CurveSet::ReadCurve(is));
@@ -1477,30 +1490,35 @@ static Handle(Draw_Drawable3D) bzcrestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore bzcsr("DrawTrSurf_BezierCurve",
-			       bzctest,bzcsave,bzcrestore);
-
-
-
+static DrawTrSurf_SaveAndRestoreBezierCurve saveAndRestoreBezierCurve;
 
 //=================================================================
-// save and restore bspline curves
+// class : DrawTrSurf_SaveAndRestoreBSplineCurve
 //=================================================================
 
-static Standard_Boolean bsctest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreBSplineCurve : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBSplineCurve()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineCurve") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BSplineCurve));
 }
 
-static void bscsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_BSplineCurve) 
     N = Handle(DrawTrSurf_BSplineCurve)::DownCast(d);
   GeomTools_CurveSet::PrintCurve(N->GetCurve(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) bscrestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_BSplineCurve) G =
     Handle(Geom_BSplineCurve)::DownCast (GeomTools_CurveSet::ReadCurve(is));
@@ -1513,27 +1531,34 @@ static Handle(Draw_Drawable3D) bscrestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore bscsr("DrawTrSurf_BSplineCurve",
-			       bsctest,bscsave,bscrestore);
-
+static DrawTrSurf_SaveAndRestoreBSplineCurve saveAndRestoreBSplineCurve;
 
 //=================================================================
-// save and restore curves 2d
+// class : DrawTrSurf_SaveAndRestoreCurve2d
 //=================================================================
 
-static Standard_Boolean c2dtest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreCurve2d()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Curve2d") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Curve2d));
 }
 
-static void c2dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_Curve2d) N = Handle(DrawTrSurf_Curve2d)::DownCast(d);
   GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) c2drestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom2d_Curve) G = GeomTools_Curve2dSet::ReadCurve2d(is);
   Handle(DrawTrSurf_Curve2d) N = 
@@ -1541,30 +1566,35 @@ static Handle(Draw_Drawable3D) c2drestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore c2dsr("DrawTrSurf_Curve2d",
-			       c2dtest,c2dsave,c2drestore);
-
-
-
+static DrawTrSurf_SaveAndRestoreCurve2d saveAndRestoreCurve2d;
 
 //=================================================================
-// save and restore bezier curves 2d
+// class : DrawTrSurf_SaveAndRestoreBezierCurve2d
 //=================================================================
 
-static Standard_Boolean bzc2dtest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreBezierCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBezierCurve2d()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BezierCurve2d") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BezierCurve2d));
 }
 
-static void bzc2dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_BezierCurve2d) 
     N = Handle(DrawTrSurf_BezierCurve2d)::DownCast(d);
   GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) bzc2drestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom2d_BezierCurve) G =
     Handle(Geom2d_BezierCurve)::DownCast (GeomTools_Curve2dSet::ReadCurve2d(is));
@@ -1574,30 +1604,35 @@ static Handle(Draw_Drawable3D) bzc2drestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore bzc2dsr("DrawTrSurf_BezierCurve2d",
-			       bzc2dtest,bzc2dsave,bzc2drestore);
-
-
-
+static DrawTrSurf_SaveAndRestoreBezierCurve2d saveAndRestoreBezierCurve2d;
 
 //=================================================================
-// save and restore bspline curves 2d
+// class : DrawTrSurf_SaveAndRestoreBSplineCurve2d
 //=================================================================
 
-static Standard_Boolean bsc2dtest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreBSplineCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBSplineCurve2d()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineCurve2d") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BSplineCurve2d));
 }
 
-static void bsc2dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_BSplineCurve2d) 
     N = Handle(DrawTrSurf_BSplineCurve2d)::DownCast(d);
   GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) bsc2drestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom2d_BSplineCurve) G =
     Handle(Geom2d_BSplineCurve)::DownCast (GeomTools_Curve2dSet::ReadCurve2d(is));
@@ -1610,27 +1645,33 @@ static Handle(Draw_Drawable3D) bsc2drestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore bsc2dsr("DrawTrSurf_BSplineCurve2d",
-			       bsc2dtest,bsc2dsave,bsc2drestore);
-
+static DrawTrSurf_SaveAndRestoreBSplineCurve2d saveAndRestoreBSplineCurve2d;
 
 //=================================================================
-// save and restore surfaces
+// class : DrawTrSurf_SaveAndRestoreSurface
 //=================================================================
+class DrawTrSurf_SaveAndRestoreSurface : public Draw_SaveAndRestoreBase
+{
+public:
 
-static Standard_Boolean stest(const Handle(Draw_Drawable3D)& d) 
+DrawTrSurf_SaveAndRestoreSurface()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Surface") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Surface));
 }
 
-static void ssave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_Surface) N = Handle(DrawTrSurf_Surface)::DownCast(d);
   GeomTools_SurfaceSet::PrintSurface(N->GetSurface(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) srestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_Surface) G = GeomTools_SurfaceSet::ReadSurface(is);
   Handle(DrawTrSurf_Surface) N = 
@@ -1641,30 +1682,35 @@ static Handle(Draw_Drawable3D) srestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore ssr("DrawTrSurf_Surface",
-			       stest,ssave,srestore);
-
-
-
+static DrawTrSurf_SaveAndRestoreSurface saveAndRestoreSurface;
 
 //=================================================================
-// save and restore bezier surfaces
+// class : DrawTrSurf_SaveAndRestoreBezierSurface
 //=================================================================
 
-static Standard_Boolean bzstest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreBezierSurface : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBezierSurface()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BezierSurface") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BezierSurface));
 }
 
-static void bzssave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_BezierSurface) 
     N = Handle(DrawTrSurf_BezierSurface)::DownCast(d);
   GeomTools_SurfaceSet::PrintSurface(N->GetSurface(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) bzsrestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_BezierSurface) G =
     Handle(Geom_BezierSurface)::DownCast (GeomTools_SurfaceSet::ReadSurface(is));
@@ -1676,30 +1722,35 @@ static Handle(Draw_Drawable3D) bzsrestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore bzssr("DrawTrSurf_BezierSurface",
-			       bzstest,bzssave,bzsrestore);
-
-
-
+static DrawTrSurf_SaveAndRestoreBezierSurface saveAndRestoreBezierSurface;
 
 //=================================================================
-// save and restore bspline surfaces
+// class : DrawTrSurf_SaveAndRestoreBSplineSurface
 //=================================================================
 
-static Standard_Boolean bsstest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreBSplineSurface : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBSplineSurface()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineSurface") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BSplineSurface));
 }
 
-static void bsssave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_BSplineSurface) 
     N = Handle(DrawTrSurf_BSplineSurface)::DownCast(d);
   GeomTools_SurfaceSet::PrintSurface(N->GetSurface(),OS,Standard_True);
 }
 
-static Handle(Draw_Drawable3D) bssrestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_BSplineSurface) G =
     Handle(Geom_BSplineSurface)::DownCast (GeomTools_SurfaceSet::ReadSurface(is));
@@ -1723,22 +1774,29 @@ static Handle(Draw_Drawable3D) bssrestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore bsssr("DrawTrSurf_BSplineSurface",
-			       bsstest,bsssave,bssrestore);
-
+static DrawTrSurf_SaveAndRestoreBSplineSurface saveAndRestoreBSplineSurface;
 
 //=================================================================
-// save and restore points
+// class : DrawTrSurf_SaveAndRestorePoint
 //=================================================================
 
-static Standard_Boolean pnttest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestorePoint : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestorePoint()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Point") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Point));
 }
 
-static void pntsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_Point) 
     N = Handle(DrawTrSurf_Point)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1766,7 +1824,7 @@ static void pntsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
 #endif
 }
 
-static Handle(Draw_Drawable3D) pntrestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Standard_Integer is3d;
   is >> is3d;
@@ -1784,23 +1842,29 @@ static Handle(Draw_Drawable3D) pntrestore (std::istream& is)
   return N;
 }
 
+};
 
-static Draw_SaveAndRestore pntsr("DrawTrSurf_Point",
-			       pnttest,pntsave,pntrestore);
-
-
+static DrawTrSurf_SaveAndRestorePoint saveAndRestorePoint;
 
 //=================================================================
-// save and restore triangulation
+// class : DrawTrSurf_SaveAndRestoreTriangulation
 //=================================================================
 
-static Standard_Boolean triatest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestoreTriangulation : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreTriangulation()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Triangulation") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Triangulation));
 }
 
-static void triasave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_Triangulation) 
     T = Handle(DrawTrSurf_Triangulation)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1820,28 +1884,36 @@ static void triasave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
 #endif
 }
 
-static Handle(Draw_Drawable3D) triarestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   return new DrawTrSurf_Triangulation(Poly::ReadTriangulation(is));
 }
 
+};
 
-static Draw_SaveAndRestore triasr("DrawTrSurf_Triangulation",
-			       triatest,triasave,triarestore);
+static DrawTrSurf_SaveAndRestoreTriangulation saveAndRestoreTriangulation;
 
 
 
 //=================================================================
-// save and restore polygon3d
+// class : DrawTrSurf_SaveAndRestorePolygon3D
 //=================================================================
 
-static Standard_Boolean poly3dtest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestorePolygon3D : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestorePolygon3D()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Polygon3D") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Polygon3D));
 }
 
-static void poly3dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_Polygon3D) 
     T = Handle(DrawTrSurf_Polygon3D)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1861,27 +1933,34 @@ static void poly3dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
 #endif
 }
 
-static Handle(Draw_Drawable3D) poly3drestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   return new DrawTrSurf_Polygon3D(Poly::ReadPolygon3D(is));
 }
 
+};
 
-static Draw_SaveAndRestore poly3dsr("DrawTrSurf_Polygon3D",
-			       poly3dtest,poly3dsave,poly3drestore);
-
+static DrawTrSurf_SaveAndRestorePolygon3D saveAndRestorePolygon3D;
 
 //=================================================================
-// save and restore polygon2d
+// class : DrawTrSurf_SaveAndRestorePolygon2D
 //=================================================================
 
-static Standard_Boolean poly2dtest(const Handle(Draw_Drawable3D)& d) 
+class DrawTrSurf_SaveAndRestorePolygon2D : public Draw_SaveAndRestoreBase
 {
-  return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Polygon2D));
+public:
+
+DrawTrSurf_SaveAndRestorePolygon2D()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Polygon2D") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
+{
+return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Polygon2D));
 }
 
-static void poly2dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(DrawTrSurf_Polygon2D) 
     T = Handle(DrawTrSurf_Polygon2D)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1901,12 +1980,12 @@ static void poly2dsave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
 #endif
 }
 
-static Handle(Draw_Drawable3D) poly2drestore (std::istream& is)
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   return new DrawTrSurf_Polygon2D(Poly::ReadPolygon2D(is));
 }
 
+};
 
-static Draw_SaveAndRestore poly2dsr("DrawTrSurf_Polygon2D",
-			       poly2dtest,poly2dsave,poly2drestore);
+static DrawTrSurf_SaveAndRestorePolygon2D saveAndRestorePolygon2D;
 

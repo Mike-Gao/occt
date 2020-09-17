@@ -596,22 +596,23 @@ void HLRTest::Commands (Draw_Interpretor& theCommands)
 }
 
 //=======================================================================
-//function : save and restore projector
-//purpose  : 
+// class : HLRTest_SaveAndRestore
 //=======================================================================
+class HLRTest_SaveAndRestore : public Draw_SaveAndRestoreBase
+{
+public:
 
-static Standard_Boolean stest(const Handle(Draw_Drawable3D)& d) 
+HLRTest_SaveAndRestore()
+  :Draw_SaveAndRestoreBase("HLRTest_Projector") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(HLRTest_Projector));
 }
 
-//=======================================================================
-//function : ssave
-//purpose  : 
-//=======================================================================
-
-static void ssave (const Handle(Draw_Drawable3D)&d, std::ostream& OS)
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
 {
+  (void) theVersion;
   Handle(HLRTest_Projector) HP =
     Handle(HLRTest_Projector)::DownCast(d);
 
@@ -642,12 +643,7 @@ static void ssave (const Handle(Draw_Drawable3D)&d, std::ostream& OS)
 
 }
 
-//=======================================================================
-//function : srestore
-//purpose  : 
-//=======================================================================
-
-static Handle(Draw_Drawable3D) srestore (std::istream& IS)
+Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
 {
   Standard_Boolean pers;
   IS >> pers;
@@ -677,10 +673,7 @@ static Handle(Draw_Drawable3D) srestore (std::istream& IS)
   return HP;
 }
 
-//=======================================================================
-//function : ssr
-//purpose  : 
-//=======================================================================
+};
 
-static Draw_SaveAndRestore ssr("HLRTest_Projector",stest,ssave,srestore);
+static HLRTest_SaveAndRestore saveAndRestoreHLRTest;
 

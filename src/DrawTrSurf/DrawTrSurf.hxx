@@ -25,6 +25,7 @@
 #include <Geom_Geometry.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom2d_Curve.hxx>
+#include <Draw_SaveAndRestore.hxx>
 
 class gp_Pnt;
 class gp_Pnt2d;
