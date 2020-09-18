@@ -25,6 +25,7 @@
 #include <BVH_BoxSet.hxx>
 #include <BVH_IndexedBoxSet.hxx>
 #include <BVH_Traverse.hxx>
+#include <Extrema_HArray2OfPOnSurf.hxx>
 #include <Extrema_HArray2OfPOnSurfParams.hxx>
 #include <Extrema_FuncPSNorm.hxx>
 #include <Extrema_POnSurfParams.hxx>
@@ -395,6 +396,7 @@ protected: //! @name Fields
   // Intermediate data
 
   Handle(Extrema_HArray2OfPOnSurfParams) myPoints; //!< Grid points
+  Handle(Extrema_HArray2OfPOnSurf) myMidPoints;    //!< Points in the middle of the cell
   Handle(TColStd_HArray1OfReal) myUParams;         //!< Grid parameters in U parametric direction
   Handle(TColStd_HArray1OfReal) myVParams;         //!< Grid parameters in V parametric direction
 

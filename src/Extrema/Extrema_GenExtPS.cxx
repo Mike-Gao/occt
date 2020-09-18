@@ -263,25 +263,16 @@ void Extrema_GenExtPS::Perform (const gp_Pnt& thePoint,
   if (myTarget == Extrema_ExtFlag_MIN)
     mySqDistance = RealLast();
   else if (myTarget == Extrema_ExtFlag_MAX)
-    mySqDistance = -1;
+    mySqDistance = -1.;
 
   // Fill Square distances with default values
-  for (int iU = 0; iU <= myNbUSamples + 1; ++iU)
+  Handle(Extrema_HArray2OfPOnSurfParams) anArrays[] = 
+    { myPoints, myFacePntParams, myUEdgePntParams, myVEdgePntParams };
+  for (Standard_Integer i = 0; i < 4; ++i)
   {
-    for (int iV = 0; iV <= myNbVSamples + 1; ++iV)
+    for (Extrema_Array2OfPOnSurfParams::Iterator it (anArrays[i]->Array2()); it.More(); it.Next())
     {
-      myPoints->ChangeValue (iU, iV).SetSqrDistance (-1.);
-
-      if (iU <= myNbUSamples && iV <= myNbVSamples)
-        myFacePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
-
-      if (iU > 0 && iU <= myNbUSamples && iV > 0 && iV <= myNbVSamples)
-      {
-        if (iU < myNbUSamples)
-          myUEdgePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
-        if (iV < myNbVSamples)
-          myVEdgePntParams->ChangeValue (iU, iV).SetSqrDistance (-1.);
-      }
+      it.ChangeValue().SetSqrDistance (-1.);
     }
   }
 
@@ -368,9 +359,13 @@ void Extrema_GenExtPS::BuildGrid()
   }
 
   myPoints = new Extrema_HArray2OfPOnSurfParams (0, myNbUSamples + 1, 0, myNbVSamples + 1);
+  myMidPoints = new Extrema_HArray2OfPOnSurf (1, myNbUSamples, 1, myNbVSamples);
+
   for (int iU = 1; iU <= myNbUSamples; iU++)
   {
     Standard_Real U = myUParams->Value (iU);
+    Standard_Integer aUCoeff = (iU < myNbUSamples) ? 1 : 0;
+    Standard_Real UMax = aUCoeff ? myUParams->Value (iU + aUCoeff) : U;
     for (int iV = 1; iV <= myNbVSamples; iV++)
     {
       Standard_Real V = myVParams->Value (iV);
@@ -379,6 +374,18 @@ void Extrema_GenExtPS::BuildGrid()
       aParam.SetElementType (Extrema_Node);
       aParam.SetIndices (iU, iV);
       myPoints->SetValue (iU, iV, aParam);
+
+      if (myTarget != Extrema_ExtFlag_MINMAX)
+      {
+        Standard_Integer aVCoeff = (iV < myNbVSamples) ? 1 : 0;
+        if (aUCoeff != 0 || aVCoeff != 0)
+        {
+          Standard_Real VMax = aVCoeff ? myVParams->Value (iV + aVCoeff) : V;
+          Standard_Real UMid = (U + UMax) * 0.5, VMid = (V + VMax) * 0.5;
+          gp_Pnt aPMid = myS->Value (UMid, VMid);
+          myMidPoints->SetValue (iU, iV, Extrema_POnSurf (UMid, VMid, aPMid));
+        }
+      }
     }
   }
 
@@ -468,17 +475,13 @@ void Extrema_GenExtPS::BuildTree()
             aGridBox.Add (myPoints->Value (iU + i * aUCoeff, iV + j * aVCoeff).Value());
         aGridBox.Enlarge (Precision::Confusion());
 
-        const Extrema_POnSurf& aPMin = myPoints->Value (iU, iV);
-        const Extrema_POnSurf& aPMax = myPoints->Value (iU + aUCoeff, iV + aVCoeff);
-
-        Standard_Real U1, V1, U2, V2;
-        aPMin.Parameter (U1, V1);
-        aPMax.Parameter (U2, V2);
-
         // Enlarge box to make sure the whole cell is covered
-        if (U1 != U2 || V1 != V2)
+        if (aUCoeff > 0 || aVCoeff > 0)
         {
-          gp_Pnt aPMid = myS->Value ((U1 + U2) * 0.5, (V1 + V2) * 0.5);
+          gp_Pnt aPMid = myMidPoints->Value (iU, iV).Value();
+
+          const Extrema_POnSurf& aPMin = myPoints->Value (iU, iV);
+          const Extrema_POnSurf& aPMax = myPoints->Value (iU + aUCoeff, iV + aVCoeff);
 
           gp_Vec aDir (aPMin.Value(), aPMax.Value());
           Standard_Real diag = aDir.SquareMagnitude();
