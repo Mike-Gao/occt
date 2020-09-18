@@ -339,8 +339,6 @@ public: //! @name Destruction, allocation
   //! Relieved scope should not be used.
   void Relieve();
 
-  DEFINE_STANDARD_ALLOC
-
 private: //! @name Internal methods
   
   //! Creates a top-level scope with default range [0,1] and step 1.

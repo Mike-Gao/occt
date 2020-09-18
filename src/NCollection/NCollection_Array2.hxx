@@ -42,6 +42,11 @@ template <class TheItemType>
 class NCollection_Array2
 {
 public:
+  //! Memory allocation
+  DEFINE_STANDARD_ALLOC
+  DEFINE_NCOLLECTION_ALLOC
+
+public:
   //! STL-compliant typedef for value type
   typedef TheItemType value_type;
 
