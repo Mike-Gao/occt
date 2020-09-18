@@ -11,20 +11,17 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
 #ifndef _AIS_SelectionScheme_HeaderFile
 #define _AIS_SelectionScheme_HeaderFile
 
-
 //! Sets selection schemes for interactive contexts.
-//! It is possible to use combination of schemes.
 enum AIS_SelectionScheme
 {
-  AIS_SelectionScheme_UNKNOWN = -1, //!< unknown scheme
-  AIS_SelectionScheme_Replace = 0,  //!< clear current selection and select detected objects
-  AIS_SelectionScheme_Add,          //!< add detected object to current selection
-  AIS_SelectionScheme_Remove,       //!< removed detected object from the current selection
-  AIS_SelectionScheme_XOR,          //!< perform XOR for detected objects, other selected not touched
+  AIS_SelectionScheme_UNKNOWN = -1, //!< undefined scheme
+  AIS_SelectionScheme_Replace = 0,  //!< clears current selection and select detected objects
+  AIS_SelectionScheme_Add,          //!< adds    detected object to current selection
+  AIS_SelectionScheme_Remove,       //!< removes detected object from the current selection
+  AIS_SelectionScheme_XOR,          //!< performs XOR for detected objects, other selected not touched
   AIS_SelectionScheme_Clear         //!< clears current selection
 };
 

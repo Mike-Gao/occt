@@ -78,24 +78,24 @@ public:
   //! Return selected object at iterator position.
   const Handle(SelectMgr_EntityOwner)& Value() const { return myIterator.Value(); }
 
-  //! Select or deselect owners depending on the selection scheme
-  //! \param theOwners elements to change selection state
-  //! \param theSelScheme selection scheme, defines how owner is selected
-  //! \param theFilter context filter to skip not acceptable owners
-  //! \return result of selection
+  //! Select or deselect owners depending on the selection scheme.
+  //! @param theOwners [in] elements to change selection state
+  //! @param theSelScheme [in] selection scheme, defines how owner is selected
+  //! @param theFilter [in] context filter to skip not acceptable owners
   Standard_EXPORT virtual void SelectOwners (const AIS_NListOfEntityOwner& thePickedOwners,
                                              const AIS_SelectionScheme theSelScheme,
                                              const Handle(SelectMgr_Filter)& theFilter);
 
 protected:
+
   //! Append the owner into the current selection if filter is Ok.
-  //! \param theOwner element to change selection state
-  //! \param theFilter context filter to skip not acceptable owners
-  //! \return result of selection
+  //! @param theOwner [in] element to change selection state
+  //! @param theFilter [in] context filter to skip not acceptable owners
+  //! @return result of selection
   Standard_EXPORT virtual AIS_SelectStatus appendOwner (const Handle(SelectMgr_EntityOwner)& theOwner,
                                                         const Handle(SelectMgr_Filter)& theFilter);
 
-private:
+protected:
 
   AIS_NListOfEntityOwner myresult;
   AIS_NListOfEntityOwner::Iterator myIterator;

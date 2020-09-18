@@ -579,25 +579,24 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectDetected (const AIS_SelectionSche
 
   AIS_NListOfEntityOwner aPickedOwners;
   aPickedOwners.Append (myLastPicked);
-
   return Select (aPickedOwners, theSelScheme);
 }
 
 //=======================================================================
 //function : Select
-//purpose  : 
+//purpose  :
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMin,
                                                  const Standard_Integer  theYPMin,
                                                  const Standard_Integer  theXPMax,
                                                  const Standard_Integer  theYPMax,
                                                  const Handle(V3d_View)& theView,
-                                                 const Standard_Boolean  toUpdateViewer)
+                                                 const Standard_Boolean  theToUpdateViewer)
 {
   AIS_StatusOfPick aStatus = SelectRectangle (Graphic3d_Vec2i (theXPMin, theYPMin),
-                                              Graphic3d_Vec2i(theXPMax, theYPMax),
+                                              Graphic3d_Vec2i (theXPMax, theYPMax),
                                               theView);
-  if(toUpdateViewer)
+  if (theToUpdateViewer)
   {
     UpdateCurrentViewer();
   }
@@ -610,10 +609,10 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Integer  theXPMi
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& thePolyline,
                                                  const Handle(V3d_View)&     theView,
-                                                 const Standard_Boolean      toUpdateViewer)
+                                                 const Standard_Boolean      theToUpdateViewer)
 {
   AIS_StatusOfPick aStatus = SelectPolygon (thePolyline, theView);
-  if(toUpdateViewer)
+  if (theToUpdateViewer)
   {
     UpdateCurrentViewer();
   }
@@ -622,12 +621,12 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const TColgp_Array1OfPnt2d& the
 
 //=======================================================================
 //function : Select
-//purpose  : 
+//purpose  :
 //=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdateViewer)
+AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean theToUpdateViewer)
 {
   AIS_StatusOfPick aStatus = SelectDetected();
-  if(toUpdateViewer)
+  if (theToUpdateViewer)
   {
     UpdateCurrentViewer();
   }
@@ -638,10 +637,10 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const Standard_Boolean toUpdate
 //function : ShiftSelect
 //purpose  : 
 //=======================================================================
-AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Boolean toUpdateViewer)
+AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Boolean theToUpdateViewer)
 {
   AIS_StatusOfPick aStatus = SelectDetected (AIS_SelectionScheme_XOR);
-  if(toUpdateViewer)
+  if (theToUpdateViewer)
   {
     UpdateCurrentViewer();
   }
@@ -657,13 +656,13 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Integer the
                                                       const Standard_Integer theXPMax,
                                                       const Standard_Integer theYPMax,
                                                       const Handle(V3d_View)& theView,
-                                                      const Standard_Boolean toUpdateViewer)
+                                                      const Standard_Boolean theToUpdateViewer)
 {
   AIS_StatusOfPick aStatus = SelectRectangle (Graphic3d_Vec2i (theXPMin, theYPMin),
                                               Graphic3d_Vec2i (theXPMax, theYPMax),
                                               theView,
                                               AIS_SelectionScheme_XOR);
-  if(toUpdateViewer)
+  if (theToUpdateViewer)
   {
     UpdateCurrentViewer();
   }
@@ -676,10 +675,10 @@ AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const Standard_Integer the
 //=======================================================================
 AIS_StatusOfPick AIS_InteractiveContext::ShiftSelect (const TColgp_Array1OfPnt2d& thePolyline,
                                                       const Handle(V3d_View)& theView,
-                                                      const Standard_Boolean toUpdateViewer)
+                                                      const Standard_Boolean theToUpdateViewer)
 {
   AIS_StatusOfPick aStatus = SelectPolygon (thePolyline, theView, AIS_SelectionScheme_XOR);
-  if(toUpdateViewer)
+  if (theToUpdateViewer)
   {
     UpdateCurrentViewer();
   }
@@ -705,7 +704,7 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_NListOfEntityOwner& t
 
   if (myAutoHilight)
   {
-    HilightSelected (Standard_False);
+    HilightSelected (false);
   }
 
   Standard_Integer aSelNum = NbSelected();

@@ -472,27 +472,44 @@ public: //! @name Selection management
     return AddSelect (theObject->GlobalSelOwner());
   }
 
-  //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima,
-  //! thePntMin and thePntMax points in the view.
-  //! The objects detected are passed to the main viewer, which is then updated.
-  Standard_EXPORT AIS_StatusOfPick SelectRectangle (const Graphic3d_Vec2i& thePntMin,
-                                                    const Graphic3d_Vec2i& thePntMax,
+  //! Selects objects within the bounding rectangle.
+  //! Viewer should be explicitly redrawn after selection.
+  //! @param thePntMin [in] rectangle lower point (in pixels)
+  //! @param thePntMax [in] rectangle upper point (in pixels)
+  //! @param theView   [in] active view where rectangle is defined
+  //! @param theSelScheme [in] selection scheme
+  //! @return picking status
+  //! @sa StdSelect_ViewerSelector3d::AllowOverlapDetection()
+  Standard_EXPORT AIS_StatusOfPick SelectRectangle (const Graphic3d_Vec2i&    thePntMin,
+                                                    const Graphic3d_Vec2i&    thePntMax,
                                                     const Handle(V3d_View)&   theView,
                                                     const AIS_SelectionScheme theSelScheme = AIS_SelectionScheme_Replace);
-  
-  //! Select everything found in the polygon bounded by the polyline
+
+  //! Select everything found in the polygon defined by bounding polyline.
+  //! Viewer should be explicitly redrawn after selection.
+  //! @param thePolyline  [in] polyline defining polygon bounds (in pixels)
+  //! @param theView      [in] active view where polyline is defined
+  //! @param theSelScheme [in] selection scheme
+  //! @return picking status
   Standard_EXPORT AIS_StatusOfPick SelectPolygon (const TColgp_Array1OfPnt2d& thePolyline,
                                                   const Handle(V3d_View)&     theView,
                                                   const AIS_SelectionScheme   theSelScheme = AIS_SelectionScheme_Replace);
 
-  //! Selects everything found in the point defined by the pixel coordinate,
-  //! thePnt in the view.
-  Standard_EXPORT AIS_StatusOfPick SelectPoint (const Graphic3d_Vec2i& thePnt,
+  //! Selects the topmost object picked by the point in the view,
+  //! Viewer should be explicitly redrawn after selection.
+  //! @param thePnt  [in] point pixel coordinates within the view
+  //! @param theView [in] active view where point is defined
+  //! @param theSelScheme [in] selection scheme
+  //! @return picking status
+  Standard_EXPORT AIS_StatusOfPick SelectPoint (const Graphic3d_Vec2i&    thePnt,
                                                 const Handle(V3d_View)&   theView,
                                                 const AIS_SelectionScheme theSelScheme = AIS_SelectionScheme_Replace);
 
-  //! Select and hilights the previous detected; Unhilights the previous picked.
-  //! @sa MoveTo().
+  //! Select and hilights the previous detected via AIS_InteractiveContext::MoveTo() method;
+  //! unhilights the previous picked.
+  //! Viewer should be explicitly redrawn after selection.
+  //! @param theSelScheme [in] selection scheme
+  //! @return picking status
   Standard_EXPORT AIS_StatusOfPick SelectDetected (const AIS_SelectionScheme theSelScheme = AIS_SelectionScheme_Replace);
 
   //! Selects everything found in the bounding rectangle defined by the pixel minima and maxima, XPMin, YPMin, XPMax, and YPMax in the view.
@@ -542,10 +559,10 @@ public: //! @name Selection management
   //! Returns bounding box of selected objects.
   Standard_EXPORT Bnd_Box BoundingBoxOfSelection() const;
 
-  //! Sets list of owner selected/deselected using selection scheme
-  //! It is possible that selection of other objects is changed relatively selection scheme   .
+  //! Sets list of owner selected/deselected using specified selection scheme.
   //! @param theOwners owners to change selection state
   //! @param theSelScheme selection scheme
+  //! @return picking status
   Standard_EXPORT AIS_StatusOfPick Select (const AIS_NListOfEntityOwner& theOwners,
                                            const AIS_SelectionScheme theSelScheme);
 
