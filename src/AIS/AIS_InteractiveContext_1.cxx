@@ -496,6 +496,10 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectRectangle (const Graphic3d_Vec2i&
   }
 
   myLastActiveView = theView.get();
+  if (myAutoHilight)
+  {
+    UnhilightSelected (Standard_False);
+  }
   myMainSel->Pick (thePntMin.x(), thePntMin.y(), thePntMax.x(), thePntMax.y(), theView);
 
   AIS_NListOfEntityOwner aPickedOwners;
@@ -521,6 +525,10 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectPolygon (const TColgp_Array1OfPnt
   }
 
   myLastActiveView = theView.get();
+  if (myAutoHilight)
+  {
+    UnhilightSelected (Standard_False);
+  }
   myMainSel->Pick (thePolyline, theView);
 
   AIS_NListOfEntityOwner aPickedOwners;
@@ -543,6 +551,11 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectPoint (const Graphic3d_Vec2i&    
   if (theView->Viewer() != myMainVwr)
   {
     throw Standard_ProgramError ("AIS_InteractiveContext::SelectPoint() - invalid argument");
+  }
+
+  if (myAutoHilight)
+  {
+    UnhilightSelected (Standard_False);
   }
 
   myLastActiveView = theView.get();
@@ -575,6 +588,11 @@ AIS_StatusOfPick AIS_InteractiveContext::SelectDetected (const AIS_SelectionSche
     {
       return AIS_SOP_NothingSelected;
     }
+  }
+
+  if (myAutoHilight && theSelScheme != AIS_SelectionScheme_XOR)
+  {
+    UnhilightSelected (Standard_False);
   }
 
   AIS_NListOfEntityOwner aPickedOwners;
@@ -697,14 +715,13 @@ AIS_StatusOfPick AIS_InteractiveContext::Select (const AIS_NListOfEntityOwner& t
   if (myAutoHilight)
   {
     clearDynamicHighlight();
-    UnhilightSelected (Standard_False);
   }
 
   mySelection->SelectOwners (theOwners, theSelScheme, myFilters);
 
   if (myAutoHilight)
   {
-    HilightSelected (false);
+    HilightSelected (Standard_False);
   }
 
   Standard_Integer aSelNum = NbSelected();
