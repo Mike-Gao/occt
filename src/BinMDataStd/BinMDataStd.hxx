@@ -42,7 +42,7 @@ template<class T>
 static void SetAttributeID(const BinObjMgt_Persistent& theSource, const Handle(T)& anAtt, const Standard_Integer aDocFormatVersion)
 {
   Standard_Boolean ok = Standard_True;
-  if(aDocFormatVersion >= BIN_LDRIVERS_VERSION_8) { // process user defined guid
+  if(aDocFormatVersion >= BIN_LDRIVERS_VERSION_10) { // process user defined guid
     const Standard_Integer& aPos = theSource.Position();
     Standard_GUID aGuid;
     ok = theSource >> aGuid;

@@ -21,6 +21,7 @@
 #include <Standard_Handle.hxx>
 
 #include <TopTools_IndexedMapOfShape.hxx>
+#include <BinTools_FormatVersion.hxx>
 #include <BinTools_LocationSet.hxx>
 #include <Standard_Integer.hxx>
 #include <BRep_Builder.hxx>
@@ -36,14 +37,6 @@
 class TopoDS_Shape;
 class BinTools_LocationSet;
 
-enum BinTools_FormatVersion
-{
-  BIN_TOOLS_DEFAULT_VERSION = 0, 
-  BIN_TOOLS_VERSION_1 = 1, 
-  BIN_TOOLS_VERSION_2 = 2, 
-  BIN_TOOLS_VERSION_3 = 3, 
-  BIN_TOOLS_VERSION_4 = 4
-};
 
 //! Writes topology in OStream in binary format
 class BinTools_ShapeSet 
@@ -68,18 +61,10 @@ public:
   
   static const BinTools_FormatVersion THE_CURRENT_VERSION = BIN_TOOLS_VERSION_4;
 
-  //! Sets the format version.
-  //! If value of <theFormat> is incorrect, sets the format version to <THE_CURRENT_VERSION>
+  //! Sets the BinTools_FormatVersion.
   Standard_EXPORT void SetFormatNb (const Standard_Integer theFormatNb);
 
-  //! Sets the format version to <THE_CURRENT_VERSION>
-  void SetCurrentFormat();
-  
-  //! two formats available for the moment:
-  //! First: does not write CurveOnSurface UV Points into the file
-  //! on reading calls Check() method.
-  //! Second: stores CurveOnSurface UV Points.
-  //! On reading format is recognized from Version string.
+  //! Returns the BinTools_FormatVersion.
   Standard_EXPORT Standard_Integer FormatNb() const;
   
   //! Clears the content of the set.
@@ -209,6 +194,13 @@ public:
     (Standard_OStream& OS,
         const Message_ProgressRange& theRange = Message_ProgressRange()) const;
 
+public:
+
+  static Standard_CString Version_1;
+  static Standard_CString Version_2;
+  static Standard_CString Version_3;
+  static Standard_CString Version_4;
+
 private:
 
   TopTools_IndexedMapOfShape myShapes;
@@ -220,11 +212,12 @@ private:
   BinTools_Curve2dSet myCurves2d;
   NCollection_IndexedMap<Handle(Poly_Polygon2D), TColStd_MapTransientHasher> myPolygons2D;
   NCollection_IndexedMap<Handle(Poly_Polygon3D), TColStd_MapTransientHasher> myPolygons3D;
-  NCollection_IndexedDataMap<Handle(Poly_Triangulation), Standard_Boolean, TColStd_MapTransientHasher> myTriangulations;
+  NCollection_IndexedDataMap<Handle(Poly_Triangulation),
+                             Standard_Boolean> myTriangulations; //!< Contains a boolean flag with information
+                                                                 //!  to save normals for triangulation
   NCollection_IndexedMap<Handle(Poly_PolygonOnTriangulation), TColStd_MapTransientHasher> myNodes;
   Standard_Boolean myWithTriangles;
 
-  static Standard_CString Version_1, Version_2, Version_3, Version_4;
 };
 
 #endif // _BinTools_ShapeSet_HeaderFile

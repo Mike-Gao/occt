@@ -82,7 +82,7 @@ public:
   //! triangles. Here the UVNodes flag indicates whether
   //! 2D nodes will be associated with 3D ones, (i.e. to
   //! enable a 2D representation). Here the hasNormals flag indicates whether
-  //! normals will be associated with 3D ones
+  //! normals will be given and associated with nodes
   Standard_EXPORT Poly_Triangulation(const Standard_Integer nbNodes, 
                                      const Standard_Integer nbTriangles, 
                                      const Standard_Boolean UVNodes,

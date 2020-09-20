@@ -78,7 +78,7 @@ static Standard_Integer save(Draw_Interpretor& di, Standard_Integer argc, const 
 {
   if (argc < 3)
   {
-    std::cout << "Syntax error: wrong number of arguments!\n";
+    di << "Syntax error: wrong number of arguments!\n";
     di.PrintHelp(argv[0]);
     return 1;
   }
@@ -93,25 +93,29 @@ static Standard_Integer save(Draw_Interpretor& di, Standard_Integer argc, const 
     {
       ++i;
       if (i < argc)
+      {
         aVersion = static_cast<TopTools_FormatVersion>(Draw::Atoi(argv[i]));
+      }
       if (aVersion == TOP_TOOLS_DEFAULT_VERSION)
+      {
         aVersion = TopTools_ShapeSet::THE_CURRENT_VERSION;
+      }
       if (aVersion < TOP_TOOLS_VERSION_1)
       {
-        std::cout << "Version must not be negative\n";
+        di << "Version must not be negative\n";
         return 1;
       }
       if (aVersion > TopTools_ShapeSet::THE_CURRENT_VERSION)
       {
-        std::cout << "Version higher than " 
-                  << static_cast<Standard_Integer>(TopTools_ShapeSet::THE_CURRENT_VERSION) 
-                  << " is not supported\n"; \
+        di << "Version higher than " 
+           << static_cast<Standard_Integer>(TopTools_ShapeSet::THE_CURRENT_VERSION) 
+           << " is not supported\n"; \
         return 1;
       }
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << aParam << "'\n";
+      di << "Syntax error: unknown argument '" << aParam << "'\n";
       return 1;
     }
   }

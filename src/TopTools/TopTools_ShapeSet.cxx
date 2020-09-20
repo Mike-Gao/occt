@@ -28,6 +28,7 @@
 #include <TopoDS_Shape.hxx>
 #include <TopTools_LocationSet.hxx>
 #include <TopTools_ShapeSet.hxx>
+#include <Standard_Assert.hxx>
 
 #include <BRep_TFace.hxx>
 
@@ -55,10 +56,11 @@ TopTools_ShapeSet::~TopTools_ShapeSet()
 //=======================================================================
 void TopTools_ShapeSet::SetFormatNb(const Standard_Integer theFormatNb)
 {
-  if (theFormatNb >= TOP_TOOLS_VERSION_1 && theFormatNb <= THE_CURRENT_VERSION)
-    myFormatNb = theFormatNb;
-  else
-    myFormatNb = THE_CURRENT_VERSION;
+  Standard_ASSERT_RETURN(theFormatNb >= TOP_TOOLS_VERSION_1 &&
+                         theFormatNb <= THE_CURRENT_VERSION,
+    "Error: unsupported TopTools version.", );
+
+  myFormatNb = theFormatNb;
 }
 
 //=======================================================================
@@ -458,11 +460,17 @@ void  TopTools_ShapeSet::Write(Standard_OStream& OS, const Message_ProgressRange
 
   // write the copyright
   if (myFormatNb == TOP_TOOLS_VERSION_3)
+  {
     OS << "\n" << Version_3 << "\n";
+  }
   else if (myFormatNb == TOP_TOOLS_VERSION_2)
+  {
     OS << "\n" << Version_2 << "\n";
+  }
   else
+  {
     OS << "\n" << Version_1 << "\n";
+  }
 
   //-----------------------------------------
   // write the locations
@@ -623,12 +631,18 @@ void  TopTools_ShapeSet::Read(Standard_IStream& IS, const Message_ProgressRange&
     IS.imbue (anOldLocale);
     return;
   }
-  if (strcmp(vers, Version_3) == 0) 
+  if (strcmp(vers, Version_3) == 0)
+  {
     SetFormatNb(TOP_TOOLS_VERSION_3);
-  else if (strcmp(vers, Version_2) == 0) 
+  }
+  else if (strcmp(vers, Version_2) == 0)
+  {
     SetFormatNb(TOP_TOOLS_VERSION_2);
-  else 
+  }
+  else
+  {
     SetFormatNb(TOP_TOOLS_VERSION_1);
+  }
 
   //-----------------------------------------
   // read the locations

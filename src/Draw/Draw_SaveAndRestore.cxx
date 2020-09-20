@@ -1,6 +1,4 @@
-// Created on: 2020-03-06
-// Created by: Andrey SURAVENKOV
-// Copyright (c) 1999-2020 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -41,7 +39,7 @@ Standard_Boolean Draw_SaveAndRestoreNumber::Test(const Handle(Draw_Drawable3D)& 
 
 void Draw_SaveAndRestoreNumber::Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& theStream, TopTools_FormatVersion theVersion) const
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(Draw_Number) aNum = Handle(Draw_Number)::DownCast(theDrawable3D);
   std::ios::fmtflags aFlags = theStream.flags();
   theStream.setf(std::ios::scientific);

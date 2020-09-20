@@ -596,23 +596,23 @@ void HLRTest::Commands (Draw_Interpretor& theCommands)
 }
 
 //=======================================================================
-//function : save and restore projector
-//purpose  : 
+// class : HLRTest_SaveAndRestore
 //=======================================================================
-
-Standard_Boolean HLRTest_SaveAndRestore::Test(const Handle(Draw_Drawable3D)& theDrawable3D) const
+class HLRTest_SaveAndRestore : public Draw_SaveAndRestoreBase
 {
-  return theDrawable3D->IsInstance(STANDARD_TYPE(HLRTest_Projector));
+public:
+
+HLRTest_SaveAndRestore()
+  :Draw_SaveAndRestoreBase("HLRTest_Projector") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
+{
+  return d->IsInstance(STANDARD_TYPE(HLRTest_Projector));
 }
 
-//=======================================================================
-//function : Draw_SaveAndRestoreHLRTest::Save
-//purpose  : 
-//=======================================================================
-
-void HLRTest_SaveAndRestore::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(HLRTest_Projector) HP =
     Handle(HLRTest_Projector)::DownCast(d);
 
@@ -642,12 +642,7 @@ void HLRTest_SaveAndRestore::Save(const Handle(Draw_Drawable3D)& d, std::ostream
   OS << "\n";
 }
 
-//=======================================================================
-//function : Draw_SaveAndRestoreHLRTest::Restore
-//purpose  : 
-//=======================================================================
-
-Handle(Draw_Drawable3D) HLRTest_SaveAndRestore::Restore(std::istream& IS) const
+Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
 {
   Standard_Boolean pers;
   IS >> pers;
@@ -677,10 +672,7 @@ Handle(Draw_Drawable3D) HLRTest_SaveAndRestore::Restore(std::istream& IS) const
   return HP;
 }
 
-//=======================================================================
-//function : ssr
-//purpose  : 
-//=======================================================================
+};
 
 static HLRTest_SaveAndRestore saveAndRestoreHLRTest;
 

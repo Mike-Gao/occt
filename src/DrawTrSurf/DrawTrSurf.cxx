@@ -1420,116 +1420,149 @@ void  DrawTrSurf::BasicCommands(Draw_Interpretor& theCommands)
 		  d2transform,g);
 }
 
+//=================================================================
+// class : DrawTrSurf_SaveAndRestoreCurve
+//=================================================================
 
-//=================================================================
-// Draw_SaveAndRestoreCurve
-//=================================================================
-Standard_Boolean DrawTrSurf_SaveAndRestoreCurve::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreCurve : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreCurve()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Curve") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Curve));
 }
 
-void DrawTrSurf_SaveAndRestoreCurve::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void)theVersion;
   Handle(DrawTrSurf_Curve) N = Handle(DrawTrSurf_Curve)::DownCast(d);
-  GeomTools_CurveSet::PrintCurve(N->GetCurve(), OS, Standard_True);
+  GeomTools_CurveSet::PrintCurve(N->GetCurve(),OS,Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreCurve::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_Curve) G = GeomTools_CurveSet::ReadCurve(is);
-  Handle(DrawTrSurf_Curve) N = 
-    new DrawTrSurf_Curve(G, CurvColor, Discret, Deflection, DrawMode);
+  Handle(DrawTrSurf_Curve) N =
+    new DrawTrSurf_Curve(G,CurvColor,Discret,Deflection,DrawMode);
   return N;
 }
 
+};
+
 static DrawTrSurf_SaveAndRestoreCurve saveAndRestoreCurve;
 
-
-
-
 //=================================================================
-// Draw_SaveAndRestoreBezierCurve
+// class : DrawTrSurf_SaveAndRestoreBezierCurve
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreBezierCurve::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreBezierCurve : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBezierCurve()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BezierCurve") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BezierCurve));
 }
 
-void DrawTrSurf_SaveAndRestoreBezierCurve::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
-  Handle(DrawTrSurf_BezierCurve) N = Handle(DrawTrSurf_BezierCurve)::DownCast(d);
+  (void)theVersion;
+  Handle(DrawTrSurf_BezierCurve)
+    N = Handle(DrawTrSurf_BezierCurve)::DownCast(d);
   GeomTools_CurveSet::PrintCurve(N->GetCurve(), OS, Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBezierCurve::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
-  Handle(Geom_BezierCurve) G = Handle(Geom_BezierCurve)::DownCast (GeomTools_CurveSet::ReadCurve(is));
-  Handle(DrawTrSurf_BezierCurve) N = new DrawTrSurf_BezierCurve(G,
-                                                                CurvColor,
-                                                                PolesColor,
-                                                                ShowPoles,
-			                                                          Discret,
-                                                                Deflection,
-                                                                DrawMode);
+  Handle(Geom_BezierCurve) G =
+    Handle(Geom_BezierCurve)::DownCast(GeomTools_CurveSet::ReadCurve(is));
+  Handle(DrawTrSurf_BezierCurve) N =
+    new DrawTrSurf_BezierCurve(G,
+      CurvColor,
+      PolesColor,
+      ShowPoles,
+      Discret,
+      Deflection,
+      DrawMode);
   return N;
 }
+
+};
 
 static DrawTrSurf_SaveAndRestoreBezierCurve saveAndRestoreBezierCurve;
 
 //=================================================================
-// Draw_SaveAndRestoreBSplineCurve
+// class : DrawTrSurf_SaveAndRestoreBSplineCurve
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreBSplineCurve::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreBSplineCurve : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBSplineCurve()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineCurve") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BSplineCurve));
 }
 
-void DrawTrSurf_SaveAndRestoreBSplineCurve::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_BSplineCurve) 
     N = Handle(DrawTrSurf_BSplineCurve)::DownCast(d);
   GeomTools_CurveSet::PrintCurve(N->GetCurve(), OS, Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBSplineCurve::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
-  Handle(Geom_BSplineCurve) G = 
+  Handle(Geom_BSplineCurve) G =
     Handle(Geom_BSplineCurve)::DownCast (GeomTools_CurveSet::ReadCurve(is));
   Handle(DrawTrSurf_BSplineCurve) N = 
-    new DrawTrSurf_BSplineCurve(G, CurvColor, PolesColor,
-			                          KnotsColor, KnotsShape,
+    new DrawTrSurf_BSplineCurve(G,CurvColor,PolesColor,
+                                KnotsColor, KnotsShape,
                                 KnotsSize, ShowPoles,
                                 ShowKnots, Discret,
                                 Deflection, DrawMode);
   return N;
 }
 
+};
+
 static DrawTrSurf_SaveAndRestoreBSplineCurve saveAndRestoreBSplineCurve;
 
-
 //=================================================================
-// Draw_SaveAndRestoreCurve2d
+// class : DrawTrSurf_SaveAndRestoreCurve2d
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreCurve2d::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreCurve2d()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Curve2d") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Curve2d));
 }
 
-void DrawTrSurf_SaveAndRestoreCurve2d::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_Curve2d) N = Handle(DrawTrSurf_Curve2d)::DownCast(d);
-  GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(), OS, Standard_True);
+  GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(),OS,Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreCurve2d::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom2d_Curve) G = GeomTools_Curve2dSet::ReadCurve2d(is);
   Handle(DrawTrSurf_Curve2d) N = 
@@ -1537,65 +1570,75 @@ Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreCurve2d::Restore(std::istream& 
   return N;
 }
 
+};
 
 static DrawTrSurf_SaveAndRestoreCurve2d saveAndRestoreCurve2d;
 
-
-
-
 //=================================================================
-// Draw_SaveAndRestoreBezierCurve2d
+// class : DrawTrSurf_SaveAndRestoreBezierCurve2d
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreBezierCurve2d::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreBezierCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBezierCurve2d()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BezierCurve2d") {}
+
+Standard_Boolean        Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BezierCurve2d));
 }
 
-void DrawTrSurf_SaveAndRestoreBezierCurve2d::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
-  Handle(DrawTrSurf_BezierCurve2d) N = 
-    Handle(DrawTrSurf_BezierCurve2d)::DownCast(d);
+  (void) theVersion;
+  Handle(DrawTrSurf_BezierCurve2d) 
+    N = Handle(DrawTrSurf_BezierCurve2d)::DownCast(d);
   GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(), OS, Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBezierCurve2d::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom2d_BezierCurve) G = 
     Handle(Geom2d_BezierCurve)::DownCast (GeomTools_Curve2dSet::ReadCurve2d(is));
   Handle(DrawTrSurf_BezierCurve2d) N = 
-    new DrawTrSurf_BezierCurve2d(G, CurvColor, PolesColor, ShowPoles, 
-                                 Discret);
+    new DrawTrSurf_BezierCurve2d(G,CurvColor,PolesColor,ShowPoles,
+                                  Discret);
   return N;
 }
 
+};
 
 static DrawTrSurf_SaveAndRestoreBezierCurve2d saveAndRestoreBezierCurve2d;
 
-
-
-
 //=================================================================
-// Draw_SaveAndRestoreBSplineCurve2d
+// class : DrawTrSurf_SaveAndRestoreBSplineCurve2d
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreBSplineCurve2d::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreBSplineCurve2d : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBSplineCurve2d()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineCurve2d") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BSplineCurve2d));
 }
 
-void DrawTrSurf_SaveAndRestoreBSplineCurve2d::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
-  Handle(DrawTrSurf_BSplineCurve2d) N = 
-    Handle(DrawTrSurf_BSplineCurve2d)::DownCast(d);
-  GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(), OS, Standard_True);
+  (void) theVersion;
+  Handle(DrawTrSurf_BSplineCurve2d) 
+    N = Handle(DrawTrSurf_BSplineCurve2d)::DownCast(d);
+  GeomTools_Curve2dSet::PrintCurve2d(N->GetCurve(),OS,Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBSplineCurve2d::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
-  Handle(Geom2d_BSplineCurve) G = 
+  Handle(Geom2d_BSplineCurve) G =
     Handle(Geom2d_BSplineCurve)::DownCast (GeomTools_Curve2dSet::ReadCurve2d(is));
   Handle(DrawTrSurf_BSplineCurve2d) N = 
     new DrawTrSurf_BSplineCurve2d(G, CurvColor, PolesColor,
@@ -1605,134 +1648,159 @@ Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBSplineCurve2d::Restore(std::is
   return N;
 }
 
+};
 
 static DrawTrSurf_SaveAndRestoreBSplineCurve2d saveAndRestoreBSplineCurve2d;
 
-
 //=================================================================
-// Draw_SaveAndRestoreSurface
+// class : DrawTrSurf_SaveAndRestoreSurface
 //=================================================================
+class DrawTrSurf_SaveAndRestoreSurface : public Draw_SaveAndRestoreBase
+{
+public:
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreSurface::Test(const Handle(Draw_Drawable3D)& d) const
+DrawTrSurf_SaveAndRestoreSurface()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Surface") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Surface));
 }
 
-void DrawTrSurf_SaveAndRestoreSurface::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_Surface) N = 
     Handle(DrawTrSurf_Surface)::DownCast(d);
   GeomTools_SurfaceSet::PrintSurface(N->GetSurface(), OS, Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreSurface::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_Surface) G = GeomTools_SurfaceSet::ReadSurface(is);
   Handle(DrawTrSurf_Surface) N = 
-    new DrawTrSurf_Surface(G, 
-                           NbUIsos, NbVIsos,
-                           BoundsColor, IsosColor,
-                           Discret, Deflection, DrawMode);
+    new DrawTrSurf_Surface(G,
+                            NbUIsos,NbVIsos,
+                            BoundsColor,IsosColor,
+                            Discret,Deflection,DrawMode);
   return N;
 }
 
+};
+
 static DrawTrSurf_SaveAndRestoreSurface saveAndRestoreSurface;
 
-
-
-
 //=================================================================
-// Draw_SaveAndRestoreBezierSurface
+// class : DrawTrSurf_SaveAndRestoreBezierSurface
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreBezierSurface::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreBezierSurface : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBezierSurface()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BezierSurface") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BezierSurface));
 }
 
-void DrawTrSurf_SaveAndRestoreBezierSurface::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_BezierSurface) 
     N = Handle(DrawTrSurf_BezierSurface)::DownCast(d);
   GeomTools_SurfaceSet::PrintSurface(N->GetSurface(), OS, Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBezierSurface::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Handle(Geom_BezierSurface) G =
     Handle(Geom_BezierSurface)::DownCast (GeomTools_SurfaceSet::ReadSurface(is));
   Handle(DrawTrSurf_BezierSurface) N = 
     new DrawTrSurf_BezierSurface(G, NbUIsos, NbVIsos,
-                                 BoundsColor, IsosColor, PolesColor, 
-                                 ShowPoles,
-                                 Discret, Deflection, DrawMode);
+                                  BoundsColor, IsosColor, PolesColor, 
+                                  ShowPoles,
+                                  Discret, Deflection, DrawMode);
   return N;
 }
 
+};
 
 static DrawTrSurf_SaveAndRestoreBezierSurface saveAndRestoreBezierSurface;
 
-
-
-
 //=================================================================
-// Draw_SaveAndRestoreBSplineSurface
+// class : DrawTrSurf_SaveAndRestoreBSplineSurface
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreBSplineSurface::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreBSplineSurface : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreBSplineSurface()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_BSplineSurface") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_BSplineSurface));
 }
 
-void DrawTrSurf_SaveAndRestoreBSplineSurface::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_BSplineSurface) 
     N = Handle(DrawTrSurf_BSplineSurface)::DownCast(d);
-  GeomTools_SurfaceSet::PrintSurface(N->GetSurface(), OS, Standard_True);
+  GeomTools_SurfaceSet::PrintSurface(N->GetSurface(),OS,Standard_True);
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreBSplineSurface::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
-  Handle(Geom_BSplineSurface) G = Handle(Geom_BSplineSurface)::DownCast (GeomTools_SurfaceSet::ReadSurface(is));
+  Handle(Geom_BSplineSurface) G =
+    Handle(Geom_BSplineSurface)::DownCast (GeomTools_SurfaceSet::ReadSurface(is));
   Handle(DrawTrSurf_BSplineSurface) N;
   if (!knotsIsos) 
-    N = new DrawTrSurf_BSplineSurface(G,
-				                              NbUIsos,NbVIsos,
-					                            BoundsColor,IsosColor,
-					                            PolesColor,KnotsColor,
-					                            KnotsShape,KnotsSize,
-					                            ShowPoles,ShowKnots,
-					                            Discret,Deflection,DrawMode);
+    N   = new DrawTrSurf_BSplineSurface(G,
+				NbUIsos,NbVIsos,
+					BoundsColor,IsosColor,
+					PolesColor,KnotsColor,
+					KnotsShape,KnotsSize,
+					ShowPoles,ShowKnots,
+					Discret,Deflection,DrawMode);
   else
-    N = new DrawTrSurf_BSplineSurface(G,
-				                              BoundsColor,IsosColor,
-					                            PolesColor,KnotsColor,
-					                            KnotsShape,KnotsSize,
-					                            ShowPoles,ShowKnots,
-					                            Discret,Deflection,DrawMode);
+    N   = new DrawTrSurf_BSplineSurface(G,
+				  BoundsColor,IsosColor,
+					PolesColor,KnotsColor,
+					KnotsShape,KnotsSize,
+					ShowPoles,ShowKnots,
+					Discret,Deflection,DrawMode);
 	
   return N;
 }
 
+};
 
 static DrawTrSurf_SaveAndRestoreBSplineSurface saveAndRestoreBSplineSurface;
 
-
 //=================================================================
-// Draw_SaveAndRestorePoint
+// class : DrawTrSurf_SaveAndRestorePoint
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestorePoint::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestorePoint : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestorePoint()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Point") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Point));
 }
 
-void DrawTrSurf_SaveAndRestorePoint::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_Point)  
     N = Handle(DrawTrSurf_Point)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1760,7 +1828,7 @@ void DrawTrSurf_SaveAndRestorePoint::Save(const Handle(Draw_Drawable3D)& d, std:
 #endif
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestorePoint::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   Standard_Integer is3d;
   is >> is3d;
@@ -1778,23 +1846,29 @@ Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestorePoint::Restore(std::istream& is
   return N;
 }
 
+};
 
 static DrawTrSurf_SaveAndRestorePoint saveAndRestorePoint;
 
-
-
 //=================================================================
-// Draw_SaveAndRestoreTriangulation
+// class : DrawTrSurf_SaveAndRestoreTriangulation
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestoreTriangulation::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestoreTriangulation : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestoreTriangulation()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Triangulation") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Triangulation));
 }
 
-void DrawTrSurf_SaveAndRestoreTriangulation::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_Triangulation) 
     T = Handle(DrawTrSurf_Triangulation)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1814,28 +1888,36 @@ void DrawTrSurf_SaveAndRestoreTriangulation::Save(const Handle(Draw_Drawable3D)&
 #endif
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestoreTriangulation::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   return new DrawTrSurf_Triangulation(Poly::ReadTriangulation(is));
 }
 
+};
 
 static DrawTrSurf_SaveAndRestoreTriangulation saveAndRestoreTriangulation;
 
 
 
 //=================================================================
-// Draw_SaveAndRestorePolygon3D
+// class : DrawTrSurf_SaveAndRestorePolygon3D
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestorePolygon3D::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestorePolygon3D : public Draw_SaveAndRestoreBase
+{
+public:
+
+DrawTrSurf_SaveAndRestorePolygon3D()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Polygon3D") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Polygon3D));
 }
 
-void DrawTrSurf_SaveAndRestorePolygon3D::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_Polygon3D) 
     T = Handle(DrawTrSurf_Polygon3D)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1855,27 +1937,34 @@ void DrawTrSurf_SaveAndRestorePolygon3D::Save(const Handle(Draw_Drawable3D)& d, 
 #endif
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestorePolygon3D::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   return new DrawTrSurf_Polygon3D(Poly::ReadPolygon3D(is));
 }
 
+};
 
 static DrawTrSurf_SaveAndRestorePolygon3D saveAndRestorePolygon3D;
 
-
 //=================================================================
-// Draw_SaveAndRestorePolygon2D
+// class : DrawTrSurf_SaveAndRestorePolygon2D
 //=================================================================
 
-Standard_Boolean DrawTrSurf_SaveAndRestorePolygon2D::Test(const Handle(Draw_Drawable3D)& d) const
+class DrawTrSurf_SaveAndRestorePolygon2D : public Draw_SaveAndRestoreBase
 {
-  return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Polygon2D));
+public:
+
+DrawTrSurf_SaveAndRestorePolygon2D()
+  :Draw_SaveAndRestoreBase("DrawTrSurf_Polygon2D") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
+{
+return d->IsInstance(STANDARD_TYPE(DrawTrSurf_Polygon2D));
 }
 
-void DrawTrSurf_SaveAndRestorePolygon2D::Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const  Standard_OVERRIDE
 {
-  theVersion; // to suppress a warning
+  (void) theVersion;
   Handle(DrawTrSurf_Polygon2D) 
     T = Handle(DrawTrSurf_Polygon2D)::DownCast(d);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
@@ -1886,7 +1975,7 @@ void DrawTrSurf_SaveAndRestorePolygon2D::Save(const Handle(Draw_Drawable3D)& d, 
   long form = OS.setf(std::ios::scientific);
   std::streamsize prec = OS.precision(15);
 #endif
-  Poly::Write(T->Polygon2D(), OS);
+  Poly::Write(T->Polygon2D(),OS);
 #if !defined(_MSC_VER) && !defined(__sgi) && !defined(IRIX)
   OS.setf(F);
 #else
@@ -1895,11 +1984,12 @@ void DrawTrSurf_SaveAndRestorePolygon2D::Save(const Handle(Draw_Drawable3D)& d, 
 #endif
 }
 
-Handle(Draw_Drawable3D) DrawTrSurf_SaveAndRestorePolygon2D::Restore(std::istream& is) const
+Handle(Draw_Drawable3D) Restore(std::istream& is) const Standard_OVERRIDE
 {
   return new DrawTrSurf_Polygon2D(Poly::ReadPolygon2D(is));
 }
 
+};
 
 static DrawTrSurf_SaveAndRestorePolygon2D saveAndRestorePolygon2D;
 

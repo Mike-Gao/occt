@@ -270,12 +270,12 @@ help save {
 proc save {name {file ""} {args {}}} {
     # set default values of arguments
     set version 0
-	
-	# check arguments
-	for {set narg 0} {$narg < [llength $args]} {incr narg} {
+
+    # check arguments
+    for {set narg 0} {$narg < [llength $args]} {incr narg} {
         set arg [lindex $args $narg]
-		
-		# set version
+
+        # set version
         if { $arg == "-version" } {
             incr narg
             if { $narg < [llength $args] && ! [regexp {^-} [lindex $args $narg]] } {
@@ -285,10 +285,10 @@ proc save {name {file ""} {args {}}} {
             }
             continue
         }
-		
-		# unsupported option
+
+        # unsupported option
         error "Error: unsupported option \"$arg\""
-	}
+    }
     if {$file == ""} {set file $name}
     upvar $name n
     if {![isdraw n]} {error "save : $name is not a Draw variable"}

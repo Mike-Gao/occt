@@ -26,7 +26,6 @@
 #include <TCollection_ExtendedString.hxx>
 #include <Standard_OStream.hxx>
 #include <CDM_ListOfDocument.hxx>
-#include <XmlLDrivers_FormatVersion.hxx>
 
 class CDM_MetaData;
 class CDM_Application;

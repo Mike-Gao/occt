@@ -1,6 +1,4 @@
-// Created on: 2020-03-06
-// Created by: Andrey SURAVENKOV
-// Copyright (c) 2002-2020 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -20,16 +18,16 @@
 
 enum BinLDrivers_FormatVersion
 {
-  BIN_LDRIVERS_VERSION_2 = 2, // First supported version
-  BIN_LDRIVERS_VERSION_3,     // Add Delta to numbers data, changes in ShapeSection
-  BIN_LDRIVERS_VERSION_4,     // entry, ContextLabel for tree
-  BIN_LDRIVERS_VERSION_5,     // Convert old format to new
-  BIN_LDRIVERS_VERSION_6,     // Add location
-  BIN_LDRIVERS_VERSION_7,     // Add orientation, type migration
-  BIN_LDRIVERS_VERSION_8,     // Stop convert old format
-  BIN_LDRIVERS_VERSION_9,     // Add GUIDs, ReadTOC changed
-  BIN_LDRIVERS_VERSION_10,
-  BIN_LDRIVERS_VERSION_11     // Add normals to Shape
+  BIN_LDRIVERS_VERSION_2 = 2, //!< First supported version
+  BIN_LDRIVERS_VERSION_3,     //!< Add Delta to numbers data, changes in ShapeSection
+  BIN_LDRIVERS_VERSION_4,     //!< entry, ContextLabel for tree
+  BIN_LDRIVERS_VERSION_5,     //!< Convert old format to new
+  BIN_LDRIVERS_VERSION_6,     //!< Add location
+  BIN_LDRIVERS_VERSION_7,     //!< Add orientation, type migration
+  BIN_LDRIVERS_VERSION_8,     //!< Stop convert old format
+  BIN_LDRIVERS_VERSION_9,     //!< Add GUIDs, ReadTOC changed
+  BIN_LDRIVERS_VERSION_10,    //!< Process user defined guid
+  BIN_LDRIVERS_VERSION_11     //!< Add normals to Shape
 };
 
 #endif

@@ -1383,7 +1383,7 @@ static Standard_Integer binsave(Draw_Interpretor& di, Standard_Integer argc, con
 {
   if (argc < 3)
   {
-    std::cout << "Syntax error: wrong number of arguments!\n";
+    di << "Syntax error: wrong number of arguments!\n";
     di.PrintHelp(argv[0]);
     return 1;
   }
@@ -1398,25 +1398,29 @@ static Standard_Integer binsave(Draw_Interpretor& di, Standard_Integer argc, con
     {
       ++i;
       if (i < argc)
-        aVersion =  static_cast<BinTools_FormatVersion>(Draw::Atoi(argv[i]));
+      {
+        aVersion = static_cast<BinTools_FormatVersion>(Draw::Atoi(argv[i]));
+      }
       if (aVersion == BIN_TOOLS_DEFAULT_VERSION)
+      {
         aVersion = BinTools_ShapeSet::THE_CURRENT_VERSION;
+      }
       if (aVersion < BIN_TOOLS_VERSION_1)
       {
-        std::cout << "Version must not be negative\n";
+        di << "Version must not be negative\n";
         return 1;
       }
       if (aVersion > BinTools_ShapeSet::THE_CURRENT_VERSION)
       {
-        std::cout << "Version higher than " 
-                  << BinTools_ShapeSet::THE_CURRENT_VERSION 
-                  << " is not supported\n";
+        di << "Version higher than " 
+           << BinTools_ShapeSet::THE_CURRENT_VERSION 
+           << " is not supported\n";
         return 1;
       }
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << aParam << "'\n";
+      di << "Syntax error: unknown argument '" << aParam << "'\n";
       return 1;
     }
   }
@@ -1611,20 +1615,21 @@ Standard_Real DBRep::HLRAngle()
 { return anglHLR; }
 
 //=======================================================================
-//function : SaveAndRestoreDBRep::Test
-//purpose  : 
+//class : DBRep_SaveAndRestore
 //=======================================================================
 
-Standard_Boolean Draw_SaveAndRestoreDBRep::Test(const Handle(Draw_Drawable3D)& d) const
+class DBRep_SaveAndRestore : public Draw_SaveAndRestoreBase
+{
+public:
+  DBRep_SaveAndRestore()
+  :Draw_SaveAndRestoreBase("DBRep_DrawableShape") {}
+
+Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
 {
   return d->IsInstance(STANDARD_TYPE(DBRep_DrawableShape));
 }
-//=======================================================================
-//function : SaveAndRestoreDBRep::Save
-//purpose  : 
-//=======================================================================
 
-void Draw_SaveAndRestoreDBRep::Save(const Handle(Draw_Drawable3D)& d, std::ostream & OS, TopTools_FormatVersion theVersion) const
+void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
 {
   const Handle(DBRep_DrawableShape)
     N = Handle(DBRep_DrawableShape)::DownCast(d);
@@ -1639,12 +1644,8 @@ void Draw_SaveAndRestoreDBRep::Save(const Handle(Draw_Drawable3D)& d, std::ostre
     return;
   S.Write(N->Shape(), OS);
 }
-//=======================================================================
-//function : SaveAndRestoreDBRep::Restore
-//purpose  : 
-//=======================================================================
 
-Handle(Draw_Drawable3D) Draw_SaveAndRestoreDBRep::Restore(std::istream & IS) const
+Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
 {
   BRep_Builder B;
   BRepTools_ShapeSet S(B);
@@ -1670,9 +1671,9 @@ Handle(Draw_Drawable3D) Draw_SaveAndRestoreDBRep::Restore(std::istream & IS) con
   return N;
 }
 
+};
 
- static Draw_SaveAndRestoreDBRep saveAndRestoreDBRep;
-
+static DBRep_SaveAndRestore saveAndRestoreDBRep;
 
 //=======================================================================
 //function : dumps

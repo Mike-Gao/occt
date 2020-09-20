@@ -256,12 +256,16 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
   TCollection_ExtendedString anInfo;
   const XmlObjMgt_Element anInfoElem =
     theElement.GetChildByTagName ("info");
-  if (anInfoElem != NULL) {
+  if (anInfoElem != NULL) 
+  {
     XmlObjMgt_DOMString aDocVerStr = anInfoElem.getAttribute("DocVersion");
-    if (aDocVerStr != NULL) {
+    if (aDocVerStr != NULL) 
+    {
       Standard_Integer anIntegerVersion;
       if (aDocVerStr.GetInteger(anIntegerVersion))
+      {
         aCurDocVersion = anIntegerVersion;
+      }
       else
       {
         TCollection_ExtendedString aMsg =

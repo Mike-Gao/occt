@@ -96,20 +96,13 @@ BinTools_ShapeSet::~BinTools_ShapeSet()
 //=======================================================================
 void BinTools_ShapeSet::SetFormatNb(const Standard_Integer theFormatNb)
 {
-  if(theFormatNb >= BIN_TOOLS_VERSION_1 && theFormatNb <= THE_CURRENT_VERSION)
-    myFormatNb = theFormatNb;
-  else 
-    myFormatNb = THE_CURRENT_VERSION;
+  Standard_ASSERT_RETURN(theFormatNb >= BIN_TOOLS_VERSION_1 && 
+                         theFormatNb <= THE_CURRENT_VERSION,
+    "Error: unsupported BinTools version.", );
+
+  myFormatNb = theFormatNb;
 }
 
-//=======================================================================
-//function : SetCurrentFormat
-//purpose  : 
-//=======================================================================
-void BinTools_ShapeSet::SetCurrentFormat()
-{
-  myFormatNb = THE_CURRENT_VERSION;
-}
 //=======================================================================
 //function : FormatNb
 //purpose  : 
@@ -293,10 +286,13 @@ void BinTools_ShapeSet::AddGeometry(const TopoDS_Shape& S)
     Standard_Boolean needNormals(Standard_False);
     Handle(BRep_TFace) TF = Handle(BRep_TFace)::DownCast(S.TShape());
     if (!TF->Surface().IsNull())
+    {
       mySurfaces.Add(TF->Surface());
+    }
     else
+    {
       needNormals = Standard_True;
-
+    }
     if (myWithTriangles
      || TF->Surface().IsNull())
     {
@@ -346,13 +342,21 @@ void  BinTools_ShapeSet::Write (Standard_OStream& OS,
 
   // write the copyright
   if (myFormatNb == BIN_TOOLS_VERSION_4)
+  {
     OS << "\n" << Version_4 << "\n";
+  }
   else if (myFormatNb == BIN_TOOLS_VERSION_3)
+  {
     OS << "\n" << Version_3 << "\n";
+  }
   else if (myFormatNb == BIN_TOOLS_VERSION_2)
+  {
     OS << "\n" << Version_2 << "\n";
+  }
   else
+  {
     OS << "\n" << Version_1 << "\n";
+  }
 
   //-----------------------------------------
   // write the locations
@@ -443,13 +447,21 @@ void  BinTools_ShapeSet::Read (Standard_IStream& IS,
   }
 
   if (strcmp(vers, Version_4) == 0)
+  {
     SetFormatNb(BIN_TOOLS_VERSION_4);
-  else if (strcmp(vers,Version_3) == 0) 
+  }
+  else if (strcmp(vers, Version_3) == 0)
+  {
     SetFormatNb(BIN_TOOLS_VERSION_3);
-  else  if (strcmp(vers,Version_2) == 0) 
+  }
+  else if (strcmp(vers, Version_2) == 0)
+  {
     SetFormatNb(BIN_TOOLS_VERSION_2);
-  else 
+  }
+  else
+  {
     SetFormatNb(BIN_TOOLS_VERSION_1);
+  }
 
   //-----------------------------------------
   // read the locations
@@ -1481,7 +1493,9 @@ void BinTools_ShapeSet::WriteTriangulation (Standard_OStream& OS,
       BinTools::PutInteger(OS, aNbTriangles);
       BinTools::PutBool(OS, aTriangulation->HasUVNodes() ? 1 : 0);
       if (myFormatNb >= BIN_TOOLS_VERSION_4)
+      {
         BinTools::PutBool(OS, (aTriangulation->HasNormals() && NeedToWriteNormals) ? 1 : 0);
+      }
       BinTools::PutReal(OS, aTriangulation->Deflection());
 
       // write the 3d nodes
@@ -1569,7 +1583,9 @@ void BinTools_ShapeSet::ReadTriangulation (Standard_IStream& IS,
       BinTools::GetInteger(IS, aNbTriangles);
       BinTools::GetBool(IS, hasUV);
       if (myFormatNb >= BIN_TOOLS_VERSION_4)
+      {
         BinTools::GetBool(IS, hasNormals);
+      }
       BinTools::GetReal(IS, aDefl); //deflection
       Handle(Poly_Triangulation) aTriangulation = new Poly_Triangulation (aNbNodes, aNbTriangles, hasUV, hasNormals);
       aTriangulation->Deflection (aDefl);

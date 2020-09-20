@@ -202,9 +202,9 @@ void Storage_HeaderData::SetStorageVersion(const TCollection_AsciiString& v)
   myStorageVersion = v;
 }
 
-void Storage_HeaderData::SetStorageVersion(const Standard_Integer aVersion)
+inline void Storage_HeaderData::SetStorageVersion(const Standard_Integer aVersion)
 {
-  myStorageVersion = TCollection_AsciiString(aVersion);
+  SetStorageVersion(TCollection_AsciiString(aVersion));
 }
 
 void Storage_HeaderData::SetCreationDate(const TCollection_AsciiString& d)

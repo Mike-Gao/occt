@@ -120,16 +120,5 @@ protected:
 
 };
 
-class Draw_SaveAndRestoreDBRep : public Draw_SaveAndRestoreBase
-{
-public:
-  Draw_SaveAndRestoreDBRep()
-    :Draw_SaveAndRestoreBase("DBRep_DrawableShape") {}
 
-  void                    Save(const Handle(Draw_Drawable3D)& theDrawable3D, std::ostream& os, TopTools_FormatVersion theVersion) const  override;
-  Handle(Draw_Drawable3D) Restore(std::istream& is) const override;
-  Standard_Boolean        Test(const Handle(Draw_Drawable3D)& theDrawable3D) const override;
-private:
-
-};
 #endif // _DBRep_HeaderFile

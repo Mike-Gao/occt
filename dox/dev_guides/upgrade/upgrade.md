@@ -1919,7 +1919,7 @@ Corresponding classes should be renamed in application code (like *AIS_LengthDim
 
 The method Select3D_SensitiveEntity::NbSubElements() has been changed to be constant. Select3D_SensitiveEntity subclasses at application level should be updated accordingly.
 
-@subsection upgrade_750_visualizationOfTriangulation Changes in storage of shapes
+@subsection upgrade_750_changesInStorageOfShapes Changes in storage of shapes
 
 * Information about per-vertex triangulations normals are now stored in BinOCAF and XmlOCAF document, BRep and Binary BRep Shape formats (only in case of triangulation-only Faces, with no analytical geometry to restore normals).
 * Versions of formats have been changed (11 for BinOCAF, 10 for XmlOCAF, 4 for BRep Shape and 3 for Binary BRep Shape)

@@ -214,10 +214,13 @@ void BRepTools_ShapeSet::AddGeometry(const TopoDS_Shape& S)
     Standard_Boolean needNormals(Standard_False);
     Handle(BRep_TFace) TF = Handle(BRep_TFace)::DownCast(S.TShape());
     if (!TF->Surface().IsNull())
+    {
       mySurfaces.Add(TF->Surface());
+    }
     else
+    {
       needNormals = Standard_True;
-
+    }
     if (myWithTriangles || TF->Surface().IsNull()) { // for XML Persistence
       Handle(Poly_Triangulation) Tr = TF->Triangulation();
       if (!Tr.IsNull()) myTriangulations.Add(Tr, needNormals);
@@ -1420,19 +1423,23 @@ void BRepTools_ShapeSet::WriteTriangulation(Standard_OStream&      OS,
   for (i = 1; i <= nbtri && aPS.More(); i++, aPS.Next()) {
 
     T = Handle(Poly_Triangulation)::DownCast(myTriangulations.FindKey(i));
-    const Standard_Boolean NeedToWriteNormals = myTriangulations(i);
+    const Standard_Boolean toWriteNormals = myTriangulations(i);
     if (Compact) {
       OS << T->NbNodes() << " " << T->NbTriangles() << " ";
       OS << ((T->HasUVNodes()) ? "1" : "0") << " ";
       if (FormatNb() >= TOP_TOOLS_VERSION_3)
-        OS << ((T->HasNormals() && NeedToWriteNormals) ? "1" : "0") << " ";
+      {
+        OS << ((T->HasNormals() && toWriteNormals) ? "1" : "0") << " ";
+      }
     }
     else {
       OS << "  "<< i << " : Triangulation with " << T->NbNodes() << " Nodes and "
          << T->NbTriangles() <<" Triangles\n";
       OS << "      "<<((T->HasUVNodes()) ? "with" : "without") << " UV nodes\n";
       if (FormatNb() >= TOP_TOOLS_VERSION_3)
-        OS << "      "<<((T->HasNormals() && NeedToWriteNormals) ? "with" : "without") << " normals\n";
+      {
+        OS << "      " << ((T->HasNormals() && toWriteNormals) ? "with" : "without") << " normals\n";
+      }
     }
     
     // write the deflection
@@ -1490,15 +1497,29 @@ void BRepTools_ShapeSet::WriteTriangulation(Standard_OStream&      OS,
 
     if (FormatNb() >= TOP_TOOLS_VERSION_3)
     {
-      if (T->HasNormals() && NeedToWriteNormals) {
+      if (T->HasNormals() && toWriteNormals) 
+      {
         if (!Compact) OS << "\nNormals :\n";
         const TShort_Array1OfShortReal& Normals = T->Normals();
-        for (j = 1; j <= nbNodes * 3; j++) {
-          if (!Compact) OS << std::setw(10) << j << " : ";
-          if (!Compact) OS << std::setw(17);
+        for (j = 1; j <= nbNodes * 3; j++) 
+        {
+          if (!Compact)
+          {
+            OS << std::setw(10) << j << " : ";
+          }
+          if (!Compact)
+          {
+            OS << std::setw(17);
+          }
           OS << Normals(j) << " ";
-          if (!Compact) OS << "\n";
-          else OS << " ";
+          if (!Compact)
+          {
+            OS << "\n";
+          }
+          else
+          {
+            OS << " ";
+          }
         }
       }
     }
@@ -1545,15 +1566,18 @@ void BRepTools_ShapeSet::ReadTriangulation(Standard_IStream& IS, const Message_P
 
     IS >> nbNodes >> nbTriangles >> hasUV;
     if (FormatNb() >= TOP_TOOLS_VERSION_3)
+    {
       IS >> hasNormals;
+    }
     GeomTools::GetReal(IS, d);
 
     TColgp_Array1OfPnt Nodes(1, nbNodes);
     TColgp_Array1OfPnt2d UVNodes(1, nbNodes);
     Handle(TShort_HArray1OfShortReal) Normals;
     if (hasNormals)
+    {
       Normals = new TShort_HArray1OfShortReal(1, nbNodes * 3);
-
+    }
     for (j = 1; j <= nbNodes; j++) {
       GeomTools::GetReal(IS, x);
       GeomTools::GetReal(IS, y);
@@ -1579,8 +1603,10 @@ void BRepTools_ShapeSet::ReadTriangulation(Standard_IStream& IS, const Message_P
 
     if (FormatNb() >= TOP_TOOLS_VERSION_3)
     {
-      if (hasNormals) {
-        for (j = 1; j <= nbNodes * 3; j++) {
+      if (hasNormals) 
+      {
+        for (j = 1; j <= nbNodes * 3; j++) 
+        {
           GeomTools::GetReal(IS, normal);
           Normals->SetValue(j, static_cast<Standard_ShortReal>(normal));
         }
@@ -1592,8 +1618,9 @@ void BRepTools_ShapeSet::ReadTriangulation(Standard_IStream& IS, const Message_P
       
     T->Deflection(d);
     if (hasNormals)
+    {
       T->SetNormals(Normals);
-      
+    }
     myTriangulations.Add(T, hasNormals);
   }
 }

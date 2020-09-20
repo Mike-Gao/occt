@@ -52,9 +52,13 @@ Poly_Triangulation::Poly_Triangulation(const Standard_Integer theNbNodes,
   myTriangles(1, theNbTriangles)
 {
   if (theHasUVNodes)
+  {
     myUVNodes = new TColgp_HArray1OfPnt2d(1, theNbNodes);
+  }
   if (theHasNormals)
+  {
     myNormals = new TShort_HArray1OfShortReal(1, theNbNodes * 3);
+  }
 }
 //=======================================================================
 //function : Poly_Triangulation

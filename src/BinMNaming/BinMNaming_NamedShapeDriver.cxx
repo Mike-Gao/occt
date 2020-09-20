@@ -141,7 +141,7 @@ static int TranslateFrom  (const BinObjMgt_Persistent&  theSource,
 
 BinMNaming_NamedShapeDriver::BinMNaming_NamedShapeDriver
                         (const Handle(Message_Messenger)& theMsgDriver)
-     : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TNaming_NamedShape)->Name()), myShapeSet(Standard_False), myFormatNb(THE_CURRENT_VERSION)
+     : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TNaming_NamedShape)->Name()), myShapeSet(Standard_False), myFormatNb(BinTools_ShapeSet::THE_CURRENT_VERSION)
 {
 }
 

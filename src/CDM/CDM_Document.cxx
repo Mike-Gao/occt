@@ -55,7 +55,7 @@ CDM_Document::CDM_Document():
   myRequestedPreviousVersionIsDefined(Standard_False),
   myFileExtensionWasFound       (Standard_False),
   myDescriptionWasFound         (Standard_False),
-  myStorageFormatVersion        (XML_LDRIVERS_VERSION_2)
+  myStorageFormatVersion        (0)
 {}
 
 

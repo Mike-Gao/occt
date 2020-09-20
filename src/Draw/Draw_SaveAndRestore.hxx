@@ -1,6 +1,4 @@
-// Created on: 2020-03-06
-// Created by: Andrey SURAVENKOV
-// Copyright (c) 1999-2020 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
