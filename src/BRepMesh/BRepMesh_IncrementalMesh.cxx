@@ -108,7 +108,7 @@ BRepMesh_IncrementalMesh::BRepMesh_IncrementalMesh( const TopoDS_Shape&    theSh
 //purpose  : 
 //=======================================================================
 BRepMesh_IncrementalMesh::BRepMesh_IncrementalMesh (const TopoDS_Shape& theShape,
-                                                    const BRepMesh_FastDiscret::Parameters& theParameters)  : 
+  const BRepMesh_FastDiscret::Parameters& theParameters) : 
   myParameters(theParameters) 
 {
   myShape       = theShape;

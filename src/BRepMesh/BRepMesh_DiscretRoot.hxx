@@ -50,9 +50,7 @@ public:
   Standard_EXPORT virtual void Perform () =0;
   
     
-  //! Compute triangulation for set shape.
-  Standard_EXPORT virtual void Perform (const Handle(Message_ProgressIndicator) &theProgress ) = 0;
-
+  
 
   DEFINE_STANDARD_RTTIEXT(BRepMesh_DiscretRoot,Standard_Transient)
 

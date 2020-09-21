@@ -80,7 +80,7 @@ public: //! @name mesher API
   Standard_EXPORT virtual void Perform() Standard_OVERRIDE;
 
   //! Performs meshing ot the shape.
-  Standard_EXPORT virtual void Perform(const Handle(Message_ProgressIndicator) &theProgress) Standard_OVERRIDE;
+  Standard_EXPORT void Perform(const Handle(Message_ProgressIndicator) &theProgress);
   
 public: //! @name accessing to parameters.
 
