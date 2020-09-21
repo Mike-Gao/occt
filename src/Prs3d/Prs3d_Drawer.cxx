@@ -15,7 +15,6 @@
 #include <Prs3d_Drawer.hxx>
 
 #include <Graphic3d_AspectFillArea3d.hxx>
-#include <Graphic3d_AspectFillCapping.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectText3d.hxx>
 #include <Prs3d_ArrowAspect.hxx>
@@ -106,9 +105,7 @@ Prs3d_Drawer::Prs3d_Drawer()
   myHasOwnDimLengthModelUnits   (Standard_False),
   myHasOwnDimAngleModelUnits    (Standard_False),
   myHasOwnDimLengthDisplayUnits (Standard_False),
-  myHasOwnDimAngleDisplayUnits  (Standard_False),
-
-  myHasOwnFillCappingAspect     (Standard_False)
+  myHasOwnDimAngleDisplayUnits  (Standard_False)
 {
   myDimensionModelUnits.SetLengthUnits ("m");
   myDimensionModelUnits.SetAngleUnits ("rad");
@@ -404,27 +401,6 @@ void Prs3d_Drawer::SetDimensionAspect (const Handle(Prs3d_DimensionAspect)& theA
 {
   myDimensionAspect = theAspect;
   myHasOwnDimensionAspect = !myDimensionAspect.IsNull();
-}
-
-// =======================================================================
-// function : FillCappingAspect
-// purpose  :
-// =======================================================================
-
-const Handle(Graphic3d_AspectFillCapping)& Prs3d_Drawer::FillCappingAspect()
-{
-  return myFillCappingAspect;
-}
-
-// =======================================================================
-// function : SetFillCappingAspect
-// purpose  :
-// =======================================================================
-
-void Prs3d_Drawer::SetFillCappingAspect (const Handle(Graphic3d_AspectFillCapping)& theAspect)
-{
-  myFillCappingAspect = theAspect;
-  myHasOwnFillCappingAspect = !myFillCappingAspect.IsNull();
 }
 
 // =======================================================================
