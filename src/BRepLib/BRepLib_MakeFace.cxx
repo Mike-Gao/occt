@@ -43,8 +43,11 @@
 #include <gp_Sphere.hxx>
 #include <gp_Torus.hxx>
 #include <Precision.hxx>
+#include <ShapeAnalysis_Edge.hxx>
 #include <StdFail_NotDone.hxx>
+#include <TopAbs.hxx>
 #include <TopAbs_State.hxx>
+#include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -364,6 +367,18 @@ BRepLib_MakeFace::BRepLib_MakeFace(const Handle(Geom_Surface)& S,
                                    const TopoDS_Wire& W,
                                    const Standard_Boolean Inside)
 {
+  const ShapeAnalysis_Edge anAnalysis;
+  TopLoc_Location aLocation = W.Location();
+  TopExp_Explorer anExplorer;
+  for (anExplorer.Init(W, TopAbs_EDGE); anExplorer.More(); anExplorer.Next())
+  {
+    const TopoDS_Edge& anEdge = TopoDS::Edge(anExplorer.Current());
+    if(!anAnalysis.HasPCurve(anEdge, S, aLocation))
+    {
+      myError = BRepLib_NoFace;
+      return;
+    }
+  }
   Init(S, Standard_False, Precision::Confusion());
   Add(W);
   if (Inside && BRep_Tool::IsClosed(W)) CheckInside();

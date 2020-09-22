@@ -371,6 +371,9 @@ BRepBuilderAPI_MakeFace::BRepBuilderAPI_MakeFace(const Handle(Geom_Surface)& S,
     Done();
     myShape = myMakeFace.Shape();
   }
+  else {
+    NotDone();
+  }
 }
 
 
