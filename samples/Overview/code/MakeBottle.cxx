@@ -112,7 +112,8 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
   // Body : Apply Fillets
   BRepFilletAPI_MakeFillet mkFillet(myBody);
   TopExp_Explorer anEdgeExplorer(myBody, TopAbs_EDGE);
-  while (anEdgeExplorer.More()) {
+  while (anEdgeExplorer.More()) 
+  {
     TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExplorer.Current());
     //Add edge to fillet algorithm
     mkFillet.Add(myThickness / 12., anEdge);
@@ -138,15 +139,18 @@ MakeBottle(const Standard_Real myWidth, const Standard_Real myHeight,
   TopoDS_Face   faceToRemove;
   Standard_Real zMax = -1;
 
-  for (TopExp_Explorer aFaceExplorer(myBody, TopAbs_FACE); aFaceExplorer.More(); aFaceExplorer.Next()) {
+  for (TopExp_Explorer aFaceExplorer(myBody, TopAbs_FACE); aFaceExplorer.More(); aFaceExplorer.Next()) 
+  {
     TopoDS_Face aFace = TopoDS::Face(aFaceExplorer.Current());
     // Check if <aFace> is the top face of the bottle’s neck 
     Handle(Geom_Surface) aSurface = BRep_Tool::Surface(aFace);
-    if (aSurface->DynamicType() == STANDARD_TYPE(Geom_Plane)) {
+    if (aSurface->DynamicType() == STANDARD_TYPE(Geom_Plane)) 
+    {
       Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(aSurface);
       gp_Pnt aPnt = aPlane->Location();
       Standard_Real aZ = aPnt.Z();
-      if (aZ > zMax) {
+      if (aZ > zMax) 
+      {
         zMax = aZ;
         faceToRemove = aFace;
       }

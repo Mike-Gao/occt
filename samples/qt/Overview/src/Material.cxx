@@ -106,17 +106,21 @@ DialogMaterial::~DialogMaterial()
 void DialogMaterial::updateButtons(bool isOn)
 {
   if (!isOn)
+  {
     return;
-
+  }
   QPushButton*sentBy = (QPushButton*)sender();
 
-  for (int i = 0; i < myButtons.size(); i++) {
+  for (int i = 0; i < myButtons.size(); i++) 
+  {
     QPushButton* b = myButtons.at(i);
-    if (b != sentBy) {
+    if (b != sentBy) 
+    {
       b->setEnabled(true);
       b->setChecked(false);
     }
-    else {
+    else 
+    {
       b->setEnabled(false);
     }
   }

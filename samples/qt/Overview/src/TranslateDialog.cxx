@@ -25,7 +25,8 @@ TranslateDialog::TranslateDialog(QWidget* parent, Qt::WindowFlags flags, bool mo
 
   QGridLayout* grid = ::qobject_cast<QGridLayout*>(layout());
 
-  if (grid) {
+  if (grid) 
+  {
     QVBoxLayout *vbox = new QVBoxLayout;
 
     QWidget* paramGroup = new QWidget(this);
@@ -46,16 +47,22 @@ TranslateDialog::~TranslateDialog()
 int TranslateDialog::getMode() const
 {
   if (myBox->currentIndex() < 0 || myBox->currentIndex() > (int)myList.count() - 1)
+  {
     return -1;
+  }
   else
+  {
     return myList.at(myBox->currentIndex());
+  }
 }
 
 void TranslateDialog::setMode(const int mode)
 {
   int idx = myList.indexOf(mode);
   if (idx >= 0)
+  {
     myBox->setCurrentIndex(idx);
+  }
 }
 
 void TranslateDialog::addMode(const int mode, const QString& name)
@@ -79,9 +86,11 @@ void TranslateDialog::clear()
 QListView* TranslateDialog::findListView(const QObjectList & childList)
 {
   QListView* listView = 0;
-  for (int i = 0, n = childList.count(); i < n && !listView; i++) {
+  for (int i = 0, n = childList.count(); i < n && !listView; i++) 
+  {
     listView = qobject_cast<QListView*>(childList.at(i));
-    if (!listView && childList.at(i)) {
+    if (!listView && childList.at(i))
+    {
       listView = findListView(childList.at(i)->children());
     }
   }

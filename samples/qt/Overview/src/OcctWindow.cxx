@@ -47,9 +47,13 @@ Aspect_Drawable OcctWindow::NativeParentHandle() const
 {
   QWidget* aParentWidget = myWidget->parentWidget();
   if (aParentWidget != NULL)
+  {
     return (Aspect_Drawable)aParentWidget->winId();
+  }
   else
+  {
     return 0;
+  }
 }
 
 // =======================================================================
@@ -99,13 +103,27 @@ Aspect_TypeOfResize OcctWindow::DoResize()
   int                 aMask = 0;
   Aspect_TypeOfResize aMode = Aspect_TOR_UNKNOWN;
 
-  if (!myWidget->isMinimized()) {
-    if (Abs(myWidget->rect().left() - myXLeft) > 2) aMask |= 1;
-    if (Abs(myWidget->rect().right() - myXRight) > 2) aMask |= 2;
-    if (Abs(myWidget->rect().top() - myYTop) > 2) aMask |= 4;
-    if (Abs(myWidget->rect().bottom() - myYBottom) > 2) aMask |= 8;
+  if (!myWidget->isMinimized()) 
+  {
+    if (Abs(myWidget->rect().left() - myXLeft) > 2)
+    {
+      aMask |= 1;
+    }
+    if (Abs(myWidget->rect().right() - myXRight) > 2)
+    {
+      aMask |= 2;
+    }
+    if (Abs(myWidget->rect().top() - myYTop) > 2)
+    {
+      aMask |= 4;
+    }
+    if (Abs(myWidget->rect().bottom() - myYBottom) > 2)
+    {
+      aMask |= 8;
+    }
 
-    switch (aMask) {
+    switch (aMask) 
+    {
     case 0:
       aMode = Aspect_TOR_NO_BORDER;
       break;

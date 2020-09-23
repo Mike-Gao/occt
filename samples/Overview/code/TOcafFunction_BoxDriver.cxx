@@ -27,7 +27,8 @@
 //purpose  :
 //=======================================================================
 
-const Standard_GUID& TOcafFunction_BoxDriver::GetID() {
+const Standard_GUID& TOcafFunction_BoxDriver::GetID() 
+{
   static Standard_GUID anID("22D22E51-D69A-11d4-8F1A-0060B0EE18E8");
   return anID;
 }
@@ -71,18 +72,29 @@ Standard_Boolean TOcafFunction_BoxDriver::MustExecute(const Handle(TFunction_Log
   // 
   // Let's check them:
   if (log->IsModified(Label().FindChild(1)))
+  {
     return Standard_True; // width.
+  }
   if (log->IsModified(Label().FindChild(2)))
+  {
     return Standard_True; // length,
+  }
   if (log->IsModified(Label().FindChild(3)))
+  {
     return Standard_True; // width.
+  }
   if (log->IsModified(Label().FindChild(4)))
+  {
     return Standard_True; // length,
+  }
   if (log->IsModified(Label().FindChild(5)))
+  {
     return Standard_True; // width.
+  }
   if (log->IsModified(Label().FindChild(6)))
+  {
     return Standard_True; // length,
-
+  }
  // if there are no any modifications concerned the box,
   // it's not necessary to recompute (to call the method Execute()):
   return Standard_False;
@@ -105,27 +117,39 @@ Standard_Integer TOcafFunction_BoxDriver::Execute(Handle(TFunction_Logbook)& /*l
   Handle(TDataStd_Real) TSR;
   Standard_Real x, y, z, l, h, w;
   if (!Label().FindChild(1).FindAttribute(TDataStd_Real::GetID(), TSR))
+  {
     return 1;
+  }
   l = TSR->Get();
 
   if (!Label().FindChild(2).FindAttribute(TDataStd_Real::GetID(), TSR))
+  {
     return 1;
+  }
   h = TSR->Get();
 
   if (!Label().FindChild(3).FindAttribute(TDataStd_Real::GetID(), TSR))
+  {
     return 1;
+  }
   w = TSR->Get();
 
   if (!Label().FindChild(4).FindAttribute(TDataStd_Real::GetID(), TSR))
+  {
     return 1;
+  }
   x = TSR->Get();
 
   if (!Label().FindChild(5).FindAttribute(TDataStd_Real::GetID(), TSR))
+  {
     return 1;
+  }
   y = TSR->Get();
 
   if (!Label().FindChild(6).FindAttribute(TDataStd_Real::GetID(), TSR))
+  {
     return 1;
+  }
   z = TSR->Get();
 
   // Build a box using the dimension and position attributes 

@@ -46,7 +46,8 @@ Handle(V3d_Viewer) DocumentCommon::Viewer(const Standard_ExtString,
 {
   static Handle(OpenGl_GraphicDriver) aGraphicDriver;
 
-  if (aGraphicDriver.IsNull()) {
+  if (aGraphicDriver.IsNull()) 
+  {
     Handle(Aspect_DisplayConnection) aDisplayConnection;
 #if !defined(_WIN32) && !defined(__WIN32__) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX))
     aDisplayConnection = new Aspect_DisplayConnection(OSD_Environment("DISPLAY").Value());
@@ -103,11 +104,16 @@ void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveO
     myContextIsEmpty = true;
   else
     myContextIsEmpty = false;
-  for (const Handle(AIS_InteractiveObject) anObject : theObjects) {
+  for (const Handle(AIS_InteractiveObject) anObject : theObjects) 
+  {
     if (!theDisplayShaded)
+    {
       myContext->Display(anObject, Standard_False);
+    }
     else
+    {
       myContext->Display(anObject, AIS_Shaded, 0, Standard_False);
+    }
   }
   myViewer->Redraw();
 }

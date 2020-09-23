@@ -64,7 +64,8 @@ void Viewer3dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     VboOn3dSample();
   else if (theSampleName == "VboOff3dSample")
     VboOff3dSample();
-  else {
+  else 
+  {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -116,11 +117,13 @@ void Viewer3dSamples::ClearLight3dSample()
   TColStd_ListOfTransient lights;
   for (myView->Viewer()->InitActiveLights();
     myView->Viewer()->MoreActiveLights();
-    myView->Viewer()->NextActiveLights()) {
+    myView->Viewer()->NextActiveLights()) 
+  {
     lights.Append(myView->Viewer()->ActiveLight());
   }
   TColStd_ListIteratorOfListOfTransient itrLights(lights);
-  for (; itrLights.More(); itrLights.Next()) {
+  for (; itrLights.More(); itrLights.Next()) 
+  {
     Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
     myView->Viewer()->SetLightOff(light);
   }
@@ -129,11 +132,13 @@ void Viewer3dSamples::ClearLight3dSample()
   lights.Clear();
   for (myView->InitActiveLights();
     myView->MoreActiveLights();
-    myView->NextActiveLights()) {
+    myView->NextActiveLights()) 
+  {
     lights.Append(myView->ActiveLight());
   }
   itrLights.Initialize(lights);
-  for (; itrLights.More(); itrLights.Next()) {
+  for (; itrLights.More(); itrLights.Next()) 
+  {
     Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
     myView->SetLightOff(light);
   }
@@ -187,7 +192,8 @@ void Viewer3dSamples::RedColorPresentation3dSample()
 {
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) 
+  {
     Quantity_Color aShapeColor;
     myContext->Color(anAisObject, aShapeColor);
     myResult << "A Current shape color: Red = " << aShapeColor.Red()
@@ -203,7 +209,8 @@ void Viewer3dSamples::GrayColorPresentation3dSample()
 {
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) 
+  {
     Quantity_Color aShapeColor;
     myContext->Color(anAisObject, aShapeColor);
     myResult << "A Current shape color: Hue = " << aShapeColor.Hue()
@@ -221,7 +228,9 @@ void Viewer3dSamples::PlasticPresentation3dSample()
   myContext->DisplayedObjects(anAisObjectsList);
   Graphic3d_NameOfMaterial aMaterial = Graphic3d_NOM_PLASTIC;
   for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
+  {
     myContext->SetMaterial(anAisObject, aMaterial, Standard_False);
+  }
   myContext->UpdateCurrentViewer();
 }
 
@@ -231,7 +240,9 @@ void Viewer3dSamples::BronzePresentation3dSample()
   myContext->DisplayedObjects(anAisObjectsList);
   Graphic3d_NameOfMaterial aMaterial = Graphic3d_NOM_BRONZE;
   for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
+  {
     myContext->SetMaterial(anAisObject, aMaterial, Standard_False);
+  }
   myContext->UpdateCurrentViewer();
 }
 
@@ -240,7 +251,9 @@ void Viewer3dSamples::OpaquePresentation3dSample()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
+  {
     myContext->SetTransparency(anAisObject, 0.0, Standard_False);
+  }
   myContext->UpdateCurrentViewer();
 }
 
@@ -249,7 +262,9 @@ void Viewer3dSamples::HalfTransparencyPresentation3dSample()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList)
+  {
     myContext->SetTransparency(anAisObject, 0.5, Standard_False);
+  }
   myContext->UpdateCurrentViewer();
 }
 
@@ -258,7 +273,8 @@ void Viewer3dSamples::VboOn3dSample()
   Handle(OpenGl_GraphicDriver) aDriver =
     Handle(OpenGl_GraphicDriver)::DownCast(myContext->CurrentViewer()->Driver());
 
-  if (!aDriver.IsNull()) {
+  if (!aDriver.IsNull())
+  {
     aDriver->ChangeOptions().vboDisable = Standard_False;
   }
 }
@@ -268,7 +284,8 @@ void Viewer3dSamples::VboOff3dSample()
   Handle(OpenGl_GraphicDriver) aDriver =
     Handle(OpenGl_GraphicDriver)::DownCast(myContext->CurrentViewer()->Driver());
 
-  if (!aDriver.IsNull()) {
+  if (!aDriver.IsNull()) 
+  {
     aDriver->ChangeOptions().vboDisable = Standard_True;
   }
 }

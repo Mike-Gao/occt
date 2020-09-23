@@ -44,10 +44,12 @@ void OcafSamples::Process(TCollection_AsciiString theSampleName)
   myObject2d.Clear();
   myCode.Clear();
   myIsProcessed = Standard_False;
-  try {
+  try 
+  {
     ExecuteSample(theSampleName);
   }
-  catch (...) {
+  catch (...) 
+  {
     TraceError(TCollection_AsciiString("Error in sample: ") + theSampleName);
   }
 }
@@ -76,7 +78,8 @@ void OcafSamples::ExecuteSample(TCollection_AsciiString theSampleName)
     DialogSaveBinOcafSample();
   else if (theSampleName == "DialogSaveXmlOcafSample")
     DialogSaveXmlOcafSample();
-  else {
+  else 
+  {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -87,33 +90,49 @@ void OcafSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 Standard_Boolean OcafSamples::IsExportSample(TCollection_AsciiString theSampleName)
 {
   if (theSampleName == "DialogSaveBinOcafSample" || theSampleName == "DialogSaveXmlOcafSample")
+  {
     return Standard_True;
+  }
   else
+  {
     return Standard_False;
+  }
 }
 
 Standard_Boolean OcafSamples::IsImportSample(TCollection_AsciiString theSampleName)
 {
   if (theSampleName == "DialogOpenOcafSample")
+  {
     return Standard_True;
+  }
   else
+  {
     return Standard_False;
+  }
 }
 
 Standard_Boolean OcafSamples::IsBinarySample(TCollection_AsciiString theSampleName)
 {
   if (theSampleName == "DialogOpenOcafSample" || theSampleName == "DialogSaveBinOcafSample")
+  {
     return Standard_True;
+  }
   else
+  {
     return Standard_False;
+  }
 }
 
 Standard_Boolean OcafSamples::IsXmlSample(TCollection_AsciiString theSampleName)
 {
   if (theSampleName == "DialogOpenOcafSample" || theSampleName == "DialogSaveXmlOcafSample")
+  {
     return Standard_True;
+  }
   else
+  {
     return Standard_False;
+  }
 }
 
 void OcafSamples::CreateOcafDocument()
@@ -236,12 +255,14 @@ void OcafSamples::CreateCylinderOcafSample()
   Handle(TFunction_Driver) myCylDriver;
   // Find the TOcafFunction_CylDriver in the TFunction_DriverTable using its GUID
   if (!TFunction_DriverTable::Get()->FindDriver(TOcafFunction_CylDriver::GetID(), myCylDriver))
+  {
     myResult << "Ocaf Cylinder driver not found";
-
+  }
   myCylDriver->Init(aLabel);
   if (myCylDriver->Execute(aLogBook))
+  {
     myResult << "Create Cylinder function execute failed";
-
+  }
   // Get the TPrsStd_AISPresentation of the new box TNaming_NamedShape
   Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
   // Display it
@@ -263,14 +284,16 @@ void OcafSamples::ModifyBoxOcafSample()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   Standard_Integer aBoxCount(0);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) 
+  {
     // Get the main label of the selected object
     Handle(TPrsStd_AISPresentation) anAisPresentation = Handle(TPrsStd_AISPresentation)::DownCast(anAisObject->GetOwner());
     TDF_Label aLabel = anAisPresentation->Label();
 
     // Get the TFunction_Function attribute of the selected object
     Handle(TFunction_Function) aFunction;
-    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction)) {
+    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction)) 
+    {
       myResult << "Object cannot be modify.";
       return;
     }
@@ -278,7 +301,8 @@ void OcafSamples::ModifyBoxOcafSample()
     Standard_GUID myDriverID = aFunction->GetDriverGUID();
 
     // Case of a box created with the box function driver
-    if (myDriverID == TOcafFunction_BoxDriver::GetID()) {
+    if (myDriverID == TOcafFunction_BoxDriver::GetID()) 
+    {
       aBoxCount++;
       Standard_Real aBoxX, aBoxY, aBoxZ, aBoxWidth, aBoxLenght, aBoxHight;
 
@@ -344,9 +368,13 @@ void OcafSamples::ModifyBoxOcafSample()
     }
   }
   if (aBoxCount)
+  {
     myResult << "Number of modified boxes: " << aBoxCount << std::endl;
+  }
   else
+  {
     myResult << "No boxes to modyfy" << std::endl;
+  }
 }
 
 void OcafSamples::ModifyCylinderOcafSample()
@@ -354,14 +382,16 @@ void OcafSamples::ModifyCylinderOcafSample()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   Standard_Integer aCylCount(0);
-  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) {
+  for (Handle(AIS_InteractiveObject) anAisObject : anAisObjectsList) 
+  {
     // Get the main label of the selected object
     Handle(TPrsStd_AISPresentation) anAisPresentation = Handle(TPrsStd_AISPresentation)::DownCast(anAisObject->GetOwner());
     TDF_Label aLabel = anAisPresentation->Label();
 
     // Get the TFunction_Function attribute of the selected object
     Handle(TFunction_Function) aFunction;
-    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction)) {
+    if (!aLabel.FindAttribute(TFunction_Function::GetID(), aFunction)) 
+    {
       myResult << "Object cannot be modify.";
       return;
     }
@@ -369,7 +399,8 @@ void OcafSamples::ModifyCylinderOcafSample()
     Standard_GUID myDriverID = aFunction->GetDriverGUID();
 
     // Case of a box created with the box function driver
-    if (myDriverID == TOcafFunction_CylDriver::GetID()) {
+    if (myDriverID == TOcafFunction_CylDriver::GetID()) 
+    {
       aCylCount++;
       Standard_Real aCylRadius, aCylHight, aCylX, aCylY, aCylZ;
 
@@ -418,8 +449,9 @@ void OcafSamples::ModifyCylinderOcafSample()
       // Set the cylinder touched, it will be usefull to recompute an object which used this box as attribute
       aLogBook->SetTouched(aLabel);
       if (aCylDriver->Execute(aLogBook))
+      {
         myResult << "Recompute failed" << std::endl;
-
+      }
       // Get the presentation of the box, display it and set it selected
       Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
       TDataStd_Integer::Set(aLabel, 1);
@@ -435,31 +467,41 @@ void OcafSamples::ModifyCylinderOcafSample()
     }
   }
   if (aCylCount)
+  {
     myResult << "Number of modified boxes: " << aCylCount << std::endl;
+  }
   else
+  {
     myResult << "No boxes to modyfy" << std::endl;
+  }
 }
 
 void OcafSamples::UndoOcafSample()
 {
-  if (myOcafDoc->Undo()) {
+  if (myOcafDoc->Undo()) 
+  {
     myOcafDoc->CommitCommand();
     myContext->UpdateCurrentViewer();
     myResult << "Undo was done successfully" << std::endl;
   }
   else
+  {
     myResult << "Nothing to undo" << std::endl;
+  }
 }
 
 void OcafSamples::RedoOcafSample()
 {
-  if (myOcafDoc->Redo()) {
+  if (myOcafDoc->Redo()) 
+  {
     myOcafDoc->CommitCommand();
     myContext->UpdateCurrentViewer();
     myResult << "Redo was done successfully" << std::endl;
   }
   else
+  {
     myResult << "Nothing to redo" << std::endl;
+  }
 }
 
 void OcafSamples::DialogOpenOcafSample()
@@ -469,13 +511,15 @@ void OcafSamples::DialogOpenOcafSample()
   BinDrivers::DefineFormat(anOcaf_Application);
   XmlDrivers::DefineFormat(anOcaf_Application);
   // Look for already opened
-  if (anOcaf_Application->IsInSession(myFileName)) {
+  if (anOcaf_Application->IsInSession(myFileName)) 
+  {
     myResult << "Document: " << myFileName << " is already in session" << std::endl;
     return;
   }
   // Open the document in the current application
   PCDM_ReaderStatus aReaderStatus = anOcaf_Application->Open(myFileName, myOcafDoc);
-  if (aReaderStatus == PCDM_ReaderStatus::PCDM_RS_OK) {
+  if (aReaderStatus == PCDM_ReaderStatus::PCDM_RS_OK) 
+  {
     // Connect the document CAF (myDoc) with the AISContext (myAISContext)
     TPrsStd_AISViewer::New(myOcafDoc->Main(), myViewer);
     myOcafDoc->SetUndoLimit(10);
@@ -491,7 +535,9 @@ void OcafSamples::DialogOpenOcafSample()
     myResult << "Open a document" << std::endl;
   }
   else
+  {
     myResult << "Error! The file wasn't opened. PCDM_ReaderStatus: " << aReaderStatus << std::endl;
+  }
 }
 
 void OcafSamples::DialogSaveBinOcafSample()
@@ -502,9 +548,13 @@ void OcafSamples::DialogSaveBinOcafSample()
   // Saves the document in the current application
   PCDM_StoreStatus aStoreStatus = anOcaf_Application->SaveAs(myOcafDoc, myFileName);
   if (aStoreStatus == PCDM_StoreStatus::PCDM_SS_OK)
+  {
     myResult << "The file was saved successfully" << std::endl;
+  }
   else
+  {
     myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStoreStatus << std::endl;
+  }
 }
 
 void OcafSamples::DialogSaveXmlOcafSample()
@@ -515,30 +565,42 @@ void OcafSamples::DialogSaveXmlOcafSample()
   // Saves the document in the current application
   PCDM_StoreStatus aStoreStatus = anOcaf_Application->SaveAs(myOcafDoc, myFileName);
   if (aStoreStatus == PCDM_StoreStatus::PCDM_SS_OK)
+  {
     myResult << "The file was saved successfully" << std::endl;
+  }
   else
+  {
     myResult << "Error! The file wasn't saved. PCDM_StoreStatus: " << aStoreStatus << std::endl;
+  }
 }
 
 void OcafSamples::DisplayPresentation()
 {
   TDF_Label aRootlabel = myOcafDoc->Main();
 
-  for (TDF_ChildIterator it(aRootlabel); it.More(); it.Next()) {
+  for (TDF_ChildIterator it(aRootlabel); it.More(); it.Next()) 
+  {
     TDF_Label aLabel = it.Value();
     Handle(TNaming_NamedShape) aNamedShape;
     if (!aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNamedShape))
+    {
       continue;
+    }
     Handle(TDataStd_Integer) aDataInteger;
 
     // To know if the object was displayed
     if (aLabel.FindAttribute(TDataStd_Integer::GetID(), aDataInteger))
+    {
       if (!aDataInteger->Get())
+      {
         continue;
-
+      }
+    }
     Handle(TPrsStd_AISPresentation) anAisPresentation;
     if (!aLabel.FindAttribute(TPrsStd_AISPresentation::GetID(), anAisPresentation))
+    {
       anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
+    }
     anAisPresentation->SetColor(Quantity_NOC_ORANGE);
     anAisPresentation->Display(1);
   }

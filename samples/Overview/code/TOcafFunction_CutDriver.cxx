@@ -34,7 +34,8 @@
 //purpose  :
 //=======================================================================
 
-const Standard_GUID& TOcafFunction_CutDriver::GetID() {
+const Standard_GUID& TOcafFunction_CutDriver::GetID() 
+{
   static Standard_GUID anID("22D22E52-D69A-11d4-8F1A-0060B0EE18E8");
   return anID;
 }
@@ -47,7 +48,8 @@ const Standard_GUID& TOcafFunction_CutDriver::GetID() {
 //=======================================================================
 
 TOcafFunction_CutDriver::TOcafFunction_CutDriver()
-{}
+{
+}
 
 //=======================================================================
 //function : Validate
@@ -118,17 +120,27 @@ Standard_Integer TOcafFunction_CutDriver::Execute(Handle(TFunction_Logbook)& /*l
   // First, we have to retrieve the TDF_Reference attributes to obtain
   // the root labels of the OriginalNShape and the ToolNShape:
   Handle(TDF_Reference)  OriginalRef, ToolRef;
-  if (!Label().FindChild(1).FindAttribute(TDF_Reference::GetID(), OriginalRef)) return 1;
+  if (!Label().FindChild(1).FindAttribute(TDF_Reference::GetID(), OriginalRef))
+  {
+    return 1;
+  }
   TDF_Label OriginalLab = OriginalRef->Get();
-  if (!Label().FindChild(2).FindAttribute(TDF_Reference::GetID(), ToolRef)) return 1;
+  if (!Label().FindChild(2).FindAttribute(TDF_Reference::GetID(), ToolRef))
+  {
+    return 1;
+  }
   TDF_Label ToolLab = ToolRef->Get();
 
   // Get the TNaming_NamedShape attributes of these labels
   Handle(TNaming_NamedShape) OriginalNShape, ToolNShape;
   if (!(OriginalLab.FindAttribute(TNaming_NamedShape::GetID(), OriginalNShape)))
+  {
     throw Standard_Failure("TOcaf_Commands::CutObjects");
+  }
   if (!(ToolLab.FindAttribute(TNaming_NamedShape::GetID(), ToolNShape)))
+  {
     throw Standard_Failure("TOcaf_Commands::CutObjects");
+  }
 
   // Now, let's get the TopoDS_Shape of these TNaming_NamedShape:
   TopoDS_Shape OriginalShape = OriginalNShape->Get();
@@ -138,7 +150,8 @@ Standard_Integer TOcafFunction_CutDriver::Execute(Handle(TFunction_Logbook)& /*l
     // Let's call for algorithm computing a cut operation:
   BRepAlgoAPI_Cut mkCut(OriginalShape, ToolShape);
   // Let's check if the Cut has been successfull:
-  if (!mkCut.IsDone()) {
+  if (!mkCut.IsDone()) 
+  {
     QMessageBox::critical(qApp->activeWindow(),
       QObject::tr("Cut Function Driver"),
       QObject::tr("Cut not done."));

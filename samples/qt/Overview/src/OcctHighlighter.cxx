@@ -150,14 +150,16 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent) : QSyntaxHighlighter(par
 
   myOcctFormat.setForeground(Qt::darkCyan);
 
-  for (const QString &aPattern : anOcctPatterns) {
+  for (const QString &aPattern : anOcctPatterns) 
+  {
     aRule.myPattern = QRegularExpression(aPattern);
     aRule.myFormat = myOcctFormat;
     myHighlightingRules.append(aRule);
   }
 
   myHelperFormat.setForeground(Qt::red);
-  for (const QString &aPattern : aHelperPatterns) {
+  for (const QString &aPattern : aHelperPatterns) 
+  {
     aRule.myPattern = QRegularExpression(aPattern);
     aRule.myFormat = myHelperFormat;
     myHighlightingRules.append(aRule);
@@ -166,7 +168,8 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent) : QSyntaxHighlighter(par
 
   myKeywordFormat.setForeground(Qt::darkBlue);
   myKeywordFormat.setFontWeight(QFont::Bold);
-  for (const QString &aPattern : aKeywordPatterns) {
+  for (const QString &aPattern : aKeywordPatterns) 
+  {
     aRule.myPattern = QRegularExpression(aPattern);
     aRule.myFormat = myKeywordFormat;
     myHighlightingRules.append(aRule);
@@ -206,9 +209,11 @@ OcctHighlighter::OcctHighlighter(QTextDocument *parent) : QSyntaxHighlighter(par
 
 void OcctHighlighter::highlightBlock(const QString &theText)
 {
-  for (const HighlightingRule &rule : qAsConst(myHighlightingRules)) {
+  for (const HighlightingRule &rule : qAsConst(myHighlightingRules)) 
+  {
     QRegularExpressionMatchIterator matchIterator = rule.myPattern.globalMatch(theText);
-    while (matchIterator.hasNext()) {
+    while (matchIterator.hasNext()) 
+    {
       QRegularExpressionMatch match = matchIterator.next();
       setFormat(match.capturedStart(), match.capturedLength(), rule.myFormat);
     }
@@ -220,15 +225,18 @@ void OcctHighlighter::highlightBlock(const QString &theText)
   if (previousBlockState() != 1)
     startIndex = theText.indexOf(myCommentStartExpression);
 
-  while (startIndex >= 0) {
+  while (startIndex >= 0) 
+  {
     QRegularExpressionMatch match = myCommentEndExpression.match(theText, startIndex);
     int endIndex = match.capturedStart();
     int commentLength = 0;
-    if (endIndex == -1) {
+    if (endIndex == -1) 
+    {
       setCurrentBlockState(1);
       commentLength = theText.length() - startIndex;
     }
-    else {
+    else 
+    {
       commentLength = endIndex - startIndex
         + match.capturedLength();
     }

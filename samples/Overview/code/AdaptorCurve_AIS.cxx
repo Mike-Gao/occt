@@ -23,7 +23,8 @@ void AdaptorCurve_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)&,
   const Standard_Integer theMode)
 {
   GeomAdaptor_Curve anAdaptorCurve(myCurve);
-  switch (theMode) {
+  switch (theMode) 
+  {
   case 1:
   {
     Handle(Prs3d_Drawer) aPoleDrawer = new Prs3d_Drawer();

@@ -170,8 +170,10 @@ void ApplicationCommonWindow::createStandardOperations()
     myCategoryActions.insert(aCategory, anAction);
   }
 
-  for (QMenu* aSampleMenu : mySamplePopups) 
+  for (QMenu* aSampleMenu : mySamplePopups)
+  {
     menuBar()->addMenu(aSampleMenu);
+  }
 
   // add a help menu
   QMenu * help = new QMenu(this);
@@ -236,27 +238,33 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
 
   createStandardOperations();
 
-  if (myAppType == DataExchange) {
+  if (myAppType == DataExchange) 
+  {
     Handle(DataExchangeSamples) aDataExchangeSamples = Handle(DataExchangeSamples)::DownCast(mySamples);
-    if (aDataExchangeSamples) {
+    if (aDataExchangeSamples) 
+    {
       aDataExchangeSamples->AppendBottle();
       aDataExchangeSamples->SetView(myGeomWidget->Get3dView());
       myDocument3d->SetObjects(mySamples->Get3dObjects());
       myGeomWidget->FitAll();
     }
   }
-  else if (myAppType == Ocaf) {
+  else if (myAppType == Ocaf) 
+  {
     Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
-    if (aOcafSamples) {
+    if (aOcafSamples) 
+    {
       aOcafSamples->SetContext(myDocument3d->getContext());
       aOcafSamples->SetViewer(myDocument3d->getViewer());
       onProcessOcaf("CreateOcafDocument");
       myGeomWidget->Show3d();
     }
   }
-  else if (myAppType == Viewer3d) {
+  else if (myAppType == Viewer3d) 
+  {
     Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
-    if (aViewer3dSamples) {
+    if (aViewer3dSamples) 
+    {
       aViewer3dSamples->SetContext(myDocument3d->getContext());
       aViewer3dSamples->AppendBottle();
       aViewer3dSamples->SetView(myGeomWidget->Get3dView());
@@ -264,7 +272,8 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
       myGeomWidget->FitAll();
     }
   }
-  else if (myAppType == Viewer2d) {
+  else if (myAppType == Viewer2d) 
+  {
     Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
     if (aViewer2dSamples)
     {
@@ -299,10 +308,12 @@ QAction* ApplicationCommonWindow::CreateAction(PointerToMemberFunction theHandle
   QString theIconName)
 {
   QAction* aAction(NULL);
-  if (theIconName.isEmpty()) {
+  if (theIconName.isEmpty()) 
+  {
     aAction = new QAction(theActionName, this);
   }
-  else {
+  else 
+  {
     QPixmap aIcon = QPixmap(theIconName);
     aAction = new QAction(aIcon, theActionName, this);
   }
@@ -360,7 +371,8 @@ void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
     return;
 
   Handle(DataExchangeSamples) aDataExchangeSamples = Handle(DataExchangeSamples)::DownCast(mySamples);
-  if (aDataExchangeSamples) {
+  if (aDataExchangeSamples) 
+  {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     aDataExchangeSamples->SetFileName(aFileName.toUtf8().data());
     aDataExchangeSamples->SetStepType(static_cast<STEPControl_StepModelType>(aMode));
@@ -378,8 +390,10 @@ void ApplicationCommonWindow::onProcessOcaf(const QString& theSampleName)
 {
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
-  if (aOcafSamples) {
-    if (theSampleName.indexOf("Dialog") == 0) {
+  if (aOcafSamples) 
+  {
+    if (theSampleName.indexOf("Dialog") == 0) 
+    {
       int aMode; // not used
       QString aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
       if (aFileName.isEmpty())
@@ -399,7 +413,8 @@ void ApplicationCommonWindow::onProcessViewer3d(const QString& theSampleName)
 {
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
-  if (aViewer3dSamples) {
+  if (aViewer3dSamples) 
+  {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     mySamples->Process(theSampleName.toUtf8().data());
     myCodeView->setPlainText(mySamples->GetCode().ToCString());
@@ -413,30 +428,41 @@ void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
 {
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
   Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
-  if (aViewer2dSamples) {
+  if (aViewer2dSamples) 
+  {
     Standard_Boolean anIsFileSample = Viewer2dSamples::IsFileSample(theSampleName.toUtf8().data());
     QString aFileName;
-    if (anIsFileSample) {
+    if (anIsFileSample) 
+    {
       int aMode; // not used
       aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
       if (aFileName.isEmpty())
+      {
         return;
+      }
       aViewer2dSamples->SetFileName(aFileName.toUtf8().data());
     }
-    if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty())) {
+    if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty())) 
+    {
       QApplication::setOverrideCursor(Qt::WaitCursor);
       mySamples->Process(theSampleName.toUtf8().data());
       if (!Viewer2dSamples::IsShadedSample(theSampleName.toUtf8().data()))
+      {
         myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_False);
+      }
       else
+      {
         myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_True);
+      }
       myCodeView->setPlainText(mySamples->GetCode().ToCString());
       myResultView->setPlainText(mySamples->GetResult().ToCString());
       myGeomWidget->Show2d();
       QApplication::restoreOverrideCursor();
     }
     else
+    {
       myResultView->setPlainText("No file selected!");
+    }
   }
 }
 
@@ -455,23 +481,32 @@ QString ApplicationCommonWindow::selectFileName(const QString& theSampleName,
   QString aFilename;
   QStringList fileNames;
   if (ret != QDialog::Accepted)
+  {
     return aFilename;
-
+  }
   fileNames = aDialog->selectedFiles();
   if (!fileNames.isEmpty())
+  {
     aFilename = fileNames[0];
+  }
 
-  if (!QFileInfo(aFilename).completeSuffix().length()) {
+  if (!QFileInfo(aFilename).completeSuffix().length()) 
+  {
     QString selFilter = aDialog->selectedNameFilter();
     int idx = selFilter.indexOf("(*.");
-    if (idx != -1) {
+    if (idx != -1) 
+    {
       QString tail = selFilter.mid(idx + 3);
       idx = tail.indexOf(" ");
       if (idx == -1)
+      {
         idx = tail.indexOf(")");
+      }
       QString ext = tail.left(idx);
       if (ext.length())
+      {
         aFilename += QString(".") + ext;
+      }
     }
   }
 
@@ -483,20 +518,25 @@ TranslateDialog* ApplicationCommonWindow::getDataExchangeDialog(const QString& t
   TranslateDialog* aTranslateDialog = new TranslateDialog(this, 0, true);
   TCollection_AsciiString aSampleName(theSampleName.toUtf8().data());
 
-  if (DataExchangeSamples::IsExportSample(aSampleName)) {
+  if (DataExchangeSamples::IsExportSample(aSampleName)) 
+  {
     aTranslateDialog->setWindowTitle("Export file");
     aTranslateDialog->setFileMode(QFileDialog::AnyFile);
     aTranslateDialog->setAcceptMode(QFileDialog::AcceptSave);
   }
-  else if (DataExchangeSamples::IsImportSample(aSampleName)) {
+  else if (DataExchangeSamples::IsImportSample(aSampleName)) 
+  {
     aTranslateDialog->setWindowTitle("Import file");
     aTranslateDialog->setFileMode(QFileDialog::ExistingFile);
     aTranslateDialog->setAcceptMode(QFileDialog::AcceptOpen);
   }
   QString aFormatFilter;
   if (DataExchangeSamples::IsBrepSample(aSampleName))
+  {
     aFormatFilter = "BREP Files(*.brep *.rle)";
-  else if (DataExchangeSamples::IsStepSample(aSampleName)) {
+  }
+  else if (DataExchangeSamples::IsStepSample(aSampleName)) 
+  {
     aFormatFilter = "STEP Files (*.stp *.step)";
     aTranslateDialog->addMode(STEPControl_ManifoldSolidBrep, "Manifold Solid Brep");
     aTranslateDialog->addMode(STEPControl_FacetedBrep, "Faceted Brep");
@@ -504,14 +544,21 @@ TranslateDialog* ApplicationCommonWindow::getDataExchangeDialog(const QString& t
     aTranslateDialog->addMode(STEPControl_GeometricCurveSet, "Geometric Curve Set");
   }
   else if (DataExchangeSamples::IsIgesSample(aSampleName))
+  {
     aFormatFilter = "IGES Files (*.igs *.iges)";
+  }
   else if (DataExchangeSamples::IsStlSample(aSampleName))
+  {
     aFormatFilter = "STL Files (*.stl)";
+  }
   else if (DataExchangeSamples::IsVrmlSample(aSampleName))
+  {
     aFormatFilter = "VRML Files (*.vrml)";
+  }
   else if (DataExchangeSamples::IsImageSample(aSampleName))
+  {
     aFormatFilter = "All Image Files (*.bmp *.gif *.jpg *.jpeg *.png *.tga)";
-
+  }
   QStringList aFilters;
   aFilters.append(aFormatFilter);
   aFilters.append("All Files(*.*)");
@@ -526,21 +573,27 @@ TranslateDialog* ApplicationCommonWindow::getOcafDialog(const QString& theSample
   TranslateDialog* aTranslateDialog = new TranslateDialog(this, 0, true);
   TCollection_AsciiString aSampleName(theSampleName.toUtf8().data());
 
-  if (OcafSamples::IsExportSample(aSampleName)) {
+  if (OcafSamples::IsExportSample(aSampleName)) 
+  {
     aTranslateDialog->setWindowTitle("Export file");
     aTranslateDialog->setFileMode(QFileDialog::AnyFile);
     aTranslateDialog->setAcceptMode(QFileDialog::AcceptSave);
   }
-  else if (OcafSamples::IsImportSample(aSampleName)) {
+  else if (OcafSamples::IsImportSample(aSampleName)) 
+  {
     aTranslateDialog->setWindowTitle("Import file");
     aTranslateDialog->setFileMode(QFileDialog::ExistingFile);
     aTranslateDialog->setAcceptMode(QFileDialog::AcceptOpen);
   }
   QStringList aFilters;
   if (OcafSamples::IsBinarySample(aSampleName))
+  {
     aFilters.append("Binary OCAF Sample (*.cbf)");
+  }
   if (OcafSamples::IsXmlSample(aSampleName))
+  {
     aFilters.append("XML OCAF Sample (*.xml)");
+  }
   aFilters.append("All Files(*.*)");
 
   aTranslateDialog->setNameFilters(aFilters);
@@ -552,13 +605,16 @@ TranslateDialog* ApplicationCommonWindow::getOcafDialog(const QString& theSample
 QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent, QSignalMapper* theMapper)
 {
   QMenu* aMenu = new QMenu(theKey, theParent);
-  if (theJsonValue.isObject()) {
+  if (theJsonValue.isObject()) 
+  {
     QJsonObject aBranchObject = theJsonValue.toObject();
-    for (const QString& aBranchKey : aBranchObject.keys()) {
+    for (const QString& aBranchKey : aBranchObject.keys()) 
+    {
       aMenu->addMenu(MenuFromJsonObject(aBranchObject.value(aBranchKey), aBranchKey, aMenu, theMapper));
     }
   }
-  else if (theJsonValue.isArray()) {
+  else if (theJsonValue.isArray()) 
+  {
     QJsonArray aDataArray = theJsonValue.toArray();
     for (const QJsonValue& aDataValue : aDataArray)
     {

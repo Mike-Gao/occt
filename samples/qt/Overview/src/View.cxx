@@ -869,8 +869,9 @@ void View::onTransparency()
   AIS_ListOfInteractive anAisObjectsList;
   myContext->DisplayedObjects(anAisObjectsList);
   if (anAisObjectsList.Extent() == 0)
+  {
     return;
-
+  }
   double aTranspValue = anAisObjectsList.First()->Transparency();
   DialogTransparency aDlg(this);
   aDlg.setValue(int(aTranspValue * 10));

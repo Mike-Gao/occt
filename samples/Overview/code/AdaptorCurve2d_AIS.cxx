@@ -50,7 +50,8 @@ void AdaptorCurve2d_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)&,
 
   Geom2dAdaptor_Curve anAdaptor(myGeom2dCurve);
   GCPnts_QuasiUniformDeflection anEdgeDistrib(anAdaptor, 1.e-2);
-  if (anEdgeDistrib.IsDone()) {
+  if (anEdgeDistrib.IsDone()) 
+  {
     Handle(Graphic3d_ArrayOfPolylines) aCurve =
       new Graphic3d_ArrayOfPolylines(anEdgeDistrib.NbPoints());
     for (Standard_Integer i = 1; i <= anEdgeDistrib.NbPoints(); ++i)
@@ -59,24 +60,29 @@ void AdaptorCurve2d_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)&,
     aPrsGroup->AddPrimitiveArray(aCurve);
   }
 
-  if (myDisplayPole) {
-    if (anAdaptor.GetType() == GeomAbs_BezierCurve) {
+  if (myDisplayPole) 
+  {
+    if (anAdaptor.GetType() == GeomAbs_BezierCurve) 
+    {
       Handle(Geom2d_BezierCurve) aBezier = anAdaptor.Bezier();
       Handle(Graphic3d_ArrayOfPolylines) anArrayOfVertex = new Graphic3d_ArrayOfPolylines(aBezier->NbPoles());
-      for (int i = 1; i <= aBezier->NbPoles(); i++) {
+      for (int i = 1; i <= aBezier->NbPoles(); i++) 
+      {
         gp_Pnt2d CurrentPoint = aBezier->Pole(i);
         anArrayOfVertex->AddVertex(CurrentPoint.X(), CurrentPoint.Y(), 0.);
       }
       aPrsGroup->AddPrimitiveArray(anArrayOfVertex);
     }
 
-    if (anAdaptor.GetType() == GeomAbs_BSplineCurve) {
+    if (anAdaptor.GetType() == GeomAbs_BSplineCurve) 
+    {
       Handle(Geom2d_BSplineCurve) aBSpline = anAdaptor.BSpline();
 
       Handle(Graphic3d_ArrayOfPolylines) anArrayOfVertex =
         new Graphic3d_ArrayOfPolylines(aBSpline->NbPoles());
 
-      for (int i = 1; i <= aBSpline->NbPoles(); i++) {
+      for (int i = 1; i <= aBSpline->NbPoles(); i++) 
+      {
         gp_Pnt2d CurrentPoint = aBSpline->Pole(i);
         anArrayOfVertex->AddVertex(CurrentPoint.X(), CurrentPoint.Y(), 0.);
       }
@@ -84,7 +90,8 @@ void AdaptorCurve2d_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)&,
     }
   }
 
-  if (myDisplayCurbure && (anAdaptor.GetType() != GeomAbs_Line)) {
+  if (myDisplayCurbure && (anAdaptor.GetType() != GeomAbs_Line)) 
+  {
     Standard_Integer ii;
     Standard_Integer intrv, nbintv = anAdaptor.NbIntervals(GeomAbs_CN);
     TColStd_Array1OfReal TI(1, nbintv + 1);
@@ -93,15 +100,19 @@ void AdaptorCurve2d_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)&,
     Geom2dLProp_CLProps2d LProp(myGeom2dCurve, 2, Resolution);
     gp_Pnt2d P1, P2;
 
-    for (intrv = 1; intrv <= nbintv; intrv++) {
+    for (intrv = 1; intrv <= nbintv; intrv++) 
+    {
       Standard_Real t = TI(intrv);
       Standard_Real step = (TI(intrv + 1) - t) / GetDiscretisation();
       Standard_Real LRad, ratio;
-      for (ii = 1; ii <= myDiscretisation; ii++) {
+      for (ii = 1; ii <= myDiscretisation; ii++) 
+      {
         LProp.SetParameter(t);
-        if (LProp.IsTangentDefined()) {
+        if (LProp.IsTangentDefined()) 
+        {
           Curvature = Abs(LProp.Curvature());
-          if (Curvature > Resolution) {
+          if (Curvature > Resolution) 
+          {
             myGeom2dCurve->D0(t, P1);
             LRad = 1. / Curvature;
             ratio = ((LRad > myradiusmax) ? myradiusmax / LRad : 1);

@@ -166,7 +166,8 @@ void TopologySamples::ExecuteSample(TCollection_AsciiString theSampleName)
     ComputeSurfaceProperties3dSample();
   else if (theSampleName == "ComputeVolumeProperties3dSample")
     ComputeVolumeProperties3dSample();
-  else {
+  else
+  {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -308,15 +309,21 @@ void TopologySamples::Face3dSample()
   // Make a face from a BSpline surface.
   // Define a 4x4 grid of points for BSpline surface.
   TColgp_Array2OfPnt aPoints(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
     gp_Pnt aPnt;
     aPnt.SetX(5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j) {
+    for (Standard_Integer j = 1; j <= 4; ++j) 
+    {
       aPnt.SetY(5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
+      {
         aPnt.SetZ(15.0);
+      }
       else
+      {
         aPnt.SetZ(10.0);
+      }
       aPoints.SetValue(i, j, aPnt);
     }
   }
@@ -368,7 +375,8 @@ void TopologySamples::Wire3dSample()
   aPoints.SetValue(4, gp_Pnt(0.0, 10.0, 0.0));
   // A wire maker contains an empty wire.
   BRepBuilderAPI_MakeWire aMakeWire;
-  for (Standard_Integer i = 1; i <= 4; ++i) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
     Standard_Integer i1 = i;
     Standard_Integer i2 = i1 < 4 ? i1 + 1 : 1;
     const gp_Pnt& aPnt1 = aPoints.Value(i1);
@@ -395,7 +403,8 @@ void TopologySamples::Wire3dSample()
   // edges connecting during wire constructing.
   TopTools_IndexedMapOfShape aVertices;
   TopExp::MapShapes(aWire, TopAbs_VERTEX, aVertices);
-  for (TopTools_IndexedMapOfShape::Iterator anIt(aVertices); anIt.More(); anIt.Next()) {
+  for (TopTools_IndexedMapOfShape::Iterator anIt(aVertices); anIt.More(); anIt.Next()) 
+  {
     TopoDS_Vertex aVertex = TopoDS::Vertex(anIt.Value());
     gp_Pnt aPnt = BRep_Tool::Pnt(aVertex);
     myResult << "[ " << aPnt.X() << ", " << aPnt.Y() << ", " << aPnt.Z() << " ]" << std::endl;
@@ -645,11 +654,13 @@ void TopologySamples::TopologyIterator3dSample()
   // Iterate over compound components.
   myResult << "Compound components:" << std::endl;
   Standard_Integer anI = 1;
-  for (TopoDS_Iterator anIt(aComp); anIt.More(); anIt.Next(), ++anI) {
+  for (TopoDS_Iterator anIt(aComp); anIt.More(); anIt.Next(), ++anI) 
+  {
     const TopoDS_Shape& aShape = anIt.Value();
     myResult << "#" << anI << " : ";
     Handle(AIS_ColoredShape) anAisShape;
-    switch (aShape.ShapeType()) {
+    switch (aShape.ShapeType())
+    {
     case TopAbs_VERTEX:
       myResult << "TopAbs_VERTEX";
       anAisShape = new AIS_ColoredShape(aShape);
@@ -684,7 +695,8 @@ void TopologySamples::TopologyIterator3dSample()
       myResult << "TopAbs_SHAPE";
     }
     myResult << std::endl;
-    if (anAisShape) {
+    if (anAisShape) 
+    {
       myObject3d.Append(anAisShape);
     }
   }
@@ -701,7 +713,8 @@ void TopologySamples::TopologyExplorer3dSample()
   // Explore vertex references.
   myResult << "Vertex refs. : ";
   Standard_Integer nbVertices = 0;
-  for (TopExp_Explorer anExp(aBox, TopAbs_VERTEX); anExp.More(); anExp.Next(), ++nbVertices) {
+  for (TopExp_Explorer anExp(aBox, TopAbs_VERTEX); anExp.More(); anExp.Next(), ++nbVertices) 
+  {
     const TopoDS_Shape& aShape = anExp.Current();
     Handle(AIS_ColoredShape) anAisShape = new AIS_ColoredShape(aShape);
     anAisShape->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
@@ -712,7 +725,8 @@ void TopologySamples::TopologyExplorer3dSample()
   // Explore edge references.
   myResult << "Edge refs.   : ";
   Standard_Integer nbEdges = 0;
-  for (TopExp_Explorer anExp(aBox, TopAbs_EDGE); anExp.More(); anExp.Next(), ++nbEdges) {
+  for (TopExp_Explorer anExp(aBox, TopAbs_EDGE); anExp.More(); anExp.Next(), ++nbEdges)
+  {
     const TopoDS_Shape& aShape = anExp.Current();
     Handle(AIS_ColoredShape) anAisShape = new AIS_ColoredShape(aShape);
     anAisShape->SetColor(Quantity_Color(Quantity_NOC_GREEN));
@@ -724,7 +738,8 @@ void TopologySamples::TopologyExplorer3dSample()
   // Explore face references.
   myResult << "Face refs.   : ";
   Standard_Integer nbFaces = 0;
-  for (TopExp_Explorer anExp(aBox, TopAbs_FACE); anExp.More(); anExp.Next(), ++nbFaces) {
+  for (TopExp_Explorer anExp(aBox, TopAbs_FACE); anExp.More(); anExp.Next(), ++nbFaces) 
+  {
     const TopoDS_Shape& aShape = anExp.Current();
     Handle(AIS_ColoredShape) anAisShape = new AIS_ColoredShape(aShape);
     anAisShape->SetColor(Quantity_Color(Quantity_NOC_GREEN));
@@ -736,21 +751,24 @@ void TopologySamples::TopologyExplorer3dSample()
   // Explore shell references.
   myResult << "Wire refs.   : ";
   Standard_Integer nbWires = 0;
-  for (TopExp_Explorer anExp(aBox, TopAbs_WIRE); anExp.More(); anExp.Next(), ++nbWires) {
+  for (TopExp_Explorer anExp(aBox, TopAbs_WIRE); anExp.More(); anExp.Next(), ++nbWires) 
+  {
   }
   myResult << nbWires << std::endl;
 
   // Explore shell references.
   myResult << "Shell refs.  : ";
   Standard_Integer nbShells = 0;
-  for (TopExp_Explorer anExp(aBox, TopAbs_SHELL); anExp.More(); anExp.Next(), ++nbShells) {
+  for (TopExp_Explorer anExp(aBox, TopAbs_SHELL); anExp.More(); anExp.Next(), ++nbShells) 
+  {
   }
   myResult << nbShells << std::endl;
 
   // Explore solid references.
   myResult << "Solid refs.  : ";
   Standard_Integer nbSolids = 0;
-  for (TopExp_Explorer anExp(aBox, TopAbs_SOLID); anExp.More(); anExp.Next(), ++nbSolids) {
+  for (TopExp_Explorer anExp(aBox, TopAbs_SOLID); anExp.More(); anExp.Next(), ++nbSolids) 
+  {
   }
   myResult << nbSolids << std::endl;
 }
@@ -772,14 +790,17 @@ void TopologySamples::AssessToCurve3dSample()
 
   // Retrieve the first not degenerated edge.
   TopoDS_Edge aCurveEdge;
-  for (TopExp_Explorer anExp(aFace, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+  for (TopExp_Explorer anExp(aFace, TopAbs_EDGE); anExp.More(); anExp.Next()) 
+  {
     TopoDS_Edge anEdge = TopoDS::Edge(anExp.Current());
-    if (!BRep_Tool::Degenerated(anEdge)) {
+    if (!BRep_Tool::Degenerated(anEdge)) 
+    {
       aCurveEdge = anEdge;
       break;
     }
   }
-  if (!aCurveEdge.IsNull()) {
+  if (!aCurveEdge.IsNull()) 
+  {
     // Make a curve on edge adaptor.
     BRepAdaptor_Curve aCurveAdaptor(aCurveEdge);
     myResult << "Curve adaptor for edge was built in red" << std::endl;
@@ -796,7 +817,8 @@ void TopologySamples::AssessToCurve3dSample()
     Standard_ASSERT_VOID(anAlgo.IsDone(), "Success is expected!");
     myResult << "Distribution of point on the curve with " << aDeflection
       << " deflection was performed:" << std::endl;
-    for (Standard_Integer i = 1; i <= anAlgo.NbPoints(); ++i)  {
+    for (Standard_Integer i = 1; i <= anAlgo.NbPoints(); ++i)  
+    {
       gp_Pnt aPnt = anAlgo.Value(i);
       myResult << "Point #" << i << " : [ "
         << aPnt.X() << ", " << aPnt.Y() << ", " << aPnt.Z() << " ]" << std::endl;
@@ -854,7 +876,8 @@ void TopologySamples::AssessToCompositeCurve3dSample()
   Standard_ASSERT_VOID(anAlgo.IsDone(), "Success is expected!");
   myResult << "Distribution of point on the curve with " << aDeflection
     << " deflection was performed:" << std::endl;
-  for (Standard_Integer i = 1; i <= anAlgo.NbPoints(); ++i) {
+  for (Standard_Integer i = 1; i <= anAlgo.NbPoints(); ++i) 
+  {
     gp_Pnt aPnt = anAlgo.Value(i);
     myResult << "Point #" << i << " : [ "
       << aPnt.X() << ", " << aPnt.Y() << ", " << aPnt.Z() << " ]" << std::endl;
@@ -926,16 +949,19 @@ void TopologySamples::Common3dSample()
   // Make operation.
   anAlgo.Build();
 
-  if (!anAlgo.IsDone()) { // Process errors
+  if (!anAlgo.IsDone()) // Process errors
+  { 
     myResult << "Errors : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
-  if (anAlgo.HasWarnings()) { // Process warnings
+  if (anAlgo.HasWarnings()) // Process warnings
+  { 
     myResult << "Warnings : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
 
@@ -978,16 +1004,19 @@ void TopologySamples::Cut3dSample()
   // Make operation.
   anAlgo.Build();
 
-  if (!anAlgo.IsDone()) { // Process errors
+  if (!anAlgo.IsDone()) // Process errors
+  { 
     myResult << "Errors : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
-  if (anAlgo.HasWarnings()) { // Process warnings
+  if (anAlgo.HasWarnings()) // Process warnings
+  { 
     myResult << "Warnings : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
 
@@ -1030,16 +1059,19 @@ void TopologySamples::Fuse3dSample()
   // Make operation.
   anAlgo.Build();
 
-  if (!anAlgo.IsDone()) { // Process errors
+  if (!anAlgo.IsDone()) // Process errors
+  { 
     myResult << "Errors : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
-  if (anAlgo.HasWarnings()) { // Process warnings
+  if (anAlgo.HasWarnings()) // Process warnings
+  { 
     myResult << "Warnings : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
 
@@ -1074,16 +1106,19 @@ void TopologySamples::Section3dSample()
   // Make operation.
   anAlgo.Build();
 
-  if (!anAlgo.IsDone()) { // Process errors
+  if (!anAlgo.IsDone()) // Process errors
+  { 
     myResult << "Errors : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
-  if (anAlgo.HasWarnings()) { // Process warnings
+  if (anAlgo.HasWarnings()) // Process warnings
+  { 
     myResult << "Warnings : " << std::endl;
     anAlgo.DumpErrors(myResult);
   }
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
 
@@ -1129,11 +1164,13 @@ void TopologySamples::Splitter3dSample()
   // Perform splitting.
   aSplitter.Build();
 
-  if (!aSplitter.IsDone()) { // Process errors
+  if (!aSplitter.IsDone()) // Process errors
+  { 
     myResult << "Errors : " << std::endl;
     aSplitter.DumpErrors(myResult);
   }
-  if (aSplitter.HasWarnings()) { // Process warnings
+  if (aSplitter.HasWarnings()) // Process warnings
+  { 
     myResult << "Warnings : " << std::endl;
     aSplitter.DumpErrors(myResult);
   }
@@ -1142,7 +1179,8 @@ void TopologySamples::Splitter3dSample()
   anAisBox->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
   myObject3d.Append(anAisBox);
 
-  if (aSplitter.IsDone()) { // Process results
+  if (aSplitter.IsDone()) // Process results
+  { 
     // Simplification of the result shape is performed by the means of
     // ShapeUpgrade_UnifySameDomain algorithm. The result of the operation will
     // be overwritten with the simplified result.
@@ -1210,7 +1248,8 @@ void TopologySamples::Defeaturing3dSample()
   // Retrieve chamfer faces generated from the edge
   const TopTools_ListOfShape& aGenShapes = anAlgo.Generated(anEdge);
   Standard_ASSERT_VOID(!aGenShapes.IsEmpty(), "Chamfer face is expected!");
-  for (TopTools_ListOfShape::Iterator anIt(aGenShapes); anIt.More(); anIt.Next()) {
+  for (TopTools_ListOfShape::Iterator anIt(aGenShapes); anIt.More(); anIt.Next()) 
+  {
     Handle(AIS_ColoredShape) anAisShape = new AIS_ColoredShape(anIt.Value());
     anAisShape->SetColor(Quantity_Color(Quantity_NOC_GREEN));
     anAisShape->SetWidth(2.5);
@@ -1227,7 +1266,8 @@ void TopologySamples::Defeaturing3dSample()
   // Remove the chamfer.
   aDefeatAlgo.Build();
 
-  if (aDefeatAlgo.IsDone()) {
+  if (aDefeatAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResult = aDefeatAlgo.Shape();
     myResult << "Defeatured box is in red" << std::endl;
@@ -1273,7 +1313,8 @@ void TopologySamples::Fillet3dSample()
   // Make a fillet.
   anAlgo.Build();
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResult = anAlgo.Shape();
     myResult << "Fillet was built. Result shape is in red" << std::endl;
@@ -1319,7 +1360,8 @@ void TopologySamples::Chamfer3dSample()
   // Make a chamfer.
   anAlgo.Build();
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResult = anAlgo.Shape();
     myResult << "Fillet was built. Result shape is in red" << std::endl;
@@ -1329,7 +1371,8 @@ void TopologySamples::Chamfer3dSample()
     myObject3d.Append(anAisResult);
 
     const TopTools_ListOfShape& aGenShapes = anAlgo.Generated(anEdge);
-    for (TopTools_ListOfShape::Iterator anIt(aGenShapes); anIt.More(); anIt.Next()) {
+    for (TopTools_ListOfShape::Iterator anIt(aGenShapes); anIt.More(); anIt.Next()) 
+    {
       Handle(AIS_ColoredShape) anAisShape = new AIS_ColoredShape(anIt.Value());
       anAisShape->SetColor(Quantity_Color(Quantity_NOC_RED));
       anAisShape->SetWidth(2.5);
@@ -1362,11 +1405,13 @@ void TopologySamples::Offset3dSample()
   // Perform a series of offsets with linearly increasing value and altitude.
   Standard_Real anOffsetStep = 0.2;
   Standard_Real anAltitudeStep = 0.1;
-  for (Standard_Integer i = 1; i <= 4; ++i) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
     Standard_Real anOffset = anOffsetStep * i;
     Standard_Real anAltitude = anAltitudeStep * i;
     anAlgo.Perform(anOffset, anAltitude);
-    if (anAlgo.IsDone()) {
+    if (anAlgo.IsDone()) 
+    {
       // Get result.
       TopoDS_Shape aResult = anAlgo.Shape();
       myResult << "#" << i << " : Offest = " << anOffset << " Altitude = " << anAltitude
@@ -1422,7 +1467,8 @@ void TopologySamples::Evolved3dSample()
   // Perform evolving.
   anAlgo.Build();
 
-  if (anAlgo.IsDone()) {
+  if (anAlgo.IsDone()) 
+  {
     // Get result.
     TopoDS_Shape aResult = anAlgo.Shape();
     myResult << "Evolving result is in red" << std::endl;
@@ -1710,7 +1756,8 @@ void TopologySamples::ComputeSurfaceProperties3dSample()
     << "  Has symmetric point : " << (aPProps.HasSymmetryPoint() ? "YES" : "NO") << std::endl
     << "  Moments of inertia  = [ " << anIxx << ", " << anIyy << ", " << anIzz << " ]" << std::endl
     << "  Radius of gyration  = [ " << aRxx << ", " << aRyy << ", " << aRzz << " ]" << std::endl;
-  if (!aPProps.HasSymmetryPoint()) {
+  if (!aPProps.HasSymmetryPoint()) 
+  {
     const gp_Vec& anAxis1 = aPProps.FirstAxisOfInertia();
     myResult << "  1st axis of inertia = [ "
       << anAxis1.X() << ", " << anAxis1.Y() << ", " << anAxis1.Z()
@@ -1719,7 +1766,8 @@ void TopologySamples::ComputeSurfaceProperties3dSample()
       BRepBuilderAPI_MakeEdge(aCOM, aCOM.XYZ() + anAxis1.XYZ()));
     anAisAxis1->SetColor(Quantity_Color(Quantity_NOC_GREEN));
     myObject3d.Append(anAisAxis1);
-    if (!aPProps.HasSymmetryPoint()) {
+    if (!aPProps.HasSymmetryPoint()) 
+    {
       const gp_Vec& anAxis2 = aPProps.SecondAxisOfInertia();
       myResult << "  2nd axis of inertia = [ "
         << anAxis2.X() << ", " << anAxis2.Y() << ", " << anAxis2.Z()
@@ -1797,7 +1845,8 @@ void TopologySamples::ComputeVolumeProperties3dSample()
     << "  Has symmetric point : " << (aPProps.HasSymmetryPoint() ? "YES" : "NO") << std::endl
     << "  Moments of inertia  = [ " << anIxx << ", " << anIyy << ", " << anIzz << " ]" << std::endl
     << "  Radius of gyration  = [ " << aRxx << ", " << aRyy << ", " << aRzz << " ]" << std::endl;
-  if (!aPProps.HasSymmetryPoint()) {
+  if (!aPProps.HasSymmetryPoint()) 
+  {
     const gp_Vec& anAxis1 = aPProps.FirstAxisOfInertia();
     myResult << "  1st axis of inertia = [ "
       << anAxis1.X() << ", " << anAxis1.Y() << ", " << anAxis1.Z()
@@ -1806,7 +1855,8 @@ void TopologySamples::ComputeVolumeProperties3dSample()
       BRepBuilderAPI_MakeEdge(aCOM, aCOM.XYZ() + anAxis1.XYZ()));
     anAisAxis1->SetColor(Quantity_Color(Quantity_NOC_GREEN));
     myObject3d.Append(anAisAxis1);
-    if (!aPProps.HasSymmetryPoint()) {
+    if (!aPProps.HasSymmetryPoint()) 
+    {
       const gp_Vec& anAxis2 = aPProps.SecondAxisOfInertia();
       myResult << "  2nd axis of inertia = [ "
         << anAxis2.X() << ", " << anAxis2.Y() << ", " << anAxis2.Z()

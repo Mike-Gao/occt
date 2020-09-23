@@ -235,7 +235,8 @@ void GeometrySamples::ExecuteSample(TCollection_AsciiString theSampleName)
     DumpCircleInfoSample();
   else if (theSampleName == "DumpBSplineCurveInfoSample")
     DumpBSplineCurveInfoSample();
-  else {
+  else 
+  {
     myResult << "No function found: " << theSampleName;
     myCode += TCollection_AsciiString("No function found: ") + theSampleName;
     anIsSamplePresent = Standard_False;
@@ -623,23 +624,35 @@ void GeometrySamples::BarycenterPoint3dSample()
   gp_Pnt aBarycenterPnt5; // P declaration
   Standard_Boolean IsPoint;
 
-  if (aPEquation.IsPoint()) {
+  if (aPEquation.IsPoint()) 
+  {
     IsPoint = true;
     aBarycenterPnt5 = aPEquation.Point();
     myResult << "GProp_PEquation is a point" << std::endl;
   }
-  else {
+  else 
+  {
     IsPoint = false;
     myResult << "GProp_PEquation is not a point" << std::endl;
   }
 
-  if (aPEquation.IsLinear()) { /*... */ }
-  if (aPEquation.IsPlanar()) { /*... */ }
-  if (aPEquation.IsSpace()) { /*... */ }
+  if (aPEquation.IsLinear())
+  {
+    /*... */ 
+  }
+  if (aPEquation.IsPlanar()) 
+  { 
+    /*... */ 
+  }
+  if (aPEquation.IsSpace()) 
+  { 
+    /*... */ 
+  }
 
   TCollection_AsciiString aPointName("P");
 
-  for (Standard_Integer i = aPntArray.Lower(); i <= aPntArray.Upper(); i++) {
+  for (Standard_Integer i = aPntArray.Lower(); i <= aPntArray.Upper(); i++) 
+  {
     TCollection_AsciiString aString(i);
     aString = aPointName + aString;
     DisplayPnt(aPntArray(i), aString, Aspect_TOM_STAR);
@@ -647,30 +660,42 @@ void GeometrySamples::BarycenterPoint3dSample()
 
   DisplayPnt(aBarycenterPnt5, "Barycenter of 5 points", Aspect_TOM_O_STAR);
   myResult << " IsPoint = ";
-  if (IsPoint) {
+  if (IsPoint) 
+  {
     myResult << "True   -->  " << " P ( " << aBarycenterPnt5.X()
       << aBarycenterPnt5.Y() << aBarycenterPnt5.Z() << " );" << std::endl;
   }
   else
+  {
     myResult << "False";
-
+  }
   myResult << std::endl << " IsLinear = ";
   if (aPEquation.IsLinear())
+  {
     myResult << "True";
+  }
   else
+  {
     myResult << "False";
-
+  }
   myResult << std::endl << " IsPlanar = ";
   if (aPEquation.IsPlanar())
+  {
     myResult << "True";
+  }
   else
+  {
     myResult << "False";
-
+  }
   myResult << std::endl << " IsSpace = ";
   if (aPEquation.IsSpace())
+  {
     myResult << "True";
+  }
   else
+  {
     myResult << "False";
+  }
 }
 
 void GeometrySamples::RotatedVector3dSample()
@@ -870,8 +895,10 @@ void GeometrySamples::Intersection3dSample()
   gp_Cone aCone(gp_Ax3(gp_Pnt(), gp_Dir(0.0, 0.0, 1.0)), 0.25*M_PI, 0.0);
   IntAna_Quadric anIntAna_Quadric(aCone);
   IntAna_IntConicQuad anIntAna_IntConicQuad(aLine, anIntAna_Quadric);
-  if (anIntAna_IntConicQuad.IsDone()) {
-    for (int i = 1; i <= anIntAna_IntConicQuad.NbPoints(); i++) {
+  if (anIntAna_IntConicQuad.IsDone()) 
+  {
+    for (int i = 1; i <= anIntAna_IntConicQuad.NbPoints(); i++) 
+    {
       const gp_Pnt& aIntersectionPnt = anIntAna_IntConicQuad.Point(i);
       DisplayPnt(aIntersectionPnt, TCollection_AsciiString(i));
     }
@@ -993,8 +1020,10 @@ void GeometrySamples::Tangent2dSample()
   GccEnt_QualifiedCirc aQaCirc2(aCirc2, GccEnt_outside);
 
   GccAna_Lin2d2Tan aLin2d2Tan(aQaCirc1, aQaCirc2, 1E-6);
-  if (aLin2d2Tan.IsDone()) {
-    for (int i = 1; i <= aLin2d2Tan.NbSolutions(); i++) {
+  if (aLin2d2Tan.IsDone()) 
+  {
+    for (int i = 1; i <= aLin2d2Tan.NbSolutions(); i++) 
+    {
       const gp_Lin2d& aTangentLin = aLin2d2Tan.ThisSolution(i);
       Handle(AdaptorVec_AIS) anAisLin = new AdaptorVec_AIS(aTangentLin.Location(), aTangentLin.Direction(), 20.0);
       myObject2d.Append(anAisLin);
@@ -1033,7 +1062,8 @@ void GeometrySamples::MinimalDistance2dSample()
   Geom2dAPI_ExtremaCurveCurve anExtremaFinder(aGeom_Line, aGeom_Circle,
     std::numeric_limits<Standard_Real>::min(),
     std::numeric_limits<Standard_Real>::max(), 0.0, M_PI*2.0);
-  if (anExtremaFinder.NbExtrema()) {
+  if (anExtremaFinder.NbExtrema()) 
+  {
     gp_Pnt2d aPnt1, aPnt2;
     anExtremaFinder.NearestPoints(aPnt1, aPnt2);
     myResult << "Extrema found: " << anExtremaFinder.NbExtrema() << std::endl;
@@ -1042,7 +1072,9 @@ void GeometrySamples::MinimalDistance2dSample()
     DisplayPnt(aPnt2, "2");
   }
   else
+  {
     myResult << "No Extrema found" << std::endl;
+  }
 
   Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeom_Circle, Aspect_TOL_SOLID);
   myObject2d.Append(anAisCirc);
@@ -1059,7 +1091,8 @@ void GeometrySamples::Intersection2dSample()
   Handle(Geom2d_Parabola) aGeom_Parabola = new Geom2d_Parabola(aParab);
 
   Geom2dAPI_InterCurveCurve anIntersectFinder(aGeom_Line, aGeom_Parabola);
-  for (Standard_Integer i = 1; i <= anIntersectFinder.NbPoints(); i++) {
+  for (Standard_Integer i = 1; i <= anIntersectFinder.NbPoints(); i++) 
+  {
     gp_Pnt2d aPnt = anIntersectFinder.Point(i);
     DisplayPnt(aPnt, i);
   }
@@ -1091,14 +1124,21 @@ void GeometrySamples::PointInfo3dSample()
   myResult << "A coordinate of a point 1: X: " << aPnt1.X()
     << " Y: " << aPnt1.Y() << " Z: " << aPnt1.Z() << std::endl;
   if (anIsEqual2_3)
+  {
     myResult << "a point 2 is equal to a point 3" << std::endl;
+  }
   else
+  {
     myResult << "a point 2 is different from a point 3" << std::endl;
+  }
   if (anIsEqual2_4)
+  {
     myResult << "a point 2 is equal to a point 4" << std::endl;
+  }
   else
+  {
     myResult << "a point 2 is different from a point 4" << std::endl;
-
+  }
   myResult << "A distance from a point 1  to a point 2 is: " << aDistance1_2 << std::endl;
   myResult << "A distance from a point 2  to a point 4 is: " << aDistance2_4 << std::endl;
 
@@ -1158,13 +1198,21 @@ void GeometrySamples::PointInfo2dSample()
   myResult << "A coordinate of a point 1: X: " << aPnt1.X()
     << " Y: " << aPnt1.Y() << std::endl;
   if (anIsEqual2_3)
+  {
     myResult << "a point 2 is equal to a point 3" << std::endl;
+  }
   else
+  {
     myResult << "a point 2 is different from a point 3" << std::endl;
+  }
   if (anIsEqual2_4)
+  {
     myResult << "a point 2 is equal to a point 4" << std::endl;
+  }
   else
+  {
     myResult << "a point 2 is different from a point 4" << std::endl;
+  }
 
   myResult << "A distance from a point 1  to a point 2 is: " << aDistance1_2 << std::endl;
   myResult << "A distance from a point 2  to a point 4 is: " << aDistance2_4 << std::endl;
@@ -1185,27 +1233,33 @@ void GeometrySamples::CircleInfo2dSample()
   gp_Pnt2d aPnt2(10.0, 0.0);
   gp_Pnt2d aPnt3(20.0, 20.0);
 
-  if (aCirc.Contains(aPnt1, 1E-6)) {
+  if (aCirc.Contains(aPnt1, 1E-6)) 
+  {
     DisplayPnt(aPnt1, "1", Aspect_TOM_STAR);
     myResult << "A circle contains a point 1" << std::endl;
   }
-  else {
+  else 
+  {
     DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS);
     myResult << "A circle does contain a point 1" << std::endl;
   }
-  if (aCirc.Contains(aPnt2, 1E-6)) {
+  if (aCirc.Contains(aPnt2, 1E-6)) 
+  {
     DisplayPnt(aPnt2, "2", Aspect_TOM_STAR);
     myResult << "A circle contains a point 2" << std::endl;
   }
-  else {
+  else 
+  {
     DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS);
     myResult << "A circle does contain a point 2" << std::endl;
   }
-  if (aCirc.Contains(aPnt3, 1E-6)) {
+  if (aCirc.Contains(aPnt3, 1E-6)) 
+  {
     DisplayPnt(aPnt3, "3", Aspect_TOM_STAR);
     myResult << "A circle contains a point 3" << std::endl;
   }
-  else {
+  else 
+  {
     DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS);
     myResult << "A circle does contain a point 3" << std::endl;
   }
@@ -1341,42 +1395,60 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
 {
   // Define a 4x4 grid of points for BSpline surface.
   TColgp_Array2OfPnt aBSplinePnts(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
     gp_Pnt aPnt;
     aPnt.SetX(5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j) {
+    for (Standard_Integer j = 1; j <= 4; ++j) 
+    {
       aPnt.SetY(5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
+      {
         aPnt.SetZ(5.0);
+      }
       else
+      {
         aPnt.SetZ(0.0);
+      }
       aBSplinePnts.SetValue(i, j, aPnt);
     }
   }
 
   // Define a 4x4 grid of points for Bezier surface.
   TColgp_Array2OfPnt aBezierPnts(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
     gp_Pnt aPnt;
     aPnt.SetX(20.0 + 5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j) {
+    for (Standard_Integer j = 1; j <= 4; ++j) 
+    {
       aPnt.SetY(20.0 + 5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
+      {
         aPnt.SetZ(5.0);
+      }
       else
+      {
         aPnt.SetZ(0.0);
+      }
       aBezierPnts.SetValue(i, j, aPnt);
     }
   }
 
   // Define BSpline weights.
   TColStd_Array2OfReal aBSplineWeights(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i) {
-    for (Standard_Integer j = 1; j <= 4; ++j) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
+    for (Standard_Integer j = 1; j <= 4; ++j) 
+    {
       if (1 < i && i < 4 && 1 < j && j < 4)
+      {
         aBSplineWeights.SetValue(i, j, 0.5);
+      }
       else
+      {
         aBSplineWeights.SetValue(i, j, 1.0);
+      }
     }
   }
 
@@ -1408,12 +1480,18 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
 
   // Define BSpline weights.
   TColStd_Array2OfReal aBezierWeights(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i) {
-    for (Standard_Integer j = 1; j <= 4; ++j) {
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
       if (1 < i && i < 4 && 1 < j && j < 4)
+      {
         aBezierWeights.SetValue(i, j, 1.5);
+      }
       else
+      {
         aBezierWeights.SetValue(i, j, 0.5);
+      }
     }
   }
 
@@ -1429,10 +1507,12 @@ void GeometrySamples::FreeStyleSurfaces3dSample()
   anAisBezierSurf->SetColor(Quantity_Color(Quantity_NOC_GREEN));
   myObject3d.Append(anAisBSplineSurf);
   myObject3d.Append(anAisBezierSurf);
-  for (TColgp_Array2OfPnt::Iterator anIt(aBSplinePnts); anIt.More(); anIt.Next()) {
+  for (TColgp_Array2OfPnt::Iterator anIt(aBSplinePnts); anIt.More(); anIt.Next()) 
+  {
     myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
   }
-  for (TColgp_Array2OfPnt::Iterator anIt(aBezierPnts); anIt.More(); anIt.Next()) {
+  for (TColgp_Array2OfPnt::Iterator anIt(aBezierPnts); anIt.More(); anIt.Next()) 
+  {
     myObject3d.Append(new AIS_Point(new Geom_CartesianPoint(anIt.Value())));
   }
 }
@@ -1779,15 +1859,21 @@ void GeometrySamples::BoundingBoxOfSurface3dSample()
 {
   // Define a 4x4 grid of points for BSpline surface.
   TColgp_Array2OfPnt aPoints(1, 4, 1, 4);
-  for (Standard_Integer i = 1; i <= 4; ++i) {
+  for (Standard_Integer i = 1; i <= 4; ++i) 
+  {
     gp_Pnt aPnt;
     aPnt.SetX(5.0 * i);
-    for (Standard_Integer j = 1; j <= 4; ++j) {
+    for (Standard_Integer j = 1; j <= 4; ++j) 
+    {
       aPnt.SetY(5.0 * j);
       if (1 < i && i < 4 && 1 < j && j < 4)
+      {
         aPnt.SetZ(5.0);
+      }
       else
+      {
         aPnt.SetZ(0.0);
+      }
       aPoints.SetValue(i, j, aPnt);
     }
   }
