@@ -298,10 +298,10 @@ void OcafSamples::ModifyBoxOcafSample()
       return;
     }
     // Get the Standard_GUID of the TFunction_FunctionDriver of the selected object TFunction_Function attribute
-    Standard_GUID myDriverID = aFunction->GetDriverGUID();
+    Standard_GUID aDriverID = aFunction->GetDriverGUID();
 
     // Case of a box created with the box function driver
-    if (myDriverID == TOcafFunction_BoxDriver::GetID()) 
+    if (aDriverID == TOcafFunction_BoxDriver::GetID()) 
     {
       aBoxCount++;
       Standard_Real aBoxX, aBoxY, aBoxZ, aBoxWidth, aBoxLenght, aBoxHight;
@@ -340,11 +340,11 @@ void OcafSamples::ModifyBoxOcafSample()
       TDataStd_Real::Set(aLabel.FindChild(6), aBoxZ);
 
       // Get the TFunction_FunctionDriver GUID used with the TFunction_Function
-      Standard_GUID myDriverID = aFunction->GetDriverGUID();
+      aDriverID = aFunction->GetDriverGUID();
       Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
       Handle(TFunction_Driver) aBoxDriver;
       // Find the TOcafFunction_BoxDriver in the TFunction_DriverTable using its GUID 
-      TFunction_DriverTable::Get()->FindDriver(myDriverID, aBoxDriver);
+      TFunction_DriverTable::Get()->FindDriver(aDriverID, aBoxDriver);
       // Execute the cut if it must be (if an attribute changes)
       aBoxDriver->Init(aLabel);
 
@@ -354,7 +354,7 @@ void OcafSamples::ModifyBoxOcafSample()
         myResult << "Recompute failed" << std::endl;
 
       // Get the presentation of the box, display it and set it selected
-      Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
+      anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
       TDataStd_Integer::Set(aLabel, 1);
       anAisPresentation->Display(1);
       myContext->UpdateCurrentViewer();
@@ -396,10 +396,10 @@ void OcafSamples::ModifyCylinderOcafSample()
       return;
     }
     // Get the Standard_GUID of the TFunction_FunctionDriver of the selected object TFunction_Function attribute
-    Standard_GUID myDriverID = aFunction->GetDriverGUID();
+    Standard_GUID aDriverID = aFunction->GetDriverGUID();
 
     // Case of a box created with the box function driver
-    if (myDriverID == TOcafFunction_CylDriver::GetID()) 
+    if (aDriverID == TOcafFunction_CylDriver::GetID()) 
     {
       aCylCount++;
       Standard_Real aCylRadius, aCylHight, aCylX, aCylY, aCylZ;
@@ -438,11 +438,11 @@ void OcafSamples::ModifyCylinderOcafSample()
       TDataStd_Real::Set(aLabel.FindChild(5), aCylZ);
 
       // Get the TFunction_FunctionDriver GUID used with the TFunction_Function
-      Standard_GUID myDriverID = aFunction->GetDriverGUID();
+      aDriverID = aFunction->GetDriverGUID();
       Handle(TFunction_Logbook) aLogBook = TFunction_Logbook::Set(aLabel);
       Handle(TFunction_Driver) aCylDriver;
       // Find the TOcafFunction_CylDriver in the TFunction_DriverTable using its GUID 
-      TFunction_DriverTable::Get()->FindDriver(myDriverID, aCylDriver);
+      TFunction_DriverTable::Get()->FindDriver(aDriverID, aCylDriver);
       // Execute the cut if it must be (if an attribute changes)
       aCylDriver->Init(aLabel);
 
@@ -453,7 +453,7 @@ void OcafSamples::ModifyCylinderOcafSample()
         myResult << "Recompute failed" << std::endl;
       }
       // Get the presentation of the box, display it and set it selected
-      Handle(TPrsStd_AISPresentation) anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
+      anAisPresentation = TPrsStd_AISPresentation::Set(aLabel, TNaming_NamedShape::GetID());
       TDataStd_Integer::Set(aLabel, 1);
       anAisPresentation->Display(1);
       myContext->UpdateCurrentViewer();

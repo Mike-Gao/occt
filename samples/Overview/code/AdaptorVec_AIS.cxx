@@ -87,22 +87,23 @@ void AdaptorVec_AIS::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPres
   Handle(Graphic3d_ArrayOfSegments) aPrims = new Graphic3d_ArrayOfSegments(2);
   aPrims->AddVertex(myPnt);
   aPrims->AddVertex(aLastPoint);
-  Prs3d_Root::CurrentGroup(aPresentation)->SetPrimitivesAspect(myDrawer->LineAspect()->Aspect());
-  Prs3d_Root::CurrentGroup(aPresentation)->AddPrimitiveArray(aPrims);
+  aPresentation->CurrentGroup()->SetPrimitivesAspect(myDrawer->LineAspect()->Aspect());
+  aPresentation->CurrentGroup()->AddPrimitiveArray(aPrims);
   // Draw arrow
-  Prs3d_Arrow::Draw(Prs3d_Root::CurrentGroup(aPresentation),
-    aLastPoint,
-    myDir,
-    anArrowAspect->Angle(),
-    anArrowAspect->Length());
+  Prs3d_Arrow::Draw(aPresentation->CurrentGroup(),
+                    aLastPoint,
+                    myDir,
+                    anArrowAspect->Angle(),
+                    anArrowAspect->Length());
 
   // Draw text
-  if (myText.Length() != 0) {
+  if (myText.Length() != 0) 
+  {
     gp_Pnt aTextPosition = aLastPoint;
-    Prs3d_Text::Draw(Prs3d_Root::CurrentGroup(aPresentation),
-      myDrawer->TextAspect(),
-      myText,
-      aTextPosition);
+    Prs3d_Text::Draw(aPresentation->CurrentGroup(),
+                     myDrawer->TextAspect(),
+                     myText,
+                     aTextPosition);
   }
 }
 

@@ -114,30 +114,16 @@ void Viewer3dSamples::AmbientLight3dSample()
 void Viewer3dSamples::ClearLight3dSample()
 {
   //	Setting Off all viewer active lights
-  TColStd_ListOfTransient lights;
-  for (myView->Viewer()->InitActiveLights();
-    myView->Viewer()->MoreActiveLights();
-    myView->Viewer()->NextActiveLights()) 
-  {
-    lights.Append(myView->Viewer()->ActiveLight());
-  }
+  const V3d_ListOfLight& lights = myView->Viewer()->ActiveLights();
   TColStd_ListIteratorOfListOfTransient itrLights(lights);
-  for (; itrLights.More(); itrLights.Next()) 
+  for (; itrLights.More(); itrLights.Next())
   {
     Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
     myView->Viewer()->SetLightOff(light);
   }
 
-  //	Setting Off all view active lights
-  lights.Clear();
-  for (myView->InitActiveLights();
-    myView->MoreActiveLights();
-    myView->NextActiveLights()) 
-  {
-    lights.Append(myView->ActiveLight());
-  }
   itrLights.Initialize(lights);
-  for (; itrLights.More(); itrLights.Next()) 
+  for (; itrLights.More(); itrLights.Next())
   {
     Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
     myView->SetLightOff(light);
