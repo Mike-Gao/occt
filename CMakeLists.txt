@@ -849,9 +849,11 @@ if (INSTALL_SAMPLES)
   OCCT_INSTALL_FILE_OR_DIR ("samples/java" "${INSTALL_DIR_SAMPLES}")
   OCCT_INSTALL_FILE_OR_DIR ("samples/ocafsamples" "${INSTALL_DIR_SAMPLES}")
   OCCT_INSTALL_FILE_OR_DIR ("samples/qt" "${INSTALL_DIR_SAMPLES}")
+  OCCT_INSTALL_FILE_OR_DIR ("samples/Overview/code" "${INSTALL_DIR_SAMPLES}/Overview")  
 
   install (FILES "${CMAKE_BINARY_DIR}/env.samples.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SAMPLES}/qt/FuncDemo" RENAME "env.${SCRIPT_EXT}")
   install (FILES "${CMAKE_BINARY_DIR}/env.samples.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SAMPLES}/qt/IESample" RENAME "env.${SCRIPT_EXT}")
+  install (FILES "${CMAKE_BINARY_DIR}/env.samples.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SAMPLES}/qt/Overview" RENAME "env.${SCRIPT_EXT}")  
   install (FILES "${CMAKE_BINARY_DIR}/env.samples.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SAMPLES}/qt/Tutorial" RENAME "env.${SCRIPT_EXT}")
 endif()
 

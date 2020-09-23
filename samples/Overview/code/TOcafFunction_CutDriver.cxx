@@ -23,9 +23,11 @@
 #include <TFunction_Logbook.hxx>
 #include <TDF_Reference.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QMessageBox>
 #include <QApplication>
 #include <QObject>
+#include <Standard_WarningsRestore.hxx>
 
 //=======================================================================
 //function : GetID

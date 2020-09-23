@@ -11,8 +11,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef DOCUMENTCOMMON_H
-#define DOCUMENTCOMMON_H
+#ifndef DOCUMENT_COMMON_OVERVIEW_H
+#define DOCUMENT_COMMON_OVERVIEW_H
 
 #include "CommonSample.h"
 
@@ -41,8 +41,6 @@ public:
   void SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects,
                   Standard_Boolean theDisplayShaded = Standard_False);
   bool IsEmpty() const { return myContextIsEmpty; } 
-	
-protected:
 
 signals:
   void selectionChanged();
@@ -56,7 +54,6 @@ private:
                              const Standard_Boolean theComputedMode,
                              const Standard_Boolean theDefaultComputedMode );
 
-protected:
 	Handle(V3d_Viewer)             myViewer;
 	Handle(AIS_InteractiveContext) myContext;
   bool myContextIsEmpty;

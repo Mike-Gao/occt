@@ -11,11 +11,10 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include "DocumentCommon.h"
-
 #include "ApplicationCommon.h"
-#include "Transparency.h"
+#include "DocumentCommon.h"
 #include "Material.h"
+#include "Transparency.h"
 
 #include <Standard_WarningsDisable.hxx>
 #include <QStatusBar>
@@ -24,10 +23,11 @@
 #include <QColorDialog>
 #include <Standard_WarningsRestore.hxx>
 
-#include <Aspect_DisplayConnection.hxx>
 #include <AIS_InteractiveObject.hxx>
+#include <Aspect_DisplayConnection.hxx>
 #include <Graphic3d_NameOfMaterial.hxx>
 #include <OpenGl_GraphicDriver.hxx>
+
 #if !defined(_WIN32) && !defined(__WIN32__) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX))
 #include <OSD_Environment.hxx>
 #endif

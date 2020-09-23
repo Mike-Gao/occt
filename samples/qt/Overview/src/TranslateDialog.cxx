@@ -13,7 +13,9 @@
 
 #include "TranslateDialog.h"
 
+#include <Standard_WarningsDisable.hxx>
 #include <QGridLayout>
+#include <Standard_WarningsRestore.hxx>
 
 TranslateDialog::TranslateDialog(QWidget* parent, Qt::WindowFlags flags, bool modal)
   : QFileDialog(parent, flags)

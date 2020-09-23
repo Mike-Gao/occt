@@ -16,13 +16,13 @@
 
 #include <functional>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QWidget>
 #include <QAction>
 #include <QToolBar>
 #include <QList>
-
 #include <Standard_WarningsRestore.hxx>
-#include <Standard_WarningsDisable.hxx>
+
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_View.hxx>
 
@@ -35,7 +35,6 @@ enum class ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top,
                         Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe, Transparency };
 enum class RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
-//class COMMONSAMPLE_EXPORT View: public QWidget
 class View: public QWidget
 {
     Q_OBJECT

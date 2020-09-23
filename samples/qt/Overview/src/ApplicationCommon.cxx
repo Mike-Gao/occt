@@ -12,41 +12,39 @@
 // commercial license or contractual agreement.
 
 #include "ApplicationCommon.h"
+#include "DataExchangeSamples.h"
 #include "DocumentCommon.h"
-#include "View.h"
 #include "GeometrySamples.h"
+#include "OcafSamples.h"
 #include "TopologySamples.h"
 #include "TriangulationSamples.h"
-#include "DataExchangeSamples.h"
-#include "OcafSamples.h"
-#include "Viewer3dSamples.h"
+#include "View.h"
 #include "Viewer2dSamples.h"
-
-#include <QtGlobal>
-#include <QApplication>
-#include <QFrame>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QSplitter>
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QMessageBox>
-
-
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QDir>
-#include <QFile>
-#include <QMap>
-#include <QPair>
-#include <QGroupBox>
+#include "Viewer3dSamples.h"
 
 #include <Standard_WarningsDisable.hxx>
+#include <QApplication>
+#include <QFile>
+#include <QFont>
+#include <QDir>
+#include <QGroupBox>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMap>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPair>
+#include <QSplitter>
+#include <QStatusBar>
+#include <QtGlobal>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <Standard_WarningsRestore.hxx>
-
 
 #include <Graphic3d_GraphicDriver.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -443,8 +441,10 @@ void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
 }
 
 QString ApplicationCommonWindow::selectFileName(const QString& theSampleName,
-  TranslateDialog* theDialog, int& theMode)
+                                                TranslateDialog* theDialog, int& theMode)
 {
+  Q_UNUSED(theSampleName)
+
   std::shared_ptr<TranslateDialog> aDialog(theDialog);
 
   int ret = aDialog->exec();

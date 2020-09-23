@@ -13,13 +13,14 @@
 
 #include "GeomWidget.h"
 
-
+#include <Standard_WarningsDisable.hxx>
 #include <QFrame>
 #include <QBoxLayout>
 #include <QTextEdit>
 #include <QStackedLayout>
 #include <QToolBar>
 #include <QStackedWidget>
+#include <Standard_WarningsRestore.hxx>
 
 GeomWidget::GeomWidget(DocumentCommon* theDocument3d,
   DocumentCommon* theDocument2d,

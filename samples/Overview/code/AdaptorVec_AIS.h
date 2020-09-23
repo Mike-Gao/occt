@@ -16,9 +16,6 @@
 
 #include <AIS_InteractiveObject.hxx>
 
-
-
-
 class AdaptorVec_AIS;
 DEFINE_STANDARD_HANDLE(AdaptorVec_AIS, AIS_InteractiveObject)
 class AdaptorVec_AIS : public AIS_InteractiveObject

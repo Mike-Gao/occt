@@ -14,11 +14,13 @@
 #ifndef OCCTHIGHLIGHTER_H
 #define OCCTHIGHLIGHTER_H
 
+#include <Standard_WarningsDisable.hxx>
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
 #include <QTextDocument>
 #include <QString>
 #include <QTextCharFormat>
+#include <Standard_WarningsRestore.hxx>
 
 QT_BEGIN_NAMESPACE
 class QTextDocument;

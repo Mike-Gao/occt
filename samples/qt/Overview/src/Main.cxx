@@ -14,15 +14,16 @@
 #include "ApplicationCommon.h"
 
 #include <OSD_Environment.hxx>
+
 #include <Standard_WarningsDisable.hxx>
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QLocale>
+#include <QSettings>
+#include <QStringList>
+#include <QTranslator>
 #include <Standard_WarningsRestore.hxx>
 
-#include <QApplication>
-#include <QSettings>
-#include <QTranslator>
-#include <QLocale>
-#include <QStringList>
-#include <QCommandLineParser>
 
 int main ( int argc, char* argv[] )
 {

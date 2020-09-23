@@ -13,6 +13,10 @@
 
 #include "OcctHighlighter.h"
 
+#include <Standard_WarningsDisable.hxx>
+#include <QFont>
+#include <Standard_WarningsRestore.hxx>
+
 const QString anOcctPatterns[] =
 {
   QStringLiteral("gp_Pnt"), QStringLiteral("gp_XYZ"),  QStringLiteral("gp_Vec"),

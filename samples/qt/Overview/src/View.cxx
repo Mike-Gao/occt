@@ -15,11 +15,10 @@
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
 
-#include "View.h"
 #include "ApplicationCommon.h"
 #include "OcctWindow.h"
 #include "Transparency.h"
-
+#include "View.h"
 
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
@@ -34,14 +33,15 @@
 #include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QBoxLayout>
+#include <Standard_WarningsRestore.hxx>
 
 #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX)) && QT_VERSION < 0x050000
 #include <QX11Info>
 #endif
-#include <Standard_WarningsRestore.hxx>
+
+#include <Aspect_DisplayConnection.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
 #include <Graphic3d_TextureEnv.hxx>
-#include <Aspect_DisplayConnection.hxx>
 
 // the key for multi selection :
 #define MULTISELECTIONKEY Qt::ShiftModifier
@@ -564,6 +564,8 @@ void View::activateCursor(const CurrentAction3d mode)
 
 void View::onLButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint point)
 {
+  Q_UNUSED(nFlags)
+
   //  save the current mouse coordinate in min
   myXmin = point.x();
   myYmin = point.y();
@@ -580,14 +582,19 @@ void View::onLButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint poin
   activateCursor(myCurrentMode);
 }
 
-void View::onMButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint /*point*/)
+void View::onMButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint point)
 {
+  Q_UNUSED(nFlags)
+  Q_UNUSED(point)
+
   myCurrentMode = CurrentAction3d::DynamicPanning;
   activateCursor(myCurrentMode);
 }
 
 void View::onRButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint point)
 {
+  Q_UNUSED(nFlags)
+  Q_UNUSED(point)
   if (myIs3dView) {
     myCurrentMode = CurrentAction3d::DynamicRotation;
     myV3dView->StartRotation(point.x(), point.y());
@@ -597,6 +604,8 @@ void View::onRButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint poin
 
 void View::onLButtonUp(Qt::MouseButtons nFlags, const QPoint point)
 {
+  Q_UNUSED(nFlags)
+  Q_UNUSED(point)
   switch (myCurrentMode) {
   case CurrentAction3d::Nothing:
     if (point.x() == myXmin && point.y() == myYmin) {
@@ -658,14 +667,20 @@ void View::onLButtonUp(Qt::MouseButtons nFlags, const QPoint point)
   activateCursor(myCurrentMode);
 }
 
-void View::onMButtonUp(Qt::MouseButtons /*nFlags*/, const QPoint /*point*/)
+void View::onMButtonUp(Qt::MouseButtons nFlags, const QPoint point)
 {
+  Q_UNUSED(nFlags)
+  Q_UNUSED(point)
+
   myCurrentMode = CurrentAction3d::Nothing;
   activateCursor(myCurrentMode);
 }
 
-void View::onRButtonUp(Qt::MouseButtons /*nFlags*/, const QPoint point)
+void View::onRButtonUp(Qt::MouseButtons nFlags, const QPoint point)
 {
+  Q_UNUSED(nFlags)
+  Q_UNUSED(point)
+
   QApplication::setOverrideCursor(Qt::WaitCursor);
   // reset tyhe good Degenerated mode according to the strored one
   //   --> dynamic rotation may have change it
@@ -781,14 +796,18 @@ void View::MultiDragEvent(const int x, const int y, const int TheState)
   }
 }
 
-void View::MultiInputEvent(const int /*x*/, const int /*y*/)
+void View::MultiInputEvent(const int x, const int y)
 {
+  Q_UNUSED(x)
+  Q_UNUSED(y)
+
   myContext->ShiftSelect(Standard_True);
   emit selectionChanged();
 }
 
-void View::addItemInPopup(QMenu* /*theMenu*/)
+void View::addItemInPopup(QMenu* theMenu)
 {
+  Q_UNUSED(theMenu)
 }
 
 void View::onBackground()

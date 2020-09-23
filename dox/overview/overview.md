@@ -504,7 +504,7 @@ See \subpage samples_mfc_standard "Readme" for details.
 
 @subsubsection OCCT_OVW_SECTION_7_3_2 Qt
 
-OCCT contains three samples based on Qt application framework
+OCCT contains four samples based on Qt application framework
 
  Import Export
 -------------
@@ -526,6 +526,25 @@ to enhance user's C++ tools with high performance modeling classes, methods and 
 The combination of these resources allows creating substantial applications.
 
 **See also:** @ref occt__tutorial "OCCT Tutorial" 
+
+ Overview
+---------
+
+The Qt sample programm to overview how use a basic Open CASCAD functionality. 
+This programm contains following samples category:
+
+  * Geometry
+  * Topology,
+  * Triangulation
+  * DataExchange
+  * OCAF
+  * Viewer 2d
+  * Viewer 3d
+
+Each sample presents geometry view and C++ code fragment.
+
+@figure{/overview/images/overview_qt.png}
+
 
 **Remarks:**
 

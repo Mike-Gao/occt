@@ -14,9 +14,10 @@
 #include "Material.h"
 
 #include <Standard_WarningsDisable.hxx>
-#include <QPushButton>
 #include <QLayout>
+#include <QPushButton>
 #include <QSignalMapper>
+#include <QWidget>
 #include <Standard_WarningsRestore.hxx>
 
 #include <Graphic3d_NameOfMaterial.hxx>

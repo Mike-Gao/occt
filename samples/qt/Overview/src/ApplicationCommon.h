@@ -11,16 +11,18 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef APPLICATIONCOMMON_H
-#define APPLICATIONCOMMON_H
+#ifndef APPLICATION_COMMON_OVERVIEW_H
+#define APPLICATION_COMMON_OVERVIEW_H
 
-#include "DocumentCommon.h"
 #include "BaseSample.h"
+#include "CommonSample.h"
+#include "DocumentCommon.h"
 #include "GeomWidget.h"
-#include "TranslateDialog.h"
-
 #include "OcctHighlighter.h"
+#include "TranslateDialog.h"
+#include "View.h"
 
+#include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QMainWindow>
 #include <QAction>
@@ -30,12 +32,8 @@
 #include <QTextEdit>
 #include <QList>
 #include <QSignalMapper>
-
+#include <QWidget>
 #include <Standard_WarningsRestore.hxx>
-#include <Standard_WarningsDisable.hxx>
-
-#include "CommonSample.h"
-#include "View.h"
 
 enum StdActions
 {

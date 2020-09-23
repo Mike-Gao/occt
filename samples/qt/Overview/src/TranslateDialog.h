@@ -14,12 +14,14 @@
 #ifndef TRANSLATEDIALOG_H
 #define TRANSLATEDIALOG_H
 
+#include <Standard_WarningsDisable.hxx>
 #include <QFileDialog>
 #include <QWidget>
 #include <QShowEvent>
 #include <QListView>
 #include <QComboBox>
 #include <QList>
+#include <Standard_WarningsRestore.hxx>
 
 class TranslateDialog : public QFileDialog
 {

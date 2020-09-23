@@ -959,7 +959,7 @@ void GeometrySamples::TransformedEllipse2dSample()
 
 void GeometrySamples::ConjugateObjects2dSample()
 {
-  gp_Parab2d aParab(gp_Ax2d(), 20.0, 10.0);
+  gp_Parab2d aParab(gp_Ax2d(), 20.0);
   gp_Ax2d aDirectrix = aParab.Directrix();
   gp_Pnt2d aFocus = aParab.Focus();
   gp_Pnt2d aLocation = aParab.Location();

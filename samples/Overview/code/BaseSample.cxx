@@ -23,11 +23,11 @@
 #include <OSD_File.hxx>
 #include <OSD_Protection.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QDir>
+#include <Standard_WarningsRestore.hxx>
 
 const TCollection_AsciiString BaseSample::FILE_EXTENSION = "cxx";
-
-
 
 void BaseSample::Clear()
 {
@@ -131,7 +131,7 @@ Standard_Integer BaseSample::FindEndOfPhrase(TCollection_AsciiString theText,
     {
       std::smatch aMatch = *aDetectIterator;
       std::string aFoundString = aMatch.str();
-      aIndexOfLastFoundSymbol = aStdText.find(aFoundString) + aFoundString.length();
+      aIndexOfLastFoundSymbol = static_cast<Standard_Integer>(aStdText.find(aFoundString) + aFoundString.length());
     }
     else
     {

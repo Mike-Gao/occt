@@ -16,7 +16,9 @@
 #include "View.h"
 #include "DocumentCommon.h"
 
+#include <Standard_WarningsDisable.hxx>
 #include <QWidget>
+#include <Standard_WarningsRestore.hxx>
 
 class ApplicationCommon;
 class QStackedWidget;
