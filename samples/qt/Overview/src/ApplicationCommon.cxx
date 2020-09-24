@@ -92,7 +92,7 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theCategory)
   aCodeViewFont.setFixedPitch(true);
   aCodeViewFont.setPointSize(10);
 
-  QGroupBox* aCodeFrame = new QGroupBox(tr("Procedure Code"));
+  QGroupBox* aCodeFrame = new QGroupBox(tr("Sample code"));
   QVBoxLayout* aCodeLayout = new QVBoxLayout(aCodeFrame);
   aCodeLayout->setContentsMargins(3, 3, 3, 3);
   myCodeView = new QTextEdit(aCodeFrame);

@@ -6,10 +6,6 @@ if exist "%~dp0custom.bat" (
 
 call "%CASROOT%\env.bat" %1 %2 %3
 
-
-rem if ["%ARCH%"] == ["32"] set VCARCH=x86
-rem if ["%ARCH%"] == ["64"] set VCARCH=amd64
-
 if /I ["%1"] == ["vc141"] set "VCVER=vc141"
 set "BIN_DIR=win%ARCH%\%VCVER%\bind"
 set "LIB_DIR=win%ARCH%\%VCVER%\libd"
@@ -31,5 +27,4 @@ if not "%QTDIR%" == "" (
   set "PATH=%QTDIR%/bin;%PATH%"
   set "QT_QPA_PLATFORM_PLUGIN_PATH=%QTDIR%\plugins\platforms"
 )
-rem set "CSF_SampleSources=%~dp0..\..\samples_src"
 set "aSamplePath=%~dp0"

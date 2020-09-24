@@ -541,9 +541,11 @@ This programm contains following samples category:
   * Viewer 2d
   * Viewer 3d
 
-Each sample presents geometry view and C++ code fragment.
+Each sample presents geometry view, C++ code fragment and sample output window.
 
-@figure{/overview/images/overview_qt.png}
+@figure{/overview/images/overview_overview_qt.png}
+
+See \subpage samples_qt_overview "Readme" for details.
 
 
 **Remarks:**
