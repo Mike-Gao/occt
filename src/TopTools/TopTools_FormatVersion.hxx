@@ -14,8 +14,6 @@
 #ifndef _TopToolsFormatVersion_HeaderFile
 #define _TopToolsFormatVersion_HeaderFile
 
-#include <Standard_Typedef.hxx>
-
 //! Defined TopTools format version
 enum TopTools_FormatVersion
 {

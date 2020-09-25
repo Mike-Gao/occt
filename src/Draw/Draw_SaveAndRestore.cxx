@@ -21,8 +21,8 @@
 Draw_SaveAndRestoreBase* Draw_SaveAndRestoreBase::Draw_FirstSaveAndRestore = nullptr;
 
 Draw_SaveAndRestoreBase::Draw_SaveAndRestoreBase(Standard_CString thename)
-  :myName(thename) 
-  ,myNext(Draw_FirstSaveAndRestore)
+  :myNext(Draw_FirstSaveAndRestore)
+  ,myName(thename) 
 {
   Draw_FirstSaveAndRestore = this;
 }

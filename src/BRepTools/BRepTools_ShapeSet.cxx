@@ -191,9 +191,9 @@ void BRepTools_ShapeSet::AddGeometry(const TopoDS_Shape& S)
         }
         else if (CR->IsPolygonOnTriangulation()) {
           // NCollection_IndexedDataMap::Add() function use is correct because
-          // Bin(Brep)Tools_ShapeSet::AddGeometry() call from Bin(Brep)Tools_ShapeSet::Add()
-          // that recursively down from complex to elementary shapes.
-          // As a result, the TopAbs_FACE’s will be processed earlier than the TopAbs_EDGE’s.
+          // Bin(Brep)Tools_ShapeSet::AddGeometry() is called from Bin(Brep)Tools_ShapeSet::Add()
+          // that processes shapes recursively from complex to elementary ones.
+          // As a result, the TopAbs_FACE's will be processed earlier than the TopAbs_EDGE's.
           myTriangulations.Add(CR->Triangulation(), Standard_False); // edge triangulation does not need normals
           myNodes.Add(CR->PolygonOnTriangulation());
           ChangeLocations().Add(CR->Location());
@@ -1006,7 +1006,7 @@ void  BRepTools_ShapeSet::ReadGeometry (const TopAbs_ShapeEnum T,
                 myBuilder.UpdateEdge
                   (E, Handle(Poly_PolygonOnTriangulation)::DownCast(myNodes(pt)),
                    Handle(Poly_PolygonOnTriangulation)::DownCast(myNodes(pt2)),
-                   Handle(Poly_Triangulation)::DownCast(myTriangulations.FindKey(t)),
+                   myTriangulations.FindKey(t),
                    Locations().Location(l));
             }
             else {
@@ -1014,7 +1014,7 @@ void  BRepTools_ShapeSet::ReadGeometry (const TopAbs_ShapeEnum T,
 				  pt > 0 && pt <= myNodes.Extent())
                 myBuilder.UpdateEdge
                   (E,Handle(Poly_PolygonOnTriangulation)::DownCast(myNodes(pt)),
-                   Handle(Poly_Triangulation)::DownCast(myTriangulations.FindKey(t)),
+                   myTriangulations.FindKey(t),
                    Locations().Location(l));
             }
             // range
@@ -1066,7 +1066,7 @@ void  BRepTools_ShapeSet::ReadGeometry (const TopAbs_ShapeEnum T,
       //only triangulation
       IS >> s;
       myBuilder.UpdateFace(TopoDS::Face(S),
-                           Handle(Poly_Triangulation)::DownCast(myTriangulations.FindKey(s)));
+                           myTriangulations.FindKey(s));
     }
 //    else pos = IS.tellg();
     
@@ -1083,7 +1083,7 @@ void  BRepTools_ShapeSet::ReadGeometry (const TopAbs_ShapeEnum T,
       s = atoi ( &string[2] );
 	  if (s > 0 && s <= myTriangulations.Extent())
         myBuilder.UpdateFace(TopoDS::Face(S),
-                             Handle(Poly_Triangulation)::DownCast(myTriangulations.FindKey(s)));
+                             myTriangulations.FindKey(s));
     }
 //    else IS.seekg(pos);
     }
@@ -1426,7 +1426,7 @@ void BRepTools_ShapeSet::WriteTriangulation(Standard_OStream&      OS,
   Handle(Poly_Triangulation) T;
   for (i = 1; i <= nbtri && aPS.More(); i++, aPS.Next()) {
 
-    T = Handle(Poly_Triangulation)::DownCast(myTriangulations.FindKey(i));
+    T = myTriangulations.FindKey(i);
     const Standard_Boolean toWriteNormals = myTriangulations(i);
     if (Compact) {
       OS << T->NbNodes() << " " << T->NbTriangles() << " ";

@@ -14,8 +14,6 @@
 #ifndef _BinLDriversFormatVersion_HeaderFile
 #define _BinLDriversFormatVersion_HeaderFile
 
-#include <Standard_Typedef.hxx>
-
 //! Defined BinLDrivers format version
 enum BinLDrivers_FormatVersion
 {

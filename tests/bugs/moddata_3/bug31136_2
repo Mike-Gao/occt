@@ -2,10 +2,7 @@ puts "=========="
 puts "31136_2"
 puts "=========="
 puts ""
-################################################################
-# Modeling Data - BinXCAF persistence loses normals from triangulation-only Faces
-################################################################
-	
+
 pload MODELING XDE OCAF VISUALIZATION
 source $env(CSF_OCCTSamplesPath)/tcl/cad.tcl
 trinfo res
@@ -18,11 +15,10 @@ save o $imagedir/${test_image_brep}.brep
 restore $imagedir/${test_image_brep}.brep b2
 vclear
 vclose ALL
-vinit v2/v2
+vinit v1/v1
 vbottom
 vdisplay -dispMode 1 b2
 vfit
 vrenderparams -shadingModel phong
 checkview -screenshot -3d -path ${imagedir}/${test_image_brep}.png
-vclear
-vclose ALL
+

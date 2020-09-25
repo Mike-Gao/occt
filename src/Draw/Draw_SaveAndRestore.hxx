@@ -15,9 +15,7 @@
 #define Draw_SaveAndRestore_HeaderFile
 
 #include <Draw.hxx>
-
-enum TopTools_FormatVersion;
-
+#include <TopTools_FormatVersion.hxx>
 
 class Draw_SaveAndRestoreBase
 {
@@ -38,7 +36,7 @@ public:
   {
     return myNext;
   } 
-  static  Draw_SaveAndRestoreBase* const GetFirst()   
+  static  Draw_SaveAndRestoreBase* const GetFirst()
   {
     return Draw_FirstSaveAndRestore;
   } 

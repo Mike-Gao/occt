@@ -14,8 +14,6 @@
 #ifndef _XmlLDriversFormatVersion_HeaderFile
 #define _XmlLDriversFormatVersion_HeaderFile
 
-#include <Standard_Typedef.hxx>
-
 enum XmlLDrivers_FormatVersion
 {
   XML_LDRIVERS_VERSION_2 = 2, 

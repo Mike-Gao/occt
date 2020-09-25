@@ -14,8 +14,6 @@
 #ifndef _BinToolsFormatVersion_HeaderFile
 #define _BinToolsFormatVersion_HeaderFile
 
-#include <Standard_Typedef.hxx>
-
 //! Defined BinTools format version
 enum BinTools_FormatVersion
 {
