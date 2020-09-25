@@ -16,6 +16,7 @@
 
 #include <Standard_Typedef.hxx>
 
+//! Defined BinLDrivers format version
 enum BinLDrivers_FormatVersion
 {
   BIN_LDRIVERS_VERSION_2 = 2, //!< First supported version

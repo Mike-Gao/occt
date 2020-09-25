@@ -190,6 +190,10 @@ void BRepTools_ShapeSet::AddGeometry(const TopoDS_Shape& S)
           }
         }
         else if (CR->IsPolygonOnTriangulation()) {
+          // NCollection_IndexedDataMap::Add() function use is correct because
+          // Bin(Brep)Tools_ShapeSet::AddGeometry() call from Bin(Brep)Tools_ShapeSet::Add()
+          // that recursively down from complex to elementary shapes.
+          // As a result, the TopAbs_FACE’s will be processed earlier than the TopAbs_EDGE’s.
           myTriangulations.Add(CR->Triangulation(), Standard_False); // edge triangulation does not need normals
           myNodes.Add(CR->PolygonOnTriangulation());
           ChangeLocations().Add(CR->Location());
@@ -1506,9 +1510,6 @@ void BRepTools_ShapeSet::WriteTriangulation(Standard_OStream&      OS,
           if (!Compact)
           {
             OS << std::setw(10) << j << " : ";
-          }
-          if (!Compact)
-          {
             OS << std::setw(17);
           }
           OS << Normals(j) << " ";
@@ -1601,15 +1602,12 @@ void BRepTools_ShapeSet::ReadTriangulation(Standard_IStream& IS, const Message_P
       Triangles(j).Set(n1,n2,n3);
     }
 
-    if (FormatNb() >= TOP_TOOLS_VERSION_3)
+    if (hasNormals) 
     {
-      if (hasNormals) 
+      for (j = 1; j <= nbNodes * 3; j++) 
       {
-        for (j = 1; j <= nbNodes * 3; j++) 
-        {
-          GeomTools::GetReal(IS, normal);
-          Normals->SetValue(j, static_cast<Standard_ShortReal>(normal));
-        }
+        GeomTools::GetReal(IS, normal);
+        Normals->SetValue(j, static_cast<Standard_ShortReal>(normal));
       }
     }
 

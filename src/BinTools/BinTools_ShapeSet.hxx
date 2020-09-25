@@ -58,8 +58,6 @@ public:
   //! Define if shape will be stored with triangles.
   //! Ignored (always written) if face defines only triangulation (no surface).
   void SetWithTriangles (const Standard_Boolean isWithTriangles) { myWithTriangles = isWithTriangles; }
-  
-  static const BinTools_FormatVersion THE_CURRENT_VERSION = BIN_TOOLS_VERSION_4;
 
   //! Sets the BinTools_FormatVersion.
   Standard_EXPORT void SetFormatNb (const Standard_Integer theFormatNb);
@@ -200,6 +198,7 @@ public:
   static Standard_CString Version_2;
   static Standard_CString Version_3;
   static Standard_CString Version_4;
+  static const BinTools_FormatVersion THE_CURRENT_VERSION = BIN_TOOLS_VERSION_4;
 
 private:
 

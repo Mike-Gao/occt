@@ -1,4 +1,4 @@
-// Copyright (c) 2002-2020 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -16,11 +16,12 @@
 
 #include <Standard_Typedef.hxx>
 
+//! Defined TopTools format version
 enum TopTools_FormatVersion
 {
   TOP_TOOLS_DEFAULT_VERSION = 0, //!< Default version
   TOP_TOOLS_VERSION_1 = 1,       //!< Does not write CurveOnSurface UV Points into 
-                                 //!  the file on reading calls Check() method.
+                                 //!  the file. On reading calls Check() method.
   TOP_TOOLS_VERSION_2 = 2,       //!< Stores CurveOnSurface UV Points. On reading format is 
                                  //!  recognized from Version string.
   TOP_TOOLS_VERSION_3 = 3        //!< Stores per-vertex normal information in case
@@ -29,4 +30,3 @@ enum TopTools_FormatVersion
 };
 
 #endif
-

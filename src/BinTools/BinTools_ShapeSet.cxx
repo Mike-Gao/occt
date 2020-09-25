@@ -261,6 +261,10 @@ void BinTools_ShapeSet::AddGeometry(const TopoDS_Shape& S)
           }
         }
         else if (CR->IsPolygonOnTriangulation()) {
+          // NCollection_IndexedDataMap::Add() function use is correct because
+          // Bin(Brep)Tools_ShapeSet::AddGeometry() call from Bin(Brep)Tools_ShapeSet::Add()
+          // that recursively down from complex to elementary shapes.
+          // As a result, the TopAbs_FACE’s will be processed earlier than the TopAbs_EDGE’s.
           myTriangulations.Add(CR->Triangulation(), Standard_False); // edge triangulation does not need normals
           myNodes.Add(CR->PolygonOnTriangulation());
           ChangeLocations().Add(CR->Location());

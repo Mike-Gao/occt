@@ -1,4 +1,4 @@
-// Copyright (c) 2002-2020 OPEN CASCADE SAS
+// Copyright (c) 2020 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -15,14 +15,13 @@
 #define _BinToolsFormatVersion_HeaderFile
 
 #include <Standard_Typedef.hxx>
-  //! two formats available for the moment:
- 
 
+//! Defined BinTools format version
 enum BinTools_FormatVersion
 {
   BIN_TOOLS_DEFAULT_VERSION = 0, //!< Default version
   BIN_TOOLS_VERSION_1 = 1,       //!< Does not write CurveOnSurface UV Points
-                                 //!  into the file on reading calls Check() method.
+                                 //!  into the file. On reading calls Check() method.
   BIN_TOOLS_VERSION_2 = 2,       //!< Stores CurveOnSurface UV Points.
                                  //!  On reading format is recognized from Version string.
   BIN_TOOLS_VERSION_3 = 3, 
@@ -32,7 +31,3 @@ enum BinTools_FormatVersion
 };
 
 #endif
-
-
-
-

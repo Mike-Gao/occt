@@ -18,6 +18,7 @@
 #include <DBRep.hxx>
 #include <Draw.hxx>
 #include <Draw_Appli.hxx>
+#include <Draw_SaveAndRestore.hxx>
 #include <gp_Ax3.hxx>
 #include <HLRAlgo_Projector.hxx>
 #include <HLRAppli_ReflectLines.hxx>
@@ -602,76 +603,76 @@ class HLRTest_SaveAndRestore : public Draw_SaveAndRestoreBase
 {
 public:
 
-HLRTest_SaveAndRestore()
-  :Draw_SaveAndRestoreBase("HLRTest_Projector") {}
+  HLRTest_SaveAndRestore()
+    :Draw_SaveAndRestoreBase("HLRTest_Projector") {}
 
-Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
-{
-  return d->IsInstance(STANDARD_TYPE(HLRTest_Projector));
-}
+  Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
+  {
+    return d->IsInstance(STANDARD_TYPE(HLRTest_Projector));
+  }
 
-void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
-{
-  (void) theVersion;
-  Handle(HLRTest_Projector) HP =
-    Handle(HLRTest_Projector)::DownCast(d);
+  void Save(const Handle(Draw_Drawable3D)& d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
+  {
+    (void) theVersion;
+    Handle(HLRTest_Projector) HP =
+      Handle(HLRTest_Projector)::DownCast(d);
 
-  const HLRAlgo_Projector& P = HP->Projector();
-  OS << (P.Perspective() ? "1" : "0") << "\n";
-  if (P.Perspective())
-    OS << P.Focus() << "\n";
+    const HLRAlgo_Projector& P = HP->Projector();
+    OS << (P.Perspective() ? "1" : "0") << "\n";
+    if (P.Perspective())
+      OS << P.Focus() << "\n";
   
-  gp_Trsf T = P.Transformation();
-  gp_XYZ V = T.TranslationPart();
-  gp_Mat M = T.VectorialPart();
+    gp_Trsf T = P.Transformation();
+    gp_XYZ V = T.TranslationPart();
+    gp_Mat M = T.VectorialPart();
 
-  OS << M(1,1) << " ";
-  OS << M(1,2) << " ";
-  OS << M(1,3) << " ";
-  OS << V.Coord(1) << " ";
-  OS << "\n";
-  OS << M(2,1) << " ";
-  OS << M(2,2) << " ";
-  OS << M(2,3) << " ";
-  OS << V.Coord(2) << " ";
-  OS << "\n";
-  OS << M(3,1) << " ";
-  OS << M(3,2) << " ";
-  OS << M(3,3) << " ";
-  OS << V.Coord(3) << " ";
-  OS << "\n";
+    OS << M(1,1) << " ";
+    OS << M(1,2) << " ";
+    OS << M(1,3) << " ";
+    OS << V.Coord(1) << " ";
+    OS << "\n";
+    OS << M(2,1) << " ";
+    OS << M(2,2) << " ";
+    OS << M(2,3) << " ";
+    OS << V.Coord(2) << " ";
+    OS << "\n";
+    OS << M(3,1) << " ";
+    OS << M(3,2) << " ";
+    OS << M(3,3) << " ";
+    OS << V.Coord(3) << " ";
+    OS << "\n";
 
-}
+  }
 
-Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
-{
-  Standard_Boolean pers;
-  IS >> pers;
-  Standard_Real focus = 1;
-  if (pers) IS >> focus;
+  Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
+  {
+    Standard_Boolean pers;
+    IS >> pers;
+    Standard_Real focus = 1;
+    if (pers) IS >> focus;
   
-  gp_Trsf T;
-  Standard_Real V1[3],V2[3],V3[3];
-  Standard_Real V[3];
+    gp_Trsf T;
+    Standard_Real V1[3],V2[3],V3[3];
+    Standard_Real V[3];
 
-  IS >> V1[0] >> V1[1] >> V1[2] >> V[0];
-  IS >> V2[0] >> V2[1] >> V2[2] >> V[1];
-  IS >> V3[0] >> V3[1] >> V3[2] >> V[2];
+    IS >> V1[0] >> V1[1] >> V1[2] >> V[0];
+    IS >> V2[0] >> V2[1] >> V2[2] >> V[1];
+    IS >> V3[0] >> V3[1] >> V3[2] >> V[2];
 
-  gp_Dir D1(V1[0],V1[1],V1[2]);
-  gp_Dir D2(V2[0],V2[1],V2[2]);
-  gp_Dir D3(V3[0],V3[1],V3[2]);
-  gp_Ax3 axes(gp_Pnt(0,0,0),D3,D1);
-  D3.Cross(D1);
-  if (D3.Dot(D2) < 0) axes.YReverse();
-  T.SetTransformation(axes);
+    gp_Dir D1(V1[0],V1[1],V1[2]);
+    gp_Dir D2(V2[0],V2[1],V2[2]);
+    gp_Dir D3(V3[0],V3[1],V3[2]);
+    gp_Ax3 axes(gp_Pnt(0,0,0),D3,D1);
+    D3.Cross(D1);
+    if (D3.Dot(D2) < 0) axes.YReverse();
+    T.SetTransformation(axes);
 
-  T.SetTranslationPart(gp_Vec(V[0],V[1],V[2]));
+    T.SetTranslationPart(gp_Vec(V[0],V[1],V[2]));
 
-  HLRAlgo_Projector P(T,pers,focus);
-  Handle(HLRTest_Projector) HP = new HLRTest_Projector(P);
-  return HP;
-}
+    HLRAlgo_Projector P(T,pers,focus);
+    Handle(HLRTest_Projector) HP = new HLRTest_Projector(P);
+    return HP;
+  }
 
 };
 

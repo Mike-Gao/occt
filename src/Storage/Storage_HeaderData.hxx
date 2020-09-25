@@ -112,7 +112,10 @@ public:
   
   Standard_EXPORT void SetStorageVersion (const TCollection_AsciiString& aVersion);
 
-  Standard_EXPORT void SetStorageVersion (const Standard_Integer aVersion);
+  void SetStorageVersion (const Standard_Integer aVersion)
+  {
+    SetStorageVersion(TCollection_AsciiString(aVersion));
+  }
   
   Standard_EXPORT void SetCreationDate (const TCollection_AsciiString& aDate);
   

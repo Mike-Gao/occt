@@ -27,6 +27,7 @@
 #include <Draw.hxx>
 #include <Draw_Appli.hxx>
 #include <Draw_ProgressIndicator.hxx>
+#include <Draw_SaveAndRestore.hxx>
 #include <Message_ProgressRange.hxx>
 #include <Draw_Segment3D.hxx>
 #include <gp_Ax2.hxx>
@@ -1621,54 +1622,54 @@ Standard_Real DBRep::HLRAngle()
 class DBRep_SaveAndRestore : public Draw_SaveAndRestoreBase
 {
 public:
-  DBRep_SaveAndRestore()
-  :Draw_SaveAndRestoreBase("DBRep_DrawableShape") {}
+    DBRep_SaveAndRestore()
+    :Draw_SaveAndRestoreBase("DBRep_DrawableShape") {}
 
-Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
-{
-  return d->IsInstance(STANDARD_TYPE(DBRep_DrawableShape));
-}
+  Standard_Boolean Test(const Handle(Draw_Drawable3D)& d) const Standard_OVERRIDE
+  {
+    return d->IsInstance(STANDARD_TYPE(DBRep_DrawableShape));
+  }
 
-void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
-{
-  Handle(DBRep_DrawableShape) 
-    N = Handle(DBRep_DrawableShape)::DownCast(d);
-  BRep_Builder B;
-  BRepTools_ShapeSet S(B);
-  S.SetFormatNb(theVersion);
-  S.Add (N->Shape());
-  Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
-  S.Write(OS, Message_ProgressIndicator::Start(aProgress));
-  if (! aProgress.IsNull() && aProgress->UserBreak())
-    return;
-  S.Write(N->Shape(),OS);
-}
+  void Save(const Handle(Draw_Drawable3D)&d, std::ostream& OS, TopTools_FormatVersion theVersion) const Standard_OVERRIDE
+  {
+    Handle(DBRep_DrawableShape) 
+      N = Handle(DBRep_DrawableShape)::DownCast(d);
+    BRep_Builder B;
+    BRepTools_ShapeSet S(B);
+    S.SetFormatNb(theVersion);
+    S.Add (N->Shape());
+    Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
+    S.Write(OS, Message_ProgressIndicator::Start(aProgress));
+    if (! aProgress.IsNull() && aProgress->UserBreak())
+      return;
+    S.Write(N->Shape(),OS);
+  }
 
-Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
-{
-  BRep_Builder B;
-  BRepTools_ShapeSet S(B);
-  Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
-  S.Read(IS, Message_ProgressIndicator::Start(aProgress));
-  Handle(DBRep_DrawableShape) N;
-  if (! aProgress.IsNull() && aProgress->UserBreak())
-    return N;
-  TopoDS_Shape theShape;
-  S.Read(theShape,IS );
-  N = new DBRep_DrawableShape(theShape,
-			    Draw_vert,
-			    Draw_jaune,
-			    Draw_rouge,
-			    Draw_bleu,
-			    size,
-			    nbIsos,
-			    discret);
-  N->DisplayTriangulation(disptriangles);
-  N->DisplayPolygons(disppolygons);
-  N->DisplayHLR(withHLR,withRg1,withRgN,withHid,anglHLR);
+  Handle(Draw_Drawable3D) Restore(std::istream& IS) const Standard_OVERRIDE
+  {
+    BRep_Builder B;
+    BRepTools_ShapeSet S(B);
+    Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
+    S.Read(IS, Message_ProgressIndicator::Start(aProgress));
+    Handle(DBRep_DrawableShape) N;
+    if (! aProgress.IsNull() && aProgress->UserBreak())
+      return N;
+    TopoDS_Shape theShape;
+    S.Read(theShape,IS );
+    N = new DBRep_DrawableShape(theShape,
+			      Draw_vert,
+			      Draw_jaune,
+			      Draw_rouge,
+			      Draw_bleu,
+			      size,
+			      nbIsos,
+			      discret);
+    N->DisplayTriangulation(disptriangles);
+    N->DisplayPolygons(disppolygons);
+    N->DisplayHLR(withHLR,withRg1,withRgN,withHid,anglHLR);
   
-  return N;
-}
+    return N;
+  }
 
 };
 

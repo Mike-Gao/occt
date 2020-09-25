@@ -83,7 +83,7 @@ static Standard_Integer save(Draw_Interpretor& di, Standard_Integer argc, const 
     return 1;
   }
 
-  TopTools_FormatVersion aVersion = TopTools_ShapeSet::THE_CURRENT_VERSION;;
+  TopTools_FormatVersion aVersion = TopTools_ShapeSet::THE_CURRENT_VERSION;
 
   for (Standard_Integer i = 3; i < argc; ++i)
   {

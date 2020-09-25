@@ -29,5 +29,4 @@ enum XmlLDrivers_FormatVersion
   XML_LDRIVERS_VERSION_10
 };
 
-
 #endif

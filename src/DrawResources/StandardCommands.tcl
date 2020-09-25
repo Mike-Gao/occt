@@ -264,7 +264,9 @@ proc datadir {{dir ""}} {
 help save {
   Use: save variable [filename] [options...]
   Allowed options are:
-  -version versnumber: a number of format version to save
+  -version versnumber: a number of format version to save.
+                       Awailable versions are 1, 2, 3
+					   Default version is 3
 } "DRAW Variables management"
 
 proc save {name {file ""} {args {}}} {
@@ -281,7 +283,7 @@ proc save {name {file ""} {args {}}} {
             if { $narg < [llength $args] && ! [regexp {^-} [lindex $args $narg]] } {
                 set version [lindex $args $narg]
             } else {
-                error "Option -outfile requires argument"
+                error "Option -version requires argument"
             }
             continue
         }

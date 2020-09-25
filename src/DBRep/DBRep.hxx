@@ -18,7 +18,6 @@
 #define _DBRep_HeaderFile
 
 #include <Draw_Interpretor.hxx>
-#include <Draw_SaveAndRestore.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
