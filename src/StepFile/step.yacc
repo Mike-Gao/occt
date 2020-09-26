@@ -39,9 +39,11 @@ namespace step {
   class scanner;
 };
 
-// disable MSVC warning C4522: 'step::parser::stack_symbol_type': multiple assignment operators
 #ifdef _MSC_VER
+// disable MSVC warning C4522: 'step::parser::stack_symbol_type': multiple assignment operators
 #pragma warning(disable: 4522)
+// disable MSVC warning C4512: 'step::parser::stack::slice' : assignment operator could not be generated
+#pragma warning(disable: 4512)
 #endif
 
 }
