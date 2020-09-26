@@ -70,7 +70,7 @@ private:
   Standard_EXPORT static TCollection_ExtendedString Concatenate (const TCollection_ExtendedString& aFolder, const TCollection_ExtendedString& aName);
   
 private:
-  CDM_MetaDataLookUpTable& myLookUpTable;
+  CDM_MetaDataLookUpTable* myLookUpTable;
 };
 
 #endif // _CDF_FWOSDriver_HeaderFile

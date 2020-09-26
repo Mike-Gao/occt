@@ -49,7 +49,7 @@ static void PutSlash (TCollection_ExtendedString& anXSTRING) {
 //purpose  :
 //==============================================================================
 CDF_FWOSDriver::CDF_FWOSDriver(CDM_MetaDataLookUpTable& theLookUpTable)
-  : myLookUpTable (theLookUpTable)
+: myLookUpTable (&theLookUpTable)
 {
 }
 
@@ -110,7 +110,7 @@ Handle(CDM_MetaData) CDF_FWOSDriver::MetaData(const TCollection_ExtendedString& 
                                                  const TCollection_ExtendedString& /*aVersion*/)
 {
   TCollection_ExtendedString p = Concatenate(aFolder,aName);
-  return CDM_MetaData::LookUp(myLookUpTable, aFolder, aName, p, p, UTL::IsReadOnly(p));
+  return CDM_MetaData::LookUp (*myLookUpTable, aFolder, aName, p, p, UTL::IsReadOnly(p));
 }
 
 //==============================================================================
@@ -120,7 +120,7 @@ Handle(CDM_MetaData) CDF_FWOSDriver::MetaData(const TCollection_ExtendedString& 
 Handle(CDM_MetaData) CDF_FWOSDriver::CreateMetaData(const Handle(CDM_Document)& aDocument,
                                                        const TCollection_ExtendedString& aFileName)
 {
-  return CDM_MetaData::LookUp(myLookUpTable, aDocument->RequestedFolder(), aDocument->RequestedName(),
+  return CDM_MetaData::LookUp(*myLookUpTable, aDocument->RequestedFolder(), aDocument->RequestedName(),
                               Concatenate(aDocument->RequestedFolder(),aDocument->RequestedName()),
                               aFileName,UTL::IsReadOnly(aFileName));
 }
