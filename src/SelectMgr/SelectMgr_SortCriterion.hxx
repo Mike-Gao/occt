@@ -32,6 +32,7 @@ public:
   gp_Pnt             Point;           //!< 3D point
   Graphic3d_Vec3     Normal;          //!< surface normal or 0 vector if undefined
   Standard_Real      Depth;           //!< distance from the view plane to the entity
+  Standard_Real      RayDistance;     //!< distance from picked ray to detected point
   Standard_Real      MinDist;         //!< distance from the clicked point to the entity on the view plane
   Standard_Real      Tolerance;       //!< tolerance used for selecting candidates
   Standard_Integer   Priority;        //!< selection priority
@@ -44,11 +45,14 @@ public:
   //! Empty constructor.
   SelectMgr_SortCriterion()
   : Depth    (0.0),
+    RayDistance(0.0),
     MinDist  (0.0),
     Tolerance(0.0),
     Priority (0),
     ZLayerPosition (0),
     NbOwnerMatches (0) {}
+
+  Standard_Real DepthWithOffset() const { return Depth + RayDistance; }
 
   //! Compare with another item by depth, priority and minDist.
   bool IsCloserDepth (const SelectMgr_SortCriterion& theOther) const
@@ -60,9 +64,11 @@ public:
     }
 
     // closest object is selected unless difference is within tolerance
-    if (Abs (Depth - theOther.Depth) > (Tolerance + theOther.Tolerance))
+    ///const Standard_Real aDepthDelta = Depth - theOther.Depth;
+    const Standard_Real aDepthDelta = DepthWithOffset() - theOther.DepthWithOffset();
+    if (Abs (aDepthDelta) > (Tolerance + theOther.Tolerance))
     {
-      return Depth < theOther.Depth;
+      return aDepthDelta < 0.0;
     }
 
     // if two objects have similar depth, select the one with higher priority
@@ -94,8 +100,7 @@ public:
       return false;
     }
 
-    //if (Abs (Depth - theOther.Depth) <= (Tolerance + theOther.Tolerance))
-    if (Abs (Depth - theOther.Depth) <= Precision::Confusion())
+    if (Abs (Depth - theOther.Depth) <= (Tolerance + theOther.Tolerance))
     {
       return MinDist < theOther.MinDist;
     }

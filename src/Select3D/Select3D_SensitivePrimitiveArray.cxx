@@ -932,7 +932,7 @@ Standard_Boolean Select3D_SensitivePrimitiveArray::Matches (SelectBasics_Selecti
       {
         myDetectedNodeMap->ChangeMap().Unite (aChild->myDetectedNodeMap->Map());
       }
-      if (thePickResult.Depth() > aPickResult.Depth())
+      if (thePickResult.DepthWithOffset() > aPickResult.DepthWithOffset())
       {
         myDetectedIdx = aGroupIter;
         thePickResult = aPickResult;

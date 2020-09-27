@@ -81,12 +81,14 @@ void SelectMgr_RectangularFrustum::segmentSegmentDistance (const gp_Pnt& theSegP
    || aFigureVecMod <= gp::Resolution())
   {
     thePickResult.SetPickedPoint (aClosestPnt);
+    thePickResult.SetRayDistance (0.0);
     return;
   }
 
   const Standard_Real aCosOfAngle = aFigureVec.Dot (aPickedVec) / (aPickedVecMod * aFigureVecMod);
   const Standard_Real aSegPntShift = Min(aFigureVecMod, Max(0.0, aCosOfAngle * aPickedVecMod));
   thePickResult.SetPickedPoint (theSegPnt1.XYZ() + aFigureVec.XYZ() * (aSegPntShift / aFigureVecMod));
+  thePickResult.SetRayDistance (thePickResult.PickedPoint().Distance (aClosestPnt) * myScale); ///
 }
 
 // =======================================================================
@@ -537,6 +539,7 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt,
 
   thePickResult.SetDepth (Abs (aDepth) * myScale);
   thePickResult.SetPickedPoint (thePnt);
+  thePickResult.SetRayDistance (thePnt.Distance (myNearPickedPnt.XYZ() + myViewRayDir.XYZ() * aDepth) * myScale);
 
   return !theClipRange.IsClipped (thePickResult.Depth());
 }
@@ -695,6 +698,7 @@ Standard_Boolean SelectMgr_RectangularFrustum::Overlaps (const gp_Pnt& thePnt1,
     {
       thePickResult.SetDepth (myNearPickedPnt.Distance (aPtOnPlane) * myScale);
       thePickResult.SetPickedPoint (aPtOnPlane);
+      thePickResult.SetRayDistance (0.0);
       thePickResult.SetSurfaceNormal (aTriangleNormal);
       return !theClipRange.IsClipped (thePickResult.Depth());
     }

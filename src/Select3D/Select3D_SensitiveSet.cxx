@@ -111,6 +111,8 @@ Standard_Boolean Select3D_SensitiveSet::processElements (SelectBasics_SelectingV
         continue;
       }
 
+      //if (thePickResult.DepthWithOffset() > aPickResult.DepthWithOffset())
+      //if (thePickResult.Depth() > aPickResult.Depth())
       if (thePickResult.Depth() > aPickResult.Depth())
       {
         thePickResult = aPickResult;

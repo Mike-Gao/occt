@@ -35,6 +35,7 @@ public:
   SelectBasics_PickResult()
   : myObjPickedPnt (RealLast(), 0.0, 0.0),
     myDepth (RealLast()),
+    myRayDistance (0.0),
     myDistToCenter (RealLast()) {}
 
   //! Constructor with initialization.
@@ -43,6 +44,7 @@ public:
                            const gp_Pnt& theObjPickedPnt)
   : myObjPickedPnt (theObjPickedPnt),
     myDepth (theDepth),
+    myRayDistance (0.0),
     myDistToCenter (theDistToCenter) {}
 
 public:
@@ -54,6 +56,7 @@ public:
   void Invalidate()
   {
     myDepth = RealLast();
+    myRayDistance = 0.0;
     myObjPickedPnt = gp_Pnt (RealLast(), 0.0, 0.0);
     myNormal.SetValues (0.0f, 0.0f, 0.0f);
   }
@@ -63,6 +66,14 @@ public:
 
   //! Set depth along picking ray.
   void SetDepth (Standard_Real theDepth) { myDepth = theDepth; }
+
+  //! Return distance from picking ray to picked point.
+  Standard_Real RayDistance() const { return myRayDistance; }
+
+  //! Set distance from picking ray to picked point.
+  void SetRayDistance (Standard_Real theDistance) { myRayDistance = theDistance; }
+
+  Standard_Real DepthWithOffset() const { return myDepth + myRayDistance; }
 
   //! Return TRUE if Picked Point lying on detected entity was set.
   Standard_Boolean HasPickedPoint() const { return myObjPickedPnt.X() != RealLast(); }
@@ -97,6 +108,7 @@ private:
   gp_Pnt                  myObjPickedPnt; //!< User-picked selection point onto object
   NCollection_Vec3<float> myNormal;       //!< surface normal
   Standard_Real           myDepth;        //!< Depth to detected point
+  Standard_Real           myRayDistance;  //!< distance from picked ray to detected point
   Standard_Real           myDistToCenter; //!< Distance from 3d projection user-picked selection point to entity's geometry center
 };
 

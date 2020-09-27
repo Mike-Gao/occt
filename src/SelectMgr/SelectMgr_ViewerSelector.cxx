@@ -287,6 +287,7 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(Select3D_SensitiveEnti
   aCriterion.Entity    = theEntity;
   aCriterion.Priority  = anOwner->Priority();
   aCriterion.Depth     = aPickResult.Depth();
+  aCriterion.RayDistance = aPickResult.RayDistance();
   aCriterion.MinDist   = aPickResult.DistToGeomCenter();
 
   if (SelectMgr_SortCriterion* aPrevCriterion = mystored.ChangeSeek (anOwner))
