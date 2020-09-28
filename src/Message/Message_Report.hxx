@@ -82,8 +82,13 @@ public:
   //! Creates an instance of Message_PrinterToReport with the current report and register it in messenger
   //! @param toActivate if true, activated else deactivated
   // @param theMessenger the messenger. If it's NULL, the default messenger is used
-  Standard_EXPORT void ActivateInMessenger (const Standard_Boolean toActivate, const Handle(Message_Messenger)& theMessenger = NULL) const;
+  Standard_EXPORT void ActivateInMessenger (const Standard_Boolean toActivate, const Handle(Message_Messenger)& theMessenger = NULL);
 
+  //! Updates internal flag IsActiveInMessenger.
+  //! It becomes true if messenger contains at least one instance of Message_PrinterToReport.
+  //! @param theMessenger the messenger. If it's NULL, the default messenger is used
+  Standard_EXPORT void UpdateActiveInMessenger (const Handle(Message_Messenger)& theMessenger = NULL);
+  
   //! Add new level of alerts
   //! @param theLevel a level 
   Standard_EXPORT void AddLevel (Message_Level* theLevel, const TCollection_AsciiString& theName);
@@ -183,6 +188,7 @@ protected:
 
   Standard_Integer myLimit; //! Maximum number of collected alerts on the top level
   Standard_Boolean myWriteFileOnEachAlert; //! State if output file should be written on each alert adding
+  Standard_Boolean myIsActiveInMessenger; //! state whether the report is activated in messenger
 };
 
 #endif // _Message_Report_HeaderFile

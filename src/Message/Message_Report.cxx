@@ -37,7 +37,8 @@ IMPLEMENT_STANDARD_RTTIEXT(Message_Report,Standard_Transient)
 //=======================================================================
 
 Message_Report::Message_Report ()
-: myLimit (-1), myWriteFileOnEachAlert (Standard_False)
+: myLimit (-1), myWriteFileOnEachAlert (Standard_False),
+  myIsActiveInMessenger (Standard_False)
 {
 }
 
@@ -123,14 +124,7 @@ Standard_Boolean Message_Report::HasAlert (const Handle(Standard_Type)& theType,
 
 Standard_Boolean Message_Report::IsActiveInMessenger (const Handle(Message_Messenger)& theMessenger) const
 {
-  Handle(Message_Messenger) aMessenger = theMessenger.IsNull() ? Message::DefaultMessenger() : theMessenger;
-  for (Message_SequenceOfPrinters::Iterator anIterator (aMessenger->Printers()); anIterator.More(); anIterator.Next())
-  {
-    if (anIterator.Value()->IsKind(STANDARD_TYPE (Message_PrinterToReport)) &&
-        Handle(Message_PrinterToReport)::DownCast (anIterator.Value())->Report() == this)
-      return Standard_True;
-  }
-  return Standard_False;
+  return myIsActiveInMessenger;
 }
 
 //=======================================================================
@@ -139,11 +133,12 @@ Standard_Boolean Message_Report::IsActiveInMessenger (const Handle(Message_Messe
 //=======================================================================
 
 void Message_Report::ActivateInMessenger (const Standard_Boolean toActivate,
-                                          const Handle(Message_Messenger)& theMessenger) const
+                                          const Handle(Message_Messenger)& theMessenger)
 {
   if (toActivate == IsActiveInMessenger())
     return;
 
+  myIsActiveInMessenger = toActivate;
   Handle(Message_Messenger) aMessenger = theMessenger.IsNull() ? Message::DefaultMessenger() : theMessenger;
   if (toActivate)
   {
@@ -166,6 +161,24 @@ void Message_Report::ActivateInMessenger (const Standard_Boolean toActivate,
       aMessenger->RemovePrinter (anIterator.Value());
     }
   }
+}
+
+//=======================================================================
+//function : UpdateActiveInMessenger
+//purpose  :
+//=======================================================================
+void Message_Report::UpdateActiveInMessenger (const Handle(Message_Messenger)& theMessenger)
+{
+  Handle(Message_Messenger) aMessenger = theMessenger.IsNull() ? Message::DefaultMessenger() : theMessenger;
+  for (Message_SequenceOfPrinters::Iterator anIterator (aMessenger->Printers()); anIterator.More(); anIterator.Next())
+  {
+    if (anIterator.Value()->IsKind(STANDARD_TYPE (Message_PrinterToReport)) &&
+        Handle(Message_PrinterToReport)::DownCast (anIterator.Value())->Report() == this)
+    {
+      myIsActiveInMessenger = Standard_True;
+    }
+  }
+  myIsActiveInMessenger = Standard_False;
 }
 
 //=======================================================================
