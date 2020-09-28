@@ -80,14 +80,14 @@ void GeomWidget::Show3d()
   aHlrOffAction->trigger();
   aHlrOffAction->setChecked(true);
   myStackWidget->setCurrentWidget(my3dVidget);
-  setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan, Right-Rotate");
+  setStatusTip("Mouse buttons: Right-Zoom, Middle-Pan, Left-Rotate");
 }
 
 void GeomWidget::Show2d()
 {
   myView2d->fitAll();
   myStackWidget->setCurrentWidget(my2dVidget);
-  setStatusTip("Mouse buttons: Left-Zoom, Middle-Pan");
+  setStatusTip("Mouse buttons: Right-Zoom, Middle-Pan");
 }
 
 Handle(V3d_View) GeomWidget::Get3dView()

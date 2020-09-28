@@ -18,7 +18,7 @@
 #include <exception>
 #include <stack>
 
-
+#include <AIS_ViewCube.hxx>
 #include <OSD_Path.hxx>
 #include <OSD_File.hxx>
 #include <OSD_Protection.hxx>
@@ -73,6 +73,11 @@ void BaseSample::Process(TCollection_AsciiString theSampleName)
   try
   {
     ExecuteSample(theSampleName);
+    if (!myObject3d.IsEmpty())
+    {
+      Handle(AIS_ViewCube) aViewCube = new AIS_ViewCube();
+      myObject3d.Append(aViewCube);
+    }
   }
   catch (...)
   {

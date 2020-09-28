@@ -43,14 +43,46 @@
 #include <Graphic3d_GraphicDriver.hxx>
 #include <Graphic3d_TextureEnv.hxx>
 
-// the key for multi selection :
-#define MULTISELECTIONKEY Qt::ShiftModifier
+namespace
+{
+  //! Map Qt buttons bitmask to virtual keys.
+  Aspect_VKeyMouse qtMouseButtons2VKeys(Qt::MouseButtons theButtons)
+  {
+    Aspect_VKeyMouse aButtons = Aspect_VKeyMouse_NONE;
+    if ((theButtons & Qt::LeftButton) != 0)
+    {
+      aButtons |= Aspect_VKeyMouse_LeftButton;
+    }
+    if ((theButtons & Qt::MiddleButton) != 0)
+    {
+      aButtons |= Aspect_VKeyMouse_MiddleButton;
+    }
+    if ((theButtons & Qt::RightButton) != 0)
+    {
+      aButtons |= Aspect_VKeyMouse_RightButton;
+    }
+    return aButtons;
+  }
 
-// the key for shortcut ( use to activate dynamic rotation, panning )
-#define CASCADESHORTCUTKEY Qt::ControlModifier
-
-// for elastic bean selection
-#define ValZWMin 1
+  //! Map Qt mouse modifiers bitmask to virtual keys.
+  Aspect_VKeyFlags qtMouseModifiers2VKeys(Qt::KeyboardModifiers theModifiers)
+  {
+    Aspect_VKeyFlags aFlags = Aspect_VKeyFlags_NONE;
+    if ((theModifiers & Qt::ShiftModifier) != 0)
+    {
+      aFlags |= Aspect_VKeyFlags_SHIFT;
+    }
+    if ((theModifiers & Qt::ControlModifier) != 0)
+    {
+      aFlags |= Aspect_VKeyFlags_CTRL;
+    }
+    if ((theModifiers & Qt::AltModifier) != 0)
+    {
+      aFlags |= Aspect_VKeyFlags_ALT;
+    }
+    return aFlags;
+  }
+}
 
 static QCursor* defCursor = NULL;
 static QCursor* handCursor = NULL;
@@ -72,19 +104,13 @@ View::View(Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* pa
   XSynchronize(x11Info().display(), true);
 #endif
   myContext = theContext;
-
-  myXmin = 0;
-  myYmin = 0;
-  myXmax = 0;
-  myYmax = 0;
   myCurZoom = 0;
-  myRectBand = 0;
 
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_NoSystemBackground);
 
+  myDefaultGestures = myMouseGestureMap;
   myCurrentMode = CurrentAction3d::Nothing;
-  myHlrModeIsOn = Standard_False;
   setMouseTracking(true);
 
   initViewActions();
@@ -110,14 +136,17 @@ void View::init()
 
   Handle(OcctWindow) hWnd = new OcctWindow(this);
   myV3dView->SetWindow(hWnd);
-  if (!hWnd->IsMapped()) {
+  if (!hWnd->IsMapped()) 
+  {
     hWnd->Map();
   }
 
-  if (myIs3dView) {
+  if (myIs3dView) 
+  {
     myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.0, 0.3, Quantity_TOC_RGB));
   }
-  else {
+  else 
+  {
     myV3dView->SetBackgroundColor(Quantity_Color(0.0, 0.2, 0.0, Quantity_TOC_RGB));
     myV3dView->SetProj(V3d_Zpos);
   }
@@ -125,12 +154,15 @@ void View::init()
   myV3dView->MustBeResized();
 
   if (myIsRaytracing)
+  {
     myV3dView->ChangeRenderingParams().Method = Graphic3d_RM_RAYTRACING;
+  }
 }
 
 void View::paintEvent(QPaintEvent *)
 {
-  myV3dView->Redraw();
+  myV3dView->InvalidateImmediate();
+  FlushViewEvents(myContext, myV3dView, true);
 }
 
 void View::resizeEvent(QResizeEvent *)
@@ -138,6 +170,13 @@ void View::resizeEvent(QResizeEvent *)
   if (!myV3dView.IsNull()) {
     myV3dView->MustBeResized();
   }
+}
+
+void View::OnSelectionChanged(const Handle(AIS_InteractiveContext)& theCtx,
+                              const Handle(V3d_View)& theView)
+{
+  Q_UNUSED(theCtx)
+  Q_UNUSED(theView)
 }
 
 void View::fitAll()
@@ -429,24 +468,10 @@ void View::initViewActions()
     return;
   myViewActions[ViewAction::FitAll] =
     RegisterAction(":/icons/view_fitall.png", tr("FilAll"), &View::fitAll);
-  if (myIs3dView) {
-    myViewActions[ViewAction::Front] =
-      RegisterAction(":/icons/view_front.png", tr("Front"), &View::front);
-    myViewActions[ViewAction::Back] =
-      RegisterAction(":/icons/view_back.png", tr("Back"), &View::back);
-    myViewActions[ViewAction::Top] =
-      RegisterAction(":/icons/view_top.png", tr("Top"), &View::top);
-    myViewActions[ViewAction::Bottom] =
-      RegisterAction(":/icons/view_bottom.png", tr("Bottom"), &View::bottom);
-    myViewActions[ViewAction::Left] =
-      RegisterAction(":/icons/view_left.png", tr("Left"), &View::left);
-    myViewActions[ViewAction::Right] =
-      RegisterAction(":/icons/view_right.png", tr("Right"), &View::right);
+  if (myIs3dView) 
+  {
     myViewActions[ViewAction::Axo] =
       RegisterAction(":/icons/view_axo.png", tr("Isometric"), &View::axo);
-
-    myViewActions[ViewAction::Reset] =
-      RegisterAction(":/icons/view_reset.png", tr("Reset"), &View::reset);
 
     QActionGroup* aShadingActionGroup = new QActionGroup(this);
     QAction* aShadingAction = RegisterAction(":/icons/tool_shading.png", tr("Shading"), &View::shading);
@@ -501,42 +526,6 @@ void View::initRaytraceActions()
   anAntiAliasingAction->setChecked(false);
 }
 
-void View::mousePressEvent(QMouseEvent* e)
-{
-  if (e->button() == Qt::LeftButton)
-    onLButtonDown((e->buttons() | e->modifiers()), e->pos());
-  else if (e->button() == Qt::MidButton)
-    onMButtonDown(e->buttons() | e->modifiers(), e->pos());
-  else if (e->button() == Qt::RightButton)
-    onRButtonDown(e->buttons() | e->modifiers(), e->pos());
-}
-
-void View::mouseReleaseEvent(QMouseEvent* e)
-{
-  if (e->button() == Qt::LeftButton)
-    onLButtonUp(e->buttons(), e->pos());
-  else if (e->button() == Qt::MidButton)
-    onMButtonUp(e->buttons(), e->pos());
-  else if (e->button() == Qt::RightButton)
-    onRButtonUp(e->buttons(), e->pos());
-}
-
-void View::mouseMoveEvent(QMouseEvent* e)
-{
-  onMouseMove(e->buttons(), e->pos());
-}
-
-void View::wheelEvent(QWheelEvent* theEvent)
-{
-  int x = theEvent->x();
-  int y = theEvent->y();
-  myV3dView->StartZoomAtPoint(x, y);
-  double aDelta = (double)(theEvent->delta()) / (15 * 8);
-  int x1 = (int)(x + width() * aDelta / 100);
-  int y1 = (int)(x + height() * aDelta / 100);
-  myV3dView->Zoom(x, y, x1, y1);
-}
-
 void View::activateCursor(const CurrentAction3d mode)
 {
   switch (mode) {
@@ -562,247 +551,132 @@ void View::activateCursor(const CurrentAction3d mode)
   }
 }
 
-void View::onLButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint point)
+void View::mousePressEvent(QMouseEvent* theEvent)
 {
-  Q_UNUSED(nFlags)
-
-  //  save the current mouse coordinate in min
-  myXmin = point.x();
-  myYmin = point.y();
-  myXmax = point.x();
-  myYmax = point.y();
-
-
-  if (myContext->HasDetected())
-    myCurrentMode = CurrentAction3d::ObjectDececting;
-  else {
-    myCurrentMode = CurrentAction3d::DynamicZooming;
-    myV3dView->StartZoomAtPoint(myXmax, myYmax);
-  }
-  activateCursor(myCurrentMode);
-}
-
-void View::onMButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint point)
-{
-  Q_UNUSED(nFlags)
-  Q_UNUSED(point)
-
-  myCurrentMode = CurrentAction3d::DynamicPanning;
-  activateCursor(myCurrentMode);
-}
-
-void View::onRButtonDown(const int/*Qt::MouseButtons*/ nFlags, const QPoint point)
-{
-  Q_UNUSED(nFlags)
-  Q_UNUSED(point)
-  if (myIs3dView) {
-    myCurrentMode = CurrentAction3d::DynamicRotation;
-    myV3dView->StartRotation(point.x(), point.y());
-    activateCursor(myCurrentMode);
-  }
-}
-
-void View::onLButtonUp(Qt::MouseButtons nFlags, const QPoint point)
-{
-  Q_UNUSED(nFlags)
-  Q_UNUSED(point)
-  switch (myCurrentMode) {
-  case CurrentAction3d::Nothing:
-    if (point.x() == myXmin && point.y() == myYmin) {
-      // no offset between down and up --> selectEvent
-      myXmax = point.x();
-      myYmax = point.y();
-      if (nFlags & MULTISELECTIONKEY)
-        MultiInputEvent(point.x(), point.y());
-      else
-        InputEvent(point.x(), point.y());
-    }
-    else {
-      myXmax = point.x();
-      myYmax = point.y();
-      if (nFlags & MULTISELECTIONKEY)
-        MultiDragEvent(point.x(), point.y(), 1);
-      else
-        DragEvent(point.x(), point.y(), 1);
-    }
-    break;
-  case CurrentAction3d::ObjectDececting:
+  Qt::MouseButtons aMouseButtons = theEvent->buttons();
+  if (!myIs3dView)
   {
-    Handle(AIS_InteractiveObject) aDecectObject = myContext->DetectedInteractive();
-    if (aDecectObject) {
-      TColStd_ListOfInteger aModeList;
-      myContext->ActivatedModes(aDecectObject, aModeList);
-      // No selection for Neutral Mode
-      if (!aModeList.IsEmpty() && aModeList.First() != 0)
-        myContext->Select(Standard_True);
-    }
-    myCurrentMode = CurrentAction3d::Nothing;
+    aMouseButtons.setFlag(Qt::LeftButton, false);
+  }
+  const Graphic3d_Vec2i aPnt(theEvent->pos().x(), theEvent->pos().y());
+  const Aspect_VKeyFlags aFlags = qtMouseModifiers2VKeys(theEvent->modifiers());
+  if (!myV3dView.IsNull()
+    && UpdateMouseButtons(aPnt,
+      qtMouseButtons2VKeys(aMouseButtons),
+      aFlags,
+      false))
+  {
+    updateView();
+  }
+  myClickPos = aPnt;
+}
+
+void View::mouseReleaseEvent(QMouseEvent* theEvent)
+{
+  Qt::MouseButtons aMouseButtons = theEvent->buttons();
+  if (!myIs3dView)
+  {
+    aMouseButtons.setFlag(Qt::LeftButton, false);
+  }
+  const Graphic3d_Vec2i aPnt(theEvent->pos().x(), theEvent->pos().y());
+  const Aspect_VKeyFlags aFlags = qtMouseModifiers2VKeys(theEvent->modifiers());
+  if (!myV3dView.IsNull()
+    && UpdateMouseButtons(aPnt,
+      qtMouseButtons2VKeys(aMouseButtons),
+      aFlags,
+      false))
+  {
+    updateView();
+  }
+
+  if (myCurrentMode == CurrentAction3d::GlobalPanning)
+  {
+    myV3dView->Place(aPnt.x(), aPnt.y(), myCurZoom);
+  }
+  if (myCurrentMode != CurrentAction3d::Nothing)
+  {
+    setCurrentAction(CurrentAction3d::Nothing);
+  }
+}
+
+void View::mouseMoveEvent(QMouseEvent* theEvent)
+{
+  Qt::MouseButtons aMouseButtons = theEvent->buttons();
+  if (!myIs3dView)
+  {
+    aMouseButtons.setFlag(Qt::LeftButton, false);
+  }
+  const Graphic3d_Vec2i aNewPos(theEvent->pos().x(), theEvent->pos().y());
+  if (!myV3dView.IsNull()
+    && UpdateMousePosition(aNewPos,
+      qtMouseButtons2VKeys(aMouseButtons),
+      qtMouseModifiers2VKeys(theEvent->modifiers()),
+      false))
+  {
+    updateView();
+  }
+}
+
+//==============================================================================
+//function : wheelEvent
+//purpose  :
+//==============================================================================
+void View::wheelEvent(QWheelEvent* theEvent)
+{
+  const Graphic3d_Vec2i aPos(theEvent->pos().x(), theEvent->pos().y());
+  if (!myV3dView.IsNull()
+    && UpdateZoom(Aspect_ScrollDelta(aPos, theEvent->delta() / 8)))
+  {
+    updateView();
+  }
+}
+
+// =======================================================================
+// function : updateView
+// purpose  :
+// =======================================================================
+void View::updateView()
+{
+  update();
+}
+
+void View::defineMouseGestures()
+{
+  myMouseGestureMap.Clear();
+  AIS_MouseGesture aRot = AIS_MouseGesture_RotateOrbit;
+  activateCursor(myCurrentMode);
+  switch (myCurrentMode)
+  {
+  case CurrentAction3d::Nothing:
+  {
+    myMouseGestureMap = myDefaultGestures;
     break;
   }
   case CurrentAction3d::DynamicZooming:
-    myCurrentMode = CurrentAction3d::Nothing;
+  {
+    myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_Zoom);
     break;
-  case CurrentAction3d::WindowZooming:
-    myXmax = point.x();
-    myYmax = point.y();
-    if ((abs(myXmin - myXmax) > ValZWMin) ||
-      (abs(myYmin - myYmax) > ValZWMin))
-      myV3dView->WindowFitAll(myXmin, myYmin, myXmax, myYmax);
-    myCurrentMode = CurrentAction3d::Nothing;
-    break;
-  case CurrentAction3d::DynamicPanning:
-    myCurrentMode = CurrentAction3d::Nothing;
-    break;
+  }
   case CurrentAction3d::GlobalPanning:
-    myV3dView->Place(point.x(), point.y(), myCurZoom);
-    myCurrentMode = CurrentAction3d::Nothing;
+  {
     break;
+  }
+  case CurrentAction3d::WindowZooming:
+  {
+    myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_ZoomWindow);
+    break;
+  }
+  case CurrentAction3d::DynamicPanning:
+  {
+    myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, AIS_MouseGesture_Pan);
+    break;
+  }
   case CurrentAction3d::DynamicRotation:
-    myCurrentMode = CurrentAction3d::Nothing;
-    break;
-  default:
-    throw Standard_Failure(" incompatible Current Mode ");
+  {
+    myMouseGestureMap.Bind(Aspect_VKeyMouse_LeftButton, aRot);
     break;
   }
-  activateCursor(myCurrentMode);
-}
-
-void View::onMButtonUp(Qt::MouseButtons nFlags, const QPoint point)
-{
-  Q_UNUSED(nFlags)
-  Q_UNUSED(point)
-
-  myCurrentMode = CurrentAction3d::Nothing;
-  activateCursor(myCurrentMode);
-}
-
-void View::onRButtonUp(Qt::MouseButtons nFlags, const QPoint point)
-{
-  Q_UNUSED(nFlags)
-  Q_UNUSED(point)
-
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  // reset tyhe good Degenerated mode according to the strored one
-  //   --> dynamic rotation may have change it
-  if (myHlrModeIsOn) {
-    myV3dView->SetComputedMode(myHlrModeIsOn);
-    myV3dView->Redraw();
   }
-  QApplication::restoreOverrideCursor();
-  myCurrentMode = CurrentAction3d::Nothing;
-
-  activateCursor(myCurrentMode);
-}
-
-void View::onMouseMove(Qt::MouseButtons nFlags, const QPoint point)
-{
-  if (nFlags & Qt::LeftButton || nFlags & Qt::RightButton || nFlags & Qt::MidButton) {
-    switch (myCurrentMode) {
-    case CurrentAction3d::Nothing:
-      myXmax = point.x();
-      myYmax = point.y();
-      if (nFlags & MULTISELECTIONKEY)
-        MultiDragEvent(myXmax, myYmax, 0);
-      else
-        DragEvent(myXmax, myYmax, 0);
-      break;
-    case CurrentAction3d::DynamicZooming:
-      myV3dView->Zoom(myXmax, myYmax, point.x(), point.y());
-      myXmax = point.x();
-      myYmax = point.y();
-      break;
-    case CurrentAction3d::WindowZooming:
-      myXmax = point.x();
-      myYmax = point.y();
-      break;
-    case CurrentAction3d::DynamicPanning:
-      myV3dView->Pan(point.x() - myXmax, myYmax - point.y());
-      myXmax = point.x();
-      myYmax = point.y();
-      break;
-    case CurrentAction3d::GlobalPanning:
-      break;
-    case CurrentAction3d::DynamicRotation:
-      myV3dView->Rotation(point.x(), point.y());
-      myV3dView->Redraw();
-      break;
-    case CurrentAction3d::ObjectDececting:
-      myXmax = point.x();
-      myYmax = point.y();
-      break;
-    default:
-      throw Standard_Failure("incompatible Current Mode");
-      break;
-    }
-  }
-  else {
-    myXmax = point.x();
-    myYmax = point.y();
-    if (nFlags & MULTISELECTIONKEY)
-      MultiMoveEvent(point.x(), point.y());
-    else
-      MoveEvent(point.x(), point.y());
-  }
-}
-
-void View::DragEvent(const int x, const int y, const int TheState)
-{
-  // TheState == -1  button down
-  // TheState ==  0  move
-  // TheState ==  1  button up
-
-  static Standard_Integer theButtonDownX = 0;
-  static Standard_Integer theButtonDownY = 0;
-
-  if (TheState == -1) {
-    theButtonDownX = x;
-    theButtonDownY = y;
-  }
-
-  if (TheState == 1) {
-    myContext->Select(theButtonDownX, theButtonDownY, x, y, myV3dView, Standard_True);
-    emit selectionChanged();
-  }
-}
-
-void View::InputEvent(const int /*x*/, const int /*y*/)
-{
-  myContext->Select(Standard_True);
-  emit selectionChanged();
-}
-
-void View::MoveEvent(const int x, const int y)
-{
-  myContext->MoveTo(x, y, myV3dView, Standard_True);
-}
-
-void View::MultiMoveEvent(const int x, const int y)
-{
-  myContext->MoveTo(x, y, myV3dView, Standard_True);
-}
-
-void View::MultiDragEvent(const int x, const int y, const int TheState)
-{
-  static Standard_Integer theButtonDownX = 0;
-  static Standard_Integer theButtonDownY = 0;
-
-  if (TheState == -1) {
-    theButtonDownX = x;
-    theButtonDownY = y;
-  }
-  if (TheState == 0) {
-    myContext->ShiftSelect(theButtonDownX, theButtonDownY, x, y, myV3dView, Standard_True);
-    emit selectionChanged();
-  }
-}
-
-void View::MultiInputEvent(const int x, const int y)
-{
-  Q_UNUSED(x)
-  Q_UNUSED(y)
-
-  myContext->ShiftSelect(Standard_True);
-  emit selectionChanged();
 }
 
 void View::addItemInPopup(QMenu* theMenu)
