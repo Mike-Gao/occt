@@ -30,11 +30,11 @@
 class TopoDS_Shape;
 class QRubberBand;
 
-enum class CurrentAction3d { Nothing, DynamicZooming, WindowZooming, 
-                             DynamicPanning, GlobalPanning, DynamicRotation, ObjectDececting };
-enum class ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top, Bottom, 
-                        Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe, Transparency };
-enum class RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
+enum CurrentAction3d { Nothing, DynamicZooming, WindowZooming, 
+                       DynamicPanning, GlobalPanning, DynamicRotation, ObjectDececting };
+enum ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top, Bottom, 
+                  Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe, Transparency };
+enum RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
 class View: public QWidget, protected AIS_ViewController
 {

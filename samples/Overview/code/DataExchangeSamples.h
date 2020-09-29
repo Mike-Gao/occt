@@ -27,14 +27,13 @@ class DataExchangeSamples : public BaseSample
 {
 public:
   DEFINE_STANDARD_RTTI_INLINE(DataExchangeSamples, BaseSample)
-  
-  DataExchangeSamples();
+
+  DataExchangeSamples(TCollection_AsciiString theSampleSourcePath, Handle(V3d_View) theView);
   virtual ~DataExchangeSamples() {}
   virtual void Process(TCollection_AsciiString theSampleName) override;
   void AppendBottle();
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
   void SetStepType(STEPControl_StepModelType theStepType) { myStepType = theStepType; };
-  void SetView(Handle(V3d_View) theView) { myView = theView; };
 
   static Standard_Boolean IsExportSample(TCollection_AsciiString theSampleName);
   static Standard_Boolean IsImportSample(TCollection_AsciiString theSampleName);

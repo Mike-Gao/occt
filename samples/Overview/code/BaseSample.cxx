@@ -85,11 +85,6 @@ void BaseSample::Process(TCollection_AsciiString theSampleName)
   }
 }
 
-void BaseSample::SetCodePath(TCollection_AsciiString theSampleSourcePath)
-{
-  myCodePath = theSampleSourcePath;
-}
-
 void BaseSample::TraceError(TCollection_AsciiString theErrorMessage)
 {
   std::cerr << std::endl << "ERROR: " << theErrorMessage.ToCString() << std::endl ;

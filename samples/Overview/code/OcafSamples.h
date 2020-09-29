@@ -32,17 +32,15 @@ class OcafSamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(OcafSamples, BaseSample)
 
-  OcafSamples();
+  OcafSamples(TCollection_AsciiString theSampleSourcePath,
+              Handle(V3d_Viewer) theViewer,
+              Handle(AIS_InteractiveContext) theContext);
   virtual ~OcafSamples() {}
 
-  enum class ExchangeType { None, Binary, Xml };
+  enum ExchangeType { None, Binary, Xml };
   virtual void Process(TCollection_AsciiString theSampleName) override;
-
-  void               SetViewer(Handle(V3d_Viewer) theViewer) { myViewer = theViewer; };
-  void               SetContext(Handle(AIS_InteractiveContext) theContext) { myContext = theContext; };
-  void               SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
-  Handle(V3d_Viewer) GetViewer() { return myViewer; };
-
+  void ClearDocument() { myOcafDoc = nullptr; }
+  void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
 
   static Standard_Boolean IsExportSample(TCollection_AsciiString theSampleName);
   static Standard_Boolean IsImportSample(TCollection_AsciiString theSampleName);
@@ -56,8 +54,8 @@ private:
   ExchangeType myExchangeType;
   TCollection_AsciiString   myFileName;
   Handle(V3d_Viewer)             myViewer;
-  Handle(TDocStd_Document)       myOcafDoc;
   Handle(AIS_InteractiveContext) myContext;
+  Handle(TDocStd_Document)       myOcafDoc;
 
   // One function for every sample
   void CreateOcafDocument();

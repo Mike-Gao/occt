@@ -27,6 +27,16 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <AIS_ColoredShape.hxx>
 
+Viewer2dSamples::Viewer2dSamples(TCollection_AsciiString theSampleSourcePath,
+                                 Handle(V3d_View) theView,
+                                 Handle(V3d_Viewer) theViewer,
+                                 Handle(AIS_InteractiveContext) theContext) :
+  BaseSample(theSampleSourcePath),
+  myView(theView),
+  myViewer(theViewer),
+  myContext(theContext)
+{}
+
 void Viewer2dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 {
   Standard_Boolean anIsSamplePresent = Standard_True;

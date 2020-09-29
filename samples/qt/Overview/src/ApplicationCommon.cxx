@@ -12,15 +12,6 @@
 // commercial license or contractual agreement.
 
 #include "ApplicationCommon.h"
-#include "DataExchangeSamples.h"
-#include "DocumentCommon.h"
-#include "GeometrySamples.h"
-#include "OcafSamples.h"
-#include "TopologySamples.h"
-#include "TriangulationSamples.h"
-#include "View.h"
-#include "Viewer2dSamples.h"
-#include "Viewer3dSamples.h"
 
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
@@ -139,12 +130,37 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theCategory)
 
   Q_INIT_RESOURCE(Samples);
 
+  TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
+  myGeometrySamples      = new GeometrySamples(aSampleSourcePach);
+  myTopologySamples      = new TopologySamples(aSampleSourcePach);
+  myTriangulationSamples = new TriangulationSamples(aSampleSourcePach);
+  myDataExchangeSamples  = new DataExchangeSamples(aSampleSourcePach, 
+                                                   myGeomWidget->Get3dView());
+  myOcafSamples          = new OcafSamples(aSampleSourcePach, 
+                                           myDocument3d->getViewer(), 
+                                           myDocument3d->getContext());
+  myViewer3dSamples      = new Viewer3dSamples(aSampleSourcePach, 
+                                               myGeomWidget->Get3dView(), 
+                                               myDocument3d->getContext());
+  myViewer2dSamples      = new Viewer2dSamples(aSampleSourcePach,
+                                               myGeomWidget->Get3dView(), 
+                                               myDocument3d->getViewer(), 
+                                               myDocument3d->getContext());
+
+  MenuFormJson(":/menus/Geometry.json",      mySampleMapper,   myGeometryMenus);
+  MenuFormJson(":/menus/Topology.json",      mySampleMapper,   myTopologyMenus);
+  MenuFormJson(":/menus/Triangulation.json", mySampleMapper,   myTriangulationMenus);
+  MenuFormJson(":/menus/DataExchange.json",  myExchangeMapper, myDataExchangeMenus);
+  MenuFormJson(":/menus/Ocaf.json",          myOcafMapper,     myOcafMenus);
+  MenuFormJson(":/menus/Viewer3d.json",      myViewer3dMapper, myViewer3dMenus);
+  MenuFormJson(":/menus/Viewer2d.json",      myViewer2dMapper, myViewer2dMenus);
+
   onChangeCategory(ALL_CATEGORIES[myAppType]);
 
   resize(1280, 560);
 }
 
-void ApplicationCommonWindow::createStandardOperations()
+void ApplicationCommonWindow::RebuildMenu()
 {
   menuBar()->clear(); 
 
@@ -170,7 +186,7 @@ void ApplicationCommonWindow::createStandardOperations()
     myCategoryActions.insert(aCategory, anAction);
   }
 
-  for (QMenu* aSampleMenu : mySamplePopups)
+  for (QMenu* aSampleMenu : GetCurrentMenus())
   {
     menuBar()->addMenu(aSampleMenu);
   }
@@ -182,6 +198,51 @@ void ApplicationCommonWindow::createStandardOperations()
   help->addAction(myStdActions[HelpAbout]);
 }
 
+Handle(BaseSample) ApplicationCommonWindow::GetCurrentSamples()
+{
+  switch (myAppType)
+  {
+  case Geometry:
+    return myGeometrySamples;
+  case Topology:
+    return myTopologySamples;
+  case Triangulation:
+    return myTriangulationSamples;
+  case DataExchange:
+    return myDataExchangeSamples;
+  case Ocaf:
+    return myOcafSamples;
+  case Viewer2d:
+    return myViewer2dSamples;
+  case Viewer3d:
+    return myViewer3dSamples;
+  default:
+    throw QString("Unknown Application type");
+  }
+}
+
+const QList<QMenu*>& ApplicationCommonWindow::GetCurrentMenus()
+{
+  switch (myAppType)
+  {
+  case Geometry:
+    return myGeometryMenus;
+  case Topology:
+    return myTopologyMenus;
+  case Triangulation:
+    return myTriangulationMenus;
+  case DataExchange:
+    return myDataExchangeMenus;
+  case Ocaf:
+    return myOcafMenus;
+  case Viewer2d:
+    return myViewer2dMenus;
+  case Viewer3d:
+    return myViewer3dMenus;
+  default:
+    throw QString("Unknown Application type");
+  }
+}
 DocumentCommon* ApplicationCommonWindow::createNewDocument()
 {
   return new DocumentCommon(this);
@@ -192,97 +253,40 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
   myAppType = ALL_CATEGORIES.key(theCategory);
   setWindowTitle(ALL_CATEGORIES[myAppType]);
 
-  switch (ALL_CATEGORIES.key(theCategory))
-  {
-  case Geometry:
-    mySamples = new GeometrySamples();
-    MenuFormJson(":/menus/Geometry.json", mySampleMapper);
-    break;
-  case Topology:
-    mySamples = new TopologySamples();
-    MenuFormJson(":/menus/Topology.json", mySampleMapper);
-    break;
-  case Triangulation:
-    mySamples = new TriangulationSamples();
-    MenuFormJson(":/menus/Triangulation.json", mySampleMapper);
-    break;
-  case DataExchange:
-    mySamples = new DataExchangeSamples();
-    MenuFormJson(":/menus/DataExchange.json", myExchangeMapper);
-    break;
-  case Ocaf:
-    mySamples = new OcafSamples();
-    MenuFormJson(":/menus/Ocaf.json", myOcafMapper);
-    break;
-  case Viewer3d:
-    mySamples = new Viewer3dSamples();
-    MenuFormJson(":/menus/Viewer3d.json", myViewer3dMapper);
-    break;
-  case Viewer2d:
-    mySamples = new Viewer2dSamples();
-    MenuFormJson(":/menus/Viewer2d.json", myViewer2dMapper);
-    break;
-  default:
-    setWindowTitle("Unknown application");
-    return;
-  }
-  TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
-  mySamples->SetCodePath(aSampleSourcePach);
+  myOcafSamples->ClearDocument();
+  GetCurrentSamples()->Clear();
+  myDocument3d->Clear();
+  myDocument2d->Clear();
 
-  mySamples->Clear();
-  myDocument3d->SetObjects(mySamples->Get3dObjects());
-  myDocument2d->SetObjects(mySamples->Get2dObjects());
+  //myDocument3d->getContext()->RemoveAll(Standard_True);
+  //myDocument2d->getContext()->RemoveAll(Standard_True);
+//  myDocument3d->getViewer()->Erase();
+
   myCodeView->setPlainText("");
   myResultView->setPlainText("");
   myGeomWidget->FitAll();
 
-  createStandardOperations();
+  RebuildMenu();
 
-  if (myAppType == DataExchange) 
+  switch (myAppType)
   {
-    Handle(DataExchangeSamples) aDataExchangeSamples = Handle(DataExchangeSamples)::DownCast(mySamples);
-    if (aDataExchangeSamples) 
-    {
-      aDataExchangeSamples->AppendBottle();
-      aDataExchangeSamples->SetView(myGeomWidget->Get3dView());
-      myDocument3d->SetObjects(mySamples->Get3dObjects());
-      myGeomWidget->FitAll();
-    }
-  }
-  else if (myAppType == Ocaf) 
-  {
-    Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
-    if (aOcafSamples) 
-    {
-      aOcafSamples->SetContext(myDocument3d->getContext());
-      aOcafSamples->SetViewer(myDocument3d->getViewer());
-      onProcessOcaf("CreateOcafDocument");
-      myGeomWidget->Show3d();
-    }
-  }
-  else if (myAppType == Viewer3d) 
-  {
-    Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
-    if (aViewer3dSamples) 
-    {
-      aViewer3dSamples->SetContext(myDocument3d->getContext());
-      aViewer3dSamples->AppendBottle();
-      aViewer3dSamples->SetView(myGeomWidget->Get3dView());
-      myDocument3d->SetObjects(mySamples->Get3dObjects());
-      myGeomWidget->FitAll();
-    }
-  }
-  else if (myAppType == Viewer2d) 
-  {
-    Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
-    if (aViewer2dSamples)
-    {
-      aViewer2dSamples->SetContext(myDocument2d->getContext());
-      aViewer2dSamples->SetView(myGeomWidget->Get2dView());
-      aViewer2dSamples->SetViewer(myDocument2d->getViewer());
-      myDocument2d->SetObjects(mySamples->Get2dObjects());
-      myGeomWidget->Show2d();
-    }
+  case DataExchange:
+    myDataExchangeSamples->AppendBottle();
+    myDocument3d->SetObjects(GetCurrentSamples()->Get3dObjects());
+    myGeomWidget->FitAll();
+    break;
+  case Ocaf:
+    onProcessOcaf("CreateOcafDocument");
+    myGeomWidget->Show3d();
+    break;
+  case Viewer3d:
+    myViewer3dSamples->AppendBottle();
+    myDocument3d->SetObjects(GetCurrentSamples()->Get3dObjects());
+    myGeomWidget->FitAll();
+    break;
+  case Viewer2d:
+    //  myDocument2d->SetObjects(GetCurrentSamples()->Get2dObjects());
+    myGeomWidget->Show2d();
   }
 }
 
@@ -353,11 +357,11 @@ void ApplicationCommonWindow::onProcessSample(const QString& theSampleName)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
-  mySamples->Process(theSampleName.toUtf8().data());
-  myDocument3d->SetObjects(mySamples->Get3dObjects());
-  myDocument2d->SetObjects(mySamples->Get2dObjects());
-  myCodeView->setPlainText(mySamples->GetCode().ToCString());
-  myResultView->setPlainText(mySamples->GetResult().ToCString());
+  GetCurrentSamples()->Process(theSampleName.toUtf8().data());
+  myDocument3d->SetObjects(GetCurrentSamples()->Get3dObjects());
+  myDocument2d->SetObjects(GetCurrentSamples()->Get2dObjects());
+  myCodeView->setPlainText(GetCurrentSamples()->GetCode().ToCString());
+  myResultView->setPlainText(GetCurrentSamples()->GetResult().ToCString());
   myGeomWidget->FitAll();
   QApplication::restoreOverrideCursor();
 }
@@ -370,99 +374,86 @@ void ApplicationCommonWindow::onProcessExchange(const QString& theSampleName)
   if (aFileName.isEmpty())
     return;
 
-  Handle(DataExchangeSamples) aDataExchangeSamples = Handle(DataExchangeSamples)::DownCast(mySamples);
-  if (aDataExchangeSamples) 
-  {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    aDataExchangeSamples->SetFileName(aFileName.toUtf8().data());
-    aDataExchangeSamples->SetStepType(static_cast<STEPControl_StepModelType>(aMode));
-    mySamples->Process(theSampleName.toUtf8().data());
-    myDocument3d->SetObjects(mySamples->Get3dObjects());
-    myDocument2d->SetObjects(mySamples->Get2dObjects());
-    myCodeView->setPlainText(mySamples->GetCode().ToCString());
-    myResultView->setPlainText(mySamples->GetResult().ToCString());
-    myGeomWidget->FitAll();
-    QApplication::restoreOverrideCursor();
-  }
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  myDataExchangeSamples->SetFileName(aFileName.toUtf8().data());
+  myDataExchangeSamples->SetStepType(static_cast<STEPControl_StepModelType>(aMode));
+  myDataExchangeSamples->Process(theSampleName.toUtf8().data());
+  myDocument3d->SetObjects(myDataExchangeSamples->Get3dObjects());
+  myDocument2d->SetObjects(myDataExchangeSamples->Get2dObjects());
+  myCodeView->setPlainText(myDataExchangeSamples->GetCode().ToCString());
+  myResultView->setPlainText(myDataExchangeSamples->GetResult().ToCString());
+  myGeomWidget->FitAll();
+  QApplication::restoreOverrideCursor();
 }
 
 void ApplicationCommonWindow::onProcessOcaf(const QString& theSampleName)
 {
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
-  Handle(OcafSamples) aOcafSamples = Handle(OcafSamples)::DownCast(mySamples);
-  if (aOcafSamples) 
+
+  if (theSampleName.indexOf("Dialog") == 0) 
   {
-    if (theSampleName.indexOf("Dialog") == 0) 
-    {
-      int aMode; // not used
-      QString aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
-      if (aFileName.isEmpty())
-        return;
-      aOcafSamples->SetFileName(aFileName.toUtf8().data());
-    }
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    mySamples->Process(theSampleName.toUtf8().data());
-    myDocument2d->SetObjects(mySamples->Get2dObjects());
-    myCodeView->setPlainText(mySamples->GetCode().ToCString());
-    myResultView->setPlainText(mySamples->GetResult().ToCString());
-    QApplication::restoreOverrideCursor();
+    int aMode; // not used
+    QString aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
+    if (aFileName.isEmpty())
+      return;
+    myOcafSamples->SetFileName(aFileName.toUtf8().data());
   }
-}
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  myOcafSamples->Process(theSampleName.toUtf8().data());
+  myDocument2d->SetObjects(myOcafSamples->Get2dObjects());
+  myCodeView->setPlainText(myOcafSamples->GetCode().ToCString());
+  myResultView->setPlainText(myOcafSamples->GetResult().ToCString());
+  QApplication::restoreOverrideCursor();
+  }
 
 void ApplicationCommonWindow::onProcessViewer3d(const QString& theSampleName)
 {
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
-  Handle(Viewer3dSamples) aViewer3dSamples = Handle(Viewer3dSamples)::DownCast(mySamples);
-  if (aViewer3dSamples) 
-  {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    mySamples->Process(theSampleName.toUtf8().data());
-    myCodeView->setPlainText(mySamples->GetCode().ToCString());
-    myResultView->setPlainText(mySamples->GetResult().ToCString());
-    myGeomWidget->FitAll();
-    QApplication::restoreOverrideCursor();
-  }
+
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  myViewer3dSamples->Process(theSampleName.toUtf8().data());
+  myCodeView->setPlainText(myViewer3dSamples->GetCode().ToCString());
+  myResultView->setPlainText(myViewer3dSamples->GetResult().ToCString());
+  myGeomWidget->FitAll();
+  QApplication::restoreOverrideCursor();
 }
 
 void ApplicationCommonWindow::onProcessViewer2d(const QString& theSampleName)
 {
   setWindowTitle(ALL_CATEGORIES[myAppType] + " - " + theSampleName);
-  Handle(Viewer2dSamples) aViewer2dSamples = Handle(Viewer2dSamples)::DownCast(mySamples);
-  if (aViewer2dSamples) 
+
+  Standard_Boolean anIsFileSample = Viewer2dSamples::IsFileSample(theSampleName.toUtf8().data());
+  QString aFileName;
+  if (anIsFileSample) 
   {
-    Standard_Boolean anIsFileSample = Viewer2dSamples::IsFileSample(theSampleName.toUtf8().data());
-    QString aFileName;
-    if (anIsFileSample) 
+    int aMode; // not used
+    aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
+    if (aFileName.isEmpty())
     {
-      int aMode; // not used
-      aFileName = selectFileName(theSampleName, getOcafDialog(theSampleName), aMode);
-      if (aFileName.isEmpty())
-      {
-        return;
-      }
-      aViewer2dSamples->SetFileName(aFileName.toUtf8().data());
+      return;
     }
-    if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty())) 
+    myViewer2dSamples->SetFileName(aFileName.toUtf8().data());
+  }
+  if (!anIsFileSample || (anIsFileSample && !aFileName.isEmpty())) 
+  {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    myViewer2dSamples->Process(theSampleName.toUtf8().data());
+    if (!Viewer2dSamples::IsShadedSample(theSampleName.toUtf8().data()))
     {
-      QApplication::setOverrideCursor(Qt::WaitCursor);
-      mySamples->Process(theSampleName.toUtf8().data());
-      if (!Viewer2dSamples::IsShadedSample(theSampleName.toUtf8().data()))
-      {
-        myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_False);
-      }
-      else
-      {
-        myDocument2d->SetObjects(mySamples->Get2dObjects(), Standard_True);
-      }
-      myCodeView->setPlainText(mySamples->GetCode().ToCString());
-      myResultView->setPlainText(mySamples->GetResult().ToCString());
-      myGeomWidget->Show2d();
-      QApplication::restoreOverrideCursor();
+      myDocument2d->SetObjects(myViewer2dSamples->Get2dObjects(), Standard_False);
     }
     else
     {
-      myResultView->setPlainText("No file selected!");
+      myDocument2d->SetObjects(myViewer2dSamples->Get2dObjects(), Standard_True);
     }
+    myCodeView->setPlainText(myViewer2dSamples->GetCode().ToCString());
+    myResultView->setPlainText(myViewer2dSamples->GetResult().ToCString());
+    myGeomWidget->Show2d();
+    QApplication::restoreOverrideCursor();
+  }
+  else
+  {
+    myResultView->setPlainText("No file selected!");
   }
 }
 
@@ -634,9 +625,9 @@ QMenu* ApplicationCommonWindow::MenuFromJsonObject(QJsonValue theJsonValue, cons
   return aMenu;
 }
 
-void ApplicationCommonWindow::MenuFormJson(const QString & thePath, QSignalMapper* theMapper)
+void ApplicationCommonWindow::MenuFormJson(const QString & thePath, QSignalMapper* theMapper, QList<QMenu*>& theMunusList)
 {
-  mySamplePopups.clear();
+  theMunusList.clear();
   QFile aJsonFile(thePath);
   QString anErrorMessage;
   if (aJsonFile.error() != QFile::NoError)
@@ -667,7 +658,7 @@ void ApplicationCommonWindow::MenuFormJson(const QString & thePath, QSignalMappe
       QJsonValue aJsonValue = aJsonObj.value(aKey);
       if (aJsonValue.isObject())
       {
-        mySamplePopups.push_back(MenuFromJsonObject(aJsonValue.toObject(), aKey, this, theMapper));
+        theMunusList.push_back(MenuFromJsonObject(aJsonValue.toObject(), aKey, this, theMapper));
       }
     }
   }

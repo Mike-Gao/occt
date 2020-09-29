@@ -26,7 +26,9 @@ class TriangulationSamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(TriangulationSamples, BaseSample)
 
-    virtual ~TriangulationSamples() {}
+  TriangulationSamples(TCollection_AsciiString theSampleSourcePath) :
+    BaseSample(theSampleSourcePath) {}
+  virtual ~TriangulationSamples() {}
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 

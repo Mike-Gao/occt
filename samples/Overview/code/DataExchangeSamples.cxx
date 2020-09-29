@@ -38,9 +38,10 @@
 #include <IGESControl_Reader.hxx>
 #include <Graphic3d_TextureEnv.hxx>
 
-DataExchangeSamples::DataExchangeSamples() :
-  myStepType(STEPControl_StepModelType(-1)),
-  myView(nullptr)
+DataExchangeSamples::DataExchangeSamples(TCollection_AsciiString theSampleSourcePath, Handle(V3d_View) theView) :
+  BaseSample(theSampleSourcePath),
+  myStepType(STEPControl_StepModelType::STEPControl_AsIs),
+  myView(theView)
 {
 
 }

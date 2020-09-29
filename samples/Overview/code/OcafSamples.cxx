@@ -31,8 +31,12 @@
 #include <BinDrivers.hxx>
 #include <XmlDrivers.hxx>
 
-OcafSamples::OcafSamples() :
-  myViewer(nullptr)
+OcafSamples::OcafSamples(TCollection_AsciiString theSampleSourcePath,
+                         Handle(V3d_Viewer) theViewer,
+                         Handle(AIS_InteractiveContext) theContext):
+  BaseSample(theSampleSourcePath),
+  myViewer(theViewer),
+  myContext(theContext)
 {
 
 }

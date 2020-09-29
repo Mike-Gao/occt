@@ -40,6 +40,7 @@ public:
 
   void SetObjects(const NCollection_Vector<Handle(AIS_InteractiveObject)>& theObjects,
                   Standard_Boolean theDisplayShaded = Standard_False);
+  void Clear();
   bool IsEmpty() const { return myContextIsEmpty; } 
 
 signals:

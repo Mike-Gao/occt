@@ -28,10 +28,12 @@ class Viewer3dSamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(Viewer3dSamples, BaseSample)
 
+  Viewer3dSamples(TCollection_AsciiString theSampleSourcePath,
+                  Handle(V3d_View) theView,
+                  Handle(AIS_InteractiveContext) theContext);
   virtual ~Viewer3dSamples() {}
   void AppendBottle();
-  void SetView(Handle(V3d_View) theView) { myView = theView; };
-  void SetContext(Handle(AIS_InteractiveContext) theContext) { myContext = theContext; };
+
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 
@@ -58,7 +60,7 @@ private:
   void VboOn3dSample();
   void VboOff3dSample();
 
-  Handle(V3d_View) myView;
+  Handle(V3d_View)               myView;
   Handle(AIS_InteractiveContext) myContext;
 };
 

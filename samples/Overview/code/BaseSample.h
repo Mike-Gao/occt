@@ -28,6 +28,10 @@ DEFINE_STANDARD_HANDLE(BaseSample, Standard_Transient)
 class BaseSample: public Standard_Transient
 {
 public:
+  BaseSample(TCollection_AsciiString theSampleSourcePath)
+  {
+    myCodePath = theSampleSourcePath;
+  }
   void Clear();
 	Standard_Boolean                                  IsProcessed();
   const NCollection_Vector<Handle(AIS_InteractiveObject)>& Get2dObjects();
@@ -36,7 +40,6 @@ public:
   TCollection_AsciiString                           GetCode();
 
   virtual void Process(TCollection_AsciiString theSampleName);
-  void SetCodePath(TCollection_AsciiString theSampleSourcePach);
 
   DEFINE_STANDARD_RTTI_INLINE(BaseSample, Standard_Transient)
 

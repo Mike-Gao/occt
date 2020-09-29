@@ -26,7 +26,9 @@ class TopologySamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(TopologySamples, BaseSample)
 
-    virtual ~TopologySamples() {}
+  TopologySamples(TCollection_AsciiString theSampleSourcePath) :
+    BaseSample(theSampleSourcePath) {}
+  virtual ~TopologySamples() {}
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 

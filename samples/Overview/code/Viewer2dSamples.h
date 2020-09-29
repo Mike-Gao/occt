@@ -28,10 +28,12 @@ class Viewer2dSamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(Viewer2dSamples, BaseSample)
 
+  Viewer2dSamples(TCollection_AsciiString theSampleSourcePath,
+                  Handle(V3d_View) theView,
+                  Handle(V3d_Viewer) theViewer,
+                  Handle(AIS_InteractiveContext) theContext);
   virtual ~Viewer2dSamples() {}
-  void SetView(Handle(V3d_View) theView) { myView = theView; };
-  void SetViewer(Handle(V3d_Viewer) theViewer) { myViewer = theViewer; };
-  void SetContext(Handle(AIS_InteractiveContext) theContext) { myContext = theContext; };
+
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
   static Standard_Boolean IsFileSample(TCollection_AsciiString theSampleName);
   static Standard_Boolean IsShadedSample(TCollection_AsciiString theSampleName);

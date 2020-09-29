@@ -16,11 +16,18 @@
 
 #include "BaseSample.h"
 #include "CommonSample.h"
+#include "DataExchangeSamples.h"
 #include "DocumentCommon.h"
+#include "GeometrySamples.h"
 #include "GeomWidget.h"
+#include "OcafSamples.h"
 #include "OcctHighlighter.h"
+#include "TopologySamples.h"
 #include "TranslateDialog.h"
+#include "TriangulationSamples.h"
 #include "View.h"
+#include "Viewer2dSamples.h"
+#include "Viewer3dSamples.h"
 
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
@@ -103,7 +110,7 @@ protected:
   QToolBar*     getCasCadeBar();
 
   QMenu* MenuFromJsonObject(QJsonValue theJsonValue, const QString& theKey, QWidget* theParent, QSignalMapper* theMapper);
-  void MenuFormJson(const QString& thePath, QSignalMapper* theMapper);
+  void MenuFormJson(const QString& thePath, QSignalMapper* theMapper, QList<QMenu*>& theMunusList);
 
 private slots:
   void onCloseAllWindows() { qApp->closeAllWindows(); };
@@ -116,17 +123,24 @@ private slots:
 
 private:
 
-  ApplicationType myAppType;
-
-	void createStandardOperations();
+	void RebuildMenu();
+  Handle(BaseSample)   GetCurrentSamples();
+  const QList<QMenu*>& GetCurrentMenus();
 
   QString selectFileName(const QString& theSampleName, TranslateDialog* theDialog, int& theMode);
   TranslateDialog* getDataExchangeDialog(const QString& theSampleName);
   TranslateDialog* getOcafDialog(const QString& theSampleName);
 
 private:
-  Handle(BaseSample) mySamples;
+  ApplicationType myAppType;
 
+  Handle(GeometrySamples)      myGeometrySamples;
+  Handle(TopologySamples)      myTopologySamples;
+  Handle(TriangulationSamples) myTriangulationSamples;
+  Handle(DataExchangeSamples)  myDataExchangeSamples;
+  Handle(OcafSamples)          myOcafSamples;
+  Handle(Viewer3dSamples)      myViewer3dSamples;
+  Handle(Viewer2dSamples)      myViewer2dSamples;
 
 	QMap<StdActions,               QAction*>  myStdActions;
 	QMap<ApplicationType,          QAction*>  myCategoryActions;
@@ -139,7 +153,15 @@ private:
 	QMenu*           myFilePopup;
 	QMenu*           myCategoryPopup;
 
-  QList<QMenu*>    mySamplePopups;
+//  QList<QMenu*>    mySamplePopups;
+  QList<QMenu*>    myGeometryMenus;
+  QList<QMenu*>    myTopologyMenus;
+  QList<QMenu*>    myTriangulationMenus;
+  QList<QMenu*>    myDataExchangeMenus;
+  QList<QMenu*>    myOcafMenus;
+  QList<QMenu*>    myViewer3dMenus;
+  QList<QMenu*>    myViewer2dMenus;
+
   QSignalMapper*   mySampleMapper;
   QSignalMapper*   myExchangeMapper;
   QSignalMapper*   myOcafMapper;
@@ -154,7 +176,6 @@ private:
 
   GeomWidget*  myGeomWidget;
 
-protected:
   DocumentCommon*  myDocument3d;
   DocumentCommon*  myDocument2d;
 };

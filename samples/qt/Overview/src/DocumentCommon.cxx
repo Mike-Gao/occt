@@ -118,4 +118,10 @@ void DocumentCommon::SetObjects(const NCollection_Vector<Handle(AIS_InteractiveO
   myViewer->Redraw();
 }
 
+void DocumentCommon::Clear()
+{
+  myContext->RemoveAll(Standard_True);
+  myContextIsEmpty = true;
+}
+
 

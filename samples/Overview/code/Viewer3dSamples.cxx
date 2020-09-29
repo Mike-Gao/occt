@@ -73,6 +73,13 @@ void Viewer3dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
   myIsProcessed = anIsSamplePresent;
 }
 
+Viewer3dSamples::Viewer3dSamples(TCollection_AsciiString theSampleSourcePath,
+                                 Handle(V3d_View) theView,
+                                 Handle(AIS_InteractiveContext) theContext):
+  BaseSample(theSampleSourcePath),
+  myView(theView)
+{}
+
 void Viewer3dSamples::AppendBottle()
 {
   TopoDS_Shape aBottle = MakeBottle(50, 70, 30);
