@@ -58,6 +58,12 @@ void OcafSamples::Process(TCollection_AsciiString theSampleName)
   }
 }
 
+void OcafSamples::ClearExtra()
+{ 
+  myOcafDoc = nullptr; 
+  myContext->RemoveAll(Standard_True);
+}
+
 void OcafSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 {
   Standard_Boolean anIsSamplePresent = Standard_True;

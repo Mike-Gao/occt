@@ -39,7 +39,7 @@ public:
 
   enum ExchangeType { None, Binary, Xml };
   virtual void Process(TCollection_AsciiString theSampleName) override;
-  void ClearDocument() { myOcafDoc = nullptr; }
+  void ClearExtra();
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
 
   static Standard_Boolean IsExportSample(TCollection_AsciiString theSampleName);

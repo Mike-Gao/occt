@@ -69,6 +69,12 @@ void Viewer2dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
   myIsProcessed = anIsSamplePresent;
 }
 
+void Viewer2dSamples::ClearExtra()
+{
+  myContext->RemoveAll(Standard_True);
+  myViewer->DeactivateGrid();
+}
+
 Standard_Boolean Viewer2dSamples::IsFileSample(TCollection_AsciiString theSampleName)
 {
   if (theSampleName == "BackgroungImage2dSample")
@@ -259,6 +265,7 @@ void Viewer2dSamples::RectagularLineGrid2dSample()
   myView->Window()->Size(aWidth, aHeight);
   myViewer->SetRectangularGridGraphicValues(aWidth, aHeight, anOffset);
   myViewer->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
+  myViewer->Redraw();
 }
 
 void Viewer2dSamples::RectagularPointGrid2dSample()
@@ -270,6 +277,7 @@ void Viewer2dSamples::RectagularPointGrid2dSample()
   myView->Window()->Size(aWidth, aHeight);
   myViewer->SetRectangularGridGraphicValues(aWidth, aHeight, anOffset);
   myViewer->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Points);
+  myViewer->Redraw();
 }
 
 void Viewer2dSamples::CircularLineGrid2dSample()
@@ -281,6 +289,7 @@ void Viewer2dSamples::CircularLineGrid2dSample()
   myView->Window()->Size(aWidth, aHeight);
   myViewer->SetRectangularGridGraphicValues(aWidth, aHeight, anOffset);
   myViewer->ActivateGrid(Aspect_GT_Circular, Aspect_GDM_Lines);
+  myViewer->Redraw();
 }
 
 void Viewer2dSamples::CircularPointGrid2dSample()
@@ -292,12 +301,13 @@ void Viewer2dSamples::CircularPointGrid2dSample()
   myView->Window()->Size(aWidth, aHeight);
   myViewer->SetRectangularGridGraphicValues(aWidth, aHeight, anOffset);
   myViewer->ActivateGrid(Aspect_GT_Circular, Aspect_GDM_Points);
+  myViewer->Redraw();
 }
 
 void Viewer2dSamples::ClearGrid2dSample()
 {
   myViewer->DeactivateGrid();
-  myViewer->Update();
+  myViewer->Redraw();
 }
 
 void Viewer2dSamples::BackgroungImage2dSample()

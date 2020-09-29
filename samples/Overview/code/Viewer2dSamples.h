@@ -35,6 +35,7 @@ public:
   virtual ~Viewer2dSamples() {}
 
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
+  void ClearExtra();
   static Standard_Boolean IsFileSample(TCollection_AsciiString theSampleName);
   static Standard_Boolean IsShadedSample(TCollection_AsciiString theSampleName);
 

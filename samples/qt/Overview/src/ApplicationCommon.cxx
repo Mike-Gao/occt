@@ -143,9 +143,9 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theCategory)
                                                myGeomWidget->Get3dView(), 
                                                myDocument3d->getContext());
   myViewer2dSamples      = new Viewer2dSamples(aSampleSourcePach,
-                                               myGeomWidget->Get3dView(), 
-                                               myDocument3d->getViewer(), 
-                                               myDocument3d->getContext());
+                                               myGeomWidget->Get2dView(), 
+                                               myDocument2d->getViewer(), 
+                                               myDocument2d->getContext());
 
   MenuFormJson(":/menus/Geometry.json",      mySampleMapper,   myGeometryMenus);
   MenuFormJson(":/menus/Topology.json",      mySampleMapper,   myTopologyMenus);
@@ -253,7 +253,10 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
   myAppType = ALL_CATEGORIES.key(theCategory);
   setWindowTitle(ALL_CATEGORIES[myAppType]);
 
-  myOcafSamples->ClearDocument();
+  myOcafSamples->ClearExtra();
+  myViewer3dSamples->ClearExtra();
+  myViewer2dSamples->ClearExtra();
+
   GetCurrentSamples()->Clear();
   myDocument3d->Clear();
   myDocument2d->Clear();
@@ -273,7 +276,7 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
   case DataExchange:
     myDataExchangeSamples->AppendBottle();
     myDocument3d->SetObjects(GetCurrentSamples()->Get3dObjects());
-    myGeomWidget->FitAll();
+    myGeomWidget->Show3d();
     break;
   case Ocaf:
     onProcessOcaf("CreateOcafDocument");
@@ -282,11 +285,11 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
   case Viewer3d:
     myViewer3dSamples->AppendBottle();
     myDocument3d->SetObjects(GetCurrentSamples()->Get3dObjects());
-    myGeomWidget->FitAll();
+    myGeomWidget->Show3d();
     break;
   case Viewer2d:
-    //  myDocument2d->SetObjects(GetCurrentSamples()->Get2dObjects());
     myGeomWidget->Show2d();
+    break;
   }
 }
 

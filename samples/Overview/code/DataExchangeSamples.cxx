@@ -14,6 +14,7 @@
 #include "DataExchangeSamples.h"
 #include "MakeBottle.h"
 
+#include <AIS_ViewCube.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
 #include <BRep_Builder.hxx>
@@ -68,6 +69,8 @@ void DataExchangeSamples::AppendBottle()
   TopoDS_Shape aBottle = MakeBottle(50, 70, 30);
   Handle(AIS_InteractiveObject) aShape = new AIS_Shape(aBottle);
   myObject3d.Append(aShape);
+  Handle(AIS_ViewCube) aViewCube = new AIS_ViewCube();
+  myObject3d.Append(aViewCube);
   myResult << "A bottle shape was created." << std::endl;
 }
 

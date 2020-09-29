@@ -15,12 +15,20 @@
 #include "MakeBottle.h"
 
 #include <AIS_Shape.hxx>
+#include <AIS_ViewCube.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <V3d_SpotLight.hxx>
 #include <V3d_PositionalLight.hxx>
 #include <V3d_DirectionalLight.hxx>
 #include <V3d_AmbientLight.hxx>
 
+Viewer3dSamples::Viewer3dSamples(TCollection_AsciiString theSampleSourcePath,
+                                 Handle(V3d_View) theView,
+                                 Handle(AIS_InteractiveContext) theContext) :
+  BaseSample(theSampleSourcePath),
+  myView(theView),
+  myContext(theContext)
+{}
 
 void Viewer3dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
 {
@@ -73,19 +81,36 @@ void Viewer3dSamples::ExecuteSample(TCollection_AsciiString theSampleName)
   myIsProcessed = anIsSamplePresent;
 }
 
-Viewer3dSamples::Viewer3dSamples(TCollection_AsciiString theSampleSourcePath,
-                                 Handle(V3d_View) theView,
-                                 Handle(AIS_InteractiveContext) theContext):
-  BaseSample(theSampleSourcePath),
-  myView(theView)
-{}
-
 void Viewer3dSamples::AppendBottle()
 {
   TopoDS_Shape aBottle = MakeBottle(50, 70, 30);
   Handle(AIS_InteractiveObject) aShape = new AIS_Shape(aBottle);
   myObject3d.Append(aShape);
+  Handle(AIS_ViewCube) aViewCube = new AIS_ViewCube();
+  myObject3d.Append(aViewCube);
   myResult << "A bottle shape was created." << std::endl;
+}
+
+void Viewer3dSamples::ClearExtra()
+{
+  NeutralPointSelect3dSample();
+  VboOff3dSample();
+  ClearLight3dSample();
+  // Delete Lights
+  V3d_ListOfLight lights;
+  for (V3d_ListOfLightIterator anIter = myView->Viewer()->DefinedLightIterator(); anIter.More(); anIter.Next())
+  {
+    lights.Append(anIter.Value());
+  }
+  V3d_ListOfLightIterator itrLights(lights);
+  for (; itrLights.More(); itrLights.Next())
+  {
+    myView->Viewer()->DelLight(itrLights.Value());
+  }
+  myView->Viewer()->SetDefaultLights(); // Setting the default lights on
+  myView->Update();
+
+  myContext->RemoveAll(Standard_True);
 }
 
 void Viewer3dSamples::SpotLight3dSample()
@@ -120,22 +145,35 @@ void Viewer3dSamples::AmbientLight3dSample()
 
 void Viewer3dSamples::ClearLight3dSample()
 {
-  //	Setting Off all viewer active lights
-  const V3d_ListOfLight& lights = myView->Viewer()->ActiveLights();
-  TColStd_ListIteratorOfListOfTransient itrLights(lights);
+  // Setting Off all viewer active lights
+  V3d_ListOfLight lights;
+  for (V3d_ListOfLightIterator anIter = 
+         myView->Viewer()->ActiveLightIterator(); 
+       anIter.More(); 
+       anIter.Next())
+  {
+    lights.Append(anIter.Value());
+  }
+  V3d_ListOfLightIterator itrLights(lights);
   for (; itrLights.More(); itrLights.Next())
   {
-    Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
-    myView->Viewer()->SetLightOff(light);
+    myView->Viewer()->SetLightOff(itrLights.Value());
   }
-
+  // Setting Off all view active lights
+  lights.Clear();
+  for (V3d_ListOfLightIterator anIter = 
+         myView->ActiveLightIterator(); 
+       anIter.More(); 
+       anIter.Next())
+  {
+    lights.Append(anIter.Value());
+  }
   itrLights.Initialize(lights);
   for (; itrLights.More(); itrLights.Next())
   {
-    Handle(V3d_Light) light = Handle(V3d_Light)::DownCast(itrLights.Value());
-    myView->SetLightOff(light);
+    myView->SetLightOff(itrLights.Value());
   }
-  myView->Viewer()->SetDefaultLights();// Setting the default lights on
+  myView->Viewer()->SetDefaultLights(); // Setting the default lights on
   myView->Update();
 }
 

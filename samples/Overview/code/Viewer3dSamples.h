@@ -33,6 +33,7 @@ public:
                   Handle(AIS_InteractiveContext) theContext);
   virtual ~Viewer3dSamples() {}
   void AppendBottle();
+  void ClearExtra();
 
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
