@@ -261,10 +261,6 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
   myDocument3d->Clear();
   myDocument2d->Clear();
 
-  //myDocument3d->getContext()->RemoveAll(Standard_True);
-  //myDocument2d->getContext()->RemoveAll(Standard_True);
-//  myDocument3d->getViewer()->Erase();
-
   myCodeView->setPlainText("");
   myResultView->setPlainText("");
   myGeomWidget->FitAll();

@@ -186,83 +186,10 @@ void View::fitAll()
   myV3dView->Redraw();
 }
 
-void View::fitArea()
-{
-  myCurrentMode = CurrentAction3d::WindowZooming;
-}
-
-void View::zoom()
-{
-  myCurrentMode = CurrentAction3d::DynamicZooming;
-}
-
-void View::pan()
-{
-  myCurrentMode = CurrentAction3d::DynamicPanning;
-}
-
-void View::rotation()
-{
-  if (myIs3dView)
-    myCurrentMode = CurrentAction3d::DynamicRotation;
-  else
-    myCurrentMode = CurrentAction3d::Nothing;
-}
-
-void View::globalPan()
-{
-  // save the current zoom value
-  myCurZoom = myV3dView->Scale();
-  // Do a Global Zoom
-  myV3dView->FitAll();
-  // Set the mode
-  myCurrentMode = CurrentAction3d::GlobalPanning;
-}
-
-void View::front()
-{
-  if (myIs3dView)
-    myV3dView->SetProj(V3d_Yneg);
-}
-
-void View::back()
-{
-  if (myIs3dView)
-    myV3dView->SetProj(V3d_Ypos);
-}
-
-void View::top()
-{
-  myV3dView->SetProj(V3d_Zpos);
-}
-
-void View::bottom()
-{
-  if (myIs3dView)
-    myV3dView->SetProj(V3d_Zneg);
-}
-
-void View::left()
-{
-  if (myIs3dView)
-    myV3dView->SetProj(V3d_Xneg);
-}
-
-void View::right()
-{
-  if (myIs3dView)
-    myV3dView->SetProj(V3d_Xpos);
-}
-
 void View::axo()
 {
   if (myIs3dView)
     myV3dView->SetProj(V3d_XposYnegZpos);
-}
-
-void View::reset()
-{
-  myV3dView->Reset();
 }
 
 void View::hlrOff()
@@ -467,7 +394,7 @@ void View::initViewActions()
   if (!myViewActions.empty())
     return;
   myViewActions[ViewAction::FitAll] =
-    RegisterAction(":/icons/view_fitall.png", tr("FilAll"), &View::fitAll);
+    RegisterAction(":/icons/view_fitall.png", tr("Fit all"), &View::fitAll);
   if (myIs3dView) 
   {
     myViewActions[ViewAction::Axo] =

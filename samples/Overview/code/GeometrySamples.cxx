@@ -244,7 +244,8 @@ void GeometrySamples::ExecuteSample(TCollection_AsciiString theSampleName)
   myIsProcessed = anIsSamplePresent;
 }
 
-void GeometrySamples::DisplayPnt(gp_Pnt2d thePnt2d, TCollection_AsciiString theText, Aspect_TypeOfMarker theMarker)
+void GeometrySamples::DisplayPnt(gp_Pnt2d thePnt2d, TCollection_AsciiString theText, 
+                                 Aspect_TypeOfMarker theMarker, Standard_Real theDistance)
 {
   gp_Pnt aPnt(thePnt2d.X(), thePnt2d.Y(), 0.0);
   Handle(Geom_CartesianPoint) aGeomPoint = new Geom_CartesianPoint(aPnt);
@@ -253,10 +254,11 @@ void GeometrySamples::DisplayPnt(gp_Pnt2d thePnt2d, TCollection_AsciiString theT
   myObject2d.Append(anAisPoint);
   Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
   aPntLabel->SetText(theText);
-  aPntLabel->SetPosition(gp_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z() + 5.0));
+  aPntLabel->SetPosition(gp_Pnt(aPnt.X(), aPnt.Y() + theDistance, aPnt.Z()));
   myObject2d.Append(aPntLabel);
 }
-void GeometrySamples::DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText, Aspect_TypeOfMarker theMarker)
+void GeometrySamples::DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText, 
+                                 Aspect_TypeOfMarker theMarker, Standard_Real theDistance)
 {
   Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(thePnt);
   Handle(AIS_Point) anAisPoint = new AIS_Point(aPoint);
@@ -264,7 +266,7 @@ void GeometrySamples::DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText,
   myObject3d.Append(anAisPoint);
   Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
   aPntLabel->SetText(theText);
-  aPntLabel->SetPosition(gp_Pnt(thePnt.X(), thePnt.Y(), thePnt.Z() + 5.0));
+  aPntLabel->SetPosition(gp_Pnt(thePnt.X(), thePnt.Y(), thePnt.Z() + theDistance));
   myObject3d.Append(aPntLabel);
 }
 
@@ -488,7 +490,7 @@ void GeometrySamples::ZeroDimensionObjects2dSample()
 
   Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
   aPntLabel->SetText("gp_Pnt2d");
-  aPntLabel->SetPosition(gp_Pnt(aCoordPnt.X(), aCoordPnt.Y(), 0.0));
+  aPntLabel->SetPosition(gp_Pnt(aCoordPnt.X(), aCoordPnt.Y() + 0.5, 0.0));
   myObject2d.Append(aPntLabel);
   myResult << "gp_Pnt was created" << std::endl;
 
@@ -496,14 +498,14 @@ void GeometrySamples::ZeroDimensionObjects2dSample()
   // This class is non persistent.This entity used for algebraic calculation.
   // An XY can be transformed with a Trsf2d or a GTrsf2d from package gp.
   // It is used in vectorial computations or for holding this type of information in data structures.
-  gp_XY aXy(10.0, 20.0);
+  gp_XY aXy(20.0, 10.0);
   Handle(Geom2d_CartesianPoint) aXyGeomPoint = new Geom2d_CartesianPoint(aXy);
   Handle(AdaptorPnt2d_AIS) aXyAisPoint = new AdaptorPnt2d_AIS(aXyGeomPoint);
   myObject2d.Append(aXyAisPoint);
 
   Handle(AIS_TextLabel) aXyLabel = new AIS_TextLabel();
   aXyLabel->SetText("gp_XY");
-  aXyLabel->SetPosition(gp_Pnt(aXy.X(), aXy.Y(), 0.0));
+  aXyLabel->SetPosition(gp_Pnt(aXy.X(), aXy.Y() + 0.5, 0.0));
   myObject2d.Append(aXyLabel);
   myResult << "gp_XY was created" << std::endl;
 }
@@ -601,9 +603,9 @@ void GeometrySamples::BarycenterPoint3dSample()
   // Assigns the result of the following expression to this point:
   // (Alpha*this + Beta*P) / (Alpha + Beta)
   aBarycenterPnt2.BaryCenter(anAlpha, aPnt2, anBeta);
-  DisplayPnt(aPnt1, "Pnt1");
-  DisplayPnt(aPnt2, "Pnt2");
-  DisplayPnt(aBarycenterPnt2, "Barycenter Pnt", Aspect_TOM_O_PLUS);
+  DisplayPnt(aPnt1, "Pnt1", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt2, "Pnt2", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aBarycenterPnt2, "Barycenter Pnt", Aspect_TOM_O_PLUS, 0.5);
 
   //  BaryCenter of an array of point
   gp_Pnt aP1(0, 0, 5);
@@ -655,10 +657,10 @@ void GeometrySamples::BarycenterPoint3dSample()
   {
     TCollection_AsciiString aString(i);
     aString = aPointName + aString;
-    DisplayPnt(aPntArray(i), aString, Aspect_TOM_STAR);
+    DisplayPnt(aPntArray(i), aString, Aspect_TOM_STAR, 0.5);
   }
 
-  DisplayPnt(aBarycenterPnt5, "Barycenter of 5 points", Aspect_TOM_O_STAR);
+  DisplayPnt(aBarycenterPnt5, "Barycenter of 5 points", Aspect_TOM_O_STAR, 0.5);
   myResult << " IsPoint = ";
   if (IsPoint) 
   {
@@ -1111,9 +1113,9 @@ void GeometrySamples::Intersection2dSample()
 void GeometrySamples::PointInfo3dSample()
 {
   gp_Pnt aPnt1;
-  gp_Pnt aPnt2(10.0, 10.0, 0.0);
+  gp_Pnt aPnt2(10.0, 10.0, 10.0);
   gp_Pnt aPnt3(10.0, -10.0, 0.0);
-  gp_Pnt aPnt4(10.0, 10.0, 0.0);
+  gp_Pnt aPnt4(10.0, 10.0, 10.0);
   Standard_Boolean anIsEqual2_3 = aPnt2.IsEqual(aPnt3, 1E-6);
   Standard_Boolean anIsEqual2_4 = aPnt2.IsEqual(aPnt4, 1E-6);
   Standard_Real aDistance1_2 = aPnt1.Distance(aPnt2);
@@ -1123,32 +1125,39 @@ void GeometrySamples::PointInfo3dSample()
 
   myResult << "A coordinate of a point 1: X: " << aPnt1.X()
     << " Y: " << aPnt1.Y() << " Z: " << aPnt1.Z() << std::endl;
+  myResult << "A coordinate of a point 2: X: " << aPnt2.X()
+    << " Y: " << aPnt2.Y() << " Z: " << aPnt2.Z() << std::endl;
+  myResult << "A coordinate of a point 3: X: " << aPnt3.X()
+    << " Y: " << aPnt3.Y() << " Z: " << aPnt3.Z() << std::endl;
+  myResult << "A coordinate of a point 4: X: " << aPnt4.X()
+    << " Y: " << aPnt4.Y() << " Z: " << aPnt4.Z() << std::endl;
+
   if (anIsEqual2_3)
   {
-    myResult << "a point 2 is equal to a point 3" << std::endl;
+    myResult << "A point 2 is equal to a point 3" << std::endl;
   }
   else
   {
-    myResult << "a point 2 is different from a point 3" << std::endl;
+    myResult << "A point 2 is different from a point 3" << std::endl;
   }
   if (anIsEqual2_4)
   {
-    myResult << "a point 2 is equal to a point 4" << std::endl;
+    myResult << "A point 2 is equal to a point 4" << std::endl;
   }
   else
   {
-    myResult << "a point 2 is different from a point 4" << std::endl;
+    myResult << "A point 2 is different from a point 4" << std::endl;
   }
-  myResult << "A distance from a point 1  to a point 2 is: " << aDistance1_2 << std::endl;
-  myResult << "A distance from a point 2  to a point 4 is: " << aDistance2_4 << std::endl;
+  myResult << "A distance from a point 1 to a point 2 is: " << aDistance1_2 << std::endl;
+  myResult << "A distance from a point 2 to a point 4 is: " << aDistance2_4 << std::endl;
 
-  myResult << "A square distance from a point 1  to a point 2 is: " << aSquareDistance1_2 << std::endl;
-  myResult << "A square distance from a point 2  to a point 4 is: " << aSquareDistance2_4 << std::endl;
+  myResult << "A square distance from a point 1 to a point 2 is: " << aSquareDistance1_2 << std::endl;
+  myResult << "A square distance from a point 2 to a point 4 is: " << aSquareDistance2_4 << std::endl;
 
-  DisplayPnt(aPnt1, "1");
-  DisplayPnt(aPnt2, "2");
-  DisplayPnt(aPnt3, "3");
-  DisplayPnt(aPnt4, "4");
+  DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt2, "2 & 4", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt4, "", Aspect_TOM_PLUS, 0.5);
 }
 
 void GeometrySamples::EllipseInfo3dSample()
@@ -1195,23 +1204,25 @@ void GeometrySamples::PointInfo2dSample()
   Standard_Real aSquareDistance1_2 = aPnt1.SquareDistance(aPnt2);
   Standard_Real aSquareDistance2_4 = aPnt2.SquareDistance(aPnt4);
 
-  myResult << "A coordinate of a point 1: X: " << aPnt1.X()
-    << " Y: " << aPnt1.Y() << std::endl;
+  myResult << "A coordinate of a point 1: X: " << aPnt1.X() << " Y: " << aPnt1.Y() << std::endl;
+  myResult << "A coordinate of a point 2: X: " << aPnt2.X() << " Y: " << aPnt2.Y() << std::endl;
+  myResult << "A coordinate of a point 3: X: " << aPnt3.X() << " Y: " << aPnt3.Y() << std::endl;
+  myResult << "A coordinate of a point 4: X: " << aPnt4.X() << " Y: " << aPnt4.Y() << std::endl;
   if (anIsEqual2_3)
   {
-    myResult << "a point 2 is equal to a point 3" << std::endl;
+    myResult << "A point 2 is equal to a point 3" << std::endl;
   }
   else
   {
-    myResult << "a point 2 is different from a point 3" << std::endl;
+    myResult << "A point 2 is different from a point 3" << std::endl;
   }
   if (anIsEqual2_4)
   {
-    myResult << "a point 2 is equal to a point 4" << std::endl;
+    myResult << "A point 2 is equal to a point 4" << std::endl;
   }
   else
   {
-    myResult << "a point 2 is different from a point 4" << std::endl;
+    myResult << "A point 2 is different from a point 4" << std::endl;
   }
 
   myResult << "A distance from a point 1  to a point 2 is: " << aDistance1_2 << std::endl;
@@ -1220,10 +1231,10 @@ void GeometrySamples::PointInfo2dSample()
   myResult << "A square distance from a point 1  to a point 2 is: " << aSquareDistance1_2 << std::endl;
   myResult << "A square distance from a point 2  to a point 4 is: " << aSquareDistance2_4 << std::endl;
 
-  DisplayPnt(aPnt1, "1");
-  DisplayPnt(aPnt2, "2");
-  DisplayPnt(aPnt3, "3");
-  DisplayPnt(aPnt4, "4");
+  DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt2, "2 & 4", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt4, "");
 }
 
 void GeometrySamples::CircleInfo2dSample()

@@ -34,9 +34,11 @@ protected:
 
 private:
   void DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText,
-                  Aspect_TypeOfMarker theMarker = Aspect_TOM_PLUS);
+                  Aspect_TypeOfMarker theMarker = Aspect_TOM_PLUS,
+                  Standard_Real theDistance = 5.0);
   void DisplayPnt(gp_Pnt2d thePnt2d, TCollection_AsciiString theText,
-                  Aspect_TypeOfMarker theMarker = Aspect_TOM_PLUS);
+                  Aspect_TypeOfMarker theMarker = Aspect_TOM_PLUS,
+                  Standard_Real theDistance = 5.0);
 
   // One function for every sample
   void ZeroDimensionObjects3dSample();

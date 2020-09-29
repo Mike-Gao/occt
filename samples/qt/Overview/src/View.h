@@ -78,19 +78,7 @@ signals:
 
 public slots:
     void fitAll();
-    void fitArea();
-    void zoom();
-    void pan();
-    void globalPan();
-    void front();
-    void back();
-    void top();
-    void bottom();
-    void left();
-    void right();
     void axo();
-    void rotation();
-    void reset();
     void hlrOn();
     void hlrOff();
     void shading();

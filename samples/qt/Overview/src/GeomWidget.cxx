@@ -72,6 +72,7 @@ void GeomWidget::FitAll()
 
 void GeomWidget::Show3d()
 {
+  myView3d->axo();
   myView3d->fitAll();
   QAction * aShadingAction = myView3d->getViewAction(ViewAction::Shading);
   aShadingAction->trigger();
