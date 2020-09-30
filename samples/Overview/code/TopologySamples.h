@@ -17,6 +17,8 @@
 
 #include "BaseSample.h"
 
+#include <AIS_InteractiveContext.hxx>
+
 
 class TopologySamples;
 DEFINE_STANDARD_HANDLE(TopologySamples, BaseSample)
@@ -26,8 +28,7 @@ class TopologySamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(TopologySamples, BaseSample)
 
-  TopologySamples(TCollection_AsciiString theSampleSourcePath) :
-    BaseSample(theSampleSourcePath) {}
+    TopologySamples(TCollection_AsciiString theSampleSourcePath, Handle(AIS_InteractiveContext) theContext);
   virtual ~TopologySamples() {}
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
@@ -67,6 +68,9 @@ private:
   void ComputeLinearProperties3dSample();
   void ComputeSurfaceProperties3dSample();
   void ComputeVolumeProperties3dSample();
+
+private:
+  Handle(AIS_InteractiveContext) myContext;
 };
 
 #endif  //TOPOLOGYSAMPLES_H

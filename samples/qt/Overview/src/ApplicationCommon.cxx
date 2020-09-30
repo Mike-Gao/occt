@@ -132,7 +132,8 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theCategory)
 
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
   myGeometrySamples      = new GeometrySamples(aSampleSourcePach);
-  myTopologySamples      = new TopologySamples(aSampleSourcePach);
+  myTopologySamples      = new TopologySamples(aSampleSourcePach,
+                                               myDocument3d->getContext());
   myTriangulationSamples = new TriangulationSamples(aSampleSourcePach);
   myDataExchangeSamples  = new DataExchangeSamples(aSampleSourcePach, 
                                                    myGeomWidget->Get3dView());

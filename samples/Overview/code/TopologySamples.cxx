@@ -12,6 +12,7 @@
 // commercial license or contractual agreement.
 
 #include "TopologySamples.h"
+#include "AdaptorVec_AIS.h"
 
 #include <gp_Circ.hxx>
 #include <gp_Circ2d.hxx>
@@ -93,6 +94,12 @@
 #include <AIS_Plane.hxx>
 #include <AIS_Point.hxx>
 #include <AIS_TextLabel.hxx>
+
+TopologySamples::TopologySamples(TCollection_AsciiString theSampleSourcePath, 
+                                 Handle(AIS_InteractiveContext) theContext) :
+  BaseSample(theSampleSourcePath),
+  myContext(theContext)
+{}
 
 void TopologySamples::ExecuteSample(TCollection_AsciiString theSampleName)
 {
@@ -931,7 +938,7 @@ void TopologySamples::Common3dSample()
   TopoDS_Shape aShape1 = BRepPrimAPI_MakeBox(aSizeX, aSizeY, aSizeZ);
   myResult << "Box at corner [0, 0, 0] and sizes ["
     << aSizeX << ", " << aSizeY << ", " << aSizeZ
-    << "] was created in yellow" << std::endl;
+    << "] was created in yellow wireframe" << std::endl;
 
   // Make a box #2 by two points.
   gp_Pnt aPnt1(5.0, 7.5, 10.0);
@@ -941,7 +948,7 @@ void TopologySamples::Common3dSample()
     << aPnt1.X() << ", " << aPnt1.Y() << ", " << aPnt1.Z()
     << "] and ["
     << aPnt2.X() << ", " << aPnt2.Y() << ", " << aPnt2.Z()
-    << "] was created in green" << std::endl;
+    << "] was created in green wirefreme" << std::endl;
 
   // Create a boolean algo.
   BRepAlgoAPI_Common anAlgo(aShape1, aShape2);
@@ -964,6 +971,7 @@ void TopologySamples::Common3dSample()
   {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
+    myResult << "Result shape was created in red shading" << std::endl;
 
     Handle(AIS_ColoredShape) anAisShape1 = new AIS_ColoredShape(aShape1);
     Handle(AIS_ColoredShape) anAisShape2 = new AIS_ColoredShape(aShape2);
@@ -974,6 +982,9 @@ void TopologySamples::Common3dSample()
     myObject3d.Append(anAisShape1);
     myObject3d.Append(anAisShape2);
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisShape1, 0, Standard_True);
+    myContext->SetDisplayMode(anAisShape2, 0, Standard_True);
+    myContext->SetDisplayMode(anAisResult, 1, Standard_True);
   }
 }
 
@@ -986,7 +997,7 @@ void TopologySamples::Cut3dSample()
   TopoDS_Shape aShape1 = BRepPrimAPI_MakeBox(aSizeX, aSizeY, aSizeZ);
   myResult << "Box at corner [0, 0, 0] and sizes ["
     << aSizeX << ", " << aSizeY << ", " << aSizeZ
-    << "] was created in yellow" << std::endl;
+    << "] was created in yellow wireframe" << std::endl;
 
   // Make a box #2 by two points as a cutting tool.
   gp_Pnt aPnt1(5.0, 7.5, 10.0);
@@ -996,7 +1007,7 @@ void TopologySamples::Cut3dSample()
     << aPnt1.X() << ", " << aPnt1.Y() << ", " << aPnt1.Z()
     << "] and ["
     << aPnt2.X() << ", " << aPnt2.Y() << ", " << aPnt2.Z()
-    << "] was created in green" << std::endl;
+    << "] was created in green wireframe" << std::endl;
 
   // Create a boolean algo.
   BRepAlgoAPI_Cut anAlgo(aShape1, aShape2);
@@ -1019,7 +1030,7 @@ void TopologySamples::Cut3dSample()
   {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
-
+    myResult << "Result shape was created in red shading" << std::endl;
     Handle(AIS_ColoredShape) anAisShape1 = new AIS_ColoredShape(aShape1);
     Handle(AIS_ColoredShape) anAisShape2 = new AIS_ColoredShape(aShape2);
     anAisShape1->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
@@ -1029,6 +1040,9 @@ void TopologySamples::Cut3dSample()
     myObject3d.Append(anAisShape1);
     myObject3d.Append(anAisShape2);
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisShape1, 0, Standard_True);
+    myContext->SetDisplayMode(anAisShape2, 0, Standard_True);
+    myContext->SetDisplayMode(anAisResult, 1, Standard_True);
   }
 }
 
@@ -1041,7 +1055,7 @@ void TopologySamples::Fuse3dSample()
   TopoDS_Shape aShape1 = BRepPrimAPI_MakeBox(aSizeX, aSizeY, aSizeZ);
   myResult << "Box at corner [0, 0, 0] and sizes ["
     << aSizeX << ", " << aSizeY << ", " << aSizeZ
-    << "] was created in yellow" << std::endl;
+    << "] was created in yellow wireframe" << std::endl;
 
   // Make a box #2 by two points.
   gp_Pnt aPnt1(5.0, 7.5, 10.0);
@@ -1051,7 +1065,7 @@ void TopologySamples::Fuse3dSample()
     << aPnt1.X() << ", " << aPnt1.Y() << ", " << aPnt1.Z()
     << "] and ["
     << aPnt2.X() << ", " << aPnt2.Y() << ", " << aPnt2.Z()
-    << "] was created in green" << std::endl;
+    << "] was created in green wireframe" << std::endl;
 
   // Create a boolean algo.
   BRepAlgoAPI_Fuse anAlgo(aShape1, aShape2);
@@ -1074,7 +1088,7 @@ void TopologySamples::Fuse3dSample()
   {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
-
+    myResult << "Result shape was created in red shading" << std::endl;
     Handle(AIS_ColoredShape) anAisShape1 = new AIS_ColoredShape(aShape1);
     Handle(AIS_ColoredShape) anAisShape2 = new AIS_ColoredShape(aShape2);
     anAisShape1->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
@@ -1084,6 +1098,9 @@ void TopologySamples::Fuse3dSample()
     myObject3d.Append(anAisShape1);
     myObject3d.Append(anAisShape2);
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisShape1, 0, Standard_True);
+    myContext->SetDisplayMode(anAisShape2, 0, Standard_True);
+    myContext->SetDisplayMode(anAisResult, 1, Standard_True);
   }
 }
 
@@ -1096,7 +1113,7 @@ void TopologySamples::Section3dSample()
   TopoDS_Shape aShape = BRepPrimAPI_MakeBox(aSizeX, aSizeY, aSizeZ);
   myResult << "Box at corner [0, 0, 0] and sizes ["
     << aSizeX << ", " << aSizeY << ", " << aSizeZ
-    << "] was created in yellow" << std::endl;
+    << "] was created in yellow wireframe" << std::endl;
 
   // Create a boolean algo.
   // Make a section by a plane.
@@ -1121,7 +1138,7 @@ void TopologySamples::Section3dSample()
   {
     // Get result.
     TopoDS_Shape aResultShape = anAlgo.Shape();
-
+    myResult << "Result shape was created in red" << std::endl;
     Handle(AIS_ColoredShape) anAisShape = new AIS_ColoredShape(aShape);
     Handle(AIS_Plane) anAisPlane = new AIS_Plane(new Geom_Plane(aPln));
     anAisShape->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
@@ -1130,6 +1147,7 @@ void TopologySamples::Section3dSample()
     myObject3d.Append(anAisShape);
     myObject3d.Append(anAisPlane);
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisShape, 0, Standard_True);
   }
 }
 
@@ -1239,11 +1257,12 @@ void TopologySamples::Defeaturing3dSample()
   Standard_ASSERT_VOID(anAlgo.IsDone(), "Couldn't prepare a box with a chamfer!");
   // Get a box with a chamfer.
   TopoDS_Shape aBoxWithChamfer = anAlgo.Shape();
-  myResult << "Box with a chamfer is in yellow" << std::endl;
+  myResult << "Box with a chamfer is in yellow shading" << std::endl;
 
   Handle(AIS_ColoredShape) anAisBoxWithChamfer = new AIS_ColoredShape(aBoxWithChamfer);
   anAisBoxWithChamfer->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
   myObject3d.Append(anAisBoxWithChamfer);
+  myContext->SetDisplayMode(anAisBoxWithChamfer, 1, Standard_True);
 
   // Retrieve chamfer faces generated from the edge
   const TopTools_ListOfShape& aGenShapes = anAlgo.Generated(anEdge);
@@ -1254,9 +1273,11 @@ void TopologySamples::Defeaturing3dSample()
     anAisShape->SetColor(Quantity_Color(Quantity_NOC_GREEN));
     anAisShape->SetWidth(2.5);
     myObject3d.Append(anAisShape);
+    myContext->SetDisplayMode(anAisBoxWithChamfer, 1, Standard_True);
   }
   myResult << "Chamfer faces : " << aGenShapes.Size() << std::endl;
-  myResult << "Select the first one to remove" << std::endl;
+  myResult << "The first one is using to remove" << std::endl;
+  myResult << "The removed face is in green" << std::endl;
 
   // Initialize defeaturing algo.
   BRepAlgoAPI_Defeaturing aDefeatAlgo;
@@ -1270,11 +1291,12 @@ void TopologySamples::Defeaturing3dSample()
   {
     // Get result.
     TopoDS_Shape aResult = aDefeatAlgo.Shape();
-    myResult << "Defeatured box is in red" << std::endl;
+    myResult << "Defeatured box is in red wireframe" << std::endl;
 
     Handle(AIS_ColoredShape) anAisResult = new AIS_ColoredShape(aResult);
     anAisResult->SetColor(Quantity_Color(Quantity_NOC_RED));
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisResult, 0, Standard_True);
   }
 }
 
@@ -1287,7 +1309,7 @@ void TopologySamples::Fillet3dSample()
   TopoDS_Shape aBox = BRepPrimAPI_MakeBox(aSizeX, aSizeY, aSizeZ);
   myResult << "Box at corner [0, 0, 0] and sizes ["
     << aSizeX << ", " << aSizeY << ", " << aSizeZ
-    << "] was created in yellow" << std::endl;
+    << "] was created in yellow wireframe" << std::endl;
 
   // Initialize fillet algo.
   BRepFilletAPI_MakeFillet anAlgo(aBox);
@@ -1309,6 +1331,7 @@ void TopologySamples::Fillet3dSample()
   anAisEdge->SetWidth(2.5);
   myObject3d.Append(anAisBox);
   myObject3d.Append(anAisEdge);
+  myContext->SetDisplayMode(anAisBox, 0, Standard_True);
 
   // Make a fillet.
   anAlgo.Build();
@@ -1317,11 +1340,12 @@ void TopologySamples::Fillet3dSample()
   {
     // Get result.
     TopoDS_Shape aResult = anAlgo.Shape();
-    myResult << "Fillet was built. Result shape is in red" << std::endl;
+    myResult << "Fillet was built. Result shape is in red shading" << std::endl;
 
     Handle(AIS_ColoredShape) anAisResult = new AIS_ColoredShape(aResult);
     anAisResult->SetColor(Quantity_Color(Quantity_NOC_RED));
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisResult, 1, Standard_True);
   }
 }
 
@@ -1334,7 +1358,7 @@ void TopologySamples::Chamfer3dSample()
   TopoDS_Shape aBox = BRepPrimAPI_MakeBox(aSizeX, aSizeY, aSizeZ);
   myResult << "Box at corner [0, 0, 0] and sizes ["
     << aSizeX << ", " << aSizeY << ", " << aSizeZ
-    << "] was created in yellow" << std::endl;
+    << "] was created in yellow wirewrame" << std::endl;
 
   // Initialize chamfer algo.
   BRepFilletAPI_MakeChamfer anAlgo(aBox);
@@ -1356,19 +1380,20 @@ void TopologySamples::Chamfer3dSample()
   anAisEdge->SetWidth(2.5);
   myObject3d.Append(anAisBox);
   myObject3d.Append(anAisEdge);
+  myContext->SetDisplayMode(anAisBox, 0, Standard_True);
 
   // Make a chamfer.
   anAlgo.Build();
-
   if (anAlgo.IsDone()) 
   {
     // Get result.
     TopoDS_Shape aResult = anAlgo.Shape();
-    myResult << "Fillet was built. Result shape is in red" << std::endl;
+    myResult << "Fillet was built. Result shape is in red shading" << std::endl;
 
     Handle(AIS_ColoredShape) anAisResult = new AIS_ColoredShape(aResult);
     anAisResult->SetColor(Quantity_Color(Quantity_NOC_RED));
     myObject3d.Append(anAisResult);
+    myContext->SetDisplayMode(anAisResult, 1, Standard_True);
 
     const TopTools_ListOfShape& aGenShapes = anAlgo.Generated(anEdge);
     for (TopTools_ListOfShape::Iterator anIt(aGenShapes); anIt.More(); anIt.Next()) 
@@ -1495,6 +1520,11 @@ void TopologySamples::Copy3dSample()
   TopoDS_Shape aBoxCopy = BRepBuilderAPI_Copy(aBox);
   myResult << "Box copy was created in red" << std::endl;
 
+  gp_Trsf aTrsf1; aTrsf1.SetTranslation(gp_Vec(15.0, 0.0, 0.0));
+  aBoxCopy.Move(aTrsf1);
+  myResult << "Box copy shape is moved apart for illustativeness"
+    << std::endl;
+
   Handle(AIS_ColoredShape) anAisBox = new AIS_ColoredShape(aBox);
   anAisBox->SetColor(Quantity_Color(Quantity_NOC_YELLOW));
   anAisBox->SetWidth(2.5);
@@ -1522,8 +1552,8 @@ void TopologySamples::Transform3dSample()
   myResult << "Moved box in green" << std::endl;
 
   // Rotate the moved box
-  gp_Trsf aTrRot; aTrRot.SetRotation(gp_Ax1(gp_Pnt(15.0, 20.0, 25.0), gp::DZ()), M_PI_4);
-  TopoDS_Shape aRotatedBox = BRepBuilderAPI_Transform(aMovedBox, aTrRot, Standard_True);
+  gp_Trsf aTrRot; aTrRot.SetRotation(gp_Ax1(gp_Pnt(15.0, 20.0, 25.0), gp::DZ()), 3.0*M_PI_4);
+  TopoDS_Shape aRotatedBox = BRepBuilderAPI_Transform(aBox, aTrRot, Standard_True);
   myResult << "Rotated box in red" << std::endl;
 
   Handle(AIS_ColoredShape) anAisBox = new AIS_ColoredShape(aBox);
@@ -1550,6 +1580,10 @@ void TopologySamples::ConvertToNurbs3dSample()
   // Convert faces/edges from analytic to NURBS geometry.
   TopoDS_Shape aNurbsFace = BRepBuilderAPI_NurbsConvert(aTorusFace);
   myResult << "Converted torus in red" << std::endl;
+  gp_Trsf aTrsf1; aTrsf1.SetTranslation(gp_Vec(60.0, 0.0, 0.0));
+  aNurbsFace.Move(aTrsf1);
+  myResult << "Converted torusis moved apart for illustativeness"
+    << std::endl;
 
   Handle(AIS_ColoredShape) anAisTorus = new AIS_ColoredShape(aTorusFace);
   Handle(AIS_ColoredShape) anAisNurbs = new AIS_ColoredShape(aNurbsFace);
