@@ -14,7 +14,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
+#include <stdlib.h>
 #include <NCollection_UtfString.hxx>
 #include <Resource_Big5.h>
 #include <Resource_ConvertUnicode.hxx>
@@ -22,6 +22,7 @@
 #include <Resource_Manager.hxx>
 #include <Resource_Unicode.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <NCollection_Array1.hxx>
 #include <TCollection_ExtendedString.hxx>
 
 #define isjis(c) (((c)>=0x21 && (c)<=0x7e))
@@ -355,12 +356,29 @@ Standard_Boolean Resource_Unicode::ConvertBig5ToUnicode(const Standard_CString f
   return Standard_True;
 }
 
-void Resource_Unicode::ConvertANSIToUnicode(const Standard_CString fromstr,TCollection_ExtendedString& tostr)
+void Resource_Unicode::ConvertANSIToUnicode(const Standard_CString theFromStr, TCollection_ExtendedString& theToStr, const Standard_CString& theLocal)
 {
-  tostr.Clear();
-
-  TCollection_ExtendedString curext(fromstr);
-  tostr.AssignCat(curext);
+  theToStr.Clear();
+  const Standard_Size aSizeOfIn = strlen(theFromStr);
+  if (aSizeOfIn == 0)
+    return;
+  TCollection_AsciiString aNameOfLocation = "English_United States.";
+  aNameOfLocation.AssignCat(theLocal);
+  _locale_t aLocation = _create_locale(LC_ALL, aNameOfLocation.ToCString());
+  if (aLocation == 0) // pass through without conversion
+  {
+    TCollection_ExtendedString aCurExt(theFromStr);
+    theToStr.AssignCat(aCurExt);
+    return;
+  }
+  NCollection_Array1<Standard_WideChar> aStringUtf(1, aSizeOfIn + 1);
+  Standard_Size aState;
+  TCollection_AsciiString anInPntr(theFromStr);
+  aState = _mbstowcs_l(&aStringUtf.ChangeFirst(), anInPntr.ToCString(), aStringUtf.Length(), aLocation);
+  if (aState < 1)
+    return;
+  TCollection_ExtendedString aCurExt(&aStringUtf.First());
+  theToStr.AssignCat(aCurExt);
 }
 
 Standard_Boolean Resource_Unicode::ConvertUnicodeToSJIS(const TCollection_ExtendedString& fromstr,
@@ -548,6 +566,23 @@ Standard_Boolean Resource_Unicode::ConvertUnicodeToANSI(const TCollection_Extend
   return Standard_True;
 }
 
+Standard_Boolean Resource_Unicode::ConvertUnicodeToANSI(const TCollection_ExtendedString& theFromStr,
+                                                        const Standard_CString& theLocal,
+                                                        Standard_PCharacter& theToStr,
+                                                        const Standard_Integer theMaxSize)
+{
+  TCollection_AsciiString aNameOfLocation = "English_United States.";
+  aNameOfLocation.AssignCat(theLocal);
+  _locale_t aLocation = _create_locale(LC_ALL, aNameOfLocation.ToCString());
+  if (aLocation == 0) // pass through without conversion
+  {
+    return ConvertUnicodeToANSI(theFromStr, theToStr, theMaxSize);
+  }
+  Standard_Size aState;
+  aState = _wcstombs_l(theToStr,(Standard_WideChar*) theFromStr.ToExtString(), theMaxSize, aLocation);
+  return aState > 0;
+}
+
 static Standard_Boolean AlreadyRead = Standard_False;
 	  
 static Resource_FormatType& Resource_Current_Format()
@@ -618,9 +653,58 @@ void Resource_Unicode::ConvertFormatToUnicode (const Resource_FormatType theForm
       break;
     }
     case Resource_FormatType_ANSI:
+    {
+      theToStr = TCollection_ExtendedString(theFromStr);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1250:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1250");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1251:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1251");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1252:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1252");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1253:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1253");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1254:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1254");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1255:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1255");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1256:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1256");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1257:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1257");
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1258:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, "1258");
+      break;
+    }
     case Resource_FormatType_UTF8:
     {
-      theToStr = TCollection_ExtendedString (theFromStr, theFormat == Resource_FormatType_UTF8);
+      theToStr = TCollection_ExtendedString (theFromStr, Standard_True);
       break;
     }
     case Resource_FormatType_SystemLocale:
@@ -655,6 +739,42 @@ Standard_Boolean Resource_Unicode::ConvertUnicodeToFormat(const Resource_FormatT
     case Resource_FormatType_ANSI:
     {
       return ConvertUnicodeToANSI (theFromStr, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1250:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1250", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1251:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1251", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1252:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1252", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1253:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1253", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1254:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1254", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1255:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1255", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1256:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1256", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1257:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1257", theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1258:
+    {
+      return ConvertUnicodeToANSI(theFromStr, "1258", theToStr, theMaxSize);
     }
     case Resource_FormatType_UTF8:
     {

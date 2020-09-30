@@ -59,9 +59,9 @@ public:
   //! to Unicode ExtendedString <tostr>.
   Standard_EXPORT static Standard_Boolean ConvertBig5ToUnicode (const Standard_CString fromstr, TCollection_ExtendedString& tostr);
   
-  //! Converts non-ASCII CString <fromstr> in ANSI format
-  //! to Unicode ExtendedString <tostr>.
-  Standard_EXPORT static void ConvertANSIToUnicode (const Standard_CString fromstr, TCollection_ExtendedString& tostr);
+  //! Converts non-ASCII CString <theFromStr> in ANSI format
+  //! to Unicode ExtendedString <theToStr>.
+  Standard_EXPORT static void ConvertANSIToUnicode (const Standard_CString theFromStr, TCollection_ExtendedString& theToStr, const Standard_CString& theLocal = "1252");
   
   //! Converts Unicode ExtendedString <fromstr> to non-ASCII
   //! CString <tostr> in SJIS format, limited to <maxsize>
@@ -84,12 +84,19 @@ public:
   //! <maxsize> has not been reached before end of conversion.
   Standard_EXPORT static Standard_Boolean ConvertUnicodeToGB (const TCollection_ExtendedString& fromstr, Standard_PCharacter& tostr, const Standard_Integer maxsize);
   
-  //! Converts Unicode ExtendedString <fromstr> to non-ASCII
-  //! CString <tostr> in ANSI format, limited to <maxsize>
-  //! characters. To translate the whole <fromstr>, use more
+  //! Converts Unicode ExtendedString <theFromStr> to non-ASCII
+  //! CString <theToStr> in ANSI format, limited to <theMaxSize>
+  //! characters. To translate the whole <theFromStr>, use more
+  //! than twice the length of <theFromStr>.  Returns true if
+  //! <theMaxSize> has not been reached before end of conversion.
+  Standard_EXPORT static Standard_Boolean ConvertUnicodeToANSI (const TCollection_ExtendedString& theFromStr, Standard_PCharacter& theToStr, const Standard_Integer theMaxSize);
+
+  //! Converts Unicode ExtendedString <theFromStr> to non-ASCII
+  //! CString <theToStr> in <theLocal> ANSI format, limited to <theMaxSize>
+  //! characters. To translate the whole <theFromStr>, use more
   //! than twice the length of <fromstr>.  Returns true if
-  //! <maxsize> has not been reached before end of conversion.
-  Standard_EXPORT static Standard_Boolean ConvertUnicodeToANSI (const TCollection_ExtendedString& fromstr, Standard_PCharacter& tostr, const Standard_Integer maxsize);
+  //! <theMaxSize> has not been reached before end of conversion.
+  Standard_EXPORT static Standard_Boolean ConvertUnicodeToANSI (const TCollection_ExtendedString& theFromStr,const Standard_CString& theLocal, Standard_PCharacter& theToStr, const Standard_Integer theMaxSize);
   
   //! Defines the current conversion format as typecode.
   //! This conversion format will then be used by the
