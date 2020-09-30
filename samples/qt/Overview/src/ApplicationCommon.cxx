@@ -263,6 +263,8 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
 
   myCodeView->setPlainText("");
   myResultView->setPlainText("");
+  GetCurrentSamples()->AppendCube();
+  myDocument3d->SetObjects(GetCurrentSamples()->Get3dObjects());
   myGeomWidget->FitAll();
 
   RebuildMenu();

@@ -64,6 +64,12 @@ TCollection_AsciiString BaseSample::GetCode()
   return myCode;
 }
 
+void BaseSample::AppendCube()
+{
+  Handle(AIS_ViewCube) aViewCube = new AIS_ViewCube();
+  myObject3d.Append(aViewCube);
+}
+
 void BaseSample::Process(TCollection_AsciiString theSampleName)
 {
   myObject3d.Clear();
