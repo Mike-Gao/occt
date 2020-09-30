@@ -17,12 +17,25 @@
 
 #include <NCollection_UtfString.hxx>
 #include <Resource_Big5.h>
+#include "Resource_ANSI.pxx"
 #include <Resource_ConvertUnicode.hxx>
 #include <Resource_GBK.h>
 #include <Resource_Manager.hxx>
 #include <Resource_Unicode.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
+
+enum WinCodePages {
+    CP1250 = 0,
+    CP1251,
+    CP1252,
+    CP1253,
+    CP1254,
+    CP1255,
+    CP1256,
+    CP1257,
+    CP1258
+};
 
 #define isjis(c) (((c)>=0x21 && (c)<=0x7e))
 #define iseuc(c) (((c)>=0xa1 && (c)<=0xfe))
@@ -355,12 +368,19 @@ Standard_Boolean Resource_Unicode::ConvertBig5ToUnicode(const Standard_CString f
   return Standard_True;
 }
 
-void Resource_Unicode::ConvertANSIToUnicode(const Standard_CString fromstr,TCollection_ExtendedString& tostr)
+void Resource_Unicode::ConvertANSIToUnicode(const Standard_CString theFromStr, const WinCodePages& theLocal, TCollection_ExtendedString& theToStr)
 {
-  tostr.Clear();
-
-  TCollection_ExtendedString curext(fromstr);
-  tostr.AssignCat(curext);
+  theToStr.Clear();
+  Standard_CString anInputPntr = theFromStr;
+  while (*anInputPntr)
+  {
+    Standard_ExtCharacter aRes;
+    if (*anInputPntr & 0x80)
+      aRes = anCodePagesANSI[theLocal][(0x7f & *anInputPntr++)];
+    else
+      aRes = *anInputPntr++;
+    theToStr.Insert(theToStr.Length() + 1, aRes);
+  }
 }
 
 Standard_Boolean Resource_Unicode::ConvertUnicodeToSJIS(const TCollection_ExtendedString& fromstr,
@@ -618,9 +638,58 @@ void Resource_Unicode::ConvertFormatToUnicode (const Resource_FormatType theForm
       break;
     }
     case Resource_FormatType_ANSI:
+    {
+      theToStr = TCollection_ExtendedString(theFromStr);
+      break;
+    }
+    case Resource_FormatType_CP1250:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1250, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1251:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1251, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1252:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1252, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1253:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1253, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1254:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1254, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1255:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1255, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1256:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1256, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1257:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1257, theToStr);
+      break;
+    }
+    case Resource_FormatType_CP1258:
+    {
+      ConvertANSIToUnicode(theFromStr, WinCodePages::CP1258, theToStr);
+      break;
+    }
     case Resource_FormatType_UTF8:
     {
-      theToStr = TCollection_ExtendedString (theFromStr, theFormat == Resource_FormatType_UTF8);
+      theToStr = TCollection_ExtendedString (theFromStr, Standard_True);
       break;
     }
     case Resource_FormatType_SystemLocale:
@@ -653,6 +722,15 @@ Standard_Boolean Resource_Unicode::ConvertUnicodeToFormat(const Resource_FormatT
       return ConvertUnicodeToGB (theFromStr, theToStr, theMaxSize);
     }
     case Resource_FormatType_ANSI:
+    case Resource_FormatType_CP1250:
+    case Resource_FormatType_CP1251:
+    case Resource_FormatType_CP1252:
+    case Resource_FormatType_CP1253:
+    case Resource_FormatType_CP1254:
+    case Resource_FormatType_CP1255:
+    case Resource_FormatType_CP1256:
+    case Resource_FormatType_CP1257:
+    case Resource_FormatType_CP1258:
     {
       return ConvertUnicodeToANSI (theFromStr, theToStr, theMaxSize);
     }

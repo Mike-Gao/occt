@@ -27,6 +27,7 @@
 #include <Standard_Integer.hxx>
 #include <Resource_FormatType.hxx>
 class TCollection_ExtendedString;
+enum WinCodePages;
 
 
 //! This class provides functions used to convert a non-ASCII C string
@@ -59,9 +60,9 @@ public:
   //! to Unicode ExtendedString <tostr>.
   Standard_EXPORT static Standard_Boolean ConvertBig5ToUnicode (const Standard_CString fromstr, TCollection_ExtendedString& tostr);
   
-  //! Converts non-ASCII CString <fromstr> in ANSI format
-  //! to Unicode ExtendedString <tostr>.
-  Standard_EXPORT static void ConvertANSIToUnicode (const Standard_CString fromstr, TCollection_ExtendedString& tostr);
+  //! Converts non-ASCII CString <theFromStr> in <theLocal> 
+  //! encoding to Unicode ExtendedString <theToStr>.
+  Standard_EXPORT static void ConvertANSIToUnicode (const Standard_CString theFromStr, const WinCodePages& theLocal, TCollection_ExtendedString& theToStr);
   
   //! Converts Unicode ExtendedString <fromstr> to non-ASCII
   //! CString <tostr> in SJIS format, limited to <maxsize>
