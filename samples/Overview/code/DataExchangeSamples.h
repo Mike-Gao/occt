@@ -35,10 +35,13 @@ class DataExchangeSamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(DataExchangeSamples, BaseSample)
 
-  DataExchangeSamples(TCollection_AsciiString theSampleSourcePath, Handle(V3d_View) theView):
-    BaseSample(theSampleSourcePath),
+  DataExchangeSamples(TCollection_AsciiString theSampleSourcePath, 
+                      Handle(V3d_View) theView,
+                      Handle(AIS_InteractiveContext) theContext):
+    BaseSample(theSampleSourcePath, theContext),
     myStepType(STEPControl_StepModelType::STEPControl_AsIs),
     myView(theView)
+
   { }
   virtual ~DataExchangeSamples() {}
   virtual void Process(TCollection_AsciiString theSampleName) override;

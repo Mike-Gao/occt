@@ -42,7 +42,10 @@ public:
 
   OcafSamples(TCollection_AsciiString theSampleSourcePath,
               Handle(V3d_Viewer) theViewer,
-              Handle(AIS_InteractiveContext) theContext);
+    Handle(AIS_InteractiveContext) theContext) :
+    BaseSample(theSampleSourcePath, theContext),
+    myViewer(theViewer)
+  { }
   virtual ~OcafSamples() {}
 
   enum ExchangeType { None, Binary, Xml };
@@ -59,12 +62,6 @@ protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
 
 private:
-  ExchangeType myExchangeType;
-  TCollection_AsciiString   myFileName;
-  Handle(V3d_Viewer)             myViewer;
-  Handle(AIS_InteractiveContext) myContext;
-  Handle(TDocStd_Document)       myOcafDoc;
-
   // One function for every sample
   void CreateOcafDocument();
   void CreateBoxOcafSample();
@@ -76,9 +73,14 @@ private:
   void DialogOpenOcafSample();
   void DialogSaveBinOcafSample();
   void DialogSaveXmlOcafSample();
-
   void DisplayPresentation();
 
+private:
+
+  ExchangeType             myExchangeType;
+  TCollection_AsciiString  myFileName;
+  Handle(V3d_Viewer)       myViewer;
+  Handle(TDocStd_Document) myOcafDoc;
 };
 
 #endif  //OCAFSAMPLES_H

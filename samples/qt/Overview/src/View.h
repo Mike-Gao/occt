@@ -46,130 +46,130 @@ enum RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialia
 
 class View: public QWidget, protected AIS_ViewController
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    View( Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* parent );
+  View( Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* parent );
 
-    ~View()
-    {
-      delete myBackMenu;
-    }
+  ~View()
+  {
+    delete myBackMenu;
+  }
 
-    virtual void    init();
-    QList<QAction*> getViewActions();
-    QAction*        getViewAction(ViewAction theAction);
-    QList<QAction*> getRaytraceActions();
-    QAction*        getRaytraceAction(RaytraceAction theAction);
+  virtual void    init();
+  QList<QAction*> getViewActions();
+  QAction*        getViewAction(ViewAction theAction);
+  QList<QAction*> getRaytraceActions();
+  QAction*        getRaytraceAction(RaytraceAction theAction);
 
-    void EnableRaytracing();
-    void DisableRaytracing();
+  void EnableRaytracing();
+  void DisableRaytracing();
 
-    void SetRaytracedShadows (bool theState);
-    void SetRaytracedReflections (bool theState);
-    void SetRaytracedAntialiasing (bool theState);
+  void SetRaytracedShadows (bool theState);
+  void SetRaytracedReflections (bool theState);
+  void SetRaytracedAntialiasing (bool theState);
 
-    bool IsRaytracingMode() const { return myIsRaytracing; }
-    bool IsShadowsEnabled() const { return myIsShadowsEnabled; }
-    bool IsReflectionsEnabled() const { return myIsReflectionsEnabled; }
-    bool IsAntialiasingEnabled() const { return myIsAntialiasingEnabled; }
+  bool IsRaytracingMode() const { return myIsRaytracing; }
+  bool IsShadowsEnabled() const { return myIsShadowsEnabled; }
+  bool IsReflectionsEnabled() const { return myIsReflectionsEnabled; }
+  bool IsAntialiasingEnabled() const { return myIsAntialiasingEnabled; }
 
-    static QString GetMessages(int type,TopAbs_ShapeEnum aSubShapeType, TopAbs_ShapeEnum aShapeType);
-    static QString GetShapeType(TopAbs_ShapeEnum aShapeType);
+  static QString GetMessages(int type,TopAbs_ShapeEnum aSubShapeType, TopAbs_ShapeEnum aShapeType);
+  static QString GetShapeType(TopAbs_ShapeEnum aShapeType);
 
-    Standard_EXPORT static void OnButtonuseraction(int ExerciceSTEP, Handle(AIS_InteractiveContext)& );
-    Standard_EXPORT static void DoSelection(int Id, Handle(AIS_InteractiveContext)& );
-    Standard_EXPORT static void OnSetSelectionMode(Handle(AIS_InteractiveContext)&,
-                                                   Standard_Integer&,
-                                                   TopAbs_ShapeEnum& SelectionMode,
-                                                   Standard_Boolean& );
-    virtual QPaintEngine* paintEngine() const;
-    Handle(V3d_View)      getView()
-    {
-      return myV3dView;
-    }
+  Standard_EXPORT static void OnButtonuseraction(int ExerciceSTEP, Handle(AIS_InteractiveContext)& );
+  Standard_EXPORT static void DoSelection(int Id, Handle(AIS_InteractiveContext)& );
+  Standard_EXPORT static void OnSetSelectionMode(Handle(AIS_InteractiveContext)&,
+                                                  Standard_Integer&,
+                                                  TopAbs_ShapeEnum& SelectionMode,
+                                                  Standard_Boolean& );
+  virtual QPaintEngine* paintEngine() const;
+  Handle(V3d_View)      getView()
+  {
+    return myV3dView;
+  }
 signals:
-    void selectionChanged();
+  void selectionChanged();
 
 public slots:
-    void fitAll();
-    void axo();
-    void hlrOn();
-    void hlrOff();
-    void shading();
-    void wireframe();
-    void onTransparency();
+  void fitAll();
+  void axo();
+  void hlrOn();
+  void hlrOff();
+  void shading();
+  void wireframe();
+  void onTransparency();
 
-    void updateToggled( bool );
-    void onBackground();
-    void onEnvironmentMap();
-    void onRaytraceAction();
+  void updateToggled( bool );
+  void onBackground();
+  void onEnvironmentMap();
+  void onRaytraceAction();
 
 private slots:
-  void onTransparencyChanged(int theVal);
+void onTransparencyChanged(int theVal);
 
 protected:
-    virtual void paintEvent( QPaintEvent* ) override;
-    virtual void resizeEvent( QResizeEvent* ) override;
-    virtual void mousePressEvent( QMouseEvent* ) override;
-    virtual void mouseReleaseEvent(QMouseEvent* ) override;
-    virtual void mouseMoveEvent( QMouseEvent* ) override;
-    virtual void wheelEvent(QWheelEvent*) override;
+  virtual void paintEvent( QPaintEvent* ) override;
+  virtual void resizeEvent( QResizeEvent* ) override;
+  virtual void mousePressEvent( QMouseEvent* ) override;
+  virtual void mouseReleaseEvent(QMouseEvent* ) override;
+  virtual void mouseMoveEvent( QMouseEvent* ) override;
+  virtual void wheelEvent(QWheelEvent*) override;
 
-    virtual void addItemInPopup( QMenu* );
+  virtual void addItemInPopup( QMenu* );
 
-    Handle(AIS_InteractiveContext)& getContext()
-    {
-      return myContext;
-    }
+  Handle(AIS_InteractiveContext)& getContext()
+  {
+    return myContext;
+  }
 
-    void                            activateCursor( const CurrentAction3d );
+  void                            activateCursor( const CurrentAction3d );
 
-    CurrentAction3d                 getCurrentMode()
-    {
-      return myCurrentMode;
-    }
-
-private:
-    void initCursors();
-    void initViewActions();
-    void initRaytraceActions();
-
-    QAction* RegisterAction(QString theIconPath, QString thePromt, void (View::*theSlot)(void));
+  CurrentAction3d                 getCurrentMode()
+  {
+    return myCurrentMode;
+  }
 
 private:
-    bool myIsRaytracing;
-    bool myIsShadowsEnabled;
-    bool myIsReflectionsEnabled;
-    bool myIsAntialiasingEnabled;
+  void initCursors();
+  void initViewActions();
+  void initRaytraceActions();
 
-    bool myIs3dView;
+  QAction* RegisterAction(QString theIconPath, QString thePromt, void (View::*theSlot)(void));
 
-    Handle(V3d_View)                myV3dView;
-    Handle(AIS_InteractiveContext)  myContext;
-    AIS_MouseGestureMap             myDefaultGestures;
-    Graphic3d_Vec2i                 myClickPos;
+private:
+  bool myIsRaytracing;
+  bool myIsShadowsEnabled;
+  bool myIsReflectionsEnabled;
+  bool myIsAntialiasingEnabled;
 
-    void                            updateView();
+  bool myIs3dView;
 
-    //! Setup mouse gestures.
-    void defineMouseGestures();
+  Handle(V3d_View)                myV3dView;
+  Handle(AIS_InteractiveContext)  myContext;
+  AIS_MouseGestureMap             myDefaultGestures;
+  Graphic3d_Vec2i                 myClickPos;
 
-    //! Set current action.
-    void setCurrentAction(CurrentAction3d theAction)
-    {
-      myCurrentMode = theAction;
-      defineMouseGestures();
-    }
+  void                            updateView();
 
-    //! Handle selection changed event.
-    void OnSelectionChanged(const Handle(AIS_InteractiveContext)& theCtx,
-                            const Handle(V3d_View)& theView) Standard_OVERRIDE;    
-    CurrentAction3d                 myCurrentMode;
-    Standard_Real                   myCurZoom;
-    QMap<ViewAction, QAction*>      myViewActions;
-    QMap<RaytraceAction, QAction*>  myRaytraceActions;
-    QMenu*                          myBackMenu;
-    QToolBar*        myViewBar;
+  //! Setup mouse gestures.
+  void defineMouseGestures();
+
+  //! Set current action.
+  void setCurrentAction(CurrentAction3d theAction)
+  {
+    myCurrentMode = theAction;
+    defineMouseGestures();
+  }
+
+  //! Handle selection changed event.
+  void OnSelectionChanged(const Handle(AIS_InteractiveContext)& theCtx,
+                          const Handle(V3d_View)& theView) Standard_OVERRIDE;    
+  CurrentAction3d                 myCurrentMode;
+  Standard_Real                   myCurZoom;
+  QMap<ViewAction, QAction*>      myViewActions;
+  QMap<RaytraceAction, QAction*>  myRaytraceActions;
+  QMenu*                          myBackMenu;
+  QToolBar*        myViewBar;
 };
 
 #endif

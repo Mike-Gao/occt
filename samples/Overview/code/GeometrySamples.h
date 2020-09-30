@@ -34,8 +34,9 @@ class GeometrySamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(GeometrySamples, BaseSample)
 
-  GeometrySamples(TCollection_AsciiString theSampleSourcePath) :
-    BaseSample(theSampleSourcePath) {}
+  GeometrySamples(TCollection_AsciiString theSampleSourcePath,
+                  Handle(AIS_InteractiveContext) theContext):
+    BaseSample(theSampleSourcePath, theContext) {}
   virtual ~GeometrySamples() {}
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;

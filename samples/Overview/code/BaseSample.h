@@ -36,10 +36,12 @@ DEFINE_STANDARD_HANDLE(BaseSample, Standard_Transient)
 class BaseSample: public Standard_Transient
 {
 public:
-  BaseSample(TCollection_AsciiString theSampleSourcePath)
-  {
-    myCodePath = theSampleSourcePath;
-  }
+  BaseSample(TCollection_AsciiString theSampleSourcePath, 
+            Handle(AIS_InteractiveContext) theContext):
+  myCodePath(theSampleSourcePath),
+  myContext(theContext)
+  { }
+
   void Clear();
   void AppendCube();
 
@@ -57,9 +59,9 @@ public:
   {
     return myObject3d;
   }
-  TCollection_AsciiString                           GetResult();
+  TCollection_AsciiString GetResult();
 
-  TCollection_AsciiString                           GetCode()
+  TCollection_AsciiString GetCode()
   {
     return myCode;
   }
@@ -77,12 +79,12 @@ protected:
   Standard_Boolean                                  myIsProcessed;
   NCollection_Vector<Handle(AIS_InteractiveObject)> myObject2d;
   NCollection_Vector<Handle(AIS_InteractiveObject)> myObject3d;
-
+protected:
   // Standard_OStream* strem = dynamic_cast<Standard_OStream*>(&myResult);
-  std::ostringstream                                myResult;
-  TCollection_AsciiString                           myCode;
-  TCollection_AsciiString                           myCodePath;
-
+  std::ostringstream             myResult;
+  TCollection_AsciiString        myCode;
+  TCollection_AsciiString        myCodePath;
+  Handle(AIS_InteractiveContext) myContext;
   static const TCollection_AsciiString FILE_EXTENSION;
 
 private:

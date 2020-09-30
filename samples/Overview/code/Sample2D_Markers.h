@@ -57,35 +57,28 @@ public:
 
 private: 
 
-virtual void Compute (const Handle(PrsMgr_PresentationManager3d)& /*aPresentationManager*/,
-                      const Handle(Prs3d_Presentation)& /*aPresentation*/,
-                      const Standard_Integer /*aMode*/);
+  virtual void Compute (const Handle(PrsMgr_PresentationManager3d)& /*aPresentationManager*/,
+                        const Handle(Prs3d_Presentation)& /*aPresentation*/,
+                        const Standard_Integer /*aMode*/);
 
-virtual void ComputeSelection (const Handle(SelectMgr_Selection)& /*aSelection*/,
-                               const Standard_Integer /*aMode*/) {}
-
-
-Standard_EXPORT virtual void SetContext(const Handle(AIS_InteractiveContext)& /*theContext*/) {}
+  virtual void ComputeSelection (const Handle(SelectMgr_Selection)& /*aSelection*/,
+                                 const Standard_Integer /*aMode*/) {}
 
 
+  Standard_EXPORT virtual void SetContext(const Handle(AIS_InteractiveContext)& /*theContext*/) {}
 
-Sample2D_CurrentTypeOfMarker myCurrentTypeOfMarker;
-Standard_Real  myXPosition;
-Standard_Real  myYPosition;
-Aspect_TypeOfMarker myMarkerType;
-Quantity_Color myColor;
-Standard_Real  myWidth;
-Standard_Real  myHeight;
-Standard_Real  myIndex;//myScaleOrId
-// specific polyline marker
-Handle(Graphic3d_ArrayOfPoints) myArrayOfPoints;
+
+
+  Sample2D_CurrentTypeOfMarker myCurrentTypeOfMarker;
+  Standard_Real  myXPosition;
+  Standard_Real  myYPosition;
+  Aspect_TypeOfMarker myMarkerType;
+  Quantity_Color myColor;
+  Standard_Real  myWidth;
+  Standard_Real  myHeight;
+  Standard_Real  myIndex;//myScaleOrId
+  // specific polyline marker
+  Handle(Graphic3d_ArrayOfPoints) myArrayOfPoints;
 };
-
-
-
-// other inCurve functions and methods (like "C++: function call" methods)
-//
-
-
 
 #endif

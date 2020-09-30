@@ -38,10 +38,9 @@ public:
 
   Viewer3dSamples(TCollection_AsciiString theSampleSourcePath,
                   Handle(V3d_View) theView,
-    Handle(AIS_InteractiveContext) theContext) :
-    BaseSample(theSampleSourcePath),
-    myView(theView),
-    myContext(theContext)
+                  Handle(AIS_InteractiveContext) theContext) :
+    BaseSample(theSampleSourcePath, theContext),
+    myView(theView)
   {}
 
   virtual ~Viewer3dSamples() {}
@@ -50,6 +49,10 @@ public:
 
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;
+
+private:
+
+  Handle(V3d_View) myView;
 
 private:
 
@@ -73,9 +76,6 @@ private:
   void HalfTransparencyPresentation3dSample();
   void VboOn3dSample();
   void VboOff3dSample();
-
-  Handle(V3d_View)               myView;
-  Handle(AIS_InteractiveContext) myContext;
 };
 
 #endif  //VIEWER3DSAMPLES_H

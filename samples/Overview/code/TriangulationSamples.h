@@ -34,8 +34,10 @@ class TriangulationSamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(TriangulationSamples, BaseSample)
 
-  TriangulationSamples(TCollection_AsciiString theSampleSourcePath) :
-    BaseSample(theSampleSourcePath) {}
+  TriangulationSamples(TCollection_AsciiString theSampleSourcePath, 
+                       Handle(AIS_InteractiveContext) theContext):
+    BaseSample(theSampleSourcePath, theContext) 
+  { }
   virtual ~TriangulationSamples() {}
 protected:
   void ExecuteSample(TCollection_AsciiString theSampleName) override;

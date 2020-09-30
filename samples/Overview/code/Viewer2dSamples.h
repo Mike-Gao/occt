@@ -39,11 +39,10 @@ public:
   Viewer2dSamples(TCollection_AsciiString theSampleSourcePath,
                   Handle(V3d_View) theView,
                   Handle(V3d_Viewer) theViewer,
-    Handle(AIS_InteractiveContext) theContext) :
-    BaseSample(theSampleSourcePath),
+                  Handle(AIS_InteractiveContext) theContext) :
+    BaseSample(theSampleSourcePath, theContext),
     myView(theView),
-    myViewer(theViewer),
-    myContext(theContext)
+    myViewer(theViewer)
   {}
 
   virtual ~Viewer2dSamples() {}
@@ -73,7 +72,6 @@ private:
   TCollection_AsciiString        myFileName;
   Handle(V3d_View)               myView;
   Handle(V3d_Viewer)             myViewer;
-  Handle(AIS_InteractiveContext) myContext;
 };
 
 #endif  //VIEWER2DSAMPLES_H

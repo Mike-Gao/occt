@@ -36,9 +36,9 @@ class TopologySamples : public BaseSample
 public:
   DEFINE_STANDARD_RTTI_INLINE(TopologySamples, BaseSample)
 
-  TopologySamples(TCollection_AsciiString theSampleSourcePath, Handle(AIS_InteractiveContext) theContext) :
-    BaseSample(theSampleSourcePath),
-    myContext(theContext)
+  TopologySamples(TCollection_AsciiString theSampleSourcePath, 
+                  Handle(AIS_InteractiveContext) theContext) :
+    BaseSample(theSampleSourcePath, theContext)
   {}
 
   virtual ~TopologySamples() {}
@@ -81,9 +81,6 @@ private:
   void ComputeLinearProperties3dSample();
   void ComputeSurfaceProperties3dSample();
   void ComputeVolumeProperties3dSample();
-
-private:
-  Handle(AIS_InteractiveContext) myContext;
 };
 
 #endif  //TOPOLOGYSAMPLES_H

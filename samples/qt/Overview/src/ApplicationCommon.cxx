@@ -139,12 +139,15 @@ ApplicationCommonWindow::ApplicationCommonWindow(ApplicationType theCategory)
   Q_INIT_RESOURCE(Samples);
 
   TCollection_AsciiString aSampleSourcePach = getSampleSourceDir();
-  myGeometrySamples      = new GeometrySamples(aSampleSourcePach);
+  myGeometrySamples      = new GeometrySamples(aSampleSourcePach,
+                                               myDocument3d->getContext());
   myTopologySamples      = new TopologySamples(aSampleSourcePach,
                                                myDocument3d->getContext());
-  myTriangulationSamples = new TriangulationSamples(aSampleSourcePach);
-  myDataExchangeSamples  = new DataExchangeSamples(aSampleSourcePach, 
-                                                   myGeomWidget->Get3dView());
+  myTriangulationSamples = new TriangulationSamples(aSampleSourcePach,
+                                                    myDocument3d->getContext());
+  myDataExchangeSamples  = new DataExchangeSamples(aSampleSourcePach,
+                                                   myGeomWidget->Get3dView(),
+                                                   myDocument3d->getContext());
   myOcafSamples          = new OcafSamples(aSampleSourcePach, 
                                            myDocument3d->getViewer(), 
                                            myDocument3d->getContext());

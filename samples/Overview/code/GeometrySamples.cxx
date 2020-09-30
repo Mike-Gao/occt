@@ -125,6 +125,7 @@
 #include <AIS_Point.hxx>
 #include <AIS_TextLabel.hxx>
 #include <AIS_Axis.hxx>
+#include <AIS_InteractiveContext.hxx>
 #include <AIS_Circle.hxx>
 #include <AIS_Plane.hxx>
 #include <AIS_Shape.hxx>
@@ -288,7 +289,7 @@ void GeometrySamples::ZeroDimensionObjects3dSample()
   myObject3d.Append(aCoordAisPoint);
 
   Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
-  aPntLabel->SetText("gp_Pnt");
+  aPntLabel->SetText("  gp_Pnt");
   aPntLabel->SetPosition(gp_Pnt(aCoordPnt.X(), aCoordPnt.Y(), aCoordPnt.Z() + 5.0));
   myObject3d.Append(aPntLabel);
   myResult << "gp_Pnt was created" << std::endl;
@@ -307,7 +308,7 @@ void GeometrySamples::ZeroDimensionObjects3dSample()
   myObject3d.Append(aSumAisPoint);
 
   Handle(AIS_TextLabel) aXyzLabel = new AIS_TextLabel();
-  aXyzLabel->SetText("gp_XYZ");
+  aXyzLabel->SetText("  gp_XYZ");
   aXyzLabel->SetPosition(gp_Pnt(aXyzSum.X(), aXyzSum.Y(), aXyzSum.Z() + 5.0));
   myObject3d.Append(aXyzLabel);
   myResult << "gp_XYZ was created" << std::endl;
@@ -322,7 +323,7 @@ void GeometrySamples::Vectors3dSample()
   // gp_Vec defines a non-persistent vector in 3D space.
   gp_Vec aVec(aPnt1, aPnt2);
   Handle(AdaptorVec_AIS) aVecAIS = new AdaptorVec_AIS(aPnt1, aVec, 0.5);
-  aVecAIS->SetText("gp_Vec");
+  aVecAIS->SetText("  gp_Vec");
   myObject3d.Append(aVecAIS);
   myResult << "gp_Vec magnitude: " << aVec.Magnitude() << std::endl;
 
@@ -335,7 +336,7 @@ void GeometrySamples::Vectors3dSample()
   gp_Dir aDir(aVec);
   Handle(AdaptorVec_AIS) aDirAIS =
     new AdaptorVec_AIS(gp_Pnt(0.0, 0.0, 10.0), aDir, 1.0, 0.5);
-  aDirAIS->SetText("gp_Dir");
+  aDirAIS->SetText("  gp_Dir");
   myObject3d.Append(aDirAIS);
   myResult << "gp_Dir coorditates: X: " << aDir.X()
     << ", Y: " << aDir.Y() << ", Z: " << aDir.Z() << std::endl;
@@ -352,7 +353,7 @@ void GeometrySamples::InfinityLines3dSample()
   // Describes an axis in 3D space.
   gp_Ax1 anAxis1(aBasePoint, aZ_Direction);
   Handle(AdaptorVec_AIS) anAx1Ais = new AdaptorVec_AIS(anAxis1.Location(), anAxis1.Direction(), 1.0, 0.3);
-  anAx1Ais->SetText("gp_Ax1");
+  anAx1Ais->SetText("  gp_Ax1");
   myObject3d.Append(anAx1Ais);
   myResult << "gp_Ax1 was created" << std::endl << std::endl;
 
@@ -361,13 +362,13 @@ void GeometrySamples::InfinityLines3dSample()
   aBasePoint.SetCoord(0.0, 0.0, 3.0);
   gp_Ax2 anAxis2(aBasePoint, aZ_Direction);
   Handle(AdaptorVec_AIS) aAx2AisZ = new AdaptorVec_AIS(anAxis2.Location(), anAxis2.Direction(), 1.0, 0.3);
-  aAx2AisZ->SetText("gp_Ax2 Z");
+  aAx2AisZ->SetText("  gp_Ax2 Z");
   myObject3d.Append(aAx2AisZ);
   Handle(AdaptorVec_AIS) aAx2AisX = new AdaptorVec_AIS(anAxis2.Location(), anAxis2.XDirection(), 1.0, 0.3);
-  aAx2AisX->SetText("gp_Ax2 X");
+  aAx2AisX->SetText("  gp_Ax2 X");
   myObject3d.Append(aAx2AisX);
   Handle(AdaptorVec_AIS) aAx2AisY = new AdaptorVec_AIS(anAxis2.Location(), anAxis2.YDirection(), 1.0, 0.3);
-  aAx2AisY->SetText("gp_Ax2 Y");
+  aAx2AisY->SetText("  gp_Ax2 Y");
   myObject3d.Append(aAx2AisY);
   myResult << "gp_Ax2 was created" << std::endl;
 
@@ -376,13 +377,13 @@ void GeometrySamples::InfinityLines3dSample()
   gp_Ax3 anAxis3(gp_XYZ(0.0, 0.0, 6.0), aZ_Direction, aX_Direction);
   anAxis3.YReverse();
   Handle(AdaptorVec_AIS) anAx3AisZ = new AdaptorVec_AIS(anAxis3.Location(), anAxis3.Direction(), 1.0, 0.3);
-  anAx3AisZ->SetText("gp_Ax3 Z");
+  anAx3AisZ->SetText("  gp_Ax3 Z");
   myObject3d.Append(anAx3AisZ);
   Handle(AdaptorVec_AIS) anAx3AisX = new AdaptorVec_AIS(anAxis3.Location(), anAxis3.XDirection(), 1.0, 0.3);
-  anAx3AisX->SetText("gp_Ax3 X");
+  anAx3AisX->SetText("  gp_Ax3 X");
   myObject3d.Append(anAx3AisX);
   Handle(AdaptorVec_AIS) anAx3AisY = new AdaptorVec_AIS(anAxis3.Location(), anAxis3.YDirection(), 1.0, 0.3);
-  anAx3AisY->SetText("gp_Ax3 Y");
+  anAx3AisY->SetText("  gp_Ax3 Y");
   myObject3d.Append(anAx3AisY);
 
   myResult << "gp_Ax3 was created" << std::endl;
@@ -403,7 +404,7 @@ void GeometrySamples::InfinityLines3dSample()
   // (a gp_Ax1 object) which gives it an origin and a unit vector.
   gp_Lin aLine(gp_Pnt(5.0, 0.0, 0.0), gp_Dir(0.0, 1.0, 0.0));
   Handle(AdaptorVec_AIS) anLineAis = new AdaptorVec_AIS(aLine.Location(), aLine.Direction(), 8.0);
-  anLineAis->SetText("gp_Lin");
+  anLineAis->SetText("  gp_Lin");
   myObject3d.Append(anLineAis);
   myResult << "gp_Lin was created" << std::endl << std::endl;
 }
@@ -512,7 +513,7 @@ void GeometrySamples::ZeroDimensionObjects2dSample()
   myObject2d.Append(aXyAisPoint);
 
   Handle(AIS_TextLabel) aXyLabel = new AIS_TextLabel();
-  aXyLabel->SetText("gp_XY");
+  aXyLabel->SetText("  gp_XY");
   aXyLabel->SetPosition(gp_Pnt(aXy.X(), aXy.Y() + 0.5, 0.0));
   myObject2d.Append(aXyLabel);
   myResult << "gp_XY was created" << std::endl;
@@ -524,7 +525,7 @@ void GeometrySamples::Vectors2dSample()
   // This unit vector is also called "Direction".
   gp_Dir2d aDir(3.0, 4.0);
   Handle(AdaptorVec_AIS) anAisDir = new AdaptorVec_AIS(gp_Pnt2d(0.0, 0.0), aDir, 1.0, 0.3);
-  anAisDir->SetText("gp_Dir2d");
+  anAisDir->SetText("  gp_Dir2d");
   myObject2d.Append(anAisDir);
   myResult << "gp_Dir2d coorditates: X: " << aDir.X() << ", Y: " << aDir.Y() << std::endl;
 
@@ -532,7 +533,7 @@ void GeometrySamples::Vectors2dSample()
   gp_Vec2d aVec(aDir);
   aVec = aVec * 2;
   Handle(AdaptorVec_AIS) anAisVec = new AdaptorVec_AIS(gp_Pnt2d(0.0, 5.0), aVec, 0.3);
-  anAisVec->SetText("gp_Vec2d");
+  anAisVec->SetText("  gp_Vec2d");
   myObject2d.Append(anAisVec);
   myResult << "gp_Vec2d magnitude: " << aVec.Magnitude() << std::endl;
 }
@@ -542,16 +543,16 @@ void GeometrySamples::InfinityLines2dSample()
   // Describes an axis in the plane (2D space)
   gp_Ax2d anAx2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(1.0, 0.0));
   Handle(AdaptorVec_AIS) anAisAx2d = new AdaptorVec_AIS(anAx2d.Location(), anAx2d.Direction(), 1.0, 0.3);
-  anAisAx2d->SetText("gp_Ax2d");
+  anAisAx2d->SetText("  gp_Ax2d");
   myObject2d.Append(anAisAx2d);
 
   // Describes a coordinate system in a plane (2D space).
   gp_Ax22d anAx22d(gp_Pnt2d(0.0, 2.0), gp_Dir2d(1.0, 1.0), Standard_False);
   Handle(AdaptorVec_AIS) anAisAx2d_X = new AdaptorVec_AIS(anAx22d.Location(), anAx22d.XDirection(), 1.0, 0.3);
-  anAisAx2d_X->SetText("gp_Ax2d X");
+  anAisAx2d_X->SetText("  gp_Ax2d X");
   myObject2d.Append(anAisAx2d_X);
   Handle(AdaptorVec_AIS) anAisAx2d_Y = new AdaptorVec_AIS(anAx22d.Location(), anAx22d.YDirection(), 1.0, 0.3);
-  anAisAx2d_Y->SetText("gp_Ax2d Y");
+  anAisAx2d_Y->SetText("  gp_Ax2d Y");
   myObject2d.Append(anAisAx2d_Y);
 
   // Describes a line in 2D space. A line is positioned in the plane with an axis (a gp_Ax2d object) which gives
@@ -560,7 +561,7 @@ void GeometrySamples::InfinityLines2dSample()
   // functions available on its positioning axis.
   gp_Lin2d aLin2d(gp_Pnt2d(2.0, 4.0), gp_Dir2d(0.0, -1.0));
   Handle(AdaptorVec_AIS) anAisLin = new AdaptorVec_AIS(aLin2d.Location(), aLin2d.Direction(), 1.0, 0.3);
-  anAisLin->SetText("gp_Lin2d");
+  anAisLin->SetText("  gp_Lin2d");
   myObject2d.Append(anAisLin);
 }
 
@@ -715,10 +716,10 @@ void GeometrySamples::RotatedVector3dSample()
   gp_Vec aRotatedVec = aBaseVec.Rotated(gp_Ax1(aZeroPnt, gp_Dir(1.0, 0.0, 0.0)), M_PI_4);
 
   Handle(AdaptorVec_AIS) aBaseVecAIS = new AdaptorVec_AIS(aZeroPnt, aBaseVec);
-  aBaseVecAIS->SetText("Base vector");
+  aBaseVecAIS->SetText("  Base vector");
   myObject3d.Append(aBaseVecAIS);
   Handle(AdaptorVec_AIS) aRotatedVecAIS = new AdaptorVec_AIS(aZeroPnt, aRotatedVec);
-  aRotatedVecAIS->SetText("Rotated vector");
+  aRotatedVecAIS->SetText("  Rotated vector");
   myObject3d.Append(aRotatedVecAIS);
   Standard_Real anAdgle = aBaseVec.Angle(aRotatedVec)*180.0 / M_PI;
   myResult << "An angle between vectors = " << anAdgle << std::endl;
@@ -732,11 +733,11 @@ void GeometrySamples::MirroredLine3dSample()
 
   Handle(AdaptorVec_AIS) aBaseLineAis =
     new AdaptorVec_AIS(aBaseLin.Location(), aBaseLin.Direction(), 8.0);
-  aBaseLineAis->SetText("Base Line");
+  aBaseLineAis->SetText("  Base Line");
   myObject3d.Append(aBaseLineAis);
   Handle(AdaptorVec_AIS) aMirroredLineAis =
     new AdaptorVec_AIS(aMirroredLin.Location(), aMirroredLin.Direction(), 8.0);
-  aMirroredLineAis->SetText("Mirrored Line");
+  aMirroredLineAis->SetText("  Mirrored Line");
   myObject3d.Append(aMirroredLineAis);
   Handle(AIS_Plane) anAisPlane =
     new AIS_Plane(new Geom_Plane(gp_Ax3(aXyzAxis)), aXyzAxis.Location(),
@@ -808,28 +809,29 @@ void GeometrySamples::ConjugateObjects3dSample()
   gp_Ax1 aDirectrix1 = aHypr.Directrix1();
   gp_Ax1 aDirectrix2 = aHypr.Directrix2();
   gp_Pnt aFocus1 = aHypr.Focus1();
+  gp_Pnt aFocus2 = aHypr.Focus2();
   gp_Pnt aLocation = aHypr.Location();
 
   Handle(AdaptorVec_AIS) anAsy1AIS =
     new AdaptorVec_AIS(anAsymptote1.Location(), gp_Vec(anAsymptote1.Direction())*10.0);
-  anAsy1AIS->SetText("Asymptote 1");
+  anAsy1AIS->SetText("  Asymptote 1");
   myObject3d.Append(anAsy1AIS);
   Handle(AdaptorVec_AIS) anAsy2AIS =
     new AdaptorVec_AIS(anAsymptote2.Location(), gp_Vec(anAsymptote2.Direction())*10.0);
-  anAsy2AIS->SetText("Asymptote 2");
+  anAsy2AIS->SetText("  Asymptote 2");
   myObject3d.Append(anAsy2AIS);
   Handle(AdaptorVec_AIS) anDir1AIS =
     new AdaptorVec_AIS(aDirectrix1.Location(), gp_Vec(aDirectrix1.Direction())*10.0);
-  anDir1AIS->SetText("Directrix 1");
+  anDir1AIS->SetText("  Directrix 1");
   myObject3d.Append(anDir1AIS);
   Handle(AdaptorVec_AIS) anDir2AIS =
     new AdaptorVec_AIS(aDirectrix2.Location(), gp_Vec(aDirectrix2.Direction())*10.0);
-  anDir2AIS->SetText("Directrix 2");
+  anDir2AIS->SetText("  Directrix 2");
   myObject3d.Append(anDir2AIS);
 
-  DisplayPnt(aFocus1, "Focus");
-  DisplayPnt(aFocus1, "Focus");
-  DisplayPnt(aLocation, "Location", Aspect_TOM_O_STAR);
+  DisplayPnt(aFocus1, "Focus 1", Aspect_TOM_PLUS, 2.0);
+  DisplayPnt(aFocus2, "Focus 2", Aspect_TOM_PLUS, 2.0);
+  DisplayPnt(aLocation, "Location", Aspect_TOM_O_STAR, 2.0);
 
   Handle(Geom_Hyperbola) aGeomHyperbola = new Geom_Hyperbola(aHypr);
   Handle(Geom_TrimmedCurve) aTrimmedHyperbola = new Geom_TrimmedCurve(aGeomHyperbola, 2.0, -2.0);
@@ -846,8 +848,8 @@ void GeometrySamples::ProjectionOfPoint3dSample()
   gp_Pnt aPrjPnt = ElSLib::Value(aPrjPnt2d.X(), aPrjPnt2d.Y(), aSphere);
 
 
-  DisplayPnt(aBasePnt, "Base point");
-  DisplayPnt(aPrjPnt, "Projection point", Aspect_TOM_O_STAR);
+  DisplayPnt(aBasePnt, "Base point", Aspect_TOM_PLUS, 2.0);
+  DisplayPnt(aPrjPnt, "Projection point", Aspect_TOM_O_STAR, 2.0);
   Handle(Geom_SphericalSurface) aSphericalSurface = new Geom_SphericalSurface(aSphere);
   Handle(AIS_Shape) anAisSphere = new AIS_Shape(BRepBuilderAPI_MakeFace(
     aSphericalSurface, 0.0, 2.0*M_PI, 0.0, 2.0*M_PI, Precision::Confusion()).Shape());
@@ -864,30 +866,33 @@ void GeometrySamples::MinimalDistance3dSample()
   {
     NCollection_Array1<gp_Vec> aVecArray(1, anExtrema_ExtElCS.NbExt());
     NCollection_Array1<gp_Pnt> aPntArray(1, anExtrema_ExtElCS.NbExt());
-    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++) {
+    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++) 
+    {
       Extrema_POnCurv aCurvPoint;
       Extrema_POnSurf aSurfPoint;
       anExtrema_ExtElCS.Points(i, aCurvPoint, aSurfPoint);
       gp_Pnt aCurvPnt = aCurvPoint.Value();
       gp_Pnt aSurfPnt = aSurfPoint.Value();
 
-      DisplayPnt(aCurvPnt, TCollection_AsciiString(i), Aspect_TOM_O_PLUS);
-      DisplayPnt(aSurfPnt, TCollection_AsciiString(i), Aspect_TOM_O_STAR);
+      DisplayPnt(aCurvPnt, TCollection_AsciiString(i), Aspect_TOM_O_PLUS, 2.0);
+      DisplayPnt(aSurfPnt, TCollection_AsciiString(i), Aspect_TOM_O_STAR, 2.0);
       gp_Vec aVec(aCurvPnt, aSurfPnt);
       aVecArray.SetValue(i, aVec);
       aPntArray.SetValue(i, aCurvPnt);
     }
     Standard_Integer aMinDistIndex(0);
     Standard_Real aMinDistance = std::numeric_limits<Standard_Real>::max();
-    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++) {
-      if (aMinDistance > aVecArray(i).Magnitude()) {
+    for (Standard_Integer i = 1; i <= anExtrema_ExtElCS.NbExt(); i++) 
+    {
+      if (aMinDistance > aVecArray(i).Magnitude()) 
+      {
         aMinDistIndex = i;
         aMinDistance = aVecArray(i).Magnitude();
       }
     }
     Handle(AdaptorVec_AIS) anMinDistanceAis =
       new AdaptorVec_AIS(aPntArray(aMinDistIndex), aVecArray(aMinDistIndex));
-    anMinDistanceAis->SetText("Min distance");
+    anMinDistanceAis->SetText("  Min distance");
     myObject3d.Append(anMinDistanceAis);
   }
   Handle(Geom_CylindricalSurface) aCylindricalSurface = new Geom_CylindricalSurface(aCylinder);
@@ -895,7 +900,7 @@ void GeometrySamples::MinimalDistance3dSample()
     aCylindricalSurface, 0.0, 2.0*M_PI, 0.0, 10.0, Precision::Confusion()).Shape());
   myObject3d.Append(anAisCylinder);
   Handle(AdaptorVec_AIS) anLineAis = new AdaptorVec_AIS(aLine.Location(), aLine.Direction(), 8.0);
-  anLineAis->SetText("gp_Lin");
+  anLineAis->SetText("  gp_Lin");
   myObject3d.Append(anLineAis);
 }
 
@@ -914,7 +919,7 @@ void GeometrySamples::Intersection3dSample()
     }
   }
   Handle(AdaptorVec_AIS) aLineVecAIS = new AdaptorVec_AIS(aLine.Location(), gp_Vec(aLine.Direction())*5.0);
-  aLineVecAIS->SetText("Base vector");
+  aLineVecAIS->SetText("  Base vector");
   myObject3d.Append(aLineVecAIS);
   Handle(Geom_ConicalSurface) aConicalSurface = new Geom_ConicalSurface(aCone);
   Handle(AIS_Shape) anAisCone = new AIS_Shape(BRepBuilderAPI_MakeFace(
@@ -926,11 +931,11 @@ void GeometrySamples::TranslatedPoint2dSample()
 {
   gp_Pnt2d aPnt1;
   gp_Pnt2d aPnt2 = aPnt1.Translated(gp_Vec2d(10.0, 10.0));
-  DisplayPnt(aPnt1, "1");
-  DisplayPnt(aPnt2, "2");
+  DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS, 1.0);
+  DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS, 1.0);
   gp_Vec2d aTranslationVec(aPnt1, aPnt2);
   Handle(AdaptorVec_AIS) aVecAIS = new AdaptorVec_AIS(aPnt1, aTranslationVec);
-  aVecAIS->SetText("Translation");
+  aVecAIS->SetText("   Translation");
   myObject2d.Append(aVecAIS);
 }
 
@@ -941,10 +946,10 @@ void GeometrySamples::RotatedDirection2dSample()
 
   myResult << "An angle between directions: " << aBaseDir.Angle(aRotatedDir)*180.0 / M_PI << " grad";
   Handle(AdaptorVec_AIS) aBaseAIS = new AdaptorVec_AIS(gp_Pnt2d(), aBaseDir, 5.0);
-  aBaseAIS->SetText("Base");
+  aBaseAIS->SetText("  Base");
   myObject2d.Append(aBaseAIS);
   Handle(AdaptorVec_AIS) aRotatedAIS = new AdaptorVec_AIS(gp_Pnt2d(), aRotatedDir, 5.0);
-  aRotatedAIS->SetText("Rotated");
+  aRotatedAIS->SetText("  Rotated");
   myObject2d.Append(aRotatedAIS);
 }
 
@@ -953,9 +958,9 @@ void GeometrySamples::MirroredAxis2dSample()
   gp_Ax22d aBaseAx(gp_Pnt2d(10.0, 0.0), gp_Dir2d(1.0, 0.0), Standard_True);
   gp_Ax22d aMirrorAx = aBaseAx.Mirrored(gp_Pnt2d());
 
-  DisplayPnt(gp_Pnt2d(), "Mirror point");
+  DisplayPnt(gp_Pnt2d(), "Mirror point", Aspect_TOM_PLUS, 1.0);
   Handle(AdaptorVec_AIS) aBaseX_AIS = new AdaptorVec_AIS(aBaseAx.Location(), aBaseAx.XDirection(), 5.0);
-  aBaseX_AIS->SetText("X (Base)");
+  aBaseX_AIS->SetText("  X (Base)");
   myObject2d.Append(aBaseX_AIS);
   Handle(AdaptorVec_AIS) aBaseY_AIS = new AdaptorVec_AIS(aBaseAx.Location(), aBaseAx.YDirection(), 5.0);
   aBaseY_AIS->SetText("Y (Base)");
@@ -964,7 +969,7 @@ void GeometrySamples::MirroredAxis2dSample()
   aMirrorX_AIS->SetText("X (Mirror)");
   myObject2d.Append(aMirrorX_AIS);
   Handle(AdaptorVec_AIS) aMirrorY_AIS = new AdaptorVec_AIS(aMirrorAx.Location(), aMirrorAx.YDirection(), 5.0);
-  aMirrorY_AIS->SetText("Y (Mirror)");
+  aMirrorY_AIS->SetText("  Y (Mirror)");
   myObject2d.Append(aMirrorY_AIS);
 
 }
@@ -1005,15 +1010,15 @@ void GeometrySamples::ConjugateObjects2dSample()
 
   Handle(AdaptorVec_AIS) aDirectAIS =
     new AdaptorVec_AIS(aDirectrix.Location(), gp_Vec2d(aDirectrix.Direction())*10.0);
-  aDirectAIS->SetText("Directrix");
+  aDirectAIS->SetText("  Directrix");
   myObject2d.Append(aDirectAIS);
   Handle(AdaptorVec_AIS) aMirrorAIS =
     new AdaptorVec_AIS(aMirror.Location(), gp_Vec2d(aMirror.Direction())*10.0);
-  aMirrorAIS->SetText("Mirror Axis");
+  aMirrorAIS->SetText("  Mirror Axis");
   myObject2d.Append(aMirrorAIS);
 
-  DisplayPnt(aFocus, "Focus");
-  DisplayPnt(aLocation, "Location", Aspect_TOM_O_STAR);
+  DisplayPnt(aFocus, "Focus", Aspect_TOM_PLUS, -3.0);
+  DisplayPnt(aLocation, "  Location", Aspect_TOM_O_STAR, 3.0);
   Handle(Geom2d_Parabola) aGeomParabola = new Geom2d_Parabola(aParab);
   Handle(Geom2d_TrimmedCurve) aTrimmedParabola = new Geom2d_TrimmedCurve(aGeomParabola, 40.0, -40.0);
   Handle(AdaptorCurve2d_AIS) anAisParabola = new AdaptorCurve2d_AIS(aTrimmedParabola, Aspect_TOL_DOT);
@@ -1089,7 +1094,7 @@ void GeometrySamples::MinimalDistance2dSample()
   Handle(AdaptorCurve2d_AIS) anAisCirc = new AdaptorCurve2d_AIS(aGeom_Circle, Aspect_TOL_SOLID);
   myObject2d.Append(anAisCirc);
   Handle(AdaptorVec_AIS) anAisLin = new AdaptorVec_AIS(aLin.Location(), aLin.Direction(), 60.0);
-  anAisLin->SetText("gp_Lin2d");
+  anAisLin->SetText("  gp_Lin2d");
   myObject2d.Append(anAisLin);
 }
 
@@ -1114,7 +1119,7 @@ void GeometrySamples::Intersection2dSample()
   Handle(AdaptorCurve2d_AIS) anAisParabola = new AdaptorCurve2d_AIS(aTrimmedParabola, Aspect_TOL_DOT);
   myObject2d.Append(anAisParabola);
   Handle(AdaptorVec_AIS) anAisLin = new AdaptorVec_AIS(aLin.Location(), aLin.Direction(), 90.0);
-  anAisLin->SetText("gp_Lin2d");
+  anAisLin->SetText("  gp_Lin2d");
   myObject2d.Append(anAisLin);
 }
 
@@ -1190,9 +1195,9 @@ void GeometrySamples::EllipseInfo3dSample()
   gp_Pnt aCenter = anElips.Location();
   gp_Pnt aFocus1 = anElips.Focus1();
   gp_Pnt aFocus2 = anElips.Focus2();
-  DisplayPnt(aCenter, "Center");
-  DisplayPnt(aFocus1, "focus 1");
-  DisplayPnt(aFocus2, "focus 2");
+  DisplayPnt(aCenter, "Center", Aspect_TOM_PLUS, 2.0);
+  DisplayPnt(aFocus1, "focus 1", Aspect_TOM_PLUS, 2.0);
+  DisplayPnt(aFocus2, "focus 2", Aspect_TOM_PLUS, 2.0);
 
   Handle(Geom_Ellipse) aGeomEllipse = new Geom_Ellipse(anElips);
   Handle(AdaptorCurve_AIS) anAisEllipce = new AdaptorCurve_AIS(aGeomEllipse);
@@ -1254,32 +1259,32 @@ void GeometrySamples::CircleInfo2dSample()
 
   if (aCirc.Contains(aPnt1, 1E-6)) 
   {
-    DisplayPnt(aPnt1, "1", Aspect_TOM_STAR);
+    DisplayPnt(aPnt1, "1", Aspect_TOM_STAR, 3.0);
     myResult << "A circle contains a point 1" << std::endl;
   }
   else 
   {
-    DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS);
+    DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS, 1.0);
     myResult << "A circle does contain a point 1" << std::endl;
   }
   if (aCirc.Contains(aPnt2, 1E-6)) 
   {
-    DisplayPnt(aPnt2, "2", Aspect_TOM_STAR);
+    DisplayPnt(aPnt2, "2", Aspect_TOM_STAR, 1.0);
     myResult << "A circle contains a point 2" << std::endl;
   }
   else 
   {
-    DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS);
+    DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS, 1.0);
     myResult << "A circle does contain a point 2" << std::endl;
   }
   if (aCirc.Contains(aPnt3, 1E-6)) 
   {
-    DisplayPnt(aPnt3, "3", Aspect_TOM_STAR);
+    DisplayPnt(aPnt3, "3", Aspect_TOM_STAR, 1.0);
     myResult << "A circle contains a point 3" << std::endl;
   }
   else 
   {
-    DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS);
+    DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS, 1.0);
     myResult << "A circle does contain a point 3" << std::endl;
   }
   myResult << "Circle area = " << aCirc.Area() << "square units" << std::endl;
@@ -1600,10 +1605,10 @@ void GeometrySamples::FreeStyleCurves2dSample()
   Handle(AdaptorCurve2d_AIS) anAisBezier = new AdaptorCurve2d_AIS(aBezierCurve);
   myObject2d.Append(anAisBezier);
 
-  DisplayPnt(aPnt1, "1");
-  DisplayPnt(aPnt2, "2");
-  DisplayPnt(aPnt3, "3");
-  DisplayPnt(aPnt4, "4");
+  DisplayPnt(aPnt1, "1", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt2, "2", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt3, "3", Aspect_TOM_PLUS, 0.5);
+  DisplayPnt(aPnt4, "4", Aspect_TOM_PLUS, 0.5);
 }
 
 void GeometrySamples::TrimmedCurve3dSample()
@@ -1922,6 +1927,7 @@ void GeometrySamples::BoundingBoxOfSurface3dSample()
     BRepPrimAPI_MakeBox(aBndBox.CornerMin(), aBndBox.CornerMax()).Shell());
   myObject3d.Append(anAisBSplineSurf);
   myObject3d.Append(anAisBndBox);
+  myContext->SetDisplayMode(anAisBndBox, 0, Standard_True);
 }
 
 void GeometrySamples::BoundingBoxOfCurves3dSample()
@@ -1963,6 +1969,7 @@ void GeometrySamples::BoundingBoxOfCurves3dSample()
     BRepPrimAPI_MakeBox(aBndBox.CornerMin(), aBndBox.CornerMax()).Shell());
   myObject3d.Append(anAisBSplineCurve);
   myObject3d.Append(anAisBndBox);
+  myContext->SetDisplayMode(anAisBndBox, 0, Standard_True);
 }
 
 void GeometrySamples::BoundingBoxOfCurves2dSample()
@@ -2029,7 +2036,7 @@ void GeometrySamples::DumpCircleInfoSample()
 
   Handle(AIS_Circle) anAisCircle = new AIS_Circle(aCircCurve);
   Handle(AIS_TextLabel) anAisCenterLabel = new AIS_TextLabel();
-  anAisCenterLabel->SetText("Center");
+  anAisCenterLabel->SetText("  Center");
   anAisCenterLabel->SetPosition(aCircCurve->Position().Location());
   Handle(AIS_Point) anAisCenter = new AIS_Point(new Geom_CartesianPoint(aCirc.Location()));
   Handle(AIS_Axis) anAisAxis = new AIS_Axis(new Geom_Axis2Placement(aCircCurve->Position()),
