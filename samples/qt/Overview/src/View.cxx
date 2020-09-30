@@ -1,15 +1,23 @@
 // Copyright (c) 2020 OPEN CASCADE SAS
 //
-// This file is part of Open CASCADE Technology software library.
+// This file is part of the examples of the Open CASCADE Technology software library.
 //
-// This library is free software; you can redistribute it and/or modify it under
-// the terms of the GNU Lesser General Public License version 2.1 as published
-// by the Free Software Foundation, with special exception defined in the file
-// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
-// distribution for complete text of the license and disclaimer of any warranty.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// Alternatively, this file may be used under the terms of Open CASCADE
-// commercial license or contractual agreement.
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
 #if !defined _WIN32
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
@@ -23,13 +31,11 @@
 #include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QPainter>
-#include <QMenu>
 #include <QColorDialog>
 #include <QCursor>
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QMouseEvent>
-#include <QRubberBand>
 #include <QMdiSubWindow>
 #include <QStyleFactory>
 #include <QBoxLayout>
@@ -122,11 +128,6 @@ View::View(Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* pa
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_NoSystemBackground);
   init();
-}
-
-View::~View()
-{
-  delete myBackMenu;
 }
 
 void View::init()
@@ -310,12 +311,15 @@ void View::updateToggled(bool isOn)
   if (!isOn)
     return;
 
-  for (QAction* anAction : myViewActions) {
-    if (anAction && (anAction != sentBy)) {
+  for (QAction* anAction : myViewActions) 
+  {
+    if (anAction && (anAction != sentBy)) 
+    {
       anAction->setCheckable(true);
       anAction->setChecked(false);
     }
-    else {
+    else 
+    {
       if (sentBy == myViewActions.value(ViewAction::FitArea))
         setCursor(*handCursor);
       else if (sentBy == myViewActions.value(ViewAction::Zoom))
@@ -622,7 +626,8 @@ void View::onBackground()
 
   QColor aRetColor = QColorDialog::getColor(aColor);
 
-  if (aRetColor.isValid()) {
+  if (aRetColor.isValid()) 
+  {
     R1 = aRetColor.red() / 255.;
     G1 = aRetColor.green() / 255.;
     B1 = aRetColor.blue() / 255.;
@@ -633,7 +638,8 @@ void View::onBackground()
 
 void View::onEnvironmentMap()
 {
-  if (myBackMenu->actions().at(1)->isChecked()) {
+  if (myBackMenu->actions().at(1)->isChecked()) 
+  {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",
       tr("All Image Files (*.bmp *.gif *.jpg *.jpeg *.png *.tga)"));
 
@@ -643,26 +649,12 @@ void View::onEnvironmentMap()
 
     myV3dView->SetTextureEnv(aTexture);
   }
-  else {
+  else 
+  {
     myV3dView->SetTextureEnv(Handle(Graphic3d_TextureEnv)());
   }
 
   myV3dView->Redraw();
-}
-
-Handle(V3d_View) View::getView()
-{
-  return myV3dView;
-}
-
-Handle(AIS_InteractiveContext)& View::getContext()
-{
-  return myContext;
-}
-
-CurrentAction3d View::getCurrentMode()
-{
-  return myCurrentMode;
 }
 
 void View::onTransparency()

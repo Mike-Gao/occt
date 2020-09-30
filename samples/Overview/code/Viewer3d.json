@@ -1,53 +1,53 @@
 {
-	"Viewer 3D": {
-		"Light source": [{
-				"text": "Spot",
-				"function": "SpotLight3dSample",
-				"description": ""
-			},
-			{
-				"text": "Positional",
-				"function": "PositionalLight3dSample",
-				"description": ""
-			},
-			{
-				"text": "Directional",
-				"function": "DirectionalLight3dSample",
-				"description": ""
-			},
-			{
-				"text": "Ambient",
-				"function": "AmbientLight3dSample",
-				"description": ""
-			},
-			{
-				"text": "Clear",
-				"function": "ClearLight3dSample",
-				"description": ""
-			}
-		],
+  "Viewer 3D": {
+    "Light source": [{
+        "text": "Spot",
+        "function": "SpotLight3dSample",
+        "description": ""
+      },
+      {
+        "text": "Positional",
+        "function": "PositionalLight3dSample",
+        "description": ""
+      },
+      {
+        "text": "Directional",
+        "function": "DirectionalLight3dSample",
+        "description": ""
+      },
+      {
+        "text": "Ambient",
+        "function": "AmbientLight3dSample",
+        "description": ""
+      },
+      {
+        "text": "Clear",
+        "function": "ClearLight3dSample",
+        "description": ""
+      }
+    ],
 
-		"Selection mode": [{
-				"text": "Vertices",
-				"function": "VerticesSelect3dSample",
-				"description": ""
-			},
-			{
-				"text": "Edges",
-				"function": "EdgesSelect3dSample",
-				"description": ""
-			},
-			{
-				"text": "Faces",
-				"function": "FacesSelect3dSample",
-				"description": ""
-			},
-			{
-				"text": "Neutral point",
-				"function": "NeutralPointSelect3dSample",
-				"description": ""
-			}
-		],
+    "Selection mode": [{
+        "text": "Vertices",
+        "function": "VerticesSelect3dSample",
+        "description": ""
+      },
+      {
+        "text": "Edges",
+        "function": "EdgesSelect3dSample",
+        "description": ""
+      },
+      {
+        "text": "Faces",
+        "function": "FacesSelect3dSample",
+        "description": ""
+      },
+      {
+        "text": "Neutral point",
+        "function": "NeutralPointSelect3dSample",
+        "description": ""
+      }
+    ],
 
     "Shape presentation": [
       {
@@ -92,15 +92,15 @@
       }
     ],
     "OpenGL VBO mode": [{
-				"text": "Vertex Buffer Object mode ON",
-				"function": "VboOn3dSample",
-				"description": ""
-			},
-			{
-				"text": "Vertex Buffer Object mode OFF",
-				"function": "VboOff3dSample",
-				"description": ""
-			}
-		]
-	}
+        "text": "Vertex Buffer Object mode ON",
+        "function": "VboOn3dSample",
+        "description": ""
+      },
+      {
+        "text": "Vertex Buffer Object mode OFF",
+        "function": "VboOff3dSample",
+        "description": ""
+      }
+    ]
+  }
 }

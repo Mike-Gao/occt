@@ -530,8 +530,8 @@ The combination of these resources allows creating substantial applications.
  Overview
 ---------
 
-The Qt sample programm to overview how use a basic Open CASCAD functionality. 
-This programm contains following samples category:
+The Qt sample program to overview how use a basic Open CASCADE functionality. 
+This program contains following samples category:
 
   * Geometry
   * Topology,

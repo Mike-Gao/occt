@@ -1,15 +1,23 @@
 // Copyright (c) 2020 OPEN CASCADE SAS
 //
-// This file is part of Open CASCADE Technology software library.
+// This file is part of the examples of the Open CASCADE Technology software library.
 //
-// This library is free software; you can redistribute it and/or modify it under
-// the terms of the GNU Lesser General Public License version 2.1 as published
-// by the Free Software Foundation, with special exception defined in the file
-// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
-// distribution for complete text of the license and disclaimer of any warranty.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// Alternatively, this file may be used under the terms of Open CASCADE
-// commercial license or contractual agreement.
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
 #ifndef OcctWindow_H
 #define OcctWindow_H
@@ -48,17 +56,22 @@ public:
   
   //! Constructor
   OcctWindow( QWidget* theWidget, const Quantity_NameOfColor theBackColor = Quantity_NOC_MATRAGRAY );
-
-  virtual void Destroy();
-
   //! Destructor
   ~OcctWindow()
   {
     Destroy();
   }
 
+  virtual void Destroy()
+  {
+    myWidget = NULL;
+  }
+
   //! Returns native Window handle
-  virtual Aspect_Drawable NativeHandle() const override;
+  virtual Aspect_Drawable NativeHandle() const override
+  {
+    return (Aspect_Drawable)myWidget->winId();
+  }
 
   //! Returns parent of native Window handle.
   virtual Aspect_Drawable NativeParentHandle() const override;
@@ -68,7 +81,10 @@ public:
 
   //! Returns True if the window <me> is opened
   //! and False if the window is closed.
-  virtual Standard_Boolean IsMapped() const override;
+  virtual Standard_Boolean IsMapped() const override
+  {
+    return !(myWidget->isMinimized() || myWidget->isHidden());
+  }
 
   //! Apply the mapping change to the window <me>
   //! and returns TRUE if the window is mapped at screen.

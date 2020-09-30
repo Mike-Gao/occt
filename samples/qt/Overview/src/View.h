@@ -1,15 +1,23 @@
 // Copyright (c) 2020 OPEN CASCADE SAS
 //
-// This file is part of Open CASCADE Technology software library.
+// This file is part of the examples of the Open CASCADE Technology software library.
 //
-// This library is free software; you can redistribute it and/or modify it under
-// the terms of the GNU Lesser General Public License version 2.1 as published
-// by the Free Software Foundation, with special exception defined in the file
-// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
-// distribution for complete text of the license and disclaimer of any warranty.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// Alternatively, this file may be used under the terms of Open CASCADE
-// commercial license or contractual agreement.
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
 #ifndef VIEW_H
 #define VIEW_H
@@ -19,6 +27,7 @@
 #include <Standard_WarningsDisable.hxx>
 #include <QWidget>
 #include <QAction>
+#include <QMenu>
 #include <QToolBar>
 #include <QList>
 #include <Standard_WarningsRestore.hxx>
@@ -28,7 +37,6 @@
 #include <AIS_ViewController.hxx>
 
 class TopoDS_Shape;
-class QRubberBand;
 
 enum CurrentAction3d { Nothing, DynamicZooming, WindowZooming, 
                        DynamicPanning, GlobalPanning, DynamicRotation, ObjectDececting };
@@ -42,7 +50,10 @@ class View: public QWidget, protected AIS_ViewController
 public:
     View( Handle(AIS_InteractiveContext) theContext, bool is3dView, QWidget* parent );
 
-    ~View();
+    ~View()
+    {
+      delete myBackMenu;
+    }
 
     virtual void    init();
     QList<QAction*> getViewActions();
@@ -72,7 +83,10 @@ public:
                                                    TopAbs_ShapeEnum& SelectionMode,
                                                    Standard_Boolean& );
     virtual QPaintEngine* paintEngine() const;
-    Handle(V3d_View)      getView();
+    Handle(V3d_View)      getView()
+    {
+      return myV3dView;
+    }
 signals:
     void selectionChanged();
 
@@ -103,9 +117,17 @@ protected:
 
     virtual void addItemInPopup( QMenu* );
 
-    Handle(AIS_InteractiveContext)& getContext();
+    Handle(AIS_InteractiveContext)& getContext()
+    {
+      return myContext;
+    }
+
     void                            activateCursor( const CurrentAction3d );
-    CurrentAction3d                 getCurrentMode();
+
+    CurrentAction3d                 getCurrentMode()
+    {
+      return myCurrentMode;
+    }
 
 private:
     void initCursors();
