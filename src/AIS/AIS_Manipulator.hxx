@@ -269,17 +269,17 @@ public: //! @name Configuration of graphical transformations
 
 public: //! @name Setters for parameters
 
-  enum AIS_SkinMode
+  enum ManipulatorSkin
   {
-    AIS_SM_Shaded,
-    AIS_SM_Flat
+    ManipulatorSkin_Shaded,
+    ManipulatorSkin_Flat
   };
 
   //! @return current manipulator skin mode.
-  AIS_SkinMode SkinMode() const { return mySkinMode; }
+  ManipulatorSkin SkinMode() const { return mySkinMode; }
 
   //! Sets skin mode for the manipulator.
-  Standard_EXPORT void SetSkinMode (const AIS_SkinMode theSkinMode);
+  Standard_EXPORT void SetSkinMode (const ManipulatorSkin theSkinMode);
 
   AIS_ManipulatorMode ActiveMode() const { return myCurrentMode; }
 
@@ -441,7 +441,7 @@ protected: //! @name Auxiliary classes to fill presentation with proper primitiv
 
     void Init (const Standard_ShortReal theRadius,
                const gp_Pnt& thePosition,
-               const AIS_SkinMode theSkinMode = AIS_SM_Shaded,
+               const ManipulatorSkin theSkinMode,
                const Standard_Integer theSlicesNb = 20,
                const Standard_Integer theStacksNb = 20);
 
@@ -489,7 +489,7 @@ protected: //! @name Auxiliary classes to fill presentation with proper primitiv
     void Init(const Standard_ShortReal theRadius,
               const gp_Ax1&            thePosition,
               const gp_Dir&            theXDirection,
-              const AIS_SkinMode       theSkinMode = AIS_SM_Shaded,
+              const ManipulatorSkin    theSkinMode,
               const Standard_Integer   theSlicesNb = 5,
               const Standard_Integer   theStacksNb = 5);
 
@@ -515,7 +515,7 @@ protected: //! @name Auxiliary classes to fill presentation with proper primitiv
     void Compute (const Handle(PrsMgr_PresentationManager)& thePrsMgr,
                   const Handle(Prs3d_Presentation)& thePrs,
                   const Handle(Prs3d_ShadingAspect)& theAspect,
-                  const AIS_SkinMode theSkinMode = AIS_SM_Shaded);
+                  const ManipulatorSkin theSkinMode);
 
     const gp_Ax1& ReferenceAxis() const { return myReferenceAxis; }
 
@@ -701,7 +701,7 @@ protected:
 
   Standard_Integer myCurrentIndex; //!< Index of active axis.
   AIS_ManipulatorMode myCurrentMode; //!< Name of active manipulation mode.
-  AIS_SkinMode mySkinMode; //!< Name of active skin mode.
+  ManipulatorSkin mySkinMode; //!< Name of active skin mode.
 
   Standard_Boolean myIsActivationOnDetection; //!< Manual activation of modes (not on parts selection).
   Standard_Boolean myIsZoomPersistentMode; //!< Zoom persistence mode activation.
