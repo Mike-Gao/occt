@@ -29,6 +29,17 @@ enum Resource_FormatType
   Resource_FormatType_UTF8,         //!< multi-byte UTF-8 encoding
   Resource_FormatType_SystemLocale, //!< active system-defined locale; this value is strongly NOT recommended to use
 
+  // new non ASCII format types
+  Resource_FormatType_ANSI_cp1250,  //!< cp1250 (Central European) encoding
+  Resource_FormatType_ANSI_cp1251,  //!< cp1251 (Cyrillic) encoding
+  Resource_FormatType_ANSI_cp1252,  //!< cp1252 (Western European) encoding
+  Resource_FormatType_ANSI_cp1253,  //!< cp1253 (Greek) encoding
+  Resource_FormatType_ANSI_cp1254,  //!< cp1254 (Turkish) encoding
+  Resource_FormatType_ANSI_cp1255,  //!< cp1255 (Hebrew) encoding
+  Resource_FormatType_ANSI_cp1256,  //!< cp1256 (Arabic) encoding
+  Resource_FormatType_ANSI_cp1257,  //!< cp1257 (Baltic) encoding
+  Resource_FormatType_ANSI_cp1258,  //!< cp1258 (Vietnamese) encoding
+
   // old aliases
   Resource_SJIS = Resource_FormatType_SJIS,
   Resource_EUC  = Resource_FormatType_EUC,

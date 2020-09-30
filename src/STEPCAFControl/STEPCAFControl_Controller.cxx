@@ -79,6 +79,15 @@ Standard_Boolean STEPCAFControl_Controller::Init ()
   Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval GB");           // Resource_FormatType_GB
   Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval UTF8");         // Resource_FormatType_UTF8
   Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval SystemLocale"); // Resource_FormatType_SystemLocale
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1250");  // Resource_FormatType_ANSI_cp1250
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1251");  // Resource_FormatType_ANSI_cp1251
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1252");  // Resource_FormatType_ANSI_cp1251
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1253");  // Resource_FormatType_ANSI_cp1253
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1254");  // Resource_FormatType_ANSI_cp1254
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1255");  // Resource_FormatType_ANSI_cp1255
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1256");  // Resource_FormatType_ANSI_cp1256
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1257");  // Resource_FormatType_ANSI_cp1257
+  Interface_Static::Init ("step", "read.stepcaf.codepage", '&', "eval ANSI_cp1258");  // Resource_FormatType_ANSI_cp1258
   Interface_Static::SetCVal ("read.stepcaf.codepage", "UTF8");
 
   return Standard_True;
