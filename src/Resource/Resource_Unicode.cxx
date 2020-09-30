@@ -17,6 +17,7 @@
 
 #include <NCollection_UtfString.hxx>
 #include <Resource_Big5.h>
+#include <Resource_ANSI.h>
 #include <Resource_ConvertUnicode.hxx>
 #include <Resource_GBK.h>
 #include <Resource_Manager.hxx>
@@ -355,12 +356,19 @@ Standard_Boolean Resource_Unicode::ConvertBig5ToUnicode(const Standard_CString f
   return Standard_True;
 }
 
-void Resource_Unicode::ConvertANSIToUnicode(const Standard_CString fromstr,TCollection_ExtendedString& tostr)
+void Resource_Unicode::ConvertANSIToUnicode(const Standard_CString theFromStr, TCollection_ExtendedString& theToStr,const ANSI& theLocal)
 {
-  tostr.Clear();
-
-  TCollection_ExtendedString curext(fromstr);
-  tostr.AssignCat(curext);
+  theToStr.Clear();
+  Standard_CString anInputPntr = theFromStr;
+  while (*anInputPntr)
+  {
+    Standard_ExtCharacter aRes;
+    if (*anInputPntr & 0x80)
+      aRes = anCodePagesANSI[theLocal][(0x7f & *anInputPntr++)];
+    else
+      aRes = *anInputPntr++;
+    theToStr.Insert(theToStr.Length() + 1, aRes);
+  }
 }
 
 Standard_Boolean Resource_Unicode::ConvertUnicodeToSJIS(const TCollection_ExtendedString& fromstr,
@@ -548,6 +556,55 @@ Standard_Boolean Resource_Unicode::ConvertUnicodeToANSI(const TCollection_Extend
   return Standard_True;
 }
 
+Standard_Boolean Resource_Unicode::ConvertUnicodeToANSI(const TCollection_ExtendedString& theFromStr,
+                                                        const ANSI& theLocal,
+                                                        Standard_PCharacter& theToStr,
+                                                        const Standard_Integer theMaxSize)
+{
+  if (!AlreadyCreateMapANSI)
+  {
+    for (Standard_Integer aLocInd = 0; aLocInd < 9; ++aLocInd)
+      for (Standard_Integer aCharInd = 0; aCharInd < 128; ++aCharInd)
+        anCodePagesUTF8[aLocInd].Bind(anCodePagesANSI[aLocInd][aCharInd], aCharInd | 0x80);
+    AlreadyCreateMapANSI = Standard_True;
+  }
+
+  Standard_Integer nbtrans = 0;
+  Standard_Integer nbext = 1;
+  Standard_Boolean finished = Standard_False;
+  Standard_ExtCharacter curcar;
+  unsigned int pl, ph;
+  // BIG INDIAN USED HERE
+
+  while (!finished) {
+    if (nbext > theFromStr.Length()) {
+      finished = Standard_True;
+      theToStr[nbtrans] = '\0';
+    }
+    else {
+      curcar = theFromStr.Value(nbext++);
+      ph = ((unsigned int)curcar) >> 8;
+      pl = ((unsigned int)curcar) & 0xFF;
+      if (ph == 0) {
+        theToStr[nbtrans] = ((char)pl);
+      }
+      else if(anCodePagesUTF8[theLocal].IsBound(curcar)){
+        theToStr[nbtrans] = theToStr[nbtrans] = anCodePagesUTF8[theLocal].Find(curcar);
+      }
+      else {
+        theToStr[nbtrans] = ' ';
+      }
+      nbtrans++;
+    }
+    if (nbtrans >= (theMaxSize - 1)) {
+      theToStr[theMaxSize - 1] = '\0';
+      finished = Standard_True;
+      return Standard_False;
+    }
+  }
+  return Standard_True;
+}
+
 static Standard_Boolean AlreadyRead = Standard_False;
 	  
 static Resource_FormatType& Resource_Current_Format()
@@ -618,9 +675,58 @@ void Resource_Unicode::ConvertFormatToUnicode (const Resource_FormatType theForm
       break;
     }
     case Resource_FormatType_ANSI:
+    {
+      theToStr = TCollection_ExtendedString(theFromStr);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1250:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr,ANSI::ANSI_cp1250);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1251:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1251);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1252:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1252);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1253:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1253);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1254:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1254);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1255:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1255);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1256:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1256);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1257:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1257);
+      break;
+    }
+    case Resource_FormatType_ANSI_cp1258:
+    {
+      ConvertANSIToUnicode(theFromStr, theToStr, ANSI::ANSI_cp1258);
+      break;
+    }
     case Resource_FormatType_UTF8:
     {
-      theToStr = TCollection_ExtendedString (theFromStr, theFormat == Resource_FormatType_UTF8);
+      theToStr = TCollection_ExtendedString (theFromStr, Standard_True);
       break;
     }
     case Resource_FormatType_SystemLocale:
@@ -655,6 +761,42 @@ Standard_Boolean Resource_Unicode::ConvertUnicodeToFormat(const Resource_FormatT
     case Resource_FormatType_ANSI:
     {
       return ConvertUnicodeToANSI (theFromStr, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1250:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1250, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1251:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1251, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1252:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1252, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1253:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1253, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1254:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1254, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1255:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1255, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1256:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1256, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1257:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1257, theToStr, theMaxSize);
+    }
+    case Resource_FormatType_ANSI_cp1258:
+    {
+      return ConvertUnicodeToANSI(theFromStr, ANSI::ANSI_cp1258, theToStr, theMaxSize);
     }
     case Resource_FormatType_UTF8:
     {
