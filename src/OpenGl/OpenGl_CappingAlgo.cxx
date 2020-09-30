@@ -341,14 +341,9 @@ namespace
 // function : RenderCapping
 // purpose  :
 // =======================================================================
-#include <Message_Alerts.hxx>
-#include <Message_PerfMeter.hxx>
 void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorkspace,
                                         const OpenGl_Structure&         theStructure)
 {
-  Message_PerfMeter aPerfMeter;
-  MESSAGE_INFO ("RenderCapping", "", &aPerfMeter, NULL);
-
   const Handle(OpenGl_Context)& aContext = theWorkspace->GetGlContext();
   if (!aContext->Clipping().IsCappingOn())
   {
@@ -391,10 +386,6 @@ void OpenGl_CappingAlgo::RenderCapping (const Handle(OpenGl_Workspace)& theWorks
     {
       continue;
     }
-
-    Standard_SStream aStream;
-    aClipChain->DumpJson (aStream);
-    MESSAGE_INFO_STREAM(aStream, "ClipChain", "", &aPerfMeter, NULL);
 
     Standard_Integer aSubPlaneIndex = 1;
     for (const Graphic3d_ClipPlane* aSubPlaneIter = aClipChain.get(); aSubPlaneIter != NULL; aSubPlaneIter = aSubPlaneIter->ChainNextPlane().get(), ++aSubPlaneIndex)
