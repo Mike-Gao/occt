@@ -29,6 +29,8 @@
 
 class AdaptorCurve2d_AIS;
 DEFINE_STANDARD_HANDLE(AdaptorCurve2d_AIS, AIS_InteractiveObject)
+
+//! AIS interactive Object for Geom2d_Curve
 class AdaptorCurve2d_AIS : public AIS_InteractiveObject
 {
 public:

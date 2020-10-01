@@ -26,19 +26,11 @@
 
 class AdaptorVec_AIS;
 DEFINE_STANDARD_HANDLE(AdaptorVec_AIS, AIS_InteractiveObject)
+
+//! AIS interactive Object for vector with arrow and text
 class AdaptorVec_AIS : public AIS_InteractiveObject
 {
 public:
-
-  void SetText(const TCollection_AsciiString& theText)
-  {
-    myText = theText;
-  }
-
-  void SetLineAspect(const Handle(Prs3d_LineAspect)& theAspect)
-  {
-    myDrawer->SetLineAspect(theAspect);
-  }
 
   AdaptorVec_AIS() { }
   AdaptorVec_AIS(const gp_Pnt& aPnt, const gp_Dir& aDir, Standard_Real aLength = 1, Standard_Real anArrowLength = 1)
@@ -72,6 +64,16 @@ public:
   AdaptorVec_AIS(const gp_Pnt2d& aPnt1, const gp_Pnt2d& aPnt2, Standard_Real anArrowLength = 1);
 
   virtual ~AdaptorVec_AIS() { }
+
+  void SetText(const TCollection_AsciiString& theText)
+  {
+    myText = theText;
+  }
+
+  void SetLineAspect(const Handle(Prs3d_LineAspect)& theAspect)
+  {
+    myDrawer->SetLineAspect(theAspect);
+  }
 
   DEFINE_STANDARD_RTTI_INLINE(AdaptorVec_AIS, AIS_InteractiveObject)
 

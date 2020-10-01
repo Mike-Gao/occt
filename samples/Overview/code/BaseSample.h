@@ -33,6 +33,7 @@
 class BaseSample;
 DEFINE_STANDARD_HANDLE(BaseSample, Standard_Transient)
 
+//! Base class for specified category classes
 class BaseSample: public Standard_Transient
 {
 public:
@@ -79,8 +80,7 @@ protected:
   Standard_Boolean                                  myIsProcessed;
   NCollection_Vector<Handle(AIS_InteractiveObject)> myObject2d;
   NCollection_Vector<Handle(AIS_InteractiveObject)> myObject3d;
-protected:
-  // Standard_OStream* strem = dynamic_cast<Standard_OStream*>(&myResult);
+
   std::ostringstream             myResult;
   TCollection_AsciiString        myCode;
   TCollection_AsciiString        myCodePath;

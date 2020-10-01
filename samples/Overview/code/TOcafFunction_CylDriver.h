@@ -28,7 +28,8 @@
 class TOcafFunction_CylDriver;
 DEFINE_STANDARD_HANDLE(TOcafFunction_CylDriver, TFunction_Driver)
 
-
+//! Creation of an instance of the cylinder driver. It's possible (and recommended)
+//! to have only one instance of a driver for the whole session.
 class TOcafFunction_CylDriver : public TFunction_Driver
 {
 public:
@@ -36,9 +37,9 @@ public:
 
   Standard_EXPORT static const Standard_GUID& GetID ();
   Standard_EXPORT TOcafFunction_CylDriver ();
-  Standard_EXPORT virtual  void Validate (Handle (TFunction_Logbook)& log) const override;
-  Standard_EXPORT virtual  Standard_Boolean MustExecute (const Handle (TFunction_Logbook)& log) const override;
-  Standard_EXPORT virtual  Standard_Integer Execute (Handle (TFunction_Logbook)& log) const override;
+  Standard_EXPORT virtual  void Validate (Handle (TFunction_Logbook)& log) const Standard_OVERRIDE;
+  Standard_EXPORT virtual  Standard_Boolean MustExecute (const Handle (TFunction_Logbook)& log) const Standard_OVERRIDE;
+  Standard_EXPORT virtual  Standard_Integer Execute (Handle (TFunction_Logbook)& log) const Standard_OVERRIDE;
 };
 
 #endif

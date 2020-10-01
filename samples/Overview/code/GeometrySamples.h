@@ -29,6 +29,7 @@
 class GeometrySamples;
 DEFINE_STANDARD_HANDLE(GeometrySamples, BaseSample)
 
+//! Implements Geometry samples
 class GeometrySamples : public BaseSample
 {
 public:
@@ -39,7 +40,7 @@ public:
     BaseSample(theSampleSourcePath, theContext) {}
   virtual ~GeometrySamples() {}
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
   void DisplayPnt(gp_Pnt thePnt, TCollection_AsciiString theText,

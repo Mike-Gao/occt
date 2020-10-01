@@ -21,7 +21,6 @@
 
 #include "ApplicationCommon.h"
 #include "DocumentCommon.h"
-#include "Material.h"
 #include "Transparency.h"
 
 #include <Standard_WarningsDisable.hxx>

@@ -44,6 +44,9 @@ enum ViewAction { FitAll, FitArea, Zoom, Pan, GlobalPan, Front, Back, Top, Botto
                   Left, Right, Axo, Rotation, Reset, HlrOff, HlrOn, Shading, Wireframe, Transparency };
 enum RaytraceAction { ToolRaytracing, ToolShadows, ToolReflections, ToolAntialiasing };
 
+//! Qt widget containing V3d_View and toolbar with view manipulation buttons.
+//! Also use AIS_ViewController for redirecting user input (mouse, keyboard)
+//! into 3D viewer events (rotation, panning, zooming)
 class View: public QWidget, protected AIS_ViewController
 {
   Q_OBJECT
@@ -108,12 +111,12 @@ private slots:
 void onTransparencyChanged(int theVal);
 
 protected:
-  virtual void paintEvent( QPaintEvent* ) override;
-  virtual void resizeEvent( QResizeEvent* ) override;
-  virtual void mousePressEvent( QMouseEvent* ) override;
-  virtual void mouseReleaseEvent(QMouseEvent* ) override;
-  virtual void mouseMoveEvent( QMouseEvent* ) override;
-  virtual void wheelEvent(QWheelEvent*) override;
+  virtual void paintEvent( QPaintEvent* ) Standard_OVERRIDE;
+  virtual void resizeEvent( QResizeEvent* ) Standard_OVERRIDE;
+  virtual void mousePressEvent( QMouseEvent* ) Standard_OVERRIDE;
+  virtual void mouseReleaseEvent(QMouseEvent* ) Standard_OVERRIDE;
+  virtual void mouseMoveEvent( QMouseEvent* ) Standard_OVERRIDE;
+  virtual void wheelEvent(QWheelEvent*) Standard_OVERRIDE;
 
   virtual void addItemInPopup( QMenu* );
 
@@ -122,9 +125,9 @@ protected:
     return myContext;
   }
 
-  void                            activateCursor( const CurrentAction3d );
+  void activateCursor( const CurrentAction3d );
 
-  CurrentAction3d                 getCurrentMode()
+  CurrentAction3d getCurrentMode()
   {
     return myCurrentMode;
   }
@@ -169,7 +172,7 @@ private:
   QMap<ViewAction, QAction*>      myViewActions;
   QMap<RaytraceAction, QAction*>  myRaytraceActions;
   QMenu*                          myBackMenu;
-  QToolBar*        myViewBar;
+  QToolBar*                       myViewBar;
 };
 
 #endif

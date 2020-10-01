@@ -83,6 +83,7 @@ const QMap<ApplicationType, QString> ALL_CATEGORIES =
   { ApplicationType::Viewer2d, "2D Viewer"}
 };
 
+//! Main application window
 class COMMONSAMPLE_EXPORT ApplicationCommonWindow: public QMainWindow
 {
     Q_OBJECT

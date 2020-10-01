@@ -28,6 +28,8 @@
 
 class AdaptorPnt2d_AIS;
 DEFINE_STANDARD_HANDLE(AdaptorPnt2d_AIS, AIS_InteractiveObject)
+
+//! AIS interactive Object for Geom2d_Point
 class AdaptorPnt2d_AIS : public AIS_InteractiveObject
 {
 public:

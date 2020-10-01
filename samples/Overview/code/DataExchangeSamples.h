@@ -30,6 +30,7 @@
 class DataExchangeSamples;
 DEFINE_STANDARD_HANDLE(DataExchangeSamples, BaseSample)
 
+//! Implements Data Exchange samples
 class DataExchangeSamples : public BaseSample
 {
 public:
@@ -44,7 +45,7 @@ public:
 
   { }
   virtual ~DataExchangeSamples() {}
-  virtual void Process(TCollection_AsciiString theSampleName) override;
+  virtual void Process(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
   void AppendBottle();
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
   void SetStepType(STEPControl_StepModelType theStepType) { myStepType = theStepType; };
@@ -59,7 +60,7 @@ public:
   static Standard_Boolean IsImageSample(TCollection_AsciiString theSampleName);
 
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
   TCollection_AsciiString   myFileName;

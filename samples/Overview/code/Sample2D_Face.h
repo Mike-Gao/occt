@@ -32,17 +32,17 @@
 
 class Sample2D_Face;
 DEFINE_STANDARD_HANDLE(Sample2D_Face, AIS_InteractiveObject)
+
+//! AIS interactive Object for sample 2D face
 class Sample2D_Face : public AIS_InteractiveObject 
 {
 public:
   DEFINE_STANDARD_RTTI_INLINE(Sample2D_Face, AIS_InteractiveObject)
- // Methods PUBLIC
- // 
+
 Standard_EXPORT Sample2D_Face (const TopoDS_Shape& theFace);
 
 private:
 
-//private fields
   TopoDS_Shape myshape;
   TColGeom_SequenceOfCurve mySeq_FORWARD;
   TColGeom_SequenceOfCurve mySeq_REVERSED;
@@ -63,7 +63,8 @@ private:
                     myInternalBounds,
                     myExternalBounds;
 
-//private methods
+private:
+
   void FillData(Standard_Boolean isSizesRecomputed = Standard_False); 
   void ClearSelected ();
   void HilightSelected( const Handle(PrsMgr_PresentationManager3d)& thePM,

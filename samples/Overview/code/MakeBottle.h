@@ -25,7 +25,7 @@
 #include <Standard_Macro.hxx>
 #include <TopoDS_Shape.hxx>
 
-
+//! Renurns sample bottle TopoDS_Shape
 TopoDS_Shape MakeBottle(const Standard_Real myWidth,
                         const Standard_Real myHeight,
                         const Standard_Real myThickness);

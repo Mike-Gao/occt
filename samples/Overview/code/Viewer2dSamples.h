@@ -31,6 +31,7 @@
 class Viewer2dSamples;
 DEFINE_STANDARD_HANDLE(Viewer2dSamples, BaseSample)
 
+//! Implements viewer 2D samples
 class Viewer2dSamples : public BaseSample
 {
 public:
@@ -53,7 +54,7 @@ public:
   static Standard_Boolean IsShadedSample(TCollection_AsciiString theSampleName);
 
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
 

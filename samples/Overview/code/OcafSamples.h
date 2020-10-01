@@ -35,6 +35,7 @@
 class OcafSamples;
 DEFINE_STANDARD_HANDLE(OcafSamples, BaseSample)
 
+//! Implements OCAF samples
 class OcafSamples : public BaseSample
 {
 public:
@@ -49,7 +50,7 @@ public:
   virtual ~OcafSamples() {}
 
   enum ExchangeType { None, Binary, Xml };
-  virtual void Process(TCollection_AsciiString theSampleName) override;
+  virtual void Process(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
   void ClearExtra();
   void SetFileName(TCollection_AsciiString theFileName) { myFileName = theFileName; };
 
@@ -59,7 +60,7 @@ public:
   static Standard_Boolean IsXmlSample(TCollection_AsciiString theSampleName);
 
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
   // One function for every sample

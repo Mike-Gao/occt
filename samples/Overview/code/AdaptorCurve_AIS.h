@@ -26,9 +26,10 @@
 #include <Geom_Curve.hxx>
 
 
-
 class AdaptorCurve_AIS;
 DEFINE_STANDARD_HANDLE(AdaptorCurve_AIS, AIS_InteractiveObject)
+
+//! AIS interactive Object for Geom_Curve
 class AdaptorCurve_AIS : public AIS_InteractiveObject
 {
 

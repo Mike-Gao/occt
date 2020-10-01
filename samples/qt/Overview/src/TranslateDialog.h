@@ -31,6 +31,7 @@
 #include <QList>
 #include <Standard_WarningsRestore.hxx>
 
+//! Qt file dialog for save and restore sample files
 class TranslateDialog : public QFileDialog
 {
 public:

@@ -29,6 +29,7 @@
 class TriangulationSamples;
 DEFINE_STANDARD_HANDLE(TriangulationSamples, BaseSample)
 
+//! Implements Triangulation sample
 class TriangulationSamples : public BaseSample
 {
 public:
@@ -40,7 +41,7 @@ public:
   { }
   virtual ~TriangulationSamples() {}
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
   // One function for every sample

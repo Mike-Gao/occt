@@ -31,6 +31,7 @@
 class ApplicationCommon;
 class QStackedWidget;
 
+//! Qt widget for organize 3D & 2D documents
 class GeomWidget : public QWidget
 {
   Q_OBJECT

@@ -31,6 +31,7 @@
 class TopologySamples;
 DEFINE_STANDARD_HANDLE(TopologySamples, BaseSample)
 
+//! Implements Topology samples
 class TopologySamples : public BaseSample
 {
 public:
@@ -44,7 +45,7 @@ public:
   virtual ~TopologySamples() {}
 
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
   // One function for every sample

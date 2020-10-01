@@ -29,6 +29,7 @@
 
 class QSlider;
 
+//! Qt dialog with slider for change shapes transparency
 class DialogTransparency : public QDialog
 {
   Q_OBJECT

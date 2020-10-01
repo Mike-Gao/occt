@@ -28,6 +28,7 @@
 class TOcaf_Application;
 DEFINE_STANDARD_HANDLE(TOcaf_Application, TDocStd_Application)
 
+//! Sample OCAF application
 class TOcaf_Application : public TDocStd_Application
 {
 public:

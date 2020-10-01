@@ -29,25 +29,29 @@
 
 class Sample2D_Markers;
 DEFINE_STANDARD_HANDLE(Sample2D_Markers,AIS_InteractiveObject)
-class Sample2D_Markers : public AIS_InteractiveObject {
 
-enum Sample2D_CurrentTypeOfMarker {
-Sample2D_CTOM_Generic,
-Sample2D_CTOM_Polyline,
-Sample2D_CTOM_Circle,
-Sample2D_CTOM_Ellips
-} ;
+//! AIS AIS interactive object for sample 2D marker
+class Sample2D_Markers : public AIS_InteractiveObject 
+{
+
+  enum Sample2D_CurrentTypeOfMarker 
+  {
+    Sample2D_CTOM_Generic,
+    Sample2D_CTOM_Polyline,
+    Sample2D_CTOM_Circle,
+    Sample2D_CTOM_Ellips
+  } ;
 
 public:
   DEFINE_STANDARD_RTTI_INLINE(Sample2D_Markers, AIS_InteractiveObject)
- // Generic marker
+ //! Generic marker
  Standard_EXPORT Sample2D_Markers (const Standard_Real theXPosition,
                    const Standard_Real theYPosition,
                    const Aspect_TypeOfMarker theMarkerType,
                    const Quantity_Color theColor,
                    const Standard_Real theScaleOrId=5.0);
 
- // Polyline marker
+ //! Polyline marker
   Standard_EXPORT Sample2D_Markers (const Standard_Real theXPosition,
                    const Standard_Real theYPosition,
                    const Handle(Graphic3d_ArrayOfPoints)& theArrayOfPoints,
@@ -64,10 +68,7 @@ private:
   virtual void ComputeSelection (const Handle(SelectMgr_Selection)& /*aSelection*/,
                                  const Standard_Integer /*aMode*/) {}
 
-
   Standard_EXPORT virtual void SetContext(const Handle(AIS_InteractiveContext)& /*theContext*/) {}
-
-
 
   Sample2D_CurrentTypeOfMarker myCurrentTypeOfMarker;
   Standard_Real  myXPosition;
@@ -76,8 +77,8 @@ private:
   Quantity_Color myColor;
   Standard_Real  myWidth;
   Standard_Real  myHeight;
-  Standard_Real  myIndex;//myScaleOrId
-  // specific polyline marker
+  Standard_Real  myIndex;
+  //! specific polyline marker
   Handle(Graphic3d_ArrayOfPoints) myArrayOfPoints;
 };
 

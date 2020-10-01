@@ -31,6 +31,7 @@
 class Viewer3dSamples;
 DEFINE_STANDARD_HANDLE(Viewer3dSamples, BaseSample)
 
+//! Implements viewer 3D samples
 class Viewer3dSamples : public BaseSample
 {
 public:
@@ -48,7 +49,7 @@ public:
   void ClearExtra();
 
 protected:
-  void ExecuteSample(TCollection_AsciiString theSampleName) override;
+  void ExecuteSample(TCollection_AsciiString theSampleName) Standard_OVERRIDE;
 
 private:
 

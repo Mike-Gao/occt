@@ -28,7 +28,7 @@
 class TOcafFunction_BoxDriver;
 DEFINE_STANDARD_HANDLE(TOcafFunction_BoxDriver, TFunction_Driver)
 
-//! Creation of an instance of the driver.It's possible (and recommended)
+//! Creation of an instance of the box driver. It's possible (and recommended)
 //! to have only one instance of a driver for the whole session.
 class TOcafFunction_BoxDriver : public TFunction_Driver
 {
@@ -37,9 +37,9 @@ public:
 
   Standard_EXPORT static const Standard_GUID& GetID ();
   Standard_EXPORT TOcafFunction_BoxDriver () { }
-  Standard_EXPORT virtual  void Validate (Handle (TFunction_Logbook)& log) const override;
-  Standard_EXPORT virtual  Standard_Boolean MustExecute (const Handle (TFunction_Logbook)& log) const override;
-  Standard_EXPORT virtual  Standard_Integer Execute (Handle (TFunction_Logbook)& log) const override;
+  Standard_EXPORT virtual  void Validate (Handle (TFunction_Logbook)& log) const Standard_OVERRIDE;
+  Standard_EXPORT virtual  Standard_Boolean MustExecute (const Handle (TFunction_Logbook)& log) const Standard_OVERRIDE;
+  Standard_EXPORT virtual  Standard_Integer Execute (Handle (TFunction_Logbook)& log) const Standard_OVERRIDE;
 };
 
 

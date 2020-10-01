@@ -22,6 +22,8 @@
 #ifndef OCCTHIGHLIGHTER_H
 #define OCCTHIGHLIGHTER_H
 
+#include <Standard_Macro.hxx>
+
 #include <Standard_WarningsDisable.hxx>
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
@@ -34,6 +36,8 @@ QT_BEGIN_NAMESPACE
 class QTextDocument;
 QT_END_NAMESPACE
 
+//! Implements C++ and OCCT objects syntax 
+//! highlighting for sample code window
 class OcctHighlighter: public QSyntaxHighlighter
 {
   Q_OBJECT
@@ -42,7 +46,7 @@ public:
   OcctHighlighter(QTextDocument *parent = 0);
 
 protected:
-  void highlightBlock(const QString &theText) override;
+  void highlightBlock(const QString &theText) Standard_OVERRIDE;
 
 private:
   struct HighlightingRule

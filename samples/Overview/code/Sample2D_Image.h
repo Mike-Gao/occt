@@ -36,6 +36,8 @@
 
 class Sample2D_Image;
 DEFINE_STANDARD_HANDLE(Sample2D_Image,AIS_Shape)
+
+//! AIS shape for sample 2D image
 class Sample2D_Image : public AIS_Shape 
 {
 public:
@@ -50,7 +52,6 @@ public:
   Standard_EXPORT inline   Standard_Real GetScale() const;
   Standard_EXPORT inline   void SetScale(const Standard_Real aNewScale) ;
   Standard_EXPORT virtual void SetContext(const Handle(AIS_InteractiveContext)& theContext) ;
-
 
 private:
   void MakeShape();
