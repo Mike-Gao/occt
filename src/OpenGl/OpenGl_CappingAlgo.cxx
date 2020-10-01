@@ -244,6 +244,28 @@ namespace
       // clear stencil only if something has been actually drawn
       theStencilSentry.Init();
 
+      const OpenGl_Aspects*              aGroupAspectFace    = aGroupIter.Value()->GlAspects();
+      const OpenGl_CappingPlaneResource* aGroupAspectCapping = aGroupIter.Value()->AspectFillCapping();
+      const OpenGl_CappingPlaneResource* anAspectCapping =
+          thePlane && (!aGroupAspectCapping || aGroupAspectCapping->Aspect().IsNull() || aPlane->ToOverrideCappingAspect())
+        ? thePlane.get()
+        : aGroupAspectCapping;
+
+      if (anAspectCapping == NULL)
+      {
+        anAspectCapping = THE_DEFAULT_ASPECT;
+      }
+
+      const OpenGl_Aspects*  anAspectFace = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
+
+      // check if capping plane should be rendered within current pass (only opaque / only transparent)
+      theWorkspace->SetAspects (anAspectFace);
+      theWorkspace->SetRenderFilter (aPrevFilter);
+      if (!theWorkspace->ShouldRender (theQuad))
+      {
+        continue;
+      }
+
       // suppress only opaque/transparent filter since for filling stencil the whole geometry should be drawn
       theWorkspace->SetRenderFilter (anAnyFilter);
 
@@ -294,19 +316,6 @@ namespace
         glEnable (GL_DEPTH_TEST);
       }
 
-      const OpenGl_Aspects*              aGroupAspectFace    = aGroupIter.Value()->GlAspects();
-      const OpenGl_CappingPlaneResource* aGroupAspectCapping = aGroupIter.Value()->AspectFillCapping();
-      const OpenGl_CappingPlaneResource* anAspectCapping =
-          thePlane && (!aGroupAspectCapping || aGroupAspectCapping->Aspect().IsNull() || aPlane->ToOverrideCappingAspect())
-        ? thePlane.get()
-        : aGroupAspectCapping;
-
-      if (anAspectCapping == NULL)
-      {
-        anAspectCapping = THE_DEFAULT_ASPECT;
-      }
-
-      const OpenGl_Aspects*  anAspectFace     = anAspectCapping->CappingFaceAspect (aGroupAspectFace);
       const Standard_Boolean hasHatch         = anAspectCapping->Aspect()->ToDrawHatch();
       const OpenGl_Aspects*  anAspectHatching = hasHatch ? anAspectCapping->HatchingFaceAspect() : NULL;
       const Standard_Boolean hasTextureHatch  = hasHatch && !anAspectCapping->Aspect()->TextureHatch().IsNull();
