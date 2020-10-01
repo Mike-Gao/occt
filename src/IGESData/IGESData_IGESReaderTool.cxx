@@ -290,6 +290,8 @@ IGESData_IGESReaderTool::IGESData_IGESReaderTool
   if (v[14] <  0) {
     fieldent = GetCasted(IGESData_IGESEntity,IR->BoundEntity( (1-v[14])/2 ));
     Color = GetCasted(IGESData_ColorEntity, fieldent);
+    //an entity that is not a color entity and has a number corresponding 
+    //to the color field should not be considered erroneous
     if (Color.IsNull()) {
       // Sending of message : Incorrect Color Number 
       Message_Msg Msg34 ("XSTEP_34");
