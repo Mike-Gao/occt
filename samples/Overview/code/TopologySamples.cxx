@@ -636,8 +636,6 @@ void TopologySamples::Revolution3dSample()
   myObject3d.Append(anAisVertex);
   myObject3d.Append(anAisEdge);
   myObject3d.Append(anAisFace);
-  myObject3d.Append(anAisAxis1);
-  myObject3d.Append(anAisAxis2);
 }
 
 void TopologySamples::TopologyIterator3dSample()
