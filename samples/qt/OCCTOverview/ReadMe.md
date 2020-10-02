@@ -1,12 +1,12 @@
-Qt Overview samples {#samples_qt_overview}
+Qt OCCTOverview samples {#samples_qt_overview}
 ==========
 
 1. Contents 
 -----------------------
 
-The directory <i> samples/qt/Overview </i> contains the folders and files of the Qt Overview application:
+The directory <i> samples/qt/OCCTOverview </i> contains the folders and files of the Qt OCCTOverview application:
 
-* Files **Overview.pro** and **Overview0.pro** are Qt project files.
+* Files **OCCTOverview.pro** and **OCCTOverview0.pro** are Qt project files.
 * File **genproj.bat** to denerate MS Visual Studio project.
 * File **msvc.bat**  to run MS Visual Studio project.
 * File **make.sh** to build of the application on Linux.
@@ -15,9 +15,9 @@ The directory <i> samples/qt/Overview </i> contains the folders and files of the
 should be changed by user to provide paths to QT directory and CasCade installation directory.
 * **src** and **res** directories provide source and resources files.
 
-The directory <i> samples/Overview/code </i> contains the source code of samples.
+The directory <i> samples/OCCTOverview/code </i> contains the source code of samples.
 
-2. How to build Qt Overview application
+2. How to build Qt OCCTOverview application
 ---------------------------------
 
 * Edit custom.bat file. It is necessary to define following variables:
@@ -49,7 +49,7 @@ The directory <i> samples/Overview/code </i> contains the source code of samples
  > run.sh
  ~~~~
 
-4. How to use the Overview application:
+4. How to use the OCCTOverview application:
 ---------------------------------
 
 * To select a samples categogy use the *Category* menu.

@@ -4,7 +4,7 @@ CONFIG += lrelease
 CONFIG += embed_translations
 QT += widgets
 
-TARGET = Overview
+TARGET = OCCTOverview
 
 SAMPLESROOT = $$quote($$(aSamplePath)/..)
 #SAMPLESROOT = $$quote($$(CSF_OCCTSamplesPath)/qt)
@@ -13,19 +13,19 @@ FREEIMAGE_DIR = $$quote($$(FREEIMAGE_DIR))
 TBB_DIR = $$quote($$(TBB_DIR))
 
 HEADERS   = ./src/*.h \
-            $${SAMPLESROOT}/../Overview/code/*.h
+            $${SAMPLESROOT}/../OCCTOverview/code/*.h
 
 SOURCES   = ./src/*.cxx \
-            $${SAMPLESROOT}/../Overview/code/*.cxx
+            $${SAMPLESROOT}/../OCCTOverview/code/*.cxx
 
-RESOURCES += $${SAMPLESROOT}/../Overview/code/Samples.qrc
-RESOURCES += ./src/Overview.qrc
+RESOURCES += $${SAMPLESROOT}/../OCCTOverview/code/Samples.qrc
+RESOURCES += ./src/OCCTOverview.qrc
 
 RES_DIR   = $$quote($$(RES_DIR))
 
 INCLUDEPATH += $$quote($$(CSF_SampleSources))
 INCLUDEPATH += $$quote($$(CSF_OCCTIncludePath)) \
-               $${SAMPLESROOT}/../Overview/code
+               $${SAMPLESROOT}/../OCCTOverview/code
 
 
 OCCT_DEFINES = $$(CSF_DEFINES)

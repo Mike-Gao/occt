@@ -8,7 +8,7 @@ if [ "$1" == "" ]; then
   echo available samples:
   echo    FuncDemo
   echo    IESample
-  echo    Overview
+  echo    OCCTOverview
   echo    Tutorial
 fi
 

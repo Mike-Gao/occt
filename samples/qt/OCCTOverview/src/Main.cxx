@@ -35,11 +35,11 @@
 
 int main ( int argc, char* argv[] )
 {
-  Q_INIT_RESOURCE(Overview);
+  Q_INIT_RESOURCE(OCCTOverview);
 
   QApplication aQApp( argc, argv );
 
-  QSettings settings("Overview.conf", QSettings::IniFormat);
+  QSettings settings("OCCTOverview.conf", QSettings::IniFormat);
   settings.beginGroup("ApplicationSetting");
     ApplicationType aCategory = static_cast<ApplicationType>(settings.value("ApplicationType", "").toInt());
   settings.endGroup();

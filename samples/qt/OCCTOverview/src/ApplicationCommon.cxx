@@ -305,7 +305,7 @@ void ApplicationCommonWindow::onChangeCategory(const QString& theCategory)
 
 void ApplicationCommonWindow::onAbout()
 {
-  QMessageBox::information(this, tr("Overview"),
+  QMessageBox::information(this, tr("OCCTOverview"),
     tr("Qt based application to study OpenCASCADE Technology"),
     tr("Ok"), QString::null, QString::null, 0, 0);
 }
@@ -313,7 +313,7 @@ void ApplicationCommonWindow::onAbout()
 TCollection_AsciiString  ApplicationCommonWindow::getSampleSourceDir()
 {
   TCollection_AsciiString aSampleSourceDir = OSD_Environment("aSamplePath").Value();
-  aSampleSourceDir += "/../../Overview/code";
+  aSampleSourceDir += "/../../OCCTOverview/code";
   return aSampleSourceDir;
 }
 

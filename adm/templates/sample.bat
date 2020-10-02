@@ -19,7 +19,7 @@ if ["%1"] == [""] (
   echo    AndroidQt
   echo    FuncDemo
   echo    IESample
-  echo    Overview  
+  echo    OCCTOverview  
   echo    Tutorial
   PAUSE
   exit /B

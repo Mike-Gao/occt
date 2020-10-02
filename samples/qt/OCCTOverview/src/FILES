@@ -10,7 +10,7 @@ OcctHighlighter.cxx
 OcctHighlighter.h
 OcctWindow.cxx
 OcctWindow.h
-Overview.qrc
+OCCTOverview.qrc
 TranslateDialog.h
 TranslateDialog.cxx
 Transparency.cxx

@@ -8,9 +8,9 @@ cd $aSamplePath
 aSystem=`uname -s`
 if [ "$aSystem" == "Darwin" ] && [ "$MACOSX_USE_GLX" != "true" ]; then
   if [ "${CASDEB}" == "d" ]; then
-    BIN_DIR="${aSamplePath}/build/Debug/Overview.app/Contents/MacOS"
+    BIN_DIR="${aSamplePath}/build/Debug/OCCTOverview.app/Contents/MacOS"
   else
-    BIN_DIR="${aSamplePath}/build/Release/Overview.app/Contents/MacOS"
+    BIN_DIR="${aSamplePath}/build/Release/OCCTOverview.app/Contents/MacOS"
   fi
 else
   BIN_DIR="${aSamplePath}/${STATION}/bin${CASDEB}"
@@ -24,8 +24,8 @@ PATH="${BIN_DIR}:${PATH}"
 export CSF_TutorialResourcesDefaults CSF_ResourcesDefaults
 export PATH
 
-if test ! -r "${BIN_DIR}/Overview"; then
-  echo "Executable \"${BIN_DIR}/Overview\" not found."
+if test ! -r "${BIN_DIR}/OCCTOverview"; then
+  echo "Executable \"${BIN_DIR}/OCCTOverview\" not found."
   if [ "$aSystem" == "Darwin" ] && [ "$MACOSX_USE_GLX" != "true" ]; then
     echo "Probably you don't compile the application. Build it with Xcode."
   else
@@ -34,4 +34,4 @@ if test ! -r "${BIN_DIR}/Overview"; then
   exit 1
 fi
 
-${BIN_DIR}/Overview
+${BIN_DIR}/OCCTOverview
