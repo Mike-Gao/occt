@@ -19,7 +19,7 @@ SOURCES   = ./src/*.cxx \
             $${SAMPLESROOT}/../Overview/code/*.cxx
 
 RESOURCES += $${SAMPLESROOT}/../Overview/code/Samples.qrc
-RESOURCES += ./res/Overview.qrc
+RESOURCES += ./src/Overview.qrc
 
 RES_DIR   = $$quote($$(RES_DIR))
 
