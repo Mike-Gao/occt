@@ -1744,7 +1744,7 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
                   if (aDistm1m2 <= aTolAdd)
                   {
                     aRealTol = aTolAdd;
-                    aCoeff = 1.05;
+                    aCoeff = 2.;
                   }
                 }
               }
