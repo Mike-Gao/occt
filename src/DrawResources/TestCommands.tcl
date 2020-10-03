@@ -1379,6 +1379,7 @@ proc _run_test {scriptsdir group gridname casefile echo} {
             decho off
             if { "$anExcep" != "" } { dputs -red -intense "Tcl Exception: $res" }
         } else {
+            if { "$anExcep" != "" } { puts "Tcl Exception: $res" }
             rename puts {}
             rename puts-saved puts
             dlog off
